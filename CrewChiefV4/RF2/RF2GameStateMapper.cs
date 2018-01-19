@@ -198,6 +198,8 @@ namespace CrewChiefV4.rFactor2
             this.lastUnknownGlobalRuleMessage = null;
             this.lastUnknownPlayerRuleMessage = null;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
+
+            this.lastTimeEngineWasRunning = DateTime.MaxValue;
         }
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
@@ -538,8 +540,6 @@ namespace CrewChiefV4.rFactor2
                 csd.TrackDefinition.setGapPoints();
 
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
-
-                lastTimeEngineWasRunning = DateTime.MaxValue;
             }
 
             // Restore cumulative data.
@@ -849,15 +849,17 @@ namespace CrewChiefV4.rFactor2
             cgs.EngineData.EngineWaterTemp = (float)playerTelemetry.mEngineWaterTemp;
 
             // JB: stall detection hackery
-            if (cgs.EngineData.EngineRpm > 5)
-                lastTimeEngineWasRunning = cgs.Now;
-            if (!cgs.PitData.InPitlane &&
-                pgs != null && !pgs.EngineData.EngineStalledWarning &&
-                cgs.SessionData.SessionRunningTime > 60 && cgs.EngineData.EngineRpm < 5 &&
-                lastTimeEngineWasRunning < cgs.Now.Subtract(TimeSpan.FromSeconds(2)))
+            if (cgs.EngineData.EngineRpm > 5.0f)
+                this.lastTimeEngineWasRunning = cgs.Now;
+
+            if (!cgs.PitData.InPitlane
+                && pgs != null && !pgs.EngineData.EngineStalledWarning
+                && cgs.SessionData.SessionRunningTime > 60.0f
+                && cgs.EngineData.EngineRpm < 5.0f
+                && this.lastTimeEngineWasRunning < cgs.Now.Subtract(TimeSpan.FromSeconds(2)))
             {
                 cgs.EngineData.EngineStalledWarning = true;
-                lastTimeEngineWasRunning = DateTime.MaxValue;
+                this.lastTimeEngineWasRunning = DateTime.MaxValue;
             }
 
             //HACK: there's probably a cleaner way to do this...
