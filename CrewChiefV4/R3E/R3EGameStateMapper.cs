@@ -97,6 +97,8 @@ namespace CrewChiefV4.RaceRoom
         HashSet<int> positionsFilledForThisTick = new HashSet<int>();
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
 
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -233,6 +235,7 @@ namespace CrewChiefV4.RaceRoom
 
                 baselineEngineDataOilTemp = targetEngineOilTemp;
                 baselineEngineDataWaterTemp = targetEngineWaterTemp;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
                 opponentDriverNamesProcessedForThisTick.Clear();
                 for (int i = 0; i < shared.DriverData.Length; i++)
                 {
@@ -1306,6 +1309,19 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.CarOrientation.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.CarOrientation.Roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.CarOrientation.Yaw;
+
+            if (currentGameState.EngineData.EngineRpm > 5)
+            {
+                lastTimeEngineWasRunning = currentGameState.Now;
+            }
+            if (!currentGameState.PitData.InPitlane && 
+                previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+                currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+            {
+                currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
+            }
             return currentGameState;
         }
 

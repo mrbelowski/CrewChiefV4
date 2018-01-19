@@ -94,6 +94,8 @@ namespace CrewChiefV4.PCars2
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
         
         public PCars2GameStateMapper()
         {
@@ -383,6 +385,8 @@ namespace CrewChiefV4.PCars2
                 brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
+
+                lastTimeEngineWasRunning = DateTime.MaxValue;
 
                 opponentDriverNamesProcessedForThisTick.Clear();
                 opponentDriverNamesProcessedForThisTick.Add(playerName);
@@ -1294,6 +1298,19 @@ namespace CrewChiefV4.PCars2
                         // currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
                     }
                 }
+            }
+            currentGameState.EngineData.EngineRpm = shared.mRpm;
+            if (shared.mRpm > 5)
+            {
+                lastTimeEngineWasRunning = currentGameState.Now;
+            }
+            if (!currentGameState.PitData.InPitlane &&
+                previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+                currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+            {
+                currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
             }
             return currentGameState;
         }

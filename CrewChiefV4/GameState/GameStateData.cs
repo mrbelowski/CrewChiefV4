@@ -138,6 +138,14 @@ namespace CrewChiefV4.GameState
 
         public int MinutesIntoSessionBeforeMonitoring = 0;
 
+        public Boolean EngineWaterTempWarning = false;
+
+        public Boolean EngineOilPressureWarning = false;
+
+        public Boolean EngineFuelPressureWarning = false;
+
+        public Boolean EngineStalledWarning = false;
+
     }
 
     public class FuelData

@@ -129,6 +129,7 @@ namespace CrewChiefV4.iRacing
             Pitch = (System.Single)sdk.GetData("Pitch");
             Yaw = (System.Single)sdk.GetData("Yaw");
             Roll = (System.Single)sdk.GetData("Roll");
+            Voltage = (System.Single)sdk.GetData("Voltage");
         }
         public iRacingData()
         {
@@ -669,6 +670,11 @@ namespace CrewChiefV4.iRacing
         /// Roll orientation. Unit: rad
         /// </summary>
         public System.Single Roll;
+
+        /// <summary>
+        /// Engine voltage. Unit: V
+        /// </summary>
+        public System.Single Voltage;
 
     }
 }
