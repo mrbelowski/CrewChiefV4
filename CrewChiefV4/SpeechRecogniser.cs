@@ -820,7 +820,7 @@ namespace CrewChiefV4
                     }
                     else
                     {
-                        crewChief.youWot();
+                        crewChief.youWot(true);
                     }
                 }
                 else if (e.Result.Confidence > minimum_voice_recognition_confidence)
@@ -865,7 +865,7 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    crewChief.youWot();
+                    crewChief.youWot(true);
                 }
             }
             catch (Exception exception)
@@ -1001,7 +1001,7 @@ namespace CrewChiefV4
         {
             if (DamageReporting.waitingForDriverIsOKResponse && ResultContains(recognisedSpeech, I_AM_OK))
             {
-                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, true);
+                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.CLEARLY_OK);
             }
             else if (ResultContains(recognisedSpeech, RADIO_CHECK))
             {

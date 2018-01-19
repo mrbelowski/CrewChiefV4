@@ -14,11 +14,14 @@ namespace CrewChiefV4.Events
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow, SessionPhase.Formation }; }
         }
 
+        public enum DriverOKResponseType { NONE, CLEARLY_OK, NOT_UNDERSTOOD, NO_SPEECH }
+
         private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
 
         private Boolean enableDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_damage_messages");
         private Boolean enableBrakeDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_brake_damage_messages");
         private Boolean enableSuspensionDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_suspension_damage_messages");
+        private Boolean enableCrashMessages = UserSettings.GetUserSettings().getBoolean("enable_crash_messages");
 
         private String folderMinorTransmissionDamage = "damage_reporting/minor_transmission_damage";
         private String folderMinorEngineDamage = "damage_reporting/minor_engine_damage";
@@ -69,7 +72,8 @@ namespace CrewChiefV4.Events
         private String folderAreYouOKThirdTry = "damage_reporting/are_you_ok_third_try";
         public static String folderAcknowledgeDriverIsOK = "damage_reporting/acknowledge_driver_is_ok";
         // TODO: record a separate message for when we get a response to the "are you OK?" message but it's not understood or expected?
-        public static String folderAcknowledgeDriverIsOKAnyResponse = "acknowledge/OK";
+        public static String folderAcknowledgeDriverIsOKAnySpeech = "acknowledge/OK";
+        public static String folderAcknowledgeDriverIsOKNoSpeech = "acknowledge/OK";
 
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
@@ -114,15 +118,22 @@ namespace CrewChiefV4.Events
         private DateTime timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
         private float speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
 
-        public void cancelWaitingForDriverIsOK(Boolean playMessage, Boolean expectedResponse)
+        public void cancelWaitingForDriverIsOK(DriverOKResponseType responseType)
         {
             DamageReporting.waitingForDriverIsOKResponse = false;
             timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
             driverIsOKRequestCount = 0;
-            if (playMessage)
+            if (responseType == DriverOKResponseType.CLEARLY_OK)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(
-                    expectedResponse ? folderAcknowledgeDriverIsOK : folderAcknowledgeDriverIsOKAnyResponse, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
+            }
+            else if (responseType == DriverOKResponseType.NOT_UNDERSTOOD)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null));
+            }
+            else if (responseType == DriverOKResponseType.NO_SPEECH)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null));
             }
         }
         
@@ -156,7 +167,7 @@ namespace CrewChiefV4.Events
             timeOfDangerousAcceleration = DateTime.MinValue;
 
             timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
-            cancelWaitingForDriverIsOK(false, false);
+            cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
             playedAreYouOKInThisSession = false;
             triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
             waitingAfterPotentiallyDangerousAcceleration = false;
@@ -241,7 +252,7 @@ namespace CrewChiefV4.Events
                     {
                         // no response after 3 requests, he's dead, jim.
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
-                        cancelWaitingForDriverIsOK(false, false);
+                        cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
                     }
                 }
                 return;
@@ -271,7 +282,7 @@ namespace CrewChiefV4.Events
             }
             
             // need to be careful with interval here
-            if (!playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
+            if (enableCrashMessages && !playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
                 currentGameState.PositionAndMotionData.CarSpeed > 0.001)
             {
                 if (previousGameState != null)
@@ -318,7 +329,7 @@ namespace CrewChiefV4.Events
             orientationSamples.AddLast(currentGameState.PositionAndMotionData.Orientation);
 
             // don't check for rolling if we've just had a dangerous acceleration as we don't want both messages to trigger
-            if (currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull &&
+            if (enableCrashMessages && currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull &&
                 currentGameState.Now.Subtract(timeOfDangerousAcceleration) > TimeSpan.FromSeconds(10))
             {
                 nextOrientationCheckDue = currentGameState.Now.Add(orientationCheckEvery);

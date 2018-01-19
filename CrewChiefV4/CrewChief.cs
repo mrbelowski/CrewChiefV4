@@ -366,11 +366,12 @@ namespace CrewChiefV4
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderRadioCheckResponse, 0, null));
         }
 
-        public void youWot()
+        public void youWot(Boolean detectedSomeSpeech)
         {
             if (DamageReporting.waitingForDriverIsOKResponse)
             {
-                ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(true, false);
+                ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(
+                    detectedSomeSpeech ? DamageReporting.DriverOKResponseType.NOT_UNDERSTOOD : DamageReporting.DriverOKResponseType.NO_SPEECH);
             }
             else
             {
