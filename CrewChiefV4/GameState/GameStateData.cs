@@ -2253,7 +2253,8 @@ namespace CrewChiefV4.GameState
                     int countForThisClass;
                     if (classCounts.TryGetValue(classId, out countForThisClass))
                     {
-                        classCounts[classId] = countForThisClass + 1;
+                        countForThisClass++;
+                        classCounts[classId] =  countForThisClass;
                     }
                     else
                     {
