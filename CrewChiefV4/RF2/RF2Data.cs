@@ -320,7 +320,7 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public int mCurrentSector;           // the current sector (zero-based) with the pitlane stored in the sign bit (example: entering pits from third sector gives 0x80000002)
             public byte mSpeedLimiter;   // whether speed limiter is on
             [XmlIgnore] public byte mMaxGears;       // maximum forward gears
-            [XmlIgnore] public byte mFrontTireCompoundIndex;   // index within brand
+            public byte mFrontTireCompoundIndex;   // index within brand
             [XmlIgnore] public byte mRearTireCompoundIndex;    // index within brand
             [XmlIgnore] public double mFuelCapacity;          // capacity in liters
             [XmlIgnore] public byte mFrontFlapActivated;       // whether front flap is activated
@@ -332,7 +332,7 @@ namespace CrewChiefV4.rFactor2
             public byte[] mFrontTireCompoundName;         // name of front tire compound
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 18)]
-            public byte[] mRearTireCompoundName;          // name of rear tire compound
+            [XmlIgnore] public byte[] mRearTireCompoundName;          // name of rear tire compound
 
             public byte mSpeedLimiterAvailable;    // whether speed limiter is available
             [XmlIgnore] public byte mAntiStallActivated;       // whether (hard) anti-stall is activated
