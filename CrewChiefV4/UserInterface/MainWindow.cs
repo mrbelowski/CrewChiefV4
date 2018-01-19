@@ -671,7 +671,7 @@ namespace CrewChiefV4
             InitializeComponent();
             SetupNotificationTrayIcon();
 
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (CrewChief.Debugging)
             {
                 // Restore last saved trace file name.
                 filenameTextbox.Text = UserSettings.GetUserSettings().getString("last_trace_file_name");
@@ -705,9 +705,9 @@ namespace CrewChiefV4
             controllerConfiguration = new ControllerConfiguration(this);
             setSelectedGameType();
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            this.filenameLabel.Visible = System.Diagnostics.Debugger.IsAttached;
-            this.filenameTextbox.Visible = System.Diagnostics.Debugger.IsAttached;
-            if (System.Diagnostics.Debugger.IsAttached)
+            this.filenameLabel.Visible = CrewChief.Debugging;
+            this.filenameTextbox.Visible = CrewChief.Debugging;
+            if (CrewChief.Debugging)
             {
                 this.recordSession.Visible = true;
             }
@@ -729,7 +729,7 @@ namespace CrewChiefV4
                     }
                 }
             }
-            this.playbackInterval.Visible = System.Diagnostics.Debugger.IsAttached;
+            this.playbackInterval.Visible = CrewChief.Debugging;
 
             if (!UserSettings.GetUserSettings().getBoolean("enable_console_logging"))
             {
@@ -1315,7 +1315,7 @@ namespace CrewChiefV4
             String filenameToRun = null;
             int interval = 0;
             Boolean record = false;
-            if (System.Diagnostics.Debugger.IsAttached && filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
+            if (CrewChief.Debugging && filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
             {
                 filenameToRun = filenameTextbox.Text;
                 if (playbackInterval.Text.Length > 0)
@@ -2104,7 +2104,7 @@ namespace CrewChiefV4
         
         private void doRestart(String warningMessage, String warningTitle)
         {
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (CrewChief.Debugging)
             {
                 warningMessage = "The app must be restarted manually";
             }
@@ -2113,9 +2113,9 @@ namespace CrewChiefV4
             this.RestoreFromTray();
 
             if (MessageBox.Show(warningMessage, warningTitle,
-                System.Diagnostics.Debugger.IsAttached ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
+                CrewChief.Debugging ? MessageBoxButtons.OK : MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
-                if (!System.Diagnostics.Debugger.IsAttached)
+                if (!CrewChief.Debugging)
                 {
                     // have to add "multi" to the start args so the app can restart
                     List<String> startArgs = new List<string>();

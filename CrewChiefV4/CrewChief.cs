@@ -18,6 +18,8 @@ namespace CrewChiefV4
 {
     public class CrewChief : IDisposable
     {
+        public static Boolean Debugging = System.Diagnostics.Debugger.IsAttached;
+
         readonly int timeBetweenProcConnectCheckMillis = 500;
         readonly int timeBetweenProcDisconnectCheckMillis = 2000;
         DateTime nextProcessStateCheck = DateTime.MinValue;
@@ -603,7 +605,7 @@ namespace CrewChiefV4
         {
             loadDataFromFile = false;
             audioPlayer.mute = false;
-            if (filenameToRun != null && System.Diagnostics.Debugger.IsAttached)
+            if (filenameToRun != null && CrewChief.Debugging)
             {
                 loadDataFromFile = true;
                 GlobalBehaviourSettings.spotterEnabled = false;

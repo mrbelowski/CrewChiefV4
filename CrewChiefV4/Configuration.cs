@@ -67,7 +67,7 @@ namespace CrewChiefV4
         }
 
         public static String getDefaultFileLocation(String filename) {
-            if (Debugger.IsAttached)
+            if (CrewChief.Debugging)
             {
                 return Application.StartupPath + @"\..\..\" + filename;
             }

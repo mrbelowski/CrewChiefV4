@@ -30,7 +30,7 @@ namespace CrewChiefV4
 
         public GameDataReader()
         {
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (CrewChief.Debugging)
             {
                 dataFilesPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), @"..\", @"..\dataFiles\");
             }

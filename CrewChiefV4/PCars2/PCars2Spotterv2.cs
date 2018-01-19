@@ -103,7 +103,7 @@ namespace CrewChiefV4.PCars2
             // game state is 3 for paused, 5 for replay. No idea what 4 is...
             if (pitMode != ePitMode.PIT_MODE_NONE || 
                 gameState == eGameState.GAME_FRONT_END ||
-                (gameState == eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
+                (gameState == eGameState.GAME_INGAME_PAUSED && !CrewChief.Debugging) ||
                 gameState == eGameState.GAME_INGAME_REPLAY || gameState == eGameState.GAME_FRONT_END_REPLAY ||
                 gameState == eGameState.GAME_EXITED)
             {
