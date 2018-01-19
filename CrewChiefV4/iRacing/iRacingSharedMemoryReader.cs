@@ -167,12 +167,9 @@ namespace CrewChiefV4.iRacing
 
                     if (sdk.IsConnected())
                     {
-                        iRacingStructWrapper structWrapper = new iRacingStructWrapper();
-                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                         if (forSpotter)
                         {
-                            var carLeftRight = (int)sdk.GetData("CarLeftRight");
-                            return carLeftRight;
+                            return (int)sdk.GetData("CarLeftRight");
                         }
 
                         _DriverId = (int)sdk.GetData("PlayerCarIdx");
@@ -191,9 +188,12 @@ namespace CrewChiefV4.iRacing
                         iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile);
 
                         sim.SdkOnTelemetryUpdated(irData);
+
+                        iRacingStructWrapper structWrapper = new iRacingStructWrapper();
+                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
                         structWrapper.data = sim;
 
-                        if (!forSpotter && dumpToFile && dataToDump != null)
+                        if (dumpToFile && dataToDump != null)
                         {
                             dataToDump.Add(new iRacingStructDumpWrapper() { ticksWhenRead = structWrapper.ticksWhenRead, data = irData });
                         }

@@ -998,7 +998,7 @@ namespace CrewChiefV4
                                 Thread.Sleep(2000);
                                 if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
                                 {
-                                    crewChief.youWot();
+                                    crewChief.youWot(false);
                                 }
                             }).Start();
                         }
