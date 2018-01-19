@@ -20,7 +20,9 @@ namespace CrewChiefV4.Events
         private String folderHotWater = "engine_monitor/hot_water";
         private String folderHotOil = "engine_monitor/hot_oil";
         private String folderHotOilAndWater = "engine_monitor/hot_oil_and_water";
-        
+        private String folderLowOilPressure = "engine_monitor/low_oil_pressure";
+        private String folderLowFuelPressure = "engine_monitor/low_fuel_pressure";
+        private String folderStalled = "engine_monitor/stalled";
         EngineStatus lastStatusMessage;
 
         EngineData engineData;
@@ -63,7 +65,8 @@ namespace CrewChiefV4.Events
             {
                 engineData.addSample(currentGameState.EngineData.EngineOilTemp, currentGameState.EngineData.EngineWaterTemp, 
                     currentGameState.EngineData.EngineOilPressure,currentGameState.EngineData.EngineOilPressureWarning,
-                    currentGameState.EngineData.EngineFuelPressureWarning,currentGameState.EngineData.EngineWaterTempWarning);
+                    currentGameState.EngineData.EngineFuelPressureWarning,currentGameState.EngineData.EngineWaterTempWarning,
+                    currentGameState.EngineData.EngineStalledWarning);
 
                 if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastStatusCheck + statusMonitorWindowLength)
                 {
@@ -80,7 +83,22 @@ namespace CrewChiefV4.Events
                             lastStatusMessage = currentEngineStatus;
                             audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
                         }
-                        else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
+                        if (currentEngineStatus.HasFlag(EngineStatus.LOW_OIL_PRESSURE))
+                        {
+                            lastStatusMessage = currentEngineStatus;
+                            audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
+                        }
+                        if (currentEngineStatus.HasFlag(EngineStatus.LOW_FUEL_PRESSURE))
+                        {
+                            lastStatusMessage = currentEngineStatus;
+                            audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
+                        }
+                        if (currentEngineStatus.HasFlag(EngineStatus.ENGINE_STALLED))
+                        {
+                            lastStatusMessage = currentEngineStatus;
+                            audioPlayer.playMessage(new QueuedMessage(folderStalled, 0, this));
+                        }
+                        if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                         {
                             // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
@@ -89,7 +107,7 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this));
                             }
                         }
-                        else if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
+                        if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
                         {
                             // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
@@ -164,6 +182,7 @@ namespace CrewChiefV4.Events
             private bool currentOilPressureWarning;
             private bool currentFuelPressureWarning;
             private bool currentWaterTempWarning;
+            private bool currentEngineStalled;
             public EngineData()
             {
                 this.samples = 0;
@@ -176,8 +195,10 @@ namespace CrewChiefV4.Events
                 this.currentOilPressureWarning = false;
                 this.currentFuelPressureWarning = false;
                 this.currentWaterTempWarning = false;
+                this.currentEngineStalled = false;
+
             }
-            public void addSample(float engineOilTemp, float engineWaterTemp, float engineOilPressure, bool engineOilPressureWarning, bool engineFuelPressureWarning, bool engineWaterTempWarning)
+            public void addSample(float engineOilTemp, float engineWaterTemp, float engineOilPressure, bool engineOilPressureWarning, bool engineFuelPressureWarning, bool engineWaterTempWarning, bool engineStalled)
             {
                 this.samples++;
                 this.cumulativeOilTemp += engineOilTemp;
@@ -189,6 +210,7 @@ namespace CrewChiefV4.Events
                 this.currentOilPressureWarning = engineOilPressureWarning;
                 this.currentFuelPressureWarning = engineFuelPressureWarning;
                 this.currentWaterTempWarning = engineWaterTempWarning;
+                this.currentEngineStalled = engineStalled;
             }
             public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp)
             {
@@ -220,6 +242,10 @@ namespace CrewChiefV4.Events
                 if (currentWaterTempWarning)
                 {
                     engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
+                }
+                if (currentEngineStalled)
+                {
+                    engineStatusFlags = engineStatusFlags | EngineStatus.ENGINE_STALLED;
                 }
                 if (engineStatusFlags != EngineStatus.NONE)
                 {
@@ -254,6 +280,10 @@ namespace CrewChiefV4.Events
                 {
                     engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
                 }
+                if (currentEngineStalled)
+                {
+                    engineStatusFlags = engineStatusFlags | EngineStatus.ENGINE_STALLED;
+                }
                 if(engineStatusFlags != EngineStatus.NONE)
                 {
                     return engineStatusFlags;
@@ -262,7 +292,7 @@ namespace CrewChiefV4.Events
             }
         }
         [Flags]
-        private enum EngineStatus
+        private enum EngineStatus : uint
         {
             NONE = 0x0,
             ALL_CLEAR = 0x1, 
@@ -270,6 +300,7 @@ namespace CrewChiefV4.Events
             HOT_WATER = 0x4,
             LOW_OIL_PRESSURE = 0x8,
             LOW_FUEL_PRESSURE = 0x10,
+            ENGINE_STALLED = 0x20,
         }
     }
 }

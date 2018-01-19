@@ -378,7 +378,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.EngineData.EngineWaterTempWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning);
             currentGameState.EngineData.EngineOilPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning);
             currentGameState.EngineData.EngineFuelPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning);
-
+            currentGameState.EngineData.EngineStalledWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled);
 
 
             //TODO add yellow 

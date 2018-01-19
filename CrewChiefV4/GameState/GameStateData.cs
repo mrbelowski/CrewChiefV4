@@ -144,6 +144,8 @@ namespace CrewChiefV4.GameState
 
         public Boolean EngineFuelPressureWarning = false;
 
+        public Boolean EngineStalledWarning = false;
+
     }
 
     public class FuelData
