@@ -1320,6 +1320,7 @@ namespace CrewChiefV4.RaceRoom
                 lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
             }
             return currentGameState;
         }

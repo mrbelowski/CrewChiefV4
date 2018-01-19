@@ -1309,6 +1309,7 @@ namespace CrewChiefV4.PCars2
                 lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
             }
             return currentGameState;
         }
