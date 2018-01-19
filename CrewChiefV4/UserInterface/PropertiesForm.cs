@@ -27,7 +27,8 @@ namespace CrewChiefV4
             hasChanges = false;
             this.parent = parent;
             InitializeComponent();
-            if (System.Diagnostics.Debugger.IsAttached) {
+            if (CrewChief.Debugging)
+            {
                 this.button1.Text = "Save (manual restart required)";
             }
             int widgetCount = 0;
@@ -146,7 +147,7 @@ namespace CrewChiefV4
         private void button1_Click(object sender, EventArgs e)
         {
             save();
-            if (!System.Diagnostics.Debugger.IsAttached)
+            if (!CrewChief.Debugging)
             {
                 // have to add "multi" to the start args so the app can restart
                 List<String> startArgs = new List<string>();
@@ -178,14 +179,14 @@ namespace CrewChiefV4
             if (PropertiesForm.hasChanges)
             {
                 String warningMessage = Configuration.getUIString("save_prop_changes_warning");
-                if (System.Diagnostics.Debugger.IsAttached)
+                if (CrewChief.Debugging)
                 {
                     warningMessage = "You have unsaved changes. Click 'Yes' to save these changes (you will need to manually restart the application). Click 'No' to discard these changes";
                 }
                 if (MessageBox.Show(warningMessage, Configuration.getUIString("save_changes"), MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     save();
-                    if (!System.Diagnostics.Debugger.IsAttached)
+                    if (!CrewChief.Debugging)
                     {
                         // have to add "multi" to the start args so the app can restart
                         List<String> startArgs = new List<string>();
