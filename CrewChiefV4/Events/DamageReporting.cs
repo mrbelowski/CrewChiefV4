@@ -945,7 +945,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.purgeQueues();
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
                 // only kick off the 'waiting for response' stuff sometimes
-                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED && Utilities.random.NextDouble() > 0.5)
+                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
                 {
                     playedAreYouOKInThisSession = true;
                     waitingForDriverIsOKResponse = true;
