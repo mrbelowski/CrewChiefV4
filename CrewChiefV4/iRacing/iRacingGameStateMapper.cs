@@ -40,6 +40,7 @@ namespace CrewChiefV4.iRacing
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
 
         class PendingRacePositionChange
         {
@@ -178,7 +179,7 @@ namespace CrewChiefV4.iRacing
 
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
-
+                 
                 String driverName = playerCar.Name.ToLower();
                 if (playerName == null)
                 {
@@ -266,7 +267,7 @@ namespace CrewChiefV4.iRacing
 
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
-
+                        lastTimeEngineWasRunning = DateTime.MaxValue;
 
                         //currentGameState.SessionData.CompletedLaps = shared.Driver.CurrentResults.LapsComplete;
 
@@ -373,14 +374,34 @@ namespace CrewChiefV4.iRacing
             currentGameState.EngineData.EngineOilTemp = shared.Telemetry.OilTemp;
             currentGameState.EngineData.EngineWaterTemp = shared.Telemetry.WaterTemp;
 
-
-            currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
-            currentGameState.EngineData.EngineWaterTempWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning);
-            currentGameState.EngineData.EngineOilPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning);
-            currentGameState.EngineData.EngineFuelPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning);
-            currentGameState.EngineData.EngineStalledWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled);
+            currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 0;
 
 
+
+            bool additionalEngineCheckFlags = shared.Telemetry.IsOnTrack && !shared.Telemetry.OnPitRoad && shared.Telemetry.Voltage > 0f;
+
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && additionalEngineCheckFlags) 
+            { 
+                lastTimeEngineWasRunning = currentGameState.Now; 
+            } 
+            if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && 
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+            {
+                currentGameState.EngineData.EngineStalledWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && additionalEngineCheckFlags;
+                if (!currentGameState.EngineData.EngineStalledWarning)
+                {
+                    currentGameState.EngineData.EngineWaterTempWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) && additionalEngineCheckFlags;
+                    currentGameState.EngineData.EngineOilPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning) && additionalEngineCheckFlags;
+                    currentGameState.EngineData.EngineFuelPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning) && additionalEngineCheckFlags;
+                }                
+            } 
+
+
+
+
+
+            //Console.WriteLine("Voltage: " + shared.Telemetry.Voltage);
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
