@@ -613,7 +613,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerTelemetry.mPos.x, (float)playerTelemetry.mPos.y, (float)playerTelemetry.mPos.z };
-                cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerTelemetry.mOri);
+                if (playerTelemetry.mOri != null)
+                    cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerTelemetry.mOri);
             }
             else
             {
