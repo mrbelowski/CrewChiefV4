@@ -553,3 +553,6 @@ bring_game_window_to_front_for_macros_help = Bring the game window to the front 
 
 report_all_laps_in_hotlap_mode = Report all laps when hotlapping
 report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap mode or when we have no opponents in the session
+
+enable_crash_messages = Enable crash messages
+enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily

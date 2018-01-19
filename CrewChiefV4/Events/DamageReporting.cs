@@ -14,11 +14,14 @@ namespace CrewChiefV4.Events
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow, SessionPhase.Formation }; }
         }
 
+        public enum DriverOKResponseType { NONE, CLEARLY_OK, NOT_UNDERSTOOD, NO_SPEECH }
+
         private Boolean delayResponses = UserSettings.GetUserSettings().getBoolean("enable_delayed_responses");
 
         private Boolean enableDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_damage_messages");
         private Boolean enableBrakeDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_brake_damage_messages");
         private Boolean enableSuspensionDamageMessages = UserSettings.GetUserSettings().getBoolean("enable_suspension_damage_messages");
+        private Boolean enableCrashMessages = UserSettings.GetUserSettings().getBoolean("enable_crash_messages");
 
         private String folderMinorTransmissionDamage = "damage_reporting/minor_transmission_damage";
         private String folderMinorEngineDamage = "damage_reporting/minor_engine_damage";
@@ -63,6 +66,15 @@ namespace CrewChiefV4.Events
         private String folderRolled = "damage_reporting/rolling";
         private String folderStoppedUpsideDown = "damage_reporting/stopped_upside_down";
 
+        // just a bit of fun...
+        private String folderAreYouOKFirstTry = "damage_reporting/are_you_ok_first_try";
+        private String folderAreYouOKSecondTry = "damage_reporting/are_you_ok_second_try";
+        private String folderAreYouOKThirdTry = "damage_reporting/are_you_ok_third_try";
+        public static String folderAcknowledgeDriverIsOK = "damage_reporting/acknowledge_driver_is_ok";
+        // separate messages for when we get a response to the "are you OK?" message but it's not understood or expected
+        public static String folderAcknowledgeDriverIsOKAnySpeech = "damage_reporting/acknowledge_driver_is_ok_not_understood";
+        public static String folderAcknowledgeDriverIsOKNoSpeech = "damage_reporting/acknowledge_driver_is_ok_no_speech";
+
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;
         private DamageLevel aeroDamage;
@@ -95,6 +107,36 @@ namespace CrewChiefV4.Events
         private DateTime nextOrientationCheckDue = DateTime.MinValue;
         private Boolean isRolling = false;
 
+        private DateTime timeOfDangerousAcceleration = DateTime.MinValue;
+        public static Boolean waitingForDriverIsOKResponse = false;
+        private DateTime timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
+        private int driverIsOKRequestCount = 0;
+        private Boolean playedAreYouOKInThisSession = false;
+        private DateTime triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
+
+        private Boolean waitingAfterPotentiallyDangerousAcceleration = false;
+        private DateTime timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+        private float speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
+
+        public void cancelWaitingForDriverIsOK(DriverOKResponseType responseType)
+        {
+            DamageReporting.waitingForDriverIsOKResponse = false;
+            timeWhenAskedIfDriverIsOK = DateTime.MaxValue;
+            driverIsOKRequestCount = 0;
+            if (responseType == DriverOKResponseType.CLEARLY_OK)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
+            }
+            else if (responseType == DriverOKResponseType.NOT_UNDERSTOOD)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null));
+            }
+            else if (responseType == DriverOKResponseType.NO_SPEECH)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null));
+            }
+        }
+        
         private enum Component
         {
             ENGINE, TRANNY, AERO, SUSPENSION, BRAKES, NONE
@@ -122,6 +164,14 @@ namespace CrewChiefV4.Events
             orientationSamples.Clear();
             nextOrientationCheckDue = DateTime.MinValue;
             isRolling = false;
+            timeOfDangerousAcceleration = DateTime.MinValue;
+
+            timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+            cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
+            playedAreYouOKInThisSession = false;
+            triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
+            waitingAfterPotentiallyDangerousAcceleration = false;
+            speedAfterPotentiallyDangerousAcceleration = float.MaxValue;
         }
 
         private Boolean hasBeenReported(Component component, DamageLevel damageLevel)
@@ -187,18 +237,105 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            // if we've crashed hard and are waiting for the player to say they're OK, don't process anything else in this event:
+            if (waitingForDriverIsOKResponse)
+            {
+                if (timeWhenAskedIfDriverIsOK.Add(TimeSpan.FromSeconds(8)) < currentGameState.Now)
+                {
+                    timeWhenAskedIfDriverIsOK = currentGameState.Now;
+                    if (driverIsOKRequestCount == 1)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null));
+                        driverIsOKRequestCount = 2;
+                    }
+                    else if (driverIsOKRequestCount == 2)
+                    {
+                        // no response after 3 requests, he's dead, jim.
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
+                        cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
+                    }
+                }
+                return;
+            }
+
+            if (waitingAfterPotentiallyDangerousAcceleration)
+            {
+                if (currentGameState.PositionAndMotionData.CarSpeed > speedAfterPotentiallyDangerousAcceleration + 5)
+                {
+                    Console.WriteLine("Car has accelerated, cancelling wait for crash message");
+                    waitingAfterPotentiallyDangerousAcceleration = false;
+                    timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+                }
+                else if (timeToRecheckAfterPotentiallyDangerousAcceleration > currentGameState.Now)
+                {
+                    waitingAfterPotentiallyDangerousAcceleration = false;
+                    timeToRecheckAfterPotentiallyDangerousAcceleration = DateTime.MaxValue;
+                    timeOfDangerousAcceleration = currentGameState.Now;
+                    // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                    triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(2));
+                }
+                else
+                {
+                    // suspend the rest of this event
+                    return;
+                }
+            }
+            
+            // need to be careful with interval here
+            if (enableCrashMessages && !playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
+                currentGameState.PositionAndMotionData.CarSpeed > 0.001)
+            {
+                if (previousGameState != null)
+                {
+                    double interval = (currentGameState.Now - previousGameState.Now).TotalSeconds;
+                    if (interval > 0)
+                    {
+                        double calculatedAcceleration = Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
+
+                        /*Console.WriteLine("Interval = " + interval + 
+                            " Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
+                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");*/
+
+                        // if we're subject to > 30G (300m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
+                        // after the impact, assume it's a bad 'un. If we're still moving after the impact, track the speed for 3 seconds and 
+                        // if it doesn't increase in that time, we can assume it's a bad 'un
+                        if (calculatedAcceleration > 300)
+                        {
+                            Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
+                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");
+                            if (currentGameState.PositionAndMotionData.CarSpeed < 3)
+                            {
+                                timeOfDangerousAcceleration = currentGameState.Now;
+                                // special case for iRacing: no damage data so we can't hang this off 'destroyed' components
+                                triggerCheckDriverIsOKForIRacingAfter = currentGameState.Now.Add(TimeSpan.FromSeconds(4));
+                            }
+                            else
+                            {
+                                // massive acceleration but we're still moving
+                                timeToRecheckAfterPotentiallyDangerousAcceleration = currentGameState.Now.Add(TimeSpan.FromSeconds(3));
+                                waitingAfterPotentiallyDangerousAcceleration = true;
+                                speedAfterPotentiallyDangerousAcceleration = currentGameState.PositionAndMotionData.CarSpeed;
+                            }
+                        }
+                    }
+                }
+            }
+
             Boolean orientationSamplesFull = orientationSamples.Count > orientationSamplesCount;
             if (orientationSamplesFull)
             {
                 orientationSamples.RemoveFirst();
             }
             orientationSamples.AddLast(currentGameState.PositionAndMotionData.Orientation);
-            if (currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull)
+
+            // don't check for rolling if we've just had a dangerous acceleration as we don't want both messages to trigger
+            if (enableCrashMessages && currentGameState.Now > nextOrientationCheckDue && orientationSamplesFull &&
+                currentGameState.Now.Subtract(timeOfDangerousAcceleration) > TimeSpan.FromSeconds(10))
             {
                 nextOrientationCheckDue = currentGameState.Now.Add(orientationCheckEvery);
                 checkOrientation(currentGameState.PositionAndMotionData.CarSpeed);
             }
-
+            
             if (currentGameState.CarDamageData.DamageEnabled && currentGameState.SessionData.SessionRunningTime > 10 && currentGameState.Now > nextPunctureCheck)
             {
                 nextPunctureCheck = currentGameState.Now + timeToWaitForDamageToSettle;
@@ -327,10 +464,17 @@ namespace CrewChiefV4.Events
                         }
                         if (enableDamageMessages)
                         {
-                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2);
+                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2, currentGameState.Now);
                         }
                     }
                 }
+            }
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING && currentGameState.Now > triggerCheckDriverIsOKForIRacingAfter)
+            {
+                // TODO: other checks in this if-block?
+                // TODO: should we always trigger this, or make it random?
+                triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
+                checkIfDriverIsOK(currentGameState.Now);
             }
         }
 
@@ -620,7 +764,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void playDamageToReport(Boolean allowRants)
+        private void playDamageToReport(Boolean allowRants, DateTime now)
         {
             if (isMissingWheel || damageToReportNext.Item2 > DamageLevel.MINOR)
             {
@@ -644,10 +788,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedEngine, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
@@ -663,10 +810,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedTransmission, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
@@ -682,10 +832,13 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
-                    if (allowRants)
+                    if (!checkIfDriverIsOK(now))
                     {
-                        audioPlayer.playRant("damage_rant", null);
+                        audioPlayer.playMessage(new QueuedMessage(folderBustedSuspension, 0, this));
+                        if (allowRants)
+                        {
+                            audioPlayer.playRant("damage_rant", null);
+                        }
                     }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR || isMissingWheel)
@@ -720,7 +873,10 @@ namespace CrewChiefV4.Events
             {
                 if (damageToReportNext.Item2 == DamageLevel.DESTROYED)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderSevereAeroDamage, 0, this));
+                    if (!checkIfDriverIsOK(now))
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderSevereAeroDamage, 0, this));
+                    }
                 }
                 else if (damageToReportNext.Item2 == DamageLevel.MAJOR)
                 {
@@ -774,6 +930,31 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+        }
+
+        // returns whether we've decided to check if the driver is OK
+        private Boolean checkIfDriverIsOK(DateTime now)
+        {
+            // if we don't have the updated sounds, just return false here
+            // note that this check will be 3 seconds *after* the acceleration event because we've waited for
+            // the damage to settle
+            if (!playedAreYouOKInThisSession &&
+                SoundCache.availableSounds.Contains(folderAreYouOKFirstTry) && 
+                now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
+            {
+                audioPlayer.purgeQueues();
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
+                // only kick off the 'waiting for response' stuff sometimes
+                if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED && Utilities.random.NextDouble() > 0.5)
+                {
+                    playedAreYouOKInThisSession = true;
+                    waitingForDriverIsOKResponse = true;
+                    timeWhenAskedIfDriverIsOK = now;
+                    driverIsOKRequestCount = 1;
+                }
+                return true;
+            }
+            return false;
         }
 
         private Boolean isUpsideDown(PositionAndMotionData.Rotation orientation)

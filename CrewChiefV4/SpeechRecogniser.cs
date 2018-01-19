@@ -175,6 +175,8 @@ namespace CrewChiefV4
 
         public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
+        public static String[] I_AM_OK = Configuration.getSpeechRecognitionPhrases("I_AM_OK");
+
         private String lastRecognisedText = null;
 
         private CrewChief crewChief;
@@ -563,6 +565,8 @@ namespace CrewChiefV4
 
                 validateAndAdd(MORE_INFO, staticSpeechChoices);
 
+                validateAndAdd(I_AM_OK, staticSpeechChoices);
+
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -816,7 +820,7 @@ namespace CrewChiefV4
                     }
                     else
                     {
-                        crewChief.youWot();
+                        crewChief.youWot(true);
                     }
                 }
                 else if (e.Result.Confidence > minimum_voice_recognition_confidence)
@@ -861,7 +865,7 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    crewChief.youWot();
+                    crewChief.youWot(true);
                 }
             }
             catch (Exception exception)
@@ -995,7 +999,11 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (ResultContains(recognisedSpeech, RADIO_CHECK))
+            if (DamageReporting.waitingForDriverIsOKResponse && ResultContains(recognisedSpeech, I_AM_OK))
+            {
+                ((DamageReporting) CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.CLEARLY_OK);
+            }
+            else if (ResultContains(recognisedSpeech, RADIO_CHECK))
             {
                 crewChief.respondToRadioCheck();
             }
