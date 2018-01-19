@@ -17,7 +17,7 @@ namespace CrewChiefV4.UserInterface
         public ShowAbout(System.Windows.Forms.Form parent)
         {
             InitializeComponent();
-            String path = Configuration.getDefaultFileLocation(Debugger.IsAttached ? "..\\readme.txt" : "readme.txt");
+            String path = Configuration.getDefaultFileLocation(CrewChief.Debugging ? "..\\readme.txt" : "readme.txt");
             textBox1.Text = File.ReadAllText(path);
             textBox1.Select(0, 0);
         }
