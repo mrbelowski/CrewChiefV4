@@ -76,15 +76,17 @@ namespace CrewChiefV4.Events
                     currentGameState.EngineData.EngineStalledWarning);
 
                 // immediately warn about oil pressure / fuel pressure / stalled:
-                if (currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
+                if (currentGameState.CarDamageData.OverallEngineDamage < DamageLevel.DESTROYED &&
+                    !currentGameState.PitData.InPitlane &&
+                    currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
                 {
                     // Play stalled warning straight away
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 0, this));
                     // don't re-check stalled warning for a couple of minutes.
                     nextStalledCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     // move the oil and fuel pressure checks out a bit to allow it to settle
-                    nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20);
-                    nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20);
+                    nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20));
+                    nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20));
                 }
                 else
                 {

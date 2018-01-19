@@ -94,6 +94,8 @@ namespace CrewChiefV4.PCars2
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
+
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
         
         public PCars2GameStateMapper()
         {
@@ -1293,6 +1295,17 @@ namespace CrewChiefV4.PCars2
                         // currentGameState.PenaltiesData.PossibleTrackLimitsViolation = true;
                     }
                 }
+            }
+            currentGameState.EngineData.EngineRpm = shared.mRpm;
+            if (shared.mRpm > 5)
+            {
+                lastTimeEngineWasRunning = currentGameState.Now;
+            }
+            if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+                currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+            {
+                currentGameState.EngineData.EngineStalledWarning = true;
             }
             return currentGameState;
         }
