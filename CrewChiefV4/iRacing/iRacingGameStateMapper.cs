@@ -408,9 +408,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.CurrentLapIsValid = true;
             }
 
-
             currentGameState.SessionData.NumCars = shared.Drivers.Count;
-
 
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && currentGameState.SessionData.SessionType == SessionType.Race)
             {
@@ -426,8 +424,6 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.UnFilteredPosition = playerCar.CurrentResults.Position;
 
             currentGameState.SessionData.ClassPosition = playerCar.Live.ClassPosition;
-
-
 
             /*Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && 
                 e.CurrentResults.FastestTime > 1 && !e.IsPacecar && !shared.Telemetry.CarIdxTrackSurface[e.Id].HasFlag(TrackSurfaces.NotInWorld)).FirstOrDefault();
@@ -504,11 +500,6 @@ namespace CrewChiefV4.iRacing
 
             currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance;
             currentGameState.PositionAndMotionData.CarSpeed = (float)shared.Telemetry.Speed;
-
-            currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
-            currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
-            currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
-
 
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
