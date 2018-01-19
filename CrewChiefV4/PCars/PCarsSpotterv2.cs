@@ -65,7 +65,7 @@ namespace CrewChiefV4.PCars
 
             // game state is 3 for paused, 5 for replay. No idea what 4 is...
             if (currentState.mGameState == (uint)eGameState.GAME_FRONT_END ||
-                (currentState.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !System.Diagnostics.Debugger.IsAttached) ||
+                (currentState.mGameState == (uint)eGameState.GAME_INGAME_PAUSED && !CrewChief.Debugging) ||
                 currentState.mGameState == (uint)eGameState.GAME_VIEWING_REPLAY || currentState.mGameState == (uint)eGameState.GAME_EXITED)
             {
                 // don't ignore the paused game updates if we're in debug mode                
