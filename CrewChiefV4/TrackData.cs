@@ -608,9 +608,7 @@ namespace CrewChiefV4
 
         public static TrackDefinition getTrackDefinition(String trackName, int trackId, float trackLength)
         {
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+            if (CrewChief.isPCars())
             {
                 List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)

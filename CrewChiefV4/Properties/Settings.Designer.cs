@@ -3046,5 +3046,17 @@ namespace CrewChiefV4.Properties {
                 this["report_all_laps_in_hotlap_mode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_crash_messages {
+            get {
+                return ((bool)(this["enable_crash_messages"]));
+            }
+            set {
+                this["enable_crash_messages"] = value;
+            }
+        }
     }
 }

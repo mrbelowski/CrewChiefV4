@@ -83,6 +83,8 @@ namespace CrewChiefV4.Events
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
         private Conditions.ConditionsSample currentConditions;
+        private Conditions.ConditionsSample conditionsAtStartOfThisLap;
+
 
         // PCars2 only
         private DateTime timeWhenCloudIncreased = DateTime.MinValue;
@@ -103,20 +105,29 @@ namespace CrewChiefV4.Events
             trackTempAtLastReport = float.MinValue;
             rainAtLastReport = float.MinValue;
             currentConditions = null;
+            conditionsAtStartOfThisLap = null;
             timeWhenCloudIncreased = DateTime.MinValue;
             timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
         }
-
+                
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             currentConditions = currentGameState.Conditions.getMostRecentConditions();
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                conditionsAtStartOfThisLap = currentConditions;
+            }
+            
             if (currentConditions != null) 
             {
+                // for pcars track temp, we're only interested in changes at the start line (a single point on the track) because the track
+                // temp is localised. The air temp is (probably) localised too, but will be less variable
+                float trackTempToUse = CrewChief.isPCars() && conditionsAtStartOfThisLap != null ? conditionsAtStartOfThisLap.TrackTemperature : currentConditions.TrackTemperature;
                 if (airTempAtLastReport == float.MinValue)
                 {
                     airTempAtLastReport = currentConditions.AmbientTemperature;
-                    trackTempAtLastReport = currentConditions.TrackTemperature;
+                    trackTempAtLastReport = trackTempToUse;
                     rainAtLastReport = currentConditions.RainDensity;
                     lastRainReport = currentGameState.Now;
                     lastTrackTempReport = currentGameState.Now;
@@ -131,28 +142,28 @@ namespace CrewChiefV4.Events
                     Boolean reportedCombinedTemps = false;
                     if (canReportAirChange || canReportTrackChange)
                     {
-                        if (currentConditions.TrackTemperature > trackTempAtLastReport + minTrackTempDeltaToReport && currentConditions.AmbientTemperature > airTempAtLastReport + minAirTempDeltaToReport)
+                        if (trackTempToUse > trackTempAtLastReport + minTrackTempDeltaToReport && currentConditions.AmbientTemperature > airTempAtLastReport + minAirTempDeltaToReport)
                         {
                             airTempAtLastReport = currentConditions.AmbientTemperature;
-                            trackTempAtLastReport = currentConditions.TrackTemperature;
+                            trackTempAtLastReport = trackTempToUse;
                             lastAirTempReport = currentGameState.Now;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
                                 (folderAirAndTrackTempIncreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this));
                             reportedCombinedTemps = true;
                         }
-                        else if (currentConditions.TrackTemperature < trackTempAtLastReport - minTrackTempDeltaToReport && currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
+                        else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport && currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
                         {
                             airTempAtLastReport = currentConditions.AmbientTemperature;
-                            trackTempAtLastReport = currentConditions.TrackTemperature;
+                            trackTempAtLastReport = trackTempToUse;
                             lastAirTempReport = currentGameState.Now;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
                                 (folderAirAndTrackTempDecreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this));
                             reportedCombinedTemps = true;
                         }
                     }
@@ -177,27 +188,25 @@ namespace CrewChiefV4.Events
                     }
                     if (!reportedCombinedTemps && canReportTrackChange)
                     {
-                        if (currentConditions.TrackTemperature > trackTempAtLastReport + minTrackTempDeltaToReport)
+                        if (trackTempToUse > trackTempAtLastReport + minTrackTempDeltaToReport)
                         {
-                            trackTempAtLastReport = currentConditions.TrackTemperature;
+                            trackTempAtLastReport = trackTempToUse;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempIncreasing, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
+                                (folderTrackTempIncreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this));
                         }
-                        else if (currentConditions.TrackTemperature < trackTempAtLastReport - minTrackTempDeltaToReport)
+                        else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport)
                         {
-                            trackTempAtLastReport = currentConditions.TrackTemperature;
+                            trackTempAtLastReport = trackTempToUse;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempDecreasing, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
+                                (folderTrackTempDecreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this));
                         }
                     }
                     //pcars2 test warning
-                    if (enablePCarsRainPrediction && 
-                        (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
-                         CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT))
+                    if (enablePCarsRainPrediction && CrewChief.isPCars())
                     {
                         if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10)
                         {
@@ -248,11 +257,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
                     {
                         // for PCars mRainDensity value is 0 or 1
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                        if (CrewChief.isPCars())
                         {
                             if (currentGameState.RainDensity == 0 && rainAtLastReport == 1)
                             {

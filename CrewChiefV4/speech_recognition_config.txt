@@ -108,6 +108,8 @@ STOP_PACE_NOTES_PLAYBACK = stop pace notes
 
 MORE_INFO = clarify:tell me more:more information:more info
 
+I_AM_OK = yeah:yes:fine:I'm OK:I'm fine:yes I'm fine:shut up:yeah I'm fine
+
 
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.

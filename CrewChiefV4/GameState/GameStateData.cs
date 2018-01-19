@@ -138,6 +138,14 @@ namespace CrewChiefV4.GameState
 
         public int MinutesIntoSessionBeforeMonitoring = 0;
 
+        public Boolean EngineWaterTempWarning = false;
+
+        public Boolean EngineOilPressureWarning = false;
+
+        public Boolean EngineFuelPressureWarning = false;
+
+        public Boolean EngineStalledWarning = false;
+
     }
 
     public class FuelData
@@ -1374,11 +1382,7 @@ namespace CrewChiefV4.GameState
         {
             if (trackDefinition == null || trackDefinition.trackLandmarks == null || trackDefinition.trackLandmarks.Count == 0 ||
                 gameTime < 30 || 
-                ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                  CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) && (currentDistanceRoundTrack == 0 || speed == 0)))
+                (CrewChief.isPCars() && (currentDistanceRoundTrack == 0 || speed == 0)))
             {
                 // don't collect data if the session has been running < 30 seconds or we're PCars and the distanceRoundTrack or speed is exactly zero
                 return null;
@@ -1744,9 +1748,10 @@ namespace CrewChiefV4.GameState
             public float WindDirectionX;
             public float WindDirectionY;
             public float CloudBrightness;
+            public Boolean atStartLine;
 
             public ConditionsSample(DateTime time, int lapCount, int sectorNumber, float AmbientTemperature, float TrackTemperature, float RainDensity,
-                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness)
+                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness, Boolean atStartLine)
             {
                 this.Time = time;
                 this.LapCount = lapCount;
@@ -1758,14 +1763,15 @@ namespace CrewChiefV4.GameState
                 this.WindDirectionX = WindDirectionX;
                 this.WindDirectionY = WindDirectionY;
                 this.CloudBrightness = CloudBrightness;
+                this.atStartLine = atStartLine;
             }
         }
 
         public void addSample(DateTime time, int lapCount, int sectorNumber, float AmbientTemperature, float TrackTemperature, float RainDensity,
-                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness)
+                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness, Boolean atStartLine)
         {
             samples.Add(new ConditionsSample(time, lapCount, sectorNumber, AmbientTemperature, TrackTemperature, RainDensity,
-                WindSpeed, WindDirectionX, WindDirectionY, CloudBrightness));
+                WindSpeed, WindDirectionX, WindDirectionY, CloudBrightness, atStartLine));
         }
 
         public ConditionsSample getMostRecentConditions()
@@ -1778,6 +1784,19 @@ namespace CrewChiefV4.GameState
             {
                 return samples[samples.Count - 1];
             }
+        }
+
+        public List<ConditionsSample> getStartLineConditions()
+        {
+            List<ConditionsSample> startLineSamples = new List<ConditionsSample>();
+            foreach (ConditionsSample sample in samples)
+            {
+                if (sample.atStartLine)
+                {
+                    startLineSamples.Add(sample);
+                }
+            }
+            return startLineSamples;
         }
     }
 

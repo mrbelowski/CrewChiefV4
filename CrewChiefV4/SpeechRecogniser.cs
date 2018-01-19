@@ -175,6 +175,8 @@ namespace CrewChiefV4
 
         public static String[] MORE_INFO = Configuration.getSpeechRecognitionPhrases("MORE_INFO");
 
+        public static String[] I_AM_OK = Configuration.getSpeechRecognitionPhrases("I_AM_OK");
+
         private String lastRecognisedText = null;
 
         private CrewChief crewChief;
@@ -563,6 +565,8 @@ namespace CrewChiefV4
 
                 validateAndAdd(MORE_INFO, staticSpeechChoices);
 
+                validateAndAdd(I_AM_OK, staticSpeechChoices);
+
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -807,61 +811,77 @@ namespace CrewChiefV4
             Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
             try
             {
-                if (opponentGrammarList.Contains(e.Result.Grammar))
+                // special case when we're waiting for a message after a heavy crash:
+                if (DamageReporting.waitingForDriverIsOKResponse)
                 {
-                    if (e.Result.Confidence > minimum_name_voice_recognition_confidence)
+                    DamageReporting damageReportingEvent = (DamageReporting)CrewChief.getEvent("DamageReporting");
+                    if (e.Result.Confidence > minimum_voice_recognition_confidence && ResultContains(e.Result.Text, I_AM_OK))
                     {
-                        this.lastRecognisedText = e.Result.Text;
-                        CrewChief.getEvent("Opponents").respond(e.Result.Text);
+                        damageReportingEvent.cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.CLEARLY_OK);
                     }
                     else
                     {
-                        crewChief.youWot();
-                    }
-                }
-                else if (e.Result.Confidence > minimum_voice_recognition_confidence)
-                {
-                    if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
-                    {
-                        this.lastRecognisedText = e.Result.Text;
-                        macroLookup[e.Result.Text].execute();
-                    }
-                    else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
-                    {
-                        this.lastRecognisedText = e.Result.Text;
-                        CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
-                    }
-                    else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
-                    {
-                        crewChief.audioPlayer.repeatLastMessage();
-                    }
-                    else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
-                    {
-                        AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
-                        if (abstractEvent != null)
-                        {
-                            abstractEvent.respondMoreInformation(this.lastRecognisedText, true);
-                        }
-                    }
-                    else
-                    {
-                        this.lastRecognisedText = e.Result.Text;
-                        AbstractEvent abstractEvent = getEventForSpeech(e.Result.Text);
-                        if (abstractEvent != null)
-                        {
-                            abstractEvent.respond(e.Result.Text);
-
-                            if (use_verbose_responses)
-                            {
-                                // In verbose mode, always respond with more info.
-                                abstractEvent.respondMoreInformation(this.lastRecognisedText, false);
-                            }
-                        }
+                        damageReportingEvent.cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.NOT_UNDERSTOOD);
                     }
                 }
                 else
                 {
-                    crewChief.youWot();
+                    if (opponentGrammarList.Contains(e.Result.Grammar))
+                    {
+                        if (e.Result.Confidence > minimum_name_voice_recognition_confidence)
+                        {
+                            this.lastRecognisedText = e.Result.Text;
+                            CrewChief.getEvent("Opponents").respond(e.Result.Text);
+                        }
+                        else
+                        {
+                            crewChief.youWot(true);
+                        }
+                    }
+                    else if (e.Result.Confidence > minimum_voice_recognition_confidence)
+                    {
+                        if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
+                        {
+                            this.lastRecognisedText = e.Result.Text;
+                            macroLookup[e.Result.Text].execute();
+                        }
+                        else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
+                        {
+                            this.lastRecognisedText = e.Result.Text;
+                            CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
+                        }
+                        else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
+                        {
+                            crewChief.audioPlayer.repeatLastMessage();
+                        }
+                        else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
+                        {
+                            AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
+                            if (abstractEvent != null)
+                            {
+                                abstractEvent.respondMoreInformation(this.lastRecognisedText, true);
+                            }
+                        }
+                        else
+                        {
+                            this.lastRecognisedText = e.Result.Text;
+                            AbstractEvent abstractEvent = getEventForSpeech(e.Result.Text);
+                            if (abstractEvent != null)
+                            {
+                                abstractEvent.respond(e.Result.Text);
+
+                                if (use_verbose_responses)
+                                {
+                                    // In verbose mode, always respond with more info.
+                                    abstractEvent.respondMoreInformation(this.lastRecognisedText, false);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        crewChief.youWot(true);
+                    }
                 }
             }
             catch (Exception exception)
