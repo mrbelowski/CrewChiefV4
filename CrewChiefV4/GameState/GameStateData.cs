@@ -414,6 +414,9 @@ namespace CrewChiefV4.GameState
 
         public int iRating = 0;
 
+        // This is updated on every tick so should always be accurate
+        public int NumberOfClasses = 1;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -2216,81 +2219,55 @@ namespace CrewChiefV4.GameState
 
         public void sortClassPositions()
         {
-            List<OpponentData> opponents = this.OpponentData.Values.ToList();
-            OpponentData player = new OpponentData() { Position = this.SessionData.Position, CarClass = this.carClass };
-            opponents.Add(player);
-
-            // get a dictionary of drivers, grouped by class ID
-            int classCount = 0;
-            Dictionary<String, List<OpponentData>> driversByClassId = new Dictionary<String, List<OpponentData>>();
-            foreach (OpponentData opponent in opponents)
+            // if we group all classes together, set everyone's ClassPosition to their Position. We still count the number of classes here:
+            if (forceSingleClass())
             {
-                String classId = opponent.CarClass.getClassIdentifier();
-                if (!driversByClassId.ContainsKey(classId))
-                {
-                    driversByClassId.Add(classId, new List<OpponentData>());
-                    classCount++;
-                }
-                driversByClassId[classId].Add(opponent);
-                // if we have no more classes at this point, set default for the class position data assuming we won't have any more classes.
-                // This just stops us having to go through the list a second time if it's a single class race
-                if (classCount == 1)
-                {
-                    opponent.ClassPosition = opponent.Position;
-                }
-            }
-
-            // if we have only 1 class, we don't need to do anything else
-            if (classCount == 1)
-            {
+                HashSet<String> classIds = new HashSet<string>();
+                classIds.Add(this.carClass.getClassIdentifier());
                 this.SessionData.ClassPosition = this.SessionData.Position;
+                foreach (OpponentData opponentData in OpponentData.Values)
+                {
+                    opponentData.ClassPosition = opponentData.Position;
+                    classIds.Add(opponentData.CarClass.getClassIdentifier());
+                }
+                this.SessionData.NumberOfClasses = classIds.Count;
             }
             else
             {
-                // more than one class, so sort them and allocate positions
-                foreach (List<OpponentData> opponentDataList in driversByClassId.Values)
-                {
-                    // sort the list by position
-                    opponentDataList.Sort(delegate(OpponentData d1, OpponentData d2)
-                    {
-                        return d1.Position.CompareTo(d2.Position);
-                    });
+                List<OpponentData> participants = this.OpponentData.Values.ToList();
+                OpponentData player = new OpponentData() { Position = this.SessionData.Position, CarClass = this.carClass };
+                participants.Add(player);
 
-                    int pos = 1;
-                    foreach (OpponentData opponent in opponentDataList)
-                    {
-                        // this check works because we've added a dummy OpponentData element for the player:
-                        if (this.SessionData.Position == opponent.Position)
-                        {
-                            this.SessionData.ClassPosition = pos;
-                        }
-                        else
-                        {
-                            opponent.ClassPosition = pos;
-                        }
-                        pos++;
-                    }
-                }
-            }
-            /*
-            var dict = (from opponent in opponents group opponent by opponent.CarClass.getClassIdentifier()).ToDictionary(d => d.Key, d => d.ToList());
-            foreach (var drivers in dict.Values)
-            {
-                var pos = 1;
-                foreach (var driver in drivers.OrderBy(d => d.Position))
+                // can't sort this list on construction because it contains a dummy entry for the player, so sort it here:
+                participants.Sort(delegate(OpponentData d1, OpponentData d2)
                 {
-                    if (this.SessionData.Position == driver.Position)
+                    return d1.Position.CompareTo(d2.Position);
+                });
+
+                Dictionary<string, int> classCounts = new Dictionary<string, int>();
+                foreach (OpponentData participant in participants)
+                {
+                    String classId = participant.CarClass.getClassIdentifier();
+                    // because the source list is sorted by position, the number of cars we've encountered so far for this participant's
+                    // class will be his class position. If this is the first time we've seen this class, he must be leading it:
+                    int classPosition = classCounts.ContainsKey(classId) ? classCounts[classId] + 1 : 1;
+                    participant.ClassPosition = classPosition;
+                    // if this is the dummy participant for the player, update the player ClassPosition
+                    if (this.SessionData.Position == participant.Position)
                     {
-                        this.SessionData.ClassPosition = pos;
+                        this.SessionData.ClassPosition = classPosition;
                     }
-                    else
-                    {
-                        driver.ClassPosition = pos;
-                    }
-                    pos++;
+                    classCounts[classId] = classPosition;
                 }
-            }*/
-            opponents.Remove(player);
+                this.SessionData.NumberOfClasses = classCounts.Count;
+            }
+        }
+
+        // this method may sanity checks the class data - e.g. if there are too many classes or whatever.
+        // For now, just check the override flag
+        private Boolean forceSingleClass()
+        {
+            return CrewChief.forceSingleClass;
         }
 
         public void display()

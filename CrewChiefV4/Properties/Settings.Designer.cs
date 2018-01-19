@@ -3058,5 +3058,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_crash_messages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool force_single_class {
+            get {
+                return ((bool)(this["force_single_class"]));
+            }
+            set {
+                this["force_single_class"] = value;
+            }
+        }
     }
 }

@@ -44,6 +44,8 @@ namespace CrewChiefV4
         public static TimeSpan spotterInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_update_interval"));
 
         private Boolean displaySessionLapTimes = UserSettings.GetUserSettings().getBoolean("display_session_lap_times");
+
+        public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
         
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
