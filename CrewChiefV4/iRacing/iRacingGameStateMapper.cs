@@ -270,7 +270,9 @@ namespace CrewChiefV4.iRacing
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                         lastTimeEngineWasRunning = DateTime.MaxValue;
-
+                        lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+                        lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+                        lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
                         //currentGameState.SessionData.CompletedLaps = shared.Driver.CurrentResults.LapsComplete;
 
                         Console.WriteLine("Just gone green, session details...");
