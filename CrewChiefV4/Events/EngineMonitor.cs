@@ -35,6 +35,10 @@ namespace CrewChiefV4.Events
 
         double gameTimeAtLastStatusCheck;
 
+        DateTime nextOilPressureCheck = DateTime.MinValue;
+        DateTime nextFuelPressureCheck = DateTime.MinValue;
+        DateTime nextStalledCheck = DateTime.MinValue;
+
         public EngineMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -47,6 +51,9 @@ namespace CrewChiefV4.Events
             gameTimeAtLastStatusCheck = 0;
             maxSafeOilTemp = 0;
             maxSafeWaterTemp = 0;
+            nextOilPressureCheck = DateTime.MinValue;
+            nextFuelPressureCheck = DateTime.MinValue;
+            nextStalledCheck = DateTime.MinValue;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -68,6 +75,27 @@ namespace CrewChiefV4.Events
                     currentGameState.EngineData.EngineFuelPressureWarning,currentGameState.EngineData.EngineWaterTempWarning,
                     currentGameState.EngineData.EngineStalledWarning);
 
+                // immediately warn about oil pressure / fuel pressure / stalled:
+                if (currentGameState.EngineData.EngineOilPressureWarning && currentGameState.Now > nextOilPressureCheck)
+                {
+                    audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
+                    // don't re-check oil pressure for a couple of minutes
+                    nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                }
+                if (currentGameState.EngineData.EngineFuelPressureWarning && currentGameState.Now > nextFuelPressureCheck)
+                {
+                    audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
+                    // don't re-check fuel pressure for a couple of minutes
+                    nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                }
+                if (currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
+                {
+                    audioPlayer.playMessage(new QueuedMessage(folderStalled, 0, this));
+                    // don't re-check stalled warning for a couple of minutes
+                    nextStalledCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                }
+
+                // check temperatures every minute:
                 if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastStatusCheck + statusMonitorWindowLength)
                 {
                     EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp);
@@ -82,21 +110,6 @@ namespace CrewChiefV4.Events
                         {
                             lastStatusMessage = currentEngineStatus;
                             audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
-                        }
-                        if (currentEngineStatus.HasFlag(EngineStatus.LOW_OIL_PRESSURE))
-                        {
-                            lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
-                        }
-                        if (currentEngineStatus.HasFlag(EngineStatus.LOW_FUEL_PRESSURE))
-                        {
-                            lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
-                        }
-                        if (currentEngineStatus.HasFlag(EngineStatus.ENGINE_STALLED))
-                        {
-                            lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderStalled, 0, this));
                         }
                         if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                         {
