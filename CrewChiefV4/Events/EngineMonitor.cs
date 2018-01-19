@@ -68,14 +68,10 @@ namespace CrewChiefV4.Events
             if (maxSafeOilTemp == 0) {
                 maxSafeOilTemp = currentGameState.carClass.maxSafeOilTemp;
             }
-            if (currentGameState.SessionData.SessionRunningTime > 60 * currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring)
-            {
-                engineData.addSample(currentGameState.EngineData.EngineOilTemp, currentGameState.EngineData.EngineWaterTemp, 
-                    currentGameState.EngineData.EngineOilPressure,currentGameState.EngineData.EngineOilPressureWarning,
-                    currentGameState.EngineData.EngineFuelPressureWarning,currentGameState.EngineData.EngineWaterTempWarning,
-                    currentGameState.EngineData.EngineStalledWarning);
 
-                // immediately warn about oil pressure / fuel pressure / stalled:
+            // immediately warn about oil pressure / fuel pressure / stalled:
+            if (currentGameState.SessionData.SessionRunningTime > 30)
+            {
                 if (currentGameState.CarDamageData.OverallEngineDamage < DamageLevel.DESTROYED &&
                     !currentGameState.PitData.InPitlane &&
                     currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
@@ -104,7 +100,14 @@ namespace CrewChiefV4.Events
                         nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     }
                 }
+            }
 
+            if (currentGameState.SessionData.SessionRunningTime > 60 * currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring)
+            {
+                engineData.addSample(currentGameState.EngineData.EngineOilTemp, currentGameState.EngineData.EngineWaterTemp, 
+                    currentGameState.EngineData.EngineOilPressure,currentGameState.EngineData.EngineOilPressureWarning,
+                    currentGameState.EngineData.EngineFuelPressureWarning,currentGameState.EngineData.EngineWaterTempWarning,
+                    currentGameState.EngineData.EngineStalledWarning);
                 // check temperatures every minute:
                 if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastStatusCheck + statusMonitorWindowLength)
                 {
