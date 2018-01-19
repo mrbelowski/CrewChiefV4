@@ -2219,6 +2219,60 @@ namespace CrewChiefV4.GameState
             List<OpponentData> opponents = this.OpponentData.Values.ToList();
             OpponentData player = new OpponentData() { Position = this.SessionData.Position, CarClass = this.carClass };
             opponents.Add(player);
+
+            // get a dictionary of drivers, grouped by class ID
+            int classCount = 0;
+            Dictionary<String, List<OpponentData>> driversByClassId = new Dictionary<String, List<OpponentData>>();
+            foreach (OpponentData opponent in opponents)
+            {
+                String classId = opponent.CarClass.getClassIdentifier();
+                if (!driversByClassId.ContainsKey(classId))
+                {
+                    driversByClassId.Add(classId, new List<OpponentData>());
+                    classCount++;
+                }
+                driversByClassId[classId].Add(opponent);
+                // if we have no more classes at this point, set default for the class position data assuming we won't have any more classes.
+                // This just stops us having to go through the list a second time if it's a single class race
+                if (classCount == 1)
+                {
+                    opponent.ClassPosition = opponent.Position;
+                }
+            }
+
+            // if we have only 1 class, we don't need to do anything else
+            if (classCount == 1)
+            {
+                this.SessionData.ClassPosition = this.SessionData.Position;
+            }
+            else
+            {
+                // more than one class, so sort them and allocate positions
+                foreach (List<OpponentData> opponentDataList in driversByClassId.Values)
+                {
+                    // sort the list by position
+                    opponentDataList.Sort(delegate(OpponentData d1, OpponentData d2)
+                    {
+                        return d1.Position.CompareTo(d2.Position);
+                    });
+
+                    int pos = 1;
+                    foreach (OpponentData opponent in opponentDataList)
+                    {
+                        // this check works because we've added a dummy OpponentData element for the player:
+                        if (this.SessionData.Position == opponent.Position)
+                        {
+                            this.SessionData.ClassPosition = pos;
+                        }
+                        else
+                        {
+                            opponent.ClassPosition = pos;
+                        }
+                        pos++;
+                    }
+                }
+            }
+            /*
             var dict = (from opponent in opponents group opponent by opponent.CarClass.getClassIdentifier()).ToDictionary(d => d.Key, d => d.ToList());
             foreach (var drivers in dict.Values)
             {
@@ -2235,7 +2289,7 @@ namespace CrewChiefV4.GameState
                     }
                     pos++;
                 }
-            }
+            }*/
             opponents.Remove(player);
         }
 
