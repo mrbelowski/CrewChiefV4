@@ -90,8 +90,9 @@ namespace CrewChiefV4.Events
                 }
                 if (currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderStalled, 0, this));
-                    // don't re-check stalled warning for a couple of minutes
+                    // Play stalled warning straight away
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 0, this));
+                    // don't re-check stalled warning for a couple of minutes.
                     nextStalledCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                 }
 
