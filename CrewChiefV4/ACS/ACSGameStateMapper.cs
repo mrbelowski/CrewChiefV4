@@ -1915,7 +1915,7 @@ namespace CrewChiefV4.assetto
             {
                 nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
-                    shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0);
+                    shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, 0, 0, 0, 0, 0, currentGameState.SessionData.IsNewLap);
             }
 
             if (currentGameState.SessionData.TrackDefinition != null)
