@@ -76,24 +76,31 @@ namespace CrewChiefV4.Events
                     currentGameState.EngineData.EngineStalledWarning);
 
                 // immediately warn about oil pressure / fuel pressure / stalled:
-                if (currentGameState.EngineData.EngineOilPressureWarning && currentGameState.Now > nextOilPressureCheck)
-                {
-                    audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
-                    // don't re-check oil pressure for a couple of minutes
-                    nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
-                }
-                if (currentGameState.EngineData.EngineFuelPressureWarning && currentGameState.Now > nextFuelPressureCheck)
-                {
-                    audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
-                    // don't re-check fuel pressure for a couple of minutes
-                    nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
-                }
                 if (currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
                 {
                     // Play stalled warning straight away
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 0, this));
                     // don't re-check stalled warning for a couple of minutes.
                     nextStalledCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                    // move the oil and fuel pressure checks out a bit to allow it to settle
+                    nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20);
+                    nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromSeconds(20);
+                }
+                else
+                {
+                    // don't check oil or fuel pressure if we're stalled
+                    if (currentGameState.EngineData.EngineOilPressureWarning && currentGameState.Now > nextOilPressureCheck)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
+                        // don't re-check oil pressure for a couple of minutes
+                        nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                    }
+                    if (currentGameState.EngineData.EngineFuelPressureWarning && currentGameState.Now > nextFuelPressureCheck)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
+                        // don't re-check fuel pressure for a couple of minutes
+                        nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
+                    }
                 }
 
                 // check temperatures every minute:
