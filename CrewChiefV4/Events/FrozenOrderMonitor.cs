@@ -204,6 +204,7 @@ namespace CrewChiefV4.Events
                 driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
 
                 // Super rare case where there's no SC in FCY/Rolling.
+                // TODO: test this with Kart rolling start from pole.
                 if (shouldFollowSafetyCar && cfod.SafetyCarSpeed == -1.0f)
                     driverToFollow = "";  // TODO: we may need special message for the case when SC is not present.  For now, simply suppress wrong message.
             }
