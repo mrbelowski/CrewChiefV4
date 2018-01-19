@@ -70,32 +70,33 @@ namespace CrewChiefV4.Events
                     EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp);
                     if (currentEngineStatus != lastStatusMessage)
                     {
-                        switch (currentEngineStatus)
+                        if (currentEngineStatus.HasFlag(EngineStatus.ALL_CLEAR))
                         {
-                            case EngineStatus.ALL_CLEAR:
+                            lastStatusMessage = currentEngineStatus;
+                            audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this));
+                        }
+                        else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL) && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
+                        {
+                            lastStatusMessage = currentEngineStatus;
+                            audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
+                        }
+                        else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
+                        {
+                            // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
+                            if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
+                            {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this));
-                                break;
-                            case EngineStatus.HOT_OIL:
-                                // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
-                                if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
-                                {
-                                    lastStatusMessage = currentEngineStatus;
-                                    audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this));
-                                }
-                                break;
-                            case EngineStatus.HOT_WATER:
-                                // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
-                                if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
-                                {
-                                    lastStatusMessage = currentEngineStatus;
-                                    audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this));
-                                }
-                                break;
-                            case EngineStatus.HOT_OIL | EngineStatus.HOT_WATER:
+                                audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this));
+                            }
+                        }
+                        else if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
+                        {
+                            // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
+                            if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
+                            {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
-                                break;
+                                audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this));
+                            }
                         }
                     }
                     gameTimeAtLastStatusCheck = currentGameState.SessionData.SessionRunningTime;
@@ -113,37 +114,37 @@ namespace CrewChiefV4.Events
             {
                 gotData = true;
                 EngineStatus currentEngineStatus = engineData.getEngineStatusFromCurrent(maxSafeWaterTemp, maxSafeOilTemp);
-                switch (currentEngineStatus)
+                if (currentEngineStatus.HasFlag(EngineStatus.ALL_CLEAR))
                 {
-                    case EngineStatus.ALL_CLEAR:
-                        lastStatusMessage = currentEngineStatus;
-                        if (!fromStatusRequest)
-                        {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
-                        }
-                        break;
-                    case EngineStatus.HOT_OIL:
-                        // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
-                        if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL)  && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
-                        {
-                            lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null));
-                        }
-                        break;
-                    case EngineStatus.HOT_WATER:
-                        // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
-                        if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
-                        {
-                            lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null));
-                        }
-                        break;
-                    case EngineStatus.HOT_OIL | EngineStatus.HOT_WATER:
-                        lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null));
-                        break;
+                    lastStatusMessage = currentEngineStatus;
+                    if (!fromStatusRequest)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
+                    }
                 }
-                
+                else if(currentEngineStatus.HasFlag(EngineStatus.HOT_OIL)  && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
+                {
+                    lastStatusMessage = currentEngineStatus;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null));
+                }
+                else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
+                {
+                    // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
+                    if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
+                    {
+                        lastStatusMessage = currentEngineStatus;
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null));
+                    }
+                }
+                else if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
+                {
+                    // don't play this if the last message was about hot oil *and* water - wait for 'all clear'
+                    if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
+                    {
+                        lastStatusMessage = currentEngineStatus;
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null));
+                    }
+                }
             }
             if (!gotData && !fromStatusRequest)
             {
@@ -175,7 +176,6 @@ namespace CrewChiefV4.Events
                 this.currentOilPressureWarning = false;
                 this.currentFuelPressureWarning = false;
                 this.currentWaterTempWarning = false;
-
             }
             public void addSample(float engineOilTemp, float engineWaterTemp, float engineOilPressure, bool engineOilPressureWarning, bool engineFuelPressureWarning, bool engineWaterTempWarning)
             {
@@ -189,7 +189,6 @@ namespace CrewChiefV4.Events
                 this.currentOilPressureWarning = engineOilPressureWarning;
                 this.currentFuelPressureWarning = engineFuelPressureWarning;
                 this.currentWaterTempWarning = engineWaterTempWarning;
-
             }
             public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp)
             {
