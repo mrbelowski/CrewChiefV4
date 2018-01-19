@@ -110,16 +110,7 @@ namespace CrewChiefV4.Events
             timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
         }
-
-        private Boolean isPCars()
-        {
-            return CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
-                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK;
-        }
-
+                
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             currentConditions = currentGameState.Conditions.getMostRecentConditions();
@@ -132,7 +123,7 @@ namespace CrewChiefV4.Events
             {
                 // for pcars track temp, we're only interested in changes at the start line (a single point on the track) because the track
                 // temp is localised. The air temp is (probably) localised too, but will be less variable
-                float trackTempToUse = isPCars() && conditionsAtStartOfThisLap != null ? conditionsAtStartOfThisLap.TrackTemperature : currentConditions.TrackTemperature;
+                float trackTempToUse = CrewChief.isPCars() && conditionsAtStartOfThisLap != null ? conditionsAtStartOfThisLap.TrackTemperature : currentConditions.TrackTemperature;
                 if (airTempAtLastReport == float.MinValue)
                 {
                     airTempAtLastReport = currentConditions.AmbientTemperature;
@@ -215,7 +206,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                     //pcars2 test warning
-                    if (enablePCarsRainPrediction && isPCars())
+                    if (enablePCarsRainPrediction && CrewChief.isPCars())
                     {
                         if (previousGameState != null && currentGameState.SessionData.SessionRunningTime > 10)
                         {
@@ -266,7 +257,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
                     {
                         // for PCars mRainDensity value is 0 or 1
-                        if (isPCars())
+                        if (CrewChief.isPCars())
                         {
                             if (currentGameState.RainDensity == 0 && rainAtLastReport == 1)
                             {

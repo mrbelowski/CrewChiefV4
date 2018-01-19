@@ -997,5 +997,15 @@ namespace CrewChiefV4
             String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
             Console.WriteLine("TrackName " + trackName);
         }
+
+        public static Boolean isPCars()
+        {
+            return CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK;
+        }
+
     }
 }
