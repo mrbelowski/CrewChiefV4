@@ -2250,14 +2250,23 @@ namespace CrewChiefV4.GameState
                     String classId = participant.CarClass.getClassIdentifier();
                     // because the source list is sorted by position, the number of cars we've encountered so far for this participant's
                     // class will be his class position. If this is the first time we've seen this class, he must be leading it:
-                    int classPosition = classCounts.ContainsKey(classId) ? classCounts[classId] + 1 : 1;
-                    participant.ClassPosition = classPosition;
+                    int countForThisClass;
+                    if (classCounts.TryGetValue(classId, out countForThisClass))
+                    {
+                        classCounts[classId] = countForThisClass + 1;
+                    }
+                    else
+                    {
+                        countForThisClass = 1;
+                        classCounts[classId] = 1;
+                    }
+
+                    participant.ClassPosition = countForThisClass;
                     // if this is the dummy participant for the player, update the player ClassPosition
                     if (this.SessionData.Position == participant.Position)
                     {
-                        this.SessionData.ClassPosition = classPosition;
+                        this.SessionData.ClassPosition = countForThisClass;
                     }
-                    classCounts[classId] = classPosition;
                 }
                 this.SessionData.NumberOfClasses = classCounts.Count;
             }
