@@ -96,6 +96,8 @@ namespace CrewChiefV4.rFactor2
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
 
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -536,6 +538,8 @@ namespace CrewChiefV4.rFactor2
                 csd.TrackDefinition.setGapPoints();
 
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
+
+                lastTimeEngineWasRunning = DateTime.MaxValue;
             }
 
             // Restore cumulative data.
@@ -843,6 +847,19 @@ namespace CrewChiefV4.rFactor2
             cgs.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             cgs.EngineData.EngineOilTemp = (float)playerTelemetry.mEngineOilTemp;
             cgs.EngineData.EngineWaterTemp = (float)playerTelemetry.mEngineWaterTemp;
+
+            // JB: stall detection hackery
+            if (cgs.EngineData.EngineRpm > 5)
+                lastTimeEngineWasRunning = cgs.Now;
+            if (!cgs.PitData.InPitlane &&
+                pgs != null && !pgs.EngineData.EngineStalledWarning &&
+                cgs.SessionData.SessionRunningTime > 60 && cgs.EngineData.EngineRpm < 5 &&
+                lastTimeEngineWasRunning < cgs.Now.Subtract(TimeSpan.FromSeconds(2)))
+            {
+                cgs.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
+            }
+
             //HACK: there's probably a cleaner way to do this...
             if (playerTelemetry.mOverheating == 1)
             {
@@ -1039,7 +1056,8 @@ namespace CrewChiefV4.rFactor2
                 nextConditionsSampleDue = cgs.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 cgs.Conditions.addSample(cgs.Now, csd.CompletedLaps, csd.SectorNumber,
                     (float)shared.scoring.mScoringInfo.mAmbientTemp, (float)shared.scoring.mScoringInfo.mTrackTemp, (float)shared.scoring.mScoringInfo.mRaining,
-                    (float)Math.Sqrt((double)(shared.scoring.mScoringInfo.mWind.x * shared.scoring.mScoringInfo.mWind.x + shared.scoring.mScoringInfo.mWind.y * shared.scoring.mScoringInfo.mWind.y + shared.scoring.mScoringInfo.mWind.z * shared.scoring.mScoringInfo.mWind.z)), 0, 0, 0);
+                    (float)Math.Sqrt((double)(shared.scoring.mScoringInfo.mWind.x * shared.scoring.mScoringInfo.mWind.x + shared.scoring.mScoringInfo.mWind.y * shared.scoring.mScoringInfo.mWind.y + shared.scoring.mScoringInfo.mWind.z * shared.scoring.mScoringInfo.mWind.z)),
+                    0, 0, 0, csd.IsNewLap);
             }
 
             // --------------------------------

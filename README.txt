@@ -202,6 +202,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.7: Added messages for oil and fuel pressure warnings (iRacing only); Added messages for stalling the engine; Added messages when you crash very heavily (these can be disabled with the "Enable crash messages" option in Properties); Only use start-line track temperature in pCARS to prevent the app calling local track temp variations
 
 Version 4.9.0.6: Don't play 'good pass' message in pCARS 2 if we've just collided with someone (might still need some tuning); some performance improvements; fixed issues with historical weather data being lost; pCARS 2 pit window fixes (again...); fixed missing DQ / DNF session end messages; fixed mid-point fuel report saying "fuel looks good" when it clearly isn't good
 

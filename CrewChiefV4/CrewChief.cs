@@ -211,7 +211,6 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = true;
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasEnabled, 0, null));
-            
         }
 
         public void disableDeltasMode()
@@ -221,7 +220,6 @@ namespace CrewChiefV4
                 readOpponentDeltasForEveryLap = false;
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0, null));
-            
         }
 
         public void toggleEnableYellowFlagsMode()
@@ -240,14 +238,12 @@ namespace CrewChiefV4
         {
             yellowFlagMessagesEnabled = true;
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowEnabled, 0, null));
-
         }
 
         public void disableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = false;
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowDisabled, 0, null));
-
         }
 
         public void toggleManualFormationLapMode()
@@ -370,9 +366,27 @@ namespace CrewChiefV4
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderRadioCheckResponse, 0, null));
         }
 
-        public void youWot()
+        public void youWot(Boolean detectedSomeSpeech)
         {
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+            if (detectedSomeSpeech)
+            {
+                Console.WriteLine("Detected speech input but nothing was recognised");
+            }
+            else
+            {
+                Console.WriteLine("No speech input was detected");
+            }
+            
+            if (DamageReporting.waitingForDriverIsOKResponse)
+            {
+                ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(
+                    detectedSomeSpeech ? DamageReporting.DriverOKResponseType.NOT_UNDERSTOOD : DamageReporting.DriverOKResponseType.NO_SPEECH);
+            }
+            else
+            {
+                // TODO: separate responses for no input detected, and input not understood?
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+            }
         }
 
         public void togglePaceNotesPlayback()
@@ -837,7 +851,7 @@ namespace CrewChiefV4
                             {
                                 if (spotter != null)
                                 {
-                                    if (currentGameState.FlagData.isFullCourseYellow)
+                                    if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
                                     {
                                         spotter.pause();
                                     }
@@ -855,7 +869,11 @@ namespace CrewChiefV4
                                 {
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                     {
-                                        triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                        // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
+                                        if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
+                                        {
+                                            triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                        }
                                     }
                                 }
                                 if (DriverTrainingService.isPlayingPaceNotes)
@@ -979,5 +997,15 @@ namespace CrewChiefV4
             String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
             Console.WriteLine("TrackName " + trackName);
         }
+
+        public static Boolean isPCars()
+        {
+            return CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK;
+        }
+
     }
 }

@@ -40,7 +40,10 @@ namespace CrewChiefV4.iRacing
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
-
+        private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
+        private DateTime lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+        private DateTime lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+        private DateTime lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -178,7 +181,7 @@ namespace CrewChiefV4.iRacing
 
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
-
+                 
                 String driverName = playerCar.Name.ToLower();
                 if (playerName == null)
                 {
@@ -212,7 +215,7 @@ namespace CrewChiefV4.iRacing
 
                 }
                 // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
-                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
+                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0, true);
 
                 //need to call this after adding opponents else we have nothing to compare against 
                 Utilities.TraceEventClass(currentGameState);
@@ -266,8 +269,10 @@ namespace CrewChiefV4.iRacing
 
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
-
-
+                        lastTimeEngineWasRunning = DateTime.MaxValue;
+                        lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+                        lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+                        lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
                         //currentGameState.SessionData.CompletedLaps = shared.Driver.CurrentResults.LapsComplete;
 
                         Console.WriteLine("Just gone green, session details...");
@@ -370,6 +375,66 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.LicenseLevel = playerCar.licensLevel;
             currentGameState.SessionData.iRating = playerCar.IRating;
 
+            currentGameState.EngineData.EngineOilTemp = shared.Telemetry.OilTemp;
+            currentGameState.EngineData.EngineWaterTemp = shared.Telemetry.WaterTemp;
+
+            currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 0;
+
+
+
+            bool additionalEngineCheckFlags = shared.Telemetry.IsOnTrack && !shared.Telemetry.OnPitRoad && shared.Telemetry.Voltage > 0f;
+
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled)) 
+            { 
+                lastTimeEngineWasRunning = currentGameState.Now; 
+            } 
+            if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
+                
+            }
+
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) )
+            {
+                lastTimeEngineWaterTempWarning = currentGameState.Now;
+            }
+            
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) &&
+                lastTimeEngineWaterTempWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+            }
+
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning))
+            {
+                lastTimeEngineOilPressureWarning = currentGameState.Now;
+            }
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning) &&
+                lastTimeEngineOilPressureWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+            }
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning))
+            {
+                lastTimeEngineFuelPressureWarning = currentGameState.Now;
+            }
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning) &&
+                lastTimeEngineFuelPressureWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
+            }
+
+
+            //Console.WriteLine("Voltage: " + shared.Telemetry.Voltage);
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
@@ -397,9 +462,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.CurrentLapIsValid = true;
             }
 
-
             currentGameState.SessionData.NumCars = shared.Drivers.Count;
-
 
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && currentGameState.SessionData.SessionType == SessionType.Race)
             {
@@ -490,7 +553,7 @@ namespace CrewChiefV4.iRacing
             }
 
             currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance;
-            currentGameState.PositionAndMotionData.CarSpeed = (float)playerCar.Live.Speed;
+            currentGameState.PositionAndMotionData.CarSpeed = (float)shared.Telemetry.Speed;
 
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
@@ -813,7 +876,7 @@ namespace CrewChiefV4.iRacing
             {
                 nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
-                    shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0);
+                    shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0, currentGameState.SessionData.IsNewLap);
             }
 
 
