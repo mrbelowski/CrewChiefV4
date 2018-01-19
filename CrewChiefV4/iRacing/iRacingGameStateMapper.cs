@@ -370,6 +370,17 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.LicenseLevel = playerCar.licensLevel;
             currentGameState.SessionData.iRating = playerCar.IRating;
 
+            currentGameState.EngineData.EngineOilTemp = shared.Telemetry.OilTemp;
+            currentGameState.EngineData.EngineWaterTemp = shared.Telemetry.WaterTemp;
+
+
+            currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
+            currentGameState.EngineData.EngineWaterTempWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning);
+            currentGameState.EngineData.EngineOilPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning);
+            currentGameState.EngineData.EngineFuelPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning);
+
+
+
             //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
@@ -415,6 +426,8 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.UnFilteredPosition = playerCar.CurrentResults.Position;
 
             currentGameState.SessionData.ClassPosition = playerCar.Live.ClassPosition;
+
+
 
             /*Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && 
                 e.CurrentResults.FastestTime > 1 && !e.IsPacecar && !shared.Telemetry.CarIdxTrackSurface[e.Id].HasFlag(TrackSurfaces.NotInWorld)).FirstOrDefault();
