@@ -935,7 +935,6 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.TyreWearActive = true;
 
             // For now, all tyres will be reported as front compund.
-            // TODO_PERF: verify once a sector only, or use index, or something.
             var tt = this.MapToTyreType(ref playerTelemetry);
 
             var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
@@ -1236,8 +1235,6 @@ namespace CrewChiefV4.rFactor2
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
                 opponent.CarClass = CarData.getCarClassForClassName(GetStringFromBytes(vehicleScoring.mVehicleClass));
-                // TODO_PERF: MTTT is heavy, need to be smarter here.
-                // TODO_PERF: may need to try preserving opponents, this has a drawback of needing to manage removals.
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
