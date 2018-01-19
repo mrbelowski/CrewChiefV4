@@ -386,6 +386,8 @@ namespace CrewChiefV4.PCars2
                 // no tyre data in the block so get the default tyre types for this car
                 defaultTyreTypeForPlayersCar = CarData.getDefaultTyreType(currentGameState.carClass);
 
+                lastTimeEngineWasRunning = DateTime.MaxValue;
+
                 opponentDriverNamesProcessedForThisTick.Clear();
                 opponentDriverNamesProcessedForThisTick.Add(playerName);
                 positionsFilledForThisTick.Clear();
