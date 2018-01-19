@@ -1303,7 +1303,8 @@ namespace CrewChiefV4.PCars2
             {
                 lastTimeEngineWasRunning = currentGameState.Now;
             }
-            if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
+            if (!currentGameState.PitData.InPitlane &&
+                previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
                 currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
                 lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
             {
