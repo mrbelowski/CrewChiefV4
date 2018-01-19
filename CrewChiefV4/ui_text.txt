@@ -556,3 +556,6 @@ report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap mode
 
 enable_crash_messages = Enable crash messages
 enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily
+
+force_single_class = Force single car class
+force_single_class_help = Don't allow participants to be grouped by their car classes
