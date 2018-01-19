@@ -41,7 +41,9 @@ namespace CrewChiefV4.iRacing
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
-
+        private DateTime lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+        private DateTime lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+        private DateTime lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -380,25 +382,54 @@ namespace CrewChiefV4.iRacing
 
             bool additionalEngineCheckFlags = shared.Telemetry.IsOnTrack && !shared.Telemetry.OnPitRoad && shared.Telemetry.Voltage > 0f;
 
-            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && additionalEngineCheckFlags) 
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled)) 
             { 
                 lastTimeEngineWasRunning = currentGameState.Now; 
             } 
             if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
-                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && 
-                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
             {
-                currentGameState.EngineData.EngineStalledWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) && additionalEngineCheckFlags;
-                if (!currentGameState.EngineData.EngineStalledWarning)
-                {
-                    currentGameState.EngineData.EngineWaterTempWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) && additionalEngineCheckFlags;
-                    currentGameState.EngineData.EngineOilPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning) && additionalEngineCheckFlags;
-                    currentGameState.EngineData.EngineFuelPressureWarning = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning) && additionalEngineCheckFlags;
-                }                
-            } 
+                currentGameState.EngineData.EngineStalledWarning = true;
+                lastTimeEngineWasRunning = DateTime.MaxValue;
+                
+            }
 
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) )
+            {
+                lastTimeEngineWaterTempWarning = currentGameState.Now;
+            }
+            
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) &&
+                lastTimeEngineWaterTempWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineWaterTempWarning = DateTime.MaxValue;
+            }
 
-
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning))
+            {
+                lastTimeEngineOilPressureWarning = currentGameState.Now;
+            }
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.OilPressureWarning) &&
+                lastTimeEngineOilPressureWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineOilPressureWarning = DateTime.MaxValue;
+            }
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning))
+            {
+                lastTimeEngineFuelPressureWarning = currentGameState.Now;
+            }
+            if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
+                currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.FuelPressureWarning) &&
+                lastTimeEngineFuelPressureWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
+            {
+                currentGameState.EngineData.EngineWaterTempWarning = true;
+                lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
+            }
 
 
             //Console.WriteLine("Voltage: " + shared.Telemetry.Voltage);
