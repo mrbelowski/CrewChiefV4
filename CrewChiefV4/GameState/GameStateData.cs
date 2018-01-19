@@ -1744,9 +1744,10 @@ namespace CrewChiefV4.GameState
             public float WindDirectionX;
             public float WindDirectionY;
             public float CloudBrightness;
+            public Boolean atStartLine;
 
             public ConditionsSample(DateTime time, int lapCount, int sectorNumber, float AmbientTemperature, float TrackTemperature, float RainDensity,
-                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness)
+                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness, Boolean atStartLine)
             {
                 this.Time = time;
                 this.LapCount = lapCount;
@@ -1758,14 +1759,15 @@ namespace CrewChiefV4.GameState
                 this.WindDirectionX = WindDirectionX;
                 this.WindDirectionY = WindDirectionY;
                 this.CloudBrightness = CloudBrightness;
+                this.atStartLine = atStartLine;
             }
         }
 
         public void addSample(DateTime time, int lapCount, int sectorNumber, float AmbientTemperature, float TrackTemperature, float RainDensity,
-                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness)
+                float WindSpeed, float WindDirectionX, float WindDirectionY, float CloudBrightness, Boolean atStartLine)
         {
             samples.Add(new ConditionsSample(time, lapCount, sectorNumber, AmbientTemperature, TrackTemperature, RainDensity,
-                WindSpeed, WindDirectionX, WindDirectionY, CloudBrightness));
+                WindSpeed, WindDirectionX, WindDirectionY, CloudBrightness, atStartLine));
         }
 
         public ConditionsSample getMostRecentConditions()
@@ -1778,6 +1780,19 @@ namespace CrewChiefV4.GameState
             {
                 return samples[samples.Count - 1];
             }
+        }
+
+        public List<ConditionsSample> getStartLineConditions()
+        {
+            List<ConditionsSample> startLineSamples = new List<ConditionsSample>();
+            foreach (ConditionsSample sample in samples)
+            {
+                if (sample.atStartLine)
+                {
+                    startLineSamples.Add(sample);
+                }
+            }
+            return startLineSamples;
         }
     }
 
