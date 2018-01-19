@@ -71,9 +71,9 @@ namespace CrewChiefV4.Events
         private String folderAreYouOKSecondTry = "damage_reporting/are_you_ok_second_try";
         private String folderAreYouOKThirdTry = "damage_reporting/are_you_ok_third_try";
         public static String folderAcknowledgeDriverIsOK = "damage_reporting/acknowledge_driver_is_ok";
-        // TODO: record a separate message for when we get a response to the "are you OK?" message but it's not understood or expected?
-        public static String folderAcknowledgeDriverIsOKAnySpeech = "acknowledge/OK";
-        public static String folderAcknowledgeDriverIsOKNoSpeech = "acknowledge/OK";
+        // separate messages for when we get a response to the "are you OK?" message but it's not understood or expected
+        public static String folderAcknowledgeDriverIsOKAnySpeech = "damage_reporting/acknowledge_driver_is_ok_not_understood";
+        public static String folderAcknowledgeDriverIsOKNoSpeech = "damage_reporting/acknowledge_driver_is_ok_no_speech";
 
         private DamageLevel engineDamage;
         private DamageLevel trannyDamage;

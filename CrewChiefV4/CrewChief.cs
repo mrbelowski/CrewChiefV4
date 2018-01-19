@@ -368,6 +368,15 @@ namespace CrewChiefV4
 
         public void youWot(Boolean detectedSomeSpeech)
         {
+            if (detectedSomeSpeech)
+            {
+                Console.WriteLine("Detected speech input but nothing was recognised");
+            }
+            else
+            {
+                Console.WriteLine("No speech input was detected");
+            }
+            
             if (DamageReporting.waitingForDriverIsOKResponse)
             {
                 ((DamageReporting)CrewChief.getEvent("DamageReporting")).cancelWaitingForDriverIsOK(
@@ -375,6 +384,7 @@ namespace CrewChiefV4
             }
             else
             {
+                // TODO: separate responses for no input detected, and input not understood?
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
             }
         }
