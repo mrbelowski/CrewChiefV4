@@ -98,6 +98,8 @@ namespace CrewChiefV4.rFactor2
 
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
 
+        private Dictionary<byte, TyreType> compoundIndexToTyreType = new Dictionary<byte, TyreType>();
+
         public RF2GameStateMapper()
         {
             this.tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.NEW, -10000.0f, this.scrubbedTyreWearPercent));
@@ -198,8 +200,8 @@ namespace CrewChiefV4.rFactor2
             this.lastUnknownGlobalRuleMessage = null;
             this.lastUnknownPlayerRuleMessage = null;
             RF2GameStateMapper.sanitizedNamesMap.Clear();
-
             this.lastTimeEngineWasRunning = DateTime.MaxValue;
+            this.compoundIndexToTyreType.Clear();
         }
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
@@ -2123,40 +2125,55 @@ namespace CrewChiefV4.rFactor2
 
         private TyreType MapToTyreType(ref rF2VehicleTelemetry vehicleTelemetry)
         {
+            // Do not cache tyre type if telemetry is not available yet.
+            if (vehicleTelemetry.mFrontTireCompoundName == null)
+                return TyreType.Unknown_Race;
+
+            // Note: this might not work perfectly with per vehicle upgrades, but this is good enough I think.
+            // There are like 2 or 3 mods that allow different brands, and even then, indexes do match.
+            var tyreType = TyreType.Unknown_Race;
+            if (this.compoundIndexToTyreType.TryGetValue(vehicleTelemetry.mFrontTireCompoundIndex, out tyreType))
+                return tyreType;
+
+            tyreType = TyreType.Unknown_Race;
+
             // For now, use fronts.
-            var frontCompound = vehicleTelemetry.mFrontTireCompoundName == null ? "" : RF2GameStateMapper.GetStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
+            var frontCompound = RF2GameStateMapper.GetStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
 
             if (string.IsNullOrWhiteSpace(frontCompound))
-                return TyreType.Unknown_Race;
+                tyreType = TyreType.Unknown_Race;
             else if (frontCompound.Contains("HARD"))
-                return TyreType.Hard;
+                tyreType = TyreType.Hard;
             else if (frontCompound.Contains("MEDIUM"))
-                return TyreType.Medium;
+                tyreType = TyreType.Medium;
             else if (frontCompound.Contains("SOFT"))
             {
                 if (frontCompound.Contains("SUPER"))
-                    return TyreType.Super_Soft;
+                    tyreType = TyreType.Super_Soft;
                 else if (frontCompound.Contains("ULTRA"))
-                    return TyreType.Ultra_Soft;
+                    tyreType = TyreType.Ultra_Soft;
 
-                return TyreType.Soft;
+                tyreType = TyreType.Soft;
             }
             else if (frontCompound.Contains("WET"))
-                return TyreType.Wet;
+                tyreType = TyreType.Wet;
             else if (frontCompound.Contains("INTERMEDIATE"))
-                return TyreType.Intermediate;
+                tyreType = TyreType.Intermediate;
             else if (frontCompound.Contains("BIAS") && frontCompound.Contains("PLY"))
-                return TyreType.Bias_Ply;
+                tyreType = TyreType.Bias_Ply;
             else if (frontCompound.Contains("PRIME"))
-                return TyreType.Prime;
+                tyreType = TyreType.Prime;
             else if (frontCompound.Contains("OPTION"))
-                return TyreType.Option;
+                tyreType = TyreType.Option;
             else if (frontCompound.Contains("ALTERNATE"))
-                return TyreType.Alternate;
+                tyreType = TyreType.Alternate;
             else if (frontCompound.Contains("PRIMARY"))
-                return TyreType.Primary;
+                tyreType = TyreType.Primary;
 
-            return TyreType.Unknown_Race;
+            // Cache the tyre type.  Use compound index for fastest lookup.
+            this.compoundIndexToTyreType.Add(vehicleTelemetry.mFrontTireCompoundIndex, tyreType);
+
+            return tyreType;
         }
 
         private ControlType MapToControlType(rFactor2Constants.rF2Control controlType)
