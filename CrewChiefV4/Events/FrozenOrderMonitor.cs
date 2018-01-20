@@ -202,11 +202,6 @@ namespace CrewChiefV4.Events
                     || (cfod.AssignedColumn != FrozenOrderColumn.None && cfod.AssignedPosition <= 2);  // Double file (grid) order.
 
                 driverToFollow = shouldFollowSafetyCar ? (useAmericanTerms ? folderThePaceCar : folderTheSafetyCar) : cfod.DriverToFollowRaw;
-
-                // Super rare case where there's no SC in FCY/Rolling.
-                // TODO: test this with Kart rolling start from pole.
-                if (shouldFollowSafetyCar && cfod.SafetyCarSpeed == -1.0f)
-                    driverToFollow = "";  // TODO: we may need special message for the case when SC is not present.  For now, simply suppress wrong message.
             }
 
             if (cfodp == FrozenOrderPhase.Rolling)
@@ -233,7 +228,7 @@ namespace CrewChiefV4.Events
                         && prevDriverToFollow != this.currDriverToFollow)  // Don't announce Follow messages for the driver that we caught up to or allowed to pass.
                     {
                         if (shouldFollowSafetyCar || AudioPlayer.canReadName(usableDriverNameToFollow))
-                        { 
+                        {
                             // Follow messages are only meaningful if there's name to announce.
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
@@ -268,6 +263,28 @@ namespace CrewChiefV4.Events
                                 MessageContents(folderCatchUpTo, usableDriverNameToFollow), Utilities.random.Next(1, 4), this, validationData));
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.StayInPole)
+                    {
+                        if (cfod.AssignedColumn == FrozenOrderColumn.None)
+                        {
+                            Console.WriteLine("FROZEN ORDER: STAY IN POLE");
+                        }
+                        else
+                        {
+                            Console.WriteLine("FROZEN ORDER: STAY IN POLE ROW");
+                        }
+                    }
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.MoveToPole)
+                    {
+                        if (cfod.AssignedColumn == FrozenOrderColumn.None)
+                        {
+                            Console.WriteLine("FROZEN ORDER: MOVE TO POLE");
+                        }
+                        else
+                        {
+                            Console.WriteLine("FROZEN ORDER: MOVE TO POLE ROW");
+                        }
                     }
                 }
             }
