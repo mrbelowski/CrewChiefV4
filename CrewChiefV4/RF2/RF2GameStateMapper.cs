@@ -383,7 +383,12 @@ namespace CrewChiefV4.rFactor2
 
             // Can't find the player or session leader vehicle info (replay).  No useful data is available.
             if (playerScoring.mIsPlayer != 1 || leaderScoring.mPlace != 1)
+            {
+                if (pgs != null)
+                    pgs.SessionData.AbruptSessionEndDetected = false;  // Not 100% sure how this happened, but I saw us entering inifinite session restart due to this sticking.
+
                 return pgs;
+            }
 
             if (RF2GameStateMapper.playerName == null)
             {
@@ -1637,6 +1642,7 @@ namespace CrewChiefV4.rFactor2
                 && pgs != null
                 && pgs.SessionData.CurrentLapIsValid
                 && !cgs.SessionData.CurrentLapIsValid
+                && !cgs.PitData.InPitlane
                 && !(cgs.SessionData.SessionType == SessionType.Race
                     && (cgs.SessionData.SessionPhase == SessionPhase.Countdown
                         || cgs.SessionData.SessionPhase == SessionPhase.Gridwalk)))
