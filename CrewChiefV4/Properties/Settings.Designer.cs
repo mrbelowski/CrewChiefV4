@@ -3070,5 +3070,17 @@ namespace CrewChiefV4.Properties {
                 this["force_single_class"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool force_min_window_size {
+            get {
+                return ((bool)(this["force_min_window_size"]));
+            }
+            set {
+                this["force_min_window_size"] = value;
+            }
+        }
     }
 }
