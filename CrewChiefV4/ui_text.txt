@@ -559,3 +559,6 @@ enable_crash_messages_help = Play 'are you OK?' messages when you crash very hea
 
 force_single_class = Force single car class
 force_single_class_help = Don't allow participants to be grouped by their car classes
+
+force_min_window_size = Force minimum window size
+force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
