@@ -84,6 +84,7 @@ namespace CrewChiefV4
         private Boolean preferAlternativeDownloadSite = UserSettings.GetUserSettings().getBoolean("prefer_alternative_download_site");
         private Boolean minimizeToTray = UserSettings.GetUserSettings().getBoolean("minimize_to_tray");
         private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
+        public static Boolean forceMinWindowSize = UserSettings.GetUserSettings().getBoolean("force_min_window_size");
 
         private float latestSoundPackVersion = -1;
         private float latestDriverNamesVersion = -1;
@@ -100,6 +101,10 @@ namespace CrewChiefV4
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            if (forceMinWindowSize)
+            {
+                this.MinimumSize = new System.Drawing.Size(1160, 730);
+            }
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
             /*
             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");

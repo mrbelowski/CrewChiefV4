@@ -24,6 +24,11 @@ namespace CrewChiefV4
 
         public PropertiesForm(System.Windows.Forms.Form parent)
         {
+            if (MainWindow.forceMinWindowSize)
+            {
+                this.MinimumSize = new System.Drawing.Size(995, 745);
+            }
+
             hasChanges = false;
             this.parent = parent;
             InitializeComponent();
