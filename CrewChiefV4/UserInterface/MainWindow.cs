@@ -100,6 +100,7 @@ namespace CrewChiefV4
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            this.MinimumSize = new System.Drawing.Size(1160, 730);
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
             /*
             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
