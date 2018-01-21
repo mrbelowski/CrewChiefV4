@@ -362,6 +362,12 @@ namespace CrewChiefV4.Audio
                     if (soundSets.ContainsKey(soundName))
                     {
                         SoundSet soundSet = soundSets[soundName];
+                        // double check whether this soundSet wants to allow personalisations at this point - 
+                        // this prevents the app always choosing the personalised version of a sound if this sound is infrequent
+                        if (soundSet.forceNonPersonalisedVersion())
+                        {
+                            preferPersonalised = false;
+                        }
                         singleSound = soundSet.getSingleSound(preferPersonalised);
                         if (!soundSet.cacheSoundPlayersPermanently)
                         {
@@ -725,6 +731,9 @@ namespace CrewChiefV4.Audio
         private List<int> indexes = null;
         private int indexesPosition = 0;
 
+        // allow the non-personalised versions of this soundset to play, if it's not frequent and has personalisations
+        private Boolean lastVersionWasPersonalised = false;
+
         public SoundSet(DirectoryInfo soundFolder, Boolean useSwearyMessages, Boolean cacheFileData, Boolean cacheSoundPlayers, 
             Boolean cacheSoundPlayersPermanently, Boolean eagerlyCreateSoundPlayers)
         {
@@ -736,6 +745,11 @@ namespace CrewChiefV4.Audio
             this.eagerlyCreateSoundPlayers = eagerlyCreateSoundPlayers;
             this.cacheSoundPlayersPermanently = cacheSoundPlayersPermanently;
             initialise();
+        }
+
+        public Boolean forceNonPersonalisedVersion()
+        {
+            return lastVersionWasPersonalised && singleSoundsNoPrefixOrSuffix.Count > 0;
         }
 
         private void shuffle(List<int> list)
@@ -895,6 +909,7 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
+                lastVersionWasPersonalised = true;
                 return ss;
             } 
             else if (singleSoundsNoPrefixOrSuffix.Count > 0)
@@ -923,6 +938,7 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
+                lastVersionWasPersonalised = false;
                 return ss;
             }
             else
