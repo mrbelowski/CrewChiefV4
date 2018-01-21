@@ -1559,9 +1559,15 @@ namespace CrewChiefV4.rFactor2
 
                         // Apparently, 2 means not allowed, 3 means allowed.  Currently, only SCR plugin sets this to 2.
                         //Debug.Assert(allowedToPit == 2 || allowedToPit == 3);
-                        // TODO: test what allowedToPit == 0 means with core rules, what a PITA.
-                        var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;
-                        cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
+                        // CORE RULES: ALWAYS open, pit state == 3
+                        if (shared.extended.mHostedPluginVars.StockCarRules_IsHosted == 0)
+                            cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
+                        else
+                        {
+                            var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;
+                            cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
+                        }
+                        //cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                     }
                     else
                         cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
