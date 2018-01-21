@@ -1564,7 +1564,7 @@ namespace CrewChiefV4.rFactor2
                             cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                         else
                         {
-                            var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;
+                            var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;  // TODO: Figure out exact SCR flag for pits open
                             cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                         }
                         //cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
