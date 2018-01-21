@@ -1314,7 +1314,9 @@ namespace CrewChiefV4.RaceRoom
             {
                 lastTimeEngineWasRunning = currentGameState.Now;
             }
+            // don't check for stalled engine in qualify because this will be triggered when starting a lap in rolling-start qual
             if (!currentGameState.PitData.InPitlane && 
+                currentGameState.SessionData.SessionType != SessionType.Qualify &&
                 previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
                 currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
                 lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))

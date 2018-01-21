@@ -302,7 +302,7 @@ namespace CrewChiefV4.Audio
             {
                 // we can now select a personalised message, but we don't always do this - the probability is based 
                 // on the time since the last one
-                due = Utilities.random.NextDouble() < (secondsSinceLastPersonalisedMessage / minSecondsBetweenPersonalisedMessages) - 1;
+                due = Utilities.random.NextDouble() < 1 - minSecondsBetweenPersonalisedMessages / secondsSinceLastPersonalisedMessage;
             }
             return due;
         }
