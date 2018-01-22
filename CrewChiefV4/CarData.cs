@@ -327,6 +327,8 @@ namespace CrewChiefV4
                 this.isBatteryPowered = false;
             }
 
+            // Turns out enum.ToString() is costly, so cache string representation of enum value.
+            private String carClassEnumString = null;
             public String getClassIdentifier()
             {
                 if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE || this.carClassEnum == CarClassEnum.USER_CREATED)
@@ -337,7 +339,12 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    return this.carClassEnum.ToString();
+                    if (this.carClassEnumString == null)
+                    {
+                        this.carClassEnumString = this.carClassEnum.ToString();
+                    }
+
+                    return this.carClassEnumString;
                 }
             }
 
