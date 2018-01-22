@@ -7,6 +7,7 @@ using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4.Audio
 {
@@ -292,7 +293,7 @@ namespace CrewChiefV4.Audio
         
         public Boolean personalisedMessageIsDue()
         {
-            double secondsSinceLastPersonalisedMessage = (DateTime.Now - lastPersonalisedMessageTime).TotalSeconds;
+            double secondsSinceLastPersonalisedMessage = (GameStateData.CurrentTime - lastPersonalisedMessageTime).TotalSeconds;
             Boolean due = false;
             if (minSecondsBetweenPersonalisedMessages == 0)
             {
@@ -302,7 +303,7 @@ namespace CrewChiefV4.Audio
             {
                 // we can now select a personalised message, but we don't always do this - the probability is based 
                 // on the time since the last one
-                due = Utilities.random.NextDouble() < 1 - minSecondsBetweenPersonalisedMessages / secondsSinceLastPersonalisedMessage;
+                due = Utilities.random.NextDouble() < 1.2 - minSecondsBetweenPersonalisedMessages / secondsSinceLastPersonalisedMessage;
             }
             return due;
         }
@@ -404,12 +405,12 @@ namespace CrewChiefV4.Audio
                 if (prefix != null)
                 {
                     singleSoundsToPlay.Insert(0, prefix.getSingleSound(false));
-                    lastPersonalisedMessageTime = DateTime.Now;
+                    lastPersonalisedMessageTime = GameStateData.CurrentTime;
                 }
                 if (suffix != null)
                 {
                     singleSoundsToPlay.Add(suffix.getSingleSound(false));
-                    lastPersonalisedMessageTime = DateTime.Now;
+                    lastPersonalisedMessageTime = GameStateData.CurrentTime;
                 }
                 foreach (SingleSound singleSound in singleSoundsToPlay)
                 {
@@ -902,9 +903,9 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         // this is a sweary message - can we play it? do we have to play it?
-                        if (prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count || DateTime.Now > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
+                        if (prefixOrSuffixIndexesPosition == prefixOrSuffixIndexes.Count || GameStateData.CurrentTime > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
                         {
-                            SoundCache.lastSwearyMessageTime = DateTime.Now;
+                            SoundCache.lastSwearyMessageTime = GameStateData.CurrentTime;
                             break;
                         }
                     }
@@ -931,9 +932,9 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         // this is a sweary message - can we play it? do we have to play it?
-                        if (indexesPosition == indexes.Count || DateTime.Now > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
+                        if (indexesPosition == indexes.Count || GameStateData.CurrentTime > SoundCache.lastSwearyMessageTime + TimeSpan.FromSeconds(10))
                         {
-                            SoundCache.lastSwearyMessageTime = DateTime.Now;
+                            SoundCache.lastSwearyMessageTime = GameStateData.CurrentTime;
                             break;
                         }
                     }
