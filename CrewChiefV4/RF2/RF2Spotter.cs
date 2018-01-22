@@ -55,7 +55,9 @@ namespace CrewChiefV4.rFactor2
 
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-            // var watch = System.Diagnostics.Stopwatch.StartNew();
+#if TRACE_SPOTTER_ELAPSED_TIME
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
             if (this.paused)
                 return;
 
@@ -179,9 +181,11 @@ namespace CrewChiefV4.rFactor2
 
             this.internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
 
-            //watch.Stop();
-            //float microsecPerTick = (1000.0f * 1000.0f) / System.Diagnostics.Stopwatch.Frequency;
-            //System.Console.WriteLine("Elapsed: " + watch.ElapsedTicks / microsecPerTick);
+#if TRACE_SPOTTER_ELAPSED_TIME
+            watch.Stop();
+            var microseconds = watch.ElapsedTicks * 1000000 / System.Diagnostics.Stopwatch.Frequency;
+            System.Console.WriteLine("Spotter microseconds: " + microseconds);
+#endif
         }
     }
 }
