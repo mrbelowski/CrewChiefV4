@@ -363,6 +363,8 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
                 currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
                 currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+
+                currentGameState.Conditions.samples = previousGameState.Conditions.samples;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
@@ -643,10 +645,6 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // track conditions
-            if (previousGameState != null)
-            {
-                currentGameState.Conditions.samples = previousGameState.Conditions.samples;
-            }
             if (currentGameState.Now > nextConditionsSampleDue)
             {
                 nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);

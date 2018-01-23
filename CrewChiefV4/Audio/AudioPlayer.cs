@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using CrewChiefV4.GameState;
 using System.Collections;
 using System.Runtime.Remoting.Contexts;
+using System.Diagnostics;
 
 namespace CrewChiefV4.Audio
 {
@@ -1189,7 +1190,9 @@ namespace CrewChiefV4.Audio
 
         public static Boolean canReadName(String rawName)
         {
-            return CrewChief.enableDriverNames &&
+            Debug.Assert(!string.IsNullOrWhiteSpace(rawName), "rawName should never be an empty string, this is a bug.");
+
+            return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
                 ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
         }
     }

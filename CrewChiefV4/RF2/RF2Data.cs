@@ -629,7 +629,7 @@ namespace CrewChiefV4.rFactor2
             [XmlIgnore] public double mCurrentRelativeDistance;      // equal to ( ( ScoringInfoV01::mLapDist * this->mRelativeLaps ) + VehicleScoringInfoV01::mLapDist )
 
             // input/output
-            [XmlIgnore] public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
+            public int mRelativeLaps;                   // current formation/caution laps relative to safety car (should generally be zero except when safety car crosses s/f line); this can be decremented to implement 'wave around' or 'beneficiary rule' (a.k.a. 'lucky dog' or 'free pass')
             public rF2TrackRulesColumn mColumnAssignment;// which column (line/lane) that participant is supposed to be in
             public int mPositionAssignment;             // 0-based position within column (line/lane) that participant is supposed to be located at (-1 is invalid)
             public byte mAllowedToPit;                   // whether the rules allow this particular vehicle to enter pits right now
@@ -823,6 +823,14 @@ namespace CrewChiefV4.rFactor2
         };
 
 
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct rF2HostedPluginVars
+        {
+            public byte StockCarRules_IsHosted;        // Is StockCarRules.dll successfully loaded into SM plugin?
+            public int StockCarRules_DoubleFileType;   // DoubleFileType plugin variable value.
+        }
+
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Extended
         {
@@ -831,7 +839,6 @@ namespace CrewChiefV4.rFactor2
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] mVersion;                            // API version
             public byte is64bit;                               // Is 64bit plugin?
-            public byte isStockCarRulesPluginHosted;           // Is StockCarRules.dll successfully loaded into SM plugin?
 
             // Physics options (updated on session start):
             public rF2PhysicsOptions mPhysics;
@@ -853,6 +860,8 @@ namespace CrewChiefV4.rFactor2
             // Captured non-empty MessageInfoV01::mText message.
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] mDisplayedMessageUpdateCapture;
+
+            public rF2HostedPluginVars mHostedPluginVars;
         }
 
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define TRACE_SPOTTER_ELAPSED_TIME
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,6 +57,9 @@ namespace CrewChiefV4.rFactor2
 
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
+#if TRACE_SPOTTER_ELAPSED_TIME
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
             if (this.paused)
                 return;
 
@@ -177,6 +182,12 @@ namespace CrewChiefV4.rFactor2
             }
 
             this.internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+
+#if TRACE_SPOTTER_ELAPSED_TIME
+            watch.Stop();
+            var microseconds = watch.ElapsedTicks * 1000000 / System.Diagnostics.Stopwatch.Frequency;
+            System.Console.WriteLine("Spotter microseconds: " + microseconds);
+#endif
         }
     }
 }
