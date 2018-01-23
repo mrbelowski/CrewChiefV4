@@ -1817,6 +1817,9 @@ namespace CrewChiefV4.GameState
     public class DeltaTime
     {
         public Dictionary<float, DateTime> deltaPoints =  new Dictionary<float, DateTime>();
+        // this array holds the keyset of the above dictionary:
+        private float[] deltaPointsKeysArray = new float[] {};
+
         public float currentDeltaPoint = -1;
         public float nextDeltaPoint = -1;
         public float distanceRoundTrackOnCurrentLap = -1;
@@ -1857,6 +1860,9 @@ namespace CrewChiefV4.GameState
                     currentDeltaPoint = totalSpacing;
                 }
             }
+            // extract the keyset to a float array so we can iterate it much more efficiently - the keyset doesn't
+            // change after the dictionary has been constructed
+            deltaPointsKeysArray = deltaPoints.Keys.ToArray();
         }
         public void SetNextDeltaPoint(float distanceRoundTrackOnCurrentLap, int lapsCompleted, float speed, DateTime now)
         {
@@ -1870,7 +1876,7 @@ namespace CrewChiefV4.GameState
 
             // expanded equivalent:
             float deltaPoint = 0;
-            foreach (float key in deltaPoints.Keys)
+            foreach (float key in deltaPointsKeysArray)
             {
                 if (key >= distanceRoundTrackOnCurrentLap)
                 {
