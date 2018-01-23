@@ -413,10 +413,7 @@ namespace CrewChiefV4.GameState
         public Tuple<String, float> LicenseLevel = new Tuple<String, float>("invalid", -1);
 
         public int iRating = 0;
-
-        // This is updated on every tick so should always be accurate
-        public int NumberOfClasses = 1;
-
+        
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
@@ -1968,6 +1965,9 @@ namespace CrewChiefV4.GameState
         public static Boolean useManualFormationLap = false;
         public static Boolean onManualFormationLap = false;
 
+        // This is updated on every tick so should always be accurate. NOTE THIS IS NOT SET FOR IRACING!
+        public static int NumberOfClasses = 1;
+
         public static DateTime CurrentTime = DateTime.Now;
 
         public long Ticks;
@@ -2221,8 +2221,12 @@ namespace CrewChiefV4.GameState
 
         public void sortClassPositions()
         {
-            // if we group all classes together, set everyone's ClassPosition to their Position. We still count the number of classes here:
-            if (forceSingleClass())
+            // if we group all classes together, set everyone's ClassPosition to their Position. We still count the number of classes here.
+            // If the number of classes at the previous check was 1, don't do the full sorting. This will allow single class sessions to skip
+            // the expensive sort call. In multiclass sessions we'll still update NumberOfClasses to be correct here, then on the next tick
+            // the class positions will be sorted properly. So we'll be behind for 1 tick in practice / qual if a new class car joins. For races
+            // cars tend to only leave, so this will probably be OK
+            if (forceSingleClass() || GameStateData.NumberOfClasses == 1)
             {
                 HashSet<String> classIds = new HashSet<string>();
                 classIds.Add(this.carClass.getClassIdentifier());
@@ -2232,7 +2236,7 @@ namespace CrewChiefV4.GameState
                     opponentData.ClassPosition = opponentData.Position;
                     classIds.Add(opponentData.CarClass.getClassIdentifier());
                 }
-                this.SessionData.NumberOfClasses = classIds.Count;
+                GameStateData.NumberOfClasses = classIds.Count;
             }
             else
             {
@@ -2271,7 +2275,7 @@ namespace CrewChiefV4.GameState
                         this.SessionData.ClassPosition = countForThisClass;
                     }
                 }
-                this.SessionData.NumberOfClasses = classCounts.Count;
+                GameStateData.NumberOfClasses = classCounts.Count;
             }
         }
 
