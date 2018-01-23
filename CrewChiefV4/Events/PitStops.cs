@@ -64,6 +64,9 @@ namespace CrewChiefV4.Events
         private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_requested";
         private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
 
+        // TODO: record me:
+        private String folderMetres = "mandatory_pit_stops/metres";
+
         private int pitWindowOpenLap;
 
         private int pitWindowClosedLap;
@@ -210,6 +213,7 @@ namespace CrewChiefV4.Events
 
             if (pitBoxPositionCountdown && currentGameState.PitData.PitBoxPositionEstimate > 0 && 
                 currentGameState.SessionData.CompletedLaps > 0 &&
+                !currentGameState.PenaltiesData.HasDriveThrough &&
                 currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 float distanceToBox;
@@ -238,8 +242,8 @@ namespace CrewChiefV4.Events
 
                         List<MessageFragment> messageContents = new List<MessageFragment>();
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
-                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));
-                        // TODO: add "metres" to the above
+                        messageContents.Add(MessageFragment.Text(folderMetres));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));                        
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
                 }
