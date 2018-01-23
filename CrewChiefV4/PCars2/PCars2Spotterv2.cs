@@ -12,6 +12,8 @@ namespace CrewChiefV4.PCars2
 {
     class PCars2Spotterv2 : Spotter
     {
+        private float twoPi = (float)(2 * Math.PI);
+
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
@@ -176,9 +178,12 @@ namespace CrewChiefV4.PCars2
                     float playerRotation = currentState.mOrientation[1];
                     if (playerRotation < 0)
                     {
-                        playerRotation = (float)(2 * Math.PI) + playerRotation;
+                        playerRotation = playerRotation * -1;
                     }
-                    playerRotation = (float)(2 * Math.PI) - playerRotation;
+                    else
+                    {
+                        playerRotation = twoPi - playerRotation;
+                    }
                     internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
                 }
                 
