@@ -117,9 +117,7 @@ namespace CrewChiefV4.Events
                     if (queuedAction == currentGameState.FrozenOrderData.Action
                         && queuedAssignedPosition == currentGameState.FrozenOrderData.AssignedPosition
                         && queuedDriverToFollow == currentGameState.FrozenOrderData.DriverToFollowRaw)
-                    {
                         return true;
-                    }
                     else
                     {
                         Console.WriteLine(string.Format("Frozen Order: message invalidated.  Was {0} {1} {2} is {3} {4} {5}", queuedAction, queuedAssignedPosition, queuedDriverToFollow,
@@ -128,7 +126,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            return true;
+            return false;
         }
 
         public override void clearState()
@@ -223,7 +221,8 @@ namespace CrewChiefV4.Events
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
 
                     var validationData = new Dictionary<string, object>();
-                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validationActionKey);
+                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validateMessageTypeAction);
+                    validationData.Add(FrozenOrderMonitor.validationActionKey, cfod.Action);
                     validationData.Add(FrozenOrderMonitor.validationAssignedPositionKey, cfod.AssignedPosition);
                     validationData.Add(FrozenOrderMonitor.validationDriverToFollowKey, cfod.DriverToFollowRaw);
 
@@ -294,7 +293,6 @@ namespace CrewChiefV4.Events
                 var prevDriverToFollow = this.currDriverToFollow;
                 var prevFrozenOrderColumn = this.currFrozenOrderColumn;
 
-                // TODO: see if last SCR lap needs to be announced for CatchUp as well.
                 var announceSCRLastFCYLapLane = useAmericanTerms
                     && currentGameState.StockCarRulesData.stockCarRulesEnabled
                     && (currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_NEXT || currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.LAST_LAP_CURRENT);
@@ -312,12 +310,13 @@ namespace CrewChiefV4.Events
                     this.scrLastFCYLapLaneAnnounced = announceSCRLastFCYLapLane;
 
                     // canReadDriverToFollow will be true if we're behind the safety car or we can read the driver's name:
-                    Boolean canReadDriverToFollow = shouldFollowSafetyCar || AudioPlayer.canReadName(driverToFollow);
+                    var canReadDriverToFollow = shouldFollowSafetyCar || AudioPlayer.canReadName(driverToFollow);
 
                     var usableDriverNameToFollow = shouldFollowSafetyCar ? driverToFollow : DriverNameHelper.getUsableDriverName(driverToFollow);
 
                     var validationData = new Dictionary<string, object>();
-                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validationActionKey);
+                    validationData.Add(FrozenOrderMonitor.validateMessageTypeKey, FrozenOrderMonitor.validateMessageTypeAction);
+                    validationData.Add(FrozenOrderMonitor.validationActionKey, cfod.Action);
                     validationData.Add(FrozenOrderMonitor.validationAssignedPositionKey, cfod.AssignedPosition);
                     validationData.Add(FrozenOrderMonitor.validationDriverToFollowKey, cfod.DriverToFollowRaw);
 
