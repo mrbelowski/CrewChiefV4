@@ -12,6 +12,8 @@ namespace CrewChiefV4.RaceRoom
 {
     class R3ESpotterv2 : Spotter
     {
+        private float twoPi = (float)(2 * Math.PI);
+
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("r3e_spotter_car_length");
@@ -109,7 +111,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentPlayerData = getDriverData(currentState, currentState.VehicleInfo.SlotId);
                 previousPlayerData = getDriverData(lastState, currentState.VehicleInfo.SlotId);
-                timeDiffSeconds = ((float)(now - previousTime).TotalMilliseconds) / 1000f;
+                timeDiffSeconds = (float)(now - previousTime).TotalSeconds;
                 previousTime = now;
                 if (timeDiffSeconds <= 0)
                 {
@@ -153,12 +155,15 @@ namespace CrewChiefV4.RaceRoom
                     positionsFilledForThisTick.Add(driverData.Place);
                     currentOpponentPositions.Add(new float[] { driverData.Position.X, driverData.Position.Z });
                 }
-                float playerRotation = currentState.CarOrientation.Yaw;                
+                float playerRotation = currentState.CarOrientation.Yaw;
                 if (playerRotation < 0)
                 {
-                    playerRotation = (float)(2 * Math.PI) + playerRotation;
+                    playerRotation = playerRotation * -1;
                 }
-                playerRotation = (float)(2 * Math.PI) - playerRotation;
+                else
+                {
+                    playerRotation = twoPi - playerRotation;
+                }
                 internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             }
         }

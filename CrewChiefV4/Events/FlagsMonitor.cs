@@ -394,15 +394,12 @@ namespace CrewChiefV4.Events
                         {
                             Console.WriteLine("Won't announce current lucky dog because it appears to be player");
                         }
-                        else
+                        else if (AudioPlayer.canReadName(currentGameState.StockCarRulesData.luckyDogNameRaw))
                         {
                             var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
-                            if (AudioPlayer.canReadName(usableDriverName))
-                            {
-                                Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
-                                audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
-                                    MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
-                            }
+                            Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
+                            audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
+                                MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
                         }
                     }
 

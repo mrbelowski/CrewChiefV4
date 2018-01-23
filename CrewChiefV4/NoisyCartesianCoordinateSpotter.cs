@@ -28,7 +28,7 @@ namespace CrewChiefV4
 
     public class NoisyCartesianCoordinateSpotter
     {
-        private float calculateOpponentSpeedsEvery = 200f;
+        private float calculateOpponentSpeedsEvery = 0.2f;
 
         private float carBehindExtraLength = 0.4f;
 
@@ -271,7 +271,7 @@ namespace CrewChiefV4
                 float minLateralSeparationForOverlapRight = -1;
                 float maxLateralSeparationForOverlapRight = -1;
 
-                List<int> activeIDs = new List<int>();
+                HashSet<int> activeIDs = new HashSet<int>();
                 for (int i = 0; i < currentOpponentPositions.Count; i++)
                 {
                     float[] currentOpponentPosition = currentOpponentPositions[i];
@@ -285,12 +285,12 @@ namespace CrewChiefV4
                             if (previousPositionAndVelocityData.ContainsKey(i))
                             {
                                 PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];
-                                float timeDiffMillis = ((float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalMilliseconds);
-                                if (timeDiffMillis >= calculateOpponentSpeedsEvery)
+                                float timeDiffSeconds = (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalSeconds;
+                                if (timeDiffSeconds >= calculateOpponentSpeedsEvery)
                                 {
                                     opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
-                                    opponentPreviousPositionAndVelocityData.xSpeed = 1000f * (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffMillis;
-                                    opponentPreviousPositionAndVelocityData.zSpeed = 1000f * (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.zPosition) / timeDiffMillis;
+                                    opponentPreviousPositionAndVelocityData.xSpeed = (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds;
+                                    opponentPreviousPositionAndVelocityData.zSpeed = (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.zPosition) / timeDiffSeconds;
                                     opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
                                     opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
                                 }
@@ -487,8 +487,8 @@ namespace CrewChiefV4
 
             // now transform the position by rotating the frame of reference to align it north-south. The player's car is at the origin pointing north.
             // We assume that both cars have similar orientations (or at least, any orientation difference isn't going to be relevant)
-            float alignedXCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawXCoordinate) + ((float)Math.Sin(playerRotationInRadians) * rawZCoordinate);
-            float alignedZCoordinate = ((float)Math.Cos(playerRotationInRadians) * rawZCoordinate) - ((float)Math.Sin(playerRotationInRadians) * rawXCoordinate);
+            float alignedXCoordinate = (float)((Math.Cos(playerRotationInRadians) * rawXCoordinate) + (Math.Sin(playerRotationInRadians) * rawZCoordinate));
+            float alignedZCoordinate = (float)((Math.Cos(playerRotationInRadians) * rawZCoordinate) - (Math.Sin(playerRotationInRadians) * rawXCoordinate));
             return new float[] {alignedXCoordinate, alignedZCoordinate};
         }
 
