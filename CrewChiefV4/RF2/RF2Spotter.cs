@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define TRACE_SPOTTER_ELAPSED_TIME
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
