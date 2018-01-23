@@ -1189,8 +1189,7 @@ namespace CrewChiefV4.Audio
 
         public static Boolean canReadName(String rawName)
         {
-            return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
-                ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+            return (SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName));
         }
     }
 }
