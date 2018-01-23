@@ -1556,18 +1556,15 @@ namespace CrewChiefV4.rFactor2
                         && shared.scoring.mScoringInfo.mYellowFlagState == (sbyte)rFactor2Constants.rF2YellowFlagState.PitClosed)
                     {
                         var allowedToPit = shared.rules.mParticipants[playerRulesIdx].mAllowedToPit;
-
-                        // Apparently, 2 means not allowed, 3 means allowed.  Currently, only SCR plugin sets this to 2.
-                        //Debug.Assert(allowedToPit == 2 || allowedToPit == 3);
-                        // CORE RULES: ALWAYS open, pit state == 3
+                        // Core rules: always open, pit state == 3
                         if (shared.extended.mHostedPluginVars.StockCarRules_IsHosted == 0)
                             cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
                         else
                         {
-                            var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;  // TODO: Figure out exact SCR flag for pits open
+                            // Apparently, 0 and 2 means not allowed with SCR plugin.
+                            var pitsClosedForPlayer = allowedToPit == 2 || allowedToPit == 0;
                             cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                         }
-                        //cgs.FlagData.fcyPhase = pitsClosedForPlayer ? FullCourseYellowPhase.PITS_CLOSED : FullCourseYellowPhase.PITS_OPEN;
                     }
                     else
                         cgs.FlagData.fcyPhase = FullCourseYellowPhase.PITS_OPEN;
