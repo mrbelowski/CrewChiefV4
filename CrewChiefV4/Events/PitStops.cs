@@ -233,7 +233,9 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("Pit box is " + distanceToBox + " metres away");
                     if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", MessageContents(100), 0, null));
+                        List<MessageFragment> messageContents = new List<MessageFragment>();
+                        messageContents.Add(MessageFragment.Integer(100, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
+                        audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", messageContents, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
                     }
