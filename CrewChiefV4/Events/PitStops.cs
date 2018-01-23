@@ -122,9 +122,9 @@ namespace CrewChiefV4.Events
         private Boolean warnedAboutOccupiedPitOnThisLap = false;
 
         private float previousDistanceToBox = -1;
+        private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
         private Boolean played100MetreWarning = false;
         private Boolean played50MetreWarning = false;
-        private Boolean played20MetreWarning = false;
         
         public PitStops(AudioPlayer audioPlayer)
         {
@@ -169,7 +169,7 @@ namespace CrewChiefV4.Events
             previousDistanceToBox = -1;
             played100MetreWarning = false;
             played50MetreWarning = false;
-            played20MetreWarning = false;
+            playedLimiterLineToPitBoxDistanceWarning = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -210,27 +210,41 @@ namespace CrewChiefV4.Events
 
             if (pitBoxPositionCountdown && currentGameState.PitData.PitBoxPositionEstimate > 0 && 
                 currentGameState.SessionData.CompletedLaps > 0 &&
-                currentGameState.SessionData.SessionType == SessionType.Race) {
+                currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                float distanceToBox;
+                if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
+                {
+                    distanceToBox = currentGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                }
+                else
+                {
+                    distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack + currentGameState.PitData.PitBoxPositionEstimate;
+                }
                 if (previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     // just entered the pitlane
                     previousDistanceToBox = 0;
                     played100MetreWarning = false;
                     played50MetreWarning = false;
-                    played20MetreWarning = false;
+                    if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
+                    {
+                        int distanceToBoxInt = (int)distanceToBox;
+                        int distanceToBoxRounded;
+                        if (distanceToBoxInt % 10 == 0)
+                            distanceToBoxRounded = distanceToBoxInt;
+                        else
+                            distanceToBoxRounded = (10 - distanceToBoxInt % 10) + distanceToBoxInt;
+
+                        List<MessageFragment> messageContents = new List<MessageFragment>();
+                        messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
+                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));
+                        // TODO: add "metres" to the above
+                    }
+                    playedLimiterLineToPitBoxDistanceWarning = true;
                 }
                 else if (currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
                 {
-                    float distanceToBox;
-                    if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
-                    {
-                        distanceToBox = currentGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack;
-                    }
-                    else
-                    {
-                        distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack + currentGameState.PitData.PitBoxPositionEstimate;
-                    }
-                    Console.WriteLine("Pit box is " + distanceToBox + " metres away");
                     if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
                     {
                         List<MessageFragment> messageContents = new List<MessageFragment>();
@@ -244,12 +258,6 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50), 0, null));
                         previousDistanceToBox = distanceToBox;
                         played50MetreWarning = true;
-                    }
-                    else if (!played20MetreWarning && distanceToBox < 20 && previousDistanceToBox > 15)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("20_metre_warning", MessageContents(20), 0, null));
-                        previousDistanceToBox = -1;
-                        played20MetreWarning = true;
                     }
                     else if (previousDistanceToBox > -1)
                     {
