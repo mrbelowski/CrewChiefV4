@@ -440,11 +440,13 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG)
                         {
+                            Console.WriteLine("Stock Car Rule triggered: " + currentGreenFlagLuckyDogStatus);
                             audioPlayer.playMessage(new QueuedMessage(folderWeAreInLuckyDogPosition, 0, this));
                         }
-                        else
+                        else if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG)
                         {
                             OpponentData carAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                            Console.WriteLine("Stock Car Rule triggered: " + currentGreenFlagLuckyDogStatus + " driver to pass: " + (carAhead != null ? carAhead.DriverRawName : "not found"));
                             if (carAhead != null && AudioPlayer.canReadName(carAhead.DriverRawName))
                             {
                                 audioPlayer.playMessage(new QueuedMessage("push_to_pass_lucky_dog", 

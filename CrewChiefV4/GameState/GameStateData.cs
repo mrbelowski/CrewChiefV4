@@ -213,7 +213,9 @@ namespace CrewChiefV4.GameState
         None,
         Follow,
         CatchUp,
-        AllowToPass
+        AllowToPass,
+        StayInPole,  // Case of being assigned pole/pole row with no SC present (Rolling start in rF2 Karts, for example).
+        MoveToPole  // Case of falling behind assigned pole/pole row with no SC present (Rolling start in rF2 Karts, for example).
     }
 
     public class FrozenOrderData
