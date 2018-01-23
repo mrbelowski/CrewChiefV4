@@ -62,7 +62,7 @@ namespace CrewChiefV4.iRacing
                 _driver = null;
             }
 
-            // Assume max 128 drivers
+            // Assume max 70 drivers
             for (int id = 0; id < 70; id++)
             {
                 // Find existing driver in list
