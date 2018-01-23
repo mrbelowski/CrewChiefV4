@@ -61,7 +61,6 @@ namespace CrewChiefV4.iRacing
             this.LastTime = Parser.ParseFloat(query["LastTime"].GetValue());
             this.LapsLed = Parser.ParseInt(query["LapsLed"].GetValue());
 
-            var previousLaps = this.LapsComplete;
             this.LapsComplete = Parser.ParseInt(query["LapsComplete"].GetValue());
             this.LapsDriven = Parser.ParseInt(query["LapsDriven"].GetValue());
 

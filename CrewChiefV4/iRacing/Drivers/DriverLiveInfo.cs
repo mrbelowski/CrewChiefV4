@@ -32,7 +32,7 @@ namespace CrewChiefV4.iRacing
         public float CorrectedLapDistance { get; private set; }
         public float TotalLapDistance
         {
-            get { return Lap + CorrectedLapDistance; }
+            get { return this.LapsCompleted + CorrectedLapDistance; }
         }
 
         public TrackSurfaces TrackSurface { get; private set; }
@@ -88,7 +88,7 @@ namespace CrewChiefV4.iRacing
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                this.LapTimePrevious = e.LapLastLapTime;                            
+                this.LapTimePrevious = this._driver.CurrentResults.LastTime;                            
             }
             else
             {
@@ -98,7 +98,7 @@ namespace CrewChiefV4.iRacing
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
         {
-            if (this.Lap > _prevLap && carIdxLapDistPct > 0.80f)
+            if (this.Lap > _prevLap && carIdxLapDistPct > 0.90f)
                 return 0;
             else
                 _prevLap = this.Lap;
@@ -106,14 +106,14 @@ namespace CrewChiefV4.iRacing
             return carIdxLapDistPct;
         }
 
-        public void CalculateSpeed(iRacingData current, double? trackLengthKm)
+        public void CalculateSpeed(iRacingData telemetry, double? trackLengthKm)
         {
-            if (current == null) return;
+            if (telemetry == null) return;
             if (trackLengthKm == null) return;
 
             try
             {
-                var t1 = current.SessionTime;
+                var t1 = telemetry.SessionTime;
                 var t0 = _prevSpeedUpdateTime;
                 var time = t1 - t0;
 
@@ -123,7 +123,7 @@ namespace CrewChiefV4.iRacing
                     return;
                 }
 
-                var p1 = current.CarIdxLapDistPct[this.Driver.Id];
+                var p1 = telemetry.CarIdxLapDistPct[this.Driver.Id];
                 var p0 = _prevSpeedUpdateDist;
 
                 if (p1 < -0.5 || _driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
@@ -139,7 +139,7 @@ namespace CrewChiefV4.iRacing
                 }
                 var distancePct = p1 - p0;
 
-                var distance = distancePct*trackLengthKm.GetValueOrDefault()*1000; //meters
+                var distance = distancePct * trackLengthKm.GetValueOrDefault() * 1000; //meters
 
 
                 if (time >= Double.Epsilon)
