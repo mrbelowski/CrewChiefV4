@@ -183,6 +183,10 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
+                    if(driver.IsSpectator || driver.IsPacecar)
+                    {
+                        continue;
+                    }
                     driver.Live.Position = pos;
                     pos++;
                 }
@@ -192,6 +196,10 @@ namespace CrewChiefV4.iRacing
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 foreach (var driver in _drivers)
                 {
+                    if (driver.IsSpectator || driver.IsPacecar)
+                    {
+                        continue;
+                    }
                     if(telemetry.CarIdxPosition[driver.Id] > 0)
                     {
                         driver.Live.Position = telemetry.CarIdxPosition[driver.Id];
@@ -214,6 +222,10 @@ namespace CrewChiefV4.iRacing
                 var pos = 1;
                 foreach (var driver in drivers.OrderBy(d => d.Live.Position))
                 {
+                    if (driver.IsSpectator || driver.IsPacecar)
+                    {
+                        continue;
+                    }
                     driver.Live.ClassPosition = pos;
                     pos++;
                 }
