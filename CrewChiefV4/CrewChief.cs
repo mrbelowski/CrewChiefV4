@@ -18,7 +18,7 @@ namespace CrewChiefV4
 {
     public class CrewChief : IDisposable
     {
-        public static Boolean Debugging = /*System.Diagnostics.Debugger.IsAttached;*/true;
+        public static Boolean Debugging = System.Diagnostics.Debugger.IsAttached;
 
         readonly int timeBetweenProcConnectCheckMillis = 500;
         readonly int timeBetweenProcDisconnectCheckMillis = 2000;
