@@ -1636,6 +1636,9 @@ namespace CrewChiefV4.GameState
         public Boolean IsPitCrewReady = false;
 
         public float PitSpeedLimit = -1.0f;
+
+        // distance round track of pit box
+        public float PitBoxPositionEstimate = -1.0f;
     }
 
     public class PenatiesData

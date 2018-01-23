@@ -562,3 +562,6 @@ force_single_class_help = Don't allow participants to be grouped by their car cl
 
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
+
+pit_box_position_countdown = Pit box position countdown (R3E only)
+pit_box_position_countdown_help = Play distance in metres to box as you approach

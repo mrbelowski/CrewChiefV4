@@ -9,6 +9,8 @@ namespace CrewChiefV4.Events
 {
     class PitStops : AbstractEvent
     {
+        private Boolean pitBoxPositionCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown");
+
         public static String folderMandatoryPitStopsPitWindowOpensOnLap = "mandatory_pit_stops/pit_window_opens_on_lap";
         public static String folderMandatoryPitStopsPitWindowOpensAfter = "mandatory_pit_stops/pit_window_opens_after";
 
@@ -118,6 +120,11 @@ namespace CrewChiefV4.Events
         private Boolean pitStallOccupied = false;
 
         private Boolean warnedAboutOccupiedPitOnThisLap = false;
+
+        private float previousDistanceToBox = -1;
+        private Boolean played100MetreWarning = false;
+        private Boolean played50MetreWarning = false;
+        private Boolean played20MetreWarning = false;
         
         public PitStops(AudioPlayer audioPlayer)
         {
@@ -159,6 +166,10 @@ namespace CrewChiefV4.Events
             enableWindowWarnings = true;
             pitStallOccupied = false;
             warnedAboutOccupiedPitOnThisLap = false;
+            previousDistanceToBox = -1;
+            played100MetreWarning = false;
+            played50MetreWarning = false;
+            played20MetreWarning = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -196,6 +207,55 @@ namespace CrewChiefV4.Events
             {
                 enableWindowWarnings = false;
             }
+
+            if (pitBoxPositionCountdown && currentGameState.PitData.PitBoxPositionEstimate > 0 && 
+                currentGameState.SessionData.CompletedLaps > 0 &&
+                currentGameState.SessionData.SessionType == SessionType.Race) {
+                if (previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                {
+                    // just entered the pitlane
+                    previousDistanceToBox = 0;
+                    played100MetreWarning = false;
+                    played50MetreWarning = false;
+                    played20MetreWarning = false;
+                }
+                else if (currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
+                {
+                    float distanceToBox;
+                    if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
+                    {
+                        distanceToBox = currentGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                    }
+                    else
+                    {
+                        distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack + currentGameState.PitData.PitBoxPositionEstimate;
+                    }
+                    Console.WriteLine("Pit box is " + distanceToBox + " metres away");
+                    if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", MessageContents(100), 0, null));
+                        previousDistanceToBox = distanceToBox;
+                        played100MetreWarning = true;
+                    }
+                    else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50), 0, null));
+                        previousDistanceToBox = distanceToBox;
+                        played50MetreWarning = true;
+                    }
+                    else if (!played20MetreWarning && distanceToBox < 20 && previousDistanceToBox > 15)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("20_metre_warning", MessageContents(20), 0, null));
+                        previousDistanceToBox = -1;
+                        played20MetreWarning = true;
+                    }
+                    else if (previousDistanceToBox > -1)
+                    {
+                        previousDistanceToBox = distanceToBox;
+                    }
+                }
+            }
+
             if (!mandatoryStopCompleted && currentGameState.PitData.MandatoryPitStopCompleted)
             {
                 mandatoryStopCompleted = true;
