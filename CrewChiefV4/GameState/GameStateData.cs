@@ -1973,6 +1973,8 @@ namespace CrewChiefV4.GameState
         public long Ticks;
 
         public DateTime Now;
+        // lazily initialised only when we're using trace playback:
+        public String CurrentTimeStr = null;
 
         public CarData.CarClass carClass = new CarData.CarClass();
 
