@@ -90,6 +90,12 @@ namespace CrewChiefV4.Events
             get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
         }
 
+        // allow this event to trigger for FCY, but only the retired and DQ'ed checks:
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.FullCourseYellow }; }
+        }
+
         public override void clearState()
         {
             currentGameState = null;
@@ -197,100 +203,105 @@ namespace CrewChiefV4.Events
                 return;
             }
             this.currentGameState = currentGameState;
-            if (nextCarAheadChangeMessage == DateTime.MinValue)
+            // skip the lap time checks and stuff under yellow:
+            if (currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
             {
-                nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-            }
-            if (nextLeadChangeMessage == DateTime.MinValue)
-            {
-                nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-            }
-            if (currentGameState.SessionData.SessionType != SessionType.Race || frequencyOfOpponentRaceLapTimes > 0)
-            {
-                foreach (KeyValuePair<string, OpponentData> entry in currentGameState.OpponentData)
+                if (nextCarAheadChangeMessage == DateTime.MinValue)
                 {
-                    string opponentKey = entry.Key;
-                    OpponentData opponentData = entry.Value;
-
-                    // in race sessions, announce tyre type changes once the session is underway
-                    if (currentGameState.SessionData.SessionType == SessionType.Race &&
-                        currentGameState.SessionData.SessionRunningTime > 30 && opponentData.hasJustChangedToDifferentTyreType)
+                    nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                }
+                if (nextLeadChangeMessage == DateTime.MinValue)
+                {
+                    nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                }
+                if (currentGameState.SessionData.SessionType != SessionType.Race || frequencyOfOpponentRaceLapTimes > 0)
+                {
+                    foreach (KeyValuePair<string, OpponentData> entry in currentGameState.OpponentData)
                     {
-                        // this may be a race position or an OpponentData object
-                        Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
-                        if (opponentIdentifier != null)
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
-                                folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
-                        }
-                    }
+                        string opponentKey = entry.Key;
+                        OpponentData opponentData = entry.Value;
 
-                    if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
-                        opponentData.LastLapValid && opponentData.CurrentBestLapTime > 0)
-                    {
-                        float currentFastestLap;
-                        if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1)
+                        // in race sessions, announce tyre type changes once the session is underway
+                        if (currentGameState.SessionData.SessionType == SessionType.Race &&
+                            currentGameState.SessionData.SessionRunningTime > 30 && opponentData.hasJustChangedToDifferentTyreType)
                         {
-                            currentFastestLap = currentGameState.SessionData.OpponentsLapTimeSessionBestOverall;
-                        }
-                        else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1)
-                        {
-                            currentFastestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                        }
-                        else
-                        {
-                            currentFastestLap = Math.Min(currentGameState.SessionData.PlayerLapTimeSessionBest, currentGameState.SessionData.OpponentsLapTimeSessionBestOverall);
-                        }
-
-                        // this opponent has just completed a lap - do we need to report it? if it's fast overall and more than
-                        // a tenth quicker then his previous best we do...
-                        if (((currentGameState.SessionData.SessionType == SessionType.Race && opponentData.CompletedLaps > 2) ||
-                            (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
-                            (opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName)))
-                        {
-                            if ((currentGameState.SessionData.SessionType == SessionType.Race && frequencyOfOpponentRaceLapTimes > 0) ||
-                                (currentGameState.SessionData.SessionType != SessionType.Race && frequencyOfOpponentPracticeAndQualLapTimes > 0))
+                            // this may be a race position or an OpponentData object
+                            Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
+                            if (opponentIdentifier != null)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
+                                audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
+                                    folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
+                            }
+                        }
+
+                        if (opponentData.IsNewLap && opponentData.LastLapTime > 0 && opponentData.OpponentLapData.Count > 1 &&
+                            opponentData.LastLapValid && opponentData.CurrentBestLapTime > 0)
+                        {
+                            float currentFastestLap;
+                            if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1)
+                            {
+                                currentFastestLap = currentGameState.SessionData.OpponentsLapTimeSessionBestOverall;
+                            }
+                            else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall == -1)
+                            {
+                                currentFastestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                            }
+                            else
+                            {
+                                currentFastestLap = Math.Min(currentGameState.SessionData.PlayerLapTimeSessionBest, currentGameState.SessionData.OpponentsLapTimeSessionBestOverall);
+                            }
+
+                            // this opponent has just completed a lap - do we need to report it? if it's fast overall and more than
+                            // a tenth quicker then his previous best we do...
+                            if (((currentGameState.SessionData.SessionType == SessionType.Race && opponentData.CompletedLaps > 2) ||
+                                (currentGameState.SessionData.SessionType != SessionType.Race && opponentData.CompletedLaps > 1)) && opponentData.LastLapTime <= currentFastestLap &&
+                                (opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName)))
+                            {
+                                if ((currentGameState.SessionData.SessionType == SessionType.Race && frequencyOfOpponentRaceLapTimes > 0) ||
+                                    (currentGameState.SessionData.SessionType != SessionType.Race && frequencyOfOpponentPracticeAndQualLapTimes > 0))
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
+                                                TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                }
+                            }
+                            else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
+                                    (opponentData.LastLapTime <= opponentData.CurrentBestLapTime &&
+                                     opponentData.LastLapTime < opponentData.PreviousBestLapTime - minImprovementBeforeReadingOpponentRaceTime &&
+                                     opponentData.LastLapTime < currentFastestLap + maxOffPaceBeforeReadingOpponentRaceTime)) ||
+                               ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
+                                     opponentData.LastLapTime <= opponentData.CurrentBestLapTime))
+                            {
+                                if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == 1 &&
+                                    (currentGameState.SessionData.SessionType == SessionType.Race || frequencyOfOpponentPracticeAndQualLapTimes > 0))
+                                {
+                                    // he's leading, and has recorded 3 or more laps, and this one's his fastest
+                                    Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
+                                    audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
                                             TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
-                            }
-                        }
-                        else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
-                                (opponentData.LastLapTime <= opponentData.CurrentBestLapTime &&
-                                 opponentData.LastLapTime < opponentData.PreviousBestLapTime - minImprovementBeforeReadingOpponentRaceTime &&
-                                 opponentData.LastLapTime < currentFastestLap + maxOffPaceBeforeReadingOpponentRaceTime)) ||
-                           ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
-                                 opponentData.LastLapTime <= opponentData.CurrentBestLapTime))
-                        {
-                            if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == 1 &&
-                                (currentGameState.SessionData.SessionType == SessionType.Race || frequencyOfOpponentPracticeAndQualLapTimes > 0))
-                            {
-                                // he's leading, and has recorded 3 or more laps, and this one's his fastest
-                                Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
-                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
-                            }
-                            else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
-                                (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
-                            {
-                                // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
-                                Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
-                                       TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
-                            }
-                            else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
-                                (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
-                            {
-                                // he's behind us, and has recorded 3 or more laps, and this one's his fastest
-                                Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
-                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                }
+                                else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
+                                    (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
+                                {
+                                    // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
+                                    Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
+                                    audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
+                                           TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                }
+                                else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
+                                    (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
+                                {
+                                    // he's behind us, and has recorded 3 or more laps, and this one's his fastest
+                                    Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
+                                    audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
+                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                }
                             }
                         }
                     }
                 }
             }
 
+            // allow the retired and DQ checks under yellow:
             if (currentGameState.SessionData.SessionType == SessionType.Race &&
                 ((currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > 0) ||
                  (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps < currentGameState.SessionData.SessionNumberOfLaps)))
@@ -329,50 +340,55 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    if (!currentGameState.SessionData.IsRacingSameCarInFront)
+                    // skip the position change checks under yellow:
+                    if (currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
                     {
-                        if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
-                            && currentGameState.SessionData.CompletedLaps > 0)
+                        if (!currentGameState.SessionData.IsRacingSameCarInFront)
                         {
-                            OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                            if (opponentData != null)
+                            if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
+                                && currentGameState.SessionData.CompletedLaps > 0)
                             {
-                                String opponentName = opponentData.DriverRawName;
-                                if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
-                                    opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                                    (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                                OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                                if (opponentData != null)
                                 {
-                                    Console.WriteLine("new car ahead: " + opponentName);
-                                    audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
-                                        Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
-                                        new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
-                                    nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-                                    onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
-                                    lastNextCarAheadOpponentName = opponentName;
+                                    String opponentName = opponentData.DriverRawName;
+                                    if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
+                                        opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
+                                        (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                                    {
+                                        Console.WriteLine("new car ahead: " + opponentName);
+                                        audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
+                                            Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
+                                            new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
+                                        nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                                        onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
+                                        lastNextCarAheadOpponentName = opponentName;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if (currentGameState.SessionData.HasLeadChanged)
-                    {
-                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                        if (leader != null)
+                        if (currentGameState.SessionData.HasLeadChanged)
                         {
-                            String name = leader.DriverRawName;
-                            if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
-                                !name.Equals(lastLeaderAnnounced) &&
-                                currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
+                            OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                            if (leader != null)
                             {
-                                Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
-                                audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
-                                    new Dictionary<string, object> { { validationNewLeaderKey, name } }));
-                                nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
-                                lastLeaderAnnounced = name;
+                                String name = leader.DriverRawName;
+                                if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
+                                    !name.Equals(lastLeaderAnnounced) &&
+                                    currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
+                                {
+                                    Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
+                                    audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
+                                        new Dictionary<string, object> { { validationNewLeaderKey, name } }));
+                                    nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
+                                    lastLeaderAnnounced = name;
+                                }
                             }
                         }
                     }
                 }
 
+                // TODO: should probably keep the leader-pitting message under FCY, not sure about the others
                 if (currentGameState.PitData.LeaderIsPitting &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
