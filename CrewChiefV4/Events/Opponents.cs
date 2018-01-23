@@ -178,7 +178,7 @@ namespace CrewChiefV4.Events
             if ((positionToCheck > 1 && positionToCheck <= 3) ||
                 (playerRacePosition - 2 <= positionToCheck && playerRacePosition + 2 >= positionToCheck))
             {
-                if (opponentData.CanUseName && SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(opponentData.DriverRawName)))
+                if (opponentData.CanUseName && AudioPlayer.canReadName(opponentData.DriverRawName))
                 {
                     return opponentData;
                 }
@@ -295,79 +295,80 @@ namespace CrewChiefV4.Events
                 ((currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > 0) ||
                  (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps < currentGameState.SessionData.SessionNumberOfLaps)))
             {
-                foreach (String retiredDriver in currentGameState.retriedDriverNames)
+                // don't bother processing retired and DQ'ed drivers and position changes if we're not allowed to use the names:
+                if (CrewChief.enableDriverNames)
                 {
-                    if (!announcedRetirementsAndDQs.Contains(retiredDriver))
+                    foreach (String retiredDriver in currentGameState.retriedDriverNames)
                     {
-                        announcedRetirementsAndDQs.Add(retiredDriver);
-                        if ((CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
-                            && currentGameState.SessionData.SessionPhase != SessionPhase.Green
-                            && currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow
-                            && currentGameState.SessionData.SessionPhase != SessionPhase.Checkered)
+                        if (!announcedRetirementsAndDQs.Contains(retiredDriver))
                         {
-                            // In an offline session of the ISI games it is possible to select more AI drivers than a track can handle.
-                            // The ones that don't fit on a track are marked as DNF before session goes Green.  Don't announce those.
-                            continue;
-                        }
-                        String nameToAnnounce = DriverNameHelper.getUsableDriverName(retiredDriver);
-                        if (SoundCache.hasSuitableTTSVoice || SoundCache.availableDriverNames.Contains(nameToAnnounce))
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(nameToAnnounce, folderHasJustRetired), 0, this));
-                        }
-                    }
-                }
-                foreach (String dqDriver in currentGameState.disqualifiedDriverNames)
-                {
-                    if (!announcedRetirementsAndDQs.Contains(dqDriver))
-                    {
-                        announcedRetirementsAndDQs.Add(dqDriver);
-                        String nameToAnnounce = DriverNameHelper.getUsableDriverName(dqDriver);
-                        if (AudioPlayer.canReadName(nameToAnnounce))
-                        {
-                            audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(nameToAnnounce, folderHasJustBeenDisqualified), 0, this));
-                        }
-                    }
-                }
-                if (!currentGameState.SessionData.IsRacingSameCarInFront)
-                {
-                    
-                    if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
-                        && currentGameState.SessionData.CompletedLaps > 0)
-                    {
-                        OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
-                        if (opponentData != null)
-                        {
-                            String opponentName = opponentData.DriverRawName;
-                            if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
-                                opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                                (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                            announcedRetirementsAndDQs.Add(retiredDriver);
+                            if ((CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                                && currentGameState.SessionData.SessionPhase != SessionPhase.Green
+                                && currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow
+                                && currentGameState.SessionData.SessionPhase != SessionPhase.Checkered)
                             {
-                                Console.WriteLine("new car ahead: " + opponentName);
-                                audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
-                                    Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
-                                    new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
-                                nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
-                                onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
-                                lastNextCarAheadOpponentName = opponentName;
+                                // In an offline session of the ISI games it is possible to select more AI drivers than a track can handle.
+                                // The ones that don't fit on a track are marked as DNF before session goes Green.  Don't announce those.
+                                continue;
+                            }
+                            if (AudioPlayer.canReadName(retiredDriver))
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(retiredDriver), folderHasJustRetired), 0, this));
                             }
                         }
                     }
-                }
-                if (currentGameState.SessionData.HasLeadChanged)
-                {
-                    OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
-                    if (leader != null)
+                    foreach (String dqDriver in currentGameState.disqualifiedDriverNames)
                     {
-                        String name = leader.DriverRawName;
-                        if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
-                            !name.Equals(lastLeaderAnnounced) &&
-                            currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
+                        if (!announcedRetirementsAndDQs.Contains(dqDriver))
                         {
-                            Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
-                            audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
-                                new Dictionary<string, object> { { validationNewLeaderKey, name } }));
-                            nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
-                            lastLeaderAnnounced = name;
+                            announcedRetirementsAndDQs.Add(dqDriver);
+                            if (AudioPlayer.canReadName(dqDriver))
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(dqDriver), folderHasJustBeenDisqualified), 0, this));
+                            }
+                        }
+                    }
+                    if (!currentGameState.SessionData.IsRacingSameCarInFront)
+                    {
+                        if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
+                            && currentGameState.SessionData.CompletedLaps > 0)
+                        {
+                            OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                            if (opponentData != null)
+                            {
+                                String opponentName = opponentData.DriverRawName;
+                                if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
+                                    opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
+                                    (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                                {
+                                    Console.WriteLine("new car ahead: " + opponentName);
+                                    audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
+                                        Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
+                                        new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
+                                    nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
+                                    onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
+                                    lastNextCarAheadOpponentName = opponentName;
+                                }
+                            }
+                        }
+                    }
+                    if (currentGameState.SessionData.HasLeadChanged)
+                    {
+                        OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                        if (leader != null)
+                        {
+                            String name = leader.DriverRawName;
+                            if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
+                                !name.Equals(lastLeaderAnnounced) &&
+                                currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
+                            {
+                                Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
+                                audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
+                                    new Dictionary<string, object> { { validationNewLeaderKey, name } }));
+                                nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
+                                lastLeaderAnnounced = name;
+                            }
                         }
                     }
                 }
