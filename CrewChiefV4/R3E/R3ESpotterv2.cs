@@ -109,7 +109,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentPlayerData = getDriverData(currentState, currentState.VehicleInfo.SlotId);
                 previousPlayerData = getDriverData(lastState, currentState.VehicleInfo.SlotId);
-                timeDiffSeconds = ((float)(now - previousTime).TotalMilliseconds) / 1000f;
+                timeDiffSeconds = (float)(now - previousTime).TotalSeconds;
                 previousTime = now;
                 if (timeDiffSeconds <= 0)
                 {
