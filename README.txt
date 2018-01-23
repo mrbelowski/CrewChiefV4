@@ -202,6 +202,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.0.8: Some internal fixes; more performance improvements; fixed 'enable driver names' flag being ignored for some messages; added optional pit box countdown (R3E only, enable with property "pit_box_position_countdown")
+
 Version 4.9.0.7: Added messages for oil and fuel pressure warnings (iRacing only); Added messages for stalling the engine; Added messages when you crash very heavily - the app will ask if you're OK and, if you're using voice commands, wait for you to respond (this can be disabled with the "Enable crash messages" option in Properties); Only use start-line track temperature in pCARS to prevent the app calling local track temp variations; Allow multi-class support to be disabled ("Force single class" property) - useful if you're playing with 3rd party content that has incorrect car class IDs; More performance improvements; Prevent the app's windows being resized such that controls are no longer visible (this behaviour can be disabled by unchecking the "Force minimum window size" property)
 
 Version 4.9.0.6: Don't play 'good pass' message in pCARS 2 if we've just collided with someone (might still need some tuning); some performance improvements; fixed issues with historical weather data being lost; pCARS 2 pit window fixes (again...); fixed missing DQ / DNF session end messages; fixed mid-point fuel report saying "fuel looks good" when it clearly isn't good
