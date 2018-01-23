@@ -16,6 +16,7 @@ using CrewChiefV4.Audio;
 using CrewChiefV4.UserInterface;
 using System.Diagnostics;
 using CrewChiefV4.commands;
+using CrewChiefV4.GameState;
 
 namespace CrewChiefV4
 {
@@ -2238,8 +2239,25 @@ namespace CrewChiefV4
         {
             if (enable)
             {
+                Boolean gotDateStamp = false;
                 StringBuilder sb = new StringBuilder();
-                sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" : ").Append(value).AppendLine();
+                if (CrewChief.loadDataFromFile)
+                {
+                    if (CrewChief.currentGameState != null)
+                    {
+                        if (CrewChief.currentGameState.CurrentTimeStr == null)
+                        {
+                            CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
+                        }
+                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                        gotDateStamp = true;
+                    }
+                }
+                if (!gotDateStamp)
+                {
+                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
+                }
+                sb.Append(" : ").Append(value).AppendLine();
                 if (textbox != null && !textbox.IsDisposed)
                 {
                     try
