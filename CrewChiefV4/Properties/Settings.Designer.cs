@@ -3082,5 +3082,17 @@ namespace CrewChiefV4.Properties {
                 this["force_min_window_size"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool pit_box_position_countdown {
+            get {
+                return ((bool)(this["pit_box_position_countdown"]));
+            }
+            set {
+                this["pit_box_position_countdown"] = value;
+            }
+        }
     }
 }

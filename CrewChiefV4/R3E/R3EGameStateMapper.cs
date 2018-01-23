@@ -207,6 +207,18 @@ namespace CrewChiefV4.RaceRoom
                 Console.WriteLine("rawSessionPhase = " + shared.SessionPhase);
                 Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
 
+                if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
+                    && shared.InPitlane == 1)
+                {
+                    currentGameState.PitData.PitBoxPositionEstimate = shared.LapDistance;
+                    Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                }
+                else if (previousGameState != null)
+                {
+                    // if we're entering a race session or rolling qually, copy the value from the previous field
+                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
+                }
+
                 // reset the flag to allow the improvised blue flag calling
                 useImprovisedBlueFlagDetection = true;
 
@@ -318,6 +330,7 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
                             currentGameState.PositionAndMotionData.DistanceRoundTrack = shared.DriverData[shared.VehicleInfo.SlotId].LapDistance;
+                            currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
                         }
                         currentGameState.PitData.PitWindowStart = shared.PitWindowStart;
                         currentGameState.PitData.PitWindowEnd = shared.PitWindowEnd;
@@ -404,6 +417,7 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
                     currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
                     currentGameState.PitData.NumPitStops = previousGameState.PitData.NumPitStops;
+                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
                     currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
@@ -1323,7 +1337,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
                 lastTimeEngineWasRunning = DateTime.MaxValue;
-            }
+            }            
             return currentGameState;
         }
 
