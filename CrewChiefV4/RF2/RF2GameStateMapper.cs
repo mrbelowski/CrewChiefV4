@@ -1515,6 +1515,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
                 if (csd.IsNewLap)
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                csd.SessionStartClassPosition = pgs.SessionData.SessionStartClassPosition;
+                csd.ClassPositionAtStartOfCurrentLap = pgs.SessionData.ClassPositionAtStartOfCurrentLap;
             }
 
             // --------------------------------

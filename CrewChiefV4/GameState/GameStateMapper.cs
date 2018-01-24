@@ -51,7 +51,7 @@ namespace CrewChiefV4.GameState
             }
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
-                if (opponent.CarClass != currentGameState.carClass || opponent.Position != opponent.ClassPosition)
+                if (opponent.CarClass != currentGameState.carClass || opponent.Position == opponent.ClassPosition)
                 {
                     // don't care about other classes or cases where the position and class position match
                     continue;

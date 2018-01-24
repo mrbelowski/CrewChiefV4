@@ -954,6 +954,8 @@ namespace CrewChiefV4.rFactor1
                 {
                     currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
                 }
+                currentGameState.SessionData.SessionStartClassPosition = previousGameState.SessionData.SessionStartClassPosition;
+                currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = previousGameState.SessionData.ClassPositionAtStartOfCurrentLap;
             }
 
             // --------------------------------
