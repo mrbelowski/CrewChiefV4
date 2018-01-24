@@ -108,7 +108,6 @@ namespace CrewChiefV4.iRacing
 
             int PlayerCarIdx = shared.Telemetry.PlayerCarIdx;
 
-            Boolean justGoneGreen = false;
             if (shared.Driver != null)
             {
                 playerCar = shared.Driver;
@@ -219,7 +218,7 @@ namespace CrewChiefV4.iRacing
                     Console.WriteLine("New session phase, was " + lastSessionPhase + " now " + currentGameState.SessionData.SessionPhase);
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
-                        justGoneGreen = true;
+                        currentGameState.SessionData.JustGoneGreen = true;
                         // just gone green, so get the session data
 
                         if (shared.SessionData.IsLimitedTime)
@@ -282,7 +281,7 @@ namespace CrewChiefV4.iRacing
 
                     }
                 }
-                if (!justGoneGreen && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen. && previousGameState != null)
                 {
                     //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
 
@@ -764,7 +763,7 @@ namespace CrewChiefV4.iRacing
                                 previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                             currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                         }
-                        if (justGoneGreen)
+                        if (currentGameState.SessionData.JustGoneGreen)
                         {
                             currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                         }
@@ -1004,6 +1003,7 @@ namespace CrewChiefV4.iRacing
             {
                 opponentData.NumPitStops++;
             }
+            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
             opponentData.InPits = isInPits;
             bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);

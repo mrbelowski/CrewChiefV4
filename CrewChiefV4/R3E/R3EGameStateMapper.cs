@@ -186,7 +186,6 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
                 previousLapsCompleted, shared.CompletedLaps, isCarRunning, shared.FlagsExtended.checkered == 1);
 
-            Boolean justGoneGreen = false;
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
                     currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
@@ -288,7 +287,7 @@ namespace CrewChiefV4.RaceRoom
                     Console.WriteLine("New session phase, was " + lastSessionPhase + " now " + currentGameState.SessionData.SessionPhase);
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
-                        justGoneGreen = true;
+                        currentGameState.SessionData.JustGoneGreen = true;
                         // just gone green, so get the session data
                         if (shared.sessionLengthFormat == 0 || shared.sessionLengthFormat == 2 || shared.SessionTimeRemaining > 0)
                         {
@@ -387,7 +386,7 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("TrackName " + trackName);                        
                     }
                 }
-                if (!justGoneGreen && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
@@ -911,7 +910,7 @@ namespace CrewChiefV4.RaceRoom
                                     previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                 currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                             }
-                            if (justGoneGreen)
+                            if (currentGameState.SessionData.JustGoneGreen)
                             {
                                 currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                             }
@@ -1682,6 +1681,7 @@ namespace CrewChiefV4.RaceRoom
                     opponentData.NumPitStops++;
                 }
             }
+            opponentData.JustEnteredPits = !wasInPits && isInPits;
             opponentData.InPits = isInPits;
             TyreType previousTyreType = opponentData.CurrentTyres;
             opponentData.hasJustChangedToDifferentTyreType = false;

@@ -469,7 +469,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown &&
                 (currentGameState.SessionData.SessionType == SessionType.Race ||
                     currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1);
-            Boolean justGoneGreen = false;
+
             if (sessionOfSameTypeRestarted ||
                 (currentGameState.SessionData.SessionType != SessionType.Unavailable && 
                     (lastSessionType != currentGameState.SessionData.SessionType ||                
@@ -556,7 +556,7 @@ namespace CrewChiefV4.PCars
                         // just gone green, so get the session data.
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            justGoneGreen = true;
+                            currentGameState.SessionData.JustGoneGreen = true;
                             // ensure that we track the car we're in at the point when the lights change
                             setCurrentParticipant(shared);
                             if (currentGameState.SessionData.SessionHasFixedTime)
@@ -631,7 +631,7 @@ namespace CrewChiefV4.PCars
                 //
 
                 // TODO: this is just retarded. Clone the previousGameState and update it as required...
-                if (!justGoneGreen && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
@@ -941,7 +941,7 @@ namespace CrewChiefV4.PCars
                                             previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                         currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                                     }
-                                    if (justGoneGreen)
+                                    if (currentGameState.SessionData.JustGoneGreen)
                                     {
                                         currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                                     }
@@ -1448,6 +1448,8 @@ namespace CrewChiefV4.PCars
             {
                 opponentData.setInLap();
             }
+            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
+            opponentData.InPits = isInPits;
             opponentData.CompletedLaps = completedLaps;
         }
 

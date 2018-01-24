@@ -969,7 +969,6 @@ namespace CrewChiefV4.assetto
                 (currentGameState.SessionData.SessionType == SessionType.Race ||
                     currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1);
 
-            Boolean justGoneGreen = false;
             if (sessionOfSameTypeRestarted ||
                 (currentGameState.SessionData.SessionType != SessionType.Unavailable &&
                  currentGameState.SessionData.SessionPhase != SessionPhase.Finished &&
@@ -1080,7 +1079,7 @@ namespace CrewChiefV4.assetto
                         // just gone green, so get the session data.
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            justGoneGreen = true;
+                            currentGameState.SessionData.JustGoneGreen = true;
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
                                 currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
@@ -1166,7 +1165,7 @@ namespace CrewChiefV4.assetto
                         Console.WriteLine("TrackName " + trackName);
                     }
                 }
-                if (!justGoneGreen && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
@@ -1573,7 +1572,7 @@ namespace CrewChiefV4.assetto
                                             previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                         currentOpponentData.stoppedInLandmark = participantStruct.isCarInPitline == 1 ? null : stoppedInLandmark;
                                     }
-                                    if (justGoneGreen)
+                                    if (currentGameState.SessionData.JustGoneGreen)
                                     {
                                         currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                                     }
@@ -2048,6 +2047,7 @@ namespace CrewChiefV4.assetto
             }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
+            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
             opponentData.InPits = isInPits;
             bool hasCrossedSFline = opponentData.CurrentSectorNumber == 3 && sector == 1;
 
