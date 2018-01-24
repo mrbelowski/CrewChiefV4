@@ -308,7 +308,6 @@ namespace CrewChiefV4.PCars2
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown &&
                 (currentGameState.SessionData.SessionType == SessionType.Race ||
                     currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1);
-            Boolean justGoneGreen = false;
 
 
             // pcars will update the session type before updating the race state, so it goes [qual / finished] -> [race / finished] -> [race / not started]
@@ -427,7 +426,7 @@ namespace CrewChiefV4.PCars2
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            justGoneGreen = true;
+                            currentGameState.SessionData.JustGoneGreen = true;
                             // ensure that we track the car we're in at the point when the lights change
                             if (currentGameState.SessionData.SessionHasFixedTime)
                             {
@@ -501,7 +500,7 @@ namespace CrewChiefV4.PCars2
                 //
 
                 // TODO: this is just retarded. Clone the previousGameState and update it as required...
-                if (!justGoneGreen && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
                     currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
@@ -869,7 +868,7 @@ namespace CrewChiefV4.PCars2
                                             previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
                                         currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
                                     }
-                                    if (justGoneGreen)
+                                    if (currentGameState.SessionData.JustGoneGreen)
                                     {
                                         currentOpponentData.trackLandmarksTiming = new TrackLandmarksTiming();
                                     }
@@ -1382,6 +1381,7 @@ namespace CrewChiefV4.PCars2
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.CarClass = carClass;
+            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
             opponentData.InPits = isEnteringPits || isInPits || isLeavingPits;
             if (opponentData.CurrentSectorNumber != sector)
             {

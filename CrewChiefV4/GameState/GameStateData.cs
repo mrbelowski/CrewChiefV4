@@ -251,6 +251,9 @@ namespace CrewChiefV4.GameState
 
         public DateTime YellowFlagStartTime = DateTime.Now;
 
+        // used for race sessions that have just started
+        public Boolean JustGoneGreen = false;
+
         public Boolean IsNewSession = false;
 
         public Boolean SessionHasFixedTime = false;
@@ -268,6 +271,7 @@ namespace CrewChiefV4.GameState
         public Boolean HasExtraLap = false;
 
         public int SessionStartPosition = 0;
+        public int SessionStartClassPosition = 0;
 
         public int NumCarsAtStartOfSession = 0;
 
@@ -305,6 +309,7 @@ namespace CrewChiefV4.GameState
         public int LeaderSectorNumber = 0;
 
         public int PositionAtStartOfCurrentLap = 0;
+        public int ClassPositionAtStartOfCurrentLap = 0;
 
         // Current position (1 = first place)
         public int Position = 0;
@@ -692,6 +697,7 @@ namespace CrewChiefV4.GameState
 
         // be careful with this one, not all games actually set it...
         public Boolean InPits = false;
+        public Boolean JustEnteredPits = false; // true for 1 tick only
         // and this one:
         public int NumPitStops = 0;
 

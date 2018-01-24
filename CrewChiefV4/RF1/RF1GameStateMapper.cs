@@ -816,8 +816,9 @@ namespace CrewChiefV4.rFactor1
                 opponent.bestSector1Time = vehicle.bestSector1 > 0 ? vehicle.bestSector1 : -1;
                 opponent.bestSector2Time = vehicle.bestSector2 > 0 && vehicle.bestSector1 > 0 ? vehicle.bestSector2 - vehicle.bestSector1 : -1;
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
-                opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;
+                opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;                
                 opponent.InPits = vehicle.inPits == 1;
+                opponent.JustEnteredPits = !opponentPrevious.InPits && opponent.InPits;
 
                 if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
                     && opponentPrevious != null && !opponentPrevious.InPits && opponent.InPits)
@@ -1156,6 +1157,13 @@ namespace CrewChiefV4.rFactor1
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+
+            if (previousGameState != null &&
+                currentGameState.SessionData.SessionType == SessionType.Race &&
+                currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
+                    (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
+                     previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
+                currentGameState.SessionData.JustGoneGreen = true;
 
             return currentGameState;
         }

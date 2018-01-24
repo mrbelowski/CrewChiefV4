@@ -1345,6 +1345,7 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 opponent.InPits = isInPits;
+                opponent.JustEnteredPits = !opponentPrevious.InPits && opponent.InPits;
 
                 var wasInPits = opponentPrevious != null && opponentPrevious.InPits;
                 opponent.hasJustChangedToDifferentTyreType = false;
@@ -1734,6 +1735,13 @@ namespace CrewChiefV4.rFactor2
             CrewChief.carClass = cgs.carClass.carClassEnum;
             CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+
+            if (pgs != null &&
+               csd.SessionType == SessionType.Race &&
+               csd.SessionPhase == SessionPhase.Green &&
+                   (pgs.SessionData.SessionPhase == SessionPhase.Formation ||
+                    pgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                csd.JustGoneGreen = true;
 
             return cgs;
         }
