@@ -13,7 +13,7 @@ namespace CrewChiefV4.iRacing
     {
 
         private iRacingSDK sdk = null;
-        private Sim sim = new Sim();
+        private Sim sim = null; 
         private Boolean initialised = false;
         private List<iRacingStructDumpWrapper> dataToDump;
         private iRacingStructDumpWrapper[] dataReadFromFile = null;
@@ -85,7 +85,7 @@ namespace CrewChiefV4.iRacing
                 if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate && structDumpWrapperData.data.SessionInfo.Length > 0)
                 {
                     SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
-                    sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
+                    sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx, structDumpWrapperData.data.SessionInfoUpdate);
                     lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
@@ -167,6 +167,10 @@ namespace CrewChiefV4.iRacing
 
                     if (sdk.IsConnected())
                     {
+                        if(sim == null)
+                        {
+                            sim = new Sim();
+                        }
                         if (forSpotter)
                         {
                             return (int)sdk.GetData("CarLeftRight");
@@ -176,16 +180,17 @@ namespace CrewChiefV4.iRacing
 
                         int newUpdate = sdk.Header.SessionInfoUpdate;
                         bool hasNewSessionData = false;
+                        bool isNewSession = false;
                         if (newUpdate != lastUpdate)
                         {
                             // Get the session info string
                             SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
                             // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                            sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId);
+                            isNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId, newUpdate);
                             lastUpdate = newUpdate;
                             hasNewSessionData = true;
                         }
-                        iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile);
+                        iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile, isNewSession);
 
                         sim.SdkOnTelemetryUpdated(irData);
 
@@ -223,9 +228,15 @@ namespace CrewChiefV4.iRacing
                     sdk.Shutdown();
                     sdk = null;
                 }
-                sim.Reset();
+                if(sim != null)
+                {
+                    sim = null;
+                }
+                
                 if (initialised)
                 {
+                    lastUpdate = -1;
+                    _DriverId = -1;
                     initialised = false;
                     Console.WriteLine("Disconnected from iRacing Shared Memory");
                 }

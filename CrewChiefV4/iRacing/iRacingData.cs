@@ -10,7 +10,7 @@ namespace CrewChiefV4.iRacing
     [Serializable]
     public class iRacingData
     {
-        public iRacingData( iRacingSDK sdk, bool hasNewSessionData)
+        public iRacingData( iRacingSDK sdk, bool hasNewSessionData, bool isNewSession)
         {
             
             if(hasNewSessionData)
@@ -21,7 +21,11 @@ namespace CrewChiefV4.iRacing
             {
                 SessionInfo = "";
             }
-            SessionInfoUpdate = sdk.Header.SessionInfoUpdate;     
+
+            SessionInfoUpdate = sdk.Header.SessionInfoUpdate;
+            IsNewSession = isNewSession;
+    
+
             SessionTime = (System.Double)sdk.GetData("SessionTime");
             SessionTick = (System.Int32)sdk.GetData("SessionTick");
             SessionNum = (System.Int32)sdk.GetData("SessionNum");
@@ -135,6 +139,8 @@ namespace CrewChiefV4.iRacing
         {
 
         }
+        public System.Boolean IsNewSession;
+
         public System.Int32 SessionInfoUpdate;
 
         public System.String SessionInfo;
