@@ -5,15 +5,20 @@ using System.Text;
 
 namespace CrewChiefV4.GameState
 {
-    interface GameStateMapper
+    public abstract class GameStateMapper
     {
+        protected SpeechRecogniser speechRecogniser;
+
         /** May return null if the game state raw data is considered invalid */
-        GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState);
+        public abstract GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState);
 
-        void versionCheck(Object memoryMappedFileStruct);
-        
-        SessionType mapToSessionType(Object memoryMappedFileStruct);
+        public abstract void versionCheck(Object memoryMappedFileStruct);
 
-        void setSpeechRecogniser(SpeechRecogniser speechRecogniser);
+        public abstract SessionType mapToSessionType(Object memoryMappedFileStruct);
+
+        public virtual void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
+        {
+            this.speechRecogniser = speechRecogniser;
+        }
     }
 }

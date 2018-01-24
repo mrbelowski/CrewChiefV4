@@ -84,8 +84,6 @@ namespace CrewChiefV4.PCars
 
         private int opponentSpeedsToAverage = 20;
 
-        private SpeechRecogniser speechRecogniser;
-
         private Dictionary<string, float> waitingForCarsToFinish = new Dictionary<string, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
@@ -127,7 +125,7 @@ namespace CrewChiefV4.PCars
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, wornOutTyreWearPercent, 10000));
         }
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             pCarsAPIStruct shared = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).data;
             uint currentVersion = shared.mVersion;
@@ -135,11 +133,6 @@ namespace CrewChiefV4.PCars
             {
                 throw new GameDataReadException("Expected shared data version " + expectedVersion + " but got version " + currentVersion);
             }
-        }
-
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
         }
 
         /**
@@ -340,7 +333,7 @@ namespace CrewChiefV4.PCars
             }
         }
 
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             pCarsAPIStruct shared = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).data;
             long ticks = ((CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper)memoryMappedFileStruct).ticksWhenRead;
@@ -1496,7 +1489,7 @@ namespace CrewChiefV4.PCars
          * TODO: other session types. The "SESSION_TEST" above is actually the warmup. Presumably
          * an event with prac -> qual -> warmup -> race would use SESSION_PRACTICE
          * */
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             pCarsAPIStruct shared = (pCarsAPIStruct)memoryMappedFileStruct;
             uint sessionState = shared.mSessionState;

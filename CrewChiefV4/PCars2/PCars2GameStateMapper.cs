@@ -73,9 +73,7 @@ namespace CrewChiefV4.PCars2
         private float minorTyreWearPercent = 20f;
         private float majorTyreWearPercent = 40f;
         private float wornOutTyreWearPercent = 80f;
-
-        private SpeechRecogniser speechRecogniser;
-
+        
         private Dictionary<string, float> waitingForCarsToFinish = new Dictionary<string, float>();
         private DateTime nextDebugCheckeredToFinishMessageTime = DateTime.MinValue;
 
@@ -128,14 +126,9 @@ namespace CrewChiefV4.PCars2
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, wornOutTyreWearPercent, 10000));
         }
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             // no-op
-        }
-
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
         }
 
         public static void addOpponentForName(String name, OpponentData opponentData, GameStateData gameState)
@@ -178,7 +171,7 @@ namespace CrewChiefV4.PCars2
             return lastGuessAtPlayerIndex;
         }
 
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             pCars2APIStruct shared = ((CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)memoryMappedFileStruct).data;
             long ticks = ((CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper)memoryMappedFileStruct).ticksWhenRead;
@@ -1464,7 +1457,7 @@ namespace CrewChiefV4.PCars2
          * TODO: other session types. The "SESSION_TEST" above is actually the warmup. Presumably
          * an event with prac -> qual -> warmup -> race would use SESSION_PRACTICE
          * */
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             pCars2APIStruct shared = (pCars2APIStruct)memoryMappedFileStruct;
             uint sessionState = shared.mSessionState;

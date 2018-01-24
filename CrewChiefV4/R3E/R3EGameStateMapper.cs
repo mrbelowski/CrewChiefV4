@@ -74,9 +74,7 @@ namespace CrewChiefV4.RaceRoom
         private float targetEngineWaterTemp = 88;
         private float targetEngineOilTemp = 105;
         private float baselineEngineDataOilTemp = 88;
-        private float baselineEngineDataWaterTemp = 105;
-
-        private SpeechRecogniser speechRecogniser;
+        private float baselineEngineDataWaterTemp = 105;        
 
         // blue flag zone for improvised blues when the 'full flag rules' are disabled
         // note that this will be set to true at the start of a session and change to false as soon as the game sends a blue flag
@@ -119,17 +117,12 @@ namespace CrewChiefV4.RaceRoom
             tyreWearThresholds.Add(new CornerData.EnumWithThresholds(TyreCondition.WORN_OUT, wornOutTyreWearPercent, 10000));
         }
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             // no version number in r3e shared data so this is a no-op
         }
 
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
-        }
-
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper wrapper = (CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
@@ -1537,7 +1530,7 @@ namespace CrewChiefV4.RaceRoom
             return lastSessionPhase;
         }
 
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
             int r3eSessionType = shared.SessionType;
@@ -1791,6 +1784,11 @@ namespace CrewChiefV4.RaceRoom
         {
             int count = Array.IndexOf(name, (byte) 0);
             return Encoding.UTF8.GetString(name, 0, count);
-        } 
+        }
+
+        public void correctForMulticlass(GameStateData currentGameState)
+        {
+
+        }
     }
 }

@@ -31,6 +31,8 @@ namespace CrewChiefV4.assetto
                 tyreWearMinimumValue = tyreWearMinimum;
             }
         }
+
+
         List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
         private static Dictionary<string, AcTyres> acTyres = new Dictionary<string, AcTyres>();
 
@@ -766,7 +768,7 @@ namespace CrewChiefV4.assetto
         }
         #endregion
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
 
             AssettoCorsaShared shared = ((ACSSharedMemoryReader.ACSStructWrapper)memoryMappedFileStruct).data;
@@ -788,12 +790,7 @@ namespace CrewChiefV4.assetto
                 versionChecked = true;
             }
         }
-
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
-        }
-
+        
         public static OpponentData getOpponentForName(GameStateData gameState, String nameToFind)
         {
             if (gameState.OpponentData == null || gameState.OpponentData.Count == 0 || nameToFind == null || nameToFind.Length == 0)
@@ -808,7 +805,7 @@ namespace CrewChiefV4.assetto
             return null;
         }
 
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             ACSSharedMemoryReader.ACSStructWrapper wrapper = (ACSSharedMemoryReader.ACSStructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
@@ -2196,7 +2193,7 @@ namespace CrewChiefV4.assetto
             return Math.Min(100, mapToPercentage((minimumLevel / wearLevel) * 100, minimumLevel, 100, 0, 100));
         }
 
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             return SessionType.Unavailable;
         }
