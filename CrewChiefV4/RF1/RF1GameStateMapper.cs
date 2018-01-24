@@ -819,7 +819,7 @@ namespace CrewChiefV4.rFactor1
                 opponent.bestSector3Time = vehicle.bestLapTime > 0 && vehicle.bestSector2 > 0 ? vehicle.bestLapTime - vehicle.bestSector2 : -1;
                 opponent.LastLapTime = vehicle.lastLapTime > 0 ? vehicle.lastLapTime : -1;                
                 opponent.InPits = vehicle.inPits == 1;
-                opponent.JustEnteredPits = !opponentPrevious.InPits && opponent.InPits;
+                opponent.JustEnteredPits = opponentPrevious != null && !opponentPrevious.InPits && opponent.InPits;
 
                 if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10
                     && opponentPrevious != null && !opponentPrevious.InPits && opponent.InPits)
