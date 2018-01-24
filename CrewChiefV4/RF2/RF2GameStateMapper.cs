@@ -238,6 +238,7 @@ namespace CrewChiefV4.rFactor2
                 || sessionJustEnded  // Need to start the wait for the next session
                 || this.waitingToTerminateSession  // Wait for the next session (or timeout) is in progress
                 || !sessionStarted)  // We don't process game state updates outside of the active session
+                // shared.scoring.mScoringInfo.mGamePhase == 9  // No idea WTF this is but don't process state 9, it is some form of transition.
             {
                 //
                 // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
@@ -500,7 +501,7 @@ namespace CrewChiefV4.rFactor2
                         || psd.SessionPhase == SessionPhase.Finished
                         || psd.SessionPhase == SessionPhase.Green
                         || psd.SessionPhase == SessionPhase.FullCourseYellow
-                        || psd.SessionPhase == SessionPhase.Unavailable)
+                        || psd.SessionPhase == SessionPhase.Unavailable)  // this double triggers if session == 9, wtf is 9?
                     && (csd.SessionPhase == SessionPhase.Garage
                         || csd.SessionPhase == SessionPhase.Gridwalk
                         || csd.SessionPhase == SessionPhase.Formation
