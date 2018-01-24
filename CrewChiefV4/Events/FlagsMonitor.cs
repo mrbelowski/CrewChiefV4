@@ -445,7 +445,7 @@ namespace CrewChiefV4.Events
                         }
                         else if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG)
                         {
-                            OpponentData carAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                            OpponentData carAhead = currentGameState.getOpponentAtOverallPosition(currentGameState.SessionData.OverallPosition - 1);
                             Console.WriteLine("Stock Car Rule triggered: " + currentGreenFlagLuckyDogStatus + " driver to pass: " + (carAhead != null ? carAhead.DriverRawName : "not found"));
                             if (carAhead != null && AudioPlayer.canReadName(carAhead.DriverRawName))
                             {
@@ -471,12 +471,12 @@ namespace CrewChiefV4.Events
 
         private GreenFlagLuckyDogStatus getGreenFlagLuckyDogPosition(GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.Position > 1 && !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
+            if (currentGameState.SessionData.OverallPosition > 1 && !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
                 currentGameState.SessionData.TrackDefinition != null && currentGameState.SessionData.TrackDefinition.trackLength > 0)
             {
                 float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
-                OpponentData leader = currentGameState.getOpponentAtPosition(1, true);
-                OpponentData carAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, true);
+                OpponentData leader = currentGameState.getOpponentAtOverallPosition(1);
+                OpponentData carAhead = currentGameState.getOpponentAtOverallPosition(currentGameState.SessionData.OverallPosition - 1);
                 if (carAhead != null && leader != null && leader.CompletedLaps > 0 && !leader.InPits && !leader.isExitingPits())
                 {
                     float leaderRaceDistance = (trackLength * leader.CompletedLaps) + leader.DistanceRoundTrack;
@@ -500,10 +500,10 @@ namespace CrewChiefV4.Events
                     }
 
                     // if we're in p3 or higher, see if the guy in front is the lucky dog:
-                    if (currentGameState.SessionData.Position > 2)
+                    if (currentGameState.SessionData.OverallPosition > 2)
                     {
                         // check if car ahead is lucky dog - need to get the car ahead of him
-                        OpponentData car2PlacesAhead = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 2, true);
+                        OpponentData car2PlacesAhead = currentGameState.getOpponentAtOverallPosition(currentGameState.SessionData.OverallPosition - 2);
                         if (car2PlacesAhead != null)
                         {
                             float car2PlacesAheadRaceDistance = (trackLength * car2PlacesAhead.CompletedLaps) + car2PlacesAhead.DistanceRoundTrack;
@@ -611,7 +611,7 @@ namespace CrewChiefV4.Events
                             if (enableOpponentCrashMessages)
                             {
                                 findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
-                                positionAtStartOfIncident = currentGameState.SessionData.Position;
+                                positionAtStartOfIncident = currentGameState.SessionData.OverallPosition;
                                 nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                 getInvolvedInIncidentAttempts = 0;
                                 driversInvolvedInCurrentIncident.Clear();
@@ -859,7 +859,7 @@ namespace CrewChiefV4.Events
                                 {
                                     // start working out who's gone off
                                     findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
-                                    positionAtStartOfIncident = currentGameState.SessionData.Position;
+                                    positionAtStartOfIncident = currentGameState.SessionData.OverallPosition;
                                     nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                     getInvolvedInIncidentAttempts = 0;
                                     driversInvolvedInCurrentIncident.Clear();
@@ -1009,8 +1009,8 @@ namespace CrewChiefV4.Events
                                     (currentGameState.PositionAndMotionData.DistanceRoundTrack - currentGameState.SessionData.TrackDefinition.trackLength) < 1000;
                             }
                             // are we fighting with him and can we call him by name?
-                            Boolean isInteresting = Math.Abs(currentGameState.SessionData.Position - opponent.Position) <= 2 &&
-                                (AudioPlayer.canReadName(opponent.DriverRawName) || opponent.Position <= folderPositionHasGoneOff.Length);
+                            Boolean isInteresting = Math.Abs(currentGameState.SessionData.ClassPosition - opponent.ClassPosition) <= 2 &&
+                                (AudioPlayer.canReadName(opponent.DriverRawName) || opponent.ClassPosition <= folderPositionHasGoneOff.Length);
                             if ((isApproaching || isInteresting) &&
                                 (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < currentGameState.Now))
                             {
@@ -1059,9 +1059,9 @@ namespace CrewChiefV4.Events
                                 {
                                     opponentNamesToRead.Add(opponent);
                                 }
-                                else if (opponent.Position <= folderPositionHasGoneOff.Length && positionToRead == -1)
+                                else if (opponent.ClassPosition <= folderPositionHasGoneOff.Length && positionToRead == -1)
                                 {
-                                    positionToRead = opponent.Position;
+                                    positionToRead = opponent.ClassPosition;
                                 }
                             }
                         }
@@ -1127,7 +1127,7 @@ namespace CrewChiefV4.Events
                 if ((flagSector == -1 || opponentData.CurrentSectorNumber == flagSector) && !opponentData.InPits)
                 {
                     LapData lapData = opponentData.getCurrentLapData();
-                    incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, opponentData.Position,
+                    incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, opponentData.OverallPosition,
                         lapData == null || lapData.IsValid));
                 }
             }
@@ -1151,7 +1151,7 @@ namespace CrewChiefV4.Events
                     if (flagSector == -1 || opponent.CurrentSectorNumber == flagSector)
                     {
                         if ((Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
-                                opponent.Position > incidentCandidate.positionAtStartOfIncident + 3)
+                                opponent.OverallPosition > incidentCandidate.positionAtStartOfIncident + 3)
                         {
                             // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved.
                             // Only add him if we've not reported him already in this spot on the track
@@ -1177,7 +1177,7 @@ namespace CrewChiefV4.Events
                         else
                         {
                             // update incident candidate element to reflect the current state ready for the next check
-                            incidentCandidate.positionAtLastCheck = opponent.Position;
+                            incidentCandidate.positionAtLastCheck = opponent.OverallPosition;
                             incidentCandidate.distanceRoundTrackAtLastCheck = opponent.DistanceRoundTrack;
                             remainingIncidentCandidates.Add(incidentCandidate);
                         }

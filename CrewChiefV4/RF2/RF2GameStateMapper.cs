@@ -308,11 +308,11 @@ namespace CrewChiefV4.rFactor2
                         if (playerVehIdx != -1)
                         {
                             var playerVehCapture = shared.extended.mSessionTransitionCapture.mScoringVehicles[playerVehIdx];
-                            if (pgs.SessionData.Position != playerVehCapture.mPlace)
+                            if (pgs.SessionData.OverallPosition != playerVehCapture.mPlace)
                             {
                                 Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}.",
-                                    pgs.SessionData.Position, playerVehCapture.mPlace));
-                                pgs.SessionData.Position = playerVehCapture.mPlace;
+                                    pgs.SessionData.OverallPosition, playerVehCapture.mPlace));
+                                pgs.SessionData.OverallPosition = playerVehCapture.mPlace;
                             }
                         }
                         else
@@ -589,15 +589,15 @@ namespace CrewChiefV4.rFactor2
             // hack for test day sessions running longer than allotted time
             csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && shared.scoring.mScoringInfo.mSession == 0 ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
 
-            csd.NumCars = shared.scoring.mScoringInfo.mNumVehicles;
-            csd.NumCarsAtStartOfSession = csd.IsNewSession ? csd.NumCars : psd.NumCarsAtStartOfSession;
-            csd.Position = playerScoring.mPlace;
-            csd.UnFilteredPosition = csd.Position;
-            csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
+            csd.NumCarsOverall = shared.scoring.mScoringInfo.mNumVehicles;
+            csd.NumCarsOverallAtStartOfSession = csd.IsNewSession ? csd.NumCarsOverall : psd.NumCarsOverallAtStartOfSession;
+            csd.OverallPosition = playerScoring.mPlace;
+            csd.UnFilteredPosition = csd.OverallPosition;
+            csd.SessionStartPosition = csd.IsNewSession ? csd.OverallPosition : psd.SessionStartPosition;
 
             // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
             if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
-                csd.SessionStartPosition = csd.Position;
+                csd.SessionStartPosition = csd.OverallPosition;
 
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
@@ -608,7 +608,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.FlagData.previousLapWasFCY = pgs != null && pgs.FlagData.currentLapIsFCY;
                 cgs.FlagData.currentLapIsFCY = cgs.FlagData.isFullCourseYellow;
             }
-            csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
+            csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.OverallPosition : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
             csd.IsDNF = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf;
@@ -1252,7 +1252,7 @@ namespace CrewChiefV4.rFactor2
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.Position = vehicleScoring.mPlace;
+                opponent.OverallPosition = vehicleScoring.mPlace;
 
                 // Telemetry isn't always available, initialize first tyre set 10 secs or more into race.
                 if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
@@ -1267,7 +1267,7 @@ namespace CrewChiefV4.rFactor2
 
                     Console.WriteLine("New driver \"" + driverName +
                         "\" is using car class " + opponent.CarClass.getClassIdentifier() +
-                        " at position " + opponent.Position.ToString());
+                        " at position " + opponent.OverallPosition.ToString());
                 }
 
                 // Carry over state
@@ -1283,9 +1283,9 @@ namespace CrewChiefV4.rFactor2
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
 
-                opponent.UnFilteredPosition = opponent.Position;
+                opponent.UnFilteredPosition = opponent.OverallPosition;
                 opponent.SessionTimeAtLastPositionChange
-                    = opponentPrevious != null && opponentPrevious.Position != opponent.Position
+                    = opponentPrevious != null && opponentPrevious.OverallPosition != opponent.OverallPosition
                             ? csd.SessionRunningTime : -1.0f;
 
                 opponent.CompletedLaps = vehicleScoring.mTotalLaps;
@@ -1312,7 +1312,7 @@ namespace CrewChiefV4.rFactor2
                     if (opponentPrevious.DistanceRoundTrack < csd.TrackDefinition.distanceForNearPitEntryChecks
                         && opponent.DistanceRoundTrack > csd.TrackDefinition.distanceForNearPitEntryChecks)
                     {
-                        opponent.PositionOnApproachToPitEntry = opponent.Position;
+                        opponent.PositionOnApproachToPitEntry = opponent.OverallPosition;
                     }
                     else
                     {
@@ -1373,7 +1373,7 @@ namespace CrewChiefV4.rFactor2
                     if (lastSectorTime > 0.0f)
                     {
                         opponent.CompleteLapWithProvidedLapTime(
-                            opponent.Position,
+                            opponent.OverallPosition,
                             csd.SessionRunningTime,
                             opponent.LastLapTime,
                             lapValid,  // TODO: revisit
@@ -1386,7 +1386,7 @@ namespace CrewChiefV4.rFactor2
                     }
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
-                        opponent.Position,
+                        opponent.OverallPosition,
                         vehicleScoring.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
                         csd.SessionRunningTime,
                         shared.scoring.mScoringInfo.mRaining > minRainThreshold,
@@ -1397,7 +1397,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.AddCumulativeSectorData(
                         opponentPrevious.CurrentSectorNumber,
-                        opponent.Position,
+                        opponent.OverallPosition,
                         lastSectorTime,
                         csd.SessionRunningTime,
                         lapValid,
@@ -1418,29 +1418,29 @@ namespace CrewChiefV4.rFactor2
                         cgs.PitData.OpponentForLeaderPitting = opponent;
                     }
 
-                    if (opponent.PositionOnApproachToPitEntry == csd.Position - 1 && csd.Position > 2)
+                    if (opponent.PositionOnApproachToPitEntry == csd.OverallPosition - 1 && csd.OverallPosition > 2)
                     {
                         cgs.PitData.CarInFrontIsPitting = true;
                         cgs.PitData.OpponentForCarAheadPitting = opponent;
                     }
 
-                    if (opponent.PositionOnApproachToPitEntry == csd.Position + 1 && !cgs.isLast())
+                    if (opponent.PositionOnApproachToPitEntry == csd.OverallPosition + 1 && !cgs.isLast())
                     {
                         cgs.PitData.CarBehindIsPitting = true;
                         cgs.PitData.OpponentForCarBehindPitting = opponent;
                     }
                 }
 
-                if (opponent.Position == csd.Position + 1 && csd.SessionType == SessionType.Race)
+                if (opponent.OverallPosition == csd.OverallPosition + 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
                 // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
-                if (opponent.Position == csd.Position - 1 && csd.SessionType == SessionType.Race)
+                if (opponent.OverallPosition == csd.OverallPosition - 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
                 if (opponentPrevious != null
-                    && opponentPrevious.Position > 1
-                    && opponent.Position == 1)
+                    && opponentPrevious.OverallPosition > 1
+                    && opponent.OverallPosition == 1)
                 {
                     csd.HasLeadChanged = true;
                 }
@@ -1502,9 +1502,9 @@ namespace CrewChiefV4.rFactor2
 
             if (pgs != null)
             {
-                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;
-                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
-                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
+                csd.HasLeadChanged = !csd.HasLeadChanged && psd.OverallPosition > 1 && csd.OverallPosition == 1 ? true : csd.HasLeadChanged;
+                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(cgs.carClass.carClassEnum), cgs.getOpponentKeyInFront(cgs.carClass.carClassEnum));
+                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(cgs.carClass.carClassEnum), cgs.getOpponentKeyBehind(cgs.carClass.carClassEnum));
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
 
@@ -1705,14 +1705,14 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("HasMandatoryPitStop " + cgs.PitData.HasMandatoryPitStop);
                 Console.WriteLine("PitWindowStart " + cgs.PitData.PitWindowStart);
                 Console.WriteLine("PitWindowEnd " + cgs.PitData.PitWindowEnd);
-                Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsAtStartOfSession);
+                Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsOverallAtStartOfSession);
                 Console.WriteLine("SessionNumberOfLaps " + csd.SessionNumberOfLaps);
                 Console.WriteLine("SessionRunTime " + csd.SessionTotalRunTime);
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("Track Name \"" + csd.TrackDefinition.name + "\"");
                 Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
-                    " at position " + csd.Position.ToString());
+                    " at position " + csd.OverallPosition.ToString());
 
                 Utilities.TraceEventClass(cgs);
             }
@@ -1917,7 +1917,7 @@ namespace CrewChiefV4.rFactor2
                 if (lastSectorTime > 0.0f)
                 {
                     csd.playerCompleteLapWithProvidedLapTime(
-                        csd.Position,
+                        csd.OverallPosition,
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
                         csd.CurrentLapIsValid,
@@ -1931,7 +1931,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
-                    csd.Position,
+                    csd.OverallPosition,
                     playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
                     csd.SessionRunningTime,
                     scoring.mScoringInfo.mRaining > minRainThreshold,
@@ -1942,7 +1942,7 @@ namespace CrewChiefV4.rFactor2
             {
                 csd.playerAddCumulativeSectorData(
                     psd.SectorNumber,
-                    csd.Position,
+                    csd.OverallPosition,
                     lastSectorTime,
                     csd.SessionRunningTime,
                     csd.CurrentLapIsValid,

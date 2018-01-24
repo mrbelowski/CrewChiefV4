@@ -464,7 +464,7 @@ namespace CrewChiefV4.Events
                         }
                         if (enableDamageMessages)
                         {
-                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCars > 2, currentGameState.Now);
+                            playDamageToReport(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.NumCarsOverall > 2, currentGameState.Now);
                         }
                     }
                 }

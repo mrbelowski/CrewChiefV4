@@ -929,8 +929,8 @@ namespace CrewChiefV4.assetto
             AC_FLAG_TYPE currentFlag = shared.acsGraphic.flag;
             if (sessionType == AC_SESSION_TYPE.AC_PRACTICE || sessionType == AC_SESSION_TYPE.AC_QUALIFY)
             {
-                currentGameState.SessionData.Position = playerVehicle.carLeaderboardPosition;
-                currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
+                currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
+                currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
             }
             else
             {
@@ -940,13 +940,13 @@ namespace CrewChiefV4.assetto
                     currentFlag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
                 {
                     //Console.WriteLine("using carLeaderboardPosition");
-                    currentGameState.SessionData.Position = playerVehicle.carLeaderboardPosition;
-                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
+                    currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
+                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
                 }
                 else
                 {
-                    currentGameState.SessionData.Position = playerVehicle.carRealTimeLeaderboardPosition + realTimeLeaderBoardValid;
-                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.Position;
+                    currentGameState.SessionData.OverallPosition = playerVehicle.carRealTimeLeaderboardPosition + realTimeLeaderBoardValid;
+                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
                 }
             }
 
@@ -1094,7 +1094,7 @@ namespace CrewChiefV4.assetto
                             currentGameState.SessionData.SessionStartPosition = playerVehicle.carLeaderboardPosition;
                         }
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
-                        currentGameState.SessionData.NumCarsAtStartOfSession = shared.acsChief.numVehicles;
+                        currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.acsChief.numVehicles;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
                         if (currentGameState.SessionData.TrackDefinition.unknownTrack)
                         {
@@ -1156,7 +1156,7 @@ namespace CrewChiefV4.assetto
                         Console.WriteLine("HasMandatoryPitStop " + currentGameState.PitData.HasMandatoryPitStop);
                         Console.WriteLine("PitWindowStart " + currentGameState.PitData.PitWindowStart);
                         Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
-                        Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsAtStartOfSession);
+                        Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
                         Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
@@ -1172,7 +1172,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
                     currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
-                    currentGameState.SessionData.NumCarsAtStartOfSession = previousGameState.SessionData.NumCarsAtStartOfSession;
+                    currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
                     currentGameState.SessionData.SessionIteration = previousGameState.SessionData.SessionIteration;
@@ -1237,7 +1237,7 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.SectorNumber = getCurrentSector(currentGameState.SessionData.TrackDefinition, distanceRoundTrack);
                 }
-                if (currentGameState.SessionData.Position == 1)
+                if (currentGameState.SessionData.OverallPosition == 1)
                 {
                     currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
                 }
@@ -1273,7 +1273,7 @@ namespace CrewChiefV4.assetto
                         sectorTimeToUse = currentGameState.SessionData.LapTimeCurrent;
                     }
 
-                    sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.Position);
+                    sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.OverallPosition);
 
                     if (currentGameState.SessionData.IsNewLap && shared.acsGraphic.numberOfLaps > 0)
                     {
@@ -1351,7 +1351,7 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.YellowFlagStartTime = currentGameState.Now;
                 }*/
-                currentGameState.SessionData.NumCars = shared.acsChief.numVehicles;
+                currentGameState.SessionData.NumCarsOverall = shared.acsChief.numVehicles;
                 
                 currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
 
@@ -1371,8 +1371,10 @@ namespace CrewChiefV4.assetto
                     }
                 }
 
-                currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null && previousGameState.getOpponentKeyBehind(false) == currentGameState.getOpponentKeyBehind(false);
-                currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null && previousGameState.getOpponentKeyInFront(false) == currentGameState.getOpponentKeyInFront(false);
+                currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
+                    previousGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum) == currentGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum);
+                currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
+                    previousGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum) == currentGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum);
                 if (!currentGameState.SessionData.IsRacingSameCarInFront)
                 {
                     currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
@@ -1449,7 +1451,7 @@ namespace CrewChiefV4.assetto
                                     {
                                         previousOpponentSectorNumber = previousOpponentData.CurrentSectorNumber;
                                         previousOpponentCompletedLaps = previousOpponentData.CompletedLaps;
-                                        previousOpponentPosition = previousOpponentData.Position;
+                                        previousOpponentPosition = previousOpponentData.OverallPosition;
                                         previousOpponentIsEnteringPits = previousOpponentData.isEnteringPits();
                                         previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
                                         previousOpponentWorldPosition = previousOpponentData.WorldPosition;
@@ -1532,23 +1534,23 @@ namespace CrewChiefV4.assetto
                                             currentGameState.PitData.LeaderIsPitting = true;
                                             currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
                                         }
-                                        if (currentGameState.SessionData.Position > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position - 1)
+                                        if (currentGameState.SessionData.OverallPosition > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1)
                                         {
                                             currentGameState.PitData.CarInFrontIsPitting = true;
                                             currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
                                         }
-                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.Position + 1)
+                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1)
                                         {
                                             currentGameState.PitData.CarBehindIsPitting = true;
                                             currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
                                         }
                                     }
 
-                                    if (currentOpponentRacePosition == currentGameState.SessionData.Position + 1 && !useCarLeaderBoardPosition)
+                                    if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition + 1 && !useCarLeaderBoardPosition)
                                     {
                                         currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
-                                    if (currentOpponentRacePosition == currentGameState.SessionData.Position - 1 && !useCarLeaderBoardPosition)
+                                    if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition - 1 && !useCarLeaderBoardPosition)
                                     {
                                         currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                                     }
@@ -1655,10 +1657,10 @@ namespace CrewChiefV4.assetto
                 {
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-                    currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.Position;
+                    currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.OverallPosition;
                     currentGameState.SessionData.CurrentLapIsValid = true;
                     StartNewLap(currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SessionRunningTime);
-                    currentGameState.SessionData.Position = playerVehicle.carLeaderboardPosition;
+                    currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
                     currentGameState.SessionData.UnFilteredPosition = playerVehicle.carLeaderboardPosition;
                     // currentGameState.displayOpponentData();
                 }
@@ -2038,15 +2040,15 @@ namespace CrewChiefV4.assetto
                 opponentData.Speed = 0;
             }
             opponentData.Speed = speed;
-            if (opponentData.Position != racePosition)
+            if (opponentData.OverallPosition != racePosition)
             {
                 opponentData.SessionTimeAtLastPositionChange = sessionRunningTime;
             }
-            opponentData.Position = racePosition;
+            opponentData.OverallPosition = racePosition;
             opponentData.UnFilteredPosition = racePosition;
             if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
             {
-                opponentData.PositionOnApproachToPitEntry = opponentData.Position;
+                opponentData.PositionOnApproachToPitEntry = opponentData.OverallPosition;
             }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
@@ -2112,8 +2114,8 @@ namespace CrewChiefV4.assetto
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
             }
 
-            opponentData.Position = (int)participantStruct.carLeaderboardPosition;
-            opponentData.UnFilteredPosition = opponentData.Position;
+            opponentData.OverallPosition = (int)participantStruct.carLeaderboardPosition;
+            opponentData.UnFilteredPosition = opponentData.OverallPosition;
             opponentData.CompletedLaps = (int)participantStruct.lapCount;
             opponentData.CurrentSectorNumber = 0;
             opponentData.WorldPosition = new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z };

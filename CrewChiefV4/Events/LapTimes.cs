@@ -245,7 +245,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            currentPosition = currentGameState.SessionData.Position;
+            currentPosition = currentGameState.SessionData.ClassPosition;
 
             // check the current lap is still valid
             if (lapIsValid && currentGameState.SessionData.CompletedLaps > 0 &&
@@ -388,11 +388,11 @@ namespace CrewChiefV4.Events
                                     }
                                 }
                                     // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
-                                else if (currentGameState.SessionData.Position == 1) 
+                                else if (currentGameState.SessionData.ClassPosition == 1) 
                                 {
                                     // TODO: rework this grotty logic...
                                     Boolean newGapToSecond = false;
-                                    if (previousGameState != null && previousGameState.SessionData.Position > 1)
+                                    if (previousGameState != null && previousGameState.SessionData.ClassPosition > 1)
                                     {                                        
                                         newGapToSecond = true;
                                         if (currentGameState.SessionData.SessionType == SessionType.Qualify)
@@ -570,7 +570,7 @@ namespace CrewChiefV4.Events
                                         {
                                             Console.WriteLine("Skipping 'worsening' laptimes message - inconsistent with lap rating");
                                         }
-                                        else if (currentGameState.SessionData.Position >= currentGameState.SessionData.PositionAtStartOfCurrentLap)
+                                        else if (currentGameState.SessionData.ClassPosition >= currentGameState.SessionData.ClassPositionAtStartOfCurrentLap)
                                         {
                                             // only complain about worsening laptimes if we've not overtaken anyone on this lap
                                             lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
