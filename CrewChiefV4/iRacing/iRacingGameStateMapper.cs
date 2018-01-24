@@ -13,18 +13,17 @@ namespace CrewChiefV4.iRacing
     {
         public static String playerName = null;
         Driver playerCar = null;
-        private SpeechRecogniser speechRecogniser;
         public iRacingGameStateMapper()
         {
 
         }
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             // no version number in r3e shared data so this is a no-op
         }
 
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
+        public override void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
         {
             speechRecogniser.addiRacingSpeechRecogniser();
             this.speechRecogniser = speechRecogniser;
@@ -54,7 +53,7 @@ namespace CrewChiefV4.iRacing
                 this.positionChangeTime = positionChangeTime;
             }
         }
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             if (memoryMappedFileStruct == null)
             {
@@ -1044,7 +1043,7 @@ namespace CrewChiefV4.iRacing
             {"Race", SessionType.Race}
         };
 
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             String sessionString = (String)memoryMappedFileStruct;
             if (sessionTypeMap.ContainsKey(sessionString))

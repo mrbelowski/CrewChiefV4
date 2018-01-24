@@ -32,9 +32,7 @@ namespace CrewChiefV4.rFactor1
         private bool incrementCutTrackCountWhenLeavingRacingSurface = true;
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
-
-        private SpeechRecogniser speechRecogniser;
-
+        
         // if we're running only against AI, force the pit window to open
         private Boolean isOfflineSession = true;
         // keep track of opponents processed this time
@@ -67,17 +65,12 @@ namespace CrewChiefV4.rFactor1
             suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1, 2));
         }
 
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             // no version number in rFactor shared data so this is a no-op
         }
 
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
-        }
-
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper wrapper = (CrewChiefV4.rFactor1.RF1SharedMemoryReader.RF1StructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
@@ -1225,7 +1218,7 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        public SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             rFactor1Data.rfShared shared = (rFactor1Data.rfShared)memoryMappedFileStruct;
             if (CrewChief.gameDefinition == GameDefinition.rFactor1)

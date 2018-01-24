@@ -32,8 +32,6 @@ namespace CrewChiefV4.rFactor2
         private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
         private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
 
-        private SpeechRecogniser speechRecogniser;
-
         public static string playerName = null;
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
@@ -115,7 +113,7 @@ namespace CrewChiefV4.rFactor2
         private int[] minimumSupportedVersionParts = new int[] { 2, 4, 0, 0 };
         public static bool pluginVerified = false;
         private string lastVersionString;
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             if (RF2GameStateMapper.pluginVerified)
                 return;
@@ -172,12 +170,7 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine(msg);
             }
         }
-
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
-        }
-
+        
         // Abrupt session detection variables.
         private bool waitingToTerminateSession = false;
         private long ticksWhenSessionEnded = DateTime.MinValue.Ticks;
@@ -207,7 +200,7 @@ namespace CrewChiefV4.rFactor2
             this.compoundIndexToTyreType.Clear();
         }
 
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
@@ -2117,7 +2110,7 @@ namespace CrewChiefV4.rFactor2
             return bestKey;
         }
 
-        public SessionType mapToSessionType(Object wrapper)
+        public override SessionType mapToSessionType(Object wrapper)
         {
             var shared = wrapper as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             switch (shared.scoring.mScoringInfo.mSession)
