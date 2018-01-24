@@ -21,7 +21,6 @@ namespace CrewChiefV4.iRacing
         }
 
         private iRacingData _telemetry;
-        private SessionInfo _sessionInfo;
 
         private int _infoUpdate, _sessionId;
 
@@ -29,7 +28,6 @@ namespace CrewChiefV4.iRacing
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
 
         public iRacingData Telemetry { get { return _telemetry; } }
-        public SessionInfo SessionInfo { get { return _sessionInfo; } }
 
         private SessionData _sessionData;
         public SessionData SessionData { get { return _sessionData; } }
@@ -71,7 +69,7 @@ namespace CrewChiefV4.iRacing
                 {
                     driver = Driver.FromSessionInfo(info, id);
 
-                    if (driver == null)
+                    if (driver == null || driver.IsPacecar)
                     {
                         continue;
                     }
