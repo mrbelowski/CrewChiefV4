@@ -762,7 +762,7 @@ namespace CrewChiefV4
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
-                            gameStateMapper.correctForMulticlassPositions(currentGameState);
+                            gameStateMapper.correctForMulticlassPositions(currentGameState, previousGameState);
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
@@ -777,7 +777,7 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    positionMsg = currentGameState.SessionData.Position.ToString();
+                                    positionMsg = currentGameState.SessionData.ClassPosition.ToString();
                                 }
                                 Console.WriteLine("Session finished, position = " + positionMsg);
                                 audioPlayer.purgeQueues();
@@ -787,7 +787,8 @@ namespace CrewChiefV4
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                    previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                    previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
+                                    previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
                                     currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF);
 
                                 sessionFinished = true;

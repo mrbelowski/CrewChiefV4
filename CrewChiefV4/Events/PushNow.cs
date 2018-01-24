@@ -227,22 +227,22 @@ namespace CrewChiefV4.Events
 
         private Boolean checkGaps(GameStateData currentGameState, int numLapsLeft, Boolean checkPushToGain, Boolean checkPushToHold)
         {
-            if (checkPushToGain && currentGameState.SessionData.Position > 1)
+            if (checkPushToGain && currentGameState.SessionData.ClassPosition > 1)
             {
-                float opponentInFrontBestLap = getOpponentBestLap(currentGameState.SessionData.Position - 1, lapsToCountBackForOpponentBest, currentGameState);
+                float opponentInFrontBestLap = getOpponentBestLap(currentGameState.SessionData.ClassPosition - 1, lapsToCountBackForOpponentBest, currentGameState);
                 if (opponentInFrontBestLap > 0 &&
                     (opponentInFrontBestLap - currentGameState.SessionData.PlayerLapTimeSessionBest) * numLapsLeft > currentGameState.SessionData.TimeDeltaFront)
                 {
                     // going flat out, we're going to catch the guy ahead us before the end
-                    if (currentGameState.SessionData.Position == 2)
+                    if (currentGameState.SessionData.ClassPosition == 2)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 0, this));
                     }
-                    else if (currentGameState.SessionData.Position == 3)
+                    else if (currentGameState.SessionData.ClassPosition == 3)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 0, this));
                     }
-                    else if (currentGameState.SessionData.Position == 4)
+                    else if (currentGameState.SessionData.ClassPosition == 4)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 0, this));
                     }
@@ -255,7 +255,7 @@ namespace CrewChiefV4.Events
             }
             if (checkPushToHold && !currentGameState.isLast())
             {
-                float opponentBehindBestLap = getOpponentBestLap(currentGameState.SessionData.Position + 1, lapsToCountBackForOpponentBest, currentGameState);
+                float opponentBehindBestLap = getOpponentBestLap(currentGameState.SessionData.ClassPosition + 1, lapsToCountBackForOpponentBest, currentGameState);
                 if (opponentBehindBestLap > 0 &&
                     (currentGameState.SessionData.PlayerLapTimeSessionBest - opponentBehindBestLap) * numLapsLeft > currentGameState.SessionData.TimeDeltaBehind)
                 {
@@ -271,7 +271,7 @@ namespace CrewChiefV4.Events
 
         private float getOpponentBestLap(int opponentPosition, int lapsToCheck, GameStateData gameState)
         {
-            OpponentData opponent = gameState.getOpponentAtPosition(opponentPosition, false);
+            OpponentData opponent = gameState.getOpponentAtClassPosition(opponentPosition, gameState.carClass.carClassEnum);
             if (opponent == null || opponent.OpponentLapData.Count < lapsToCheck)
             {
                 return -1;

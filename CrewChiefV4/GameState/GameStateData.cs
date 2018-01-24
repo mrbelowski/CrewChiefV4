@@ -273,7 +273,8 @@ namespace CrewChiefV4.GameState
         public int SessionStartPosition = 0;
         public int SessionStartClassPosition = 0;
 
-        public int NumCarsAtStartOfSession = 0;
+        public int NumCarsOverallAtStartOfSession = 0;
+        public int NumCarsInPlayerClassAtStartOfSession = 0;
 
         // race number in ongoing championship (zero indexed)
         public int EventIndex = 0;
@@ -312,7 +313,7 @@ namespace CrewChiefV4.GameState
         public int ClassPositionAtStartOfCurrentLap = 0;
 
         // Current position (1 = first place)
-        public int Position = 0;
+        public int OverallPosition = 0;
 
         public int UnFilteredPosition = 0;
         
@@ -323,7 +324,8 @@ namespace CrewChiefV4.GameState
         public float GameTimeAtLastPositionBehindChange = 0;
 
         // Number of cars (including the player) in the race
-        public int NumCars = 0;
+        public int NumCarsOverall = 0;
+        public int NumCarsInPlayerClass = 0;
 
         public Single SessionRunningTime = 0;
 
@@ -649,7 +651,7 @@ namespace CrewChiefV4.GameState
 
         public Boolean DriverNameSet = false;
 
-        public int Position = 0;
+        public int OverallPosition = 0;
 
         public int UnFilteredPosition = 0;
 
@@ -728,7 +730,7 @@ namespace CrewChiefV4.GameState
 
         public override string ToString()
         {
-            return DriverRawName + " position " + Position + " lapsCompleted " + CompletedLaps + " lapDist " + DistanceRoundTrack;
+            return DriverRawName + " class position " + ClassPosition + " overall position " + OverallPosition + " lapsCompleted " + CompletedLaps + " lapDist " + DistanceRoundTrack;
         }
 
         public LapData getCurrentLapData()
@@ -2098,7 +2100,14 @@ namespace CrewChiefV4.GameState
         // some convenience methods
         public Boolean isLast()
         {
-            return SessionData.UnFilteredPosition == SessionData.NumCars;
+            if (!GameStateData.Multiclass)
+            {
+                return SessionData.UnFilteredPosition == SessionData.NumCarsOverall;
+            }
+            else
+            {
+                return SessionData.ClassPosition == SessionData.NumCarsInPlayerClass;
+            }
         }
 
         public List<String> getRawDriverNames()
@@ -2115,9 +2124,22 @@ namespace CrewChiefV4.GameState
             return rawDriverNames;
         }
 
-        public OpponentData getOpponentAtPosition(int position, Boolean useUnfilteredPosition)
+        public OpponentData getOpponentAtClassPosition(int position, CarData.CarClassEnum carClass)
         {
-            string opponentKey = getOpponentKeyAtPosition(position, useUnfilteredPosition);
+            string opponentKey = getOpponentKeyAtClassPosition(position, carClass);
+            if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
+            {
+                return OpponentData[opponentKey];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public OpponentData getOpponentAtOverallPosition(int position)
+        {
+            string opponentKey = getOpponentKeyAtOverallPosition(position);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
             {
                 return OpponentData[opponentKey];
@@ -2188,11 +2210,11 @@ namespace CrewChiefV4.GameState
                 return opponentKeyFurthestInFront;
         }
 
-        public string getOpponentKeyInFront(Boolean useUnfilteredPosition)
+        public string getOpponentKeyInFront(CarData.CarClassEnum carClass)
         {
-            if (SessionData.Position > 1)
+            if (SessionData.ClassPosition > 1)
             {
-                return getOpponentKeyAtPosition(SessionData.Position - 1, useUnfilteredPosition);
+                return getOpponentKeyAtClassPosition(SessionData.ClassPosition - 1, carClass);
             }
             else
             {
@@ -2200,11 +2222,11 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public string getOpponentKeyBehind(Boolean useUnfilteredPosition)
+        public string getOpponentKeyBehind(CarData.CarClassEnum carClass)
         {
-            if (SessionData.Position < SessionData.NumCars)
+            if (SessionData.ClassPosition < SessionData.NumCarsInPlayerClass)
             {
-                return getOpponentKeyAtPosition(SessionData.Position + 1, useUnfilteredPosition);
+                return getOpponentKeyAtClassPosition(SessionData.ClassPosition + 1, carClass);
             }
             else
             {
@@ -2212,25 +2234,30 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public string getOpponentKeyAtPosition(int position, Boolean useUnfilteredPosition)
+        public string getOpponentKeyAtClassPosition(int position, CarData.CarClassEnum carClass)
         {
             if (OpponentData.Count != 0)
             {
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
-                    if (useUnfilteredPosition)
+                    if (entry.Value.ClassPosition == position && entry.Value.CarClass.carClassEnum == carClass)
                     {
-                        if (entry.Value.UnFilteredPosition == position)
-                        {
-                            return entry.Key;
-                        }
+                        return entry.Key;
                     }
-                    else
+                }
+            }
+            return null;
+        }
+
+        public string getOpponentKeyAtOverallPosition(int position)
+        {
+            if (OpponentData.Count != 0)
+            {
+                foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
+                {
+                    if (entry.Value.OverallPosition == position)
                     {
-                        if (entry.Value.Position == position)
-                        {
-                            return entry.Key;
-                        }
+                        return entry.Key;
                     }
                 }
             }
@@ -2248,24 +2275,24 @@ namespace CrewChiefV4.GameState
             {
                 HashSet<String> classIds = new HashSet<string>();
                 classIds.Add(this.carClass.getClassIdentifier());
-                this.SessionData.ClassPosition = this.SessionData.Position;
+                this.SessionData.ClassPosition = this.SessionData.OverallPosition;
                 foreach (OpponentData opponentData in OpponentData.Values)
                 {
-                    opponentData.ClassPosition = opponentData.Position;
+                    opponentData.ClassPosition = opponentData.OverallPosition;
                     classIds.Add(opponentData.CarClass.getClassIdentifier());
                 }
-                GameStateData.NumberOfClasses = classIds.Count;                
+                GameStateData.NumberOfClasses = classIds.Count;
             }
             else
             {
                 List<OpponentData> participants = this.OpponentData.Values.ToList();
-                OpponentData player = new OpponentData() { Position = this.SessionData.Position, CarClass = this.carClass };
+                OpponentData player = new OpponentData() { OverallPosition = this.SessionData.OverallPosition, CarClass = this.carClass };
                 participants.Add(player);
 
                 // can't sort this list on construction because it contains a dummy entry for the player, so sort it here:
                 participants.Sort(delegate(OpponentData d1, OpponentData d2)
                 {
-                    return d1.Position.CompareTo(d2.Position);
+                    return d1.OverallPosition.CompareTo(d2.OverallPosition);
                 });
 
                 Dictionary<string, int> classCounts = new Dictionary<string, int>();
@@ -2288,7 +2315,7 @@ namespace CrewChiefV4.GameState
 
                     participant.ClassPosition = countForThisClass;
                     // if this is the dummy participant for the player, update the player ClassPosition
-                    if (this.SessionData.Position == participant.Position)
+                    if (this.SessionData.OverallPosition == participant.OverallPosition)
                     {
                         this.SessionData.ClassPosition = countForThisClass;
                     }
@@ -2309,7 +2336,8 @@ namespace CrewChiefV4.GameState
         {
             Console.WriteLine("Laps completed = " + SessionData.CompletedLaps);
             Console.WriteLine("Time elapsed = " + SessionData.SessionRunningTime);
-            Console.WriteLine("Position = " + SessionData.Position);
+            Console.WriteLine("Overall Position = " + SessionData.OverallPosition);
+            Console.WriteLine("Class Position = " + SessionData.ClassPosition);
             Console.WriteLine("Session phase = " + SessionData.SessionPhase);
         }
 
@@ -2320,7 +2348,8 @@ namespace CrewChiefV4.GameState
             {
                 Console.WriteLine("last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps +
                     " ID " + opponent.Key + " name " + opponent.Value.DriverRawName + " active " + opponent.Value.IsActive +
-                    " approx speed " + opponent.Value.Speed + " position " + opponent.Value.Position);
+                    " approx speed " + opponent.Value.Speed + " class position " + opponent.Value.ClassPosition +
+                    " overall position " + opponent.Value.OverallPosition);
             }
         }
 
