@@ -68,7 +68,8 @@ namespace CrewChiefV4.rFactor2
             GreenFlag = 5,
             FullCourseYellow = 6,
             SessionStopped = 7,
-            SessionOver = 8
+            SessionOver = 8,
+            Undocumented_PreRace = 9  // I suspect 9 means we're in a garage/monitor, waiting for race to start.
         }
 
         // Yellow flag states (applies to full-course only)

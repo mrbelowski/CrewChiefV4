@@ -98,7 +98,16 @@ namespace CrewChiefV4.rFactor2
 
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
 
+        // Session caches:
         private Dictionary<byte, TyreType> compoundIndexToTyreType = new Dictionary<byte, TyreType>();
+
+        class CarInfo
+        {
+            string carClassString = null;
+            string driverNameRawSanitized = null;
+        }
+
+        private Dictionary<long, CarInfo> idToCarInfoMap = new Dictionary<long, CarInfo>();
 
         public RF2GameStateMapper()
         {
@@ -205,6 +214,7 @@ namespace CrewChiefV4.rFactor2
             RF2GameStateMapper.sanitizedNamesMap.Clear();
             this.lastTimeEngineWasRunning = DateTime.MaxValue;
             this.compoundIndexToTyreType.Clear();
+            this.idToCarInfoMap.Clear();
         }
 
         public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
@@ -238,7 +248,6 @@ namespace CrewChiefV4.rFactor2
                 || sessionJustEnded  // Need to start the wait for the next session
                 || this.waitingToTerminateSession  // Wait for the next session (or timeout) is in progress
                 || !sessionStarted)  // We don't process game state updates outside of the active session
-                // shared.scoring.mScoringInfo.mGamePhase == 9  // No idea WTF this is but don't process state 9, it is some form of transition.
             {
                 //
                 // If we have a previous game state and it's in a valid phase here, update it to "Finished" and return it,
@@ -501,7 +510,7 @@ namespace CrewChiefV4.rFactor2
                         || psd.SessionPhase == SessionPhase.Finished
                         || psd.SessionPhase == SessionPhase.Green
                         || psd.SessionPhase == SessionPhase.FullCourseYellow
-                        || psd.SessionPhase == SessionPhase.Unavailable)  // this double triggers if session == 9, wtf is 9?
+                        || psd.SessionPhase == SessionPhase.Unavailable)
                     && (csd.SessionPhase == SessionPhase.Garage
                         || csd.SessionPhase == SessionPhase.Gridwalk
                         || csd.SessionPhase == SessionPhase.Formation
@@ -2036,6 +2045,7 @@ namespace CrewChiefV4.rFactor2
                 case rFactor2Constants.rF2GamePhase.Formation:
                     return SessionPhase.Formation;
                 case rFactor2Constants.rF2GamePhase.Garage:
+                case rFactor2Constants.rF2GamePhase.Undocumented_PreRace:
                     return SessionPhase.Garage;
                 case rFactor2Constants.rF2GamePhase.GridWalk:
                     return SessionPhase.Gridwalk;
