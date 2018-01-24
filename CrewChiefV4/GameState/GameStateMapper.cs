@@ -37,6 +37,10 @@ namespace CrewChiefV4.GameState
          */
         public virtual void correctForMulticlassPositions(GameStateData currentGameState)
         {
+            if (GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState))
+            {
+                return;
+            }
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {
                 currentGameState.SessionData.SessionStartClassPosition = currentGameState.SessionData.ClassPosition;

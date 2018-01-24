@@ -1984,6 +1984,7 @@ namespace CrewChiefV4.GameState
 
         // This is updated on every tick so should always be accurate. NOTE THIS IS NOT SET FOR IRACING!
         public static int NumberOfClasses = 1;
+        public static Boolean Multiclass = false;
 
         public static DateTime CurrentTime = DateTime.Now;
 
@@ -2243,7 +2244,7 @@ namespace CrewChiefV4.GameState
             // the expensive sort call. In multiclass sessions we'll still update NumberOfClasses to be correct here, then on the next tick
             // the class positions will be sorted properly. So we'll be behind for 1 tick in practice / qual if a new class car joins. For races
             // cars tend to only leave, so this will probably be OK
-            if (forceSingleClass() || GameStateData.NumberOfClasses == 1)
+            if (forceSingleClass(this) || GameStateData.NumberOfClasses == 1)
             {
                 HashSet<String> classIds = new HashSet<string>();
                 classIds.Add(this.carClass.getClassIdentifier());
@@ -2253,7 +2254,7 @@ namespace CrewChiefV4.GameState
                     opponentData.ClassPosition = opponentData.Position;
                     classIds.Add(opponentData.CarClass.getClassIdentifier());
                 }
-                GameStateData.NumberOfClasses = classIds.Count;
+                GameStateData.NumberOfClasses = classIds.Count;                
             }
             else
             {
@@ -2294,11 +2295,12 @@ namespace CrewChiefV4.GameState
                 }
                 GameStateData.NumberOfClasses = classCounts.Count;
             }
+            GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
         }
 
         // this method may sanity checks the class data - e.g. if there are too many classes or whatever.
         // For now, just check the override flag
-        private Boolean forceSingleClass()
+        public static Boolean forceSingleClass(GameStateData currentGameState)
         {
             return CrewChief.forceSingleClass;
         }

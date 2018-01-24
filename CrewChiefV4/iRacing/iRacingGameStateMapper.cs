@@ -281,7 +281,7 @@ namespace CrewChiefV4.iRacing
 
                     }
                 }
-                if (!currentGameState.SessionData.JustGoneGreen. && previousGameState != null)
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
 
@@ -595,6 +595,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
             }
 
+            GameStateData.Multiclass = false;
             foreach (Driver driver in shared.Drivers)
             {
                 if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || driver.IsPacecar || driver.IsSpectator)
@@ -602,10 +603,8 @@ namespace CrewChiefV4.iRacing
                     continue;
                 }
 
-
                 String driverName = driver.Name.ToLower();
                 lastActiveTimeForOpponents[driverName] = currentGameState.Now;
-
 
                 if (currentGameState.OpponentData.ContainsKey(driverName))
                 {
@@ -731,7 +730,12 @@ namespace CrewChiefV4.iRacing
                                  previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry,
                                  previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
-                        if (currentGameState.SessionData.SessionType == SessionType.Race && CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
+                        Boolean carIsSameAsPlayer = CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass);
+                        if (!carIsSameAsPlayer)
+                        {
+                            GameStateData.Multiclass = true;
+                        }
+                        if (currentGameState.SessionData.SessionType == SessionType.Race && carIsSameAsPlayer)
                         {
                             if (currentOpponentClassPosition == currentGameState.SessionData.ClassPosition + 1  )
                             {
@@ -743,7 +747,7 @@ namespace CrewChiefV4.iRacing
                             }
                         }
                         //allow gapes in qual and prac, delta here is not on track delta but diff on fastest time 
-                        else if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
+                        else if (carIsSameAsPlayer)
                         {
                             if (currentOpponentClassPosition == currentGameState.SessionData.ClassPosition + 1)
                             {
