@@ -184,8 +184,8 @@ namespace CrewChiefV4.Events
                     {
                         gapsBehind.Add(currentGameState.SessionData.TimeDeltaBehind);
                     }
-                    string currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum);
-                    string currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum);
+                    string currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+                    string currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
                     // seems like belt and braces, but as Raceroom names aren't unique we need to double check a pass actually happened here:
                     if (frequencyOfOvertakingMessages > 0 && currentOpponentAheadKey != opponentAheadKey)
                     {

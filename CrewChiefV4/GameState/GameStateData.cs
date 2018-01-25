@@ -2129,7 +2129,7 @@ namespace CrewChiefV4.GameState
             return rawDriverNames;
         }
 
-        public OpponentData getOpponentAtClassPosition(int position, CarData.CarClassEnum carClass)
+        public OpponentData getOpponentAtClassPosition(int position, CarData.CarClass carClass)
         {
             string opponentKey = getOpponentKeyAtClassPosition(position, carClass);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
@@ -2215,7 +2215,7 @@ namespace CrewChiefV4.GameState
                 return opponentKeyFurthestInFront;
         }
 
-        public string getOpponentKeyInFront(CarData.CarClassEnum carClass)
+        public string getOpponentKeyInFront(CarData.CarClass carClass)
         {
             if (SessionData.ClassPosition > 1)
             {
@@ -2227,7 +2227,7 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public string getOpponentKeyBehind(CarData.CarClassEnum carClass)
+        public string getOpponentKeyBehind(CarData.CarClass carClass)
         {
             if (SessionData.ClassPosition < SessionData.NumCarsInPlayerClass)
             {
@@ -2239,13 +2239,13 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public string getOpponentKeyAtClassPosition(int position, CarData.CarClassEnum carClass)
+        public string getOpponentKeyAtClassPosition(int position, CarData.CarClass carClass)
         {
             if (OpponentData.Count != 0)
             {
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
-                    if (entry.Value.ClassPosition == position && entry.Value.CarClass.carClassEnum == carClass)
+                    if (entry.Value.ClassPosition == position && string.Equals(entry.Value.CarClass.getClassIdentifier(), carClass.getClassIdentifier()))
                     {
                         return entry.Key;
                     }

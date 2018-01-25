@@ -935,9 +935,9 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.OverallPosition > 1 && currentGameState.SessionData.OverallPosition == 1 ?
                     true : currentGameState.SessionData.HasLeadChanged;
                 currentGameState.SessionData.IsRacingSameCarInFront = 
-                    String.Equals(previousGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum), currentGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum));
+                    String.Equals(previousGameState.getOpponentKeyInFront(currentGameState.carClass), currentGameState.getOpponentKeyInFront(currentGameState.carClass));
                 currentGameState.SessionData.IsRacingSameCarBehind = 
-                    String.Equals(previousGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum), currentGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum));
+                    String.Equals(previousGameState.getOpponentKeyBehind(currentGameState.carClass), currentGameState.getOpponentKeyBehind(currentGameState.carClass));
                 currentGameState.SessionData.GameTimeAtLastPositionFrontChange = !currentGameState.SessionData.IsRacingSameCarInFront ? 
                     currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 

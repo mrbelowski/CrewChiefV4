@@ -140,7 +140,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass.carClassEnum);
+                        OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                         timeWillBeZeroAtEndOfLeadersLap = leader != null && leader.isProbablyLastLap;
                     }
                     if ((addExtraLap && timeLeft <= 0) ||
