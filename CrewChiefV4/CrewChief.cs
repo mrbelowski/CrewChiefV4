@@ -762,7 +762,13 @@ namespace CrewChiefV4
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
-                            gameStateMapper.populateDerivedData(currentGameState);
+                            // TODO: derived data for practice and qually sessions, if we need it
+                            // TODO: check this is safe at session end (do any of the mappers set the sessionType to Unavailable
+                            // as soon as it finishes? Don't think they do but needs checking)
+                            if (currentGameState.SessionData.SessionType == SessionType.Race)
+                            {
+                                gameStateMapper.populateDerivedRaceSessionData(currentGameState);
+                            }
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {

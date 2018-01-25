@@ -21,25 +21,10 @@ namespace CrewChiefV4.GameState
             this.speechRecogniser = speechRecogniser;
         }
 
-        // called after mapping - 
-        //
-        // need to correct as many of the following as we can:
-        /*
-            currentGameState.SessionData.SessionStartPosition
-            currentGameState.SessionData.PositionAtStartOfCurrentLap
-            currentGameState.SessionData.LeaderSectorNumber
-            currentGameState.PitData.LeaderIsPitting
-            currentGameState.PitData.OpponentForLeaderPitting
-            currentGameState.PitData.CarInFrontIsPitting
-            currentGameState.PitData.OpponentForCarAheadPitting
-            opponentData.PositionOnApproachToPitEntry
-            currentGameState.SessionData.TimeDeltaBehind
-            currentGameState.SessionData.TimeDeltaFront
-          
-         */
-        // This method populates data derived from the mapped data, that's common to all games. Currently this is only
-        // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
-        public virtual void populateDerivedData(GameStateData currentGameState)
+        // This method populates data derived from the mapped data, that's common to all games.
+        // This is specific to race sessions. At the time of writing there's nothing needed for qual and
+        // practice, but these may be added later
+        public virtual void populateDerivedRaceSessionData(GameStateData currentGameState)
         {
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
             // always set the session start class position and lap start class position:
