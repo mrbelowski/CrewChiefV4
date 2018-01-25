@@ -651,8 +651,6 @@ namespace CrewChiefV4.GameState
 
         public int OverallPosition = 0;
 
-        public int UnFilteredPosition = 0;
-
         public int ClassPosition = 0;
 
         public float SessionTimeAtLastPositionChange = -1;
