@@ -804,26 +804,7 @@ namespace CrewChiefV4.PCars2
                                     Boolean isEnteringPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
                                     Boolean isLeavingPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
                                     Boolean isInPits = opponentPitMode == ePitMode.PIT_MODE_IN_PIT || opponentPitMode == ePitMode.PIT_MODE_IN_GARAGE;
-
-                                    if (isEnteringPits && !previousOpponentIsEnteringPits)
-                                    {
-                                        if (currentOpponentData.PositionOnApproachToPitEntry == 1)
-                                        {
-                                            currentGameState.PitData.LeaderIsPitting = true;
-                                            currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                        }
-                                        if (currentGameState.SessionData.OverallPosition > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1)
-                                        {
-                                            currentGameState.PitData.CarInFrontIsPitting = true;
-                                            currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                        }
-                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1)
-                                        {
-                                            currentGameState.PitData.CarBehindIsPitting = true;
-                                            currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
-                                        }
-                                    }
-                                    
+                                                                        
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
                                     float lastSectorTime = -1;
                                     if (currentOpponentSector == 1)

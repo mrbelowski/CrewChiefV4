@@ -1508,26 +1508,7 @@ namespace CrewChiefV4.assetto
 
                                     Boolean isEnteringPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == numberOfSectorsOnTrack;
                                     Boolean isLeavingPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == 1;
-
-                                    if (isEnteringPits && !previousOpponentIsEnteringPits)
-                                    {
-                                        if (currentOpponentData.PositionOnApproachToPitEntry == 1)
-                                        {
-                                            currentGameState.PitData.LeaderIsPitting = true;
-                                            currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                        }
-                                        if (currentGameState.SessionData.OverallPosition > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1)
-                                        {
-                                            currentGameState.PitData.CarInFrontIsPitting = true;
-                                            currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                        }
-                                        if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1)
-                                        {
-                                            currentGameState.PitData.CarBehindIsPitting = true;
-                                            currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
-                                        }
-                                    }
-
+                                    
                                     if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition + 1 && !useCarLeaderBoardPosition)
                                     {
                                         currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);

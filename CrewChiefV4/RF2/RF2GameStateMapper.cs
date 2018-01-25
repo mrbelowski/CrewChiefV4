@@ -1411,23 +1411,6 @@ namespace CrewChiefV4.rFactor2
                     && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
-                    if (opponent.PositionOnApproachToPitEntry == 1)
-                    {
-                        cgs.PitData.LeaderIsPitting = true;
-                        cgs.PitData.OpponentForLeaderPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == csd.OverallPosition - 1 && csd.OverallPosition > 2)
-                    {
-                        cgs.PitData.CarInFrontIsPitting = true;
-                        cgs.PitData.OpponentForCarAheadPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == csd.OverallPosition + 1 && !cgs.isLast())
-                    {
-                        cgs.PitData.CarBehindIsPitting = true;
-                        cgs.PitData.OpponentForCarBehindPitting = opponent;
-                    }
                 }
 
                 if (opponent.OverallPosition == csd.OverallPosition + 1 && csd.SessionType == SessionType.Race)
