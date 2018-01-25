@@ -483,8 +483,8 @@ namespace CrewChiefV4.rFactor2
             public double mLapStartET;            // time this lap was started
 
             // Position and derivatives
-            // TODO: remove these from serialization, no telemetry case is corner case.
-            public rF2Vec3 mPos;                  // world position in meters
+            [XmlIgnore] public rF2Vec3 mPos;                  // world position in meters
+            // TODO: remove these serialization, once we use telemetry
             public rF2Vec3 mLocalVel;             // velocity (meters/sec) in local vehicle coordinates
             public rF2Vec3 mLocalAccel;           // acceleration (meters/sec^2) in local vehicle coordinates
 
