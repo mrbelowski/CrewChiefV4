@@ -64,23 +64,10 @@ namespace CrewChiefV4.GameState
                 currentGameState.SessionData.NumCarsInPlayerClass = currentGameState.SessionData.NumCarsOverall;
                 return;
             }
-            int numCarsInPlayerClass = 1;
+            
             float PitApproachPosition = currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1;
-
-            // have to re-calculate these for multiclass:
-            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
-                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
-            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
-                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
-            if (!currentGameState.SessionData.IsRacingSameCarInFront)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
-            }
-            if (!currentGameState.SessionData.IsRacingSameCarBehind)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
-            }
-
+            
+            int numCarsInPlayerClass = 1;
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {                
                 if (opponent.CarClass == currentGameState.carClass)
@@ -147,6 +134,20 @@ namespace CrewChiefV4.GameState
                 currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
             }
             currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
+
+            // have to re-calculate these for multiclass:
+            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
+                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
+            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
+                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+            if (!currentGameState.SessionData.IsRacingSameCarInFront)
+            {
+                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
+            }
+            if (!currentGameState.SessionData.IsRacingSameCarBehind)
+            {
+                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
+            }
         }
     }
 }
