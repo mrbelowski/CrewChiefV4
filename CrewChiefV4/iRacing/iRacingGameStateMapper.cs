@@ -32,7 +32,7 @@ namespace CrewChiefV4.iRacing
 
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
-        TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(10);
+        TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(3);
         string prevTrackSurface = "";
 
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
@@ -601,7 +601,7 @@ namespace CrewChiefV4.iRacing
 
                 String driverName = driver.Name.ToLower();
                 lastActiveTimeForOpponents[driverName] = currentGameState.Now;
-
+                
                 if (currentGameState.OpponentData.ContainsKey(driverName))
                 {
                     if (previousGameState != null)
@@ -643,11 +643,13 @@ namespace CrewChiefV4.iRacing
                             previousOpponentLastLapValid = previousOpponentData.LastLapValid;
                             previousIsApporchingPits = previousOpponentData.isApporchingPits;
                         }
-
+                        
                         hasCrossedSFLine = driver.Live.HasCrossedSFLine;
                         int currentOpponentSector = driver.Live.CurrentSector;
-                        OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
 
+                        OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
+                        
+                        currentOpponentData.IsActive = true;
                         bool previousOpponentLapValid = driver.Live.PreviousLapWasValid;
 
                         currentOpponentData.isApporchingPits = shared.Telemetry.CarIdxTrackSurface[driver.Id].HasFlag(TrackSurfaces.AproachingPits);
@@ -809,9 +811,14 @@ namespace CrewChiefV4.iRacing
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
                 foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) && lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || (lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate && currentGameState.OpponentData[opponentName].IsActive))
                     {
-                        currentGameState.OpponentData[opponentName].InPits = true;
+                        OpponentData currentOpponent = currentGameState.OpponentData[opponentName];
+                        currentOpponent.IsActive = false;
+                        currentOpponent.InPits = true;
+                        currentOpponent.Speed = 0;
+                        currentOpponent.stoppedInLandmark = null;
+                        currentOpponent.DeltaTime.SetNextDeltaPoint(0, currentOpponent.CompletedLaps, 0, currentGameState.Now);
                         Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
                     }
                 }
