@@ -666,7 +666,10 @@ namespace CrewChiefV4.iRacing
                             currentOpponentLapValid = false;
                         }
                         Boolean carIsSameAsPlayer = CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass);
-
+                        if(!carIsSameAsPlayer)
+                        {
+                            GameStateData.Multiclass = true;
+                        }
                         int currentOpponentOverallPosition = getRacePosition(driverName, previousOpponentOverallPosition, driver.Live.Position, currentGameState.Now);
                         
                         int currentOpponentLapsCompleted = driver.Live.LapsCompleted;
