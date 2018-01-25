@@ -1663,7 +1663,6 @@ namespace CrewChiefV4.RaceRoom
                 opponentData.SessionTimeAtLastPositionChange = sessionRunningTime;
             }
             opponentData.OverallPosition = racePosition;
-            opponentData.UnFilteredPosition = unfilteredRacePosition;
             if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
             {
                 opponentData.PositionOnApproachToPitEntry = opponentData.OverallPosition;
@@ -1750,7 +1749,6 @@ namespace CrewChiefV4.RaceRoom
             OpponentData opponentData = new OpponentData();
             opponentData.DriverRawName = driverName;
             opponentData.OverallPosition = participantStruct.Place;
-            opponentData.UnFilteredPosition = opponentData.OverallPosition;
             opponentData.CompletedLaps = participantStruct.CompletedLaps;
             opponentData.CurrentSectorNumber = participantStruct.TrackSector;
             opponentData.WorldPosition = new float[] { participantStruct.Position.X, participantStruct.Position.Z };

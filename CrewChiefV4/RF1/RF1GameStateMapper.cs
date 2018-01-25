@@ -772,7 +772,6 @@ namespace CrewChiefV4.rFactor1
                     }
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
-                opponent.UnFilteredPosition = opponent.OverallPosition;
                 opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.OverallPosition != opponent.OverallPosition ? currentGameState.SessionData.SessionRunningTime : -1;
                 opponent.CompletedLaps = vehicle.totalLaps;
                 opponent.CurrentSectorNumber = vehicle.sector == 0 ? 3 : vehicle.sector;

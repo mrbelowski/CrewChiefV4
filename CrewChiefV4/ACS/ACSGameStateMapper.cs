@@ -2036,7 +2036,6 @@ namespace CrewChiefV4.assetto
                 opponentData.SessionTimeAtLastPositionChange = sessionRunningTime;
             }
             opponentData.OverallPosition = racePosition;
-            opponentData.UnFilteredPosition = racePosition;
             if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
             {
                 opponentData.PositionOnApproachToPitEntry = opponentData.OverallPosition;
@@ -2106,7 +2105,6 @@ namespace CrewChiefV4.assetto
             }
 
             opponentData.OverallPosition = (int)participantStruct.carLeaderboardPosition;
-            opponentData.UnFilteredPosition = opponentData.OverallPosition;
             opponentData.CompletedLaps = (int)participantStruct.lapCount;
             opponentData.CurrentSectorNumber = 0;
             opponentData.WorldPosition = new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z };

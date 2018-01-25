@@ -1385,7 +1385,6 @@ namespace CrewChiefV4.PCars
                 opponentData.Speed = speed;
             }
             opponentData.OverallPosition = racePosition;
-            opponentData.UnFilteredPosition = racePosition;
             if (previousDistanceRoundTrack < nearPitEntryPointDistance && opponentData.DistanceRoundTrack > nearPitEntryPointDistance)
             {
                 opponentData.PositionOnApproachToPitEntry = opponentData.OverallPosition;
@@ -1462,7 +1461,6 @@ namespace CrewChiefV4.PCars
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
             }
             opponentData.OverallPosition = (int)participantStruct.mRacePosition;
-            opponentData.UnFilteredPosition = opponentData.OverallPosition;
             opponentData.CompletedLaps = (int)participantStruct.mLapsCompleted;
             opponentData.CurrentSectorNumber = (int)participantStruct.mCurrentSector;
             opponentData.WorldPosition = new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] };

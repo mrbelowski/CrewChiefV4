@@ -1278,7 +1278,6 @@ namespace CrewChiefV4.rFactor2
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
                 }
 
-                opponent.UnFilteredPosition = opponent.OverallPosition;
                 opponent.SessionTimeAtLastPositionChange
                     = opponentPrevious != null && opponentPrevious.OverallPosition != opponent.OverallPosition
                             ? csd.SessionRunningTime : -1.0f;
