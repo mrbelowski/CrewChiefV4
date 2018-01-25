@@ -1856,13 +1856,18 @@ namespace CrewChiefV4.GameState
                     deltaPoints.Add(totalSpacing, now);
                 }
                 totalSpacing += spacing;
+                Boolean addedDeltaPoint = false;
                 if (totalSpacing < trackLength - spacing)
                 {
                     deltaPoints.Add(totalSpacing, now);
+                    addedDeltaPoint = true;
                 }
                 if (distanceRoundTrackOnCurrentLap >= totalSpacing)
                 {
-                    currentDeltaPoint = totalSpacing;
+                    if (addedDeltaPoint)
+                    {
+                        currentDeltaPoint = totalSpacing;
+                    }
                 }
             }
             // extract the keyset to a float array so we can iterate it much more efficiently - the keyset doesn't
