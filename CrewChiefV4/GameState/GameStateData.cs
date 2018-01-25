@@ -1996,6 +1996,8 @@ namespace CrewChiefV4.GameState
 
         public static DateTime CurrentTime = DateTime.Now;
 
+        public Boolean sortClassPositionsCompleted = false;
+
         public long Ticks;
 
         public DateTime Now;
@@ -2345,6 +2347,7 @@ namespace CrewChiefV4.GameState
                 GameStateData.NumberOfClasses = classCounts.Count;
             }
             GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
+            sortClassPositionsCompleted = true;
         }
 
         // this method may sanity checks the class data - e.g. if there are too many classes or whatever.

@@ -43,6 +43,11 @@ namespace CrewChiefV4.GameState
         // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
         public virtual void populateDerivedData(GameStateData currentGameState)
         {
+            // ensure we've got sorted class positions before proceeding:
+            if (!currentGameState.sortClassPositionsCompleted)
+            {
+                currentGameState.sortClassPositions();
+            }
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
             // always set the session start class position and lap start class position:
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
@@ -57,86 +62,86 @@ namespace CrewChiefV4.GameState
             {
                 currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = currentGameState.SessionData.ClassPosition;
             }
+
+            float PitApproachPosition = currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1;
             
-            // if we're single class, no need to process the opponents data
             if (singleClass)
             {
                 currentGameState.SessionData.NumCarsInPlayerClass = currentGameState.SessionData.NumCarsOverall;
-                return;
             }
-            
-            float PitApproachPosition = currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1;
-            
-            int numCarsInPlayerClass = 1;
-            foreach (OpponentData opponent in currentGameState.OpponentData.Values)
-            {                
-                if (opponent.CarClass == currentGameState.carClass)
+            else
+            {
+                // sort out all the class position stuff
+                int numCarsInPlayerClass = 1;
+                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
                 {
-                    numCarsInPlayerClass++;
-                    // don't care about other classes
-                    if (opponent.OverallPosition == opponent.ClassPosition)
+                    if (opponent.CarClass == currentGameState.carClass)
                     {
-                        // don't care about opponents who's class position matches their overall position
-                        continue;
-                    }
-                    if (PitApproachPosition != -1
-                        && opponent.DistanceRoundTrack < PitApproachPosition + 20
-                        && opponent.DistanceRoundTrack > PitApproachPosition - 20)
-                    {
-                        opponent.PositionOnApproachToPitEntry = opponent.ClassPosition;
-                    }
-                    if (opponent.ClassPosition == 1)
-                    {
-                        currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
-                        if (opponent.JustEnteredPits)
+                        numCarsInPlayerClass++;
+                        // don't care about other classes
+                        if (opponent.OverallPosition == opponent.ClassPosition)
                         {
-                            currentGameState.PitData.LeaderIsPitting = true;
-                            currentGameState.PitData.OpponentForLeaderPitting = opponent;
+                            // don't care about opponents who's class position matches their overall position
+                            continue;
                         }
-                        else
+                        if (PitApproachPosition != -1
+                            && opponent.DistanceRoundTrack < PitApproachPosition + 20
+                            && opponent.DistanceRoundTrack > PitApproachPosition - 20)
                         {
-                            currentGameState.PitData.LeaderIsPitting = false;
-                            currentGameState.PitData.OpponentForLeaderPitting = null;
+                            opponent.PositionOnApproachToPitEntry = opponent.ClassPosition;
                         }
-                    }
-                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
-                    {
-                        currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        if (opponent.JustEnteredPits)
+                        if (opponent.ClassPosition == 1)
                         {
-                            currentGameState.PitData.CarInFrontIsPitting = true;
-                            currentGameState.PitData.OpponentForCarAheadPitting = opponent;
+                            currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
+                            if (opponent.JustEnteredPits)
+                            {
+                                currentGameState.PitData.LeaderIsPitting = true;
+                                currentGameState.PitData.OpponentForLeaderPitting = opponent;
+                            }
+                            else
+                            {
+                                currentGameState.PitData.LeaderIsPitting = false;
+                                currentGameState.PitData.OpponentForLeaderPitting = null;
+                            }
                         }
-                        else
+                        else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                         {
-                            currentGameState.PitData.CarInFrontIsPitting = false;
-                            currentGameState.PitData.OpponentForCarAheadPitting = null;
+                            currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                            if (opponent.JustEnteredPits)
+                            {
+                                currentGameState.PitData.CarInFrontIsPitting = true;
+                                currentGameState.PitData.OpponentForCarAheadPitting = opponent;
+                            }
+                            else
+                            {
+                                currentGameState.PitData.CarInFrontIsPitting = false;
+                                currentGameState.PitData.OpponentForCarAheadPitting = null;
+                            }
                         }
-                    }
-                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
-                    {
-                        currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        if (opponent.JustEnteredPits)
+                        else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
                         {
-                            currentGameState.PitData.CarBehindIsPitting = true;
-                            currentGameState.PitData.OpponentForCarBehindPitting = opponent;
-                        }
-                        else
-                        {
-                            currentGameState.PitData.CarBehindIsPitting = false;
-                            currentGameState.PitData.OpponentForCarBehindPitting = null;
+                            currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                            if (opponent.JustEnteredPits)
+                            {
+                                currentGameState.PitData.CarBehindIsPitting = true;
+                                currentGameState.PitData.OpponentForCarBehindPitting = opponent;
+                            }
+                            else
+                            {
+                                currentGameState.PitData.CarBehindIsPitting = false;
+                                currentGameState.PitData.OpponentForCarBehindPitting = null;
+                            }
                         }
                     }
                 }
+                if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
+                {
+                    currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
+                }
+                currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
             }
-            if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
-            {
-                currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
-            }
-            currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
 
-            // have to re-calculate these for multiclass:
-            
+            // now derive some stuff that we always need to derive, using the correct class positions:
             String previousBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass, true);
             String currentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
             String previousAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass, true);
