@@ -36,8 +36,6 @@ namespace CrewChiefV4.GameState
             currentGameState.SessionData.TimeDeltaBehind
             currentGameState.SessionData.TimeDeltaFront
           
-            --- don't think we can get this one ---
-            currentGameState.SessionData.HasLeadChanged
          */
         // This method populates data derived from the mapped data, that's common to all games. Currently this is only
         // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
