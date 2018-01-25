@@ -827,6 +827,9 @@ namespace CrewChiefV4.iRacing
                 }
             }
 
+            //Sort class positions
+            currentGameState.sortClassPositions();
+
             if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 1)
             {
