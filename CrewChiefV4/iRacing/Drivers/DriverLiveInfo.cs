@@ -88,7 +88,7 @@ namespace CrewChiefV4.iRacing
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                this.LapTimePrevious = this._driver.CurrentResults.LastTime;                            
+                this.LapTimePrevious = e.LapLastLapTime;                            
             }
             else
             {
