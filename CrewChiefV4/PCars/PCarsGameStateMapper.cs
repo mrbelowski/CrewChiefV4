@@ -889,24 +889,6 @@ namespace CrewChiefV4.PCars
                                                         currentGameState.SessionData.TrackDefinition.isAtPitExit(participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2]);
                                             }
                                         }
-                                        if (isEnteringPits && !previousOpponentIsEnteringPits)
-                                        {
-                                            if (currentOpponentData.PositionOnApproachToPitEntry == 1)
-                                            {
-                                                currentGameState.PitData.LeaderIsPitting = true;
-                                                currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                                            }
-                                            if (currentGameState.SessionData.OverallPosition > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1)
-                                            {
-                                                currentGameState.PitData.CarInFrontIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                                            }
-                                            if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1)
-                                            {
-                                                currentGameState.PitData.CarBehindIsPitting = true;
-                                                currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
-                                            }
-                                        }
                                     }
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
                                     upateOpponentData(currentOpponentData, participantName, currentOpponentRacePosition, currentOpponentLapsCompleted,

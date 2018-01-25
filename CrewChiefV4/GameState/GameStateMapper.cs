@@ -77,13 +77,8 @@ namespace CrewChiefV4.GameState
                 {
                     if (opponent.CarClass == currentGameState.carClass)
                     {
-                        numCarsInPlayerClass++;
                         // don't care about other classes
-                        if (opponent.OverallPosition == opponent.ClassPosition)
-                        {
-                            // don't care about opponents who's class position matches their overall position
-                            continue;
-                        }
+                        numCarsInPlayerClass++;
                         if (PitApproachPosition != -1
                             && opponent.DistanceRoundTrack < PitApproachPosition + 20
                             && opponent.DistanceRoundTrack > PitApproachPosition - 20)

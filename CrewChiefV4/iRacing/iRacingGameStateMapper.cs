@@ -697,25 +697,6 @@ namespace CrewChiefV4.iRacing
                         Boolean isEnteringPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 3;
                         Boolean isLeavingPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 1;
 
-                        if (isEnteringPits && !previousOpponentIsEnteringPits)
-                        {
-                            if (currentOpponentData.PositionOnApproachToPitEntry == 1)
-                            {
-                                currentGameState.PitData.LeaderIsPitting = true;
-                                currentGameState.PitData.OpponentForLeaderPitting = currentOpponentData;
-                            }
-                            if (currentGameState.SessionData.OverallPosition > 2 && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1)
-                            {
-                                currentGameState.PitData.CarInFrontIsPitting = true;
-                                currentGameState.PitData.OpponentForCarAheadPitting = currentOpponentData;
-                            }
-                            if (!currentGameState.isLast() && currentOpponentData.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1)
-                            {
-                                currentGameState.PitData.CarBehindIsPitting = true;
-                                currentGameState.PitData.OpponentForCarBehindPitting = currentOpponentData;
-                            }
-                        }
-
                         currentOpponentData.LicensLevel = driver.licensLevel;
                         currentOpponentData.iRating = driver.IRating;
 

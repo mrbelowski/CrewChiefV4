@@ -863,24 +863,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 if (vehicle.inPits == 1 && opponent.CurrentSectorNumber == 3 && opponentPrevious != null && !opponentPrevious.isEnteringPits())
                 {
-                    opponent.setInLap();
-                    if (opponent.PositionOnApproachToPitEntry == 1)
-                    {
-                        currentGameState.PitData.LeaderIsPitting = true;
-                        currentGameState.PitData.OpponentForLeaderPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition - 1 && currentGameState.SessionData.OverallPosition > 2)
-                    {
-                        currentGameState.PitData.CarInFrontIsPitting = true;
-                        currentGameState.PitData.OpponentForCarAheadPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == currentGameState.SessionData.OverallPosition + 1 && !currentGameState.isLast())
-                    {
-                        currentGameState.PitData.CarBehindIsPitting = true;
-                        currentGameState.PitData.OpponentForCarBehindPitting = opponent;
-                    }                    
+                    opponent.setInLap();  
                 }
 
                 if (opponent.OverallPosition == currentGameState.SessionData.OverallPosition + 1 && currentGameState.SessionData.SessionType == SessionType.Race)
