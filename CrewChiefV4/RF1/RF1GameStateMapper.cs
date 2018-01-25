@@ -351,13 +351,7 @@ namespace CrewChiefV4.rFactor1
                 // Those values change on sector/lap change, otherwise stay the same between updates.
                 previousGameState.SessionData.restorePlayerTimings(currentGameState.SessionData);
 
-                currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
-                currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
-                currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
-                currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
-                currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
-                currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
-
+                currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
                 currentGameState.Conditions.samples = previousGameState.Conditions.samples;
             }
             float lastSectorTime = -1;
