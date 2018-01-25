@@ -85,6 +85,7 @@ namespace CrewChiefV4.RaceRoom
         // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
         // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
         // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
+        private Boolean trustGamePositionChanges = true;
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
 
@@ -532,7 +533,8 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
             currentGameState.SessionData.NumCarsOverall = shared.NumCars;
 
-            currentGameState.SessionData.OverallPosition = getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now);
+            currentGameState.SessionData.OverallPosition = trustGamePositionChanges ? shared.Position : 
+                getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now);
             // currentGameState.SessionData.Position = shared.Position;
             currentGameState.SessionData.TimeDeltaBehind = shared.TimeDeltaBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.TimeDeltaFront;
@@ -814,7 +816,8 @@ namespace CrewChiefV4.RaceRoom
                                 sectorTime = participantStruct.SectorTimeCurrentSelf.Sector2;
                             }
 
-                            int currentOpponentRacePosition = getRacePosition(driverName, previousOpponentPosition, participantStruct.Place, currentGameState.Now);
+                            int currentOpponentRacePosition = trustGamePositionChanges ? participantStruct.Place :
+                                getRacePosition(driverName, previousOpponentPosition, participantStruct.Place, currentGameState.Now);
                             //int currentOpponentRacePosition = participantStruct.place;
                             int currentOpponentLapsCompleted = participantStruct.CompletedLaps;
                             int currentOpponentSector = participantStruct.TrackSector;
