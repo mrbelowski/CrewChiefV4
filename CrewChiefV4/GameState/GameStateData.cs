@@ -2274,7 +2274,7 @@ namespace CrewChiefV4.GameState
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
                     int opponentPosition = previousTick ? entry.Value.ClassPositionAtPreviousTick : entry.Value.ClassPosition;
-                    if (opponentPosition == position && string.Equals(entry.Value.CarClass.getClassIdentifier(), carClass.getClassIdentifier()))
+                    if (opponentPosition == position && CarData.IsCarClassEqual(entry.Value.CarClass, carClass))
                     {
                         return entry.Key;
                     }

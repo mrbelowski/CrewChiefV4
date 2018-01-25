@@ -877,7 +877,7 @@ namespace CrewChiefV4.assetto
             {
                 CarData.CarClass newClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
                 CarData.CLASS_ID = shared.acsStatic.carModel;
-                if (!String.Equals(newClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
+                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass))
                 {
                     currentGameState.carClass = newClass;
                     GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);

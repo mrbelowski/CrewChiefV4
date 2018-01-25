@@ -422,7 +422,7 @@ namespace CrewChiefV4.PCars
                 String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                 CarData.CarClass newClass = CarData.getCarClassForClassName(carClassId);
                 CarData.CLASS_ID = carClassId;
-                if (!String.Equals(newClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
+                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass))
                 {
                     currentGameState.carClass = newClass;
                     GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
