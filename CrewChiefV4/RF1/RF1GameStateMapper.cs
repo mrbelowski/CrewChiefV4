@@ -932,14 +932,7 @@ namespace CrewChiefV4.rFactor1
             {
                 currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.OverallPosition > 1 && currentGameState.SessionData.OverallPosition == 1 ?
                     true : currentGameState.SessionData.HasLeadChanged;
-                currentGameState.SessionData.IsRacingSameCarInFront = 
-                    String.Equals(previousGameState.getOpponentKeyInFront(currentGameState.carClass), currentGameState.getOpponentKeyInFront(currentGameState.carClass));
-                currentGameState.SessionData.IsRacingSameCarBehind = 
-                    String.Equals(previousGameState.getOpponentKeyBehind(currentGameState.carClass), currentGameState.getOpponentKeyBehind(currentGameState.carClass));
-                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = !currentGameState.SessionData.IsRacingSameCarInFront ? 
-                    currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
-                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = !currentGameState.SessionData.IsRacingSameCarBehind ? 
-                    currentGameState.SessionData.SessionRunningTime : previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
+                
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
                                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,

@@ -683,19 +683,6 @@ namespace CrewChiefV4.PCars2
                 }
             }
 
-            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
-                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
-            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
-                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
-            if (!currentGameState.SessionData.IsRacingSameCarInFront)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
-            }
-            if (!currentGameState.SessionData.IsRacingSameCarBehind)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
-            }
-
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[playerIndex] +
                 shared.mCurrentSector3Times[playerIndex] + shared.mCurrentSector3Times[playerIndex];
             currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
