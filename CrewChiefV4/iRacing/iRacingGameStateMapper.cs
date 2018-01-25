@@ -35,7 +35,6 @@ namespace CrewChiefV4.iRacing
         string prevTrackSurface = "";
 
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
-        private Dictionary<string, PendingRacePositionChange> PendingRaceClassPositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
 
         // next track conditions sample due after:
@@ -466,6 +465,11 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.OverallPosition = getRacePosition(playerName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now);
                 }
             }
+
+            if (currentGameState.SessionData.SessionType != SessionType.Race)
+            {
+                currentGameState.SessionData.ClassPosition = playerCar.Live.ClassPosition;
+            }
             /*Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && 
                 e.CurrentResults.FastestTime > 1 && !e.IsPacecar && !shared.Telemetry.CarIdxTrackSurface[e.Id].HasFlag(TrackSurfaces.NotInWorld)).FirstOrDefault();
             if (fastestPlayerClassDriver != null && !shared.Telemetry.IsReplayPlaying)
@@ -701,19 +705,19 @@ namespace CrewChiefV4.iRacing
                                  shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, (float)driver.Live.Speed,
                                  previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry,
                                  previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
-
                         
-                        if (!carIsSameAsPlayer)
+                        if(currentGameState.SessionData.SessionType != SessionType.Race)
                         {
-                            
+                            currentOpponentData.ClassPosition = driver.Live.ClassPosition;
                         }
-                        if (currentGameState.SessionData.SessionType == SessionType.Race && carIsSameAsPlayer)
+                        
+                        if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            if (currentOpponentOverallPosition == currentGameState.SessionData.ClassPosition + 1  )
+                            if (currentOpponentOverallPosition == currentGameState.SessionData.OverallPosition + 1  )
                             {
                                 currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                             }
-                            if (currentOpponentOverallPosition == currentGameState.SessionData.ClassPosition - 1)
+                            if (currentOpponentOverallPosition == currentGameState.SessionData.OverallPosition - 1)
                             {
                                 currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                             }
@@ -802,9 +806,11 @@ namespace CrewChiefV4.iRacing
                     currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
-
             //Sort class positions
-            currentGameState.sortClassPositions();
+            if(currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                currentGameState.sortClassPositions();
+            }
 
             if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
                 currentGameState.SessionData.LapTimePrevious > 1)
@@ -927,58 +933,6 @@ namespace CrewChiefV4.iRacing
                 return oldPosition;
             }
         }
-
-        private int getRaceClassPosition(String driverName, int oldPosition, int newPosition, DateTime now)
-        {
-            if (oldPosition < 1)
-            {
-                return newPosition;
-            }
-            if (newPosition < 1)
-            {
-                return oldPosition;
-            }
-            if (oldPosition == newPosition)
-            {
-                // clear any pending position change
-                if (PendingRaceClassPositionChanges.ContainsKey(driverName))
-                {
-                    PendingRaceClassPositionChanges.Remove(driverName);
-                }
-                return oldPosition;
-            }
-            else if (PendingRaceClassPositionChanges.ContainsKey(driverName))
-            {
-                PendingRacePositionChange pendingRacePositionChange = PendingRaceClassPositionChanges[driverName];
-                if (newPosition == pendingRacePositionChange.newPosition)
-                {
-                    // R3E is still reporting this driver is in the same race position, see if it's been long enough...
-                    if (now > pendingRacePositionChange.positionChangeTime + PositionChangeLag)
-                    {
-                        int positionToReturn = newPosition;
-                        PendingRaceClassPositionChanges.Remove(driverName);
-                        return positionToReturn;
-                    }
-                    else
-                    {
-                        return oldPosition;
-                    }
-                }
-                else
-                {
-                    // the new position is not consistent with the pending position change, bit of an edge case here
-                    pendingRacePositionChange.newPosition = newPosition;
-                    pendingRacePositionChange.positionChangeTime = now;
-                    return oldPosition;
-                }
-            }
-            else
-            {
-                PendingRaceClassPositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now));
-                return oldPosition;
-            }
-        }
-
 
         private void updateOpponentData(OpponentData opponentData, int racePosition, int completedLaps,
             int sector, float completedLapTime, Boolean hasCrossedSFLine, Boolean isInPits, bool previousIsInPits,
