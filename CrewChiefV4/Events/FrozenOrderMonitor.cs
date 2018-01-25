@@ -39,39 +39,42 @@ namespace CrewChiefV4.Events
         private bool scrLastFCYLapLaneAnnounced = false;
 
         // sounds...
-        public static String folderFollow = "frozen_order/follow";
-        public static String folderInTheLeftColumn = "frozen_order/in_the_left_column";
-        public static String folderInTheRightColumn = "frozen_order/in_the_right_column";
-        public static String folderInTheInsideColumn = "frozen_order/in_the_inside_column";
-        public static String folderInTheOutsideColumn = "frozen_order/in_the_outside_column";
+        public const string folderFollow = "frozen_order/follow";
+        public const string folderInTheLeftColumn = "frozen_order/in_the_left_column";
+        public const string folderInTheRightColumn = "frozen_order/in_the_right_column";
+        public const string folderInTheInsideColumn = "frozen_order/in_the_inside_column";
+        public const string folderInTheOutsideColumn = "frozen_order/in_the_outside_column";
 
         // for cases where we have no driver name:
-        private String folderLineUpInLeftColumn = "frozen_order/line_up_in_the_left_column";
-        private String folderLineUpInRightColumn = "frozen_order/line_up_in_the_right_column";
-        private String folderLineUpInInsideColumn = "frozen_order/line_up_in_the_inside_column";
-        private String folderLineUpInOutsideColumn = "frozen_order/line_up_in_the_outside_column";
+        private const string folderLineUpInLeftColumn = "frozen_order/line_up_in_the_left_column";
+        private const string folderLineUpInRightColumn = "frozen_order/line_up_in_the_right_column";
+        private const string folderLineUpInInsideColumn = "frozen_order/line_up_in_the_inside_column";
+        private const string folderLineUpInOutsideColumn = "frozen_order/line_up_in_the_outside_column";
 
-        public static String folderCatchUpTo = "frozen_order/catch_up_to";    // can we have multiple phrasings of this without needing different structure?
-        public static String folderAllow = "frozen_order/allow";
-        public static String folderToPass = "frozen_order/to_pass";
-        public static String folderTheSafetyCar = "frozen_order/the_safety_car";
-        public static String folderThePaceCar = "frozen_order/the_pace_car";
-        public static String folderYoureAheadOfAGuyYouShouldBeFollowing = "frozen_order/youre_ahead_of_guy_you_should_follow";
-        public static String folderYouNeedToCatchUpToTheGuyAhead = "frozen_order/you_need_to_catch_up_to_the_guy_ahead";
-        public static String folderAllowGuyBehindToPass = "frozen_order/allow_guy_behind_to_pass";
+        public const string folderCatchUpTo = "frozen_order/catch_up_to";    // can we have multiple phrasings of this without needing different structure?
+        public const string folderAllow = "frozen_order/allow";
+        public const string folderToPass = "frozen_order/to_pass";
+        public const string folderTheSafetyCar = "frozen_order/the_safety_car";
+        public const string folderThePaceCar = "frozen_order/the_pace_car";
+        public const string folderYoureAheadOfAGuyYouShouldBeFollowing = "frozen_order/youre_ahead_of_guy_you_should_follow";
+        public const string folderYouNeedToCatchUpToTheGuyAhead = "frozen_order/you_need_to_catch_up_to_the_guy_ahead";
+        public const string folderAllowGuyBehindToPass = "frozen_order/allow_guy_behind_to_pass";
 
-        public static String folderWeStartingFromPosition = "frozen_order/were_starting_from_position";
-        public static String folderRow = "frozen_order/row";    // "starting from position 4, row 2 in the outside column" - uses column stuff above
+        public const string folderWeStartingFromPosition = "frozen_order/were_starting_from_position";
+        public const string folderRow = "frozen_order/row";    // "starting from position 4, row 2 in the outside column" - uses column stuff above
         // we'll use the get-ready sound from the LapCounter event here
-        public static String folderWereStartingFromPole = "frozen_order/were_starting_from_pole";
-        public static String folderSafetyCarSpeedIs = "frozen_order/safety_car_speed_is";
-        public static String folderPaceCarSpeedIs = "frozen_order/pace_car_speed_is";
-        public static String folderMilesPerHour = "frozen_order/miles_per_hour";
-        public static String folderKilometresPerHour = "frozen_order/kilometres_per_hour";
-        public static String folderSafetyCarJustLeft = "frozen_order/safety_car_just_left"; // left the pits?
-        public static String folderPaceCarJustLeft = "frozen_order/pace_car_just_left"; // left the pits?
-        public static String folderRollingStartReminder = "frozen_order/thats_a_rolling_start";
-        public static String folderStandingStartReminder = "frozen_order/thats_a_standing_start";
+        public const string folderWereStartingFromPole = "frozen_order/were_starting_from_pole";
+        public const string folderSafetyCarSpeedIs = "frozen_order/safety_car_speed_is";
+        public const string folderPaceCarSpeedIs = "frozen_order/pace_car_speed_is";
+        public const string folderMilesPerHour = "frozen_order/miles_per_hour";
+        public const string folderKilometresPerHour = "frozen_order/kilometres_per_hour";
+        public const string folderSafetyCarJustLeft = "frozen_order/safety_car_just_left"; // left the pits?
+        public const string folderPaceCarJustLeft = "frozen_order/pace_car_just_left"; // left the pits?
+        public const string folderRollingStartReminder = "frozen_order/thats_a_rolling_start";
+        public const string folderStandingStartReminder = "frozen_order/thats_a_standing_start";
+        public const string folderStayInPole = "frozen_order/stay_in_pole";
+        public const string folderMoveToPole = "frozen_order/move_to_pole";
+        public const string folderMoveToPoleRow = "frozen_order/move_to_pole_row";
 
         // Validation stuff:
         private const string validateMessageTypeKey = "validateMessageTypeKey";
@@ -205,6 +208,7 @@ namespace CrewChiefV4.Events
             if (cfodp == FrozenOrderPhase.Rolling)
             {
                 var prevDriverToFollow = this.currDriverToFollow;
+                var prevFrozenOrderAction = this.currFrozenOrderAction;
 
                 if (isActionUpdateStable
                     && (this.currFrozenOrderAction != this.newFrozenOrderAction
@@ -235,7 +239,7 @@ namespace CrewChiefV4.Events
                             if (cfod.AssignedColumn == FrozenOrderColumn.None
                                 || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
                                 audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver" : "frozen_order/follow_safety_car",
-                                    MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(0, 3), this, validationData));
+                                    MessageContents(folderFollow, usableDriverNameToFollow), Utilities.random.Next(3, 6), this, validationData));
                             else
                             {
                                 string columnName;
@@ -243,7 +247,7 @@ namespace CrewChiefV4.Events
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
                                 else
                                     columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver_in_col" : "frozen_order/follow_safecy_car_in_col", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(0, 3), this, validationData));
+                                audioPlayer.playMessage(new QueuedMessage(!shouldFollowSafetyCar ? "frozen_order/follow_driver_in_col" : "frozen_order/follow_safecy_car_in_col", MessageContents(folderFollow, usableDriverNameToFollow, columnName), Utilities.random.Next(3, 6), this, validationData));
                             }
                         }
                     }
@@ -264,15 +268,25 @@ namespace CrewChiefV4.Events
                         else
                             audioPlayer.playMessage(new QueuedMessage(folderYouNeedToCatchUpToTheGuyAhead, Utilities.random.Next(1, 4), this, validationData));
                     }
-                    else if (this.newFrozenOrderAction == FrozenOrderAction.StayInPole)
+                    else if (this.newFrozenOrderAction == FrozenOrderAction.StayInPole
+                        && prevFrozenOrderAction != FrozenOrderAction.MoveToPole)  // No point in nagging user to stay in pole if we previously told them to move there.
                     {
-                        if (cfod.AssignedColumn == FrozenOrderColumn.None)
+                        if (cfod.AssignedColumn == FrozenOrderColumn.None
+                            || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
                         {
                             Console.WriteLine("FROZEN ORDER: STAY IN POLE");
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/stay_in_pole",
+                                MessageContents(folderStayInPole), Utilities.random.Next(0, 3), this, validationData));
                         }
                         else
                         {
                             Console.WriteLine("FROZEN ORDER: STAY IN POLE ROW");
+                            string columnName;
+                            if (useOvalLogic)
+                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
+                            else
+                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/stay_in_pole_in_column", MessageContents(folderStayInPole, columnName), Utilities.random.Next(0, 3), this, validationData));
                         }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.MoveToPole)
@@ -280,10 +294,14 @@ namespace CrewChiefV4.Events
                         if (cfod.AssignedColumn == FrozenOrderColumn.None)
                         {
                             Console.WriteLine("FROZEN ORDER: MOVE TO POLE");
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/move_to_pole",
+                                MessageContents(folderMoveToPole), Utilities.random.Next(2, 5), this, validationData));
                         }
                         else
                         {
                             Console.WriteLine("FROZEN ORDER: MOVE TO POLE ROW");
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/move_to_pole_row",
+                                MessageContents(folderMoveToPoleRow), Utilities.random.Next(2, 5), this, validationData));
                         }
                     }
                 }
