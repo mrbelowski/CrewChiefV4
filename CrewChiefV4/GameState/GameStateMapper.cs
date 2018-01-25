@@ -41,7 +41,7 @@ namespace CrewChiefV4.GameState
          */
         // This method populates data derived from the mapped data, that's common to all games. Currently this is only
         // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
-        public virtual void populateDerivedData(GameStateData currentGameState, GameStateData previousGameState)
+        public virtual void populateDerivedData(GameStateData currentGameState)
         {
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
             // always set the session start class position and lap start class position:
@@ -57,7 +57,7 @@ namespace CrewChiefV4.GameState
             {
                 currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = currentGameState.SessionData.ClassPosition;
             }
-
+            
             // if we're single class, no need to process the opponents data
             if (singleClass)
             {
@@ -99,7 +99,7 @@ namespace CrewChiefV4.GameState
                             currentGameState.PitData.OpponentForLeaderPitting = null;
                         }
                     }
-                    if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
+                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                     {
                         currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         if (opponent.JustEnteredPits)
@@ -113,7 +113,7 @@ namespace CrewChiefV4.GameState
                             currentGameState.PitData.OpponentForCarAheadPitting = null;
                         }
                     }
-                    if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
+                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
                     {
                         currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         if (opponent.JustEnteredPits)
@@ -136,10 +136,28 @@ namespace CrewChiefV4.GameState
             currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
 
             // have to re-calculate these for multiclass:
-            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
-                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
-            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
-                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+            
+            String previousBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass, true);
+            String currentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
+            String previousAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass, true);
+            String currentAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+            if ((currentBehindKey == null && currentGameState.SessionData.ClassPosition < currentGameState.SessionData.NumCarsInPlayerClass)
+                || (currentAheadKey == null && currentGameState.SessionData.ClassPosition > 1))
+            {
+                Console.WriteLine("Non-contiguous class positions");
+                List<OpponentData> opponentsInClass = new List<OpponentData>();
+                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                {
+                    if (opponent.CarClass.getClassIdentifier() == currentGameState.carClass.getClassIdentifier())
+                    {
+                        opponentsInClass.Add(opponent);
+                    }
+                    Console.WriteLine(String.Join("\n", opponentsInClass.OrderBy(o => o.ClassPosition)));
+                }
+            }
+
+            currentGameState.SessionData.IsRacingSameCarBehind = currentBehindKey == previousBehindKey;
+            currentGameState.SessionData.IsRacingSameCarInFront = currentAheadKey == previousAheadKey;
             if (!currentGameState.SessionData.IsRacingSameCarInFront)
             {
                 currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;

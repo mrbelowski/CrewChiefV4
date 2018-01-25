@@ -747,7 +747,7 @@ namespace CrewChiefV4.PCars2
                         
                         if (currentGameState.OpponentData.ContainsKey(participantName))
                         {
-                            OpponentData currentOpponentData = currentGameState.OpponentData[participantName];
+                            OpponentData currentOpponentData = currentGameState.OpponentData[participantName];                            
                             if (participantStruct.mIsActive)
                             {
                                 lastActiveTimeForOpponents[participantName] = currentGameState.Now;
@@ -772,6 +772,8 @@ namespace CrewChiefV4.PCars2
                                         previousOpponentIsExitingPits = previousOpponentData.isExitingPits();
                                         previousOpponentWorldPosition = previousOpponentData.WorldPosition;
                                         previousDistanceRoundTrack = previousOpponentData.DistanceRoundTrack;
+                                        currentOpponentData.ClassPositionAtPreviousTick = previousOpponentData.ClassPosition;
+                                        currentOpponentData.OverallPositionAtPreviousTick = previousOpponentData.OverallPosition;
                                     }
 
                                     int currentOpponentRacePosition = (int)participantStruct.mRacePosition;

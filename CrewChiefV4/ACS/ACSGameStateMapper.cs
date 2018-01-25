@@ -1445,6 +1445,8 @@ namespace CrewChiefV4.assetto
 
                                         previousOpponentLastLapTime = previousOpponentData.LastLapTime;
                                         previousOpponentLastLapValid = previousOpponentData.LastLapValid;
+                                        currentOpponentData.ClassPositionAtPreviousTick = previousOpponentData.ClassPosition;
+                                        currentOpponentData.OverallPositionAtPreviousTick = previousOpponentData.OverallPosition;
                                     }
                                     float currentOpponentLapDistance = spLineLengthToDistanceRoundTrack(shared.acsStatic.trackSPlineLength, participantStruct.spLineLength);
                                     currentOpponentSector = getCurrentSector(currentGameState.SessionData.TrackDefinition, currentOpponentLapDistance);

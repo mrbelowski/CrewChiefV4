@@ -775,6 +775,7 @@ namespace CrewChiefV4.RaceRoom
                         if (previousGameState != null)
                         {
                             OpponentData previousOpponentData = null;
+                            OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
                             Boolean newOpponentLap = false;
                             int previousOpponentSectorNumber = 1;
                             int previousOpponentCompletedLaps = 0;
@@ -798,10 +799,10 @@ namespace CrewChiefV4.RaceRoom
                                 previousOpponentSpeed = previousOpponentData.Speed;
                                 newOpponentLap = previousOpponentData.CurrentSectorNumber == 3 && participantStruct.TrackSector == 1;
                                 previousDistanceRoundTrack = previousOpponentData.DistanceRoundTrack;
+                                currentOpponentData.ClassPositionAtPreviousTick = previousOpponentData.ClassPosition;
+                                currentOpponentData.OverallPositionAtPreviousTick = previousOpponentData.OverallPosition;
                             }
-
-                            OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
-                            
+                                                                                    
                             float sectorTime = -1;
                             if (participantStruct.TrackSector == 1)
                             {

@@ -753,6 +753,11 @@ namespace CrewChiefV4.rFactor1
 
                 opponentPrevious = previousGameState == null || opponentKey == null || !previousGameState.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 OpponentData opponent = new OpponentData();
+                if (opponentPrevious != null)
+                {
+                    opponent.OverallPositionAtPreviousTick = opponentPrevious.OverallPosition;
+                    opponent.ClassPositionAtPreviousTick = opponentPrevious.ClassPosition;
+                }
                 opponent.DriverRawName = driverName;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.CarClass = getCarClass(getStringFromBytes(vehicle.vehicleName), false);
@@ -770,7 +775,7 @@ namespace CrewChiefV4.rFactor1
                     {
                         opponent.OpponentLapData.Add(old);
                     }
-                    opponent.NumPitStops = opponentPrevious.NumPitStops;
+                    opponent.NumPitStops = opponentPrevious.NumPitStops;                    
                 }
                 opponent.SessionTimeAtLastPositionChange = opponentPrevious != null && opponentPrevious.OverallPosition != opponent.OverallPosition ? currentGameState.SessionData.SessionRunningTime : -1;
                 opponent.CompletedLaps = vehicle.totalLaps;
