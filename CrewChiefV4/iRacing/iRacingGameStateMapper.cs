@@ -606,6 +606,7 @@ namespace CrewChiefV4.iRacing
                     if (previousGameState != null)
                     {
                         OpponentData previousOpponentData = null;
+                        OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
                         int previousOpponentSectorNumber = 0;
                         int previousOpponentCompletedLaps = 0;
                         int previousOpponentOverallPosition = 0;
@@ -641,11 +642,12 @@ namespace CrewChiefV4.iRacing
                             previousOpponentLastLapTime = previousOpponentData.LastLapTime;
                             previousOpponentLastLapValid = previousOpponentData.LastLapValid;
                             previousIsApporchingPits = previousOpponentData.isApporchingPits;
+                            currentOpponentData.ClassPositionAtPreviousTick = previousOpponentData.ClassPosition;
+                            currentOpponentData.OverallPositionAtPreviousTick = previousOpponentData.OverallPosition;
                         }
 
                         hasCrossedSFLine = driver.Live.HasCrossedSFLine;
-                        int currentOpponentSector = driver.Live.CurrentSector;
-                        OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
+                        int currentOpponentSector = driver.Live.CurrentSector;                        
 
                         bool previousOpponentLapValid = driver.Live.PreviousLapWasValid;
 

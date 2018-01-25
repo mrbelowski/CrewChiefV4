@@ -651,7 +651,11 @@ namespace CrewChiefV4.GameState
 
         public int OverallPosition = 0;
 
+        public int OverallPositionAtPreviousTick = 0;
+
         public int ClassPosition = 0;
+
+        public int ClassPositionAtPreviousTick = 0;
 
         public float SessionTimeAtLastPositionChange = -1;
 
@@ -726,7 +730,8 @@ namespace CrewChiefV4.GameState
 
         public override string ToString()
         {
-            return DriverRawName + " class position " + ClassPosition + " overall position " + OverallPosition + " lapsCompleted " + CompletedLaps + " lapDist " + DistanceRoundTrack;
+            return DriverRawName + " " + CarClass.getClassIdentifier() + " class position " + ClassPosition + " overall position " 
+                + OverallPosition + " lapsCompleted " + CompletedLaps + " lapDist " + DistanceRoundTrack;
         }
 
         public LapData getCurrentLapData()
@@ -2211,11 +2216,28 @@ namespace CrewChiefV4.GameState
                 return opponentKeyFurthestInFront;
         }
 
-        public string getOpponentKeyInFront(CarData.CarClass carClass)
+        public string getOpponentKeyInFront(CarData.CarClass carClass, Boolean previousTick)
         {
             if (SessionData.ClassPosition > 1)
             {
-                return getOpponentKeyAtClassPosition(SessionData.ClassPosition - 1, carClass);
+                return getOpponentKeyAtClassPosition(SessionData.ClassPosition - 1, carClass, previousTick);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public string getOpponentKeyInFront(CarData.CarClass carClass)
+        {
+            return getOpponentKeyInFront(carClass, false);
+        }
+
+        public string getOpponentKeyBehind(CarData.CarClass carClass, Boolean previousTick)
+        {
+            if (SessionData.ClassPosition < SessionData.NumCarsInPlayerClass)
+            {
+                return getOpponentKeyAtClassPosition(SessionData.ClassPosition + 1, carClass, previousTick);
             }
             else
             {
@@ -2225,23 +2247,22 @@ namespace CrewChiefV4.GameState
 
         public string getOpponentKeyBehind(CarData.CarClass carClass)
         {
-            if (SessionData.ClassPosition < SessionData.NumCarsInPlayerClass)
-            {
-                return getOpponentKeyAtClassPosition(SessionData.ClassPosition + 1, carClass);
-            }
-            else
-            {
-                return null;
-            }
+            return getOpponentKeyBehind(carClass, false);
         }
 
         public string getOpponentKeyAtClassPosition(int position, CarData.CarClass carClass)
+        {
+            return getOpponentKeyAtClassPosition(position, carClass, false);
+        }
+
+        public string getOpponentKeyAtClassPosition(int position, CarData.CarClass carClass, Boolean previousTick)
         {
             if (OpponentData.Count != 0)
             {
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
-                    if (entry.Value.ClassPosition == position && string.Equals(entry.Value.CarClass.getClassIdentifier(), carClass.getClassIdentifier()))
+                    int opponentPosition = previousTick ? entry.Value.ClassPositionAtPreviousTick : entry.Value.ClassPosition;
+                    if (opponentPosition == position && string.Equals(entry.Value.CarClass.getClassIdentifier(), carClass.getClassIdentifier()))
                     {
                         return entry.Key;
                     }

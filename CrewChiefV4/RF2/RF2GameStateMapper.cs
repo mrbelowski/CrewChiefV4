@@ -1242,6 +1242,11 @@ namespace CrewChiefV4.rFactor2
 
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
+                if (opponentPrevious != null)
+                {
+                    opponent.OverallPositionAtPreviousTick = opponentPrevious.OverallPosition;
+                    opponent.ClassPositionAtPreviousTick = opponentPrevious.ClassPosition;
+                }
                 // TODO_PERF: cache this.
                 opponent.CarClass = CarData.getCarClassForClassName(RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mVehicleClass));
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
