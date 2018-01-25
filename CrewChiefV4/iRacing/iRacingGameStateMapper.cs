@@ -792,18 +792,13 @@ namespace CrewChiefV4.iRacing
             {
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
-                List<string> inactiveOpponents = new List<string>();
                 foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) && lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
                     {
-                        inactiveOpponents.Add(opponentName);
-                        Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
+                        currentGameState.OpponentData[opponentName].InPits = true;
+                        Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
                     }
-                }
-                foreach (String inactiveOpponent in inactiveOpponents)
-                {
-                    currentGameState.OpponentData.Remove(inactiveOpponent);
                 }
             }
             //Sort class positions
