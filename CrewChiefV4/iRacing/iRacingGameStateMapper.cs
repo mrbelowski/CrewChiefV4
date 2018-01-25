@@ -465,11 +465,6 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.OverallPosition = getRacePosition(playerName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now);
                 }
             }
-            currentGameState.SessionData.UnFilteredPosition = playerCar.Live.Position;
-            if (previousGameState != null)
-            {
-                currentGameState.SessionData.ClassPosition = getRaceClassPosition(playerName, previousGameState.SessionData.ClassPosition, playerCar.Live.ClassPosition, currentGameState.Now);
-            }
             /*Driver fastestPlayerClassDriver = shared.Drivers.OrderBy(d => d.CurrentResults.FastestTime).Where(e => e.Car.CarClassId == playerCar.Car.CarClassId && 
                 e.CurrentResults.FastestTime > 1 && !e.IsPacecar && !shared.Telemetry.CarIdxTrackSurface[e.Id].HasFlag(TrackSurfaces.NotInWorld)).FirstOrDefault();
             if (fastestPlayerClassDriver != null && !shared.Telemetry.IsReplayPlaying)

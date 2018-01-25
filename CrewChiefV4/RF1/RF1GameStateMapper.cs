@@ -308,7 +308,6 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.NumCarsOverallAtStartOfSession = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.NumCarsOverall : previousGameState.SessionData.NumCarsOverallAtStartOfSession;
 
             currentGameState.SessionData.OverallPosition = player.place;
-            currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
             currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.OverallPosition : previousGameState.SessionData.SessionStartPosition;
             currentGameState.SessionData.SectorNumber = player.sector == 0 ? 3 : player.sector;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.IsNewSession || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;

@@ -587,7 +587,6 @@ namespace CrewChiefV4.rFactor2
             csd.NumCarsOverall = shared.scoring.mScoringInfo.mNumVehicles;
             csd.NumCarsOverallAtStartOfSession = csd.IsNewSession ? csd.NumCarsOverall : psd.NumCarsOverallAtStartOfSession;
             csd.OverallPosition = playerScoring.mPlace;
-            csd.UnFilteredPosition = csd.OverallPosition;
             csd.SessionStartPosition = csd.IsNewSession ? csd.OverallPosition : psd.SessionStartPosition;
 
             // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
