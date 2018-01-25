@@ -1499,8 +1499,8 @@ namespace CrewChiefV4.rFactor2
             if (pgs != null)
             {
                 csd.HasLeadChanged = !csd.HasLeadChanged && psd.OverallPosition > 1 && csd.OverallPosition == 1 ? true : csd.HasLeadChanged;
-                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(cgs.carClass.carClassEnum), cgs.getOpponentKeyInFront(cgs.carClass.carClassEnum));
-                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(cgs.carClass.carClassEnum), cgs.getOpponentKeyBehind(cgs.carClass.carClassEnum));
+                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(cgs.carClass), cgs.getOpponentKeyInFront(cgs.carClass));
+                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(cgs.carClass), cgs.getOpponentKeyBehind(cgs.carClass));
                 csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
                 csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
 

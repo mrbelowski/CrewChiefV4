@@ -296,7 +296,7 @@ namespace CrewChiefV4.Events
                                         Utilities.random.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingHeldUp, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
-                                OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                                OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                 if (opponent != null)
                                 {
                                     if (!trackLandmarkAttackDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
@@ -335,7 +335,7 @@ namespace CrewChiefV4.Events
                             {
                                 if (gapInFrontStatus == GapStatus.INCREASING)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
@@ -345,7 +345,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapInFrontStatus == GapStatus.DECREASING)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
@@ -368,7 +368,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapInFrontStatus == GapStatus.OTHER)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
@@ -398,7 +398,7 @@ namespace CrewChiefV4.Events
                                         Utilities.random.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingPressured, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
-                                OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                                OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                 if (opponent != null)
                                 {
                                     if (!trackLandmarkDefendDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
@@ -437,7 +437,7 @@ namespace CrewChiefV4.Events
                             {
                                 if (gapBehindStatus == GapStatus.INCREASING)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
@@ -447,7 +447,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapBehindStatus == GapStatus.DECREASING)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
@@ -471,7 +471,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (gapBehindStatus == GapStatus.OTHER)
                                 {
-                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
@@ -490,7 +490,7 @@ namespace CrewChiefV4.Events
                     {                            
                         if (currentGapInFront > 0.05)
                         {
-                            OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                            OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                             if (opponent != null)
                             {
                                 TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapInFront, Precision.AUTO_GAPS);
@@ -511,7 +511,7 @@ namespace CrewChiefV4.Events
                             playedGapBehindForThisLap = true;
                             TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapBehind, Precision.AUTO_GAPS);
                             QueuedMessage message = new QueuedMessage("Timings/gap_behind", MessageContents(folderTheGapTo,
-                                currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum), folderBehindIsNow, gap),
+                                currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass), folderBehindIsNow, gap),
                                 MessageContents(folderGapBehindIsNow, gap), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
                             message.playEvenWhenSilenced = true;
                             audioPlayer.playMessage(message);
@@ -587,7 +587,7 @@ namespace CrewChiefV4.Events
                     GameStateData currentGameState = CrewChief.currentGameState;
                     if (currentGameState != null)
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
@@ -609,7 +609,7 @@ namespace CrewChiefV4.Events
                     GameStateData currentGameState = CrewChief.currentGameState;
                     if (currentGameState != null)
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =

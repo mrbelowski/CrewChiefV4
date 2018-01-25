@@ -117,7 +117,7 @@ namespace CrewChiefV4.Events
                     {
                         String expectedOpponentName = (String)validationData[validationDriverAheadKey];
                         OpponentData opponentInFront = currentGameState.SessionData.ClassPosition > 1 ?
-                            currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum) : null;
+                            currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass) : null;
                         String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
                         if (actualOpponentName != expectedOpponentName)
                         {
@@ -143,7 +143,7 @@ namespace CrewChiefV4.Events
                                     " no longer valid - player is now leader");
                             return false;
                         }
-                        OpponentData actualLeader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass.carClassEnum);
+                        OpponentData actualLeader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                         String actualLeaderName = actualLeader == null ? null : actualLeader.DriverRawName;
                         if (actualLeaderName != expectedLeaderName)
                         {
@@ -350,7 +350,7 @@ namespace CrewChiefV4.Events
                             if (currentGameState.SessionData.ClassPosition > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
                                 && currentGameState.SessionData.CompletedLaps > 0)
                             {
-                                OpponentData opponentData = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                                OpponentData opponentData = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                 if (opponentData != null)
                                 {
                                     String opponentName = opponentData.DriverRawName;
@@ -371,7 +371,7 @@ namespace CrewChiefV4.Events
                         }
                         if (currentGameState.SessionData.HasLeadChanged)
                         {
-                            OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass.carClassEnum);
+                            OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                             if (leader != null)
                             {
                                 String name = leader.DriverRawName;
@@ -422,7 +422,7 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.ClassPosition > 1)
                 {
-                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass.carClassEnum);
+                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);
                 }
                 else if (currentGameState.SessionData.ClassPosition == 1)
                 {
@@ -432,12 +432,12 @@ namespace CrewChiefV4.Events
             if ((voiceMessage.Contains(SpeechRecogniser.THE_CAR_AHEAD) || voiceMessage.Contains(SpeechRecogniser.THE_GUY_AHEAD) ||
                 voiceMessage.Contains(SpeechRecogniser.THE_GUY_IN_FRONT) || voiceMessage.Contains(SpeechRecogniser.THE_CAR_IN_FRONT)) && currentGameState.SessionData.ClassPosition > 1)
             {
-                opponentKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass.carClassEnum);
+                opponentKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
             }
             else if ((voiceMessage.Contains(SpeechRecogniser.THE_CAR_BEHIND) || voiceMessage.Contains(SpeechRecogniser.THE_GUY_BEHIND)) &&
                             !currentGameState.isLast())
             {
-                opponentKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass.carClassEnum);
+                opponentKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
             }
             else if (voiceMessage.Contains(SpeechRecogniser.POSITION_LONG) || voiceMessage.Contains(SpeechRecogniser.POSITION_SHORT))
             {
@@ -466,7 +466,7 @@ namespace CrewChiefV4.Events
                 }
                 if (position != currentGameState.SessionData.ClassPosition)
                 {
-                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(position, currentGameState.carClass.carClassEnum);
+                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(position, currentGameState.carClass);
                 }
                 else
                 {
@@ -844,7 +844,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass.carClassEnum);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
@@ -876,7 +876,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass.carClassEnum);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
@@ -900,7 +900,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_LEADING) && currentGameState.SessionData.ClassPosition > 1)
                 {
-                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass.carClassEnum);
+                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                     if (opponent != null)
                     {
                         QueuedMessage queuedMessage;
