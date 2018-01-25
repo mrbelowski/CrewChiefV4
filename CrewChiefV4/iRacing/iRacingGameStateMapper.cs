@@ -858,20 +858,6 @@ namespace CrewChiefV4.iRacing
 
             currentGameState.PitData.limiterStatus = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.PitSpeedLimiter) == true ? 1 : 0;
 
-
-            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
-                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
-            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
-                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
-
-            if (!currentGameState.SessionData.IsRacingSameCarInFront)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
-            }
-            if (!currentGameState.SessionData.IsRacingSameCarBehind)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
-            }
             //conditions
             if (currentGameState.Now > nextConditionsSampleDue)
             {

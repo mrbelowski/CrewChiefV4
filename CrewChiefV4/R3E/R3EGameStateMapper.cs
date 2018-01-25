@@ -1032,21 +1032,7 @@ namespace CrewChiefV4.RaceRoom
                 Console.WriteLine("Leader has finished race, player has done "+ shared.CompletedLaps + " laps, session time = " + shared.Player.GameSimulationTime);
                 currentGameState.SessionData.LeaderHasFinishedRace = true;
             }
-
-            currentGameState.SessionData.IsRacingSameCarBehind = previousGameState != null &&
-                previousGameState.getOpponentKeyBehind(currentGameState.carClass) == currentGameState.getOpponentKeyBehind(currentGameState.carClass);
-            currentGameState.SessionData.IsRacingSameCarInFront = previousGameState != null &&
-                previousGameState.getOpponentKeyInFront(currentGameState.carClass) == currentGameState.getOpponentKeyInFront(currentGameState.carClass);
-
-            if (!currentGameState.SessionData.IsRacingSameCarInFront)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionFrontChange = currentGameState.SessionData.SessionRunningTime;
-            } 
-            if (!currentGameState.SessionData.IsRacingSameCarBehind)
-            {
-                currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
-            }
-                        
+                                    
             //------------------------ Car damage data -----------------------
             currentGameState.CarDamageData.DamageEnabled = shared.CarDamage.Aerodynamics != -1 &&
                 shared.CarDamage.Transmission != -1 && shared.CarDamage.Engine != -1;
