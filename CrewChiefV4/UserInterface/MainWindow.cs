@@ -114,7 +114,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging && AudioPlayer.soundPackVersion > 0)
+            if (!CrewChief.Debugging || AudioPlayer.soundPackVersion <= 0)
             {
                 new Thread(() =>
                 {
