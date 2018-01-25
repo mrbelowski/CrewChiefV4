@@ -563,12 +563,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.NumPitStops = pgs.PitData.NumPitStops;
                 cgs.PenaltiesData.CutTrackWarnings = pgs.PenaltiesData.CutTrackWarnings;
 
-                csd.DeltaTime.deltaPoints = psd.DeltaTime.deltaPoints;
-                csd.DeltaTime.currentDeltaPoint = psd.DeltaTime.currentDeltaPoint;
-                csd.DeltaTime.nextDeltaPoint = psd.DeltaTime.nextDeltaPoint;
-                csd.DeltaTime.lapsCompleted = psd.DeltaTime.lapsCompleted;
-                csd.DeltaTime.totalDistanceTravelled = psd.DeltaTime.totalDistanceTravelled;
-                csd.DeltaTime.trackLength = psd.DeltaTime.trackLength;
+                csd.DeltaTime = psd.DeltaTime;
                 cgs.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
 
                 cgs.retriedDriverNames = pgs.retriedDriverNames;
