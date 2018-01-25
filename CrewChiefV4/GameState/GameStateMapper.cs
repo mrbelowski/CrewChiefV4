@@ -43,11 +43,6 @@ namespace CrewChiefV4.GameState
         // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
         public virtual void populateDerivedData(GameStateData currentGameState)
         {
-            // ensure we've got sorted class positions before proceeding:
-            if (!currentGameState.sortClassPositionsCompleted)
-            {
-                currentGameState.sortClassPositions();
-            }
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
             // always set the session start class position and lap start class position:
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
