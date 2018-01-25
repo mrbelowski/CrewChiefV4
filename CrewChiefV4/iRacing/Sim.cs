@@ -91,13 +91,18 @@ namespace CrewChiefV4.iRacing
                 }                
             }
         }
-        
+
         private void GetResults(SessionInfo info)
         {
             if (_currentSessionNumber == null) 
                 return;
             this.GetRaceResults(info);
-            this.GetQualyResults(info);
+
+            if (this.SessionData.EventType == "Race" || this.SessionData.EventType == "Open Qualify" || this.SessionData.EventType == "Lone Qualify")
+            {
+                this.GetQualyResults(info);
+            }
+            
         }
 
         private void GetQualyResults(SessionInfo info)
@@ -198,7 +203,7 @@ namespace CrewChiefV4.iRacing
                     {
                         continue;
                     }
-                    if(telemetry.CarIdxPosition[driver.Id] > 0)
+                    if (telemetry.CarIdxPosition[driver.Id] > 0)
                     {
                         driver.Live.Position = telemetry.CarIdxPosition[driver.Id];
                     }
@@ -206,29 +211,17 @@ namespace CrewChiefV4.iRacing
                     {
                         driver.Live.Position = driver.CurrentResults.Position;
                     }
-                    
-                }
-            }
 
-            // Determine live class position from live positions and class
-            // Group drivers in dictionary with key = classid and value = list of all drivers in that class
-            var dict = (from driver in _drivers group driver by driver.Car.CarClassId).ToDictionary(d => d.Key, d => d.ToList());
-
-            // Set class position
-            foreach (var drivers in dict.Values)
-            {
-                var pos = 1;
-                foreach (var driver in drivers.OrderBy(d => d.Live.Position))
-                {
-                    if (driver.IsSpectator || driver.IsPacecar)
+                    if (telemetry.CarIdxClassPosition[driver.Id] > 0)
                     {
-                        continue;
+                        driver.Live.ClassPosition = telemetry.CarIdxClassPosition[driver.Id];
                     }
-                    driver.Live.ClassPosition = pos;
-                    pos++;
+                    else
+                    {
+                        driver.Live.ClassPosition = driver.CurrentResults.ClassPosition;
+                    }
                 }
             }
-
         }
         
         public bool SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber, int driverId, int infoUpdate)
