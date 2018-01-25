@@ -1420,13 +1420,7 @@ namespace CrewChiefV4.rFactor2
                 if (opponent.OverallPosition == csd.OverallPosition - 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
-                if (opponentPrevious != null
-                    && opponentPrevious.OverallPosition > 1
-                    && opponent.OverallPosition == 1)
-                {
-                    csd.HasLeadChanged = true;
-                }
-
+                
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
@@ -1483,9 +1477,7 @@ namespace CrewChiefV4.rFactor2
             cgs.sortClassPositions();
 
             if (pgs != null)
-            {
-                csd.HasLeadChanged = !csd.HasLeadChanged && psd.OverallPosition > 1 && csd.OverallPosition == 1 ? true : csd.HasLeadChanged;
-               
+            {               
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 var stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
                     csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack,

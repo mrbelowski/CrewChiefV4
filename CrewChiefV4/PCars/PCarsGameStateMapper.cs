@@ -857,14 +857,6 @@ namespace CrewChiefV4.PCars
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
                                     }
-                                    if (currentOpponentRacePosition == 1)
-                                    {
-                                        currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
-                                    }
-                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
-                                    {
-                                        currentGameState.SessionData.HasLeadChanged = true;
-                                    }
                                     Boolean isEnteringPits = false;
                                     Boolean isLeavingPits = false;
                                     if (attemptPitDetection)

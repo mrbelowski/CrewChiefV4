@@ -856,14 +856,6 @@ namespace CrewChiefV4.RaceRoom
                             {
                                 currentGameState.SessionData.LeaderHasFinishedRace = true;
                             }
-                            if (currentGameState.SessionData.OverallPosition == 1)
-                            {
-                                currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
-                            }
-                            if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
-                            {
-                                currentGameState.SessionData.HasLeadChanged = true;
-                            }
                             Boolean isEnteringPits = participantStruct.InPitlane == 1 && !previousOpponentInPits;
                             Boolean isLeavingPits = previousOpponentInPits && participantStruct.InPitlane != 1;
 

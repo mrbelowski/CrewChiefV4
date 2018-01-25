@@ -2134,7 +2134,12 @@ namespace CrewChiefV4.GameState
 
         public OpponentData getOpponentAtClassPosition(int position, CarData.CarClass carClass)
         {
-            string opponentKey = getOpponentKeyAtClassPosition(position, carClass);
+            return getOpponentAtClassPosition(position, carClass, false);
+        }
+
+        public OpponentData getOpponentAtClassPosition(int position, CarData.CarClass carClass, Boolean previousTick)
+        {
+            string opponentKey = getOpponentKeyAtClassPosition(position, carClass, previousTick);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
             {
                 return OpponentData[opponentKey];
@@ -2147,7 +2152,12 @@ namespace CrewChiefV4.GameState
 
         public OpponentData getOpponentAtOverallPosition(int position)
         {
-            string opponentKey = getOpponentKeyAtOverallPosition(position);
+            return getOpponentAtOverallPosition(position, false);
+        }
+
+        public OpponentData getOpponentAtOverallPosition(int position, Boolean previousTick)
+        {
+            string opponentKey = getOpponentKeyAtOverallPosition(position, previousTick);
             if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
             {
                 return OpponentData[opponentKey];
@@ -2273,13 +2283,14 @@ namespace CrewChiefV4.GameState
             return null;
         }
 
-        public string getOpponentKeyAtOverallPosition(int position)
+        public string getOpponentKeyAtOverallPosition(int position, Boolean previousTick)
         {
             if (OpponentData.Count != 0)
             {
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
-                    if (entry.Value.OverallPosition == position)
+                    int opponentPosition = previousTick ? entry.Value.OverallPositionAtPreviousTick : entry.Value.OverallPosition;
+                    if (opponentPosition == position)
                     {
                         return entry.Key;
                     }

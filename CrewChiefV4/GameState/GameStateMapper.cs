@@ -87,6 +87,10 @@ namespace CrewChiefV4.GameState
                         }
                         if (opponent.ClassPosition == 1)
                         {
+                            if (opponent.ClassPositionAtPreviousTick != 1)
+                            {
+                                currentGameState.SessionData.HasLeadChanged = true;
+                            }
                             currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
                             if (opponent.JustEnteredPits)
                             {
@@ -141,6 +145,13 @@ namespace CrewChiefV4.GameState
             String currentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
             String previousAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass, true);
             String currentAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+            if (currentGameState.SessionData.ClassPosition > 2)
+            {
+                // if we're first or second we don't care about lead changes
+                String previousLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass, true);
+                String currentLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);
+                
+            }
             if ((currentBehindKey == null && currentGameState.SessionData.ClassPosition < currentGameState.SessionData.NumCarsInPlayerClass)
                 || (currentAheadKey == null && currentGameState.SessionData.ClassPosition > 1))
             {

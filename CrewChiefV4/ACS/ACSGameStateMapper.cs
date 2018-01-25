@@ -1496,16 +1496,7 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
                                     }
-
-                                    if (currentOpponentRacePosition == 1)
-                                    {
-                                        currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
-                                    }
-                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
-                                    {
-                                        currentGameState.SessionData.HasLeadChanged = true;
-                                    }
-
+                                    
                                     Boolean isEnteringPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == numberOfSectorsOnTrack;
                                     Boolean isLeavingPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == 1;
                                     
