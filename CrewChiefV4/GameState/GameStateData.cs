@@ -314,8 +314,6 @@ namespace CrewChiefV4.GameState
 
         // Current position (1 = first place)
         public int OverallPosition = 0;
-
-        public int UnFilteredPosition = 0;
         
         public int ClassPosition = 0;
 
@@ -2107,7 +2105,7 @@ namespace CrewChiefV4.GameState
         {
             if (!GameStateData.Multiclass)
             {
-                return SessionData.UnFilteredPosition == SessionData.NumCarsOverall;
+                return SessionData.OverallPosition == SessionData.NumCarsOverall;
             }
             else
             {

@@ -930,7 +930,6 @@ namespace CrewChiefV4.assetto
             if (sessionType == AC_SESSION_TYPE.AC_PRACTICE || sessionType == AC_SESSION_TYPE.AC_QUALIFY)
             {
                 currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
-                currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
             }
             else
             {
@@ -941,12 +940,10 @@ namespace CrewChiefV4.assetto
                 {
                     //Console.WriteLine("using carLeaderboardPosition");
                     currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
-                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
                 }
                 else
                 {
                     currentGameState.SessionData.OverallPosition = playerVehicle.carRealTimeLeaderboardPosition + realTimeLeaderBoardValid;
-                    currentGameState.SessionData.UnFilteredPosition = currentGameState.SessionData.OverallPosition;
                 }
             }
 
@@ -1656,7 +1653,6 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.CurrentLapIsValid = true;
                     StartNewLap(currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SessionRunningTime);
                     currentGameState.SessionData.OverallPosition = playerVehicle.carLeaderboardPosition;
-                    currentGameState.SessionData.UnFilteredPosition = playerVehicle.carLeaderboardPosition;
                     // currentGameState.displayOpponentData();
                 }
                 else if (previousGameState != null)

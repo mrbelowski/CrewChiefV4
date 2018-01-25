@@ -762,7 +762,7 @@ namespace CrewChiefV4
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
-                            gameStateMapper.correctForMulticlassPositions(currentGameState, previousGameState);
+                            gameStateMapper.populateDerivedData(currentGameState, previousGameState);
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {

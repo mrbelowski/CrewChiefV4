@@ -273,7 +273,7 @@ namespace CrewChiefV4.Events
                                ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
                                      opponentData.LastLapTime <= opponentData.CurrentBestLapTime))
                             {
-                                if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == 1 &&
+                                if (currentGameState.SessionData.ClassPosition > 1 && opponentData.ClassPosition == 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || frequencyOfOpponentPracticeAndQualLapTimes > 0))
                                 {
                                     // he's leading, and has recorded 3 or more laps, and this one's his fastest

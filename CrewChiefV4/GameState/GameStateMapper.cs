@@ -22,6 +22,7 @@ namespace CrewChiefV4.GameState
         }
 
         // called after mapping - 
+        //
         // need to correct as many of the following as we can:
         /*
             currentGameState.SessionData.SessionStartPosition
@@ -37,9 +38,10 @@ namespace CrewChiefV4.GameState
           
             --- don't think we can get this one ---
             currentGameState.SessionData.HasLeadChanged
-                     
          */
-        public virtual void correctForMulticlassPositions(GameStateData currentGameState, GameStateData previousGameState)
+        // This method populates data derived from the mapped data, that's common to all games. Currently this is only
+        // for fixing multiclass data but may be extended to tidy up some of the copy-paste chaos in the mappers.
+        public virtual void populateDerivedData(GameStateData currentGameState, GameStateData previousGameState)
         {
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
             // always set the session start class position and lap start class position:

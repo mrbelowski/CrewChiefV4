@@ -534,7 +534,6 @@ namespace CrewChiefV4.RaceRoom
 
             currentGameState.SessionData.OverallPosition = getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now);
             // currentGameState.SessionData.Position = shared.Position;
-            currentGameState.SessionData.UnFilteredPosition = shared.Position;
             currentGameState.SessionData.TimeDeltaBehind = shared.TimeDeltaBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.TimeDeltaFront;
 
