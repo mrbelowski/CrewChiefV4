@@ -251,7 +251,7 @@ namespace CrewChiefV4.rFactor1
             // if previous state is null or any of the above change, this is a new session
             currentGameState.SessionData.IsNewSession = previousGameState == null ||
                 currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType ||
-                !String.Equals(currentGameState.carClass.getClassIdentifier(), previousGameState.carClass.getClassIdentifier()) ||
+                !CarData.IsCarClassEqual(currentGameState.carClass, previousGameState.carClass) ||
                 currentGameState.SessionData.DriverRawName != previousGameState.SessionData.DriverRawName || 
                 currentGameState.SessionData.TrackDefinition.name != previousGameState.SessionData.TrackDefinition.name ||
                 currentGameState.SessionData.TrackDefinition.trackLength != previousGameState.SessionData.TrackDefinition.trackLength ||

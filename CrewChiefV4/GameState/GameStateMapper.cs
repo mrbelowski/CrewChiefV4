@@ -47,7 +47,7 @@ namespace CrewChiefV4.GameState
             int numCarsInPlayerClass = 1;
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
-                if (singleClass || string.Equals(opponent.CarClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
+                if (singleClass || CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
                     // don't care about other classes
                     numCarsInPlayerClass++;
@@ -131,7 +131,7 @@ namespace CrewChiefV4.GameState
                 List<OpponentData> opponentsInClass = new List<OpponentData>();
                 foreach (OpponentData opponent in currentGameState.OpponentData.Values)
                 {
-                    if (string.Equals(opponent.CarClass.getClassIdentifier(), currentGameState.carClass.getClassIdentifier()))
+                    if (CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                     {
                         opponentsInClass.Add(opponent);
                     }
