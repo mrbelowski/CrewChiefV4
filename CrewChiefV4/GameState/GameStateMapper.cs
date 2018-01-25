@@ -65,81 +65,74 @@ namespace CrewChiefV4.GameState
 
             float PitApproachPosition = currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1;
             
-            if (singleClass)
+            // sort out all the class position stuff
+            int numCarsInPlayerClass = 1;
+            foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
-                currentGameState.SessionData.NumCarsInPlayerClass = currentGameState.SessionData.NumCarsOverall;
-            }
-            else
-            {
-                // sort out all the class position stuff
-                int numCarsInPlayerClass = 1;
-                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                if (singleClass || opponent.CarClass == currentGameState.carClass)
                 {
-                    if (opponent.CarClass == currentGameState.carClass)
+                    // don't care about other classes
+                    numCarsInPlayerClass++;
+                    if (PitApproachPosition != -1
+                        && opponent.DistanceRoundTrack < PitApproachPosition + 20
+                        && opponent.DistanceRoundTrack > PitApproachPosition - 20)
                     {
-                        // don't care about other classes
-                        numCarsInPlayerClass++;
-                        if (PitApproachPosition != -1
-                            && opponent.DistanceRoundTrack < PitApproachPosition + 20
-                            && opponent.DistanceRoundTrack > PitApproachPosition - 20)
+                        opponent.PositionOnApproachToPitEntry = opponent.ClassPosition;
+                    }
+                    if (opponent.ClassPosition == 1)
+                    {
+                        if (opponent.ClassPositionAtPreviousTick != 1)
                         {
-                            opponent.PositionOnApproachToPitEntry = opponent.ClassPosition;
+                            currentGameState.SessionData.HasLeadChanged = true;
                         }
-                        if (opponent.ClassPosition == 1)
+                        currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
+                        if (opponent.JustEnteredPits)
                         {
-                            if (opponent.ClassPositionAtPreviousTick != 1)
-                            {
-                                currentGameState.SessionData.HasLeadChanged = true;
-                            }
-                            currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
-                            if (opponent.JustEnteredPits)
-                            {
-                                currentGameState.PitData.LeaderIsPitting = true;
-                                currentGameState.PitData.OpponentForLeaderPitting = opponent;
-                            }
-                            else
-                            {
-                                currentGameState.PitData.LeaderIsPitting = false;
-                                currentGameState.PitData.OpponentForLeaderPitting = null;
-                            }
+                            currentGameState.PitData.LeaderIsPitting = true;
+                            currentGameState.PitData.OpponentForLeaderPitting = opponent;
                         }
-                        else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
+                        else
                         {
-                            currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                            if (opponent.JustEnteredPits)
-                            {
-                                currentGameState.PitData.CarInFrontIsPitting = true;
-                                currentGameState.PitData.OpponentForCarAheadPitting = opponent;
-                            }
-                            else
-                            {
-                                currentGameState.PitData.CarInFrontIsPitting = false;
-                                currentGameState.PitData.OpponentForCarAheadPitting = null;
-                            }
+                            currentGameState.PitData.LeaderIsPitting = false;
+                            currentGameState.PitData.OpponentForLeaderPitting = null;
                         }
-                        else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
+                    }
+                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
+                    {
+                        currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        if (opponent.JustEnteredPits)
                         {
-                            currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                            if (opponent.JustEnteredPits)
-                            {
-                                currentGameState.PitData.CarBehindIsPitting = true;
-                                currentGameState.PitData.OpponentForCarBehindPitting = opponent;
-                            }
-                            else
-                            {
-                                currentGameState.PitData.CarBehindIsPitting = false;
-                                currentGameState.PitData.OpponentForCarBehindPitting = null;
-                            }
+                            currentGameState.PitData.CarInFrontIsPitting = true;
+                            currentGameState.PitData.OpponentForCarAheadPitting = opponent;
+                        }
+                        else
+                        {
+                            currentGameState.PitData.CarInFrontIsPitting = false;
+                            currentGameState.PitData.OpponentForCarAheadPitting = null;
+                        }
+                    }
+                    else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
+                    {
+                        currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        if (opponent.JustEnteredPits)
+                        {
+                            currentGameState.PitData.CarBehindIsPitting = true;
+                            currentGameState.PitData.OpponentForCarBehindPitting = opponent;
+                        }
+                        else
+                        {
+                            currentGameState.PitData.CarBehindIsPitting = false;
+                            currentGameState.PitData.OpponentForCarBehindPitting = null;
                         }
                     }
                 }
-                if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
-                {
-                    currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
-                }
-                currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
             }
-
+            if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
+            {
+                currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
+            }
+            currentGameState.SessionData.NumCarsInPlayerClass = numCarsInPlayerClass;
+            
             // now derive some stuff that we always need to derive, using the correct class positions:
             String previousBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass, true);
             String currentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
