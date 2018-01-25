@@ -222,6 +222,11 @@ namespace CrewChiefV4.Events
                     {
                         string opponentKey = entry.Key;
                         OpponentData opponentData = entry.Value;
+                        if (opponentData.CarClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
+                        {
+                            // not interested in opponents from other classes
+                            continue;
+                        }
 
                         // in race sessions, announce tyre type changes once the session is underway
                         if (currentGameState.SessionData.SessionType == SessionType.Race &&
