@@ -872,10 +872,6 @@ namespace CrewChiefV4.rFactor1
                 if (opponent.OverallPosition == currentGameState.SessionData.OverallPosition - 1 && currentGameState.SessionData.SessionType == SessionType.Race)
                     currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
 
-                if (opponentPrevious != null && opponentPrevious.OverallPosition > 1 && opponent.OverallPosition == 1)
-                {
-                    currentGameState.SessionData.HasLeadChanged = true;
-                }
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall || 
                     currentGameState.SessionData.OpponentsLapTimeSessionBestOverall < 0))
@@ -918,9 +914,6 @@ namespace CrewChiefV4.rFactor1
             currentGameState.PitData.InPitlane = player.inPits == 1;
             if (previousGameState != null)
             {
-                currentGameState.SessionData.HasLeadChanged = !currentGameState.SessionData.HasLeadChanged && previousGameState.SessionData.OverallPosition > 1 && currentGameState.SessionData.OverallPosition == 1 ?
-                    true : currentGameState.SessionData.HasLeadChanged;
-                
                 currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
                                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,

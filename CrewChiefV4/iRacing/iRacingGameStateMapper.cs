@@ -685,14 +685,6 @@ namespace CrewChiefV4.iRacing
                         {
                             currentGameState.SessionData.LeaderHasFinishedRace = true;
                         }
-                        if (currentGameState.SessionData.OverallPosition == 1)
-                        {
-                            currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
-                        }
-                        if (currentOpponentOverallPosition == 1 && previousOpponentOverallPosition > 1)
-                        {
-                            currentGameState.SessionData.HasLeadChanged = true;
-                        }
 
                         Boolean isEnteringPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 3;
                         Boolean isLeavingPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 1;

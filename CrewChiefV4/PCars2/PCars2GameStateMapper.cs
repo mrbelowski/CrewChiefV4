@@ -792,14 +792,6 @@ namespace CrewChiefV4.PCars2
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
                                     }
-                                    if (currentOpponentRacePosition == 1)
-                                    {
-                                        currentGameState.SessionData.LeaderSectorNumber = currentOpponentSector;
-                                    }
-                                    if (currentOpponentRacePosition == 1 && previousOpponentPosition > 1)
-                                    {
-                                        currentGameState.SessionData.HasLeadChanged = true;
-                                    }
                                     ePitMode opponentPitMode = (ePitMode)shared.mPitModes[i];
                                     Boolean isEnteringPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS;
                                     Boolean isLeavingPits = opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || opponentPitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
