@@ -1487,6 +1487,7 @@ namespace CrewChiefV4.rFactor2
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
                 csd.SessionStartClassPosition = pgs.SessionData.SessionStartClassPosition;
                 csd.ClassPositionAtStartOfCurrentLap = pgs.SessionData.ClassPositionAtStartOfCurrentLap;
+                csd.NumCarsInPlayerClassAtStartOfSession = pgs.SessionData.NumCarsInPlayerClassAtStartOfSession;
             }
 
             // --------------------------------
