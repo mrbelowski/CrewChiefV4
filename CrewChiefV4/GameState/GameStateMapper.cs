@@ -138,8 +138,9 @@ namespace CrewChiefV4.GameState
                 String currentLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);
                 
             }
-            if ((currentBehindKey == null && currentGameState.SessionData.ClassPosition < currentGameState.SessionData.NumCarsInPlayerClass)
-                || (currentAheadKey == null && currentGameState.SessionData.ClassPosition > 1))
+            if (CrewChief.Debugging 
+                && ((currentBehindKey == null && currentGameState.SessionData.ClassPosition < currentGameState.SessionData.NumCarsInPlayerClass)
+                      || (currentAheadKey == null && currentGameState.SessionData.ClassPosition > 1)))
             {
                 Console.WriteLine("Non-contiguous class positions");
                 List<OpponentData> opponentsInClass = new List<OpponentData>();
