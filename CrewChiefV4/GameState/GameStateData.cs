@@ -1909,7 +1909,7 @@ namespace CrewChiefV4.GameState
         {
             TimeSpan splitTime = new TimeSpan(0);
             int lapDifference = 0;
-            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
+            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0 && currentDeltaPoint != -1 && otherCarDelta.currentDeltaPoint != -1)
             {
                 // +ve means I've travelled further than him:
                 float totalDistanceTravelledDifference = totalDistanceTravelled - otherCarDelta.totalDistanceTravelled;
@@ -1952,7 +1952,7 @@ namespace CrewChiefV4.GameState
         public float GetSignedDeltaTimeOnly(DeltaTime otherCarDelta)
         {
             TimeSpan splitTime = new TimeSpan(0);
-            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0)
+            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0 && currentDeltaPoint != -1 && otherCarDelta.currentDeltaPoint != -1)
             {
                 //opponent is behind
                 if (distanceRoundTrackOnCurrentLap < otherCarDelta.distanceRoundTrackOnCurrentLap)
