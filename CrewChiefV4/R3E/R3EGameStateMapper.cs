@@ -448,12 +448,7 @@ namespace CrewChiefV4.RaceRoom
 
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
 
-                    currentGameState.SessionData.DeltaTime.deltaPoints = previousGameState.SessionData.DeltaTime.deltaPoints;
-                    currentGameState.SessionData.DeltaTime.currentDeltaPoint = previousGameState.SessionData.DeltaTime.currentDeltaPoint;
-                    currentGameState.SessionData.DeltaTime.nextDeltaPoint = previousGameState.SessionData.DeltaTime.nextDeltaPoint;
-                    currentGameState.SessionData.DeltaTime.lapsCompleted = previousGameState.SessionData.DeltaTime.lapsCompleted;
-                    currentGameState.SessionData.DeltaTime.totalDistanceTravelled = previousGameState.SessionData.DeltaTime.totalDistanceTravelled;
-                    currentGameState.SessionData.DeltaTime.trackLength = previousGameState.SessionData.DeltaTime.trackLength;
+                    currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
 
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;

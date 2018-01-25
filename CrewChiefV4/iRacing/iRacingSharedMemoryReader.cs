@@ -71,7 +71,10 @@ namespace CrewChiefV4.iRacing
 
         public override Object ReadGameDataFromFile(String filename)
         {
-
+            if(sim == null)
+            {
+                sim = new Sim();
+            }
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
@@ -81,15 +84,17 @@ namespace CrewChiefV4.iRacing
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
+                bool IsNewSession = false;
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate && structDumpWrapperData.data.SessionInfo.Length > 0)
                 {
                     SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
-                    sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx, structDumpWrapperData.data.SessionInfoUpdate);
+                    IsNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx, structDumpWrapperData.data.SessionInfoUpdate);
                     lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
                 iRacingStructWrapper structWrapperData = new iRacingStructWrapper() { data = sim, ticksWhenRead = structDumpWrapperData.ticksWhenRead };
+                structWrapperData.data.Telemetry.IsNewSession = IsNewSession;
                 dataReadFromFileIndex++;
 
                 return structWrapperData;

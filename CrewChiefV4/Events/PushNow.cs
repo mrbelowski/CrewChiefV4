@@ -36,7 +36,7 @@ namespace CrewChiefV4.Events
         private Boolean playedQualExitMessage = false;
         private float minTimeToBeInThisPosition = 60;
 
-        private float distanceBeforeStartLineToWarnOfPitExit = 100;
+        private float distanceBeforeStartLineToWarnOfPitExit = 200;
         private float maxSpeedWhenCrossingLine = 0;
 
         public PushNow(AudioPlayer audioPlayer)
@@ -68,9 +68,9 @@ namespace CrewChiefV4.Events
             {
                 maxSpeedWhenCrossingLine = currentGameState.PositionAndMotionData.CarSpeed;
                 // the distance at which we check if there's a car exiting the pits will be speed dependent. 
-                // The faster we are over the line, the more notice we'll need. * 2 is a number I pulled out of my arse,
+                // The faster we are over the line, the more notice we'll need. * 3 is a number I pulled out of my arse,
                 // it may be shit.
-                distanceBeforeStartLineToWarnOfPitExit = maxSpeedWhenCrossingLine * 2;
+                distanceBeforeStartLineToWarnOfPitExit = maxSpeedWhenCrossingLine * 3;
             }
             Boolean checkPushToGain = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionFrontChange < minTimeToBeInThisPosition;
             Boolean checkPushToHold = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.GameTimeAtLastPositionBehindChange < minTimeToBeInThisPosition;
