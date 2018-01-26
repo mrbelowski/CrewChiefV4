@@ -102,7 +102,6 @@ namespace CrewChiefV4.rFactor2
         class CarInfo
         {
             public CarData.CarClass carClass = null;
-            public string carClassId = null;
             public string driverNameRawSanitized = null;
         }
 
@@ -522,7 +521,7 @@ namespace CrewChiefV4.rFactor2
                 // Initialize variables that persist for the duration of a session.
                 var cci = this.GetCachedCarInfo(ref playerScoring);
                 cgs.carClass = cci.carClass;
-                CarData.CLASS_ID = cci.carClassId;
+                CarData.CLASS_ID = cgs.carClass.getClassIdentifier();
                 this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
                 csd.DriverRawName = cci.driverNameRawSanitized;
                 csd.TrackDefinition = new TrackDefinition(RF2GameStateMapper.GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
@@ -1250,11 +1249,6 @@ namespace CrewChiefV4.rFactor2
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
 
-                if (opponentPrevious != null)
-                {
-                    opponent.OverallPositionAtPreviousTick = opponentPrevious.OverallPosition;
-                    opponent.ClassPositionAtPreviousTick = opponentPrevious.ClassPosition;
-                }
                 opponent.CarClass = vehicleCachedInfo.carClass;
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
                 opponent.DriverRawName = vehicleCachedInfo.driverNameRawSanitized;
@@ -1288,6 +1282,8 @@ namespace CrewChiefV4.rFactor2
                         opponent.TyreChangesByLap.Add(old.Key, old.Value);
 
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
+                    opponent.OverallPositionAtPreviousTick = opponentPrevious.OverallPosition;
+                    opponent.ClassPositionAtPreviousTick = opponentPrevious.ClassPosition;
                 }
 
                 opponent.SessionTimeAtLastPositionChange
@@ -1699,27 +1695,21 @@ namespace CrewChiefV4.rFactor2
                     " to " + csd.SessionPhase);
                 if (csd.SessionPhase == SessionPhase.Checkered ||
                     csd.SessionPhase == SessionPhase.Finished)
-                {
-                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps +
-                        " laps, session running time = " + csd.SessionRunningTime);
-                }
+                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps + " laps, session running time = " + csd.SessionRunningTime);
             }
             if (pgs != null && !psd.LeaderHasFinishedRace && csd.LeaderHasFinishedRace)
-            {
-                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps +
-                    " laps, session time = " + csd.SessionRunningTime);
-            }
+                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps + " laps, session time = " + csd.SessionRunningTime);
 
             CrewChief.trackName = csd.TrackDefinition.name;
             CrewChief.carClass = cgs.carClass.carClassEnum;  // TODO: Why is this an enum and not a CarClass?
             CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
 
-            if (pgs != null &&
-               csd.SessionType == SessionType.Race &&
-               csd.SessionPhase == SessionPhase.Green &&
-                   (pgs.SessionData.SessionPhase == SessionPhase.Formation ||
-                    pgs.SessionData.SessionPhase == SessionPhase.Countdown))
+            if (pgs != null
+                && csd.SessionType == SessionType.Race
+                && csd.SessionPhase == SessionPhase.Green
+                && (pgs.SessionData.SessionPhase == SessionPhase.Formation
+                    || pgs.SessionData.SessionPhase == SessionPhase.Countdown))
                 csd.JustGoneGreen = true;
 
             return cgs;
@@ -2489,7 +2479,6 @@ namespace CrewChiefV4.rFactor2
             ci = new CarInfo()
             {
                 carClass = carClass,
-                carClassId = carClassId,
                 driverNameRawSanitized = driverName
             };
 
