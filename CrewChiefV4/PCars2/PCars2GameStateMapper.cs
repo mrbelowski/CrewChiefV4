@@ -1341,7 +1341,7 @@ namespace CrewChiefV4.PCars2
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.CarClass = carClass;
-            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
+            opponentData.JustEnteredPits = !opponentData.InPits && (isInPits || isEnteringPits);
             opponentData.InPits = isEnteringPits || isInPits || isLeavingPits;
             if (opponentData.CurrentSectorNumber != sector)
             {
