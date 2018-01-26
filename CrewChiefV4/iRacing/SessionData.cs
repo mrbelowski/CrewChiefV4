@@ -16,13 +16,11 @@ namespace CrewChiefV4.iRacing
         public int SessionId { get; set; }
         public int SubsessionId { get; set; }
         public string SessionTimeString { get; set; }
-
         public string RaceLaps { get; set; }
         public double RaceTime { get; set; }
-
         public string IncidentLimitString { get; set; }
-
         public int IncidentLimit { get; set; }
+        public bool IsTeamRacing { get; set; }
 
         public void Update(SessionInfo info, int sessionNumber)
         {
@@ -31,6 +29,8 @@ namespace CrewChiefV4.iRacing
             var weekend = info["WeekendInfo"];
             this.SubsessionId = Parser.ParseInt(weekend["SubSessionID"].GetValue());
             this.SessionId = Parser.ParseInt(weekend["SessionID"].GetValue());
+
+            this.IsTeamRacing = Parser.ParseInt(weekend["TeamRacing"].GetValue()) == 1;
 
             this.EventType = weekend["EventType"].GetValue();
 
