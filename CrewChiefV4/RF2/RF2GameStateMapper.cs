@@ -1532,7 +1532,6 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // flags data
-            // TODO: should RF2 ever drop back to the improvised incident calling?
             cgs.FlagData.useImprovisedIncidentCalling = false;
 
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow
