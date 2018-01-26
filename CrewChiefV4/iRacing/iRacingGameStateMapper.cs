@@ -965,6 +965,7 @@ namespace CrewChiefV4.iRacing
             {
                 Console.WriteLine("Driver " + opponentData.DriverRawName + " has been swapped for " + driverName);
                 opponentData.DriverRawName = driverName;
+                speechRecogniser.addNewOpponentName(driverName);
             }
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
