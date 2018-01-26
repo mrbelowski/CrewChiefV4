@@ -120,9 +120,10 @@ namespace CrewChiefV4.GameState
             {
                 // if we're first or second we don't care about lead changes
                 String previousLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass, true);
-                String currentLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);
-                
+                String currentLeaderKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);                
             }
+            // don't really need this any more:
+            /*
             if (CrewChief.Debugging 
                 && ((currentBehindKey == null && currentGameState.SessionData.ClassPosition < currentGameState.SessionData.NumCarsInPlayerClass)
                       || (currentAheadKey == null && currentGameState.SessionData.ClassPosition > 1)))
@@ -137,7 +138,7 @@ namespace CrewChiefV4.GameState
                     }
                     Console.WriteLine(String.Join("\n", opponentsInClass.OrderBy(o => o.ClassPosition)));
                 }
-            }
+            }*/
 
             currentGameState.SessionData.IsRacingSameCarBehind = currentBehindKey == previousBehindKey;
             currentGameState.SessionData.IsRacingSameCarInFront = currentAheadKey == previousAheadKey;
