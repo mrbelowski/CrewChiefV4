@@ -613,7 +613,7 @@ namespace CrewChiefV4.iRacing
                 if (currentGameState.OpponentData.ContainsKey(opponentDataKey))
                 {
                     OpponentData currentOpponentData = currentGameState.OpponentData[opponentDataKey];
-                    if (currentGameState.SessionData.SessionType != SessionType.Practice || string.Equals(driverName, currentOpponentData.DriverRawName))
+                    if (shared.SessionData.IsTeamRacing || string.Equals(driverName, currentOpponentData.DriverRawName))
                     {
                         createNewDriver = false;
                         if (previousGameState != null)
@@ -1157,6 +1157,7 @@ namespace CrewChiefV4.iRacing
                 speechRecogniser.addNewOpponentName(driverName);
             }
             OpponentData opponentData = new OpponentData();
+            opponentData.IsActive = true;
             opponentData.DriverRawName = driverName;
             opponentData.OverallPosition = opponentCar.Live.Position;
             opponentData.CompletedLaps = opponentCar.CurrentResults.LapsComplete;
