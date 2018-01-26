@@ -2482,6 +2482,8 @@ namespace CrewChiefV4.rFactor2
                 driverNameRawSanitized = driverName
             };
 
+            this.idToCarInfoMap.Add(vehicleScoring.mID, ci);
+
             return ci;
         }
     }
