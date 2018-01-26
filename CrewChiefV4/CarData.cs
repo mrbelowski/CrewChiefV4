@@ -436,10 +436,12 @@ namespace CrewChiefV4
             {
                 return false;
             }
-            if (String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
+            if (class1.carClassEnum == class2.carClassEnum // Disambiguate only if enum values are equal.
+                && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
             {
                 return true;
             }
+            // Check for grouping.
             foreach (List<CarClassEnum> groupedClass in groupedClasses) 
             {
                 if (groupedClass.Contains(class1.carClassEnum) && groupedClass.Contains(class2.carClassEnum))
