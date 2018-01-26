@@ -1740,7 +1740,7 @@ namespace CrewChiefV4.rFactor2
             }
 
             CrewChief.trackName = csd.TrackDefinition.name;
-            CrewChief.carClass = cgs.carClass.carClassEnum;
+            CrewChief.carClass = cgs.carClass.carClassEnum;  // TODO: Why is this an enum and not a CarClass?
             CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
 
@@ -2081,7 +2081,7 @@ namespace CrewChiefV4.rFactor2
 
             float minDistDiff = -1.0f;
             float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
-            String bestKey = null;
+            string bestKey = null;
             if (timeDelta >= 0.0f)
             {
                 foreach (var possibleKey in possibleKeys)
@@ -2094,7 +2094,7 @@ namespace CrewChiefV4.rFactor2
                         var driverNameFromScoring = cci.driverNameRawSanitized;
 
                         if (o.DriverRawName != driverNameFromScoring
-                            || !string.Equals(o.CarClass.getClassIdentifier(), cci.carClass.getClassIdentifier())
+                            || !CarData.IsCarClassEqual(o.CarClass, cci.carClass)
                             || opponentKeysProcessed.Contains(possibleKey))
                             continue;
 
