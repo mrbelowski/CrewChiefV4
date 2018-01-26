@@ -241,9 +241,11 @@ namespace CrewChiefV4.Events
                             distanceToBoxRounded = (10 - distanceToBoxInt % 10) + distanceToBoxInt;
 
                         List<MessageFragment> messageContents = new List<MessageFragment>();
-                        messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
+                        if (SoundCache.soundSets.ContainsKey(folderBoxPositionIntro))
+                            messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
-                        messageContents.Add(MessageFragment.Text(folderMetres));
+                        if (SoundCache.soundSets.ContainsKey(folderMetres))
+                            messageContents.Add(MessageFragment.Text(folderMetres));
                         audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));                        
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
@@ -260,7 +262,11 @@ namespace CrewChiefV4.Events
                     }
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50, folderMetres), 0, null));
+                        List<MessageFragment> messageContents = new List<MessageFragment>();
+                        messageContents.Add(MessageFragment.Integer(50));
+                        if (SoundCache.soundSets.ContainsKey(folderMetres))
+                            messageContents.Add(MessageFragment.Text(folderMetres));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", messageContents, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played50MetreWarning = true;
                     }
