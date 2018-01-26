@@ -648,9 +648,10 @@ namespace CrewChiefV4
             else
             {
                 // first check if it's in the cache
-                if (nameToCarClass.ContainsKey(className))
+                CarClass cachedCarClass = null;
+                if (nameToCarClass.TryGetValue(className, out cachedCarClass))
                 {
-                    return nameToCarClass[className];
+                    return cachedCarClass;
                 }
                 else
                 {
