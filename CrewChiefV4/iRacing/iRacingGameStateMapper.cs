@@ -343,7 +343,6 @@ namespace CrewChiefV4.iRacing
                     currentGameState.OpponentData = previousGameState.OpponentData;
                     currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
-
                     currentGameState.SessionData.MaxIncidentCount = previousGameState.SessionData.MaxIncidentCount;
                     currentGameState.SessionData.CurrentIncidentCount = previousGameState.SessionData.CurrentIncidentCount;
                     currentGameState.SessionData.CurrentDriverIncidentCount = previousGameState.SessionData.CurrentDriverIncidentCount;
@@ -441,7 +440,10 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.FlagData.isLocalYellow = true;
             }
-
+            if (previousGameState != null && !previousGameState.SessionData.Flag.HasFlag(FlagEnum.BLUE) && flag.HasFlag(SessionFlags.Blue))
+            {
+                currentGameState.SessionData.Flag = FlagEnum.BLUE;
+            }
             currentGameState.SessionData.CompletedLaps = playerCar.Live.LapsCompleted;
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
