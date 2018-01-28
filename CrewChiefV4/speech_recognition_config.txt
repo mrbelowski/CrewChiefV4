@@ -235,6 +235,8 @@ PIT_STOP_CHANGE_FRONT_LEFT_TYRE = pitstop change left front tyre
 PIT_STOP_CHANGE_FRONT_RIGHT_TYRE = pitstop change right front tyre
 PIT_STOP_CHANGE_REAR_LEFT_TYRE = pitstop change left rear tyre
 PIT_STOP_CHANGE_REAR_RIGHT_TYRE = pitstop change right rear tyre
+PIT_STOP_CHANGE_LEFT_SIDE_TYRES = pitstop change left side tyres
+PIT_STOP_CHANGE_RIGHT_SIDE_TYRES = pitstop change right side tyres
 
 PIT_STOP_CHANGE_TYRE_PRESSURE = pitstop change tyres pressure
 PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE = pitstop change left front tyre pressure
