@@ -155,7 +155,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
 
-                if (shared.SessionData.IsLimitedTime)
+                if (!shared.SessionData.IsLimitedSessionLaps)
                 {
                     currentGameState.SessionData.SessionHasFixedTime = true;
                     currentGameState.SessionData.SessionTotalRunTime = (float)shared.SessionData.RaceTime;
@@ -220,15 +220,15 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.JustGoneGreen = true;
                         // just gone green, so get the session data
 
-                        if (shared.SessionData.IsLimitedTime)
-                        {
-                            currentGameState.SessionData.SessionHasFixedTime = true;
-                            currentGameState.SessionData.SessionTotalRunTime = (float)shared.SessionData.RaceTime;
-                        }
-                        else
+                        if (shared.SessionData.IsLimitedSessionLaps)
                         {
                             currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
                             currentGameState.SessionData.SessionHasFixedTime = false;
+                        }
+                        else
+                        {
+                            currentGameState.SessionData.SessionHasFixedTime = true;
+                            currentGameState.SessionData.SessionTotalRunTime = (float)shared.SessionData.RaceTime;
                         }
                         currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
 
