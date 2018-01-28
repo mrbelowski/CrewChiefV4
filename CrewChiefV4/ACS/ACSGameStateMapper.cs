@@ -798,9 +798,10 @@ namespace CrewChiefV4.assetto
                 return null;
             }
 
-            if (gameState.OpponentData.ContainsKey(nameToFind))
+            OpponentData od = null;
+            if (gameState.OpponentData.TryGetValue(nameToFind, out od))
             {
-                return gameState.OpponentData[nameToFind];
+                return od;
             }
             return null;
         }
@@ -1894,18 +1895,19 @@ namespace CrewChiefV4.assetto
         private List<CornerData.EnumWithThresholds> getTyreTempThresholds(CarData.CarClass carClass, string currentTyreCompound)
         {
             List<CornerData.EnumWithThresholds> tyreTempThresholds = new List<CornerData.EnumWithThresholds>();
-            if(carClass.acTyreTypeData.ContainsKey(currentTyreCompound))
+            CarData.TyreTypeData tyreTypeData = null;
+            AcTyres acTyre = null;
+            if(carClass.acTyreTypeData.TryGetValue(currentTyreCompound, out tyreTypeData))
             {
-                CarData.TyreTypeData tyreTypeData = carClass.acTyreTypeData[currentTyreCompound];
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000f, tyreTypeData.maxColdTyreTemp));
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, tyreTypeData.maxColdTyreTemp, tyreTypeData.maxWarmTyreTemp));
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, tyreTypeData.maxWarmTyreTemp, tyreTypeData.maxHotTyreTemp));
                 tyreTempThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, tyreTypeData.maxHotTyreTemp, 10000f));
                 Console.WriteLine("Using user defined temperature thresholds for TyreType: " + currentTyreCompound);
             }
-            else if (acTyres.ContainsKey(currentTyreCompound))
+            else if (acTyres.TryGetValue(currentTyreCompound, out acTyre))
             {
-                tyreTempThresholds = acTyres[currentTyreCompound].tyreTempThresholdsForAC;
+                tyreTempThresholds = acTyre.tyreTempThresholdsForAC;
                 Console.WriteLine("Using buildin defined temperature thresholds for TyreType: " + currentTyreCompound);
             }
             else
