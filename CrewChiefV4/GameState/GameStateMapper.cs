@@ -15,11 +15,11 @@ namespace CrewChiefV4.GameState
         class PendingRacePositionChange
         {
             public int newPosition;
-            public DateTime positionChangeTime;
-            public PendingRacePositionChange(int newPosition, DateTime positionChangeTime)
+            public DateTime positionSettledTime;
+            public PendingRacePositionChange(int newPosition, DateTime positionSettledTime)
             {
                 this.newPosition = newPosition;
-                this.positionChangeTime = positionChangeTime;
+                this.positionSettledTime = positionSettledTime;
             }
         }
 
@@ -192,8 +192,8 @@ namespace CrewChiefV4.GameState
                 PendingRacePositionChange pendingRacePositionChange = PendingRacePositionChanges[driverName];
                 if (newPosition == pendingRacePositionChange.newPosition)
                 {
-                    // R3E is still reporting this driver is in the same race position, see if it's been long enough...
-                    if (now > pendingRacePositionChange.positionChangeTime + PositionChangeLag)
+                    // the game is still reporting this driver is in the same race position, see if it's been long enough...
+                    if (now > pendingRacePositionChange.positionSettledTime)
                     {
                         int positionToReturn = newPosition;
                         PendingRacePositionChanges.Remove(driverName);
@@ -208,13 +208,13 @@ namespace CrewChiefV4.GameState
                 {
                     // the new position is not consistent with the pending position change, bit of an edge case here
                     pendingRacePositionChange.newPosition = newPosition;
-                    pendingRacePositionChange.positionChangeTime = now;
+                    pendingRacePositionChange.positionSettledTime = now + PositionChangeLag;
                     return oldPosition;
                 }
             }
             else
             {
-                PendingRacePositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now));
+                PendingRacePositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now + PositionChangeLag));
                 return oldPosition;
             }
         }
