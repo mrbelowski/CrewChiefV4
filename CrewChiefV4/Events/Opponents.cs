@@ -78,6 +78,10 @@ namespace CrewChiefV4.Events
 
         private String lastLeaderAnnounced = null;
 
+        private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
+        private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
+
+
         public Opponents(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -105,6 +109,7 @@ namespace CrewChiefV4.Events
             onlyAnnounceOpponentAfter.Clear();
             lastNextCarAheadOpponentName = null;
             lastLeaderAnnounced = null;
+            nextCheckForOtherCarClasses = DateTime.MinValue;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -205,6 +210,10 @@ namespace CrewChiefV4.Events
                 return;
             }
             this.currentGameState = currentGameState;
+            if (currentGameState.Now > nextCheckForOtherCarClasses)
+            {
+                OtherCarClassWarningData otherClassWarningData = getOtherCarClassWarningData(currentGameState);
+            }
             // skip the lap time checks and stuff under yellow:
             if (currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
             {
@@ -981,6 +990,139 @@ namespace CrewChiefV4.Events
                 }
             }
             return bestLap;
+        }
+
+        private class OtherCarClassWarningData
+        {
+            public int numFasterCars;
+            public int numSlowerCars;
+            public Boolean fasterCarsIncludeClassLeader;
+            public Boolean slowerCarsIncludeClassLeader;
+            public Boolean fasterCarsRacingForPosition;
+            public Boolean slowerCarsRacingForPosition;
+            public OtherCarClassWarningData(int numFasterCars, int numSlowerCars, Boolean fasterCarsIncludeClassLeader, Boolean slowerCarsIncludeClassLeader,
+                Boolean fasterCarsRacingForPosition, Boolean slowerCarsRacingForPosition)
+            {
+                this.numFasterCars = numFasterCars;
+                this.numSlowerCars = numSlowerCars;
+                this.fasterCarsIncludeClassLeader = fasterCarsIncludeClassLeader;
+                this.slowerCarsIncludeClassLeader = slowerCarsIncludeClassLeader;
+                this.fasterCarsRacingForPosition = fasterCarsRacingForPosition;
+                this.slowerCarsRacingForPosition = slowerCarsRacingForPosition;
+            }
+        }
+
+        // to be called every couple of seconds, not every tick
+        private OtherCarClassWarningData getOtherCarClassWarningData(GameStateData currentGameState)
+        {
+            // probably do this check in the caller:
+            if (GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) || 
+                currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
+                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane || 
+                currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
+            {
+                return null;
+            }
+
+            float playerDistanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            float playerBestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
+            float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
+
+            int numFasterCars = 0;
+            int numSlowerCars = 0;
+            Dictionary<int, List<float>> fasterCarLapCountAndSeparations = new Dictionary<int, List<float>>();
+            Dictionary<int, List<float>> slowerCarLapCountAndSeparations = new Dictionary<int, List<float>>();
+            Boolean fasterCarsIncludeClassLeader = false;
+            Boolean slowerCarsIncludeClassLeader = false;
+            Boolean fasterCarsRacingForPosition = false;
+            Boolean slowerCarsRacingForPosition = false;
+            foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
+            {
+                if (CarData.IsCarClassEqual(opponentData.CarClass, currentGameState.carClass) ||
+                    opponentData.CurrentBestLapTime <= 0 || opponentData.InPits)
+                {
+                    continue;
+                }
+                Boolean isFaster = playerBestLap - opponentData.CurrentBestLapTime > 0;
+                // separation is +ve when the player is in front, -ve when he's behind
+                float separation;
+                float opponentDistanceRoundTrack = opponentData.DistanceRoundTrack;
+                if (playerDistanceRoundTrack > opponentDistanceRoundTrack)
+                {
+                    separation = playerDistanceRoundTrack - opponentDistanceRoundTrack;
+                }
+                else
+                {
+                    separation = playerDistanceRoundTrack + trackLength - opponentDistanceRoundTrack;
+                }
+                if (isFaster && separation < 400 && separation > 100)
+                {
+                    // player is ahead of a faster class car
+                    numFasterCars++;
+                    if (opponentData.ClassPosition == 1)
+                    {
+                        fasterCarsIncludeClassLeader = true;
+                    }
+                    // get the separations of other cars we've already processed which are on the same lap as this opponent:
+                    if (!fasterCarsRacingForPosition)
+                    {
+                        List<float> separationsForOtherCarsOnSameLap;
+                        if (fasterCarLapCountAndSeparations.TryGetValue(opponentData.CompletedLaps, out separationsForOtherCarsOnSameLap))
+                        {
+                            // if any of them are close to each other, set the boolean flag
+                            foreach (float otherSeparation in separationsForOtherCarsOnSameLap)
+                            {
+                                if (Math.Abs(otherSeparation - separation) < 50)
+                                {
+                                    fasterCarsRacingForPosition = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            separationsForOtherCarsOnSameLap = new List<float>();
+                            separationsForOtherCarsOnSameLap.Add(separation);
+                            fasterCarLapCountAndSeparations.Add(opponentData.CompletedLaps, separationsForOtherCarsOnSameLap);
+                        }
+                    }
+                }
+                else if (!isFaster && separation > -400 && separation < -100)
+                {
+                    // player is behind a slower class car
+                    // player is ahead of a faster class car
+                    numSlowerCars++;
+                    if (opponentData.ClassPosition == 1)
+                    {
+                        slowerCarsIncludeClassLeader = true;
+                    }
+                    // get the separations of other cars we've already processed which are on the same lap as this opponent:
+                    if (!slowerCarsRacingForPosition)
+                    {
+                        List<float> separationsForOtherCarsOnSameLap;
+                        if (slowerCarLapCountAndSeparations.TryGetValue(opponentData.CompletedLaps, out separationsForOtherCarsOnSameLap))
+                        {
+                            // if any of them are close to each other, set the boolean flag
+                            foreach (float otherSeparation in separationsForOtherCarsOnSameLap)
+                            {
+                                if (Math.Abs(otherSeparation - separation) < 50)
+                                {
+                                    slowerCarsRacingForPosition = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            separationsForOtherCarsOnSameLap = new List<float>();
+                            separationsForOtherCarsOnSameLap.Add(separation);
+                            slowerCarLapCountAndSeparations.Add(opponentData.CompletedLaps, separationsForOtherCarsOnSameLap);
+                        }
+                    }
+                }
+            }
+            return new OtherCarClassWarningData(numFasterCars, numSlowerCars, fasterCarsIncludeClassLeader, 
+                slowerCarsIncludeClassLeader, fasterCarsRacingForPosition, slowerCarsRacingForPosition);
         }
     }
 }
