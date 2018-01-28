@@ -100,8 +100,10 @@ namespace CrewChiefV4.Events
 
         private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
         private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
+        private TimeSpan timeToWaitForOtherClassWarningToSettle = TimeSpan.FromSeconds(6);
         private OtherCarClassWarningData previousCheckOtherClassWarningData;
-
+        private HashSet<string> driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>();
+        private HashSet<string> driverNamesForFasterClassLastWarnedAbout = new HashSet<string>();
 
         public Opponents(AudioPlayer audioPlayer)
         {
@@ -132,6 +134,8 @@ namespace CrewChiefV4.Events
             lastLeaderAnnounced = null;
             nextCheckForOtherCarClasses = DateTime.MinValue;
             previousCheckOtherClassWarningData = null;
+            driverNamesForSlowerClassLastWarnedAbout.Clear();
+            driverNamesForFasterClassLastWarnedAbout.Clear();
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -1023,18 +1027,19 @@ namespace CrewChiefV4.Events
                 {
                     previousCheckOtherClassWarningData = otherClassWarningData;
                     // wait a while and check again before announcing
-                    nextCheckForOtherCarClasses = currentGameState.Now.Add(timeBetweenOtherClassChecks);
+                    nextCheckForOtherCarClasses = currentGameState.Now.Add(timeToWaitForOtherClassWarningToSettle);
                 }
                 else
                 {
-                    // check if this data is consistent with the previous data
-                    if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData))
+                    // check if this data is consistent with the previous data and that we've not warned about all these cars
+                    if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData, driverNamesForFasterClassLastWarnedAbout, driverNamesForSlowerClassLastWarnedAbout))
                     {
                         previousCheckOtherClassWarningData = null;
                         // do the announcing - need to decide which to prefer - read multiple?
                         Console.WriteLine(otherClassWarningData.ToString());
                         if (otherClassWarningData.numFasterCars > 1)
                         {
+                            this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
                             if (otherClassWarningData.fasterCarsIncludeClassLeader)
                             {
                                 if (otherClassWarningData.fasterCarsRacingForPosition)
@@ -1059,6 +1064,7 @@ namespace CrewChiefV4.Events
                         }
                         else if (otherClassWarningData.numFasterCars == 1)
                         {
+                            this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
                             if (otherClassWarningData.fasterCarsIncludeClassLeader)
                             {
                                 if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
@@ -1081,6 +1087,7 @@ namespace CrewChiefV4.Events
                         }
                         if (otherClassWarningData.numSlowerCars > 1)
                         {
+                            this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
                             if (otherClassWarningData.slowerCarsIncludeClassLeader)
                             {
                                 if (otherClassWarningData.slowerCarsRacingForPosition)
@@ -1105,6 +1112,7 @@ namespace CrewChiefV4.Events
                         }
                         else if (otherClassWarningData.numSlowerCars == 1)
                         {
+                            this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
                             if (otherClassWarningData.slowerCarsIncludeClassLeader)
                             {
                                 if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
@@ -1146,9 +1154,12 @@ namespace CrewChiefV4.Events
             public Boolean slowerCarsRacingForPosition;
             public Boolean fasterCarIsRacingPlayerForPosition = false;
             public Boolean slowerCarIsRacingPlayerForPosition = false;
+            public HashSet<string> fasterCarDriverNames;
+            public HashSet<string> slowerCarDriverNames;
 
             public OtherCarClassWarningData(int numFasterCars, int numSlowerCars, Boolean fasterCarsIncludeClassLeader, Boolean slowerCarsIncludeClassLeader,
-                Boolean fasterCarsRacingForPosition, Boolean slowerCarsRacingForPosition, Boolean fasterCarIsRacingPlayerForPosition, Boolean slowerCarIsRacingPlayerForPosition)
+                Boolean fasterCarsRacingForPosition, Boolean slowerCarsRacingForPosition, Boolean fasterCarIsRacingPlayerForPosition, Boolean slowerCarIsRacingPlayerForPosition,
+                HashSet<string> fasterCarDriverNames, HashSet<string> slowerCarDriverNames)
             {
                 this.numFasterCars = numFasterCars;
                 this.numSlowerCars = numSlowerCars;
@@ -1158,13 +1169,19 @@ namespace CrewChiefV4.Events
                 this.slowerCarsRacingForPosition = slowerCarsRacingForPosition;
                 this.fasterCarIsRacingPlayerForPosition = fasterCarIsRacingPlayerForPosition;
                 this.slowerCarIsRacingPlayerForPosition = slowerCarIsRacingPlayerForPosition;
+                this.fasterCarDriverNames = fasterCarDriverNames;
+                this.slowerCarDriverNames = slowerCarDriverNames;
             }
 
             // checks if the current warning data is consistent with the previous warning data. Bit of a hack but lets see how it goes...
-            public Boolean canAnnounce(OtherCarClassWarningData previousOtherCarClassWarningData)
+            public Boolean canAnnounce(OtherCarClassWarningData previousOtherCarClassWarningData, HashSet<string> fasterDriversAtLastAnnouncement,
+                HashSet<string> slowerDriversAtLastAnnouncement)
             {
-                return (this.numFasterCars > 0 && previousOtherCarClassWarningData.numFasterCars > 0) ||
-                    (this.numSlowerCars > 0 && previousOtherCarClassWarningData.numSlowerCars > 0);
+                Boolean newFasterDriverToWarnAbout = fasterCarDriverNames.Except(fasterDriversAtLastAnnouncement).Any();
+                Boolean newSlowerDriverToWarnAbout = slowerCarDriverNames.Except(slowerDriversAtLastAnnouncement).Any();
+                return ((this.numFasterCars > 0 && previousOtherCarClassWarningData.numFasterCars > 0) ||
+                    (this.numSlowerCars > 0 && previousOtherCarClassWarningData.numSlowerCars > 0)) &&
+                    (newFasterDriverToWarnAbout || newSlowerDriverToWarnAbout);
             }
 
             public override string ToString()
@@ -1207,6 +1224,9 @@ namespace CrewChiefV4.Events
             // or a slower car is immediately ahead of us on track and is immediately ahead of us overall
             Boolean fasterCarIsRacingPlayerForPosition = false;
             Boolean slowerCarIsRacingPlayerForPosition = false;
+            HashSet<string> fasterCarDriverNames = new HashSet<string>();
+            HashSet<string> slowerCarDriverNames = new HashSet<string>();
+
             foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
             {
                 if (CarData.IsCarClassEqual(opponentData.CarClass, currentGameState.carClass) ||
@@ -1229,6 +1249,7 @@ namespace CrewChiefV4.Events
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
+                    fasterCarDriverNames.Add(opponentData.DriverRawName);
                     if (opponentData.ClassPosition == 1)
                     {
                         fasterCarsIncludeClassLeader = true;
@@ -1264,8 +1285,8 @@ namespace CrewChiefV4.Events
                 else if (!isFaster && separation > -400 && separation < -100)
                 {
                     // player is behind a slower class car
-                    // player is ahead of a faster class car
                     numSlowerCars++;
+                    slowerCarDriverNames.Add(opponentData.DriverRawName);
                     if (opponentData.ClassPosition == 1)
                     {
                         slowerCarsIncludeClassLeader = true;
@@ -1300,7 +1321,8 @@ namespace CrewChiefV4.Events
                 }
             }
             return new OtherCarClassWarningData(numFasterCars, numSlowerCars, fasterCarsIncludeClassLeader, slowerCarsIncludeClassLeader,
-                fasterCarsRacingForPosition, slowerCarsRacingForPosition, fasterCarIsRacingPlayerForPosition, slowerCarIsRacingPlayerForPosition);
+                fasterCarsRacingForPosition, slowerCarsRacingForPosition, fasterCarIsRacingPlayerForPosition, slowerCarIsRacingPlayerForPosition,
+                fasterCarDriverNames, slowerCarDriverNames);
         }
     }
 }
