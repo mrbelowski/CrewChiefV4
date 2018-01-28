@@ -1032,7 +1032,6 @@ namespace CrewChiefV4.Events
                 else
                 {
                     // TODO: THIS LOGIC FOR CHECKING THE STATE HAS CHANGED BEFORE ANNOUNCING IS BOLLOCKS
-
                     // check if this data is consistent with the previous data and that we've not warned about all these cars
                     if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData, driverNamesForFasterClassLastWarnedAbout, driverNamesForSlowerClassLastWarnedAbout))
                     {
@@ -1047,19 +1046,23 @@ namespace CrewChiefV4.Events
                                 if (otherClassWarningData.fasterCarsRacingForPosition)
                                 {
                                     Console.WriteLine("FASTER CARS BEHIND INCLUDING THE CLASS LEADER, THEY'RE RACING FOR POSITION");
+                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 0, this));
                                 }
                                 else
                                 {
                                     Console.WriteLine("FASTER CARS BEHIND INCLUDING THE CLASS LEADER");
+                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this));
                                 }
                             }
                             else if (otherClassWarningData.fasterCarsRacingForPosition)
                             {
                                 Console.WriteLine("FASTER CARS BEHIND, THEY'RE RACING EACH OTHER FOR POSITION");
+                                audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindFighting, 0, this));
                             }
                             else
                             {
                                 Console.WriteLine("FASTER CARS BEHIND");
+                                audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehind, 0, this));
                             }
                             // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
                             // cars in the group are racing the player for position. Do we need to fix this in the OtherCarClassWarningData data?
@@ -1072,19 +1075,23 @@ namespace CrewChiefV4.Events
                                 if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                 {
                                     Console.WriteLine("LEADER FROM FASTER CLASS RACING PLAYER FOR POSITION BEHIND - NO BLUE FLAG");
+                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 0, this));
                                 }
                                 else
                                 {
                                     Console.WriteLine("LEADER FROM FASTER CLASS BEHIND");
+                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this));
                                 }
                             }
                             else if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                             {
                                 Console.WriteLine("FASTER CAR RACING PLAYER FOR POSITION BEHIND - NO BLUE FLAG");
+                                audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this));
                             }
                             else
                             {
                                 Console.WriteLine("FASTER CAR BEHIND");
+                                audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehind, 0, this));
                             }
                         }
                         if (otherClassWarningData.numSlowerCars > 1)
@@ -1095,19 +1102,23 @@ namespace CrewChiefV4.Events
                                 if (otherClassWarningData.slowerCarsRacingForPosition)
                                 {
                                     Console.WriteLine("SLOWER CARS AHEAD INCLUDING THE CLASS LEADER, THEY'RE RACING FOR POSITION");
+                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 0, this));
                                 }
                                 else
                                 {
                                     Console.WriteLine("SLOWER CARS AHEAD INCLUDING THE CLASS LEADER");
+                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this));
                                 }
                             }
                             else if (otherClassWarningData.slowerCarsRacingForPosition)
                             {
                                 Console.WriteLine("SLOWER CARS AHEAD, THEY'RE RACING EACH OTHER FOR POSITION");
+                                audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this));
                             }
                             else
                             {
                                 Console.WriteLine("SLOWER CARS AHEAD");
+                                audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAhead, 0, this));
                             }
                             // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
                             // cars in the group are racing the player for position. Do we need to fix this in the OtherCarClassWarningData data?
@@ -1119,25 +1130,29 @@ namespace CrewChiefV4.Events
                             {
                                 if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                 {
-                                    Console.WriteLine("EADER FROM SLOWER CLASS RACING PLAYER FOR POSITION AHEAD - NO BLUE FLAG");
+                                    Console.WriteLine("LEADER FROM SLOWER CLASS RACING PLAYER FOR POSITION AHEAD - NO BLUE FLAG");
+                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 0, this));
                                 }
                                 else
                                 {
                                     Console.WriteLine("LEADER FROM SLOWER CLASS AHEAD");
+                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this));
                                 }
                             }
                             else if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                             {
                                 Console.WriteLine("SLOWER CAR RACING PLAYER FOR POSITION AHEAD - NO BLUE FLAG");
+                                audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this));
                             }
                             else
                             {
                                 Console.WriteLine("SLOWER CAR AHEAD");
+                                audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAhead, 0, this));
                             }
                         }
                     }
-                    // now wait a while before checking again - how long should we wait here?
-                    nextCheckForOtherCarClasses = currentGameState.Now.Add(TimeSpan.FromMinutes(1));                    
+                    // now wait a while before checking again - how long should we wait here? What if the 'canAnnounce' check fails?
+                    nextCheckForOtherCarClasses = currentGameState.Now.Add(TimeSpan.FromSeconds(30));                    
                 }
             }
             else
@@ -1193,7 +1208,9 @@ namespace CrewChiefV4.Events
                     " num slower cars closing = " + numSlowerCars + " slower cars battling for position = " +
                     slowerCarsRacingForPosition + " slower cars include class leader = " + slowerCarsIncludeClassLeader +
                     " faster car is racing player for position = " + fasterCarIsRacingPlayerForPosition +
-                    " slower car is racing player for position = " + slowerCarIsRacingPlayerForPosition;
+                    " slower car is racing player for position = " + slowerCarIsRacingPlayerForPosition + 
+                    " fasterCarDriverNames = " + String.Join(", ", fasterCarDriverNames) +
+                    " slowerCarDriverNames = " + String.Join(", ", slowerCarDriverNames);
             }
         }
 
