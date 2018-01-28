@@ -169,7 +169,7 @@ namespace CrewChiefV4.GameState
         // filters race position changes by delaying them a short time to prevent bouncing and noise interferring with event logic
         protected int getRacePosition(String driverName, int oldPosition, int newPosition, DateTime now)
         {
-            if (oldPosition < 1)
+            if (driverName == null || oldPosition < 1)
             {
                 return newPosition;
             }
