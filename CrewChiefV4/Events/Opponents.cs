@@ -210,9 +210,15 @@ namespace CrewChiefV4.Events
                 return;
             }
             this.currentGameState = currentGameState;
-            if (currentGameState.Now > nextCheckForOtherCarClasses)
+            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.Now > nextCheckForOtherCarClasses)
             {
                 OtherCarClassWarningData otherClassWarningData = getOtherCarClassWarningData(currentGameState);
+                if (otherClassWarningData != null && (otherClassWarningData.numFasterCars > 0 || otherClassWarningData.numSlowerCars > 0))
+                {
+                    // TODO: we'll see this data a lot, need to decide carefully when and how to use it otherwise we'll be spamming messages
+                    Console.WriteLine(otherClassWarningData.ToString());
+                }
+                nextCheckForOtherCarClasses = currentGameState.Now.Add(timeBetweenOtherClassChecks);
             }
             // skip the lap time checks and stuff under yellow:
             if (currentGameState.SessionData.SessionPhase != SessionPhase.FullCourseYellow)
@@ -1010,6 +1016,14 @@ namespace CrewChiefV4.Events
                 this.fasterCarsRacingForPosition = fasterCarsRacingForPosition;
                 this.slowerCarsRacingForPosition = slowerCarsRacingForPosition;
             }
+
+            public override string ToString()
+            {
+                return "num faster cars closing = " + numFasterCars + " faster cars battling for position = " +
+                    fasterCarsRacingForPosition + " faster cars include class leader = " + fasterCarsIncludeClassLeader +
+                    "num slower cars closing = " + numSlowerCars + " slower cars battling for position = " +
+                    slowerCarsRacingForPosition + " slower cars include class leader = " + slowerCarsIncludeClassLeader;
+            }
         }
 
         // to be called every couple of seconds, not every tick
@@ -1027,6 +1041,7 @@ namespace CrewChiefV4.Events
             float playerDistanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             float playerBestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
             float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
+            float halfTrackLength = trackLength / 2f;
 
             int numFasterCars = 0;
             int numSlowerCars = 0;
@@ -1045,15 +1060,14 @@ namespace CrewChiefV4.Events
                 }
                 Boolean isFaster = playerBestLap - opponentData.CurrentBestLapTime > 0;
                 // separation is +ve when the player is in front, -ve when he's behind
-                float separation;
-                float opponentDistanceRoundTrack = opponentData.DistanceRoundTrack;
-                if (playerDistanceRoundTrack > opponentDistanceRoundTrack)
+                float separation = playerDistanceRoundTrack - opponentData.DistanceRoundTrack;
+                if (separation > halfTrackLength)
                 {
-                    separation = playerDistanceRoundTrack - opponentDistanceRoundTrack;
+                    separation = trackLength - separation;
                 }
-                else
+                else if (separation < -1 * halfTrackLength)
                 {
-                    separation = playerDistanceRoundTrack + trackLength - opponentDistanceRoundTrack;
+                    separation = trackLength + separation;
                 }
                 if (isFaster && separation < 400 && separation > 100)
                 {
