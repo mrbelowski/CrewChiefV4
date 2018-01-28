@@ -1831,7 +1831,8 @@ namespace CrewChiefV4.GameState
     public class DeltaTime
     {
         public Dictionary<float, DateTime> deltaPoints =  new Dictionary<float, DateTime>();
-        // this array holds the keyset of the above dictionary:
+        public Dictionary<float, float> speedTrapPoints = new Dictionary<float, float>();
+        // this array holds the keyset of the above dictionaries:
         private float[] deltaPointsKeysArray = new float[] {};
 
         public float currentDeltaPoint = -1;
@@ -1841,8 +1842,7 @@ namespace CrewChiefV4.GameState
         public int lapsCompleted = -1;
         public float trackLength = 0;
         public DeltaTime()
-        {            
-            this.deltaPoints = new Dictionary<float, DateTime>();
+        {
             this.currentDeltaPoint = -1;
             this.nextDeltaPoint = -1;
             this.distanceRoundTrackOnCurrentLap = -1;
@@ -1854,7 +1854,6 @@ namespace CrewChiefV4.GameState
         {
             this.distanceRoundTrackOnCurrentLap = distanceRoundTrackOnCurrentLap;
             this.totalDistanceTravelled = distanceRoundTrackOnCurrentLap;
-            this.deltaPoints = new Dictionary<float, DateTime>();
             this.trackLength = trackLength;
             float totalSpacing = 0;
             while (totalSpacing < trackLength)
@@ -1863,12 +1862,14 @@ namespace CrewChiefV4.GameState
                 if (totalSpacing == 0)
                 {
                     deltaPoints.Add(totalSpacing, now);
+                    speedTrapPoints.Add(totalSpacing, 0);
                 }
                 totalSpacing += spacing;
                 Boolean addedDeltaPoint = false;
                 if (totalSpacing < trackLength - spacing)
                 {
                     deltaPoints.Add(totalSpacing, now);
+                    speedTrapPoints.Add(totalSpacing, 0);
                     addedDeltaPoint = true;
                 }
                 if (distanceRoundTrackOnCurrentLap >= totalSpacing)
@@ -1889,11 +1890,6 @@ namespace CrewChiefV4.GameState
             this.lapsCompleted = lapsCompleted;
             this.totalDistanceTravelled = (lapsCompleted * this.trackLength) + distanceRoundTrackOnCurrentLap;
 
-            // JB: this lambda expression is significantly slower than the expanded equivalent below:
-            //
-            // nextDeltaPoint = deltaPoints.FirstOrDefault(d => d.Key >= distanceRoundTrackOnCurrentLap).Key;
-
-            // expanded equivalent:
             float deltaPoint = 0;
             foreach (float key in deltaPointsKeysArray)
             {
@@ -1909,6 +1905,7 @@ namespace CrewChiefV4.GameState
             if (currentDeltaPoint != nextDeltaPoint || speed < 5)
             {
                 deltaPoints[nextDeltaPoint] = now;
+                speedTrapPoints[nextDeltaPoint] = speed;
                 currentDeltaPoint = nextDeltaPoint;
             }
         }
