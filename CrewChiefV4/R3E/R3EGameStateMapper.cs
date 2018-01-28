@@ -81,14 +81,6 @@ namespace CrewChiefV4.RaceRoom
         private Boolean useImprovisedBlueFlagDetection = true;
         private int blueFlagDetectionDistance = UserSettings.GetUserSettings().getInt("r3e_blue_flag_detection_distance");
 
-        // now we're much stricter with the bollocks opponents data (duplicates, missing entries, stuff randomly being given the wrong
-        // slot_id), can we remove this grotty delayed-position hack and all the associated crap it creates? Turns out that no, we can't. 
-        // The data are broken and unreliable in multiple ways - the opponent data get jumbled up, and the data *within each opponent slot*
-        // get jumbled up too. Can't criticise too strongly though, there's no shortage of shit code right here...
-        private Boolean trustGamePositionChanges = true;
-        private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
-        private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
-
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(2);
@@ -534,8 +526,9 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
             currentGameState.SessionData.NumCarsOverall = shared.NumCars;
 
-            currentGameState.SessionData.OverallPosition = trustGamePositionChanges ? shared.Position : 
-                getRacePosition(currentGameState.SessionData.DriverRawName, currentGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now);
+            currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null ?
+                getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now)
+                : shared.Position;
             // currentGameState.SessionData.Position = shared.Position;
             currentGameState.SessionData.TimeDeltaBehind = shared.TimeDeltaBehind;
             currentGameState.SessionData.TimeDeltaFront = shared.TimeDeltaFront;
@@ -818,8 +811,9 @@ namespace CrewChiefV4.RaceRoom
                                 sectorTime = participantStruct.SectorTimeCurrentSelf.Sector2;
                             }
 
-                            int currentOpponentRacePosition = trustGamePositionChanges ? participantStruct.Place :
-                                getRacePosition(driverName, previousOpponentPosition, participantStruct.Place, currentGameState.Now);
+                            int currentOpponentRacePosition = currentGameState.SessionData.SessionType == SessionType.Race && previousOpponentPosition > 0 ?
+                                getRacePosition(driverName, previousOpponentPosition, participantStruct.Place, currentGameState.Now)
+                                : participantStruct.Place;
                             //int currentOpponentRacePosition = participantStruct.place;
                             int currentOpponentLapsCompleted = participantStruct.CompletedLaps;
                             int currentOpponentSector = participantStruct.TrackSector;
@@ -1295,58 +1289,6 @@ namespace CrewChiefV4.RaceRoom
                 lastTimeEngineWasRunning = DateTime.MaxValue;
             }            
             return currentGameState;
-        }
-
-        private int getRacePosition(String driverName, int oldPosition, int newPosition, DateTime now)
-        {
-            if (oldPosition < 1)
-            {
-                return newPosition;
-            }
-            if (newPosition < 1)
-            {
-                Console.WriteLine("Can't update position to " + newPosition);
-                return oldPosition;
-            }
-            if (oldPosition == newPosition)
-            {
-                // clear any pending position change
-                if (PendingRacePositionChanges.ContainsKey(driverName))
-                {
-                    PendingRacePositionChanges.Remove(driverName);
-                }
-                return oldPosition;
-            }
-            else if (PendingRacePositionChanges.ContainsKey(driverName))
-            {
-                PendingRacePositionChange pendingRacePositionChange = PendingRacePositionChanges[driverName];
-                if (newPosition == pendingRacePositionChange.newPosition)
-                {
-                    // R3E is still reporting this driver is in the same race position, see if it's been long enough...
-                    if (now > pendingRacePositionChange.positionChangeTime + PositionChangeLag)
-                    {
-                        int positionToReturn = newPosition;
-                        PendingRacePositionChanges.Remove(driverName);
-                        return positionToReturn;
-                    }
-                    else
-                    {
-                        return oldPosition;
-                    }
-                }
-                else
-                {
-                    // the new position is not consistent with the pending position change, bit of an edge case here
-                    pendingRacePositionChange.newPosition = newPosition;
-                    pendingRacePositionChange.positionChangeTime = now;
-                    return oldPosition;
-                }
-            }
-            else
-            {
-                PendingRacePositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now));
-                return oldPosition;
-            }
         }
 
         private TyreType mapToTyreType(int tire_type_front, int tire_sub_type_front, int tire_type_rear, int tire_sub_type_rear, CarData.CarClassEnum carClass)
