@@ -11,7 +11,7 @@ namespace CrewChiefV4.GameState
 
         // in race sessions, delay position changes to allow things to settle. This is game-dependent
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
-        private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(500);
+        private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
         class PendingRacePositionChange
         {
             public int newPosition;
