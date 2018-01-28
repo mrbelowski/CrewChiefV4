@@ -54,6 +54,26 @@ namespace CrewChiefV4.Events
         public static String folderLicenseR = "licence/r_licence";
         public static String folderLicensePro = "licence/pro_licence";
 
+        // warnings about other classes
+        private String folderFasterCarsFightingBehindIncludingClassLeader = "opponents/faster_cars_fighting_behind_including_class_leader";
+        private String folderFasterCarsBehindIncludingClassLeader = "opponents/folder_faster_cars_behind_including_class_leader";
+        private String folderFasterCarsBehindFighting = "opponents/folder_faster_cars_behind_fighting";
+        private String folderFasterCarsBehind = "opponents/folder_faster_cars_behind";
+        private String folderFasterCarBehindRacingPlayerForPositionIsClassLeader = "opponents/folder_faster_car_behind_racing_player_for_position_is_class_leader"; // this one's a mouth-full :(
+        private String folderFasterCarBehindIsClassLeader = "opponents/folder_faster_car_behind_is_class_leader";
+        private String folderFasterCarBehindRacingPlayerForPosition = "opponents/folder_faster_car_behind_racing_player_for_position";
+        private String folderFasterCarBehind = "opponents/folder_faster_car_behind";
+
+        private String folderSlowerCarsFightingAheadIncludingClassLeader = "opponents/folder_slower_cars_fighting_ahead_including_class_leader";
+        private String folderSlowerCarsAheadIncludingClassLeader = "opponents/folder_slower_cars_ahead_including_class_leader";
+        private String folderSlowerCarsAheadFighting = "opponents/folder_slower_cars_ahead_fighting";
+        private String folderSlowerCarsAhead = "opponents/folder_slower_cars_ahead";
+        private String folderSlowerCarAheadRacingPlayerForPositionIsClassLeader = "opponents/folder_slower_car_ahead_racing_player_for_position_is_class_leader";
+        private String folderSlowerCarAheadClassLeader = "opponents/folder_slower_car_ahead_class_leader";
+        private String folderSlowerCarAheadRacingPlayerForPosition = "opponents/folder_slower_car_ahead_racing_player_for_position";
+        private String folderSlowerCarAhead = "opponents/folder_slower_car_ahead";
+        //
+
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
         private int frequencyOfOpponentPracticeAndQualLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_practice_and_qual_lap_times");
 
