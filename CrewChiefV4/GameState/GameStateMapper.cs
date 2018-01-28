@@ -9,6 +9,20 @@ namespace CrewChiefV4.GameState
     {
         protected SpeechRecogniser speechRecogniser;
 
+        // in race sessions, delay position changes to allow things to settle. This is game-dependent
+        private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
+        private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(500);
+        class PendingRacePositionChange
+        {
+            public int newPosition;
+            public DateTime positionChangeTime;
+            public PendingRacePositionChange(int newPosition, DateTime positionChangeTime)
+            {
+                this.newPosition = newPosition;
+                this.positionChangeTime = positionChangeTime;
+            }
+        }
+
         /** May return null if the game state raw data is considered invalid */
         public abstract GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState);
 
@@ -149,6 +163,59 @@ namespace CrewChiefV4.GameState
             if (!currentGameState.SessionData.IsRacingSameCarBehind)
             {
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
+            }
+        }
+
+        // filters race position changes by delaying them a short time to prevent bouncing and noise interferring with event logic
+        protected int getRacePosition(String driverName, int oldPosition, int newPosition, DateTime now)
+        {
+            if (oldPosition < 1)
+            {
+                return newPosition;
+            }
+            if (newPosition < 1)
+            {
+                Console.WriteLine("Can't update position to " + newPosition);
+                return oldPosition;
+            }
+            if (oldPosition == newPosition)
+            {
+                // clear any pending position change
+                if (PendingRacePositionChanges.ContainsKey(driverName))
+                {
+                    PendingRacePositionChanges.Remove(driverName);
+                }
+                return oldPosition;
+            }
+            else if (PendingRacePositionChanges.ContainsKey(driverName))
+            {
+                PendingRacePositionChange pendingRacePositionChange = PendingRacePositionChanges[driverName];
+                if (newPosition == pendingRacePositionChange.newPosition)
+                {
+                    // R3E is still reporting this driver is in the same race position, see if it's been long enough...
+                    if (now > pendingRacePositionChange.positionChangeTime + PositionChangeLag)
+                    {
+                        int positionToReturn = newPosition;
+                        PendingRacePositionChanges.Remove(driverName);
+                        return positionToReturn;
+                    }
+                    else
+                    {
+                        return oldPosition;
+                    }
+                }
+                else
+                {
+                    // the new position is not consistent with the pending position change, bit of an edge case here
+                    pendingRacePositionChange.newPosition = newPosition;
+                    pendingRacePositionChange.positionChangeTime = now;
+                    return oldPosition;
+                }
+            }
+            else
+            {
+                PendingRacePositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now));
+                return oldPosition;
             }
         }
     }
