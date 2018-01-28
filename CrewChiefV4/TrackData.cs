@@ -405,6 +405,12 @@ namespace CrewChiefV4
 
         public static TrackLandmarksData TRACK_LANDMARKS_DATA;
 
+        // very long track = anything more than 20000 metres, long = anything more than 10000 metres, short track = anything less than 1 mile (1600 metres),
+        // medium = everything else 
+        // This allows a quick sanity check of some messages without having to fart about with track length. Expected use (to be done...)
+        // is when checking how many laps to wait for enabling some messages like gaps and laps
+        public enum TrackLengthClass { SHORT, MEDIUM, LONG, VERY_LONG }
+
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
             new TrackDefinition("Autodromo Nazionale Monza:Grand Prix", 3, 5782.521f, new float[] {22.20312f, -437.1672f}, new float[] {63.60915f, -1.117797f}),
@@ -712,11 +718,13 @@ namespace CrewChiefV4
         public Boolean isOval = false;
         // this is the distance round the track where we save the opponent's race position before he slows for pit entry
         public float distanceForNearPitEntryChecks;
+        public TrackData.TrackLengthClass trackLengthClass = TrackData.TrackLengthClass.MEDIUM;
 
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
             this.name = name;
             this.trackLength = trackLength;
+            this.trackLengthClass = getLengthClass(trackLength);
             // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
             this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = true;
@@ -729,6 +737,7 @@ namespace CrewChiefV4
         {
             this.name = name;
             this.trackLength = trackLength;
+            this.trackLengthClass = getLengthClass(trackLength);
             // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
             this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = false;
@@ -739,6 +748,7 @@ namespace CrewChiefV4
             this.name = name;
             this.id = id;
             this.trackLength = trackLength;
+            this.trackLengthClass = getLengthClass(trackLength);
             // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
             this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = false;
@@ -748,11 +758,29 @@ namespace CrewChiefV4
         {
             this.name = name;
             this.trackLength = trackLength;
+            this.trackLengthClass = getLengthClass(trackLength);
             // hard-code this to 300metres before start line for now, but it needs to be overrideable on a per-track basis
             this.distanceForNearPitEntryChecks = trackLength - 300;
             this.hasPitLane = true;
             this.sectorsOnTrack = sectorsOnTrack;
             this.sectorPoints = sectorPoints;
+        }
+
+        private TrackData.TrackLengthClass getLengthClass(float length)
+        {
+            if (length > 20000)
+            {
+                return TrackData.TrackLengthClass.VERY_LONG;
+            }
+            if (length > 10000)
+            {
+                return TrackData.TrackLengthClass.LONG;
+            }
+            if (length < 1600)
+            {
+                return TrackData.TrackLengthClass.SHORT;
+            }
+            return TrackData.TrackLengthClass.MEDIUM;
         }
 
         public void setGapPoints()
