@@ -1031,6 +1031,8 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
+                    // TODO: THIS LOGIC FOR CHECKING THE STATE HAS CHANGED BEFORE ANNOUNCING IS BOLLOCKS
+
                     // check if this data is consistent with the previous data and that we've not warned about all these cars
                     if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData, driverNamesForFasterClassLastWarnedAbout, driverNamesForSlowerClassLastWarnedAbout))
                     {
@@ -1133,9 +1135,9 @@ namespace CrewChiefV4.Events
                                 Console.WriteLine("SLOWER CAR AHEAD");
                             }
                         }
-                        // now wait a while before checking again - how long should we wait here?
-                        nextCheckForOtherCarClasses = currentGameState.Now.Add(TimeSpan.FromMinutes(1));
                     }
+                    // now wait a while before checking again - how long should we wait here?
+                    nextCheckForOtherCarClasses = currentGameState.Now.Add(TimeSpan.FromMinutes(1));                    
                 }
             }
             else
