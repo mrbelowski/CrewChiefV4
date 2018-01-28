@@ -181,7 +181,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
                 if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
-                     && playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall))
+                     && playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0)
                 {
                     currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
                     Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
@@ -566,10 +566,11 @@ namespace CrewChiefV4.iRacing
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
 
             //experimantal
-            if((playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall) && previousGameState != null && previousGameState.PitData.PitBoxPositionEstimate == -1) ||
-                (playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall) && previousGameState != null && Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 10))
-            {                
-                previousGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+            if((playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null && previousGameState.PitData.PitBoxPositionEstimate == -1) ||
+                (playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null &&
+                Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 10 && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0))
+            {
+                currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
                 Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
             }
 
