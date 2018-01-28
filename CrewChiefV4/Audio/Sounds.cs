@@ -455,13 +455,15 @@ namespace CrewChiefV4.Audio
                     while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
                     {
                         String soundToPurgeValue = soundToPurge.Value;
-                        if (soundSets.ContainsKey(soundToPurgeValue))
+                        SoundSet soundSet = null;
+                        SingleSound singleSound = null;
+                        if (soundSets.TryGetValue(soundToPurgeValue, out soundSet))
                         {
-                            purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                            purgeCount += soundSet.UnLoadAll();
                         }
-                        else if (singleSounds.ContainsKey(soundToPurgeValue))
+                        else if (singleSounds.TryGetValue(soundToPurgeValue, out singleSound))
                         {
-                            if (singleSounds[soundToPurgeValue].UnLoad())
+                            if (singleSound.UnLoad())
                             {
                                 purgeCount++;
                             }
@@ -811,9 +813,9 @@ namespace CrewChiefV4.Audio
                                 Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER);
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
-                                    if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
-                                    {                                       
-                                        SoundSet additionalSoundSet = SoundCache.soundSets[prefixSuffixName];
+                                    SoundSet additionalSoundSet = null;
+                                    if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.TryGetValue(prefixSuffixName, out additionalSoundSet))
+                                    {
                                         if (additionalSoundSet.hasSounds)
                                         {
                                             hasPrefixOrSuffix = true;
