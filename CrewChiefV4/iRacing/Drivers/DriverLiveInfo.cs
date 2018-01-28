@@ -57,7 +57,7 @@ namespace CrewChiefV4.iRacing
         public void ParseTelemetry(iRacingData e)
         {   
                      
-            this.LapDistance = e.CarIdxLapDistPct[this.Driver.Id];
+            this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
             this.Lap = e.CarIdxLap[this.Driver.Id];
 
             if (this._prevSector == 3 && (this.CurrentSector == 1))
@@ -73,7 +73,7 @@ namespace CrewChiefV4.iRacing
                 this._prevSector = this.CurrentSector;
             }
 
-            this.CorrectedLapDistance = FixPercentagesOnLapChange(e.CarIdxLapDistPct[this.Driver.Id]);
+            this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
             this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
             if (this.LapsCompleted < 0)
             {
@@ -103,7 +103,7 @@ namespace CrewChiefV4.iRacing
             else
                 _prevLap = this.Lap;
 
-            return carIdxLapDistPct;
+            return Math.Abs(carIdxLapDistPct);
         }
 
         public void CalculateSpeed(iRacingData telemetry, double? trackLengthKm)

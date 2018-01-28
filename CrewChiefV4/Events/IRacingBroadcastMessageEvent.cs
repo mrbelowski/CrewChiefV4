@@ -316,6 +316,21 @@ namespace CrewChiefV4.Events
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                 return;
             }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_LEFT_SIDE_TYRES))
+            {
+                ChangeTire(PitCommandModeTypes.LF, lastColdRRPressure);
+                ChangeTire(PitCommandModeTypes.LR, lastColdRRPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_RIGHT_SIDE_TYRES))
+            {
+                ChangeTire(PitCommandModeTypes.RF, lastColdRRPressure);
+                ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                return;
+            }
+
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MANY_INCIDENT_POINTS))
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", MessageContents(folderYouHave, incidentsCount, folderincidents), 0, null));

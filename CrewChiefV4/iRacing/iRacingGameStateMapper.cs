@@ -178,7 +178,20 @@ namespace CrewChiefV4.iRacing
                 }
 
                 currentGameState.PitData.InPitlane = shared.Telemetry.OnPitRoad;
-                currentGameState.PositionAndMotionData.DistanceRoundTrack = playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength;
+                currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
+
+                if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
+                     && playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall))
+                {
+                    currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                    Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                }
+                else if (previousGameState != null)
+                {
+                    // if we're entering a race session or rolling qually, copy the value from the previous field
+                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
+                }
+
                 //TODO update car classes
                 currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                 CarData.IRACING_CLASS_ID = playerCar.Car.CarClassId;
@@ -253,6 +266,7 @@ namespace CrewChiefV4.iRacing
                             currentGameState.OpponentData = previousGameState.OpponentData;
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
+                            currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
                         }
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
 
@@ -309,6 +323,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
                     currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
                     currentGameState.PitData.NumPitStops = previousGameState.PitData.NumPitStops;
+                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
                     currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
@@ -543,13 +558,20 @@ namespace CrewChiefV4.iRacing
 
             }
 
-            currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance;
+            currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance);
             currentGameState.PositionAndMotionData.CarSpeed = (float)shared.Telemetry.Speed;
 
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
 
+            //experimantal
+            if((playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall) && previousGameState != null && previousGameState.PitData.PitBoxPositionEstimate == -1) ||
+                playerCar.Live.TrackSurface.HasFlag(TrackSurfaces.InPitStall) && previousGameState != null && Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 10)
+            {                
+                previousGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+            }
 
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
                 (float)playerCar.Live.Speed, currentGameState.Now);
