@@ -382,6 +382,7 @@ namespace CrewChiefV4
             this.playbackInterval.Name = "playbackInterval";
             this.playbackInterval.Size = new System.Drawing.Size(100, 20);
             this.playbackInterval.TabIndex = 26;
+            this.playbackInterval.TextChanged += new System.EventHandler(this.playbackIntervalChanged);
             // 
             // app_version
             // 

@@ -93,6 +93,8 @@ namespace CrewChiefV4
         public static Boolean viewingReplay = false;
         public static float distanceRoundTrack = -1;
 
+        public static int playbackIntervalMilliseconds = 0;
+
         private Object latestRawGameData;
 
         public CrewChief()
@@ -604,24 +606,14 @@ namespace CrewChiefV4
             return this.spotter.getGridSide(this.latestRawGameData);
         }
 
-        public Boolean Run(String filenameToRun, int interval, Boolean dumpToFile)
+        public Boolean Run(String filenameToRun, Boolean dumpToFile)
         {
             loadDataFromFile = false;
             audioPlayer.mute = false;
-            if (filenameToRun != null && CrewChief.Debugging)
+            if (filenameToRun != null)
             {
                 loadDataFromFile = true;
                 GlobalBehaviourSettings.spotterEnabled = false;
-                if (interval > 0)
-                {
-                    _timeInterval = TimeSpan.FromMilliseconds(interval);
-                    audioPlayer.mute = false;
-                }
-                else
-                {
-                    _timeInterval = TimeSpan.Zero;
-                    audioPlayer.mute = true;
-                }
                 dumpToFile = false;
             }
             SpeechRecogniser.waitingForSpeech = false;
@@ -664,6 +656,19 @@ namespace CrewChiefV4
                 {
                     // ensure the updates don't get synchronised with the spotter / UDP receiver
                     int updateTweak = Utilities.random.Next(10) - 5;
+                    if (filenameToRun != null)
+                    {
+                        if (CrewChief.playbackIntervalMilliseconds > 0)
+                        {
+                            _timeInterval = TimeSpan.FromMilliseconds(CrewChief.playbackIntervalMilliseconds);
+                            audioPlayer.mute = false;
+                        }
+                        else
+                        {
+                            _timeInterval = TimeSpan.Zero;
+                            audioPlayer.mute = true;
+                        }
+                    }
                     nextRunTime = DateTime.Now.Add(_timeInterval);
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
                     if (!loadDataFromFile)
