@@ -405,11 +405,11 @@ namespace CrewChiefV4
 
         public static TrackLandmarksData TRACK_LANDMARKS_DATA;
 
-        // very long track = anything more than 20000 metres, long = anything more than 10000 metres, short track = anything less than 1 mile (1600 metres),
-        // medium = everything else 
+        // very long track = anything more than 20000 metres, long = anything more than 10000 metres, short track = anything less than 1.5 mile (2400 metres),
+        // very short track = anything less than 1000 metres, medium = everything else 
         // This allows a quick sanity check of some messages without having to fart about with track length. Expected use (to be done...)
         // is when checking how many laps to wait for enabling some messages like gaps and laps
-        public enum TrackLengthClass { SHORT, MEDIUM, LONG, VERY_LONG }
+        public enum TrackLengthClass { VERY_SHORT, SHORT, MEDIUM, LONG, VERY_LONG }
 
         public static List<TrackDefinition> pCarsTracks = new List<TrackDefinition>()
         {
@@ -776,7 +776,11 @@ namespace CrewChiefV4
             {
                 return TrackData.TrackLengthClass.LONG;
             }
-            if (length < 1600)
+            if (length < 1000)
+            {
+                return TrackData.TrackLengthClass.VERY_SHORT;
+            }
+            if (length < 2400)
             {
                 return TrackData.TrackLengthClass.SHORT;
             }
