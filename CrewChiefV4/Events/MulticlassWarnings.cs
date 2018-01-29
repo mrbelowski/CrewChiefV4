@@ -291,25 +291,25 @@ namespace CrewChiefV4.Events
                         // try to estimate how important this warning might be
                         if (numSlowerCars == 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarIsRacingPlayerForPosition ||
-                                timeOfLastSingleCarSlowerClassWarning + TimeSpan.FromMinutes(2) > now))
+                                now > timeOfLastSingleCarSlowerClassWarning + TimeSpan.FromMinutes(2)))
                         {
                             return true;
                         }
                         else if (numSlowerCars > 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarsRacingForPosition ||
-                                timeOfLastMultipleCarSlowerClassWarning + TimeSpan.FromMinutes(2) > now))
+                                now > timeOfLastMultipleCarSlowerClassWarning + TimeSpan.FromMinutes(2)))
                         {
                             return true;
                         }
                         else if (numFasterCars == 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarIsRacingPlayerForPosition ||
-                                timeOfLastSingleCarFasterClassWarning + TimeSpan.FromMinutes(2) > now))
+                                now > timeOfLastSingleCarFasterClassWarning + TimeSpan.FromMinutes(2)))
                         {
                             return true;
                         }
                         else if (numFasterCars > 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarsRacingForPosition ||
-                                timeOfLastMultipleCarFasterClassWarning + TimeSpan.FromMinutes(2) > now))
+                                now > timeOfLastMultipleCarFasterClassWarning + TimeSpan.FromMinutes(2)))
                         {
                             return true;
                         }
