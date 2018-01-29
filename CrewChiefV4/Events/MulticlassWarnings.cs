@@ -42,6 +42,15 @@ namespace CrewChiefV4.Events
         private DateTime timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
         private DateTime timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
 
+        // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
+        private float slowerCarWarningZoneStart = -100;
+        private float slowerCarWarningZoneEnd = -400;
+
+        // distance behind where we consider faster cars
+        private float fasterCarWarningZoneStart = 400;
+        private float fasterCarWarningZoneEnd = 100;
+
+
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;            
@@ -361,7 +370,7 @@ namespace CrewChiefV4.Events
                 {
                     separation = trackLength + separation;
                 }
-                if (isFaster && separation < 400 && separation > 100)
+                if (isFaster && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStart)
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
@@ -398,7 +407,8 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (!isFaster && separation > -400 && separation < -100)
+                // this separation check looks odd because the separation value is negative (player is behind) so the < and > appear reversed
+                else if (!isFaster && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEnd)
                 {
                     // player is behind a slower class car
                     numSlowerCars++;
