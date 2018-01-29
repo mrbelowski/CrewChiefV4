@@ -145,7 +145,8 @@ namespace CrewChiefV4.Events
                 Boolean isStillInThisPosition = true;
                 if (validationData != null)
                 {
-                    if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.ClassPosition)
+                    object positionValidationData = null;
+                    if (validationData.TryGetValue(positionValidationKey, out positionValidationData) && (int)positionValidationData != currentGameState.SessionData.ClassPosition)
                     {
                         isStillInThisPosition = false;
                     }
@@ -240,11 +241,11 @@ namespace CrewChiefV4.Events
         {
             if (opponentKeyForCarWeJustPassed != null)
             {
-                if (currentGameState.OpponentData.ContainsKey(opponentKeyForCarWeJustPassed) &&
+                OpponentData carWeJustPassed = null;
+                if (currentGameState.OpponentData.TryGetValue(opponentKeyForCarWeJustPassed, out carWeJustPassed) &&
                     currentGameState.Now < timeWhenWeMadeAPass.Add(maxTimeToWaitBeforeReportingPass) && lastOvertakeWasClean)
                 {
                     Boolean reported = false;
-                    OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];
                     if (currentGameState.Now > timeWhenWeMadeAPass.Add(minTimeToWaitBeforeReportingPass))
                     {                                 
                         if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) &&
@@ -281,11 +282,11 @@ namespace CrewChiefV4.Events
             }
             if (opponentKeyForCarThatJustPassedUs != null)
             {
-                if (currentGameState.OpponentData.ContainsKey(opponentKeyForCarThatJustPassedUs) && 
+                OpponentData carThatJustPassedUs = null;
+                if (currentGameState.OpponentData.TryGetValue(opponentKeyForCarThatJustPassedUs, out carThatJustPassedUs) && 
                     currentGameState.Now < timeWhenWeWerePassed.Add(maxTimeToWaitBeforeReportingPass))
                 {
                     Boolean reported = false;
-                    OpponentData carThatJustPassedUs = currentGameState.OpponentData[opponentKeyForCarThatJustPassedUs];
                     if (currentGameState.Now > timeWhenWeWerePassed.Add(minTimeToWaitBeforeReportingPass))
                     {
                         if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) &&
