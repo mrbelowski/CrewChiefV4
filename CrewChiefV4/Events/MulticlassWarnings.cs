@@ -61,6 +61,7 @@ namespace CrewChiefV4.Events
         private static String folderCarreraCup = "multiclass/carrera_cup";
 
         private static Dictionary<CarData.CarClassEnum, string> carClassEnumToSound = new Dictionary<CarData.CarClassEnum, string>();
+        private static Dictionary<TrackData.TrackLengthClass, int> minLapsForTrackLengthClass = new Dictionary<TrackData.TrackLengthClass, int>();
 
         private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
         private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
@@ -106,6 +107,12 @@ namespace CrewChiefV4.Events
             carClassEnumToSound.Add(CarData.CarClassEnum.TC1, folderTC1);
             carClassEnumToSound.Add(CarData.CarClassEnum.TC2, folderTC2);
             carClassEnumToSound.Add(CarData.CarClassEnum.CARRERA_CUP, folderCarreraCup);
+
+            minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.VERY_SHORT, 5);
+            minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.SHORT, 4);
+            minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.MEDIUM, 3);
+            minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.LONG, 2);
+            minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.VERY_LONG, 2);
         }
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
@@ -124,7 +131,7 @@ namespace CrewChiefV4.Events
 
         // cars within this many metres of each other will be considered as 'fighting for position'
         private float maxSeparateToBeConsideredFighting = 30;
-
+        
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;            
@@ -157,10 +164,13 @@ namespace CrewChiefV4.Events
         {
             this.currentGameState = currentGameState;
             if (!enableMulticlassWarnings ||
-                GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
-                currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
-                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane ||
-                currentGameState.PositionAndMotionData.CarSpeed < 5 || currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
+                GameStateData.onManualFormationLap || GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
+                currentGameState.SessionData.TrackDefinition == null || 
+                currentGameState.SessionData.CompletedLaps < minLapsForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass] ||
+                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || 
+                currentGameState.PitData.InPitlane ||
+                currentGameState.PositionAndMotionData.CarSpeed < 5 || 
+                currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
             {
                 return;
             }
