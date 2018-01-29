@@ -161,9 +161,10 @@ namespace CrewChiefV4.Events
 
         private OpponentData getOpponent(GameStateData currentGameState, String opponentName)
         {
-            if (opponentName != null && currentGameState.OpponentData.ContainsKey(opponentName))
+            OpponentData opponent = null;
+            if (opponentName != null && currentGameState.OpponentData.TryGetValue(opponentName, out opponent))
             {
-                return currentGameState.OpponentData[opponentName];
+                return opponent;
             }
             return null;
         }
