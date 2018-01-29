@@ -45,13 +45,15 @@ namespace CrewChiefV4.Events
         private DateTime timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
-        private float slowerCarWarningZoneStart = -100;
-        private float slowerCarWarningZoneEnd = -400;
+        private float slowerCarWarningZoneStart = -50;
+        private float slowerCarWarningZoneEnd = -200;
 
         // distance behind where we consider faster cars
-        private float fasterCarWarningZoneStart = 400;
-        private float fasterCarWarningZoneEnd = 100;
+        private float fasterCarWarningZoneStart = 200;
+        private float fasterCarWarningZoneEnd = 50;
 
+        // cars within this many metres of each other will be considered as 'fighting for position'
+        private float maxSeparateToBeConsideredFighting = 20;
 
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
@@ -433,7 +435,7 @@ namespace CrewChiefV4.Events
                             // if any of them are close to each other, set the boolean flag
                             foreach (float otherSeparation in separationsForOtherCarsOnSameLap)
                             {
-                                if (Math.Abs(otherSeparation - separation) < 50)
+                                if (Math.Abs(otherSeparation - separation) < maxSeparateToBeConsideredFighting)
                                 {
                                     slowerCarsRacingForPosition = true;
                                     break;
