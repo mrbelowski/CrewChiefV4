@@ -2091,10 +2091,7 @@ namespace CrewChiefV4.assetto
             {
                 gameState.OpponentData = new Dictionary<string, OpponentData>();
             }
-            if (gameState.OpponentData.ContainsKey(name))
-            {
-                gameState.OpponentData.Remove(name);
-            }
+            gameState.OpponentData.Remove(name);
             gameState.OpponentData.Add(name, opponentData);
         }
 

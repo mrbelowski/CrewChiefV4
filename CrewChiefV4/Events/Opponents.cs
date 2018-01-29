@@ -360,9 +360,10 @@ namespace CrewChiefV4.Events
                                 if (opponentData != null)
                                 {
                                     String opponentName = opponentData.DriverRawName;
+                                    DateTime announceAfterTime = DateTime.MinValue;
                                     if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
                                         opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                                        (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                                        (!onlyAnnounceOpponentAfter.TryGetValue(opponentName, out announceAfterTime) || currentGameState.Now > announceAfterTime))
                                     {
                                         Console.WriteLine("new car ahead: " + opponentName);
                                         audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),

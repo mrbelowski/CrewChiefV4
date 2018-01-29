@@ -1015,8 +1015,9 @@ namespace CrewChiefV4.Events
                             // are we fighting with him and can we call him by name?
                             Boolean isInteresting = Math.Abs(currentGameState.SessionData.ClassPosition - opponent.ClassPosition) <= 2 &&
                                 (AudioPlayer.canReadName(opponent.DriverRawName) || opponent.ClassPosition <= folderPositionHasGoneOff.Length);
+                            DateTime incidentWarningTime = DateTime.MinValue;
                             if ((isApproaching || isInteresting) &&
-                                (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < currentGameState.Now))
+                                (!incidentWarnings.TryGetValue(landmark, out incidentWarningTime) || incidentWarningTime + incidentRepeatFrequency < currentGameState.Now))
                             {
                                 waitingForCrashedDriverInCorner = landmark;
                                 driversCrashedInCorner.Add(opponent);

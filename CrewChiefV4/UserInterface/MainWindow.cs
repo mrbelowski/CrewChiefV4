@@ -1623,9 +1623,10 @@ namespace CrewChiefV4
 
         private void messagesAudioDeviceSelected(object sender, EventArgs e)
         {
-            if (AudioPlayer.playbackDevices.ContainsKey(this.messagesAudioDeviceBox.Text))
+            Tuple<string, int> device = null;
+            if (AudioPlayer.playbackDevices.TryGetValue(this.messagesAudioDeviceBox.Text, out device))
             {
-                int deviceId = AudioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item2;
+                int deviceId = device.Item2;
                 AudioPlayer.naudioMessagesPlaybackDeviceId = deviceId;
                 UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_MESSAGES",
                     AudioPlayer.playbackDevices[this.messagesAudioDeviceBox.Text].Item1);
@@ -1635,9 +1636,10 @@ namespace CrewChiefV4
 
         private void speechRecognitionDeviceSelected(object sender, EventArgs e)
         {
-            if (SpeechRecogniser.speechRecognitionDevices.ContainsKey(this.speechRecognitionDeviceBox.Text))
+            Tuple<string, int> device = null;
+            if (SpeechRecogniser.speechRecognitionDevices.TryGetValue(this.speechRecognitionDeviceBox.Text, out device))
             {
-                int deviceId = SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item2;
+                int deviceId = device.Item2;
                 crewChief.speechRecogniser.changeInputDevice(deviceId);
                 UserSettings.GetUserSettings().setProperty("NAUDIO_RECORDING_DEVICE_GUID",
                     SpeechRecogniser.speechRecognitionDevices[this.speechRecognitionDeviceBox.Text].Item1);
@@ -1647,9 +1649,10 @@ namespace CrewChiefV4
 
         private void backgroundAudioDeviceSelected(object sender, EventArgs e)
         {
-            if (AudioPlayer.playbackDevices.ContainsKey(this.backgroundAudioDeviceBox.Text))
+            Tuple<string, int> device = null;
+            if (AudioPlayer.playbackDevices.TryGetValue(this.backgroundAudioDeviceBox.Text, out device))
             {
-                int deviceId = AudioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item2; 
+                int deviceId = device.Item2; 
                 AudioPlayer.naudioBackgroundPlaybackDeviceId = deviceId;
                 UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_BACKGROUND",
                     AudioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item1);

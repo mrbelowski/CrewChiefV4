@@ -96,10 +96,7 @@ namespace CrewChiefV4
                     {
                         String[] split = line.Split('=');
                         String key = split[0].Trim();
-                        if (dict.ContainsKey(key))
-                        {
-                            dict.Remove(key);
-                        }
+                        dict.Remove(key);
                         dict.Add(split[0].Trim(), split[1].Trim());
                     }
                     catch (Exception)
