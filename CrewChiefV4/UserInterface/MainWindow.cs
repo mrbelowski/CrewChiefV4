@@ -513,6 +513,13 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+                    else if (arg.Equals(GameDefinition.iracing.gameEnum.ToString()))
+                    {
+                        Console.WriteLine("Set iRacing mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.iracing.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
                     // special cases for RF1 versions
                     else if (arg.Equals("AMS"))
                     {
