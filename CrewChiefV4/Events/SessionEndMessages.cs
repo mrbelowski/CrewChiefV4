@@ -31,17 +31,24 @@ namespace CrewChiefV4.Events
 
         private int minSessionRunTimeForEndMessages = 60;
 
+        private DateTime lastSessionEndMessagesPlayedAt = DateTime.MinValue;
+
         public SessionEndMessages(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
         }
 
         public void trigger(float sessionRunningTime, SessionType sessionType, SessionPhase lastSessionPhase, int startPosition,
-            int finishPosition, int numCars, int completedLaps, Boolean isDisqualified, Boolean isDNF)
+            int finishPosition, int numCars, int completedLaps, Boolean isDisqualified, Boolean isDNF, DateTime now)
         {
             if (!enableSessionEndMessages)
             {
                 Console.WriteLine("Session end, position = " + finishPosition + ", session end messages are disabled");
+                return;
+            }
+            if (lastSessionEndMessagesPlayedAt.AddSeconds(10) > now)
+            {
+                Console.WriteLine("Skipping duplicate session end message call - last call was " + (now - lastSessionEndMessagesPlayedAt).TotalSeconds + " seconds ago");
                 return;
             }
             if (sessionType == SessionType.Race)
@@ -51,6 +58,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Finished)
                     {
                         // only play session end message for races if we've actually finished, not restarted
+                        lastSessionEndMessagesPlayedAt = now;
                         playFinishMessage(sessionType, startPosition, finishPosition, numCars, isDisqualified, isDNF, completedLaps);
                     }
                     else
@@ -70,6 +78,7 @@ namespace CrewChiefV4.Events
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow || 
                         lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Checkered)
                     {
+                        lastSessionEndMessagesPlayedAt = now;
                         playFinishMessage(sessionType, startPosition, finishPosition, numCars, false, isDNF, completedLaps);
                     }
                     else
