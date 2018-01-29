@@ -31,7 +31,37 @@ namespace CrewChiefV4.Events
         private String folderSlowerCarAheadClassLeader = "multiclass/slower_car_ahead_is_class_leader";
         private String folderSlowerCarAheadRacingPlayerForPosition = "multiclass/slower_car_ahead_racing_player";
         private String folderSlowerCarAhead = "multiclass/slower_car_ahead";
-        
+
+        private static String folderFasterClass = "multiclass/it_is_a_faster_class";
+        private static String folderSlowerClass = "multiclass/it_is_a_slower_class";
+        private static String folderSameClassAsUs = "multiclass/same_class_as_us";
+        private static String folderLmp1 = "multiclass/lmp1";
+        private static String folderLmp2 = "multiclass/lmp2";
+        private static String folderLmp3 = "multiclass/lmp3";
+        private static String folderGT1 = "multiclass/gt1";
+        private static String folderGT2 = "multiclass/gt2";
+        private static String folderGTE = "multiclass/gte";
+        private static String folderGTC = "multiclass/gtc";
+        private static String folderGTLM = "multiclass/gtlm";
+        private static String folderGT3 = "multiclass/gt3";
+        private static String folderGT4 = "multiclass/gt4";
+        private static String folderGT5 = "multiclass/gt5";
+        private static String folderGT500 = "multiclass/gt500";
+        private static String folderGT300 = "multiclass/gt300";
+        private static String folderDTM = "multiclass/dtm";
+        private static String folderGroupA = "multiclass/groupa";
+        private static String folderGroupB = "multiclass/groupb";
+        private static String folderGroupC = "multiclass/groupc";
+        private static String folderGroup4 = "multiclass/group4";
+        private static String folderGroup5 = "multiclass/group5";
+        private static String folderGroup6 = "multiclass/group6";
+        private static String folderGTO = "multiclass/gto";
+        private static String folderTC1 = "multiclass/tc1";
+        private static String folderTC2 = "multiclass/tc2";
+        private static String folderCarreraCup = "multiclass/carrera_cup";
+
+        private static Dictionary<CarData.CarClassEnum, string> carClassEnumToSound = new Dictionary<CarData.CarClassEnum, string>();
+
         private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
         private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
         private TimeSpan timeToWaitForOtherClassWarningToSettle = TimeSpan.FromSeconds(6);
@@ -52,6 +82,39 @@ namespace CrewChiefV4.Events
         private float fasterCarWarningZoneStart = 400;
         private float fasterCarWarningZoneEnd = 100;
 
+        Dictionary<CarData.CarClass, float> bestTimesByClass = new Dictionary<CarData.CarClass, float>();
+
+        enum ClassSpeedComparison {SLOWER, FASTER, UNKNOWN};
+
+        private GameStateData currentGameState;
+
+        static MulticlassWarnings()
+        {
+            carClassEnumToSound.Add(CarData.CarClassEnum.LMP1, folderLmp1);
+            carClassEnumToSound.Add(CarData.CarClassEnum.LMP2, folderLmp2);
+            carClassEnumToSound.Add(CarData.CarClassEnum.LMP3, folderLmp3);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT1, folderGT1);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT2, folderGT2);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT3, folderGT3);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT4, folderGT4);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT5, folderGT5);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GTO, folderGTO);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GTC, folderGTC);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GTE, folderGTE);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GTLM, folderGTLM);
+            //carClassEnumToSound.Add(CarData.CarClassEnum.GT300, folderGT300);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT500, folderGT500);
+            carClassEnumToSound.Add(CarData.CarClassEnum.DTM, folderDTM);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUPA, folderGroupA);
+            //carClassEnumToSound.Add(CarData.CarClassEnum.GROUPB, folderGroupB);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUPC, folderGroupC);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUP4, folderGroup4);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUP5, folderGroup5);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUP6, folderGroup6);
+            carClassEnumToSound.Add(CarData.CarClassEnum.TC1, folderTC1);
+            carClassEnumToSound.Add(CarData.CarClassEnum.TC2, folderTC2);
+            carClassEnumToSound.Add(CarData.CarClassEnum.CARRERA_CUP, folderCarreraCup);
+        }
 
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
@@ -78,10 +141,12 @@ namespace CrewChiefV4.Events
             timeOfLastMultipleCarFasterClassWarning = DateTime.MinValue;
             timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
             timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
+            bestTimesByClass.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            this.currentGameState = currentGameState;
             if (!enableMulticlassWarnings ||
                 GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
                 currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
@@ -89,6 +154,11 @@ namespace CrewChiefV4.Events
                 currentGameState.PositionAndMotionData.CarSpeed < 5 || currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
             {
                 return;
+            }
+            // update the best lap for each class - do this every sector once we've completed 2 laps
+            if (currentGameState.SessionData.CompletedLaps > 1 && currentGameState.SessionData.IsNewSector)
+            {
+                getBestTimesByClass(currentGameState);
             }
             if (currentGameState.Now > nextCheckForOtherCarClasses)
             {
@@ -239,9 +309,93 @@ namespace CrewChiefV4.Events
                 }
             }
         }
+
         public override void respond(String voiceMessage)
         {
+            Boolean gotResponse = false;
+            if (SpeechRecogniser.WHAT_CLASS_IS_CAR_AHEAD.Contains(voiceMessage))
+            {
+                String opponentKey = currentGameState.getOpponentKeyInFrontOnTrack();
+                if (opponentKey != null)
+                {
+                    gotResponse = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                }
+            }
+            else if (SpeechRecogniser.WHAT_CLASS_IS_CAR_BEHIND.Contains(voiceMessage))
+            {                
+                String opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
+                if (opponentKey != null)
+                {
+                    gotResponse = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                }
+            }
+            else if (SpeechRecogniser.IS_CAR_AHEAD_MY_CLASS.Contains(voiceMessage))
+            {
+                String opponentKey = currentGameState.getOpponentKeyInFrontOnTrack();
+                if (opponentKey != null)
+                {
+                    gotResponse = true;
+                    CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
+                    if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                    }
+                }
+            }
+            else if (SpeechRecogniser.IS_CAR_BEHIND_MY_CLASS.Contains(voiceMessage))
+            {
+                String opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
+                if (opponentKey != null)
+                {
+                    gotResponse = true;
+                    CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
+                    if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                    }
+                }
+            }
+            if (!gotResponse)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
+            }
+        }
 
+        private String getClassSound(OpponentData opponentToCheck)
+        {
+            CarData.CarClass opponentClass = opponentToCheck.CarClass;
+            if (CarData.IsCarClassEqual(opponentClass, currentGameState.carClass))
+            {
+                return folderSameClassAsUs;
+            }
+            String classSound;
+            if (carClassEnumToSound.TryGetValue(opponentClass.carClassEnum, out classSound) && SoundCache.availableSounds.Contains(classSound))
+            {
+                return classSound;
+            }
+            else
+            {
+                ClassSpeedComparison opponentComparisonToPlayer = getClassSpeedComparisonToPlayer(opponentClass);
+                if (opponentComparisonToPlayer == ClassSpeedComparison.FASTER)
+                {
+                    return folderFasterClass;
+                }
+                else if (opponentComparisonToPlayer == ClassSpeedComparison.SLOWER)
+                {
+                    return folderSlowerClass;
+                }
+            }
+            return AudioPlayer.folderNoData;
         }
 
         private class OtherCarClassWarningData
@@ -331,6 +485,87 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private void getBestTimesByClass(GameStateData currentGameState)
+        {
+            // this is used by the main thread and the speech recogniser thread, both of which may update it, so lock before using
+            lock (this)
+            {
+                CarData.CarClass playerCarClass = currentGameState.carClass;
+                float playerBestTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                this.bestTimesByClass.Clear();
+                if (playerBestTime > 0)
+                {
+                    bestTimesByClass.Add(playerCarClass, playerBestTime);
+                }
+                foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
+                {
+                    CarData.CarClass opponentCarClass = opponentData.CarClass;
+                    float bestLap = opponentData.CurrentBestLapTime;
+                    if (bestLap > 0)
+                    {
+                        Boolean foundInDictionary = false;
+                        foreach (CarData.CarClass carClass in bestTimesByClass.Keys)
+                        {
+                            if (CarData.IsCarClassEqual(carClass, opponentCarClass))
+                            {
+                                foundInDictionary = true;
+                                float existingBestTime = bestTimesByClass[carClass];
+                                if (bestLap < existingBestTime)
+                                {
+                                    bestTimesByClass[carClass] = bestLap;
+                                }
+                                break;
+                            }
+                        }
+                        if (!foundInDictionary)
+                        {
+                            bestTimesByClass.Add(opponentCarClass, bestLap);
+                        }
+                    }
+                }
+            }
+        }
+
+        // returns ClassSpeedComparison.FASTER if the opponent class is faster than the player's class
+        private ClassSpeedComparison getClassSpeedComparisonToPlayer(CarData.CarClass opponentClass)
+        {
+            // work out if this opponent is faster or slower
+            float playerClassBestLap = 0;
+            float opponentClassBestLap = 0;
+            Boolean gotOpponentClassBestLap = false;
+            Boolean gotPlayerClassBestLap = false;
+            // the getBestTimesByClass dictionary may be updated by another Thread at any point, so lock on this before using it
+            lock (this)
+            {
+                if (bestTimesByClass.Count == 0)
+                {
+                    getBestTimesByClass(currentGameState);
+                }
+                foreach (CarData.CarClass carClass in bestTimesByClass.Keys)
+                {
+                    if (CarData.IsCarClassEqual(carClass, opponentClass))
+                    {
+                        opponentClassBestLap = bestTimesByClass[carClass];
+                        gotOpponentClassBestLap = true;
+                    }
+                    else if (CarData.IsCarClassEqual(carClass, currentGameState.carClass))
+                    {
+                        playerClassBestLap = bestTimesByClass[carClass];
+                        gotPlayerClassBestLap = true;
+                    }
+                    if (gotOpponentClassBestLap && gotPlayerClassBestLap)
+                    {
+                        break;
+                    }
+                }
+                if (playerClassBestLap > 0 && opponentClassBestLap > 0)
+                {
+                    return playerClassBestLap > opponentClassBestLap ? ClassSpeedComparison.FASTER : ClassSpeedComparison.SLOWER;
+                }
+            }
+            return ClassSpeedComparison.UNKNOWN;
+        }
+
         // to be called every couple of seconds, not every tick
         private OtherCarClassWarningData getOtherCarClassWarningData(GameStateData currentGameState)
         {
@@ -362,7 +597,11 @@ namespace CrewChiefV4.Events
                 {
                     continue;
                 }
-                Boolean isFaster = playerBestLap - opponentData.CurrentBestLapTime > 0;
+                ClassSpeedComparison classSpeedComparisonToPlayer = getClassSpeedComparisonToPlayer(opponentData.CarClass);
+                if (classSpeedComparisonToPlayer == ClassSpeedComparison.UNKNOWN)
+                {
+                    continue;
+                }
                 // separation is +ve when the player is in front, -ve when he's behind
                 float separation = playerDistanceRoundTrack - opponentData.DistanceRoundTrack;
                 if (separation > halfTrackLength)
@@ -373,7 +612,7 @@ namespace CrewChiefV4.Events
                 {
                     separation = trackLength + separation;
                 }
-                if (isFaster && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStart)
+                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStart)
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
@@ -411,7 +650,7 @@ namespace CrewChiefV4.Events
                     }
                 }
                 // this separation check looks odd because the separation value is negative (player is behind) so the < and > appear reversed
-                else if (!isFaster && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEnd)
+                else if (classSpeedComparisonToPlayer == ClassSpeedComparison.SLOWER && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEnd)
                 {
                     // player is behind a slower class car
                     numSlowerCars++;
