@@ -73,15 +73,7 @@ namespace CrewChiefV4.Events
         private DateTime timeOfLastMultipleCarFasterClassWarning = DateTime.MinValue;
         private DateTime timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
         private DateTime timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
-
-        // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
-        private float slowerCarWarningZoneStart = -100;
-        private float slowerCarWarningZoneEnd = -400;
-
-        // distance behind where we consider faster cars
-        private float fasterCarWarningZoneStart = 400;
-        private float fasterCarWarningZoneEnd = 100;
-
+        
         Dictionary<CarData.CarClass, float> bestTimesByClass = new Dictionary<CarData.CarClass, float>();
 
         enum ClassSpeedComparison {SLOWER, FASTER, UNKNOWN};
@@ -115,6 +107,23 @@ namespace CrewChiefV4.Events
             carClassEnumToSound.Add(CarData.CarClassEnum.TC2, folderTC2);
             carClassEnumToSound.Add(CarData.CarClassEnum.CARRERA_CUP, folderCarreraCup);
         }
+
+        // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
+        private float slowerCarWarningZoneStart = -30;        
+        private float slowerCarWarningZoneEndShortTracks = -150;
+        private float slowerCarWarningZoneEndNormalTracks = -200;
+        private float slowerCarWarningZoneEndLongTracks = -300;
+        private float slowerCarWarningZoneEndToUse = -200;
+
+        // distance behind where we consider faster cars
+        private float fasterCarWarningZoneStartShortTracks = 100;
+        private float fasterCarWarningZoneStartNormalTracks = 150;
+        private float fasterCarWarningZoneStartLongTracks = 250;
+        private float fasterCarWarningZoneStartToUse = 150;
+        private float fasterCarWarningZoneEnd = 30;
+
+        // cars within this many metres of each other will be considered as 'fighting for position'
+        private float maxSeparateToBeConsideredFighting = 30;
 
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
@@ -160,6 +169,25 @@ namespace CrewChiefV4.Events
             {
                 getBestTimesByClass(currentGameState);
             }
+            slowerCarWarningZoneEndToUse = slowerCarWarningZoneEndNormalTracks;
+            fasterCarWarningZoneStartToUse = fasterCarWarningZoneStartNormalTracks;
+            if (currentGameState.SessionData.JustGoneGreen && currentGameState.SessionData.TrackDefinition != null)
+            {
+                if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG ||
+                    currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                {
+                    // adjust the class distance thresholds for longer tracks at session start
+                    slowerCarWarningZoneEndToUse = slowerCarWarningZoneEndLongTracks;
+                    fasterCarWarningZoneStartToUse = fasterCarWarningZoneStartLongTracks;
+                }
+                else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.SHORT ||
+                    currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT)
+                {
+                    // adjust the class distance thresholds for shorted tracks at session start
+                    slowerCarWarningZoneEndToUse = slowerCarWarningZoneEndShortTracks;
+                    fasterCarWarningZoneStartToUse = fasterCarWarningZoneStartShortTracks;
+                }
+            }
             if (currentGameState.Now > nextCheckForOtherCarClasses)
             {
                 OtherCarClassWarningData otherClassWarningData = getOtherCarClassWarningData(currentGameState);
@@ -190,23 +218,19 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarsRacingForPosition)
                                     {
-                                        Console.WriteLine("FASTER CARS BEHIND INCLUDING THE CLASS LEADER, THEY'RE RACING FOR POSITION");
                                         audioPlayer.playMessage(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 0, this));
                                     }
                                     else
                                     {
-                                        Console.WriteLine("FASTER CARS BEHIND INCLUDING THE CLASS LEADER");
                                         audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this));
                                     }
                                 }
                                 else if (otherClassWarningData.fasterCarsRacingForPosition)
                                 {
-                                    Console.WriteLine("FASTER CARS BEHIND, THEY'RE RACING EACH OTHER FOR POSITION");
                                     audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindFighting, 0, this));
                                 }
                                 else
                                 {
-                                    Console.WriteLine("FASTER CARS BEHIND");
                                     audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehind, 0, this));
                                 }
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
@@ -220,23 +244,19 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                     {
-                                        Console.WriteLine("LEADER FROM FASTER CLASS RACING PLAYER FOR POSITION BEHIND - NO BLUE FLAG");
                                         audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 0, this));
                                     }
                                     else
                                     {
-                                        Console.WriteLine("LEADER FROM FASTER CLASS BEHIND");
                                         audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this));
                                     }
                                 }
                                 else if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                 {
-                                    Console.WriteLine("FASTER CAR RACING PLAYER FOR POSITION BEHIND - NO BLUE FLAG");
                                     audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this));
                                 }
                                 else
                                 {
-                                    Console.WriteLine("FASTER CAR BEHIND");
                                     audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehind, 0, this));
                                 }
                             }
@@ -248,23 +268,19 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.slowerCarsRacingForPosition)
                                     {
-                                        Console.WriteLine("SLOWER CARS AHEAD INCLUDING THE CLASS LEADER, THEY'RE RACING FOR POSITION");
                                         audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 0, this));
                                     }
                                     else
                                     {
-                                        Console.WriteLine("SLOWER CARS AHEAD INCLUDING THE CLASS LEADER");
                                         audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this));
                                     }
                                 }
                                 else if (otherClassWarningData.slowerCarsRacingForPosition)
                                 {
-                                    Console.WriteLine("SLOWER CARS AHEAD, THEY'RE RACING EACH OTHER FOR POSITION");
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this));
                                 }
                                 else
                                 {
-                                    Console.WriteLine("SLOWER CARS AHEAD");
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAhead, 0, this));
                                 }
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
@@ -278,23 +294,19 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                     {
-                                        Console.WriteLine("LEADER FROM SLOWER CLASS RACING PLAYER FOR POSITION AHEAD - NO BLUE FLAG");
                                         audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 0, this));
                                     }
                                     else
                                     {
-                                        Console.WriteLine("LEADER FROM SLOWER CLASS AHEAD");
                                         audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this));
                                     }
                                 }
                                 else if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                 {
-                                    Console.WriteLine("SLOWER CAR RACING PLAYER FOR POSITION AHEAD - NO BLUE FLAG");
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this));
                                 }
                                 else
                                 {
-                                    Console.WriteLine("SLOWER CAR AHEAD");
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAhead, 0, this));
                                 }
                             }
@@ -309,6 +321,7 @@ namespace CrewChiefV4.Events
                 }
             }
         }
+
 
         public override void respond(String voiceMessage)
         {
@@ -437,33 +450,34 @@ namespace CrewChiefV4.Events
                 if ((this.numFasterCars > 0 && previousOtherCarClassWarningData.numFasterCars > 0) ||
                     (this.numSlowerCars > 0 && previousOtherCarClassWarningData.numSlowerCars > 0))
                 {
-                    Boolean hasNewFasterDriverToWarnAbout = fasterCarDriverNames.Except(fasterDriversAtLastAnnouncement).Any();
-                    Boolean hasNewSlowerDriverToWarnAbout = slowerCarDriverNames.Except(slowerDriversAtLastAnnouncement).Any();
+                    Boolean hasNewFasterDriverToWarnAbout = Enumerable.Except(fasterCarDriverNames, fasterDriversAtLastAnnouncement).Any();
+                    Boolean hasNewSlowerDriverToWarnAbout = Enumerable.Except(slowerCarDriverNames, slowerDriversAtLastAnnouncement).Any();
+
 
                     if (hasNewFasterDriverToWarnAbout || hasNewSlowerDriverToWarnAbout)
                     {
                         // try to estimate how important this warning might be
                         if (numSlowerCars == 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarIsRacingPlayerForPosition ||
-                                now > timeOfLastSingleCarSlowerClassWarning + TimeSpan.FromMinutes(2)))
+                                now > timeOfLastSingleCarSlowerClassWarning.AddSeconds(90)))
                         {
                             return true;
                         }
                         else if (numSlowerCars > 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarsRacingForPosition ||
-                                now > timeOfLastMultipleCarSlowerClassWarning + TimeSpan.FromMinutes(2)))
+                                now > timeOfLastMultipleCarSlowerClassWarning.AddSeconds(60)))
                         {
                             return true;
                         }
                         else if (numFasterCars == 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarIsRacingPlayerForPosition ||
-                                now > timeOfLastSingleCarFasterClassWarning + TimeSpan.FromMinutes(2)))
+                                now > timeOfLastSingleCarFasterClassWarning.AddSeconds(90)))
                         {
                             return true;
                         }
                         else if (numFasterCars > 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarsRacingForPosition ||
-                                now > timeOfLastMultipleCarFasterClassWarning + TimeSpan.FromMinutes(2)))
+                                now > timeOfLastMultipleCarFasterClassWarning.AddSeconds(60)))
                         {
                             return true;
                         }
@@ -612,7 +626,7 @@ namespace CrewChiefV4.Events
                 {
                     separation = trackLength + separation;
                 }
-                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStart)
+                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStartToUse)
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
@@ -650,7 +664,7 @@ namespace CrewChiefV4.Events
                     }
                 }
                 // this separation check looks odd because the separation value is negative (player is behind) so the < and > appear reversed
-                else if (classSpeedComparisonToPlayer == ClassSpeedComparison.SLOWER && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEnd)
+                else if (classSpeedComparisonToPlayer == ClassSpeedComparison.SLOWER && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEndToUse)
                 {
                     // player is behind a slower class car
                     numSlowerCars++;
@@ -672,7 +686,7 @@ namespace CrewChiefV4.Events
                             // if any of them are close to each other, set the boolean flag
                             foreach (float otherSeparation in separationsForOtherCarsOnSameLap)
                             {
-                                if (Math.Abs(otherSeparation - separation) < 50)
+                                if (Math.Abs(otherSeparation - separation) < maxSeparateToBeConsideredFighting)
                                 {
                                     slowerCarsRacingForPosition = true;
                                     break;
