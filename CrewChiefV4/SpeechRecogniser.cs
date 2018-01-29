@@ -180,6 +180,11 @@ namespace CrewChiefV4
 
         public static String[] I_AM_OK = Configuration.getSpeechRecognitionPhrases("I_AM_OK");
 
+        public static String[] IS_CAR_AHEAD_MY_CLASS = Configuration.getSpeechRecognitionPhrases("IS_CAR_AHEAD_MY_CLASS");
+        public static String[] IS_CAR_BEHIND_MY_CLASS = Configuration.getSpeechRecognitionPhrases("IS_CAR_BEHIND_MY_CLASS");
+        public static String[] WHAT_CLASS_IS_CAR_AHEAD = Configuration.getSpeechRecognitionPhrases("WHAT_CLASS_IS_CAR_AHEAD");
+        public static String[] WHAT_CLASS_IS_CAR_BEHIND = Configuration.getSpeechRecognitionPhrases("WHAT_CLASS_IS_CAR_BEHIND");
+
         private String lastRecognisedText = null;
 
         private CrewChief crewChief;
@@ -565,6 +570,11 @@ namespace CrewChiefV4
                 validateAndAdd(WHOS_IN_FRONT_ON_TRACK, staticSpeechChoices);
                 validateAndAdd(WHOS_BEHIND_ON_TRACK, staticSpeechChoices);
                 validateAndAdd(WHOS_LEADING, staticSpeechChoices);
+
+                validateAndAdd(WHAT_CLASS_IS_CAR_AHEAD, staticSpeechChoices);
+                validateAndAdd(WHAT_CLASS_IS_CAR_BEHIND, staticSpeechChoices);
+                validateAndAdd(IS_CAR_AHEAD_MY_CLASS, staticSpeechChoices);
+                validateAndAdd(IS_CAR_BEHIND_MY_CLASS, staticSpeechChoices);
 
                 validateAndAdd(MORE_INFO, staticSpeechChoices);
 
@@ -1188,6 +1198,13 @@ namespace CrewChiefV4
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
+            }
+            else if (ResultContains(recognisedSpeech, IS_CAR_AHEAD_MY_CLASS) ||
+                ResultContains(recognisedSpeech, IS_CAR_BEHIND_MY_CLASS) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_AHEAD) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND))
+            {
+                return CrewChief.getEvent("MulticlassWarnings");
             }
             return null;
         }
