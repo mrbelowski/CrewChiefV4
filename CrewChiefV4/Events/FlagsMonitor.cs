@@ -18,10 +18,10 @@ namespace CrewChiefV4.Events
         private String folderWhiteFlagEU = "flags/white_flag";
         private String folderBlackFlag = "flags/black_flag";
 
-        private DateTime lastYellowFlagTime = DateTime.MinValue;
-        private DateTime lastBlackFlagTime = DateTime.MinValue;
-        private DateTime lastWhiteFlagTime = DateTime.MinValue;
-        private DateTime lastBlueFlagTime = DateTime.MinValue;
+        private DateTime disableYellowFlagUntil = DateTime.MinValue;
+        private DateTime disableBlackFlagUntil = DateTime.MinValue;
+        private DateTime disableWhiteFlagUntil = DateTime.MinValue;
+        private DateTime disableBlueFlagUntil = DateTime.MinValue;
 
         private TimeSpan timeBetweenYellowFlagMessages = TimeSpan.FromSeconds(30);
         private TimeSpan timeBetweenBlueFlagMessages = TimeSpan.FromSeconds(20);
@@ -275,10 +275,10 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
-            lastYellowFlagTime = DateTime.MinValue;
-            lastBlackFlagTime = DateTime.MinValue;
-            lastWhiteFlagTime = DateTime.MinValue;
-            lastBlueFlagTime = DateTime.MinValue;
+            disableYellowFlagUntil = DateTime.MinValue;
+            disableWhiteFlagUntil = DateTime.MinValue;
+            disableBlackFlagUntil = DateTime.MinValue;
+            disableBlueFlagUntil = DateTime.MinValue;
 
             lastSectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
             lastSectorFlagsReported = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
@@ -326,7 +326,11 @@ namespace CrewChiefV4.Events
                 // don't process if we're in the pits or just started a session
                 return;
             }
-
+            if (currentGameState.SessionData.JustGoneGreen)
+            {
+                // ensure blue & white flags aren't enabled immediately:
+                disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenYellowFlagMessages);
+            }
             if (currentGameState.FlagData.useImprovisedIncidentCalling)
             {
                 improvisedYellowFlagImplementation(previousGameState, currentGameState);
@@ -342,25 +346,25 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.Flag == FlagEnum.BLACK)
             {
-                if (currentGameState.Now > lastBlackFlagTime.Add(timeBetweenBlackFlagMessages))
+                if (currentGameState.Now > disableBlackFlagUntil)
                 {
-                    lastBlackFlagTime = currentGameState.Now;
+                    disableBlackFlagUntil = currentGameState.Now.Add(timeBetweenBlackFlagMessages);
                     audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
             {
-                if (currentGameState.Now > lastBlueFlagTime.Add(timeBetweenBlueFlagMessages))
+                if (currentGameState.Now > disableBlueFlagUntil)
                 {
-                    lastBlueFlagTime = currentGameState.Now;
+                    disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenBlueFlagMessages);
                     audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
             else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !GlobalBehaviourSettings.useAmericanTerms)
             {
-                if (currentGameState.Now > lastWhiteFlagTime.Add(timeBetweenWhiteFlagMessages))
+                if (currentGameState.Now > disableWhiteFlagUntil)
                 {
-                    lastWhiteFlagTime = currentGameState.Now;
+                    disableWhiteFlagUntil = currentGameState.Now.Add(timeBetweenWhiteFlagMessages);
                     audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
                 }
             }
@@ -964,9 +968,9 @@ namespace CrewChiefV4.Events
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.YELLOW)
             {
-                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages))
+                if (currentGameState.Now > disableYellowFlagUntil)
                 {
-                    lastYellowFlagTime = currentGameState.Now;
+                    disableYellowFlagUntil = currentGameState.Now.Add(timeBetweenYellowFlagMessages);
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
@@ -975,11 +979,11 @@ namespace CrewChiefV4.Events
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.DOUBLE_YELLOW)
             {
-                if (currentGameState.Now > lastYellowFlagTime.Add(timeBetweenYellowFlagMessages) &&
+                if (currentGameState.Now > disableYellowFlagUntil &&
                     // AMS specific hack until RF2 FCY stuff is ported - don't spam the double yellow during caution periods, just report it once per lap
                     (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 || currentGameState.SessionData.IsNewLap))
                 {
-                    lastYellowFlagTime = currentGameState.Now;
+                    disableYellowFlagUntil = currentGameState.Now.Add(timeBetweenYellowFlagMessages);
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));
