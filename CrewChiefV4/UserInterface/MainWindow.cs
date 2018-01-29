@@ -99,7 +99,7 @@ namespace CrewChiefV4
         private ToolStripItem contextMenuStopItem;
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
-
+        
         private void FormMain_Load(object sender, EventArgs e)
         {
             if (forceMinWindowSize)
@@ -1327,21 +1327,20 @@ namespace CrewChiefV4
         private void runApp()
         {
             String filenameToRun = null;
-            int interval = 0;
             Boolean record = false;
             if (CrewChief.Debugging && filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
             {
                 filenameToRun = filenameTextbox.Text;
-                if (playbackInterval.Text.Length > 0)
+                if (this.playbackInterval.Text.Length > 0)
                 {
-                    interval = int.Parse(playbackInterval.Text);
+                    CrewChief.playbackIntervalMilliseconds = int.Parse(playbackInterval.Text);
                 }
             }
             if (recordSession.Checked)
             {
                 record = true;
             }
-            if (!crewChief.Run(filenameToRun, interval, record))
+            if (!crewChief.Run(filenameToRun, record))
             {
                 this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
                     this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
@@ -1359,6 +1358,25 @@ namespace CrewChiefV4
             runListenForChannelOpenThread = false;
             runListenForButtonPressesThread = false;
             crewChief.stop();
+        }
+
+        private void playbackIntervalChanged(object sender, EventArgs e)
+        {
+            if (this.playbackInterval.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.playbackIntervalMilliseconds = int.Parse(playbackInterval.Text);
+                }
+                catch (Exception)
+                {
+                    // swallow - not much we can do here
+                }
+            }
+            else
+            {
+                CrewChief.playbackIntervalMilliseconds = 0;
+            }
         }
 
         private void buttonActionSelect_SelectedIndexChanged(object sender, EventArgs e)
