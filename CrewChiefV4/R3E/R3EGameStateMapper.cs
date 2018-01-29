@@ -757,10 +757,7 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("Opponent " + driverName + " has retired");
                         currentGameState.retriedDriverNames.Add(driverName);
                     }
-                    if (currentGameState.OpponentData.ContainsKey(driverName))
-                    {
-                        currentGameState.OpponentData.Remove(driverName);
-                    }
+                    currentGameState.OpponentData.Remove(driverName);
                     continue;
                 }
                 else if (participantStruct.FinishStatus == (int)CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DQ)
@@ -771,21 +768,18 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("Opponent " + driverName + " has been disqualified");
                         currentGameState.disqualifiedDriverNames.Add(driverName);
                     }
-                    if (currentGameState.OpponentData.ContainsKey(driverName))
-                    {
-                        currentGameState.OpponentData.Remove(driverName);
-                    }
+                    currentGameState.OpponentData.Remove(driverName);
                     continue;
                 }
                 lastActiveTimeForOpponents[driverName] = currentGameState.Now;
                 positionsFilledForThisTick.Add(participantStruct.Place);
                 opponentDriverNamesProcessedForThisTick.Add(driverName);
-                if (currentGameState.OpponentData.ContainsKey(driverName))
+                OpponentData currentOpponentData = null;
+                if (currentGameState.OpponentData.TryGetValue(driverName, out currentOpponentData))
                 {
                     if (previousGameState != null)
                     {
                         OpponentData previousOpponentData = null;
-                        OpponentData currentOpponentData = currentGameState.OpponentData[driverName];
                         Boolean newOpponentLap = false;
                         int previousOpponentSectorNumber = 1;
                         int previousOpponentCompletedLaps = 0;
@@ -796,9 +790,8 @@ namespace CrewChiefV4.RaceRoom
                         float previousOpponentSpeed = 0;
                         float previousDistanceRoundTrack = 0;
                         Boolean previousOpponentInPits = false;
-                        if (previousGameState.OpponentData.ContainsKey(driverName))
+                        if (previousGameState.OpponentData.TryGetValue(driverName, out previousOpponentData))
                         {
-                            previousOpponentData = previousGameState.OpponentData[driverName];
                             previousOpponentSectorNumber = previousOpponentData.CurrentSectorNumber;
                             previousOpponentCompletedLaps = previousOpponentData.CompletedLaps;
                             previousOpponentPosition = previousOpponentData.OverallPosition;
@@ -917,9 +910,10 @@ namespace CrewChiefV4.RaceRoom
                                 }
                                 if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
                                 {
+                                    float playerTimeByTyre = -1.0f;
                                     if (currentOpponentData.LastLapTime > 0 && currentOpponentData.LastLapValid &&
-                                        (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.ContainsKey(currentOpponentData.CurrentTyres) ||
-                                        currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentOpponentData.CurrentTyres] > currentOpponentData.LastLapTime))
+                                        (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.TryGetValue(currentOpponentData.CurrentTyres, out playerTimeByTyre) ||
+                                        playerTimeByTyre > currentOpponentData.LastLapTime))
                                     {
                                         currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentOpponentData.CurrentTyres] = currentOpponentData.LastLapTime;
                                     }
@@ -967,7 +961,8 @@ namespace CrewChiefV4.RaceRoom
                 List<string> inactiveOpponents = new List<string>();
                 foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    DateTime lastActiveTime = DateTime.MinValue;
+                    if (!lastActiveTimeForOpponents.TryGetValue(opponentName, out lastActiveTime) || lastActiveTime < oldestAllowedUpdate)
                     {
                         inactiveOpponents.Add(opponentName);
                         Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
@@ -985,13 +980,15 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.LapTimePrevious > 0)
             {
                 // TODO: different tyre types on the same car
-                if (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.ContainsKey(currentGameState.TyreData.FrontLeftTyreType) ||
-                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] > currentGameState.SessionData.LapTimePrevious)
+                float playerClassBestTimeByTyre = -1.0f;
+                if (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.TryGetValue(currentGameState.TyreData.FrontLeftTyreType, out playerClassBestTimeByTyre) ||
+                    playerClassBestTimeByTyre > currentGameState.SessionData.LapTimePrevious)
                 {
                     currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
                 }
-                if (!currentGameState.SessionData.PlayerBestLapTimeByTyre.ContainsKey(currentGameState.TyreData.FrontLeftTyreType) ||
-                    currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] > currentGameState.SessionData.LapTimePrevious)
+                float playerBestLapTimeByTyre = -1.0f;
+                if (!currentGameState.SessionData.PlayerBestLapTimeByTyre.TryGetValue(currentGameState.TyreData.FrontLeftTyreType, out playerBestLapTimeByTyre) ||
+                    playerBestLapTimeByTyre > currentGameState.SessionData.LapTimePrevious)
                 {
                     currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
                 }

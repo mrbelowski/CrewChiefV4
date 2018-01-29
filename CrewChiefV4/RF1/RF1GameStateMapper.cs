@@ -700,10 +700,11 @@ namespace CrewChiefV4.rFactor1
                         // there shouldn't be duplicate driver names in online sessions. This is probably a temporary glitch in the shared memory data - 
                         // don't panic and drop the existing opponentData for this key - just copy it across to the current state. This prevents us losing
                         // the historical data and repeatedly re-adding this name to the SpeechRecogniser (which is expensive)
-                        if (previousGameState != null && previousGameState.OpponentData.ContainsKey(driverName) &&
+                        OpponentData opp = null;
+                        if (previousGameState != null && previousGameState.OpponentData.TryGetValue(driverName, out opp) &&
                             !currentGameState.OpponentData.ContainsKey(driverName))
                         {
-                            currentGameState.OpponentData.Add(driverName, previousGameState.OpponentData[driverName]);
+                            currentGameState.OpponentData.Add(driverName, opp);
                         }
                         opponentKeysProcessed.Add(driverName);
                         continue;
@@ -751,7 +752,8 @@ namespace CrewChiefV4.rFactor1
                     continue;
                 }
 
-                opponentPrevious = previousGameState == null || opponentKey == null || !previousGameState.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
+                OpponentData opponentPrev = null;
+                opponentPrevious = previousGameState == null || opponentKey == null || !previousGameState.OpponentData.TryGetValue(opponentKey, out opponentPrev) ? null : opponentPrev;
                 OpponentData opponent = new OpponentData();
                 if (opponentPrevious != null)
                 {
@@ -1308,9 +1310,9 @@ namespace CrewChiefV4.rFactor1
             String bestKey = null;
             foreach (String possibleKey in possibleKeys)
             {
-                if (previousGameState.OpponentData.ContainsKey(possibleKey))
+                OpponentData o = null;
+                if (previousGameState.OpponentData.TryGetValue(possibleKey, out o))
                 {
-                    OpponentData o = previousGameState.OpponentData[possibleKey];
                     if (o.DriverRawName != getStringFromBytes(vehicle.driverName).ToLower() ||
                         o.CarClass != getCarClass(getStringFromBytes(vehicle.vehicleName), false) ||
                         opponentKeysProcessed.Contains(possibleKey))
