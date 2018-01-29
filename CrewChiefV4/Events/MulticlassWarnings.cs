@@ -74,7 +74,7 @@ namespace CrewChiefV4.Events
             if (GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
                 currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
                 currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane ||
-                currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
+                currentGameState.PositionAndMotionData.CarSpeed < 5 || currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
             {
                 return;
             }
@@ -345,7 +345,8 @@ namespace CrewChiefV4.Events
             foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
             {
                 if (CarData.IsCarClassEqual(opponentData.CarClass, currentGameState.carClass) ||
-                    opponentData.CurrentBestLapTime <= 0 || opponentData.InPits)
+                    opponentData.CurrentBestLapTime <= 0 || opponentData.InPits || opponentData.DistanceRoundTrack <= 0 ||
+                    opponentData.Speed < 5 || !opponentData.IsActive)
                 {
                     continue;
                 }
