@@ -565,3 +565,6 @@ force_min_window_size_help = Don't allow the app's window size to resized below 
 
 pit_box_position_countdown = Pit box position countdown (R3E only)
 pit_box_position_countdown_help = Play distance in metres to box as you approach
+
+enable_multiclass_messages = Enable multi-class messages
+enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching

@@ -12,6 +12,8 @@ namespace CrewChiefV4.Events
 {
     class MulticlassWarnings : AbstractEvent
     {
+        private Boolean enableMulticlassWarnings = UserSettings.GetUserSettings().getBoolean("enable_multiclass_messages");
+
         private String folderFasterCarsFightingBehindIncludingClassLeader = "multiclass/faster_cars_fighting_behind_inc_class_leader";
         private String folderFasterCarsBehindIncludingClassLeader = "multiclass/faster_cars_behind_inc_class_leader";
         private String folderFasterCarsBehindFighting = "multiclass/faster_cars_behind_fighting";
@@ -80,7 +82,8 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
+            if (!enableMulticlassWarnings ||
+                GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
                 currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
                 currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane ||
                 currentGameState.PositionAndMotionData.CarSpeed < 5 || currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
