@@ -73,6 +73,10 @@ namespace CrewChiefV4.Events
         public const string folderRollingStartReminder = "frozen_order/thats_a_rolling_start";
         public const string folderStandingStartReminder = "frozen_order/thats_a_standing_start";
         public const string folderStayInPole = "frozen_order/stay_in_pole";
+        public const string folderStayInPoleInInsideColumn = "frozen_order/stay_in_pole_in_inside_column";
+        public const string folderStayInPoleInOutsideColumn = "frozen_order/stay_in_pole_in_outside_column";
+        public const string folderStayInPoleInLeftColumn = "frozen_order/stay_in_pole_in_left_column";
+        public const string folderStayInPoleInRightColumn = "frozen_order/stay_in_pole_in_right_column";
         public const string folderMoveToPole = "frozen_order/move_to_pole";
         public const string folderMoveToPoleRow = "frozen_order/move_to_pole_row";
 
@@ -273,36 +277,27 @@ namespace CrewChiefV4.Events
                     {
                         if (cfod.AssignedColumn == FrozenOrderColumn.None
                             || Utilities.random.Next(1, 11) > 8)  // Randomly, announce message without coulmn info.
-                        {
-                            Console.WriteLine("FROZEN ORDER: STAY IN POLE");
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/stay_in_pole",
                                 MessageContents(folderStayInPole), Utilities.random.Next(0, 3), this, validationData));
-                        }
                         else
                         {
-                            Console.WriteLine("FROZEN ORDER: STAY IN POLE ROW");
-                            string columnName;
+                            string folderToPlay = null;
                             if (useOvalLogic)
-                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheInsideColumn : folderInTheOutsideColumn;
+                                folderToPlay = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderStayInPoleInInsideColumn : folderStayInPoleInOutsideColumn;
                             else
-                                columnName = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderInTheLeftColumn : folderInTheRightColumn;
-                            audioPlayer.playMessage(new QueuedMessage("frozen_order/stay_in_pole_in_column", MessageContents(folderStayInPole, columnName), Utilities.random.Next(0, 3), this, validationData));
+                                folderToPlay = cfod.AssignedColumn == FrozenOrderColumn.Left ? folderStayInPoleInLeftColumn : folderStayInPoleInRightColumn;
+
+                            audioPlayer.playMessage(new QueuedMessage("frozen_order/stay_in_pole_in_column", MessageContents(folderToPlay), Utilities.random.Next(0, 3), this, validationData));
                         }
                     }
                     else if (this.newFrozenOrderAction == FrozenOrderAction.MoveToPole)
                     {
                         if (cfod.AssignedColumn == FrozenOrderColumn.None)
-                        {
-                            Console.WriteLine("FROZEN ORDER: MOVE TO POLE");
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/move_to_pole",
                                 MessageContents(folderMoveToPole), Utilities.random.Next(2, 5), this, validationData));
-                        }
                         else
-                        {
-                            Console.WriteLine("FROZEN ORDER: MOVE TO POLE ROW");
                             audioPlayer.playMessage(new QueuedMessage("frozen_order/move_to_pole_row",
                                 MessageContents(folderMoveToPoleRow), Utilities.random.Next(2, 5), this, validationData));
-                        }
                     }
                 }
             }
