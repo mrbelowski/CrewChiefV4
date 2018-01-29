@@ -115,11 +115,11 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 1)
                 {
                     pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
-                    if (currentGameState.SessionData.Position < 4)
+                    if (currentGameState.SessionData.ClassPosition < 4)
                     {
                         pearlType = PearlsOfWisdom.PearlType.GOOD;
                     }
-                    else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 5 &&
+                    else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 5 &&
                         !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
                         // yuk... AC SessionStartPosition is suspect so don't allow "you're shit" messages based on it.
                         CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
@@ -133,14 +133,14 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.SessionRunningTime > 60 && !playedLastLap)
                 {
                     Boolean timeWillBeZeroAtEndOfLeadersLap = false;
-                    if (currentGameState.SessionData.Position == 1)
+                    if (currentGameState.SessionData.OverallPosition == 1)
                     {
                         timeWillBeZeroAtEndOfLeadersLap = timeLeft > 0 && currentGameState.SessionData.PlayerLapTimeSessionBest > 0 &&
                             timeLeft < currentGameState.SessionData.PlayerLapTimeSessionBest - 5;
                     }
                     else
                     {
-                        OpponentData leader = currentGameState.getOpponentAtPosition(1, true);
+                        OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                         timeWillBeZeroAtEndOfLeadersLap = leader != null && leader.isProbablyLastLap;
                     }
                     if ((addExtraLap && timeLeft <= 0) ||
@@ -152,12 +152,12 @@ namespace CrewChiefV4.Events
                         played15mins = true;
                         played20mins = true;
                         playedHalfWayHome = true;
-                        if (currentGameState.SessionData.Position == 1)
+                        if (currentGameState.SessionData.ClassPosition == 1)
                         {
                             // don't add a pearl here - the audio clip already contains encouragement
                             audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
                         }
-                        else if (currentGameState.SessionData.Position < 4)
+                        else if (currentGameState.SessionData.ClassPosition < 4)
                         {
                             // don't add a pearl here - the audio clip already contains encouragement
                             audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
@@ -194,7 +194,7 @@ namespace CrewChiefV4.Events
                     {
                         // don't play the chequered flag message in race sessions
                         audioPlayer.playMessage(new QueuedMessage("session_complete",
-                            MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.Position), 0, this));
+                            MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
                     }
                 } 
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played2mins && timeLeft / 60 < 2 && timeLeft / 60 > 1.9)
@@ -214,12 +214,12 @@ namespace CrewChiefV4.Events
                     played15mins = true;
                     played20mins = true;
                     playedHalfWayHome = true;
-                    if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position == 1)
+                    if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition == 1)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
                         audioPlayer.playMessage(new QueuedMessage(folder5minsLeading, 0, this), pearlType, 0);
                     }
-                    else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position < 4)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition < 4)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
                         audioPlayer.playMessage(new QueuedMessage(folder5minsPodium, 0, this), pearlType, 0);
