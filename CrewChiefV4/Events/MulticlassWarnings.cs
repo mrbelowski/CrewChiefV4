@@ -124,9 +124,9 @@ namespace CrewChiefV4.Events
 
         // distance behind where we consider faster cars
         private float fasterCarWarningZoneStartShortTracks = 100;
-        private float fasterCarWarningZoneStartNormalTracks = 150;
+        private float fasterCarWarningZoneStartNormalTracks = 200;
         private float fasterCarWarningZoneStartLongTracks = 250;
-        private float fasterCarWarningZoneStartToUse = 150;
+        private float fasterCarWarningZoneStartToUse = 200;
         private float fasterCarWarningZoneEnd = 30;
 
         // cars within this many metres of each other will be considered as 'fighting for position'
@@ -469,7 +469,7 @@ namespace CrewChiefV4.Events
                         // try to estimate how important this warning might be
                         if (numSlowerCars == 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarIsRacingPlayerForPosition ||
-                                now > timeOfLastSingleCarSlowerClassWarning.AddSeconds(90)))
+                                now > timeOfLastSingleCarSlowerClassWarning.AddSeconds(60)))
                         {
                             return true;
                         }
@@ -481,13 +481,13 @@ namespace CrewChiefV4.Events
                         }
                         else if (numFasterCars == 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarIsRacingPlayerForPosition ||
-                                now > timeOfLastSingleCarFasterClassWarning.AddSeconds(90)))
+                                now > timeOfLastSingleCarFasterClassWarning.AddSeconds(40)))
                         {
                             return true;
                         }
                         else if (numFasterCars > 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarsRacingForPosition ||
-                                now > timeOfLastMultipleCarFasterClassWarning.AddSeconds(60)))
+                                now > timeOfLastMultipleCarFasterClassWarning.AddSeconds(40)))
                         {
                             return true;
                         }
@@ -658,7 +658,7 @@ namespace CrewChiefV4.Events
                             // if any of them are close to each other, set the boolean flag
                             foreach (float otherSeparation in separationsForOtherCarsOnSameLap)
                             {
-                                if (Math.Abs(otherSeparation - separation) < 50)
+                                if (Math.Abs(otherSeparation - separation) < maxSeparateToBeConsideredFighting)
                                 {
                                     fasterCarsRacingForPosition = true;
                                     break;
