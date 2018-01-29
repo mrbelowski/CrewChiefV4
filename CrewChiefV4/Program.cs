@@ -42,13 +42,14 @@ namespace CrewChiefV4
             {
                 foreach (String commandLineArg in commandLineArgs)
                 {
-                    if (processorAffinities.ContainsKey(commandLineArg))
+                    IntPtr pArg = IntPtr.Zero;
+                    if (processorAffinities.TryGetValue(commandLineArg, out pArg))
                     {
                         try
                         {
                             var process = System.Diagnostics.Process.GetCurrentProcess();
                             // Set Core 
-                            process.ProcessorAffinity = processorAffinities[commandLineArg];
+                            process.ProcessorAffinity = pArg;
                         }
                         catch (Exception)
                         {
