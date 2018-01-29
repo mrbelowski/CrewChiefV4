@@ -174,14 +174,13 @@ namespace CrewChiefV4
 
         public static AbstractEvent getEvent(String eventName)
         {
-            if (eventsList.ContainsKey(eventName))
+            AbstractEvent abstractEvent = null;
+            if (eventsList.TryGetValue(eventName, out abstractEvent))
             {
-                return eventsList[eventName];
+                return abstractEvent;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public void toggleKeepQuietMode()
@@ -970,10 +969,12 @@ namespace CrewChiefV4
             }
             catch (Exception e)
             {
-                if (faultingEventsCount.ContainsKey(eventName))
+                int failureCount = 0;
+                if (faultingEventsCount.TryGetValue(eventName, out failureCount))
                 {
-                    faultingEventsCount[eventName]++;
-                    if (faultingEventsCount[eventName] > 5)
+                    ++failureCount;
+                    faultingEventsCount[eventName] = failureCount;
+                    if (failureCount > 5)
                     {
                         Console.WriteLine("Event " + eventName +
                             " has failed > 5 times in this session");

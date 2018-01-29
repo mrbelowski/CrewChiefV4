@@ -20,35 +20,38 @@ namespace CrewChiefV4
         private static Dictionary<String, String> SoundsConfig = LoadSoundsConfig();
 
         public static String getUIString(String key) {
-            if (UIStrings.ContainsKey(key)) {
-                return UIStrings[key];
+            string uiString = null;
+            if (UIStrings.TryGetValue(key, out uiString)) {
+                return uiString;
             }
             return key;
         }
 
         public static String getSoundConfigOption(String key)
         {
-            if (SoundsConfig.ContainsKey(key))
+            string soundConfig = null;
+            if (SoundsConfig.TryGetValue(key, out soundConfig))
             {
-                return SoundsConfig[key];
+                return soundConfig;
             }
             return key;
         }
 
         public static String getSpeechRecognitionConfigOption(String key)
         {
-            if (SpeechRecognitionConfig.ContainsKey(key))
+            string sreConfig = null;
+            if (SpeechRecognitionConfig.TryGetValue(key, out sreConfig))
             {
-                return SpeechRecognitionConfig[key];
+                return sreConfig;
             }
             return key;
         }
 
         public static String[] getSpeechRecognitionPhrases(String key)
         {
-            if (SpeechRecognitionConfig.ContainsKey(key))
+            string options = null;
+            if (SpeechRecognitionConfig.TryGetValue(key, out options))
             {
-                String options = SpeechRecognitionConfig[key];
                 if (options.Contains(":"))
                 {
                     var phrases = options.Split(':');
