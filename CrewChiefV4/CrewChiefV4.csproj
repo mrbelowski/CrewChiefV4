@@ -119,6 +119,7 @@
     <Compile Include="Events\Battery.cs" />
     <Compile Include="Events\CommonDataContainers.cs" />
     <Compile Include="Events\FrozenOrderMonitor.cs" />
+    <Compile Include="Events\MulticlassWarnings.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />
     <Compile Include="Events\ConditionsMonitor.cs" />
     <Compile Include="Events\IRacingBroadcastMessageEvent.cs" />

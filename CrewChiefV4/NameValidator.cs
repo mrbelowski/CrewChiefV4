@@ -14,7 +14,7 @@ namespace CrewChiefV4
         // hance, hotdog and koch for being extraordinarily ignorant and rude, and so on. My app, my rules :)
          private static HashSet<String> wankers = new HashSet<String>(StringComparer.InvariantCultureIgnoreCase) { "mr.sisterfister", "bigsilverhotdog", 
              "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "peter koch",
-             "andreas christiansen", "greg metcalf" /* twat...*/ };
+             "andreas christiansen", "greg metcalf" /* twat...*/, "Aditas H1Z1Cases.com." };
  
           public static void validateName(String name)
           {
