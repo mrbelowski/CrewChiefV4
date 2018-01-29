@@ -3094,5 +3094,17 @@ namespace CrewChiefV4.Properties {
                 this["pit_box_position_countdown"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_multiclass_messages {
+            get {
+                return ((bool)(this["enable_multiclass_messages"]));
+            }
+            set {
+                this["enable_multiclass_messages"] = value;
+            }
+        }
     }
 }

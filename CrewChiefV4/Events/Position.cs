@@ -145,7 +145,7 @@ namespace CrewChiefV4.Events
                 Boolean isStillInThisPosition = true;
                 if (validationData != null)
                 {
-                    if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.Position)
+                    if (validationData.ContainsKey(positionValidationKey) && (int)validationData[positionValidationKey] != currentGameState.SessionData.ClassPosition)
                     {
                         isStillInThisPosition = false;
                     }
@@ -184,8 +184,8 @@ namespace CrewChiefV4.Events
                     {
                         gapsBehind.Add(currentGameState.SessionData.TimeDeltaBehind);
                     }
-                    string currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(true);
-                    string currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(true);
+                    string currentOpponentAheadKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+                    string currentOpponentBehindKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
                     // seems like belt and braces, but as Raceroom names aren't unique we need to double check a pass actually happened here:
                     if (frequencyOfOvertakingMessages > 0 && currentOpponentAheadKey != opponentAheadKey)
                     {
@@ -247,8 +247,8 @@ namespace CrewChiefV4.Events
                     OpponentData carWeJustPassed = currentGameState.OpponentData[opponentKeyForCarWeJustPassed];
                     if (currentGameState.Now > timeWhenWeMadeAPass.Add(minTimeToWaitBeforeReportingPass))
                     {                                 
-                        if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) && 
-                            carWeJustPassed.Position > currentGameState.SessionData.Position && currentGameState.SessionData.TimeDeltaBehind > minTimeDeltaForPassToBeCompleted)
+                        if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) &&
+                            carWeJustPassed.ClassPosition > currentGameState.SessionData.ClassPosition && currentGameState.SessionData.TimeDeltaBehind > minTimeDeltaForPassToBeCompleted)
                         {
                             lastOvertakeMessageTime = currentGameState.Now;
                             Console.WriteLine("Reporting overtake on car " + opponentKeyForCarWeJustPassed);
@@ -257,7 +257,7 @@ namespace CrewChiefV4.Events
                             // adding a 'good' pearl with 0 probability of playing seems odd, but this forces the app to only
                             // allow an existing queued pearl to be played if it's type is 'good'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                            validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
+                            validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             audioPlayer.playMessage(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
                             reported = true;
                         }
@@ -289,7 +289,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.Now > timeWhenWeWerePassed.Add(minTimeToWaitBeforeReportingPass))
                     {
                         if (currentGameState.Now > lastOvertakeMessageTime.Add(minTimeBetweenOvertakeMessages) &&
-                            carThatJustPassedUs.Position < currentGameState.SessionData.Position && currentGameState.SessionData.TimeDeltaFront > minTimeDeltaForPassToBeCompleted)
+                            carThatJustPassedUs.ClassPosition < currentGameState.SessionData.ClassPosition && currentGameState.SessionData.TimeDeltaFront > minTimeDeltaForPassToBeCompleted)
                         {
                             lastOvertakeMessageTime = currentGameState.Now;
                             Console.WriteLine("Reporting being overtaken by car " + opponentKeyForCarThatJustPassedUs);
@@ -298,7 +298,7 @@ namespace CrewChiefV4.Events
                             // adding a 'bad' pearl with 0 probability of playing seems odd, but this forces the app to only
                             // allow an existing queued pearl to be played if it's type is 'bad'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
-                            validationData.Add(positionValidationKey, currentGameState.SessionData.Position);
+                            validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
                             reported = true;
                         }
@@ -340,7 +340,7 @@ namespace CrewChiefV4.Events
                 checkForNewOvertakes(currentGameState, previousGameState);
             }
             checkCompletedOvertake(currentGameState);
-            currentPosition = currentGameState.SessionData.Position;
+            currentPosition = currentGameState.SessionData.ClassPosition;
             sessionType = currentGameState.SessionData.SessionType;
             isLast = currentGameState.isLast();
             if (previousPosition == 0)
@@ -355,21 +355,21 @@ namespace CrewChiefV4.Events
                 {
                     playedRaceStartMessage = true;
                     Console.WriteLine("Race start message... isLast = " + isLast +
-                        " session start pos = " + currentGameState.SessionData.SessionStartPosition + " current pos = " + currentGameState.SessionData.Position);
+                        " session start pos = " + currentGameState.SessionData.SessionStartClassPosition + " current pos = " + currentGameState.SessionData.ClassPosition);
                     bool hasrFactorPenaltyPending = (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) && currentGameState.PenaltiesData.NumPenalties > 0;
-                    if (currentGameState.SessionData.SessionStartPosition > 0 &&
+                    if (currentGameState.SessionData.SessionStartClassPosition > 0 &&
                             !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo &&
                             !hasrFactorPenaltyPending)
                     {
-                        if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 4)
+                        if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 4)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
                         }
-                        else if (currentGameState.SessionData.Position > currentGameState.SessionData.SessionStartPosition + 1)
+                        else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 1)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
                         }
-                        else if (!isLast && (currentGameState.SessionData.Position == 1 || currentGameState.SessionData.Position < currentGameState.SessionData.SessionStartPosition - 1) )
+                        else if (!isLast && (currentGameState.SessionData.ClassPosition == 1 || currentGameState.SessionData.ClassPosition < currentGameState.SessionData.SessionStartClassPosition - 1))
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
                         }
@@ -395,27 +395,27 @@ namespace CrewChiefV4.Events
                 {
                     numberOfLapsInLastPlace = 0;
                 }
-                if (previousPosition == 0 && currentGameState.SessionData.Position > 0)
+                if (previousPosition == 0 && currentGameState.SessionData.ClassPosition > 0)
                 {
-                    previousPosition = currentGameState.SessionData.Position;
+                    previousPosition = currentGameState.SessionData.ClassPosition;
                 }
                 else
                 {
                     if (currentGameState.SessionData.CompletedLaps > lapNumberAtLastMessage + 3
-                            || previousPosition != currentGameState.SessionData.Position)
+                            || previousPosition != currentGameState.SessionData.ClassPosition)
                     {
                         PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
                         float pearlLikelihood = 0.2f;
-                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.Position > 0)
+                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition > 0)
                         {
-                            if (!isLast && (previousPosition > currentGameState.SessionData.Position + 5 ||
-                                (previousPosition > currentGameState.SessionData.Position && currentGameState.SessionData.Position <= 5)))
+                            if (!isLast && (previousPosition > currentGameState.SessionData.ClassPosition + 5 ||
+                                (previousPosition > currentGameState.SessionData.ClassPosition && currentGameState.SessionData.ClassPosition <= 5)))
                             {
                                 pearlType = PearlsOfWisdom.PearlType.GOOD;
                                 pearlLikelihood = 0.8f;
                             }
-                            else if (!isLast && previousPosition < currentGameState.SessionData.Position && 
-                                currentGameState.SessionData.Position > 5 && !previousGameState.PitData.OnOutLap &&
+                            else if (!isLast && previousPosition < currentGameState.SessionData.ClassPosition &&
+                                currentGameState.SessionData.ClassPosition > 5 && !previousGameState.PitData.OnOutLap &&
                                 !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
                             {
                                 // don't play bad-pearl if the lap just completed was an out lap or are in the pit

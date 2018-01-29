@@ -32,8 +32,6 @@ namespace CrewChiefV4.rFactor2
         private readonly string scrWaveArroundPassOnUpperPrefix = "Wave Around: Pass Field On".ToUpperInvariant();
         private readonly string scrMoveToEOLLUpper = "Move To End Of Longest Line".ToUpperInvariant();
 
-        private SpeechRecogniser speechRecogniser;
-
         public static string playerName = null;
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
@@ -98,7 +96,16 @@ namespace CrewChiefV4.rFactor2
 
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
 
+        // Session caches:
         private Dictionary<byte, TyreType> compoundIndexToTyreType = new Dictionary<byte, TyreType>();
+
+        class CarInfo
+        {
+            public CarData.CarClass carClass = null;
+            public string driverNameRawSanitized = null;
+        }
+
+        private Dictionary<long, CarInfo> idToCarInfoMap = new Dictionary<long, CarInfo>();
 
         public RF2GameStateMapper()
         {
@@ -115,7 +122,7 @@ namespace CrewChiefV4.rFactor2
         private int[] minimumSupportedVersionParts = new int[] { 2, 4, 0, 0 };
         public static bool pluginVerified = false;
         private string lastVersionString;
-        public void versionCheck(Object memoryMappedFileStruct)
+        public override void versionCheck(Object memoryMappedFileStruct)
         {
             if (RF2GameStateMapper.pluginVerified)
                 return;
@@ -172,12 +179,7 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine(msg);
             }
         }
-
-        public void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
-        {
-            this.speechRecogniser = speechRecogniser;
-        }
-
+        
         // Abrupt session detection variables.
         private bool waitingToTerminateSession = false;
         private long ticksWhenSessionEnded = DateTime.MinValue.Ticks;
@@ -202,12 +204,12 @@ namespace CrewChiefV4.rFactor2
             this.isApproachingPitEntry = false;
             this.lastUnknownGlobalRuleMessage = null;
             this.lastUnknownPlayerRuleMessage = null;
-            RF2GameStateMapper.sanitizedNamesMap.Clear();
             this.lastTimeEngineWasRunning = DateTime.MaxValue;
             this.compoundIndexToTyreType.Clear();
+            this.idToCarInfoMap.Clear();
         }
 
-        public GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
+        public override GameStateData mapToGameStateData(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             var pgs = previousGameState;
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
@@ -315,11 +317,11 @@ namespace CrewChiefV4.rFactor2
                         if (playerVehIdx != -1)
                         {
                             var playerVehCapture = shared.extended.mSessionTransitionCapture.mScoringVehicles[playerVehIdx];
-                            if (pgs.SessionData.Position != playerVehCapture.mPlace)
+                            if (pgs.SessionData.OverallPosition != playerVehCapture.mPlace)
                             {
                                 Console.WriteLine(string.Format("Abrupt Session End: player position was updated after session end, updating from pos {0} to: {1}.",
-                                    pgs.SessionData.Position, playerVehCapture.mPlace));
-                                pgs.SessionData.Position = playerVehCapture.mPlace;
+                                    pgs.SessionData.OverallPosition, playerVehCapture.mPlace));
+                                pgs.SessionData.OverallPosition = playerVehCapture.mPlace;
                             }
                         }
                         else
@@ -517,11 +519,11 @@ namespace CrewChiefV4.rFactor2
                 this.ClearState();
 
                 // Initialize variables that persist for the duration of a session.
-                var carClassId = RF2GameStateMapper.GetStringFromBytes(playerScoring.mVehicleClass);
-                cgs.carClass = CarData.getCarClassForClassName(carClassId);
-                CarData.CLASS_ID = carClassId;
+                var cci = this.GetCachedCarInfo(ref playerScoring);
+                cgs.carClass = cci.carClass;
+                CarData.CLASS_ID = cgs.carClass.getClassIdentifier();
                 this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
-                csd.DriverRawName = RF2GameStateMapper.GetStringFromBytes(playerScoring.mDriverName).ToLower();
+                csd.DriverRawName = cci.driverNameRawSanitized;
                 csd.TrackDefinition = new TrackDefinition(RF2GameStateMapper.GetStringFromBytes(shared.scoring.mScoringInfo.mTrackName), (float)shared.scoring.mScoringInfo.mLapDist);
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
@@ -591,15 +593,14 @@ namespace CrewChiefV4.rFactor2
             // hack for test day sessions running longer than allotted time
             csd.SessionTimeRemaining = csd.SessionTimeRemaining < 0.0f && shared.scoring.mScoringInfo.mSession == 0 ? defaultSessionTotalRunTime : csd.SessionTimeRemaining;
 
-            csd.NumCars = shared.scoring.mScoringInfo.mNumVehicles;
-            csd.NumCarsAtStartOfSession = csd.IsNewSession ? csd.NumCars : psd.NumCarsAtStartOfSession;
-            csd.Position = playerScoring.mPlace;
-            csd.UnFilteredPosition = csd.Position;
-            csd.SessionStartPosition = csd.IsNewSession ? csd.Position : psd.SessionStartPosition;
+            csd.NumCarsOverall = shared.scoring.mScoringInfo.mNumVehicles;
+            csd.NumCarsOverallAtStartOfSession = csd.IsNewSession ? csd.NumCarsOverall : psd.NumCarsOverallAtStartOfSession;
+            csd.OverallPosition = playerScoring.mPlace;
+            csd.SessionStartPosition = csd.IsNewSession ? csd.OverallPosition : psd.SessionStartPosition;
 
             // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
             if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
-                csd.SessionStartPosition = csd.Position;
+                csd.SessionStartPosition = csd.OverallPosition;
 
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
@@ -610,7 +611,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.FlagData.previousLapWasFCY = pgs != null && pgs.FlagData.currentLapIsFCY;
                 cgs.FlagData.currentLapIsFCY = cgs.FlagData.isFullCourseYellow;
             }
-            csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.Position : psd.PositionAtStartOfCurrentLap;
+            csd.PositionAtStartOfCurrentLap = csd.IsNewLap ? csd.OverallPosition : psd.PositionAtStartOfCurrentLap;
             // TODO: See if Black Flag handling needed here.
             csd.IsDisqualified = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dq;
             csd.IsDNF = (rFactor2Constants.rF2FinishStatus)playerScoring.mFinishStatus == rFactor2Constants.rF2FinishStatus.Dnf;
@@ -626,7 +627,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.CarSpeed = (float)RF2GameStateMapper.getVehicleSpeed(ref playerTelemetry);
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)getEstimatedLapDist(shared, ref playerScoring, ref playerTelemetry);
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerTelemetry.mPos.x, (float)playerTelemetry.mPos.y, (float)playerTelemetry.mPos.z };
-                cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerTelemetry.mOri);
+                if (playerTelemetry.mOri != null)
+                    cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerTelemetry.mOri);
             }
             else
             {
@@ -634,7 +636,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.PositionAndMotionData.DistanceRoundTrack = (float)playerScoring.mLapDist;
                 cgs.PositionAndMotionData.WorldPosition = new float[] { (float)playerScoring.mPos.x, (float)playerScoring.mPos.y, (float)playerScoring.mPos.z };
 
-                // TODO: drop mPos/mLapDist from serialization as well.
+                // TODO: drop mPos from serialization as well.
                 if (playerScoring.mOri != null)  // Don't bother with corner case of no telemetry data if we're reading from a file.
                     cgs.PositionAndMotionData.Orientation = RF2GameStateMapper.GetRotation(ref playerScoring.mOri);
             }
@@ -1115,9 +1117,8 @@ namespace CrewChiefV4.rFactor2
             {
                 var vehicleScoring = shared.scoring.mVehicles[i];
 
-                // TOOD_PERF: cache this.
-                var driverName = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
-                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
+                var cci = this.GetCachedCarInfo(ref vehicleScoring);
+                var driverName = cci.driverNameRawSanitized;
 
                 if (driverNameCounts.ContainsKey(driverName))
                     driverNameCounts[driverName] += 1;
@@ -1182,12 +1183,11 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                // TOOD_PERF: cache this.
-                var driverName = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
-                driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
-                OpponentData opponentPrevious;
-                int duplicatesCount = driverNameCounts[driverName];
-                string opponentKey;
+                var vehicleCachedInfo = this.GetCachedCarInfo(ref vehicleScoring);
+                var driverName = vehicleCachedInfo.driverNameRawSanitized;
+                OpponentData opponentPrevious = null;
+                var duplicatesCount = driverNameCounts[driverName];
+                string opponentKey = null;
                 if (duplicatesCount > 1)
                 {
                     if (!isOfflineSession)
@@ -1197,9 +1197,8 @@ namespace CrewChiefV4.rFactor2
                         // the historical data and repeatedly re-adding this name to the SpeechRecogniser (which is expensive)
                         if (pgs != null && pgs.OpponentData.ContainsKey(driverName)
                             && !cgs.OpponentData.ContainsKey(driverName))
-                        {
                             cgs.OpponentData.Add(driverName, pgs.OpponentData[driverName]);
-                        }
+
                         opponentKeysProcessed.Add(driverName);
                         continue;
                     }
@@ -1249,12 +1248,12 @@ namespace CrewChiefV4.rFactor2
 
                 opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
                 var opponent = new OpponentData();
-                // TODO_PERF: cache this.
-                opponent.CarClass = CarData.getCarClassForClassName(RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mVehicleClass));
+
+                opponent.CarClass = vehicleCachedInfo.carClass;
                 opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
-                opponent.DriverRawName = driverName;
+                opponent.DriverRawName = vehicleCachedInfo.driverNameRawSanitized;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
-                opponent.Position = vehicleScoring.mPlace;
+                opponent.OverallPosition = vehicleScoring.mPlace;
 
                 // Telemetry isn't always available, initialize first tyre set 10 secs or more into race.
                 if (csd.SessionType == SessionType.Race && csd.SessionRunningTime > 10
@@ -1269,7 +1268,7 @@ namespace CrewChiefV4.rFactor2
 
                     Console.WriteLine("New driver \"" + driverName +
                         "\" is using car class " + opponent.CarClass.getClassIdentifier() +
-                        " at position " + opponent.Position.ToString());
+                        " at position " + opponent.OverallPosition.ToString());
                 }
 
                 // Carry over state
@@ -1283,11 +1282,12 @@ namespace CrewChiefV4.rFactor2
                         opponent.TyreChangesByLap.Add(old.Key, old.Value);
 
                     opponent.NumPitStops = opponentPrevious.NumPitStops;
+                    opponent.OverallPositionAtPreviousTick = opponentPrevious.OverallPosition;
+                    opponent.ClassPositionAtPreviousTick = opponentPrevious.ClassPosition;
                 }
 
-                opponent.UnFilteredPosition = opponent.Position;
                 opponent.SessionTimeAtLastPositionChange
-                    = opponentPrevious != null && opponentPrevious.Position != opponent.Position
+                    = opponentPrevious != null && opponentPrevious.OverallPosition != opponent.OverallPosition
                             ? csd.SessionRunningTime : -1.0f;
 
                 opponent.CompletedLaps = vehicleScoring.mTotalLaps;
@@ -1314,7 +1314,7 @@ namespace CrewChiefV4.rFactor2
                     if (opponentPrevious.DistanceRoundTrack < csd.TrackDefinition.distanceForNearPitEntryChecks
                         && opponent.DistanceRoundTrack > csd.TrackDefinition.distanceForNearPitEntryChecks)
                     {
-                        opponent.PositionOnApproachToPitEntry = opponent.Position;
+                        opponent.PositionOnApproachToPitEntry = opponent.OverallPosition;
                     }
                     else
                     {
@@ -1347,6 +1347,7 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 opponent.InPits = isInPits;
+                opponent.JustEnteredPits = opponentPrevious != null && !opponentPrevious.InPits && opponent.InPits;
 
                 var wasInPits = opponentPrevious != null && opponentPrevious.InPits;
                 opponent.hasJustChangedToDifferentTyreType = false;
@@ -1374,7 +1375,7 @@ namespace CrewChiefV4.rFactor2
                     if (lastSectorTime > 0.0f)
                     {
                         opponent.CompleteLapWithProvidedLapTime(
-                            opponent.Position,
+                            opponent.OverallPosition,
                             csd.SessionRunningTime,
                             opponent.LastLapTime,
                             lapValid,  // TODO: revisit
@@ -1387,7 +1388,7 @@ namespace CrewChiefV4.rFactor2
                     }
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
-                        opponent.Position,
+                        opponent.OverallPosition,
                         vehicleScoring.mInPits == 1 || opponent.DistanceRoundTrack < 0.0f,
                         csd.SessionRunningTime,
                         shared.scoring.mScoringInfo.mRaining > minRainThreshold,
@@ -1398,7 +1399,7 @@ namespace CrewChiefV4.rFactor2
                 {
                     opponent.AddCumulativeSectorData(
                         opponentPrevious.CurrentSectorNumber,
-                        opponent.Position,
+                        opponent.OverallPosition,
                         lastSectorTime,
                         csd.SessionRunningTime,
                         lapValid,
@@ -1413,39 +1414,16 @@ namespace CrewChiefV4.rFactor2
                     && !opponentPrevious.isEnteringPits())
                 {
                     opponent.setInLap();
-                    if (opponent.PositionOnApproachToPitEntry == 1)
-                    {
-                        cgs.PitData.LeaderIsPitting = true;
-                        cgs.PitData.OpponentForLeaderPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == csd.Position - 1 && csd.Position > 2)
-                    {
-                        cgs.PitData.CarInFrontIsPitting = true;
-                        cgs.PitData.OpponentForCarAheadPitting = opponent;
-                    }
-
-                    if (opponent.PositionOnApproachToPitEntry == csd.Position + 1 && !cgs.isLast())
-                    {
-                        cgs.PitData.CarBehindIsPitting = true;
-                        cgs.PitData.OpponentForCarBehindPitting = opponent;
-                    }
                 }
 
-                if (opponent.Position == csd.Position + 1 && csd.SessionType == SessionType.Race)
+                if (opponent.OverallPosition == csd.OverallPosition + 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
                 // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
-                if (opponent.Position == csd.Position - 1 && csd.SessionType == SessionType.Race)
+                if (opponent.OverallPosition == csd.OverallPosition - 1 && csd.SessionType == SessionType.Race)
                     csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
 
-                if (opponentPrevious != null
-                    && opponentPrevious.Position > 1
-                    && opponent.Position == 1)
-                {
-                    csd.HasLeadChanged = true;
-                }
-
+                
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
@@ -1502,13 +1480,7 @@ namespace CrewChiefV4.rFactor2
             cgs.sortClassPositions();
 
             if (pgs != null)
-            {
-                csd.HasLeadChanged = !csd.HasLeadChanged && psd.Position > 1 && csd.Position == 1 ? true : csd.HasLeadChanged;
-                csd.IsRacingSameCarInFront = string.Equals(pgs.getOpponentKeyInFront(false), cgs.getOpponentKeyInFront(false));
-                csd.IsRacingSameCarBehind = string.Equals(pgs.getOpponentKeyBehind(false), cgs.getOpponentKeyBehind(false));
-                csd.GameTimeAtLastPositionFrontChange = !csd.IsRacingSameCarInFront ? csd.SessionRunningTime : psd.GameTimeAtLastPositionFrontChange;
-                csd.GameTimeAtLastPositionBehindChange = !csd.IsRacingSameCarBehind ? csd.SessionRunningTime : psd.GameTimeAtLastPositionBehindChange;
-
+            {               
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                 var stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
                     csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack,
@@ -1516,6 +1488,9 @@ namespace CrewChiefV4.rFactor2
                 cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
                 if (csd.IsNewLap)
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                csd.SessionStartClassPosition = pgs.SessionData.SessionStartClassPosition;
+                csd.ClassPositionAtStartOfCurrentLap = pgs.SessionData.ClassPositionAtStartOfCurrentLap;
+                csd.NumCarsInPlayerClassAtStartOfSession = pgs.SessionData.NumCarsInPlayerClassAtStartOfSession;
             }
 
             // --------------------------------
@@ -1525,7 +1500,6 @@ namespace CrewChiefV4.rFactor2
 
             // --------------------------------
             // flags data
-            // TODO: should RF2 ever drop back to the improvised incident calling?
             cgs.FlagData.useImprovisedIncidentCalling = false;
 
             cgs.FlagData.isFullCourseYellow = csd.SessionPhase == SessionPhase.FullCourseYellow
@@ -1704,14 +1678,14 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("HasMandatoryPitStop " + cgs.PitData.HasMandatoryPitStop);
                 Console.WriteLine("PitWindowStart " + cgs.PitData.PitWindowStart);
                 Console.WriteLine("PitWindowEnd " + cgs.PitData.PitWindowEnd);
-                Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsAtStartOfSession);
+                Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsOverallAtStartOfSession);
                 Console.WriteLine("SessionNumberOfLaps " + csd.SessionNumberOfLaps);
                 Console.WriteLine("SessionRunTime " + csd.SessionTotalRunTime);
                 Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("Track Name \"" + csd.TrackDefinition.name + "\"");
                 Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
-                    " at position " + csd.Position.ToString());
+                    " at position " + csd.OverallPosition.ToString());
 
                 Utilities.TraceEventClass(cgs);
             }
@@ -1721,21 +1695,22 @@ namespace CrewChiefV4.rFactor2
                     " to " + csd.SessionPhase);
                 if (csd.SessionPhase == SessionPhase.Checkered ||
                     csd.SessionPhase == SessionPhase.Finished)
-                {
-                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps +
-                        " laps, session running time = " + csd.SessionRunningTime);
-                }
+                    Console.WriteLine("Checkered - completed " + csd.CompletedLaps + " laps, session running time = " + csd.SessionRunningTime);
             }
             if (pgs != null && !psd.LeaderHasFinishedRace && csd.LeaderHasFinishedRace)
-            {
-                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps +
-                    " laps, session time = " + csd.SessionRunningTime);
-            }
+                Console.WriteLine("Leader has finished race, player has done " + csd.CompletedLaps + " laps, session time = " + csd.SessionRunningTime);
 
             CrewChief.trackName = csd.TrackDefinition.name;
-            CrewChief.carClass = cgs.carClass.carClassEnum;
+            CrewChief.carClass = cgs.carClass.carClassEnum;  // TODO: Why is this an enum and not a CarClass?
             CrewChief.distanceRoundTrack = cgs.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+
+            if (pgs != null
+                && csd.SessionType == SessionType.Race
+                && csd.SessionPhase == SessionPhase.Green
+                && (pgs.SessionData.SessionPhase == SessionPhase.Formation
+                    || pgs.SessionData.SessionPhase == SessionPhase.Countdown))
+                csd.JustGoneGreen = true;
 
             return cgs;
         }
@@ -1815,7 +1790,7 @@ namespace CrewChiefV4.rFactor2
         {
             // Estimate lapdist
             // See how much ahead telemetry is ahead of scoring update
-            // TODO: experiment with pick speed from telemetry.
+            // TODO: experiment with pick speed from telemetry.  This would allow dropping scoring mLocalVel/mLocalAccel from serialization.
             var delta = vehicleTelemetry.mElapsedTime - shared.scoring.mScoringInfo.mCurrentET;
             var lapDistEstimated = vehicleScoring.mLapDist;
             if (delta > 0.0)
@@ -1909,7 +1884,7 @@ namespace CrewChiefV4.rFactor2
                 if (lastSectorTime > 0.0f)
                 {
                     csd.playerCompleteLapWithProvidedLapTime(
-                        csd.Position,
+                        csd.OverallPosition,
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
                         csd.CurrentLapIsValid,
@@ -1923,7 +1898,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.playerStartNewLap(
                     csd.CompletedLaps + 1,
-                    csd.Position,
+                    csd.OverallPosition,
                     playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
                     csd.SessionRunningTime,
                     scoring.mScoringInfo.mRaining > minRainThreshold,
@@ -1934,7 +1909,7 @@ namespace CrewChiefV4.rFactor2
             {
                 csd.playerAddCumulativeSectorData(
                     psd.SectorNumber,
-                    csd.Position,
+                    csd.OverallPosition,
                     lastSectorTime,
                     csd.SessionRunningTime,
                     csd.CurrentLapIsValid,
@@ -2030,6 +2005,7 @@ namespace CrewChiefV4.rFactor2
                 case rFactor2Constants.rF2GamePhase.Formation:
                     return SessionPhase.Formation;
                 case rFactor2Constants.rF2GamePhase.Garage:
+                case rFactor2Constants.rF2GamePhase.Undocumented_PreRace:
                     return SessionPhase.Garage;
                 case rFactor2Constants.rF2GamePhase.GridWalk:
                     return SessionPhase.Gridwalk;
@@ -2073,7 +2049,7 @@ namespace CrewChiefV4.rFactor2
 
             float minDistDiff = -1.0f;
             float timeDelta = sessionRunningTime - previousGameState.SessionData.SessionRunningTime;
-            String bestKey = null;
+            string bestKey = null;
             if (timeDelta >= 0.0f)
             {
                 foreach (var possibleKey in possibleKeys)
@@ -2082,13 +2058,11 @@ namespace CrewChiefV4.rFactor2
                     {
                         var o = previousGameState.OpponentData[possibleKey];
 
-                        // TODO_PERF: cache this
-                        var driverNameFromScoring = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
-                        driverNameFromScoring = RF2GameStateMapper.GetSanitizedDriverName(driverNameFromScoring);
+                        var cci = this.GetCachedCarInfo(ref vehicleScoring);
+                        var driverNameFromScoring = cci.driverNameRawSanitized;
 
-                        // TODO_PERF: cache mID -> car class str (or object?)
                         if (o.DriverRawName != driverNameFromScoring
-                            || o.CarClass != CarData.getCarClassForClassName(RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mVehicleClass))
+                            || !CarData.IsCarClassEqual(o.CarClass, cci.carClass)
                             || opponentKeysProcessed.Contains(possibleKey))
                             continue;
 
@@ -2112,7 +2086,7 @@ namespace CrewChiefV4.rFactor2
             return bestKey;
         }
 
-        public SessionType mapToSessionType(Object wrapper)
+        public override SessionType mapToSessionType(Object wrapper)
         {
             var shared = wrapper as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             switch (shared.scoring.mScoringInfo.mSession)
@@ -2236,25 +2210,13 @@ namespace CrewChiefV4.rFactor2
               : Encoding.Default.GetString(bytes);
         }
 
-        // Some Endurance mods use format of LastName1/LastName2.  This is 24hrs stuff with driver swap.
-        // CC currently does not support pair of names for a vehicle.  However, this is such a rare case,
-        // that for now let's just use first last name.
-        private static Dictionary<string, string> sanitizedNamesMap = new Dictionary<string, string>();
-
         public static string GetSanitizedDriverName(string nameFromGame)
         {
-            string sanitizedName = "";
-            if (sanitizedNamesMap.TryGetValue(nameFromGame, out sanitizedName))
-                return sanitizedName;
-
             var fwdSlashPos = nameFromGame.IndexOf('/');
             if (fwdSlashPos != -1)
                 Console.WriteLine(string.Format(@"Detected pair name: ""{0}"" . Crew Chief does not currently support double names, first part will be used.", nameFromGame));
 
-            sanitizedName = fwdSlashPos == -1 ? nameFromGame : nameFromGame.Substring(0, fwdSlashPos);
-
-            // Save for fast lookup next time.
-            RF2GameStateMapper.sanitizedNamesMap.Add(nameFromGame, sanitizedName);
+            var sanitizedName = fwdSlashPos == -1 ? nameFromGame : nameFromGame.Substring(0, fwdSlashPos);
 
             return sanitizedName;
         }
@@ -2421,8 +2383,8 @@ namespace CrewChiefV4.rFactor2
                         var v = scoring.mVehicles[i];
                         if (v.mID == vehToFollowId)
                         {
-                            fod.DriverToFollowRaw = RF2GameStateMapper.GetStringFromBytes(v.mDriverName).ToLowerInvariant();
-                            fod.DriverToFollowRaw = RF2GameStateMapper.GetSanitizedDriverName(fod.DriverToFollowRaw);
+                            var cci = this.GetCachedCarInfo(ref v);
+                            fod.DriverToFollowRaw = cci.driverNameRawSanitized;
 
                             toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
                             break;
@@ -2500,6 +2462,29 @@ namespace CrewChiefV4.rFactor2
             };
 
             return rot;
+        }
+
+        private CarInfo GetCachedCarInfo(ref rF2VehicleScoring vehicleScoring)
+        {
+            CarInfo ci = null;
+            if (this.idToCarInfoMap.TryGetValue(vehicleScoring.mID, out ci))
+                return ci;
+
+            var driverName = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mDriverName).ToLowerInvariant();
+            driverName = RF2GameStateMapper.GetSanitizedDriverName(driverName);
+
+            var carClassId = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mVehicleClass);
+            var carClass = CarData.getCarClassForClassName(carClassId);
+
+            ci = new CarInfo()
+            {
+                carClass = carClass,
+                driverNameRawSanitized = driverName
+            };
+
+            this.idToCarInfoMap.Add(vehicleScoring.mID, ci);
+
+            return ci;
         }
     }
 }

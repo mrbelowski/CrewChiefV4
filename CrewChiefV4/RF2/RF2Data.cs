@@ -68,7 +68,8 @@ namespace CrewChiefV4.rFactor2
             GreenFlag = 5,
             FullCourseYellow = 6,
             SessionStopped = 7,
-            SessionOver = 8
+            SessionOver = 8,
+            Undocumented_PreRace = 9  // I suspect 9 means we're in a garage/monitor, waiting for race to start.
         }
 
         // Yellow flag states (applies to full-course only)
@@ -482,8 +483,8 @@ namespace CrewChiefV4.rFactor2
             public double mLapStartET;            // time this lap was started
 
             // Position and derivatives
-            // TODO: remove these from serialization, no telemetry case is corner case.
-            public rF2Vec3 mPos;                  // world position in meters
+            [XmlIgnore] public rF2Vec3 mPos;                  // world position in meters
+            // TODO: remove these serialization, once we use telemetry
             public rF2Vec3 mLocalVel;             // velocity (meters/sec) in local vehicle coordinates
             public rF2Vec3 mLocalAccel;           // acceleration (meters/sec^2) in local vehicle coordinates
 

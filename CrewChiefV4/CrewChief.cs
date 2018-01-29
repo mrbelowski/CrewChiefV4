@@ -121,6 +121,7 @@ namespace CrewChiefV4
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
+            eventsList.Add("MuliclassWarnings", new MulticlassWarnings(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
@@ -767,6 +768,13 @@ namespace CrewChiefV4
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
+                            // TODO: derived data for practice and qually sessions, if we need it
+                            // TODO: check this is safe at session end (do any of the mappers set the sessionType to Unavailable
+                            // as soon as it finishes? Don't think they do but needs checking)
+                            if (currentGameState.SessionData.SessionType == SessionType.Race)
+                            {
+                                gameStateMapper.populateDerivedRaceSessionData(currentGameState);
+                            }
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)
                             {
@@ -781,7 +789,7 @@ namespace CrewChiefV4
                                 }
                                 else
                                 {
-                                    positionMsg = currentGameState.SessionData.Position.ToString();
+                                    positionMsg = currentGameState.SessionData.ClassPosition.ToString();
                                 }
                                 Console.WriteLine("Session finished, position = " + positionMsg);
                                 audioPlayer.purgeQueues();
@@ -791,7 +799,8 @@ namespace CrewChiefV4
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                    previousGameState.SessionData.SessionStartPosition, previousGameState.SessionData.Position, previousGameState.SessionData.NumCarsAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                    previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
+                                    previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
                                     currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
 
                                 sessionFinished = true;

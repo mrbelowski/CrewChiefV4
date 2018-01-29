@@ -53,7 +53,7 @@ namespace CrewChiefV4.Events
         public static String folderLicenseD = "licence/d_licence";
         public static String folderLicenseR = "licence/r_licence";
         public static String folderLicensePro = "licence/pro_licence";
-
+        
         private int frequencyOfOpponentRaceLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_race_lap_times");
         private int frequencyOfOpponentPracticeAndQualLapTimes = UserSettings.GetUserSettings().getInt("frequency_of_opponent_practice_and_qual_lap_times");
 
@@ -77,7 +77,7 @@ namespace CrewChiefV4.Events
         private String lastNextCarAheadOpponentName = null;
 
         private String lastLeaderAnnounced = null;
-
+        
         public Opponents(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -116,7 +116,8 @@ namespace CrewChiefV4.Events
                     if (validationData.ContainsKey(validationDriverAheadKey))
                     {
                         String expectedOpponentName = (String)validationData[validationDriverAheadKey];
-                        OpponentData opponentInFront = currentGameState.SessionData.Position > 1 ? currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false) : null;
+                        OpponentData opponentInFront = currentGameState.SessionData.ClassPosition > 1 ?
+                            currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass) : null;
                         String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
                         if (actualOpponentName != expectedOpponentName)
                         {
@@ -136,13 +137,13 @@ namespace CrewChiefV4.Events
                     else if (validationData.ContainsKey(validationNewLeaderKey))
                     {
                         String expectedLeaderName = (String)validationData[validationNewLeaderKey];
-                        if (currentGameState.SessionData.Position == 1)
+                        if (currentGameState.SessionData.ClassPosition == 1)
                         {
                             Console.WriteLine("new leader message for opponent " + expectedLeaderName +
                                     " no longer valid - player is now leader");
                             return false;
                         }
-                        OpponentData actualLeader = currentGameState.getOpponentAtPosition(1, false);
+                        OpponentData actualLeader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                         String actualLeaderName = actualLeader == null ? null : actualLeader.DriverRawName;
                         if (actualLeaderName != expectedLeaderName)
                         {
@@ -169,12 +170,13 @@ namespace CrewChiefV4.Events
             int positionToCheck;
             if (opponentData.PositionOnApproachToPitEntry > 0)
             {
+                // TODO: THIS IS WRONG
                 positionToCheck = opponentData.PositionOnApproachToPitEntry;
             }
             else
             {
                 // fallback if the PositionOnApproachToPitEntry isn't set - shouldn't really happen
-                positionToCheck = opponentData.Position;
+                positionToCheck = opponentData.ClassPosition;
             }
             if (positionToCheck == 1)
             {
@@ -220,13 +222,18 @@ namespace CrewChiefV4.Events
                     {
                         string opponentKey = entry.Key;
                         OpponentData opponentData = entry.Value;
+                        if (opponentData.CarClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
+                        {
+                            // not interested in opponents from other classes
+                            continue;
+                        }
 
                         // in race sessions, announce tyre type changes once the session is underway
                         if (currentGameState.SessionData.SessionType == SessionType.Race &&
                             currentGameState.SessionData.SessionRunningTime > 30 && opponentData.hasJustChangedToDifferentTyreType)
                         {
                             // this may be a race position or an OpponentData object
-                            Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.Position);
+                            Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.ClassPosition);
                             if (opponentIdentifier != null)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
@@ -271,7 +278,7 @@ namespace CrewChiefV4.Events
                                ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
                                      opponentData.LastLapTime <= opponentData.CurrentBestLapTime))
                             {
-                                if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == 1 &&
+                                if (currentGameState.SessionData.ClassPosition > 1 && opponentData.ClassPosition == 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || frequencyOfOpponentPracticeAndQualLapTimes > 0))
                                 {
                                     // he's leading, and has recorded 3 or more laps, and this one's his fastest
@@ -279,7 +286,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
                                             TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                                 }
-                                else if (currentGameState.SessionData.UnFilteredPosition > 1 && opponentData.UnFilteredPosition == currentGameState.SessionData.Position - 1 &&
+                                else if (currentGameState.SessionData.ClassPosition > 1 && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition - 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                                 {
                                     // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
@@ -287,7 +294,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                                 }
-                                else if (!currentGameState.isLast() && opponentData.UnFilteredPosition == currentGameState.SessionData.Position + 1 &&
+                                else if (!currentGameState.isLast() && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition + 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                                 {
                                     // he's behind us, and has recorded 3 or more laps, and this one's his fastest
@@ -345,10 +352,10 @@ namespace CrewChiefV4.Events
                     {
                         if (!currentGameState.SessionData.IsRacingSameCarInFront)
                         {
-                            if (currentGameState.SessionData.Position > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
+                            if (currentGameState.SessionData.ClassPosition > 2 && currentGameState.Now > nextCarAheadChangeMessage && !currentGameState.PitData.InPitlane
                                 && currentGameState.SessionData.CompletedLaps > 0)
                             {
-                                OpponentData opponentData = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                                OpponentData opponentData = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                 if (opponentData != null)
                                 {
                                     String opponentName = opponentData.DriverRawName;
@@ -369,11 +376,11 @@ namespace CrewChiefV4.Events
                         }
                         if (currentGameState.SessionData.HasLeadChanged)
                         {
-                            OpponentData leader = currentGameState.getOpponentAtPosition(1, false);
+                            OpponentData leader = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                             if (leader != null)
                             {
                                 String name = leader.DriverRawName;
-                                if (currentGameState.SessionData.Position > 1 && previousGameState.SessionData.Position > 1 &&
+                                if (currentGameState.SessionData.ClassPosition > 1 && previousGameState.SessionData.ClassPosition > 1 &&
                                     !name.Equals(lastLeaderAnnounced) &&
                                     currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
                                 {
@@ -418,24 +425,24 @@ namespace CrewChiefV4.Events
             Boolean gotByPositionNumber = false;
             if (voiceMessage.Contains(SpeechRecogniser.THE_LEADER))
             {
-                if (currentGameState.SessionData.Position > 1)
+                if (currentGameState.SessionData.ClassPosition > 1)
                 {
-                    opponentKey = currentGameState.getOpponentKeyAtPosition(1, false);
+                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(1, currentGameState.carClass);
                 }
-                else if (currentGameState.SessionData.Position == 1)
+                else if (currentGameState.SessionData.ClassPosition == 1)
                 {
                     opponentKey = positionIsPlayerKey;
                 }
             }
             if ((voiceMessage.Contains(SpeechRecogniser.THE_CAR_AHEAD) || voiceMessage.Contains(SpeechRecogniser.THE_GUY_AHEAD) ||
-                voiceMessage.Contains(SpeechRecogniser.THE_GUY_IN_FRONT) || voiceMessage.Contains(SpeechRecogniser.THE_CAR_IN_FRONT)) && currentGameState.SessionData.Position > 1)
+                voiceMessage.Contains(SpeechRecogniser.THE_GUY_IN_FRONT) || voiceMessage.Contains(SpeechRecogniser.THE_CAR_IN_FRONT)) && currentGameState.SessionData.ClassPosition > 1)
             {
-                opponentKey = currentGameState.getOpponentKeyInFront(false);
+                opponentKey = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
             }
             else if ((voiceMessage.Contains(SpeechRecogniser.THE_CAR_BEHIND) || voiceMessage.Contains(SpeechRecogniser.THE_GUY_BEHIND)) &&
                             !currentGameState.isLast())
             {
-                opponentKey = currentGameState.getOpponentKeyBehind(false);
+                opponentKey = currentGameState.getOpponentKeyBehind(currentGameState.carClass);
             }
             else if (voiceMessage.Contains(SpeechRecogniser.POSITION_LONG) || voiceMessage.Contains(SpeechRecogniser.POSITION_SHORT))
             {
@@ -462,9 +469,9 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                if (position != currentGameState.SessionData.Position)
+                if (position != currentGameState.SessionData.ClassPosition)
                 {
-                    opponentKey = currentGameState.getOpponentKeyAtPosition(position, false);
+                    opponentKey = currentGameState.getOpponentKeyAtClassPosition(position, currentGameState.carClass);
                 }
                 else
                 {
@@ -637,7 +644,7 @@ namespace CrewChiefV4.Events
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         if (opponent.IsActive)
                         {
-                            int position = opponent.Position;
+                            int position = opponent.ClassPosition;
                             Tuple<int, float> deltas = currentGameState.SessionData.DeltaTime.GetSignedDeltaTimeWithLapDifference(opponent.DeltaTime);
                             int lapDifference = deltas.Item1;
                             float timeDelta = deltas.Item2;
@@ -779,6 +786,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+                // TODO: the ahead / behind on track need to have something about class if it's different to the player class
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
                 {
                     string opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
@@ -789,13 +797,13 @@ namespace CrewChiefV4.Events
                         if (SoundCache.useTTS)
                         {
                             queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
-                                    Position.folderStub + opponent.Position), 0, null);
+                                    Position.folderStub + opponent.ClassPosition), 0, null);
                         }
                         else
                         {
                             queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
-                                    Position.folderStub + opponent.Position),
-                                    MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                                    Position.folderStub + opponent.ClassPosition),
+                                    MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName), 0, null);
                         }
                         if (queuedMessage.canBePlayed)
                         {
@@ -814,13 +822,13 @@ namespace CrewChiefV4.Events
                         if (SoundCache.useTTS)
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
-                                    Position.folderStub + opponent.Position), 0, null);
+                                    Position.folderStub + opponent.ClassPosition), 0, null);
                         }
                         else
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
-                                    Position.folderStub + opponent.Position),
-                                    MessageContents(Position.folderStub + opponent.Position, folderCantPronounceName), 0, null);
+                                    Position.folderStub + opponent.ClassPosition),
+                                    MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName), 0, null);
                         }
 
                         if (queuedMessage.canBePlayed)
@@ -841,7 +849,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position + 1, false);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
@@ -865,7 +873,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_IN_FRONT_IN_THE_RACE))
                 {
-                    if (currentGameState.SessionData.Position == 1)
+                    if (currentGameState.SessionData.ClassPosition == 1)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null));
 
@@ -873,7 +881,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        OpponentData opponent = currentGameState.getOpponentAtPosition(currentGameState.SessionData.Position - 1, false);
+                        OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
@@ -895,9 +903,9 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_LEADING) && currentGameState.SessionData.Position > 1)
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_LEADING) && currentGameState.SessionData.ClassPosition > 1)
                 {
-                    OpponentData opponent = currentGameState.getOpponentAtPosition(1, false);
+                    OpponentData opponent = currentGameState.getOpponentAtClassPosition(1, currentGameState.carClass);
                     if (opponent != null)
                     {
                         QueuedMessage queuedMessage;

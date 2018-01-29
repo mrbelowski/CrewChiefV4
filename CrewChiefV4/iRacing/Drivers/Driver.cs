@@ -85,9 +85,8 @@ namespace CrewChiefV4.iRacing
             this.Car.CarClassId = Parser.ParseInt(query["CarClassID"].GetValue());
             this.Car.CarClassShortName = query["CarClassShortName"].GetValue();
             this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
-
+            this.Car.CarClassRelSpeed = Parser.ParseInt(query["CarClassRelSpeed"].GetValue());            
             bool isPaceCar = Parser.ParseInt(query["CarIsPaceCar"].GetValue()) == 1;
-
             this.IsPacecar = this.CustId == -1 || isPaceCar;
         }
 
