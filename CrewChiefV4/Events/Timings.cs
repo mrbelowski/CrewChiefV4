@@ -202,6 +202,29 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private Boolean isNearRaceEnd(GameStateData currentGameState)
+        {
+            if (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
+                currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps)
+            {
+                // on last lap - check track length 
+                if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                {
+                    return currentGameState.SessionData.SectorNumber > 1;
+                }
+                if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                {
+                    return currentGameState.SessionData.SectorNumber == 3;
+                }
+                return true;
+            }
+            else if (currentGameState.SessionData.SessionTimeRemaining < 120)
+            {
+                return true;
+            }
+            return false;
+        }
+
         protected override void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             // do the corner names stuff first, if it's enabled
@@ -244,7 +267,7 @@ namespace CrewChiefV4.Events
             {
                 return;
             }
-            if (!currentGameState.PitData.InPitlane && enableGapMessages && !currentGameState.FlagData.currentLapIsFCY)
+            if (!currentGameState.PitData.InPitlane && enableGapMessages && !currentGameState.FlagData.currentLapIsFCY && !isNearRaceEnd(currentGameState))
             {
                 if (isRace && !CrewChief.readOpponentDeltasForEveryLap &&
                     IsNewSectorOrGapPoint(previousGameState, currentGameState))
