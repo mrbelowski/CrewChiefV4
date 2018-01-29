@@ -631,9 +631,9 @@ namespace CrewChiefV4.iRacing
                 String driverName = driver.Name.ToLower();
                 lastActiveTimeForOpponents[opponentDataKey] = currentGameState.Now;
                 Boolean createNewDriver = true;
-                if (currentGameState.OpponentData.ContainsKey(opponentDataKey))
+                OpponentData currentOpponentData = null;
+                if (currentGameState.OpponentData.TryGetValue(opponentDataKey, out currentOpponentData))
                 {
-                    OpponentData currentOpponentData = currentGameState.OpponentData[opponentDataKey];
                     if (shared.SessionData.IsTeamRacing || string.Equals(driverName, currentOpponentData.DriverRawName))
                     {
                         createNewDriver = false;
@@ -656,9 +656,10 @@ namespace CrewChiefV4.iRacing
                             float previousOpponentLastLapTime = -1;
                             Boolean previousOpponentLastLapValid = false;
                             float previousOpponentGameTimeWhenLastCrossedStartFinishLine = -1;
-                            if (previousGameState.OpponentData.ContainsKey(opponentDataKey))
+                            OpponentData opponentPrevious = null;
+                            if (previousGameState.OpponentData.TryGetValue(opponentDataKey, out opponentPrevious))
                             {
-                                previousOpponentData = previousGameState.OpponentData[opponentDataKey];
+                                previousOpponentData = opponentPrevious;
                                 previousOpponentSectorNumber = previousOpponentData.CurrentSectorNumber;
                                 previousOpponentCompletedLaps = previousOpponentData.CompletedLaps;
                                 previousOpponentOverallPosition = previousOpponentData.OverallPosition;
@@ -834,9 +835,10 @@ namespace CrewChiefV4.iRacing
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
                 foreach (string opponentDataKey in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentDataKey) || (lastActiveTimeForOpponents[opponentDataKey] < oldestAllowedUpdate && currentGameState.OpponentData[opponentDataKey].IsActive))
+                    DateTime lastTimeForOpponent = DateTime.MinValue;
+                    OpponentData currentOpponent = null;
+                    if (!lastActiveTimeForOpponents.TryGetValue(opponentDataKey, out lastTimeForOpponent) || (lastTimeForOpponent < oldestAllowedUpdate && currentGameState.OpponentData.TryGetValue(opponentDataKey, out currentOpponent) && currentOpponent.IsActive))
                     {
-                        OpponentData currentOpponent = currentGameState.OpponentData[opponentDataKey];
                         currentOpponent.IsActive = false;
                         currentOpponent.InPits = true;
                         currentOpponent.Speed = 0;
@@ -1013,9 +1015,10 @@ namespace CrewChiefV4.iRacing
         public override SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             String sessionString = (String)memoryMappedFileStruct;
-            if (sessionTypeMap.ContainsKey(sessionString))
+            SessionType st = SessionType.Unavailable;
+            if (sessionTypeMap.TryGetValue(sessionString, out st))
             {
-                return sessionTypeMap[sessionString];
+                return st;
             }
             return SessionType.Unavailable;
         }

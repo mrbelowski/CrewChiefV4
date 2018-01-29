@@ -1244,6 +1244,7 @@ namespace CrewChiefV4.GameState
         private static float minSignificantRelativeTimeDiffForVoiceCommand = 0.03f;    // 3% - is this a good value?
         private static float minSignificantRelativeStartSpeedDiffForVoiceCommand = 0.05f;   // 5% - is this a good value?
 
+        // TODO: As this is a small set, we might want to move to ListDictionary<> for small data sets.
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
         // temporary variables for tracking landmark timings during a session - we add a timing when these are non-null and
@@ -1263,23 +1264,25 @@ namespace CrewChiefV4.GameState
         {
             if (time > 0)
             {
-                if (!sessionData.ContainsKey(landmarkName))
+                TrackLandmarksTimingData tltd = null;
+                if (!sessionData.TryGetValue(landmarkName, out tltd))
                 {
-                    sessionData.Add(landmarkName, new TrackLandmarksTimingData(isCommonOvertakingSpot));
+                    tltd = new TrackLandmarksTimingData(isCommonOvertakingSpot);
+                    sessionData.Add(landmarkName, tltd);
                 }
-                sessionData[landmarkName].addTimeAndSpeeds(time, startSpeed, endSpeed);
+                tltd.addTimeAndSpeeds(time, startSpeed, endSpeed);
             }
         }
         
         // returns [timeInSection, entrySpeed, exitSpeed] for the quickest time through that section
         public float[] getBestTimeAndSpeeds(String landmarkName, int lapsToCheck, int minTimesRequired)
         {
-            if (!sessionData.ContainsKey(landmarkName))
+            TrackLandmarksTimingData trackLandmarksTimingData = null;
+            if (!sessionData.TryGetValue(landmarkName, out trackLandmarksTimingData))
             {
                 return null;
             }
             float[] bestTimeAndSpeeds = new float[] { float.MaxValue, -1f, 1f };
-            TrackLandmarksTimingData trackLandmarksTimingData = sessionData[landmarkName];
             if (trackLandmarksTimingData.timesAndSpeeds.Count < minTimesRequired)
             {
                 return null;
@@ -2137,14 +2140,13 @@ namespace CrewChiefV4.GameState
         public OpponentData getOpponentAtClassPosition(int position, CarData.CarClass carClass, Boolean previousTick)
         {
             string opponentKey = getOpponentKeyAtClassPosition(position, carClass, previousTick);
-            if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
+            OpponentData opponent = null;
+            if (opponentKey != null && OpponentData.TryGetValue(opponentKey, out opponent))
             {
-                return OpponentData[opponentKey];
+                return opponent;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public OpponentData getOpponentAtOverallPosition(int position)
@@ -2155,14 +2157,13 @@ namespace CrewChiefV4.GameState
         public OpponentData getOpponentAtOverallPosition(int position, Boolean previousTick)
         {
             string opponentKey = getOpponentKeyAtOverallPosition(position, previousTick);
-            if (opponentKey != null && OpponentData.ContainsKey(opponentKey))
+            OpponentData opponent = null;
+            if (opponentKey != null && OpponentData.TryGetValue(opponentKey, out opponent))
             {
-                return OpponentData[opponentKey];
+                return opponent;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public string getOpponentKeyInFrontOnTrack()
