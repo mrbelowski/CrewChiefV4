@@ -12,23 +12,23 @@ namespace CrewChiefV4.Events
 {
     class MulticlassWarnings : AbstractEvent
     {
-        private String folderFasterCarsFightingBehindIncludingClassLeader = "opponents/faster_cars_fighting_behind_including_class_leader";
-        private String folderFasterCarsBehindIncludingClassLeader = "opponents/folder_faster_cars_behind_including_class_leader";
-        private String folderFasterCarsBehindFighting = "opponents/folder_faster_cars_behind_fighting";
-        private String folderFasterCarsBehind = "opponents/folder_faster_cars_behind";
-        private String folderFasterCarBehindRacingPlayerForPositionIsClassLeader = "opponents/folder_faster_car_behind_racing_player_for_position_is_class_leader"; // this one's a mouth-full :(
-        private String folderFasterCarBehindIsClassLeader = "opponents/folder_faster_car_behind_is_class_leader";
-        private String folderFasterCarBehindRacingPlayerForPosition = "opponents/folder_faster_car_behind_racing_player_for_position";
-        private String folderFasterCarBehind = "opponents/folder_faster_car_behind";
+        private String folderFasterCarsFightingBehindIncludingClassLeader = "multiclass/faster_cars_fighting_behind_inc_class_leader";
+        private String folderFasterCarsBehindIncludingClassLeader = "multiclass/faster_cars_behind_inc_class_leader";
+        private String folderFasterCarsBehindFighting = "multiclass/faster_cars_behind_fighting";
+        private String folderFasterCarsBehind = "multiclass/faster_cars_behind";
+        private String folderFasterCarBehindRacingPlayerForPositionIsClassLeader = "multiclass/faster_car_behind_racing_player_is_class_leader"; // this one's a mouth-full :(
+        private String folderFasterCarBehindIsClassLeader = "multiclass/faster_car_behind_is_class_leader";
+        private String folderFasterCarBehindRacingPlayerForPosition = "multiclass/faster_car_behind_racing_player";
+        private String folderFasterCarBehind = "multiclass/faster_car_behind";
 
-        private String folderSlowerCarsFightingAheadIncludingClassLeader = "opponents/folder_slower_cars_fighting_ahead_including_class_leader";
-        private String folderSlowerCarsAheadIncludingClassLeader = "opponents/folder_slower_cars_ahead_including_class_leader";
-        private String folderSlowerCarsAheadFighting = "opponents/folder_slower_cars_ahead_fighting";
-        private String folderSlowerCarsAhead = "opponents/folder_slower_cars_ahead";
-        private String folderSlowerCarAheadRacingPlayerForPositionIsClassLeader = "opponents/folder_slower_car_ahead_racing_player_for_position_is_class_leader";
-        private String folderSlowerCarAheadClassLeader = "opponents/folder_slower_car_ahead_class_leader";
-        private String folderSlowerCarAheadRacingPlayerForPosition = "opponents/folder_slower_car_ahead_racing_player_for_position";
-        private String folderSlowerCarAhead = "opponents/folder_slower_car_ahead";
+        private String folderSlowerCarsFightingAheadIncludingClassLeader = "multiclass/slower_cars_fighting_ahead_inc_class_leader";
+        private String folderSlowerCarsAheadIncludingClassLeader = "multiclass/slower_cars_ahead_inc_class_leader";
+        private String folderSlowerCarsAheadFighting = "multiclass/slower_cars_ahead_fighting";
+        private String folderSlowerCarsAhead = "multiclass/slower_cars_ahead";
+        private String folderSlowerCarAheadRacingPlayerForPositionIsClassLeader = "multiclass/slower_car_ahead_racing_player_is_class_leader";
+        private String folderSlowerCarAheadClassLeader = "multiclass/slower_car_ahead_is_class_leader";
+        private String folderSlowerCarAheadRacingPlayerForPosition = "multiclass/slower_car_ahead_racing_player";
+        private String folderSlowerCarAhead = "multiclass/slower_car_ahead";
         
         private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
         private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
