@@ -37,6 +37,11 @@ namespace CrewChiefV4.Events
         private HashSet<string> driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>();
         private HashSet<string> driverNamesForFasterClassLastWarnedAbout = new HashSet<string>();
 
+        private DateTime timeOfLastSingleCarFasterClassWarning = DateTime.MinValue;
+        private DateTime timeOfLastMultipleCarFasterClassWarning = DateTime.MinValue;
+        private DateTime timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
+        private DateTime timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
+
         public MulticlassWarnings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;            
@@ -58,15 +63,21 @@ namespace CrewChiefV4.Events
             previousCheckOtherClassWarningData = null;
             driverNamesForSlowerClassLastWarnedAbout.Clear();
             driverNamesForFasterClassLastWarnedAbout.Clear();
+            timeOfLastSingleCarFasterClassWarning = DateTime.MinValue;
+            timeOfLastMultipleCarFasterClassWarning = DateTime.MinValue;
+            timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
+            timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (GameStateData.onManualFormationLap)
+            if (GameStateData.onManualFormationLap ||GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
+                currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
+                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane ||
+                currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
             {
                 return;
             }
-
             if (currentGameState.Now > nextCheckForOtherCarClasses)
             {
                 OtherCarClassWarningData otherClassWarningData = getOtherCarClassWarningData(currentGameState);
@@ -82,13 +93,16 @@ namespace CrewChiefV4.Events
                     {
                         // TODO: THIS LOGIC FOR CHECKING THE STATE HAS CHANGED BEFORE ANNOUNCING IS BOLLOCKS
                         // check if this data is consistent with the previous data and that we've not warned about all these cars
-                        if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData, driverNamesForFasterClassLastWarnedAbout, driverNamesForSlowerClassLastWarnedAbout))
+                        if (otherClassWarningData.canAnnounce(previousCheckOtherClassWarningData, driverNamesForFasterClassLastWarnedAbout, driverNamesForSlowerClassLastWarnedAbout,
+                            currentGameState.Now, timeOfLastSingleCarFasterClassWarning, timeOfLastMultipleCarFasterClassWarning, 
+                            timeOfLastSingleCarSlowerClassWarning, timeOfLastMultipleCarSlowerClassWarning))
                         {
                             previousCheckOtherClassWarningData = null;
                             // do the announcing - need to decide which to prefer - read multiple?
                             Console.WriteLine(otherClassWarningData.ToString());
                             if (otherClassWarningData.numFasterCars > 1)
                             {
+                                timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;
                                 this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
                                 if (otherClassWarningData.fasterCarsIncludeClassLeader)
                                 {
@@ -118,6 +132,7 @@ namespace CrewChiefV4.Events
                             }
                             else if (otherClassWarningData.numFasterCars == 1)
                             {
+                                timeOfLastSingleCarFasterClassWarning = currentGameState.Now;
                                 this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
                                 if (otherClassWarningData.fasterCarsIncludeClassLeader)
                                 {
@@ -145,6 +160,7 @@ namespace CrewChiefV4.Events
                             }
                             if (otherClassWarningData.numSlowerCars > 1)
                             {
+                                timeOfLastMultipleCarSlowerClassWarning = currentGameState.Now;
                                 this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
                                 if (otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
@@ -174,6 +190,7 @@ namespace CrewChiefV4.Events
                             }
                             else if (otherClassWarningData.numSlowerCars == 1)
                             {
+                                timeOfLastSingleCarSlowerClassWarning = currentGameState.Now;
                                 this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
                                 if (otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
@@ -244,15 +261,49 @@ namespace CrewChiefV4.Events
                 this.slowerCarDriverNames = slowerCarDriverNames;
             }
 
-            // checks if the current warning data is consistent with the previous warning data. Bit of a hack but lets see how it goes...
+            // checks if the current warning data is consistent with the previous warning data and a bunch of other stuff
+            // The goal here is to ensure we play significant warnings without spamming the player with messages
             public Boolean canAnnounce(OtherCarClassWarningData previousOtherCarClassWarningData, HashSet<string> fasterDriversAtLastAnnouncement,
-                HashSet<string> slowerDriversAtLastAnnouncement)
+                HashSet<string> slowerDriversAtLastAnnouncement, DateTime now,
+                DateTime timeOfLastSingleCarFasterClassWarning, DateTime timeOfLastMultipleCarFasterClassWarning, 
+                DateTime timeOfLastSingleCarSlowerClassWarning, DateTime timeOfLastMultipleCarSlowerClassWarning)
             {
-                Boolean newFasterDriverToWarnAbout = fasterCarDriverNames.Except(fasterDriversAtLastAnnouncement).Any();
-                Boolean newSlowerDriverToWarnAbout = slowerCarDriverNames.Except(slowerDriversAtLastAnnouncement).Any();
-                return ((this.numFasterCars > 0 && previousOtherCarClassWarningData.numFasterCars > 0) ||
-                    (this.numSlowerCars > 0 && previousOtherCarClassWarningData.numSlowerCars > 0)) &&
-                    (newFasterDriverToWarnAbout || newSlowerDriverToWarnAbout);
+                if ((this.numFasterCars > 0 && previousOtherCarClassWarningData.numFasterCars > 0) ||
+                    (this.numSlowerCars > 0 && previousOtherCarClassWarningData.numSlowerCars > 0))
+                {
+                    Boolean hasNewFasterDriverToWarnAbout = fasterCarDriverNames.Except(fasterDriversAtLastAnnouncement).Any();
+                    Boolean hasNewSlowerDriverToWarnAbout = slowerCarDriverNames.Except(slowerDriversAtLastAnnouncement).Any();
+
+                    if (hasNewFasterDriverToWarnAbout || hasNewSlowerDriverToWarnAbout)
+                    {
+                        // try to estimate how important this warning might be
+                        if (numSlowerCars == 1 &&
+                            (slowerCarsIncludeClassLeader || slowerCarIsRacingPlayerForPosition ||
+                                timeOfLastSingleCarSlowerClassWarning + TimeSpan.FromMinutes(2) > now))
+                        {
+                            return true;
+                        }
+                        else if (numSlowerCars > 1 &&
+                            (slowerCarsIncludeClassLeader || slowerCarsRacingForPosition ||
+                                timeOfLastMultipleCarSlowerClassWarning + TimeSpan.FromMinutes(2) > now))
+                        {
+                            return true;
+                        }
+                        else if (numFasterCars == 1 &&
+                            (fasterCarsIncludeClassLeader || fasterCarIsRacingPlayerForPosition ||
+                                timeOfLastSingleCarFasterClassWarning + TimeSpan.FromMinutes(2) > now))
+                        {
+                            return true;
+                        }
+                        else if (numFasterCars > 1 &&
+                            (fasterCarsIncludeClassLeader || fasterCarsRacingForPosition ||
+                                timeOfLastMultipleCarFasterClassWarning + TimeSpan.FromMinutes(2) > now))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
 
             public override string ToString()
@@ -271,15 +322,6 @@ namespace CrewChiefV4.Events
         // to be called every couple of seconds, not every tick
         private OtherCarClassWarningData getOtherCarClassWarningData(GameStateData currentGameState)
         {
-            // probably do this check in the caller:
-            if (GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
-                currentGameState.SessionData.TrackDefinition == null || currentGameState.SessionData.CompletedLaps < 3 ||
-                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || currentGameState.PitData.InPitlane ||
-                currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)
-            {
-                return null;
-            }
-
             float playerDistanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             float playerBestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
             float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
