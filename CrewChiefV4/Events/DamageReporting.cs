@@ -280,8 +280,10 @@ namespace CrewChiefV4.Events
                 }
             }
             
-            // need to be careful with interval here
-            if (enableCrashMessages && !playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
+            // need to be careful with interval here.
+            // Disable these for iRacing, which has some spikes in car speed data that trigger false positives
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING &&
+                enableCrashMessages && !playedAreYouOKInThisSession && !currentGameState.PitData.InPitlane && 
                 currentGameState.PositionAndMotionData.CarSpeed > 0.001)
             {
                 if (previousGameState != null)

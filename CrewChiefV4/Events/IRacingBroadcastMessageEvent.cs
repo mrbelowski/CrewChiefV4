@@ -318,14 +318,16 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_LEFT_SIDE_TYRES))
             {
-                ChangeTire(PitCommandModeTypes.LF, lastColdRRPressure);
-                ChangeTire(PitCommandModeTypes.LR, lastColdRRPressure);
+                ClearTires();
+                ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
+                ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_RIGHT_SIDE_TYRES))
             {
-                ChangeTire(PitCommandModeTypes.RF, lastColdRRPressure);
+                ClearTires();
+                ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
                 ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
                 return;
