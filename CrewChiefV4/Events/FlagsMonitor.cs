@@ -1309,9 +1309,10 @@ namespace CrewChiefV4.Events
                     String crashLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driver.distanceRoundTrack);
                     if (crashLandmark != null)
                     {
-                        if (crashedInLandmarkCounts.ContainsKey(crashLandmark))
+                        int numCrashesInLandmark = -1;
+                        if (crashedInLandmarkCounts.TryGetValue(crashLandmark, out numCrashesInLandmark))
                         {
-                            crashedInLandmarkCounts[crashLandmark]++;
+                            crashedInLandmarkCounts[crashLandmark] = numCrashesInLandmark + 1;
                         }
                         else
                         {

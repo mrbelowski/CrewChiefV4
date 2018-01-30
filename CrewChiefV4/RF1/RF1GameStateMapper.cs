@@ -656,9 +656,10 @@ namespace CrewChiefV4.rFactor1
                 {
                     isOfflineSession = false;
                 }
-                if (driverNameCounts.ContainsKey(driverName))
+                var numNames = -1;
+                if (driverNameCounts.TryGetValue(driverName, out numNames))
                 {
-                    driverNameCounts[driverName] += 1;
+                    driverNameCounts[driverName] = ++numNames;
                 }
                 else
                 {
@@ -714,15 +715,17 @@ namespace CrewChiefV4.rFactor1
                         // offline we can have any number of duplicates :(
                         opponentKey = getOpponentKeyForVehicleInfo(vehicle, previousGameState, currentGameState.SessionData.SessionRunningTime, driverName, duplicatesCount);
                         // there's no previous opponent data record for this driver so create one
-                        if (duplicatesCreated.ContainsKey(driverName))
+                        int numDuplicates = -1;
+                        if (duplicatesCreated.TryGetValue(driverName, out numDuplicates))
                         {
-                            duplicatesCreated[driverName] += 1;
+                            duplicatesCreated[driverName] = ++numDuplicates;
                         }
                         else
                         {
+                            numDuplicates = 1;
                             duplicatesCreated.Add(driverName, 1);
                         }
-                        opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
+                        opponentKey = driverName + "_duplicate_" + numDuplicates;
                     }
                 }
                 else

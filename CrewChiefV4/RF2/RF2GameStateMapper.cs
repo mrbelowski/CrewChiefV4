@@ -1120,8 +1120,9 @@ namespace CrewChiefV4.rFactor2
                 var cci = this.GetCachedCarInfo(ref vehicleScoring);
                 var driverName = cci.driverNameRawSanitized;
 
-                if (driverNameCounts.ContainsKey(driverName))
-                    driverNameCounts[driverName] += 1;
+                var numNames = -1;
+                if (driverNameCounts.TryGetValue(driverName, out numNames))
+                    driverNameCounts[driverName] = ++numNames;
                 else
                     driverNameCounts.Add(driverName, 1);
             }
@@ -1208,12 +1209,16 @@ namespace CrewChiefV4.rFactor2
                         if (opponentKey == null)
                         {
                             // there's no previous opponent data record for this driver so create one
-                            if (duplicatesCreated.ContainsKey(driverName))
-                                duplicatesCreated[driverName] += 1;
+                            var numDuplicates = -1;
+                            if (duplicatesCreated.TryGetValue(driverName, out numDuplicates))
+                                duplicatesCreated[driverName] = ++numDuplicates;
                             else
+                            {
+                                numDuplicates = 1;
                                 duplicatesCreated.Add(driverName, 1);
+                            }
 
-                            opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
+                            opponentKey = driverName + "_duplicate_" + numDuplicates;
                         }
                     }
                 }
