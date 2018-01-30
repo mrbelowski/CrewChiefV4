@@ -38,7 +38,7 @@ ftruck = Formula Truck
 assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
 rfactor2_64_bit = rFactor 2 (64 bit)
-iracing = iRacing (beta)
+iracing = iRacing
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
@@ -563,7 +563,7 @@ force_single_class_help = Don't allow participants to be grouped by their car cl
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 
-pit_box_position_countdown = Pit box position countdown (R3E only)
+pit_box_position_countdown = Pit box position countdown (R3E and iRacing only)
 pit_box_position_countdown_help = Play distance in metres to box as you approach
 
 enable_multiclass_messages = Enable multi-class messages

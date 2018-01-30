@@ -382,7 +382,8 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            if (enablePositionMessages && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.SessionPhase != SessionPhase.Countdown)
+            if (enablePositionMessages && currentGameState.SessionData.IsNewLap && 
+                currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && !currentGameState.PitData.InPitlane)
             {
                 if (currentGameState.SessionData.CompletedLaps > 0)
                 {

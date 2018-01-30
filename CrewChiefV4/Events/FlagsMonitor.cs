@@ -138,7 +138,7 @@ namespace CrewChiefV4.Events
 
         List<IncidentCandidate> incidentCandidates = new List<IncidentCandidate>();
 
-        private int positionAtStartOfIncident = int.MaxValue;
+        private int playerClassPositionAtStartOfIncident = int.MaxValue;
 
         private Dictionary<string, DateTime> incidentWarnings = new Dictionary<string, DateTime>();
 
@@ -291,7 +291,7 @@ namespace CrewChiefV4.Events
             lastOvertakeAllowedReportTime = DateTime.MinValue;
             isUnderLocalYellow = false;
             hasWarnedOfUpcomingIncident = false;
-            positionAtStartOfIncident = int.MaxValue;
+            playerClassPositionAtStartOfIncident = int.MaxValue;
             incidentCandidates.Clear();
             incidentWarnings.Clear();
             getInvolvedInIncidentAttempts = 0;
@@ -615,7 +615,7 @@ namespace CrewChiefV4.Events
                             if (enableOpponentCrashMessages)
                             {
                                 findInitialIncidentCandidateKeys(-1, currentGameState.OpponentData);
-                                positionAtStartOfIncident = currentGameState.SessionData.OverallPosition;
+                                playerClassPositionAtStartOfIncident = currentGameState.SessionData.ClassPosition;
                                 nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                 getInvolvedInIncidentAttempts = 0;
                                 driversInvolvedInCurrentIncident.Clear();
@@ -688,7 +688,7 @@ namespace CrewChiefV4.Events
                             // we've collected as many involved drivers as we're going to get, so report them
                             reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
                             nextIncidentDriversCheck = DateTime.MaxValue;
-                            positionAtStartOfIncident = int.MaxValue;
+                            playerClassPositionAtStartOfIncident = int.MaxValue;
                             incidentCandidates.Clear();
                             getInvolvedInIncidentAttempts = 0;
                             driversInvolvedInCurrentIncident.Clear();
@@ -807,7 +807,7 @@ namespace CrewChiefV4.Events
                                 // we've collected as many involved drivers as we're going to get, so report them
                                 reportYellowFlagDrivers(currentGameState.OpponentData, currentGameState.SessionData.TrackDefinition);
                                 nextIncidentDriversCheck = DateTime.MaxValue;
-                                positionAtStartOfIncident = int.MaxValue;
+                                playerClassPositionAtStartOfIncident = int.MaxValue;
                                 incidentCandidates.Clear();
                                 getInvolvedInIncidentAttempts = 0;
                                 driversInvolvedInCurrentIncident.Clear();
@@ -863,7 +863,7 @@ namespace CrewChiefV4.Events
                                 {
                                     // start working out who's gone off
                                     findInitialIncidentCandidateKeys(i + 1, currentGameState.OpponentData);
-                                    positionAtStartOfIncident = currentGameState.SessionData.OverallPosition;
+                                    playerClassPositionAtStartOfIncident = currentGameState.SessionData.ClassPosition;
                                     nextIncidentDriversCheck = currentGameState.Now + incidentDriversCheckInterval;
                                     getInvolvedInIncidentAttempts = 0;
                                     driversInvolvedInCurrentIncident.Clear();
@@ -1132,8 +1132,8 @@ namespace CrewChiefV4.Events
                 if ((flagSector == -1 || opponentData.CurrentSectorNumber == flagSector) && !opponentData.InPits)
                 {
                     LapData lapData = opponentData.getCurrentLapData();
-                    incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, opponentData.OverallPosition,
-                        lapData == null || lapData.IsValid));
+                    incidentCandidates.Add(new IncidentCandidate(opponentKey, opponentData.DistanceRoundTrack, opponentData.ClassPosition,
+                        opponentData.OverallPosition, lapData == null || lapData.IsValid));
                 }
             }
         }
@@ -1156,7 +1156,7 @@ namespace CrewChiefV4.Events
                     if (flagSector == -1 || opponent.CurrentSectorNumber == flagSector)
                     {
                         if ((Math.Abs(opponent.DistanceRoundTrack - incidentCandidate.distanceRoundTrackAtStartOfIncident) < maxDistanceMovedForYellowAnnouncement) ||
-                                opponent.OverallPosition > incidentCandidate.positionAtStartOfIncident + 3)
+                                opponent.OverallPosition > incidentCandidate.overallPositionAtStartOfIncident + 3)
                         {
                             // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved.
                             // Only add him if we've not reported him already in this spot on the track
@@ -1176,14 +1176,15 @@ namespace CrewChiefV4.Events
                             if (canAdd)
                             {
                                 lastIncidentPositionForOpponents[opponent.DriverRawName] = opponent.DistanceRoundTrack;
-                                involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.positionAtStartOfIncident, opponent.DistanceRoundTrack,
-                                    AudioPlayer.canReadName(opponent.DriverRawName), incidentCandidate.opponentDataKey));
+                                involvedDrivers.Add(new NamePositionPair(opponent.DriverRawName, incidentCandidate.classPositionAtStartOfIncident,
+                                    incidentCandidate.overallPositionAtStartOfIncident, opponent.DistanceRoundTrack, AudioPlayer.canReadName(opponent.DriverRawName), 
+                                    incidentCandidate.opponentDataKey));
                             }
                         }
                         else
                         {
                             // update incident candidate element to reflect the current state ready for the next check
-                            incidentCandidate.positionAtLastCheck = opponent.OverallPosition;
+                            incidentCandidate.overallPositionAtLastCheck = opponent.OverallPosition;
                             incidentCandidate.distanceRoundTrackAtLastCheck = opponent.DistanceRoundTrack;
                             remainingIncidentCandidates.Add(incidentCandidate);
                         }
@@ -1214,7 +1215,7 @@ namespace CrewChiefV4.Events
 
             // no pileup so read name / positions / corners as appropriate
             // there may be many of these, so we need to sort the list then pick the top few
-            driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(positionAtStartOfIncident));
+            driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(playerClassPositionAtStartOfIncident));
             // get the landmark and other data off the first item
             String landmark = TrackData.getLandmarkForLapDistance(currentTrack, driversInvolvedInCurrentIncident[0].distanceRoundTrack);
             float distanceRoundTrackOfFirstDriver = driversInvolvedInCurrentIncident[0].distanceRoundTrack;
@@ -1222,7 +1223,7 @@ namespace CrewChiefV4.Events
             opponentsToRead.Add(opponents[driversInvolvedInCurrentIncident[0].opponentKey]);
             // if the first item is a position (we have no name for him), don't process the others
             Boolean namesMode = driversInvolvedInCurrentIncident[0].canReadName;
-            int position = driversInvolvedInCurrentIncident[0].position;
+            int position = driversInvolvedInCurrentIncident[0].classPosition;
             if (namesMode)
             {
                 for (int i = 1; i < driversInvolvedInCurrentIncident.Count; i++)
@@ -1341,15 +1342,17 @@ namespace CrewChiefV4.Events
     class NamePositionPair
     {
         public String name;
-        public int position;
+        public int classPosition;
+        public int overallPosition;
         public float distanceRoundTrack;
         public Boolean canReadName;
         public string opponentKey;
 
-        public NamePositionPair(String name, int position, float distanceRoundTrack, Boolean canReadName, string opponentKey)
+        public NamePositionPair(String name, int classPosition, int overallPosition, float distanceRoundTrack, Boolean canReadName, string opponentKey)
         {
             this.name = name;
-            this.position = position;
+            this.classPosition = classPosition;
+            this.overallPosition = overallPosition;
             this.distanceRoundTrack = distanceRoundTrack;
             this.canReadName = canReadName;
             this.opponentKey = opponentKey;
@@ -1358,36 +1361,36 @@ namespace CrewChiefV4.Events
 
     class NamePositionPairComparer : IComparer<NamePositionPair>
     {
-        private int playerPosition;
+        private int playerClassPosition;
 
-        public NamePositionPairComparer(int playerPosition)
+        public NamePositionPairComparer(int playerClassPosition)
         {
-            this.playerPosition = playerPosition;
+            this.playerClassPosition = playerClassPosition;
         }
         public int Compare(NamePositionPair a, NamePositionPair b)
         {
             if (a.canReadName == b.canReadName)
             {
                 // can (or can't) read both names, return the one closest but preferably in front
-                if (a.position > playerPosition && b.position > playerPosition)
+                if (a.classPosition > playerClassPosition && b.classPosition > playerClassPosition)
                 {
-                    return a.position > b.position ? 1 : -1;
+                    return a.classPosition > b.classPosition ? 1 : -1;
                 }
-                else if (a.position < playerPosition && b.position < playerPosition)
+                else if (a.classPosition < playerClassPosition && b.classPosition < playerClassPosition)
                 {
-                    return a.position < b.position ? 1 : -1;
+                    return a.classPosition < b.classPosition ? 1 : -1;
                 }
-                else if (a.position < playerPosition && b.position > playerPosition)
+                else if (a.classPosition < playerClassPosition && b.classPosition > playerClassPosition)
                 {
                     return 1;
                 }
-                else if (a.position > playerPosition && b.position < playerPosition)
+                else if (a.classPosition > playerClassPosition && b.classPosition < playerClassPosition)
                 {
                     return -1;
                 }
                 else
                 {
-                    return Math.Abs(a.position - playerPosition) < Math.Abs(b.position - playerPosition) ? 1 : -1;
+                    return Math.Abs(a.classPosition - playerClassPosition) < Math.Abs(b.classPosition - playerClassPosition) ? 1 : -1;
                 }
             }
             else
@@ -1396,12 +1399,12 @@ namespace CrewChiefV4.Events
                 if (a.canReadName)
                 {
                     // can't read b's name but he still might be in a more interesting position
-                    return b.position <= FlagsMonitor.folderPositionHasGoneOff.Length && b.position < playerPosition && a.position > playerPosition ? -1 : 1;
+                    return b.classPosition <= FlagsMonitor.folderPositionHasGoneOff.Length && b.classPosition < playerClassPosition && a.classPosition > playerClassPosition ? -1 : 1;
                 }
                 else
                 {
                     // can't read a's name but he still might be in a more interesting position
-                    return a.position <= FlagsMonitor.folderPositionHasGoneOff.Length && a.position < playerPosition && b.position > playerPosition ? 1 : -1;
+                    return a.classPosition <= FlagsMonitor.folderPositionHasGoneOff.Length && a.classPosition < playerClassPosition && b.classPosition > playerClassPosition ? 1 : -1;
                 }
             }
         }
@@ -1413,15 +1416,18 @@ namespace CrewChiefV4.Events
         public float distanceRoundTrackAtStartOfIncident;
         public float distanceRoundTrackAtLastCheck;
         public Boolean lapValidAtStartOfIncident;
-        public int positionAtStartOfIncident;
-        public int positionAtLastCheck;
-        public IncidentCandidate(string opponentDataKey, float distanceRoundTrackAtStartOfIncident, int positionAtStartOfIncident, Boolean lapValidAtStartOfIncident)
+        public int overallPositionAtStartOfIncident;
+        public int classPositionAtStartOfIncident;
+        public int overallPositionAtLastCheck;
+        public IncidentCandidate(string opponentDataKey, float distanceRoundTrackAtStartOfIncident, int classPositionAtStartOfIncident,
+            int overallPositionAtStartOfIncident, Boolean lapValidAtStartOfIncident)
         {
             this.opponentDataKey = opponentDataKey;
             this.distanceRoundTrackAtStartOfIncident = distanceRoundTrackAtStartOfIncident;
-            this.positionAtStartOfIncident = positionAtStartOfIncident;
+            this.classPositionAtStartOfIncident = classPositionAtStartOfIncident;
+            this.overallPositionAtStartOfIncident = overallPositionAtStartOfIncident;
             this.lapValidAtStartOfIncident = lapValidAtStartOfIncident;
-            this.positionAtLastCheck = positionAtStartOfIncident;
+            this.overallPositionAtLastCheck = overallPositionAtStartOfIncident;
             this.distanceRoundTrackAtLastCheck = distanceRoundTrackAtStartOfIncident;
         }
     }
