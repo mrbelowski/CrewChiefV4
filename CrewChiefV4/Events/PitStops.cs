@@ -211,7 +211,9 @@ namespace CrewChiefV4.Events
                 enableWindowWarnings = false;
             }
 
-            if (pitBoxPositionCountdown && currentGameState.PitData.PitBoxPositionEstimate > 0 && 
+            if (previousGameState != null && pitBoxPositionCountdown && 
+                currentGameState.PositionAndMotionData.CarSpeed > 2 &&
+                currentGameState.PitData.PitBoxPositionEstimate > 0 && 
                 currentGameState.SessionData.CompletedLaps > 0 &&
                 !currentGameState.PenaltiesData.HasDriveThrough &&
                 currentGameState.SessionData.SessionType == SessionType.Race)
@@ -225,7 +227,7 @@ namespace CrewChiefV4.Events
                 {
                     distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack + currentGameState.PitData.PitBoxPositionEstimate;
                 }
-                if (previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     // just entered the pitlane
                     previousDistanceToBox = 0;
@@ -250,7 +252,7 @@ namespace CrewChiefV4.Events
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
                 }
-                else if (currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
+                else if (previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
                 {
                     if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
                     {
