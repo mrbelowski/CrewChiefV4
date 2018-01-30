@@ -568,7 +568,7 @@ namespace CrewChiefV4.iRacing
             //experimantal
             if((playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null && previousGameState.PitData.PitBoxPositionEstimate == -1) ||
                 (playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null &&
-                Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 10 && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0))
+                Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 5 && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0))
             {
                 currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
                 Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);

@@ -288,7 +288,7 @@
 			"raceroomClassIds": [1923],
 			"pCarsClassNames": ["LMP2"],
             "rf2ClassNames": [ "LMP2", "ES_P2" ],
-            "iracingCarIds": [77],
+            "iracingCarIds": [70],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
