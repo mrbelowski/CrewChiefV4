@@ -32,6 +32,12 @@ namespace CrewChiefV4.Events
         private String folderSlowerCarAheadRacingPlayerForPosition = "multiclass/slower_car_ahead_racing_player";
         private String folderSlowerCarAhead = "multiclass/slower_car_ahead";
 
+        private String folderYouAreBeingCaughtByFasterCars = "multiclass/you_are_being_caught_by_the_faster_cars";
+        private String folderYouAreCatchingSlowerCars = "multiclass/you_are_catching_the_slower_cars";
+        private String folderYouAreBeingCaughtThe = "multiclass/you_are_being_caught_by_the";
+        private String folderYouAreCatchingThe = "multiclass/you_are_catching_the";
+        private String folderRunners = "multiclass/runners";
+
         private static String folderFasterClass = "multiclass/it_is_a_faster_class";
         private static String folderSlowerClass = "multiclass/it_is_a_slower_class";
         private static String folderSameClassAsUs = "multiclass/same_class_as_us";
@@ -78,6 +84,12 @@ namespace CrewChiefV4.Events
         Dictionary<CarData.CarClass, float> bestTimesByClass = new Dictionary<CarData.CarClass, float>();
 
         enum ClassSpeedComparison {SLOWER, FASTER, UNKNOWN};
+
+        // different approaches here for lapping and being lapped. The first faster car we see will be class leader,
+        // so it's always appropriate to say "the faster class leaders are bearing down on us" or similar. For the slower
+        // class, the first car we see will be in last place, so he might have dropped off the back of the field.
+        private Boolean caughtByFasterClassInThisSession = false;
+        private Boolean caughtSlowerClassInThisSession = false;
 
         private GameStateData currentGameState;
 
@@ -157,6 +169,8 @@ namespace CrewChiefV4.Events
             timeOfLastMultipleCarFasterClassWarning = DateTime.MinValue;
             timeOfLastSingleCarSlowerClassWarning = DateTime.MinValue;
             timeOfLastMultipleCarSlowerClassWarning = DateTime.MinValue;
+            caughtByFasterClassInThisSession = false;
+            caughtSlowerClassInThisSession = false;
             bestTimesByClass.Clear();
         }
 
@@ -220,7 +234,27 @@ namespace CrewChiefV4.Events
                             previousCheckOtherClassWarningData = null;
                             // do the announcing - need to decide which to prefer - read multiple?
                             Console.WriteLine(otherClassWarningData.ToString());
-                            if (otherClassWarningData.numFasterCars > 1)
+
+                            // when we're being caught by faster cars, if this is the first time in the session use a different message
+                            if (!caughtByFasterClassInThisSession && otherClassWarningData.numFasterCars > 0)
+                            {
+                                caughtByFasterClassInThisSession = true;
+                                timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;
+                                this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
+                                // if we have the class name, use it
+                                String classNameToRead;
+                                if (otherClassWarningData.carClassOfClosestFasterCar != null &&
+                                    carClassEnumToSound.TryGetValue(otherClassWarningData.carClassOfClosestFasterCar.carClassEnum, out classNameToRead))
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners", 
+                                        MessageContents(folderYouAreBeingCaughtThe, classNameToRead, folderRunners), 0, this));
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage(folderYouAreBeingCaughtByFasterCars, 0, this));
+                                }
+                            }
+                            else if (otherClassWarningData.numFasterCars > 1)
                             {
                                 timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;
                                 this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
@@ -274,7 +308,25 @@ namespace CrewChiefV4.Events
                             {
                                 timeOfLastMultipleCarSlowerClassWarning = currentGameState.Now;
                                 this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
-                                if (otherClassWarningData.slowerCarsIncludeClassLeader)
+                                
+                                // for slower cars, the first car we see might have dropped off the back of the field so we only use the "you're catching
+                                // the slower cars" message if the first slow car we see is part of a group
+                                if (!caughtSlowerClassInThisSession)
+                                {
+                                    // if we have the class name, use it
+                                    String classNameToRead;
+                                    if (otherClassWarningData.carClassOfClosestSlowerCar != null &&
+                                        carClassEnumToSound.TryGetValue(otherClassWarningData.carClassOfClosestSlowerCar.carClassEnum, out classNameToRead))
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
+                                            MessageContents(folderYouAreCatchingThe, classNameToRead, folderRunners), 0, this));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage(folderYouAreCatchingSlowerCars, 0, this));
+                                    }
+                                }
+                                else if (otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.slowerCarsRacingForPosition)
                                     {
@@ -293,6 +345,7 @@ namespace CrewChiefV4.Events
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAhead, 0, this));
                                 }
+                                caughtSlowerClassInThisSession = true;
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
                                 // cars in the group are racing the player for position. Do we need to fix this in the OtherCarClassWarningData data?
                             }
@@ -319,6 +372,7 @@ namespace CrewChiefV4.Events
                                 {
                                     audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAhead, 0, this));
                                 }
+                                caughtSlowerClassInThisSession = true;
                             }
                         }
                         // now wait a while before checking again - how long should we wait here? What if the 'canAnnounce' check fails?
@@ -433,10 +487,12 @@ namespace CrewChiefV4.Events
             public Boolean slowerCarIsRacingPlayerForPosition = false;
             public HashSet<string> fasterCarDriverNames;
             public HashSet<string> slowerCarDriverNames;
+            public CarData.CarClass carClassOfClosestFasterCar;
+            public CarData.CarClass carClassOfClosestSlowerCar;
 
             public OtherCarClassWarningData(int numFasterCars, int numSlowerCars, Boolean fasterCarsIncludeClassLeader, Boolean slowerCarsIncludeClassLeader,
                 Boolean fasterCarsRacingForPosition, Boolean slowerCarsRacingForPosition, Boolean fasterCarIsRacingPlayerForPosition, Boolean slowerCarIsRacingPlayerForPosition,
-                HashSet<string> fasterCarDriverNames, HashSet<string> slowerCarDriverNames)
+                HashSet<string> fasterCarDriverNames, HashSet<string> slowerCarDriverNames, CarData.CarClass carClassOfClosestFasterCar, CarData.CarClass carClassOfClosestSlowerCar)
             {
                 this.numFasterCars = numFasterCars;
                 this.numSlowerCars = numSlowerCars;
@@ -448,6 +504,8 @@ namespace CrewChiefV4.Events
                 this.slowerCarIsRacingPlayerForPosition = slowerCarIsRacingPlayerForPosition;
                 this.fasterCarDriverNames = fasterCarDriverNames;
                 this.slowerCarDriverNames = slowerCarDriverNames;
+                this.carClassOfClosestFasterCar = carClassOfClosestFasterCar;
+                this.carClassOfClosestSlowerCar = carClassOfClosestSlowerCar;
             }
 
             // checks if the current warning data is consistent with the previous warning data and a bunch of other stuff
@@ -613,6 +671,11 @@ namespace CrewChiefV4.Events
             HashSet<string> fasterCarDriverNames = new HashSet<string>();
             HashSet<string> slowerCarDriverNames = new HashSet<string>();
 
+            float closestFasterCarSeparation = float.MaxValue;
+            float closestSlowerCarSeparation = float.MinValue;
+            CarData.CarClass carClassOfClosestFasterCar = null;
+            CarData.CarClass carClassOfClosestSlowerCar = null;
+
             foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
             {
                 if (CarData.IsCarClassEqual(opponentData.CarClass, currentGameState.carClass) ||
@@ -640,6 +703,12 @@ namespace CrewChiefV4.Events
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
+                    // remember separation for faster cars (player in front) is positive, and for slower cars (player behind) it's positive
+                    if (separation < closestFasterCarSeparation)
+                    {
+                        closestFasterCarSeparation = separation;
+                        carClassOfClosestFasterCar = opponentData.CarClass;
+                    }
                     fasterCarDriverNames.Add(opponentData.DriverRawName);
                     if (opponentData.ClassPosition == 1)
                     {
@@ -678,6 +747,12 @@ namespace CrewChiefV4.Events
                 {
                     // player is behind a slower class car
                     numSlowerCars++;
+                    // remember separation for faster cars (player in front) is positive, and for slower cars (player behind) it's positive
+                    if (separation > closestSlowerCarSeparation)
+                    {
+                        closestSlowerCarSeparation = separation;
+                        carClassOfClosestSlowerCar = opponentData.CarClass;
+                    }
                     slowerCarDriverNames.Add(opponentData.DriverRawName);
                     if (opponentData.ClassPosition == 1)
                     {
@@ -714,7 +789,7 @@ namespace CrewChiefV4.Events
             }
             return new OtherCarClassWarningData(numFasterCars, numSlowerCars, fasterCarsIncludeClassLeader, slowerCarsIncludeClassLeader,
                 fasterCarsRacingForPosition, slowerCarsRacingForPosition, fasterCarIsRacingPlayerForPosition, slowerCarIsRacingPlayerForPosition,
-                fasterCarDriverNames, slowerCarDriverNames);
+                fasterCarDriverNames, slowerCarDriverNames, carClassOfClosestFasterCar, carClassOfClosestSlowerCar);
         }
     }
 }
