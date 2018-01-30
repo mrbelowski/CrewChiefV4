@@ -800,11 +800,9 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Skipping message " + eventName + " because we're muted");
                             }
-                            int eventMsgCount = 0;
-                            if (playedMessagesCount.TryGetValue(eventName, out eventMsgCount))
+                            if(playedMessagesCount.ContainsKey(eventName))
                             {
-                                int count = eventMsgCount + 1;
-                                playedMessagesCount[eventName] = count;
+                                ++playedMessagesCount[eventName];
                             }
                             else
                             {

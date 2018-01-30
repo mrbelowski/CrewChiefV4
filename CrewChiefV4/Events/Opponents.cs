@@ -934,9 +934,9 @@ namespace CrewChiefV4.Events
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHOS_IN))
                 {
                     string opponentKey = getOpponentKey(voiceMessage, "").Item1;
-                    OpponentData opponent = null;
-                    if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponent))
+                    if (opponentKey != null)
                     {
+                        OpponentData opponent = null;
                         if (opponentKey == positionIsPlayerKey)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null));
