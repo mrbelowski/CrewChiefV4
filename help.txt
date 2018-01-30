@@ -158,12 +158,15 @@ The app understands lots of command including:
 "pitstop change right front tyre" (change right front tyre next pitstop, this option is iRacing only)
 "pitstop change left rear tyre" (change left rear tyre next pitstop, this option is iRacing only)
 "pitstop change right rear tyre" (change right rear tyre next pitstop, this option is iRacing only)
+"pitstop change left side tyres"(change left side tyres next pitstop, this option is iRacing only)
+"pitstop change right side tyres"(change right side tyres next pitstop, this option is iRacing only)
 "pitstop change tyres pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 "pitstop change left front tyre pressure [ new value ]" (change left front tyre next pressure pitstop, this option is iRacing only)
 "pitstop change right front tyre pressure [ new value ]" (change right front tyre pressure next pitstop, this option is iRacing only)
 "pitstop change left rear tyre pressure [ new value ]" (change left rear tyre pressure next pitstop, this option is iRacing only)
 "pitstop change right rear tyre pressure [ new value ]" (change right rear tyre pressure next pitstop, this option is iRacing only)
 "pitstop fuel to the end" / "pitstop fuel to the end of the race" (add the fuel amount the app calculates you'll need to finish the race, this option is iRacing only)
+
 
 
 
