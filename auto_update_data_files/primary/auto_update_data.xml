@@ -16,7 +16,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
-<soundpackversion>141</soundpackversion>
+<soundpackversion>142</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 <!-- sound pack update from base to version 121 will use this update pack -->
 <updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
@@ -32,7 +32,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>141</soundpackversion>
+	<soundpackversion>142</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
