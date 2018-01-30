@@ -978,8 +978,7 @@ namespace CrewChiefV4
                 int failureCount = 0;
                 if (faultingEventsCount.TryGetValue(eventName, out failureCount))
                 {
-                    ++failureCount;
-                    faultingEventsCount[eventName] = failureCount;
+                    faultingEventsCount[eventName] = ++failureCount;
                     if (failureCount > 5)
                     {
                         Console.WriteLine("Event " + eventName +

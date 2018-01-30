@@ -1313,7 +1313,7 @@ namespace CrewChiefV4.Events
                         int numCrashesInLandmark = -1;
                         if (crashedInLandmarkCounts.TryGetValue(crashLandmark, out numCrashesInLandmark))
                         {
-                            crashedInLandmarkCounts[crashLandmark] = numCrashesInLandmark + 1;
+                            crashedInLandmarkCounts[crashLandmark] = ++numCrashesInLandmark;
                         }
                         else
                         {

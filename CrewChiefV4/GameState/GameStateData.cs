@@ -1244,7 +1244,7 @@ namespace CrewChiefV4.GameState
         private static float minSignificantRelativeTimeDiffForVoiceCommand = 0.03f;    // 3% - is this a good value?
         private static float minSignificantRelativeStartSpeedDiffForVoiceCommand = 0.05f;   // 5% - is this a good value?
 
-        // TODO: As this is a small set, we might want to move to ListDictionary<> for small data sets.
+        // TODO: As this is a small set, we might want to move to ListDictionary<> or HybridDictionary<> for small data sets.
         private Dictionary<string, TrackLandmarksTimingData> sessionData = new Dictionary<string, TrackLandmarksTimingData>();
 
         // temporary variables for tracking landmark timings during a session - we add a timing when these are non-null and
