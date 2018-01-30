@@ -215,8 +215,7 @@ namespace CrewChiefV4.Events
                 currentGameState.PositionAndMotionData.CarSpeed > 2 &&
                 currentGameState.PitData.PitBoxPositionEstimate > 0 && 
                 currentGameState.SessionData.CompletedLaps > 0 &&
-                !currentGameState.PenaltiesData.HasDriveThrough &&
-                currentGameState.SessionData.SessionType == SessionType.Race)
+                !currentGameState.PenaltiesData.HasDriveThrough)
             {
                 float distanceToBox;
                 if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
@@ -243,11 +242,9 @@ namespace CrewChiefV4.Events
                             distanceToBoxRounded = (10 - distanceToBoxInt % 10) + distanceToBoxInt;
 
                         List<MessageFragment> messageContents = new List<MessageFragment>();
-                        if (SoundCache.soundSets.ContainsKey(folderBoxPositionIntro))
-                            messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
+                        messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
-                        if (SoundCache.soundSets.ContainsKey(folderMetres))
-                            messageContents.Add(MessageFragment.Text(folderMetres));
+                        messageContents.Add(MessageFragment.Text(folderMetres));
                         audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));                        
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
@@ -264,11 +261,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
-                        List<MessageFragment> messageContents = new List<MessageFragment>();
-                        messageContents.Add(MessageFragment.Integer(50));
-                        if (SoundCache.soundSets.ContainsKey(folderMetres))
-                            messageContents.Add(MessageFragment.Text(folderMetres));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", messageContents, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50, folderMetres), 0, null));
                         previousDistanceToBox = distanceToBox;
                         played50MetreWarning = true;
                     }
