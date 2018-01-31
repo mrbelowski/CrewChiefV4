@@ -783,8 +783,8 @@ namespace CrewChiefV4.Events
         // we insert the most recent gap (if isGapInFront -> ahead, else behind) into the primary and (if it's non-null) secondary message content
         // lists at the specified indexes
         public Tuple<List<MessageFragment>, List<MessageFragment>> resolveGapAmount(Boolean isGapInFront,
-            int primaryGapAmountMessageIndex, List<MessageFragment> primaryCurrentGapMessageContents,
-            int alternateGapAmountMessageIndex, List<MessageFragment> alternateCurrentGapMessageContents)
+            List<MessageFragment> primaryCurrentGapMessageContents, int primaryGapAmountMessageIndex, 
+            List<MessageFragment> alternateCurrentGapMessageContents, int alternateGapAmountMessageIndex)
         {
             float gapAmount = isGapInFront ? currentGapInFront : currentGapBehind;
             MessageFragment gapFragment = MessageFragment.Time(TimeSpanWrapper.FromSeconds(gapAmount, Precision.AUTO_GAPS));
