@@ -615,6 +615,11 @@ namespace CrewChiefV4
                 GlobalBehaviourSettings.spotterEnabled = false;
                 dumpToFile = false;
             }
+            else
+            {
+                // ensure the playback interval is re-initialised, in case we've been mucking about with it in the previous run.
+                _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
+            }
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = false;
             SpeechRecogniser.keepRecognisingInHoldMode = false;
