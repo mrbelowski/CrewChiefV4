@@ -14,6 +14,12 @@ namespace CrewChiefV4
         Text, Time, Opponent, Integer, Delayed
     }
 
+    // Delayed message event allows us to insert a message into the queue who's content will be altered in some way immediately before it's played.
+    // The method 'methodName' is invoked in the specified AbstractEvent as late as possible int he workflow. 
+    // The elements in the methodParams Object[] are passed to the named method. They must match in type and ordering.
+    // 
+    // This method MUST return Tuple<List<MessageFragment>, List<MessageFragment>>. Item1 is the 'primary' message contents and Item2 is the (optional) 
+    // alternate message contents after the method has done its work to resolve them. Item2 is optional and can be null.
     public class DelayedMessageEvent
     {
         public String methodName;
@@ -234,6 +240,7 @@ namespace CrewChiefV4
             this.secondsDelay = secondsDelay;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
+            this.validationData = validationData;
         }
 
         public Boolean isMessageStillValid(String eventSubType, GameStateData currentGameState)
