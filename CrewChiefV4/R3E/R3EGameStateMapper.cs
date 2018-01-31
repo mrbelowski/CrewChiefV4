@@ -1701,10 +1701,5 @@ namespace CrewChiefV4.RaceRoom
             int count = Array.IndexOf(name, (byte) 0);
             return Encoding.UTF8.GetString(name, 0, count);
         }
-
-        public void correctForMulticlass(GameStateData currentGameState)
-        {
-
-        }
     }
 }
