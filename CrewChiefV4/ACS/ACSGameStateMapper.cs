@@ -837,7 +837,7 @@ namespace CrewChiefV4.assetto
 
 
             playerName = getNameFromBytes(playerVehicle.driverName);
-            NameValidator.validateName(playerName);
+            Validator.validate(playerName);
 
             currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
             AC_SESSION_TYPE sessionType = shared.acsGraphic.session;
