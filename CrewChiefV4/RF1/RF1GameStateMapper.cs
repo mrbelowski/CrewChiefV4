@@ -1317,7 +1317,7 @@ namespace CrewChiefV4.rFactor1
                 if (previousGameState.OpponentData.TryGetValue(possibleKey, out o))
                 {
                     if (o.DriverRawName != getStringFromBytes(vehicle.driverName).ToLower() ||
-                        o.CarClass != getCarClass(getStringFromBytes(vehicle.vehicleName), false) ||
+                        !CarData.IsCarClassEqual(o.CarClass, getCarClass(getStringFromBytes(vehicle.vehicleName), false)) ||
                         opponentKeysProcessed.Contains(possibleKey))
                     {
                         continue;
