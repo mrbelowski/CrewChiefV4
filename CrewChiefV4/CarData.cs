@@ -316,7 +316,7 @@ namespace CrewChiefV4
                 this.maxColdTyreTemp = -1;
                 this.maxWarmTyreTemp = -1;
                 this.maxHotTyreTemp = -1;
-                this.maxSafeWaterTemp = 105;
+                this.maxSafeWaterTemp = 110;
                 this.maxSafeOilTemp = 125;
                 this.minTyreCircumference = 0.5f * (float)Math.PI;
                 this.maxTyreCircumference = 1.2f * (float)Math.PI;
