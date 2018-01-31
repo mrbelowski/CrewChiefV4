@@ -448,7 +448,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public List<MessageFragment> getPositionMessages(int positionWhenQueued)
+        public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)
         {
             // the position might have changed between queueing this messasge and processing it, so update the
             // previousPosition here. We should probably do the same with the lapNumberAtLastMessage, but this won't
@@ -462,26 +462,26 @@ namespace CrewChiefV4.Events
             }
             if (this.currentPosition == 1 && this.sessionType == SessionType.Race)
             {
-                return MessageContents(folderLeading);
+                return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderLeading), null);
             }
             else if (this.isLast)
             {
                 if (this.numberOfLapsInLastPlace > 3)
                 {
-                    return MessageContents(folderConsistentlyLast);
+                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderConsistentlyLast), null);
                 }
                 else
                 {
-                    return MessageContents(folderLast);
+                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderLast), null);
                 }
             }
             else if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
             {
-                return MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition);
+                return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition), null);
             }
             else
             {
-                return MessageContents(folderStub + this.currentPosition);
+                return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderStub + this.currentPosition), null);
             }
         }
 

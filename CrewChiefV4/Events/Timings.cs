@@ -361,9 +361,14 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
-                                            MessageContents(folderTheGapTo, opponent, folderAheadIsIncreasing,
-                                            gapInFront), MessageContents(folderGapInFrontIncreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderAheadIsIncreasing);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIncreasing);
+                                        int primaryGapIndex = 3;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                                 else if (gapInFrontStatus == GapStatus.DECREASING)
@@ -371,9 +376,15 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
-                                            MessageContents(folderYoureReeling, opponent, folderInTheGapIsNow, gapInFront),
-                                            MessageContents(folderGapInFrontDecreasing, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(folderYoureReeling, opponent, folderInTheGapIsNow);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontDecreasing);
+                                        int primaryGapIndex = 3;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        
                                         if (!trackLandmarkAttackDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
                                             trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
@@ -394,9 +405,14 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front",
-                                        MessageContents(folderTheGapTo, opponent,
-                                        folderAheadIsNow, gapInFront), MessageContents(folderGapInFrontIsNow, gapInFront), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderAheadIsNow);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIsNow);
+                                        int primaryGapIndex = 3;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                             }
@@ -463,9 +479,14 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
-                                        MessageContents(folderTheGapTo, opponent,
-                                        folderBehindIsIncreasing, gapBehind), MessageContents(folderGapBehindIncreasing, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderBehindIsIncreasing);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIncreasing);
+                                        int primaryGapIndex = 3;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                                 else if (gapBehindStatus == GapStatus.DECREASING)
@@ -473,10 +494,15 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
-                                            MessageContents(opponent, folderIsReelingYouIn, gapBehind), MessageContents(folderGapBehindDecreasing, gapBehind),
-                                            0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(opponent, folderIsReelingYouIn);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindDecreasing);
+                                        int primaryGapIndex = 2;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        
                                         if (!trackLandmarkDefendDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
                                         trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
@@ -497,9 +523,14 @@ namespace CrewChiefV4.Events
                                     OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                     if (opponent != null)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind",
-                                        MessageContents(folderTheGapTo, opponent,
-                                        folderBehindIsNow, gapBehind), MessageContents(folderGapBehindIsNow, gapBehind), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
+                                        List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderBehindIsNow);
+                                        List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIsNow);
+                                        int primaryGapIndex = 3;
+                                        int alternateGapIndex = 1;
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                        audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                             }
@@ -516,10 +547,14 @@ namespace CrewChiefV4.Events
                             OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                             if (opponent != null)
                             {
-                                TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapInFront, Precision.AUTO_GAPS);
-                                   QueuedMessage message = new QueuedMessage("Timings/gap_ahead", MessageContents(folderTheGapTo,
-                                    opponent, folderAheadIsNow, gap),
-                                    MessageContents(folderGapInFrontIsNow, gap), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
+                                List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderAheadIsNow);
+                                List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIsNow);
+                                int primaryGapIndex = 3;
+                                int alternateGapIndex = 1;
+                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                QueuedMessage message = new QueuedMessage("Timings/gap_ahead", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
                                 message.playEvenWhenSilenced = true;
                                 audioPlayer.playMessage(message);
                             }
@@ -532,12 +567,20 @@ namespace CrewChiefV4.Events
                             currentGameState.SessionData.LapTimeCurrent <= currentGapBehind + CrewChief._timeInterval.TotalSeconds)
                         {
                             playedGapBehindForThisLap = true;
-                            TimeSpanWrapper gap = TimeSpanWrapper.FromSeconds(currentGapBehind, Precision.AUTO_GAPS);
-                            QueuedMessage message = new QueuedMessage("Timings/gap_behind", MessageContents(folderTheGapTo,
-                                currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass), folderBehindIsNow, gap),
-                                MessageContents(folderGapBehindIsNow, gap), 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
-                            message.playEvenWhenSilenced = true;
-                            audioPlayer.playMessage(message);
+                            OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
+                            if (opponent != null)
+                            {                                
+                                List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderBehindIsNow);
+                                List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIsNow);
+                                int primaryGapIndex = 3;
+                                int alternateGapIndex = 1;
+                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                            false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
+
+                                QueuedMessage message = new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
+                                message.playEvenWhenSilenced = true;
+                                audioPlayer.playMessage(message);
+                            }
                         }
                     }
                 }
@@ -729,6 +772,29 @@ namespace CrewChiefV4.Events
             else
             {
                 return currentGameState.SessionData.IsNewSector;
+            }
+        }
+
+        // this call assumes the gap amount is NOT present in the list of primaryCurrentGapMessageContents (and alternateCurrentGapMessageContents 
+        // if it exists)
+        //
+        // we insert the most recent gap (if isGapInFront -> ahead, else behind) into the primary and (if it's non-null) secondary message content
+        // lists at the specified indexes
+        public Tuple<List<MessageFragment>, List<MessageFragment>> resolveGapAmount(Boolean isGapInFront,
+            int primaryGapAmountMessageIndex, List<MessageFragment> primaryCurrentGapMessageContents,
+            int alternateGapAmountMessageIndex, List<MessageFragment> alternateCurrentGapMessageContents)
+        {
+            float gapAmount = isGapInFront ? currentGapInFront : currentGapBehind;
+            MessageFragment gapFragment = MessageFragment.Time(TimeSpanWrapper.FromSeconds(gapAmount, Precision.AUTO_GAPS));
+            primaryCurrentGapMessageContents.Insert(primaryGapAmountMessageIndex, gapFragment);
+            if (alternateGapAmountMessageIndex != -1 && alternateCurrentGapMessageContents != null)
+            {
+                alternateCurrentGapMessageContents.Insert(alternateGapAmountMessageIndex, gapFragment);
+                return new Tuple<List<MessageFragment>, List<MessageFragment>>(primaryCurrentGapMessageContents, alternateCurrentGapMessageContents);
+            }
+            else
+            {
+                return new Tuple<List<MessageFragment>, List<MessageFragment>>(primaryCurrentGapMessageContents, null);
             }
         }
     }
