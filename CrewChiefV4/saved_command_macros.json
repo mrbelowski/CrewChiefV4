@@ -179,9 +179,9 @@
 		"buttonTriggers": [],
 		"commandSets": [
 		{
-			"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by pressing 'decrease' a few times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
+			"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by ensuring the cursor is at the top of the menu, then it goes to the fuel row and presses 'decrease' a few times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Increase", "Pit Menu Increase", "Pit Menu Increase", "Multiple Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Increase", "Pit Menu Increase", "Pit Menu Increase", "Multiple Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 100,
 			"allowAutomaticTriggering": false,
@@ -207,7 +207,7 @@
 		{
 			"description": "r3e only. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is getting a drive through or stop-go penalty (when playing R3E)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Down", "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200,
 			"allowAutomaticTriggering": true
@@ -223,7 +223,7 @@
 		{
 			"description": "r3e only - presses the 'confirm' button when entering the pits. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is crossing the pit limiter line (when playing R3E)",
 			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Select", "WAIT_3000", "Pit Menu Toggle" ],
+			"actionSequence": [ "Pit Menu Down", "Pit Menu Down", "Pit Menu Down", "Pit Menu Down", "Pit Menu Down", "Pit Menu Down", "Pit Menu Down", "Pit Menu Select", "WAIT_3000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200,
 			"allowAutomaticTriggering": true
