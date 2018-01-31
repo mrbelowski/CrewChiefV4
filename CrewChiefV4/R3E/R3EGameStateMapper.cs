@@ -910,10 +910,10 @@ namespace CrewChiefV4.RaceRoom
                                 }
                                 if (CarData.IsCarClassEqual(currentOpponentData.CarClass, currentGameState.carClass))
                                 {
-                                    float playerTimeByTyre = -1.0f;
+                                    float playerClassSessionBestByTyre = -1.0f;
                                     if (currentOpponentData.LastLapTime > 0 && currentOpponentData.LastLapValid &&
-                                        (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.TryGetValue(currentOpponentData.CurrentTyres, out playerTimeByTyre) ||
-                                        playerTimeByTyre > currentOpponentData.LastLapTime))
+                                        (!currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre.TryGetValue(currentOpponentData.CurrentTyres, out playerClassSessionBestByTyre) ||
+                                        playerClassSessionBestByTyre > currentOpponentData.LastLapTime))
                                     {
                                         currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre[currentOpponentData.CurrentTyres] = currentOpponentData.LastLapTime;
                                     }
