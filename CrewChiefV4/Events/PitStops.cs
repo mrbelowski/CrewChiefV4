@@ -217,6 +217,10 @@ namespace CrewChiefV4.Events
                 currentGameState.SessionData.CompletedLaps > 0 &&
                 !currentGameState.PenaltiesData.HasDriveThrough)
             {
+                if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
+                {
+                    playedLimiterLineToPitBoxDistanceWarning = false;
+                }
                 float distanceToBox;
                 if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
                 {
