@@ -1015,8 +1015,9 @@ namespace CrewChiefV4.Events
                             // are we fighting with him and can we call him by name?
                             Boolean isInteresting = Math.Abs(currentGameState.SessionData.ClassPosition - opponent.ClassPosition) <= 2 &&
                                 (AudioPlayer.canReadName(opponent.DriverRawName) || opponent.ClassPosition <= folderPositionHasGoneOff.Length);
+                            DateTime incidentWarningTime = DateTime.MinValue;
                             if ((isApproaching || isInteresting) &&
-                                (!incidentWarnings.ContainsKey(landmark) || incidentWarnings[landmark] + incidentRepeatFrequency < currentGameState.Now))
+                                (!incidentWarnings.TryGetValue(landmark, out incidentWarningTime) || incidentWarningTime + incidentRepeatFrequency < currentGameState.Now))
                             {
                                 waitingForCrashedDriverInCorner = landmark;
                                 driversCrashedInCorner.Add(opponent);
@@ -1144,9 +1145,9 @@ namespace CrewChiefV4.Events
             List<IncidentCandidate> remainingIncidentCandidates = new List<IncidentCandidate>();
             foreach (IncidentCandidate incidentCandidate in incidentCandidates)
             {
-                if (opponents.ContainsKey(incidentCandidate.opponentDataKey))
+                OpponentData opponent = null;
+                if (opponents.TryGetValue(incidentCandidate.opponentDataKey, out opponent))
                 {
-                    OpponentData opponent = opponents[incidentCandidate.opponentDataKey];
                     if (opponent.DistanceRoundTrack == 0)
                     {
                         // fuck's sake... pCARS2's data is so shit. This value will be 0 when a car enters the pitlane.
@@ -1160,10 +1161,11 @@ namespace CrewChiefV4.Events
                             // this guy is in the same sector as the yellow but has only travelled 10m in 2 seconds or has lost a load of places so he's probably involved.
                             // Only add him if we've not reported him already in this spot on the track
                             Boolean canAdd = true;
-                            if (lastIncidentPositionForOpponents.ContainsKey(opponent.DriverRawName))
+                            float distanceRoundTrackAtIncident = -1.0f;
+                            if (lastIncidentPositionForOpponents.TryGetValue(opponent.DriverRawName, out distanceRoundTrackAtIncident))
                             {
                                 // we've already reported on this guy in this session - if he's not really moved since this report, don't report him again
-                                float distanceRoundTrackAtIncident = lastIncidentPositionForOpponents[opponent.DriverRawName];
+
                                 // this check doesn't make sense when the incident is within 20m of the start line, but it's an edge case and this check isn't
                                 // really essential anyway so let's not worry about it
                                 if (Math.Abs(opponent.DistanceRoundTrack - distanceRoundTrackAtIncident) < 20)
@@ -1308,9 +1310,10 @@ namespace CrewChiefV4.Events
                     String crashLandmark = TrackData.getLandmarkForLapDistance(currentTrack, driver.distanceRoundTrack);
                     if (crashLandmark != null)
                     {
-                        if (crashedInLandmarkCounts.ContainsKey(crashLandmark))
+                        int numCrashesInLandmark = -1;
+                        if (crashedInLandmarkCounts.TryGetValue(crashLandmark, out numCrashesInLandmark))
                         {
-                            crashedInLandmarkCounts[crashLandmark]++;
+                            crashedInLandmarkCounts[crashLandmark] = ++numCrashesInLandmark;
                         }
                         else
                         {

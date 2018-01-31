@@ -189,7 +189,8 @@ namespace CrewChiefV4.Events
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
-                if (validationData != null && validationData.ContainsKey("position") && (int)validationData["position"] != currentGameState.SessionData.ClassPosition)
+                object timingValidationDataValue = null;
+                if (validationData != null && validationData.TryGetValue("position", out timingValidationDataValue) && (int)timingValidationDataValue != currentGameState.SessionData.ClassPosition)
                 {
                     return false;
                 }
@@ -324,8 +325,9 @@ namespace CrewChiefV4.Events
                                 OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                 if (opponent != null)
                                 {
-                                    if (!trackLandmarkAttackDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
-                                        trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
+                                    DateTime lastTimeDriverNameUsed = DateTime.MinValue;
+                                    if (!trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                        lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                     {
                                         CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
                                                     currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
@@ -387,8 +389,9 @@ namespace CrewChiefV4.Events
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                         
-                                        if (!trackLandmarkAttackDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
-                                            trackLandmarkAttackDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
+                                        DateTime lastTimeDriverNameUsed = DateTime.MinValue;
+                                        if (!trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                            lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
                                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
                                                 currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmFaster(opponent.trackLandmarksTiming, true, false);
@@ -442,8 +445,9 @@ namespace CrewChiefV4.Events
                                 OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                                 if (opponent != null)
                                 {
-                                    if (!trackLandmarkDefendDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
-                                        trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
+                                    DateTime lastTimeDriverNameUsed = DateTime.MinValue;
+                                    if (!trackLandmarkDefendDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                        lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                     {
                                         CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
                                                 currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);
@@ -505,8 +509,9 @@ namespace CrewChiefV4.Events
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                         
-                                        if (!trackLandmarkDefendDriverNamesUsed.ContainsKey(opponent.DriverRawName) ||
-                                        trackLandmarkDefendDriverNamesUsed[opponent.DriverRawName] + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
+                                        DateTime lastTimeDriverNameUsed = DateTime.MinValue;
+                                        if (!trackLandmarkDefendDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                            lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
                                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
                                                 currentGameState.SessionData.trackLandmarksTiming.getLandmarkWhereIAmSlower(opponent.trackLandmarksTiming, true, false);

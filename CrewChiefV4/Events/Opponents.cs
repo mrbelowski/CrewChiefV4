@@ -113,9 +113,10 @@ namespace CrewChiefV4.Events
             {
                 if (validationData != null)
                 {
-                    if (validationData.ContainsKey(validationDriverAheadKey))
+                    object validationValue = null;
+                    if (validationData.TryGetValue(validationDriverAheadKey, out validationValue))
                     {
-                        String expectedOpponentName = (String)validationData[validationDriverAheadKey];
+                        String expectedOpponentName = (String)validationValue;
                         OpponentData opponentInFront = currentGameState.SessionData.ClassPosition > 1 ?
                             currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass) : null;
                         String actualOpponentName = opponentInFront == null ? null : opponentInFront.DriverRawName;
@@ -134,9 +135,9 @@ namespace CrewChiefV4.Events
                                 " no longer valid - driver is " + (opponentInFront.InPits ? "in pits" : "is entering the pits"));
                         }
                     }
-                    else if (validationData.ContainsKey(validationNewLeaderKey))
+                    else if (validationData.TryGetValue(validationNewLeaderKey, out validationValue))
                     {
-                        String expectedLeaderName = (String)validationData[validationNewLeaderKey];
+                        String expectedLeaderName = (String)validationValue;
                         if (currentGameState.SessionData.ClassPosition == 1)
                         {
                             Console.WriteLine("new leader message for opponent " + expectedLeaderName +
@@ -359,9 +360,10 @@ namespace CrewChiefV4.Events
                                 if (opponentData != null)
                                 {
                                     String opponentName = opponentData.DriverRawName;
+                                    DateTime announceAfterTime = DateTime.MinValue;
                                     if (!opponentData.isEnteringPits() && !opponentData.InPits && (lastNextCarAheadOpponentName == null || !lastNextCarAheadOpponentName.Equals(opponentName)) &&
                                         opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
-                                        (!onlyAnnounceOpponentAfter.ContainsKey(opponentName) || currentGameState.Now > onlyAnnounceOpponentAfter[opponentName]))
+                                        (!onlyAnnounceOpponentAfter.TryGetValue(opponentName, out announceAfterTime) || currentGameState.Now > announceAfterTime))
                                     {
                                         Console.WriteLine("new car ahead: " + opponentName);
                                         audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
@@ -496,35 +498,39 @@ namespace CrewChiefV4.Events
 
         private float getOpponentLastLap(string opponentKey)
         {
-            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            OpponentData opponentData = null;
+            if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponentData))
             {
-                return currentGameState.OpponentData[opponentKey].LastLapTime;
+                return opponentData.LastLapTime;
             }
             return -1;
         }
 
         private float getOpponentBestLap(string opponentKey)
         {
-            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            OpponentData opponentData = null;
+            if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponentData))
             {
-                return currentGameState.OpponentData[opponentKey].CurrentBestLapTime;
+                return opponentData.CurrentBestLapTime;
             }
             return -1;
         }
 
         private Tuple<String, float> getOpponentLicensLevel(string opponentKey)
         {
-            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            OpponentData opponentData = null;
+            if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponentData))
             {
-                return currentGameState.OpponentData[opponentKey].LicensLevel;
+                return opponentData.LicensLevel;
             }
             return new Tuple<String, float>("invalid", -1);
         }
         private int getOpponentIRating(string opponentKey)
         {
-            if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+            OpponentData opponentData = null;
+            if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponentData))
             {
-                return currentGameState.OpponentData[opponentKey].iRating;
+                return opponentData.iRating;
             }
             return -1;
         }
@@ -639,9 +645,9 @@ namespace CrewChiefV4.Events
                     Tuple<string, Boolean> response = getOpponentKey(voiceMessage, "");
                     string opponentKey = response.Item1;
                     Boolean gotByPositionNumber = response.Item2;
-                    if (opponentKey != null && currentGameState.OpponentData.ContainsKey(opponentKey))
+                    OpponentData opponent = null;
+                    if (opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponent))
                     {
-                        OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         if (opponent.IsActive)
                         {
                             int position = opponent.ClassPosition;
@@ -930,15 +936,15 @@ namespace CrewChiefV4.Events
                     string opponentKey = getOpponentKey(voiceMessage, "").Item1;
                     if (opponentKey != null)
                     {
+                        OpponentData opponent = null;
                         if (opponentKey == positionIsPlayerKey)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null));
 
                             gotData = true;
                         }
-                        else if (currentGameState.OpponentData.ContainsKey(opponentKey))
+                        else if (currentGameState.OpponentData.TryGetValue(opponentKey, out opponent))
                         {
-                            OpponentData opponent = currentGameState.OpponentData[opponentKey];
                             QueuedMessage queuedMessage;
                             if (SoundCache.useTTS)
                             {

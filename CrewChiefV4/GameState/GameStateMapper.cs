@@ -178,18 +178,15 @@ namespace CrewChiefV4.GameState
                 Console.WriteLine("Can't update position to " + newPosition);
                 return oldPosition;
             }
+            PendingRacePositionChange pendingRacePositionChange = null;
             if (oldPosition == newPosition)
             {
                 // clear any pending position change
-                if (PendingRacePositionChanges.ContainsKey(driverName))
-                {
-                    PendingRacePositionChanges.Remove(driverName);
-                }
+                PendingRacePositionChanges.Remove(driverName);
                 return oldPosition;
             }
-            else if (PendingRacePositionChanges.ContainsKey(driverName))
+            else if (PendingRacePositionChanges.TryGetValue(driverName, out pendingRacePositionChange))
             {
-                PendingRacePositionChange pendingRacePositionChange = PendingRacePositionChanges[driverName];
                 if (newPosition == pendingRacePositionChange.newPosition)
                 {
                     // the game is still reporting this driver is in the same race position, see if it's been long enough...

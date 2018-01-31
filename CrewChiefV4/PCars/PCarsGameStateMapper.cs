@@ -275,10 +275,7 @@ namespace CrewChiefV4.PCars
             {
                 gameState.OpponentData = new Dictionary<string, OpponentData>();
             }
-            if (gameState.OpponentData.ContainsKey(name))
-            {
-                gameState.OpponentData.Remove(name);
-            }
+            gameState.OpponentData.Remove(name);
             gameState.OpponentData.Add(name, opponentData);
         }
 
@@ -302,9 +299,10 @@ namespace CrewChiefV4.PCars
             }
             else
             {
-                if (gameState.OpponentData.ContainsKey(nameToFind))
+                OpponentData opponent = null;
+                if (gameState.OpponentData.TryGetValue(nameToFind, out opponent))
                 {
-                    return gameState.OpponentData[nameToFind];
+                    return opponent;
                 }
                 else
                 {
@@ -966,7 +964,8 @@ namespace CrewChiefV4.PCars
                 List<String> inactiveOpponents = new List<string>();
                 foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    DateTime lastActiveTime = DateTime.MinValue;
+                    if (!lastActiveTimeForOpponents.TryGetValue(opponentName, out lastActiveTime) || lastActiveTime < oldestAllowedUpdate)
                     {
                         inactiveOpponents.Add(opponentName);
                         Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
@@ -1330,17 +1329,17 @@ namespace CrewChiefV4.PCars
                 }
                 speed = opponentData.Speed;
             }
-            if (opponentSpeedsWindow.ContainsKey(opponentData.DriverRawName)) {
-                List<float> speeds = opponentSpeedsWindow[opponentData.DriverRawName];
-                if (speeds.Count() == opponentSpeedsToAverage) {
-                    speeds.RemoveAt(opponentSpeedsToAverage - 1);
+            List<float> speedsExisting = null;
+            if (opponentSpeedsWindow.TryGetValue(opponentData.DriverRawName, out speedsExisting)) {
+                if (speedsExisting.Count() == opponentSpeedsToAverage) {
+                    speedsExisting.RemoveAt(opponentSpeedsToAverage - 1);
                 }
-                speeds.Insert(0, speed);
+                speedsExisting.Insert(0, speed);
                 float sum = 0f;
-                foreach (float item in speeds) {
+                foreach (float item in speedsExisting) {
                     sum += item;
                 }
-                opponentData.Speed = sum / speeds.Count();
+                opponentData.Speed = sum / speedsExisting.Count();
             } else {
                 List<float> speeds = new List<float>();
                 speeds.Add(speed);
@@ -1558,11 +1557,12 @@ namespace CrewChiefV4.PCars
                             foreach (OpponentData opponent in opponentData.Values)
                             {
                                 Boolean running = false;
-                                if (!waitingForCarsToFinish.ContainsKey(opponent.DriverRawName)) {
+                                float distRoundTrack = -1.0f;
+                                if (!waitingForCarsToFinish.TryGetValue(opponent.DriverRawName, out distRoundTrack)) {
                                     waitingForCarsToFinish.Add(opponent.DriverRawName, opponent.DistanceRoundTrack);
                                     running = true;
                                 }
-                                else if (waitingForCarsToFinish[opponent.DriverRawName] < opponent.DistanceRoundTrack)
+                                else if (distRoundTrack < opponent.DistanceRoundTrack)
                                 {
                                     waitingForCarsToFinish[opponent.DriverRawName] = opponent.DistanceRoundTrack;                                        
                                     running = true;

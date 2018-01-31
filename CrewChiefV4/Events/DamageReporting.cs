@@ -197,14 +197,13 @@ namespace CrewChiefV4.Events
 
         private DamageLevel getLastReportedDamageLevel(Component component)
         {
-            if (reportedDamagesLevels.ContainsKey(component))
+            DamageLevel level = DamageLevel.NONE;
+            if (reportedDamagesLevels.TryGetValue(component, out level))
             {
-                return reportedDamagesLevels[component];
+                return level;
             }
-            else
-            {
-                return DamageLevel.NONE;
-            }
+
+            return DamageLevel.NONE;
         }
 
         public static CornerData.Corners getPuncture(TyreData tyreData)
@@ -482,14 +481,7 @@ namespace CrewChiefV4.Events
 
         private void addReportedDamage(Component component, DamageLevel damageLevel)
         {
-            if (reportedDamagesLevels.ContainsKey(component))
-            {
-                reportedDamagesLevels[component] = damageLevel;
-            }
-            else
-            {
-                reportedDamagesLevels.Add(component, damageLevel);
-            }
+            reportedDamagesLevels[component] = damageLevel;
         }
 
         private QueuedMessage getDamageMessage(Component component, Boolean includeNoDamage)

@@ -282,9 +282,9 @@ namespace CrewChiefV4
                         if (opponentPositionInRange(currentOpponentPosition, currentPlayerPosition))
                         {
                             Boolean isOpponentVelocityInRange = false;
-                            if (previousPositionAndVelocityData.ContainsKey(i))
+                            PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = null;
+                            if (previousPositionAndVelocityData.TryGetValue(i, out opponentPreviousPositionAndVelocityData))
                             {
-                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = previousPositionAndVelocityData[i];
                                 float timeDiffSeconds = (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalSeconds;
                                 if (timeDiffSeconds >= calculateOpponentSpeedsEvery)
                                 {
@@ -348,7 +348,7 @@ namespace CrewChiefV4
                                 }
                             }
                         } 
-                        else if (previousPositionAndVelocityData.ContainsKey(i))
+                        else
                         {
                             // once this opponent goes out of range, we must reset his cached speed and position data
                             previousPositionAndVelocityData.Remove(i);
@@ -363,10 +363,7 @@ namespace CrewChiefV4
                     }
                 }
                 foreach (int idToPurge in opponentsToPurge) {
-                    if (previousPositionAndVelocityData.ContainsKey(idToPurge))
-                    {
-                        previousPositionAndVelocityData.Remove(idToPurge);
-                    }
+                    previousPositionAndVelocityData.Remove(idToPurge);
                 }
                 // now check the min and max lateral separations before allowing 3 wide-on-left/right
                 if (carsOnLeft > 1 && carsOnRight == 0)
