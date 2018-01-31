@@ -25,7 +25,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 <drivernamesversion>100</drivernamesversion>
 <basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 <updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-<personalisationsversion>127</personalisationsversion>
+<personalisationsversion>128</personalisationsversion>
 <basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 <update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
@@ -38,10 +38,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<!-- sound pack update from version 121 upwards will use this update pack -->
 	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
-	<drivernamesversion>128</drivernamesversion>
+	<drivernamesversion>129</drivernamesversion>
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<personalisationsversion>127</personalisationsversion>
+	<personalisationsversion>128</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 	<update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
