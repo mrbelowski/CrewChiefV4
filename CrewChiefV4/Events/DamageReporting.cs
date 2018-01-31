@@ -289,7 +289,7 @@ namespace CrewChiefV4.Events
                 if (previousGameState != null)
                 {
                     double interval = (currentGameState.Now - previousGameState.Now).TotalSeconds;
-                    if (interval > 0)
+                    if (interval > 0.01)
                     {
                         double calculatedAcceleration = Math.Abs(currentGameState.PositionAndMotionData.CarSpeed - previousGameState.PositionAndMotionData.CarSpeed) / interval;
 
@@ -297,10 +297,10 @@ namespace CrewChiefV4.Events
                             " Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
                                 " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");*/
 
-                        // if we're subject to > 30G (300m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
+                        // if we're subject to > 40G (400m/s2), this is considered dangerous. If we've stopped (or nearly stopped) immediately
                         // after the impact, assume it's a bad 'un. If we're still moving after the impact, track the speed for 3 seconds and 
                         // if it doesn't increase in that time, we can assume it's a bad 'un
-                        if (calculatedAcceleration > 300)
+                        if (calculatedAcceleration > 400)
                         {
                             Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
                                 " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");
