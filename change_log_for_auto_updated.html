@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.1.1</h2>
+<ul>
+	<li>Major internal overhaul to fully support multiclass races - opponents and positions are now tracked correctly for the player's car class, the app doesn't make calls about opponent laptimes, pitting, and other stuff if they're not in the same class as the player</li>
+	<li>Added multi-class specific messages for when you're lapping or being lapped by other classes</li>	
+	<li>Added multi-class specific voice commands "is the car ahead in my class", "is the car behind my class", "what class is the car ahead", "what class is the car behind" and variations</li>
+	<li>More performance improvements</li>
+	<li>Speculative fixes for driver swaps in iRacing</li>
+	<li>Fixed 'enable driver names' flag being ignored for some messages</li>
+	<li>Added optional pit box countdown (R3E and iRacing only, disabled by default - enable with property "pit_box_position_countdown")</li>
+	<li>rF2 improvements: improved rolling start detection and distance to safety car detection, in SCR mode Crew Chief now respects DoubleFileType value and will announce last FCY lap Frozen Order instructions correctly</li>
+	<li>Added option to change left/right side tyres(iRacing only)</li>
+	<li>Modified R3E pit macros to take advantage of modify pit menu behaviour (should make the pit macros, particularly the auto-confirm pit actions, more reliable)</li>
+	<li>Retrieve gap ahead / gap behind as late as possible when playing gap messages to improve accuracy</li>
+	<li>Made auto-refuel ("fuel to the end" macro in R3E and "pitstop fuel to the end" command in iRacing) a bit more conservative - more so at longer tracks</li>
+</ul>
 <h2>Version 4.9.0.7</h2>
 <ul>
 	<li>Added messages for oil and fuel pressure warnings (iRacing only)</li>
