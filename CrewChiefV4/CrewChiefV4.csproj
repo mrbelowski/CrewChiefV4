@@ -157,7 +157,7 @@
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="iRacing\YamlQuery.cs" />
-    <Compile Include="NameValidator.cs" />
+    <Compile Include="Validator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />
     <Compile Include="NumberReaderIt.cs" />

@@ -209,7 +209,7 @@ namespace CrewChiefV4.PCars2
                 " EventTimeRemaining: " + shared.mEventTimeRemaining + " LapsInEvent: " + 
                 shared.mLapsInEvent + " SequenceNumber: " + shared.mSequenceNumber);*/
             
-            NameValidator.validateName(playerName);
+            Validator.validate(playerName);
             currentGameState.SessionData.CompletedLaps = (int)playerData.mLapsCompleted;
             currentGameState.SessionData.SectorNumber = (int)playerData.mCurrentSector + 1; // zero indexed
             currentGameState.SessionData.OverallPosition = (int)playerData.mRacePosition;

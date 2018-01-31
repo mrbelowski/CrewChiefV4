@@ -260,7 +260,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.TrackSector != previousGameState.SessionData.SectorNumber;
                         
                         currentGameState.SessionData.SectorNumber = participantStruct.TrackSector;
-                        NameValidator.validateName(driverName);
+                        Validator.validate(driverName);
 
                         currentGameState.PitData.InPitlane = participantStruct.InPitlane == 1;
                         currentGameState.PositionAndMotionData.DistanceRoundTrack = participantStruct.LapDistance;

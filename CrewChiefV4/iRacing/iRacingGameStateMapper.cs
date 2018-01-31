@@ -173,7 +173,7 @@ namespace CrewChiefV4.iRacing
                 String driverName = playerCar.Name.ToLower();
                 if (playerName == null)
                 {
-                    NameValidator.validateName(driverName);
+                    Validator.validate(driverName);
                     playerName = driverName;
                 }
 
