@@ -141,10 +141,7 @@ namespace CrewChiefV4.PCars2
             {
                 gameState.OpponentData = new Dictionary<string, OpponentData>();
             }
-            if (gameState.OpponentData.ContainsKey(name))
-            {
-                gameState.OpponentData.Remove(name);
-            }
+            gameState.OpponentData.Remove(name);
             gameState.OpponentData.Add(name, opponentData);
         }
 
@@ -724,10 +721,7 @@ namespace CrewChiefV4.PCars2
                                 currentGameState.retriedDriverNames.Add(participantName);
                             }
                             // remove this driver from the set immediately
-                            if (currentGameState.OpponentData.ContainsKey(participantName))
-                            {
-                                currentGameState.OpponentData.Remove(participantName);
-                            }
+                            currentGameState.OpponentData.Remove(participantName);
                             continue;
                         }
                         if (shared.mRaceStates[i] == (uint)eRaceState.RACESTATE_DISQUALIFIED)
@@ -738,17 +732,14 @@ namespace CrewChiefV4.PCars2
                                 currentGameState.disqualifiedDriverNames.Add(participantName);
                             }
                             // remove this driver from the set immediately
-                            if (currentGameState.OpponentData.ContainsKey(participantName))
-                            {
-                                currentGameState.OpponentData.Remove(participantName);
-                            }
+                            currentGameState.OpponentData.Remove(participantName);
                             continue;
                         }
                         CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
-                        
-                        if (currentGameState.OpponentData.ContainsKey(participantName))
+
+                        OpponentData currentOpponentData = null;
+                        if (currentGameState.OpponentData.TryGetValue(participantName, out currentOpponentData))
                         {
-                            OpponentData currentOpponentData = currentGameState.OpponentData[participantName];                            
                             if (participantStruct.mIsActive)
                             {
                                 lastActiveTimeForOpponents[participantName] = currentGameState.Now;
@@ -763,9 +754,8 @@ namespace CrewChiefV4.PCars2
                                     float[] previousOpponentWorldPosition = new float[] { 0, 0, 0 };
                                     float previousDistanceRoundTrack = 0;
                                     OpponentData previousOpponentData = null;
-                                    if (previousGameState.OpponentData.ContainsKey(participantName))
+                                    if (previousGameState.OpponentData.TryGetValue(participantName, out previousOpponentData))
                                     {
-                                        previousOpponentData = currentGameState.OpponentData[participantName];                                    
                                         previousOpponentSectorNumber = previousOpponentData.CurrentSectorNumber;
                                         previousOpponentCompletedLaps = previousOpponentData.CompletedLaps;
                                         previousOpponentPosition = previousOpponentData.OverallPosition;
@@ -892,7 +882,8 @@ namespace CrewChiefV4.PCars2
                 List<string> inactiveOpponents = new List<string>();
                 foreach (string opponentName in currentGameState.OpponentData.Keys)
                 {
-                    if (!lastActiveTimeForOpponents.ContainsKey(opponentName) || lastActiveTimeForOpponents[opponentName] < oldestAllowedUpdate)
+                    DateTime lastTimeActive = DateTime.MinValue;
+                    if (!lastActiveTimeForOpponents.TryGetValue(opponentName, out lastTimeActive) || lastTimeActive < oldestAllowedUpdate)
                     {
                         inactiveOpponents.Add(opponentName);
                         Console.WriteLine("Opponent " + opponentName + " has been inactive for " + opponentCleanupInterval + ", removing him");
@@ -1529,13 +1520,14 @@ namespace CrewChiefV4.PCars2
                             foreach (OpponentData opponent in opponentData.Values)
                             {
                                 Boolean running = false;
-                                if (!waitingForCarsToFinish.ContainsKey(opponent.DriverRawName)) {
+                                float distRoundLap = -1.0f;
+                                if (!waitingForCarsToFinish.TryGetValue(opponent.DriverRawName, out distRoundLap)) {
                                     waitingForCarsToFinish.Add(opponent.DriverRawName, opponent.DistanceRoundTrack);
                                     running = true;
                                 }
-                                else if (waitingForCarsToFinish[opponent.DriverRawName] < opponent.DistanceRoundTrack)
+                                else if (distRoundLap < opponent.DistanceRoundTrack)
                                 {
-                                    waitingForCarsToFinish[opponent.DriverRawName] = opponent.DistanceRoundTrack;                                        
+                                    waitingForCarsToFinish[opponent.DriverRawName] = opponent.DistanceRoundTrack;
                                     running = true;
                                 }
                                 else

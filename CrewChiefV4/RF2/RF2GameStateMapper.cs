@@ -1120,8 +1120,9 @@ namespace CrewChiefV4.rFactor2
                 var cci = this.GetCachedCarInfo(ref vehicleScoring);
                 var driverName = cci.driverNameRawSanitized;
 
-                if (driverNameCounts.ContainsKey(driverName))
-                    driverNameCounts[driverName] += 1;
+                var numNames = -1;
+                if (driverNameCounts.TryGetValue(driverName, out numNames))
+                    driverNameCounts[driverName] = ++numNames;
                 else
                     driverNameCounts.Add(driverName, 1);
             }
@@ -1142,17 +1143,15 @@ namespace CrewChiefV4.rFactor2
                         && csd.LapTimePrevious > 0.0f
                         && csd.PreviousLapWasValid)
                     {
-                        if (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
-                            || csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
-                        {
+                        float playerClassBestTimeByTyre = -1.0f;
+                        if (!csd.PlayerClassSessionBestLapTimeByTyre.TryGetValue(cgs.TyreData.FrontLeftTyreType, out playerClassBestTimeByTyre)
+                            || playerClassBestTimeByTyre > csd.LapTimePrevious)
                             csd.PlayerClassSessionBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
-                        }
 
-                        if (!csd.PlayerBestLapTimeByTyre.ContainsKey(cgs.TyreData.FrontLeftTyreType)
-                            || csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] > csd.LapTimePrevious)
-                        {
+                        float playerBestTimeByTyre = -1.0f;
+                        if (!csd.PlayerBestLapTimeByTyre.TryGetValue(cgs.TyreData.FrontLeftTyreType, out playerBestTimeByTyre)
+                            || playerBestTimeByTyre > csd.LapTimePrevious)
                             csd.PlayerBestLapTimeByTyre[cgs.TyreData.FrontLeftTyreType] = csd.LapTimePrevious;
-                        }
                     }
 
                     continue;
@@ -1210,12 +1209,16 @@ namespace CrewChiefV4.rFactor2
                         if (opponentKey == null)
                         {
                             // there's no previous opponent data record for this driver so create one
-                            if (duplicatesCreated.ContainsKey(driverName))
-                                duplicatesCreated[driverName] += 1;
+                            var numDuplicates = -1;
+                            if (duplicatesCreated.TryGetValue(driverName, out numDuplicates))
+                                duplicatesCreated[driverName] = ++numDuplicates;
                             else
+                            {
+                                numDuplicates = 1;
                                 duplicatesCreated.Add(driverName, 1);
+                            }
 
-                            opponentKey = driverName + "_duplicate_" + duplicatesCreated[driverName];
+                            opponentKey = driverName + "_duplicate_" + numDuplicates;
                         }
                     }
                 }
@@ -1246,7 +1249,7 @@ namespace CrewChiefV4.rFactor2
                     continue;
                 }
 
-                opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.ContainsKey(opponentKey) ? null : previousGameState.OpponentData[opponentKey];
+                opponentPrevious = pgs == null || opponentKey == null || !pgs.OpponentData.TryGetValue(opponentKey, out opponentPrevious) ? null : opponentPrevious;
                 var opponent = new OpponentData();
 
                 opponent.CarClass = vehicleCachedInfo.carClass;
@@ -1444,22 +1447,19 @@ namespace CrewChiefV4.rFactor2
 
                     if (opponent.IsNewLap && opponentPrevious != null && !opponentPrevious.IsNewLap)
                     {
+                        float playerClassSessionBestByTyre = -1.0f;
                         if (opponent.LastLapTime > 0.0
                             && opponent.LastLapValid
-                            && (!csd.PlayerClassSessionBestLapTimeByTyre.ContainsKey(opponent.CurrentTyres)
-                                || csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] > opponent.LastLapTime))
-                        {
+                            && (!csd.PlayerClassSessionBestLapTimeByTyre.TryGetValue(opponent.CurrentTyres, out playerClassSessionBestByTyre)
+                                || playerClassSessionBestByTyre > opponent.LastLapTime))
                             csd.PlayerClassSessionBestLapTimeByTyre[opponent.CurrentTyres] = opponent.LastLapTime;
-                        }
                     }
                 }
 
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OverallSessionBestLapTime
                         || csd.OverallSessionBestLapTime < 0.0f))
-                {
                     csd.OverallSessionBestLapTime = opponent.CurrentBestLapTime;
-                }
 
                 if (opponentPrevious != null)
                 {
@@ -2054,10 +2054,9 @@ namespace CrewChiefV4.rFactor2
             {
                 foreach (var possibleKey in possibleKeys)
                 {
-                    if (previousGameState.OpponentData.ContainsKey(possibleKey))
+                    OpponentData o = null;
+                    if (previousGameState.OpponentData.TryGetValue(possibleKey, out o))
                     {
-                        var o = previousGameState.OpponentData[possibleKey];
-
                         var cci = this.GetCachedCarInfo(ref vehicleScoring);
                         var driverNameFromScoring = cci.driverNameRawSanitized;
 

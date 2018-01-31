@@ -803,9 +803,10 @@ namespace CrewChiefV4
         }
         public static Boolean ResultContains(String result, String[] alternatives)
         {
+            result = result.ToLower();
             foreach (String alternative in alternatives)
             {
-                if (result.ToLower() == alternative.ToLower())
+                if (result == alternative.ToLower())
                 {
                     return true;
                 }
@@ -813,7 +814,7 @@ namespace CrewChiefV4
             // no result with == so try contains
             foreach (String alternative in alternatives)
             {
-                if (result.ToLower().Contains(alternative.ToLower()))
+                if (result.Contains(alternative.ToLower()))
                 {
                     return true;
                 }

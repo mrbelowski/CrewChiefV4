@@ -290,14 +290,15 @@ namespace CrewChiefV4
                         {
                             string json = File.ReadAllText(configPath);
                             Dictionary<string, Dictionary<string, int>> plugins = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(json);
-                            if (plugins.ContainsKey(rf2PluginFileName))
+                            Dictionary<string, int> plugin = null;
+                            if (plugins.TryGetValue(rf2PluginFileName, out plugin))
                             {
                                 //the whitespace is intended, this is how the game writes it.
-                                if(plugins[rf2PluginFileName][" Enabled"] == 0)
+                                if(plugin[" Enabled"] == 0)
                                 {
                                     if(presentEnableMessagebox())
                                     {
-                                        plugins[rf2PluginFileName][" Enabled"] = 1;
+                                        plugin[" Enabled"] = 1;
                                         json = JsonConvert.SerializeObject(plugins, Formatting.Indented);
                                         File.WriteAllText(configPath, json);
                                     }

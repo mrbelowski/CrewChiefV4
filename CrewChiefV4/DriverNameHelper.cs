@@ -48,16 +48,8 @@ namespace CrewChiefV4
                         String usableName = line.Substring(separatorIndex + 1).Trim().ToLower();
                         if (usableName != null && usableName.Length > 0) 
                         {
-                            if (lowerCaseRawNameToUsableName.ContainsKey(lowerCaseRawName))
-                            {
-                                // replace the existing mapping - last one wins
-                                lowerCaseRawNameToUsableName[lowerCaseRawName] = usableName;
-                            } 
-                            else
-                            {
-                                // add a new mapping
-                                lowerCaseRawNameToUsableName.Add(lowerCaseRawName, usableName);
-                            }
+                            // add new or replace the existing mapping - last one wins
+                            lowerCaseRawNameToUsableName[lowerCaseRawName] = usableName;
                         }
                     }
                     counter++;
@@ -244,9 +236,8 @@ namespace CrewChiefV4
             if (!usableNamesForSession.ContainsKey(rawDriverName))
             {
                 String usableDriverName = null;
-                if (lowerCaseRawNameToUsableName.ContainsKey(rawDriverName.ToLower()))
+                if (lowerCaseRawNameToUsableName.TryGetValue(rawDriverName.ToLower(), out usableDriverName))
                 {
-                    usableDriverName = lowerCaseRawNameToUsableName[rawDriverName.ToLower()];
                     Console.WriteLine("Using mapped drivername " + usableDriverName + " for raw driver name " + rawDriverName);
                     usableNamesForSession.Add(rawDriverName, usableDriverName);
                 }
@@ -261,9 +252,8 @@ namespace CrewChiefV4
                             String lastName = getUnambiguousLastName(usableDriverName);
                             if (lastName != null && lastName.Count() > 1)
                             {
-                                if (lowerCaseRawNameToUsableName.ContainsKey(lastName.ToLower()))
+                                if (lowerCaseRawNameToUsableName.TryGetValue(lastName.ToLower(), out usableDriverName))
                                 {
-                                    usableDriverName = lowerCaseRawNameToUsableName[lastName.ToLower()];
                                     Console.WriteLine("Using mapped driver last name " + usableDriverName + " for raw driver last name " + lastName);
                                     usableNamesForSession.Add(rawDriverName, usableDriverName);
                                     usedLastName = true;
