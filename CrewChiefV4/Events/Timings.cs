@@ -203,19 +203,21 @@ namespace CrewChiefV4.Events
 
         private Boolean isNearRaceEnd(GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.SessionNumberOfLaps > 0 &&
-                currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps)
+            if (currentGameState.SessionData.SessionNumberOfLaps > 0)
             {
-                // on last lap - check track length 
-                if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps)
                 {
-                    return currentGameState.SessionData.SectorNumber > 1;
+                    // on last lap - check track length 
+                    if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                    {
+                        return currentGameState.SessionData.SectorNumber > 1;
+                    }
+                    if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                    {
+                        return currentGameState.SessionData.SectorNumber == 3;
+                    }
+                    return true;
                 }
-                if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
-                {
-                    return currentGameState.SessionData.SectorNumber == 3;
-                }
-                return true;
             }
             else if (currentGameState.SessionData.SessionTimeRemaining < 120)
             {
