@@ -305,7 +305,7 @@ namespace CrewChiefV4.Events
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
         }
 
-        public List<MessageFragment> getPositionMessages(int positionWhenQueued)
+        public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)
         {
             if (this.currentPosition != positionWhenQueued)
             {
@@ -316,22 +316,22 @@ namespace CrewChiefV4.Events
             {
                 if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                 {
-                    return MessageContents(Position.folderDriverPositionIntro, Position.folderPole);
+                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Position.folderDriverPositionIntro, Position.folderPole), null);;
                 }
                 else
                 {
-                    return MessageContents(Pause(200), Position.folderPole);
+                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Pause(200), Position.folderPole), null);;
                 }
             }
             else
             {
                 if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                 {
-                    return MessageContents(Position.folderDriverPositionIntro, Position.folderStub + this.currentPosition);
+                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Position.folderDriverPositionIntro, Position.folderStub + this.currentPosition), null);;
                 }
                 else
                 {
-                    return MessageContents(Position.folderStub + this.currentPosition);
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(Position.folderStub + this.currentPosition), null); ;
                 }
             }
         }

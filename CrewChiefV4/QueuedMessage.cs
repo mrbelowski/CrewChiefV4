@@ -14,6 +14,12 @@ namespace CrewChiefV4
         Text, Time, Opponent, Integer, Delayed
     }
 
+    // Delayed message event allows us to insert a message into the queue who's content will be altered in some way immediately before it's played.
+    // The method 'methodName' is invoked in the specified AbstractEvent as late as possible int he workflow. 
+    // The elements in the methodParams Object[] are passed to the named method. They must match in type and ordering.
+    // 
+    // This method MUST return Tuple<List<MessageFragment>, List<MessageFragment>>. Item1 is the 'primary' message contents and Item2 is the (optional) 
+    // alternate message contents after the method has done its work to resolve them. Item2 is optional and can be null.
     public class DelayedMessageEvent
     {
         public String methodName;
@@ -221,7 +227,11 @@ namespace CrewChiefV4
             this.abstractEvent = abstractEvent;
         }
 
-        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent)
+        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent) :
+            this(messageName, delayedMessageEvent, secondsDelay, abstractEvent, null)
+        { }
+        
+        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData)
         {
             this.messageName = compoundMessageIdentifier + messageName;
             this.delayedMessageEvent = delayedMessageEvent;
@@ -230,6 +240,7 @@ namespace CrewChiefV4
             this.secondsDelay = secondsDelay;
             this.delayMessageResolution = true;
             this.abstractEvent = abstractEvent;
+            this.validationData = validationData;
         }
 
         public Boolean isMessageStillValid(String eventSubType, GameStateData currentGameState)
@@ -240,8 +251,24 @@ namespace CrewChiefV4
 
         public void resolveDelayedContents()
         {
-            this.messageFolders = getMessageFolders((List<MessageFragment>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
-                Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams), false);
+            // the delayed resolution gets primary and alternate message fragments:
+            Tuple<List<MessageFragment>, List<MessageFragment>> primaryAndAlternateMessages =
+                (Tuple<List<MessageFragment>, List<MessageFragment>>) delayedMessageEvent.abstractEvent.GetType().GetMethod(delayedMessageEvent.methodName).
+                Invoke(delayedMessageEvent.abstractEvent, delayedMessageEvent.methodParams);
+
+            Boolean hasAlternate = primaryAndAlternateMessages.Item2 != null && primaryAndAlternateMessages.Item2.Count > 0;
+            this.messageFolders = getMessageFolders(primaryAndAlternateMessages.Item1, hasAlternate);
+            if (!canBePlayed)
+            {
+                Console.WriteLine("Using secondary messages for delayed message resolution event " + messageName);
+                canBePlayed = true;
+                this.messageFolders = getMessageFolders(primaryAndAlternateMessages.Item2, false);
+                if (!canBePlayed)
+                {
+                    Console.WriteLine("Primary and secondary messages for delayed resolution event " +
+                        messageName + " can't be played");
+                }
+            }
         }
 
         private List<String> getMessageFolders(List<MessageFragment> messageFragments, Boolean hasAlternative)
