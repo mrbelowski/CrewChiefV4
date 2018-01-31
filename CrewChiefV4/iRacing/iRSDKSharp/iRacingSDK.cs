@@ -111,17 +111,18 @@ namespace iRSDKSharp
         {
             if(IsInitialized && Header != null)
             {
-                if (VarHeaders.ContainsKey(name))
+                CVarHeader header = null;
+                if (VarHeaders.TryGetValue(name, out header))
                 {
-                    int varOffset = VarHeaders[name].Offset;
-                    int count = VarHeaders[name].Count;
-                    if (VarHeaders[name].Type == CVarHeader.VarType.irChar)
+                    int varOffset = header.Offset;
+                    int count = header.Count;
+                    if (header.Type == CVarHeader.VarType.irChar)
                     {
                         byte[] data = new byte[count];
                         FileMapView.ReadArray<byte>(Header.Buffer + varOffset, data, 0, count);
                         return System.Text.Encoding.Default.GetString(data).TrimEnd(new char[] { '\0' });
                     }
-                    else if (VarHeaders[name].Type == CVarHeader.VarType.irBool)
+                    else if (header.Type == CVarHeader.VarType.irBool)
                     {
                         if (count > 1)
                         {
@@ -134,7 +135,7 @@ namespace iRSDKSharp
                             return FileMapView.ReadBoolean(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == CVarHeader.VarType.irInt || VarHeaders[name].Type == CVarHeader.VarType.irBitField)
+                    else if (header.Type == CVarHeader.VarType.irInt || header.Type == CVarHeader.VarType.irBitField)
                     {
                         if (count > 1)
                         {
@@ -147,7 +148,7 @@ namespace iRSDKSharp
                             return FileMapView.ReadInt32(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == CVarHeader.VarType.irFloat)
+                    else if (header.Type == CVarHeader.VarType.irFloat)
                     {
                         if (count > 1)
                         {
@@ -160,7 +161,7 @@ namespace iRSDKSharp
                             return FileMapView.ReadSingle(Header.Buffer + varOffset);
                         }
                     }
-                    else if (VarHeaders[name].Type == CVarHeader.VarType.irDouble)
+                    else if (header.Type == CVarHeader.VarType.irDouble)
                     {
                         if (count > 1)
                         {

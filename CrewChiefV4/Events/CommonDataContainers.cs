@@ -30,9 +30,10 @@ namespace CrewChiefV4.Events
 
         public Corners getCornersForStatus(Enum status)
         {
-            if (cornersForEachStatus.ContainsKey(status))
+            Corners cornerStatus = Corners.NONE;
+            if (cornersForEachStatus.TryGetValue(status, out cornerStatus))
             {
-                return cornersForEachStatus[status];
+                return cornerStatus;
             }
             else
             {
@@ -42,7 +43,13 @@ namespace CrewChiefV4.Events
 
         public Boolean hasValueAtLevel(Enum e)
         {
-            return cornersForEachStatus.ContainsKey(e) && cornersForEachStatus[e] != Corners.NONE;
+            Corners cornerStatus = Corners.NONE;
+            if (cornersForEachStatus.TryGetValue(e, out cornerStatus))
+            {
+                return cornerStatus != Corners.NONE;
+            }
+
+            return false;
         }
 
         private static void addCornerStatus(CornerData cornerData, Enum e, Corners corners) 

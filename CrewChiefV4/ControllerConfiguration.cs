@@ -596,10 +596,7 @@ namespace CrewChiefV4
 
         public void removeNetworkControllerFromList()
         {
-            if (controllers.Contains(networkGamePad))
-            {
-                controllers.Remove(networkGamePad);
-            }
+            controllers.Remove(networkGamePad);
         }
 
         public Boolean assignButton(System.Windows.Forms.Form parent, int controllerIndex, int actionIndex)

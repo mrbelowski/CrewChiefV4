@@ -536,7 +536,8 @@ namespace CrewChiefV4.Events
                         WheelsLockedEnum cornerLocking = getCornerEntryLocking(lockedTicksThreshold);
                         if (cornerLocking != WheelsLockedEnum.NONE) {
                             // if we moaned about this corner recently, don't moan again
-                            DateTime timeLastWarnedAboutThisCorner = cornerLockWarningsPlayed.ContainsKey(currentCornerName) ? cornerLockWarningsPlayed[currentCornerName] : DateTime.MinValue;
+                            DateTime lastMoanTime = DateTime.MinValue;
+                            DateTime timeLastWarnedAboutThisCorner = cornerLockWarningsPlayed.TryGetValue(currentCornerName, out lastMoanTime) ? lastMoanTime : DateTime.MinValue;
                             if (currentGameState.Now > timeLastWarnedAboutThisCorner + cornerLockWarningMaxFrequency)
                             {
                                 // not moaned about this for a while, so moan away
@@ -584,7 +585,8 @@ namespace CrewChiefV4.Events
                     nextCornerSpecificSpinningCheck = DateTime.MaxValue;
                     if (!playedCumulativeSpinningMessage && currentCornerName != null)
                     {
-                        DateTime timeLastWarnedAboutThisCorner = cornerSpinningWarningsPlayed.ContainsKey(currentCornerName) ? cornerSpinningWarningsPlayed[currentCornerName] : DateTime.MinValue;
+                        DateTime lastWarningTime = DateTime.MinValue;
+                        DateTime timeLastWarnedAboutThisCorner = cornerSpinningWarningsPlayed.TryGetValue(currentCornerName, out lastWarningTime) ? lastWarningTime : DateTime.MinValue;
                         if (currentGameState.Now > timeLastWarnedAboutThisCorner + cornerSpinningWarningMaxFrequency)
                         {
                             float leftFrontCornerSpecificWheelSpinTime = timeLeftFrontIsSpinningForLap - leftFrontExitStartWheelSpinTime;
@@ -1713,16 +1715,16 @@ namespace CrewChiefV4.Events
                 // get a TyrePeformanceContainer for each pair of tyres we have data for:
                 foreach (TyreType tyreType1 in Enum.GetValues(typeof(TyreType)))
                 {
-                    if (this.playerClassSessionBestLapTimeByTyre.ContainsKey(tyreType1))
+                    float type1BestLap = -1.0f;
+                    if (this.playerClassSessionBestLapTimeByTyre.TryGetValue(tyreType1, out type1BestLap))
                     {
-                        float type1BestLap = this.playerClassSessionBestLapTimeByTyre[tyreType1];
                         // now get all the other tyre types best lap to compare it to
                         foreach (TyreType tyreType2 in Enum.GetValues(typeof(TyreType)))
                         {
-                            if (tyreType1 != tyreType2 && this.playerClassSessionBestLapTimeByTyre.ContainsKey(tyreType2) &&
+                            float type2BestLap = -1.0f;
+                            if (tyreType1 != tyreType2 && this.playerClassSessionBestLapTimeByTyre.TryGetValue(tyreType2, out type2BestLap) &&
                                 !comparisonAlreadyPresent(performanceData, tyreType1, tyreType2))
                             {
-                                float type2BestLap = this.playerClassSessionBestLapTimeByTyre[tyreType2];
                                 if (type1BestLap > type2BestLap)
                                 {
                                     performanceData.Add(new TyrePerformanceContainer(tyreType2, tyreType1, type1BestLap - type2BestLap));

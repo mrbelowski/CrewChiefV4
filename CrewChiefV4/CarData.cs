@@ -594,9 +594,10 @@ namespace CrewChiefV4
         public static CarClass getCarClassForRaceRoomId(int carClassId)
         {
             // first check if it's in the cache
-            if (intToCarClass.ContainsKey(carClassId))
+            CarClass carClassCached = null;
+            if (intToCarClass.TryGetValue(carClassId, out carClassCached))
             {
-                return intToCarClass[carClassId];
+                return carClassCached;
             }
             foreach (CarClass carClass in CAR_CLASSES.carClasses)
             {
@@ -616,13 +617,14 @@ namespace CrewChiefV4
         public static CarClass getCarClassForIRacingId(int carClassId, int carId)
         {
             // first check if it's in the cache
-            if (intToCarClass.ContainsKey(carClassId))
+            CarClass carClassCached = null;
+            if (intToCarClass.TryGetValue(carClassId, out carClassCached))
             {
-                return intToCarClass[carClassId];
+                return carClassCached;
             }
-            if (intToCarClass.ContainsKey(carId))
+            if (intToCarClass.TryGetValue(carId, out carClassCached))
             {
-                return intToCarClass[carId];
+                return carClassCached;
             }
             foreach (CarClass carClass in CAR_CLASSES.carClasses)
             {

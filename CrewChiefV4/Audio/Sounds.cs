@@ -288,7 +288,12 @@ namespace CrewChiefV4.Audio
 
         public Boolean eventHasPersonalisedPrefixOrSuffix(String eventName)
         {
-            return soundSets.ContainsKey(eventName) && soundSets[eventName].hasPrefixOrSuffix;
+            SoundSet ss = null;
+            if (soundSets.TryGetValue(eventName, out ss))
+            {
+                return ss.hasPrefixOrSuffix;
+            }
+            return false;
         }
         
         public Boolean personalisedMessageIsDue()
@@ -344,14 +349,10 @@ namespace CrewChiefV4.Audio
                 else if (soundName.StartsWith(TTS_IDENTIFIER))
                 {
                     SingleSound singleSound = null;
-                    if (!singleSounds.ContainsKey(soundName))
+                    if (!singleSounds.TryGetValue(soundName, out singleSound))
                     {
                         singleSound = new SingleSound(soundName.Substring(TTS_IDENTIFIER.Count()));
                         singleSounds.Add(soundName, singleSound);
-                    }
-                    else
-                    {
-                        singleSound = singleSounds[soundName];
                     }
                     moveToTopOfCache(soundName);
                     singleSoundsToPlay.Add(singleSound);
@@ -360,9 +361,9 @@ namespace CrewChiefV4.Audio
                 {
                     Boolean preferPersonalised = personalisedMessageIsDue();
                     SingleSound singleSound = null;
-                    if (soundSets.ContainsKey(soundName))
+                    SoundSet soundSet = null;
+                    if (soundSets.TryGetValue(soundName, out soundSet))
                     {
-                        SoundSet soundSet = soundSets[soundName];
                         // double check whether this soundSet wants to allow personalisations at this point - 
                         // this prevents the app always choosing the personalised version of a sound if this sound is infrequent
                         if (soundSet.forceNonPersonalisedVersion())
@@ -375,14 +376,13 @@ namespace CrewChiefV4.Audio
                             moveToTopOfCache(soundName);
                         }
                     }
-                    else if (singleSounds.ContainsKey(soundName))
+                    else if (singleSounds.TryGetValue(soundName, out singleSound))
                     {
-                        singleSound = singleSounds[soundName];
                         if (!singleSound.cacheSoundPlayerPermanently)
                         {
                             moveToTopOfCache(soundName);
                         }
-                    }                    
+                    }
                     if (singleSound != null)
                     {
                         // hack... we double check the prefer setting here and only play the prefix / suffix if it's true.
@@ -455,13 +455,15 @@ namespace CrewChiefV4.Audio
                     while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
                     {
                         String soundToPurgeValue = soundToPurge.Value;
-                        if (soundSets.ContainsKey(soundToPurgeValue))
+                        SoundSet soundSet = null;
+                        SingleSound singleSound = null;
+                        if (soundSets.TryGetValue(soundToPurgeValue, out soundSet))
                         {
-                            purgeCount += soundSets[soundToPurgeValue].UnLoadAll();
+                            purgeCount += soundSet.UnLoadAll();
                         }
-                        else if (singleSounds.ContainsKey(soundToPurgeValue))
+                        else if (singleSounds.TryGetValue(soundToPurgeValue, out singleSound))
                         {
-                            if (singleSounds[soundToPurgeValue].UnLoad())
+                            if (singleSound.UnLoad())
                             {
                                 purgeCount++;
                             }
@@ -811,9 +813,9 @@ namespace CrewChiefV4.Audio
                                 Boolean isOptional = soundFile.Name.Contains(SoundCache.OPTIONAL_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.OPTIONAL_SUFFIX_IDENTIFIER);
                                 foreach (String prefixSuffixName in SoundCache.availablePrefixesAndSuffixes)
                                 {
-                                    if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.ContainsKey(prefixSuffixName))
-                                    {                                       
-                                        SoundSet additionalSoundSet = SoundCache.soundSets[prefixSuffixName];
+                                    SoundSet additionalSoundSet = null;
+                                    if (soundFile.Name.Contains(prefixSuffixName) && SoundCache.soundSets.TryGetValue(prefixSuffixName, out additionalSoundSet))
+                                    {
                                         if (additionalSoundSet.hasSounds)
                                         {
                                             hasPrefixOrSuffix = true;
