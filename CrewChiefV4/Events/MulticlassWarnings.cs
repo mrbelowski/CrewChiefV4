@@ -533,19 +533,19 @@ namespace CrewChiefV4.Events
                         }
                         else if (numSlowerCars > 1 &&
                             (slowerCarsIncludeClassLeader || slowerCarsRacingForPosition ||
-                                now > timeOfLastMultipleCarSlowerClassWarning.AddSeconds(60)))
+                                now > timeOfLastMultipleCarSlowerClassWarning.AddSeconds(55)))
                         {
                             return true;
                         }
                         else if (numFasterCars == 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarIsRacingPlayerForPosition ||
-                                now > timeOfLastSingleCarFasterClassWarning.AddSeconds(40)))
+                                now > timeOfLastSingleCarFasterClassWarning.AddSeconds(50)))
                         {
                             return true;
                         }
                         else if (numFasterCars > 1 &&
                             (fasterCarsIncludeClassLeader || fasterCarsRacingForPosition ||
-                                now > timeOfLastMultipleCarFasterClassWarning.AddSeconds(40)))
+                                now > timeOfLastMultipleCarFasterClassWarning.AddSeconds(45)))
                         {
                             return true;
                         }
