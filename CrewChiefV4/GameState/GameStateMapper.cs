@@ -61,6 +61,10 @@ namespace CrewChiefV4.GameState
             int numCarsInPlayerClass = 1;
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
+                if (!opponent.IsActive)
+                {
+                    continue;
+                }
                 if (singleClass || CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
                     // don't care about other classes
