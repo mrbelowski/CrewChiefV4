@@ -223,7 +223,7 @@ namespace CrewChiefV4.Events
                     {
                         string opponentKey = entry.Key;
                         OpponentData opponentData = entry.Value;
-                        if (opponentData.CarClass.getClassIdentifier() != currentGameState.carClass.getClassIdentifier())
+                        if (!CarData.IsCarClassEqual(opponentData.CarClass, currentGameState.carClass))
                         {
                             // not interested in opponents from other classes
                             continue;
