@@ -461,7 +461,7 @@ namespace CrewChiefV4
                 return false;
             }
             // check gropued classes separately
-            if (class1.grouped && class2.grouped && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier())
+            if (class1.grouped && class2.grouped && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
             {
                 return true;
             }
