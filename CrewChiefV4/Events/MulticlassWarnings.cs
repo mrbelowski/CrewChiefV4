@@ -235,8 +235,9 @@ namespace CrewChiefV4.Events
                             // do the announcing - need to decide which to prefer - read multiple?
                             Console.WriteLine(otherClassWarningData.ToString());
 
-                            // when we're being caught by faster cars, if this is the first time in the session use a different message
-                            if (!caughtByFasterClassInThisSession && otherClassWarningData.numFasterCars > 0)
+                            // when we're being caught by faster cars, if this is the first time in the session, and this guy is the leader
+                            // (just in case this car has pitted and is a lap down or something) use a different message
+                            if (!caughtByFasterClassInThisSession && otherClassWarningData.numFasterCars > 0 && otherClassWarningData.fasterCarsIncludeClassLeader)
                             {
                                 caughtByFasterClassInThisSession = true;
                                 timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;

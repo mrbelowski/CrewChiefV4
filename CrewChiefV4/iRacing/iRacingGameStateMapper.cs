@@ -205,7 +205,7 @@ namespace CrewChiefV4.iRacing
                 for (int driverIndex = 0; driverIndex < shared.Drivers.Count; driverIndex++)
                 {
                     Driver driver = shared.Drivers[driverIndex];
-                    String opponentDataKey = driverIndex.ToString();
+                    String opponentDataKey = driver.Id.ToString();
                     driverName = driver.Name.ToLower();
                     if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.IsPacecar || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || driver.IsSpectator)
                     {
