@@ -619,10 +619,9 @@ namespace CrewChiefV4.iRacing
             }
 
             GameStateData.Multiclass = false;
-            for (int driverIndex = 0; driverIndex < shared.Drivers.Count; driverIndex ++)
+            foreach (Driver driver in shared.Drivers)
             {
-                String opponentDataKey = driverIndex.ToString();
-                Driver driver = shared.Drivers[driverIndex];
+                String opponentDataKey = driver.Id.ToString();
                 if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || driver.IsPacecar || driver.IsSpectator)
                 {
                     continue;
