@@ -1532,6 +1532,29 @@ namespace CrewChiefV4
             doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"));
         }
 
+        private void saveConsoleOutputButtonClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if(textBox1.Text.Length > 0) 
+                {
+                    String filename = "console_" + DateTime.Now.ToString("yyyy_MM_dd-HH-mm-ss") + ".txt";
+                    String path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "debugLogs");
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
+                    path = System.IO.Path.Combine(path, filename);
+                    File.WriteAllText(path, textBox1.Text);
+                    Console.WriteLine("Console output saved to " + path);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to save console output, message = " + ex.Message);
+            }
+        }
+
         private void scanControllersButtonClicked(object sender, EventArgs e)
         {
             controllerConfiguration.controllers = this.controllerConfiguration.scanControllers();

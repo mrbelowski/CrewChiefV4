@@ -44,6 +44,7 @@ namespace CrewChiefV4
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.forceVersionCheckButton = new System.Windows.Forms.Button();
+            this.saveConsoleOutputButton = new System.Windows.Forms.Button();
             this.buttonActionSelect = new System.Windows.Forms.ListBox();
             this.controllersList = new System.Windows.Forms.ListBox();
             this.assignButtonToAction = new System.Windows.Forms.Button();
@@ -404,6 +405,17 @@ namespace CrewChiefV4
             this.forceVersionCheckButton.UseVisualStyleBackColor = true;
             this.forceVersionCheckButton.Click += new System.EventHandler(this.forceVersionCheckButtonClicked);
             // 
+            // save_console_output
+            // 
+            this.saveConsoleOutputButton.AutoSize = true;
+            this.saveConsoleOutputButton.Location = new System.Drawing.Point(925, 665);
+            this.saveConsoleOutputButton.Name = "saveConsoleOutputButton";
+            this.saveConsoleOutputButton.Size = new System.Drawing.Size(65, 13);
+            this.saveConsoleOutputButton.TabIndex = 101;
+            this.saveConsoleOutputButton.Text = Configuration.getUIString("save_console_output");
+            this.saveConsoleOutputButton.UseVisualStyleBackColor = true;
+            this.saveConsoleOutputButton.Click += new System.EventHandler(this.saveConsoleOutputButtonClicked);
+            // 
             // soundPackProgressBar
             // 
             this.soundPackProgressBar.Location = new System.Drawing.Point(39, 176);
@@ -495,7 +507,7 @@ namespace CrewChiefV4
             this.speechRecognitionDeviceLabel.Location = new System.Drawing.Point(115, 70);
             this.speechRecognitionDeviceLabel.Name = "speechRecognitionDeviceLabel";
             this.speechRecognitionDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            this.speechRecognitionDeviceLabel.TabIndex = 22;
+            this.speechRecognitionDeviceLabel.TabIndex = 101;
             this.speechRecognitionDeviceLabel.Text = Configuration.getUIString("speech_recognition_device_label");
             this.speechRecognitionDeviceLabel.Visible = false;
 
@@ -597,6 +609,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.buttonActionSelect);
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.forceVersionCheckButton);
+            this.Controls.Add(this.saveConsoleOutputButton);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.spotterNameBox);
@@ -625,6 +638,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button startApplicationButton;
         private System.Windows.Forms.Button forceVersionCheckButton;
+        private System.Windows.Forms.Button saveConsoleOutputButton;
         private System.Windows.Forms.ListBox buttonActionSelect;
         private System.Windows.Forms.ListBox controllersList;
         private System.Windows.Forms.Button assignButtonToAction;

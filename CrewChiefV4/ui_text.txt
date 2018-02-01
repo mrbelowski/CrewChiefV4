@@ -61,6 +61,7 @@ game = Game
 app_version = App version
 help = Help and getting started
 about = About Crew Chief
+save_console_output = Save console text
 
 restore_context_menu = Restore
 start_context_menu = Start {0} mode
