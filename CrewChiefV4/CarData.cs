@@ -293,11 +293,15 @@ namespace CrewChiefV4
 
             public String placeholderClassId = "";
 
+            public Boolean grouped = false;
+
             public List<Regex> pCarsClassNamesRegexs = new List<Regex>();
             public List<Regex> rf1ClassNamesRegexs = new List<Regex>();
             public List<Regex> rf2ClassNamesRegexs = new List<Regex>();
             public List<Regex> acClassNamesRegexs = new List<Regex>();
 
+            // Turns out enum.ToString() is costly, so cache string representation of enum value.
+            private String carClassEnumString = null;
             public CarClass()
             {
                 // initialise with default values
@@ -328,8 +332,7 @@ namespace CrewChiefV4
                 this.isBatteryPowered = false;
             }
 
-            // Turns out enum.ToString() is costly, so cache string representation of enum value.
-            private String carClassEnumString = null;
+
             public String getClassIdentifier()
             {
                 if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE || this.carClassEnum == CarClassEnum.USER_CREATED)
@@ -345,7 +348,6 @@ namespace CrewChiefV4
                         // if this car class is part of a group, the class identifier will be the group name, 
                         // not the enum name. This dictionary lookup and iteration is only done once per class because
                         // the result is cached, so this shouldn't affect performance too much
-                        Boolean grouped = false;
                         foreach (KeyValuePair<string, List<CarClassEnum>> keyValuePair in groupedClasses)
                         {
                             foreach (CarClassEnum carClassEnum in keyValuePair.Value)
@@ -459,6 +461,11 @@ namespace CrewChiefV4
             {
                 return false;
             }
+            // check gropued classes separately
+            if (class1.grouped && class2.grouped && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
+            {
+                return true;
+            }
             if (class1.carClassEnum == class2.carClassEnum // Disambiguate only if enum values are equal.
                 && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
             {
@@ -477,6 +484,8 @@ namespace CrewChiefV4
             foreach (CarClass carClass in userCarClassData.carClasses)
             {
                 carClass.setupRegexs();
+                // eagerly initialise these - this ensures the grouped flag is set correctly from the outset
+                carClass.getClassIdentifier();
             }
             CAR_CLASSES = userCarClassData;
 
