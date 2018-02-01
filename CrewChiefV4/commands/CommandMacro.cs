@@ -19,6 +19,8 @@ namespace CrewChiefV4.commands
         private static Object mutex = new Object();
 
         Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
+        Boolean enableAutoTriggering = UserSettings.GetUserSettings().getBoolean("allow_macros_to_trigger_automatically");
+
         AudioPlayer audioPlayer;
         Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
@@ -28,7 +30,7 @@ namespace CrewChiefV4.commands
             this.audioPlayer = audioPlayer;
             this.macro = macro;
             this.assignmentsByGame = assignmentsByGame;
-            this.allowAutomaticTriggering = allowAutomaticTriggering;
+            this.allowAutomaticTriggering = allowAutomaticTriggering && enableAutoTriggering;
             if (allowAutomaticTriggering)
             {
                 Console.WriteLine("Macro \"" + macro.name + "\" can be triggered automatically");
