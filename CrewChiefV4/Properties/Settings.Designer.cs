@@ -3106,5 +3106,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_multiclass_messages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool allow_macros_to_trigger_automatically {
+            get {
+                return ((bool)(this["allow_macros_to_trigger_automatically"]));
+            }
+            set {
+                this["allow_macros_to_trigger_automatically"] = value;
+            }
+        }
     }
 }

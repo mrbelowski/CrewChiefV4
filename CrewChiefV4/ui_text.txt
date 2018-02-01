@@ -568,3 +568,6 @@ pit_box_position_countdown_help = Play distance in metres to box as you approach
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
+
+allow_macros_to_trigger_automatically = Allow automatic macro triggering
+allow_macros_to_trigger_automatically_help = Enable some macros to execute automatically (e.g. R3E pit auto-confirm)
