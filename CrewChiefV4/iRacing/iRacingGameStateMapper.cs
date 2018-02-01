@@ -633,7 +633,7 @@ namespace CrewChiefV4.iRacing
                 OpponentData currentOpponentData = null;
                 if (currentGameState.OpponentData.TryGetValue(opponentDataKey, out currentOpponentData))
                 {
-                    if (shared.SessionData.IsTeamRacing || string.Equals(driverName, currentOpponentData.DriverRawName))
+                    if (shared.SessionData.IsTeamRacing || driver.CustId == currentOpponentData.CostId)
                     {
                         createNewDriver = false;
                         if (previousGameState != null)
@@ -731,7 +731,7 @@ namespace CrewChiefV4.iRacing
                             currentOpponentData.LicensLevel = driver.licensLevel;
                             currentOpponentData.iRating = driver.IRating;
 
-                            updateOpponentData(currentOpponentData, driverName, currentOpponentOverallPosition, currentOpponentLapsCompleted,
+                            updateOpponentData(currentOpponentData, driverName, driver.CustId, currentOpponentOverallPosition, currentOpponentLapsCompleted,
                                         currentOpponentSector, (float)driver.Live.LapTimePrevious, hasCrossedSFLine,
                                         shared.Telemetry.CarIdxOnPitRoad[driver.Id], previousIsInPits, previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
@@ -924,7 +924,7 @@ namespace CrewChiefV4.iRacing
             return currentGameState;
         }
 
-        private void updateOpponentData(OpponentData opponentData, String driverName, int racePosition, int completedLaps,
+        private void updateOpponentData(OpponentData opponentData, String driverName, int CostId, int racePosition, int completedLaps,
             int sector, float completedLapTime, Boolean hasCrossedSFLine, Boolean isInPits, bool previousIsInPits,
             Boolean previousLapWasValid, Boolean currentLapValid, float sessionRunningTime,
             float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
@@ -934,7 +934,7 @@ namespace CrewChiefV4.iRacing
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
             int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
-            if (!string.Equals(opponentData.DriverRawName, driverName))
+            if (opponentData.CostId !=  CostId)
             {
                 Console.WriteLine("Driver " + opponentData.DriverRawName + " has been swapped for " + driverName);
                 opponentData.DriverRawName = driverName;
@@ -1133,6 +1133,7 @@ namespace CrewChiefV4.iRacing
             OpponentData opponentData = new OpponentData();
             opponentData.IsActive = true;
             opponentData.DriverRawName = driverName;
+            opponentData.CostId = opponentCar.CustId;
             opponentData.OverallPosition = opponentCar.Live.Position;
             opponentData.CompletedLaps = opponentCar.CurrentResults.LapsComplete;
             opponentData.DistanceRoundTrack = opponentCar.Live.CorrectedLapDistance * trackLength;

@@ -646,6 +646,9 @@ namespace CrewChiefV4.GameState
 
         // the name read directly from the game data - might be a 'handle' with all kinds of random crap in it
         public String DriverRawName = null;
+        
+        //iRacing costumer ID used to check for driver changes.
+        public int CostId = -1;
 
         public Boolean DriverNameSet = false;
 
