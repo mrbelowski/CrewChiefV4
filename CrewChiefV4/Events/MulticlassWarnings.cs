@@ -181,7 +181,6 @@ namespace CrewChiefV4.Events
                 GameStateData.onManualFormationLap || GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
                 currentGameState.SessionData.TrackDefinition == null || 
                 currentGameState.SessionData.CompletedLaps < minLapsForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass] ||
-                currentGameState.SessionData.PlayerLapTimeSessionBest <= 0 || 
                 currentGameState.PitData.InPitlane ||
                 currentGameState.PositionAndMotionData.CarSpeed < 5 || 
                 currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
@@ -653,7 +652,6 @@ namespace CrewChiefV4.Events
         private OtherCarClassWarningData getOtherCarClassWarningData(GameStateData currentGameState)
         {
             float playerDistanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
-            float playerBestLap = currentGameState.SessionData.PlayerLapTimeSessionBest;
             float trackLength = currentGameState.SessionData.TrackDefinition.trackLength;
             float halfTrackLength = trackLength / 2f;
 
