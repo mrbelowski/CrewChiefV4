@@ -293,6 +293,8 @@ namespace CrewChiefV4
 
             public String placeholderClassId = "";
 
+            public Boolean grouped = false;
+
             public List<Regex> pCarsClassNamesRegexs = new List<Regex>();
             public List<Regex> rf1ClassNamesRegexs = new List<Regex>();
             public List<Regex> rf2ClassNamesRegexs = new List<Regex>();
@@ -345,7 +347,6 @@ namespace CrewChiefV4
                         // if this car class is part of a group, the class identifier will be the group name, 
                         // not the enum name. This dictionary lookup and iteration is only done once per class because
                         // the result is cached, so this shouldn't affect performance too much
-                        Boolean grouped = false;
                         foreach (KeyValuePair<string, List<CarClassEnum>> keyValuePair in groupedClasses)
                         {
                             foreach (CarClassEnum carClassEnum in keyValuePair.Value)
@@ -458,6 +459,11 @@ namespace CrewChiefV4
             if (class2 == null && class1 != null)
             {
                 return false;
+            }
+            // check gropued classes separately
+            if (class1.grouped && class2.grouped && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier())
+            {
+                return true;
             }
             if (class1.carClassEnum == class2.carClassEnum // Disambiguate only if enum values are equal.
                 && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
