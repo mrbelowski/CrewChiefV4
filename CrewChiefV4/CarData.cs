@@ -102,17 +102,18 @@ namespace CrewChiefV4
         private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
 
-        private static List<List<CarClassEnum>> groupedClasses = new List<List<CarClassEnum>>();
-
+        private static Dictionary<string, List<CarClassEnum>> groupedClasses = new Dictionary<string, List<CarClassEnum>>();
+        
         static CarData()
         {
             List<CarClassEnum> r3eDTMClasses = new List<CarClassEnum>();
             r3eDTMClasses.Add(CarClassEnum.DTM_2013); r3eDTMClasses.Add(CarClassEnum.DTM_2014); r3eDTMClasses.Add(CarClassEnum.DTM_2015); r3eDTMClasses.Add(CarClassEnum.DTM_2016);
-            groupedClasses.Add(r3eDTMClasses);
+            groupedClasses.Add("DTM", r3eDTMClasses);
 
             List<CarClassEnum> r3eTC1Classes = new List<CarClassEnum>();
             r3eTC1Classes.Add(CarClassEnum.TC1); r3eTC1Classes.Add(CarClassEnum.TC1_2014);
-            groupedClasses.Add(r3eTC1Classes);		
+            groupedClasses.Add("TC1", r3eTC1Classes);
+
             List<CornerData.EnumWithThresholds> roadTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdRoadTyreTempPeak));
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdRoadTyreTempPeak, maxWarmRoadTyreTempPeak));
@@ -341,9 +342,31 @@ namespace CrewChiefV4
                 {
                     if (this.carClassEnumString == null)
                     {
-                        this.carClassEnumString = this.carClassEnum.ToString();
+                        // if this car class is part of a group, the class identifier will be the group name, 
+                        // not the enum name. This dictionary lookup and iteration is only done once per class because
+                        // the result is cached, so this shouldn't affect performance too much
+                        Boolean grouped = false;
+                        foreach (KeyValuePair<string, List<CarClassEnum>> keyValuePair in groupedClasses)
+                        {
+                            foreach (CarClassEnum carClassEnum in keyValuePair.Value)
+                            {
+                                if (carClassEnum == this.carClassEnum)
+                                {
+                                    this.carClassEnumString = keyValuePair.Key;
+                                    grouped = true;
+                                    break;
+                                }
+                            }
+                            if (grouped)
+                            {
+                                break;
+                            }
+                        }
+                        if (!grouped)
+                        {
+                            this.carClassEnumString = this.carClassEnum.ToString();
+                        }
                     }
-
                     return this.carClassEnumString;
                 }
             }
@@ -441,14 +464,7 @@ namespace CrewChiefV4
             {
                 return true;
             }
-            // Check for grouping.
-            foreach (List<CarClassEnum> groupedClass in groupedClasses) 
-            {
-                if (groupedClass.Contains(class1.carClassEnum) && groupedClass.Contains(class2.carClassEnum))
-                {
-                    return true;
-                }
-            }
+            // The grouping is processed in the getClassIdentifier method, so we don't need to check for it here
             return false;
         }
 
