@@ -300,6 +300,8 @@ namespace CrewChiefV4
             public List<Regex> rf2ClassNamesRegexs = new List<Regex>();
             public List<Regex> acClassNamesRegexs = new List<Regex>();
 
+            // Turns out enum.ToString() is costly, so cache string representation of enum value.
+            private String carClassEnumString = null;
             public CarClass()
             {
                 // initialise with default values
@@ -330,8 +332,7 @@ namespace CrewChiefV4
                 this.isBatteryPowered = false;
             }
 
-            // Turns out enum.ToString() is costly, so cache string representation of enum value.
-            private String carClassEnumString = null;
+
             public String getClassIdentifier()
             {
                 if (this.carClassEnum == CarClassEnum.UNKNOWN_RACE || this.carClassEnum == CarClassEnum.USER_CREATED)
@@ -483,6 +484,8 @@ namespace CrewChiefV4
             foreach (CarClass carClass in userCarClassData.carClasses)
             {
                 carClass.setupRegexs();
+                // eagerly initialise these - this ensures the grouped flag is set correctly from the outset
+                carClass.getClassIdentifier();
             }
             CAR_CLASSES = userCarClassData;
 
