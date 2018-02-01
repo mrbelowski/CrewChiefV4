@@ -477,10 +477,8 @@ namespace CrewChiefV4
                 {
                     return false;  // Both are UNKNOWN_RACE/USER_CREATED, but identifiers don't match.  Those are different classes.
                 }
-                else
-                {
-                    return true;
-                }
+
+                return true;  // Same, unambigous enum values, classes are equal.
             }
 
             // The grouping is processed in the getClassIdentifier method, so we don't need to check for it here
