@@ -108,7 +108,11 @@ namespace CrewChiefV4.iRacing
             if (shared.Driver != null)
             {
                 playerCar = shared.Driver;
+                playerName = playerCar.Name.ToLower();
             }
+
+            Validator.validate(playerName);
+
             /*
             if (!prevTrackSurface.Equals(playerCar.Live.TrackSurface.ToString()))
             {
@@ -170,13 +174,6 @@ namespace CrewChiefV4.iRacing
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                  
-                String driverName = playerCar.Name.ToLower();
-                if (playerName == null)
-                {
-                    Validator.validate(driverName);
-                    playerName = driverName;
-                }
-
                 currentGameState.PitData.InPitlane = shared.Telemetry.OnPitRoad;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
@@ -202,19 +199,16 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentSector;
 
-                for (int driverIndex = 0; driverIndex < shared.Drivers.Count; driverIndex++)
+                foreach (Driver driver in shared.Drivers)
                 {
-                    Driver driver = shared.Drivers[driverIndex];
-                    String opponentDataKey = driver.Id.ToString();
-                    driverName = driver.Name.ToLower();
                     if (driver.Id == PlayerCarIdx || driver.CurrentResults.IsOut || driver.IsPacecar || driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || driver.IsSpectator)
                     {
                         continue;
                     }
                     else
                     {
-                        currentGameState.OpponentData.Add(opponentDataKey, createOpponentData(driver, driverName,
-                            true, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                        currentGameState.OpponentData.Add(driver.Id.ToString(), createOpponentData(driver, true, 
+                            CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
                 // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
@@ -823,7 +817,7 @@ namespace CrewChiefV4.iRacing
                 {
                     if (!driver.CurrentResults.IsOut || !driver.IsPacecar || !driver.Live.TrackSurface.HasFlag(TrackSurfaces.NotInWorld) || !driver.IsSpectator)
                     {
-                        currentGameState.OpponentData.Add(opponentDataKey, createOpponentData(driver, driverName,
+                        currentGameState.OpponentData.Add(opponentDataKey, createOpponentData(driver,
                             false, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
@@ -1124,8 +1118,9 @@ namespace CrewChiefV4.iRacing
             return lastSessionPhase;
         }
 
-        private OpponentData createOpponentData(Driver opponentCar, String driverName, Boolean loadDriverName, CarData.CarClassEnum playerCarClass, float trackLength)
+        private OpponentData createOpponentData(Driver driver, Boolean loadDriverName, CarData.CarClassEnum playerCarClass, float trackLength)
         {
+            String driverName = driver.Name.ToLower();
             if (loadDriverName && CrewChief.enableDriverNames)
             {
                 speechRecogniser.addNewOpponentName(driverName);
@@ -1133,16 +1128,16 @@ namespace CrewChiefV4.iRacing
             OpponentData opponentData = new OpponentData();
             opponentData.IsActive = true;
             opponentData.DriverRawName = driverName;
-            opponentData.CostId = opponentCar.CustId;
-            opponentData.OverallPosition = opponentCar.Live.Position;
-            opponentData.CompletedLaps = opponentCar.CurrentResults.LapsComplete;
-            opponentData.DistanceRoundTrack = opponentCar.Live.CorrectedLapDistance * trackLength;
+            opponentData.CostId = driver.CustId;
+            opponentData.OverallPosition = driver.Live.Position;
+            opponentData.CompletedLaps = driver.CurrentResults.LapsComplete;
+            opponentData.DistanceRoundTrack = driver.Live.CorrectedLapDistance * trackLength;
             opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
-            opponentData.CarClass = CarData.getCarClassForIRacingId(opponentCar.Car.CarClassId, opponentCar.Car.CarId);
-            opponentData.CurrentSectorNumber = opponentCar.Live.CurrentSector;
-            opponentData.CarNr = Parser.ParseInt(opponentCar.CarNumber);
+            opponentData.CarClass = CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId);
+            opponentData.CurrentSectorNumber = driver.Live.CurrentSector;
+            opponentData.CarNr = Parser.ParseInt(driver.CarNumber);
             Console.WriteLine("New driver " + driverName + " is using car class " +
-                opponentData.CarClass.getClassIdentifier() + " (car ID " + opponentCar.Car.CarId + ")");
+                opponentData.CarClass.getClassIdentifier() + " (car ID " + driver.Car.CarId + ")");
 
             return opponentData;
         }
