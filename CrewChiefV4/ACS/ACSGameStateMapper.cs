@@ -1250,7 +1250,6 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
                     currentGameState.SessionData.IsNewSector = false;
                 }
-                Console.WriteLine("AFTER " + currentGameState.SessionData.SectorNumber +", " + currentGameState.SessionData.IsNewSector);
 
                 //Sector Log
                 if (currentGameState.SessionData.TrackDefinition.unknownTrack && logUnknownTrackSectors && !isOnline && currentGameState.SessionData.IsNewSector &&
