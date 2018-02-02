@@ -34,37 +34,39 @@ namespace CrewChiefV4.Events
 
         private String folderYouAreBeingCaughtByFasterCars = "multiclass/you_are_being_caught_by_the_faster_cars";
         private String folderYouAreCatchingSlowerCars = "multiclass/you_are_catching_the_slower_cars";
-        private String folderYouAreBeingCaughtThe = "multiclass/you_are_being_caught_by_the";
+        private String folderYouAreBeingCaughtByThe = "multiclass/you_are_being_caught_by_the";
         private String folderYouAreCatchingThe = "multiclass/you_are_catching_the";
         private String folderRunners = "multiclass/runners";
 
         private static String folderFasterClass = "multiclass/it_is_a_faster_class";
         private static String folderSlowerClass = "multiclass/it_is_a_slower_class";
         private static String folderSameClassAsUs = "multiclass/same_class_as_us";
-        private static String folderLmp1 = "multiclass/lmp1";
-        private static String folderLmp2 = "multiclass/lmp2";
-        private static String folderLmp3 = "multiclass/lmp3";
-        private static String folderGT1 = "multiclass/gt1";
-        private static String folderGT2 = "multiclass/gt2";
-        private static String folderGTE = "multiclass/gte";
-        private static String folderGTC = "multiclass/gtc";
-        private static String folderGTLM = "multiclass/gtlm";
-        private static String folderGT3 = "multiclass/gt3";
-        private static String folderGT4 = "multiclass/gt4";
-        private static String folderGT5 = "multiclass/gt5";
-        private static String folderGT500 = "multiclass/gt500";
-        private static String folderGT300 = "multiclass/gt300";
-        private static String folderDTM = "multiclass/dtm";
-        private static String folderGroupA = "multiclass/groupa";
-        private static String folderGroupB = "multiclass/groupb";
-        private static String folderGroupC = "multiclass/groupc";
-        private static String folderGroup4 = "multiclass/group4";
-        private static String folderGroup5 = "multiclass/group5";
-        private static String folderGroup6 = "multiclass/group6";
-        private static String folderGTO = "multiclass/gto";
-        private static String folderTC1 = "multiclass/tc1";
-        private static String folderTC2 = "multiclass/tc2";
-        private static String folderCarreraCup = "multiclass/carrera_cup";
+        private static String folderLmp1 = "lmp1";
+        private static String folderLmp2 = "lmp2";
+        private static String folderLmp3 = "lmp3";
+        private static String folderGT1 = "gt1";
+        private static String folderGT2 = "gt2";
+        private static String folderGTE = "gte";
+        private static String folderGTC = "gtc";
+        private static String folderGTLM = "gtlm";
+        private static String folderGT3 = "gt3";
+        private static String folderGT4 = "gt4";
+        private static String folderGT5 = "gt5";
+        private static String folderGT500 = "gt500";
+        private static String folderGT300 = "gt300";
+        private static String folderDTM = "dtm";
+        private static String folderGroupA = "groupa";
+        private static String folderGroupB = "groupb";
+        private static String folderGroupC = "groupc";
+        private static String folderGroup4 = "group4";
+        private static String folderGroup5 = "group5";
+        private static String folderGroup6 = "group6";
+        private static String folderGTO = "gto";
+        private static String folderTC1 = "tc1";
+        private static String folderTC2 = "tc2";
+        private static String folderCarreraCup = "carrera_cup";
+        private static String folderClassStub = "multiclass/";
+        private static String folderRunnersSuffix = "_runners";
 
         private static Dictionary<CarData.CarClassEnum, string> carClassEnumToSound = new Dictionary<CarData.CarClassEnum, string>();
         private static Dictionary<TrackData.TrackLengthClass, int> minLapsForTrackLengthClass = new Dictionary<TrackData.TrackLengthClass, int>();
@@ -246,8 +248,18 @@ namespace CrewChiefV4.Events
                                 if (otherClassWarningData.carClassOfClosestFasterCar != null &&
                                     carClassEnumToSound.TryGetValue(otherClassWarningData.carClassOfClosestFasterCar.carClassEnum, out classNameToRead))
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners", 
-                                        MessageContents(folderYouAreBeingCaughtThe, classNameToRead, folderRunners), 0, this));
+                                    String classWithRunnersSuffix = folderClassStub + classNameToRead + folderRunnersSuffix;
+                                    String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
+                                    if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners",
+                                            MessageContents(folderYouAreBeingCaughtByThe, classWithRunnersSuffix), 0, this));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners",
+                                            MessageContents(folderYouAreBeingCaughtByThe, classWithoutRunnersSuffix, folderRunners), 0, this));
+                                    }
                                 }
                                 else
                                 {
@@ -318,8 +330,18 @@ namespace CrewChiefV4.Events
                                     if (otherClassWarningData.carClassOfClosestSlowerCar != null &&
                                         carClassEnumToSound.TryGetValue(otherClassWarningData.carClassOfClosestSlowerCar.carClassEnum, out classNameToRead))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
-                                            MessageContents(folderYouAreCatchingThe, classNameToRead, folderRunners), 0, this));
+                                        String classWithRunnersSuffix = folderClassStub + classNameToRead + folderRunnersSuffix;
+                                        String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
+                                        if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
+                                        {
+                                            audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
+                                                MessageContents(folderYouAreCatchingThe, classWithRunnersSuffix), 0, this));
+                                        }
+                                        else
+                                        {
+                                            audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
+                                                MessageContents(folderYouAreCatchingThe, classWithoutRunnersSuffix, folderRunners), 0, this));
+                                        }                                        
                                     }
                                     else
                                     {
@@ -458,7 +480,7 @@ namespace CrewChiefV4.Events
             String classSound;
             if (carClassEnumToSound.TryGetValue(opponentClass.carClassEnum, out classSound) && SoundCache.availableSounds.Contains(classSound))
             {
-                return classSound;
+                return folderClassStub + classSound;
             }
             else
             {
