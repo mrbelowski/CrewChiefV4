@@ -129,7 +129,8 @@
 			"carClassEnum": "GT1",
 			"raceroomClassIds": [1687],
 			"pCarsClassNames": ["GT1"],
-			"rf2ClassNames": ["*GT1*"],
+            "rf2ClassNames": [ "*GT1*" ],
+            "acClassNames": ["*GT1*", "rss_gt_tornado_v12", "rss_gt_vortex_v10", "rss_gt_ferruccio_55"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
