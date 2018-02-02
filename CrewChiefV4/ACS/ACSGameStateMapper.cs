@@ -50,8 +50,6 @@ namespace CrewChiefV4.assetto
         private static string expectedVersion = "1.7";
         private static string expectedPluginVersion = "1.0.0";
 
-        private SpeechRecogniser speechRecogniser;
-
         public List<LapData> playerLapData = new List<LapData>();
 
         // next track conditions sample due after:
@@ -838,7 +836,6 @@ namespace CrewChiefV4.assetto
 
             playerName = getNameFromBytes(playerVehicle.driverName);
             Validator.validate(playerName);
-
             currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
             AC_SESSION_TYPE sessionType = shared.acsGraphic.session;
 
@@ -1240,10 +1237,21 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), hasCrossedSFLine)
                     || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow));
+
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.readLandmarksForThisLap = false;
+                    // correct IsNewSector so it's in sync with IsNewLap
+                    currentGameState.SessionData.IsNewSector = true;
                 }
+                else if (previousGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.IsNewSector)
+                {
+                    // don't allow IsNewSector to be true if IsNewLap is not - roll back to the previous sector number and correct the flag
+                    currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
+                    currentGameState.SessionData.IsNewSector = false;
+                }
+                Console.WriteLine("AFTER " + currentGameState.SessionData.SectorNumber +", " + currentGameState.SessionData.IsNewSector);
+
                 //Sector Log
                 if (currentGameState.SessionData.TrackDefinition.unknownTrack && logUnknownTrackSectors && !isOnline && currentGameState.SessionData.IsNewSector &&
                     (shared.acsGraphic.currentSectorIndex + 1 == 2 || shared.acsGraphic.currentSectorIndex + 1 == 3))
@@ -1345,7 +1353,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.YellowFlagStartTime = currentGameState.Now;
                 }*/
                 currentGameState.SessionData.NumCarsOverall = shared.acsChief.numVehicles;
-                
+
                 currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
 
 
@@ -1887,8 +1895,6 @@ namespace CrewChiefV4.assetto
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.acsPhysics.pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.acsPhysics.roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.acsPhysics.heading;
-
-
             return currentGameState;
         }
 
