@@ -447,13 +447,13 @@ namespace CrewChiefV4
             }
         }
 
-        public static Boolean IsCarClassEqual(CarClass class1, CarClass class2) 
+        public static Boolean IsCarClassEqual(CarClass class1, CarClass class2)
         {
             if (class1 == class2)
             {
                 return true;
             }
-            if (class1 == null && class2 != null) 
+            if (class1 == null && class2 != null)
             {
                 return false;
             }
@@ -466,11 +466,21 @@ namespace CrewChiefV4
             {
                 return true;
             }
-            if (class1.carClassEnum == class2.carClassEnum // Disambiguate only if enum values are equal.
-                && String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
+            if (class1.carClassEnum == class2.carClassEnum)
             {
-                return true;
+                // If car class enums are matching, we need to check if it isn't a special case of
+                // ambigous enums, that is UNKNOWN_RACE or USER_CREATED.  Both of those can only be disambiguated
+                // via identifier comparison.
+                if ((class1.carClassEnum == CarClassEnum.UNKNOWN_RACE || class1.carClassEnum == CarClassEnum.USER_CREATED)
+                    && (class2.carClassEnum == CarClassEnum.UNKNOWN_RACE || class2.carClassEnum == CarClassEnum.USER_CREATED)
+                    && !String.Equals(class1.getClassIdentifier(), class2.getClassIdentifier()))
+                {
+                    return false;  // Both are UNKNOWN_RACE/USER_CREATED, but identifiers don't match.  Those are different classes.
+                }
+
+                return true;  // Same, unambigous enum values, classes are equal.
             }
+
             // The grouping is processed in the getClassIdentifier method, so we don't need to check for it here
             return false;
         }
