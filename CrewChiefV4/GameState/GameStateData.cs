@@ -2307,17 +2307,29 @@ namespace CrewChiefV4.GameState
             // the expensive sort call. In multiclass sessions we'll still update NumberOfClasses to be correct here, then on the next tick
             // the class positions will be sorted properly. So we'll be behind for 1 tick in practice / qual if a new class car joins. For races
             // cars tend to only leave, so this will probably be OK
+            HashSet<string> unknownClassIds = new HashSet<string>();
+            int numberOfClasses;
             if (forceSingleClass(this) || GameStateData.NumberOfClasses == 1)
-            {
+            {                
                 HashSet<String> classIds = new HashSet<string>();
-                classIds.Add(this.carClass.getClassIdentifier());
+                String playerClassId = this.carClass.getClassIdentifier();
+                classIds.Add(playerClassId);
+                if (CrewChief.gameDefinition.allowsUserCreatedCars && this.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                {
+                    unknownClassIds.Add(playerClassId);
+                }
                 this.SessionData.ClassPosition = this.SessionData.OverallPosition;
                 foreach (OpponentData opponentData in OpponentData.Values)
                 {
                     opponentData.ClassPosition = opponentData.OverallPosition;
-                    classIds.Add(opponentData.CarClass.getClassIdentifier());
+                    String opponentClassId = opponentData.CarClass.getClassIdentifier();
+                    classIds.Add(opponentClassId);
+                    if (CrewChief.gameDefinition.allowsUserCreatedCars && opponentData.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                    {
+                        unknownClassIds.Add(playerClassId);
+                    }
                 }
-                GameStateData.NumberOfClasses = classIds.Count;
+                numberOfClasses = classIds.Count;
             }
             else
             {
@@ -2335,6 +2347,10 @@ namespace CrewChiefV4.GameState
                 foreach (OpponentData participant in participants)
                 {
                     String classId = participant.CarClass.getClassIdentifier();
+                    if (CrewChief.gameDefinition.allowsUserCreatedCars && participant.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                    {
+                        unknownClassIds.Add(classId);
+                    }
                     // because the source list is sorted by position, the number of cars we've encountered so far for this participant's
                     // class will be his class position. If this is the first time we've seen this class, he must be leading it:
                     int countForThisClass;
@@ -2356,7 +2372,18 @@ namespace CrewChiefV4.GameState
                         this.SessionData.ClassPosition = countForThisClass;
                     }
                 }
-                GameStateData.NumberOfClasses = classCounts.Count;
+                numberOfClasses = classCounts.Count;
+            }
+
+            // every car in the session is an unknown class - if the game allows mods, we have to assume the player is using a mod
+            // for which we have no data, and fall back to single class mode
+            if (CrewChief.gameDefinition.allowsUserCreatedCars && numberOfClasses == unknownClassIds.Count)
+            {
+                GameStateData.NumberOfClasses = 1;
+            }
+            else
+            {
+                GameStateData.NumberOfClasses = numberOfClasses;
             }
             GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
             sortClassPositionsCompleted = true;
