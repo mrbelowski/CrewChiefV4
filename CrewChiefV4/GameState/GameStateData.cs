@@ -2375,7 +2375,7 @@ namespace CrewChiefV4.GameState
                 numberOfClasses = classCounts.Count;
             }
 
-            // every car in the session is an unknown class - if the game allows mods, we have to assume the player is using a mod
+            // if every car in the session is an unknown class and the game allows mods, we have to assume the player is using a mod
             // for which we have no data, and fall back to single class mode
             if (CrewChief.gameDefinition.allowsUserCreatedCars && numberOfClasses == unknownClassIds.Count)
             {
