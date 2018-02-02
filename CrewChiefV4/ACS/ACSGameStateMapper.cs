@@ -2029,6 +2029,8 @@ namespace CrewChiefV4.assetto
             {
                 if (hasNewLapData)
                 {
+                    // if we have new lap data, we must be in sector 1
+                    opponentData.CurrentSectorNumber = 1;
                     if (opponentData.OpponentLapData.Count > 0)
                     {
                         // special case here: if there's only 1 lap in the list, and it's marked as an in-lap, and we don't have a laptime, remove it.
@@ -2049,12 +2051,18 @@ namespace CrewChiefV4.assetto
                     opponentData.IsNewLap = true;
                     // recheck the car class here?
                 }
-                else if (opponentData.OpponentLapData.Count > 0 && ((opponentData.CurrentSectorNumber == 1 && sector == 2) || (opponentData.CurrentSectorNumber == 2 && sector == 3)))
+                else if (opponentData.OpponentLapData.Count > 0 &&
+                    ((opponentData.CurrentSectorNumber == 1 && sector == 2) || 
+                     (opponentData.CurrentSectorNumber == 2 && sector == 3) || 
+                     (opponentData.CurrentSectorNumber == 1 && sector == 3)))
                 {
+                    // special case for laps with 2 sectors - they are called sector 1 and sector 3. AC....
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, completedLapTime, sessionRunningTime,
                         lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+                    // only update the sector number if it's one of the above cases. This prevents us from moving the opponent sector number to 1 before
+                    // he has new lap data
+                    opponentData.CurrentSectorNumber = sector;
                 }
-                opponentData.CurrentSectorNumber = sector;
             }
             opponentData.CompletedLaps = completedLaps;
             if (sector == trackNumberOfSectors && isInPits)
