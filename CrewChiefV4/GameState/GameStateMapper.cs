@@ -40,7 +40,7 @@ namespace CrewChiefV4.GameState
         // practice, but these may be added later
         public virtual void populateDerivedRaceSessionData(GameStateData currentGameState)
         {
-            Boolean singleClass = GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState);
+            Boolean singleClass = GameStateData.NumberOfClasses == 1 || CrewChief.forceSingleClass;
             // always set the session start class position and lap start class position:
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {

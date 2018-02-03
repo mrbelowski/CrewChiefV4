@@ -180,7 +180,7 @@ namespace CrewChiefV4.Events
         {
             this.currentGameState = currentGameState;
             if (!enableMulticlassWarnings ||
-                GameStateData.onManualFormationLap || GameStateData.NumberOfClasses == 1 || GameStateData.forceSingleClass(currentGameState) ||
+                GameStateData.onManualFormationLap || GameStateData.NumberOfClasses == 1 || CrewChief.forceSingleClass ||
                 currentGameState.SessionData.TrackDefinition == null || 
                 currentGameState.SessionData.CompletedLaps < minLapsForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass] ||
                 currentGameState.PitData.InPitlane ||
