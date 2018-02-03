@@ -2305,88 +2305,102 @@ namespace CrewChiefV4.GameState
 
         public void sortClassPositions()
         {
-            // if we group all classes together, set everyone's ClassPosition to their Position. We still count the number of classes here.
-            // If the number of classes at the previous check was 1, don't do the full sorting. This will allow single class sessions to skip
-            // the expensive sort call. In multiclass sessions we'll still update NumberOfClasses to be correct here, then on the next tick
-            // the class positions will be sorted properly. So we'll be behind for 1 tick in practice / qual if a new class car joins. For races
-            // cars tend to only leave, so this will probably be OK
-            HashSet<string> unknownClassIds = new HashSet<string>();
-            int numberOfClasses;
-            if (CrewChief.forceSingleClass || GameStateData.NumberOfClasses == 1)
-            {                
-                HashSet<String> classIds = new HashSet<string>();
-                String playerClassId = this.carClass.getClassIdentifier();
-                classIds.Add(playerClassId);
-                if (CrewChief.gameDefinition.allowsUserCreatedCars && this.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
-                {
-                    unknownClassIds.Add(playerClassId);
-                }
+            if (CrewChief.forceSingleClass)
+            {
                 this.SessionData.ClassPosition = this.SessionData.OverallPosition;
                 foreach (OpponentData opponentData in OpponentData.Values)
                 {
                     opponentData.ClassPosition = opponentData.OverallPosition;
-                    String opponentClassId = opponentData.CarClass.getClassIdentifier();
-                    classIds.Add(opponentClassId);
-                    if (CrewChief.gameDefinition.allowsUserCreatedCars && opponentData.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                }
+                GameStateData.NumberOfClasses = 1;
+                sortClassPositionsCompleted = true;
+            }
+            else
+            {
+                // if we group all classes together, set everyone's ClassPosition to their Position. We still count the number of classes here.
+                // If the number of classes at the previous check was 1, don't do the full sorting. This will allow single class sessions to skip
+                // the expensive sort call. In multiclass sessions we'll still update NumberOfClasses to be correct here, then on the next tick
+                // the class positions will be sorted properly. So we'll be behind for 1 tick in practice / qual if a new class car joins. For races
+                // cars tend to only leave, so this will probably be OK
+
+                HashSet<string> unknownClassIds = new HashSet<string>();
+                int numberOfClasses;
+                if (GameStateData.NumberOfClasses == 1)
+                {
+                    HashSet<String> classIds = new HashSet<string>();
+                    String playerClassId = this.carClass.getClassIdentifier();
+                    classIds.Add(playerClassId);
+                    if (CrewChief.gameDefinition.allowsUserCreatedCars && this.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
                     {
                         unknownClassIds.Add(playerClassId);
                     }
+                    this.SessionData.ClassPosition = this.SessionData.OverallPosition;
+                    foreach (OpponentData opponentData in OpponentData.Values)
+                    {
+                        opponentData.ClassPosition = opponentData.OverallPosition;
+                        String opponentClassId = opponentData.CarClass.getClassIdentifier();
+                        classIds.Add(opponentClassId);
+                        if (CrewChief.gameDefinition.allowsUserCreatedCars && opponentData.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                        {
+                            unknownClassIds.Add(playerClassId);
+                        }
+                    }
+                    numberOfClasses = classIds.Count;
                 }
-                numberOfClasses = classIds.Count;
-            }
-            else
-            {
-                List<OpponentData> participants = this.OpponentData.Values.ToList();
-                OpponentData player = new OpponentData() { OverallPosition = this.SessionData.OverallPosition, CarClass = this.carClass };
-                participants.Add(player);
-
-                // can't sort this list on construction because it contains a dummy entry for the player, so sort it here:
-                participants.Sort(delegate(OpponentData d1, OpponentData d2)
+                else
                 {
-                    return d1.OverallPosition.CompareTo(d2.OverallPosition);
-                });
+                    List<OpponentData> participants = this.OpponentData.Values.ToList();
+                    OpponentData player = new OpponentData() { OverallPosition = this.SessionData.OverallPosition, CarClass = this.carClass };
+                    participants.Add(player);
 
-                Dictionary<string, int> classCounts = new Dictionary<string, int>();
-                foreach (OpponentData participant in participants)
-                {
-                    String classId = participant.CarClass.getClassIdentifier();
-                    if (CrewChief.gameDefinition.allowsUserCreatedCars && participant.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                    // can't sort this list on construction because it contains a dummy entry for the player, so sort it here:
+                    participants.Sort(delegate(OpponentData d1, OpponentData d2)
                     {
-                        unknownClassIds.Add(classId);
-                    }
-                    // because the source list is sorted by position, the number of cars we've encountered so far for this participant's
-                    // class will be his class position. If this is the first time we've seen this class, he must be leading it:
-                    int countForThisClass;
-                    if (classCounts.TryGetValue(classId, out countForThisClass))
-                    {
-                        countForThisClass++;
-                        classCounts[classId] =  countForThisClass;
-                    }
-                    else
-                    {
-                        countForThisClass = 1;
-                        classCounts[classId] = 1;
-                    }
+                        return d1.OverallPosition.CompareTo(d2.OverallPosition);
+                    });
 
-                    participant.ClassPosition = countForThisClass;
-                    // if this is the dummy participant for the player, update the player ClassPosition
-                    if (this.SessionData.OverallPosition == participant.OverallPosition)
+                    Dictionary<string, int> classCounts = new Dictionary<string, int>();
+                    foreach (OpponentData participant in participants)
                     {
-                        this.SessionData.ClassPosition = countForThisClass;
+                        String classId = participant.CarClass.getClassIdentifier();
+                        if (CrewChief.gameDefinition.allowsUserCreatedCars && participant.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
+                        {
+                            unknownClassIds.Add(classId);
+                        }
+                        // because the source list is sorted by position, the number of cars we've encountered so far for this participant's
+                        // class will be his class position. If this is the first time we've seen this class, he must be leading it:
+                        int countForThisClass;
+                        if (classCounts.TryGetValue(classId, out countForThisClass))
+                        {
+                            countForThisClass++;
+                            classCounts[classId] = countForThisClass;
+                        }
+                        else
+                        {
+                            countForThisClass = 1;
+                            classCounts[classId] = 1;
+                        }
+
+                        participant.ClassPosition = countForThisClass;
+                        // if this is the dummy participant for the player, update the player ClassPosition
+                        if (this.SessionData.OverallPosition == participant.OverallPosition)
+                        {
+                            this.SessionData.ClassPosition = countForThisClass;
+                        }
                     }
+                    numberOfClasses = classCounts.Count;
                 }
-                numberOfClasses = classCounts.Count;
+                if (hasTooManyUnknownClasses(numberOfClasses, unknownClassIds))
+                {
+                    GameStateData.NumberOfClasses = 1;
+                }
+                else
+                {
+                    GameStateData.NumberOfClasses = numberOfClasses;
+                }
+                GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
+                sortClassPositionsCompleted = true;
             }
-            if (hasTooManyUnknownClasses(numberOfClasses, unknownClassIds))
-            {
-                GameStateData.NumberOfClasses = 1;
-            }
-            else
-            {
-                GameStateData.NumberOfClasses = numberOfClasses;
-            }
-            GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
-            sortClassPositionsCompleted = true;
         }
 
         private Boolean hasTooManyUnknownClasses(int totalNumberOfClassesIds, HashSet<String> unknownClassIds)
