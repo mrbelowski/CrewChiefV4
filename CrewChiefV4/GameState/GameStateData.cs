@@ -2312,7 +2312,7 @@ namespace CrewChiefV4.GameState
             // cars tend to only leave, so this will probably be OK
             HashSet<string> unknownClassIds = new HashSet<string>();
             int numberOfClasses;
-            if (forceSingleClass(this) || GameStateData.NumberOfClasses == 1)
+            if (CrewChief.forceSingleClass || GameStateData.NumberOfClasses == 1)
             {                
                 HashSet<String> classIds = new HashSet<string>();
                 String playerClassId = this.carClass.getClassIdentifier();
@@ -2377,10 +2377,7 @@ namespace CrewChiefV4.GameState
                 }
                 numberOfClasses = classCounts.Count;
             }
-
-            // if every car in the session is an unknown class and the game allows mods, we have to assume the player is using a mod
-            // for which we have no data, and fall back to single class mode
-            if (CrewChief.gameDefinition.allowsUserCreatedCars && numberOfClasses == unknownClassIds.Count)
+            if (hasTooManyUnknownClasses(numberOfClasses, unknownClassIds))
             {
                 GameStateData.NumberOfClasses = 1;
             }
@@ -2392,11 +2389,16 @@ namespace CrewChiefV4.GameState
             sortClassPositionsCompleted = true;
         }
 
-        // this method may sanity checks the class data - e.g. if there are too many classes or whatever.
-        // For now, just check the override flag
-        public static Boolean forceSingleClass(GameStateData currentGameState)
+        private Boolean hasTooManyUnknownClasses(int totalNumberOfClassesIds, HashSet<String> unknownClassIds)
         {
-            return CrewChief.forceSingleClass;
+            if (CrewChief.gameDefinition.allowsUserCreatedCars)
+            {
+                // for games that allow user-created cars, if the number of unknown class IDs exceeds the number of known class IDs, disable multiclass
+                int numberOfUnknownClassIds = unknownClassIds.Count;
+                int numberOfKnownClassIds = totalNumberOfClassesIds - numberOfUnknownClassIds;
+                return numberOfUnknownClassIds > numberOfKnownClassIds;
+            }
+            return false;
         }
 
         public void display()
