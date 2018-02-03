@@ -2,7 +2,7 @@ CrewChief version 4.9
 
 Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation), Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
-Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
+Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden, Lee Taylor and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
@@ -208,7 +208,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.1.2: Minor multi-class tweaks; Assume single class if all car classes in a race are unknown to the app (AC, rF2 and rF1 only); Added button to save console output to a file (in Documents/ CrewChiefV4/debug/); Some AC internal fixes
+Version 4.9.1.3: Minor multi-class tweaks; Assume single class if all car classes in a race are unknown to the app (AC, rF2 and rF1 only); Added button to save console output to a file (in Documents/ CrewChiefV4/debug/); Some AC internal fixes; Don't give damage and tyre wear responses in iRacing; Added Lee spotter (in latest sound pack update)
 
 Version 4.9.1.1: Major internal overhaul to fully support multiclass races - opponents and positions are now tracked correctly for the player's car class, the app doesn't make calls about opponent laptimes, pitting, and other stuff if they're not in the same class as the player; added multi-class specific messages for when you're lapping or being lapped by other classes; added multi-class specific voice commands "is the car ahead in my class", "is the car behind my class", "what class is the car ahead", :"what class is the car behind" and variations; more performance improvements; speculative fixes for driver swaps in iRacing; fixed 'enable driver names' flag being ignored for some messages; added optional pit box countdown (R3E and iRacing only, enable with property "pit_box_position_countdown"); rF2 improvements: improved rolling start detection and distance to safety car detection, in SCR mode Crew Chief now respects DoubleFileType value and will announce last FCY lap Frozen Order instructions correctly; added option to change left/right side tyres(iRacing only); modified R3E pit macros to take advantage of modify pit menu behaviour (should make the pit macros, particularly the auto-confirm pit actions, more reliable); retrieve gap ahead / gap behind as late as possible when playing gap messages to improve accuracy; made auto-refuel ("fuel to the end" macro in R3E and "pitstop fuel to the end" command in iRacing) a bit more conservative - more so at longer tracks
 
