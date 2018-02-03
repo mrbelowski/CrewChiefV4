@@ -2313,7 +2313,6 @@ namespace CrewChiefV4.GameState
                     opponentData.ClassPosition = opponentData.OverallPosition;
                 }
                 GameStateData.NumberOfClasses = 1;
-                sortClassPositionsCompleted = true;
             }
             else
             {
@@ -2399,8 +2398,8 @@ namespace CrewChiefV4.GameState
                     GameStateData.NumberOfClasses = numberOfClasses;
                 }
                 GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
-                sortClassPositionsCompleted = true;
             }
+            sortClassPositionsCompleted = true;
         }
 
         private Boolean hasTooManyUnknownClasses(int totalNumberOfClassesIds, HashSet<String> unknownClassIds)
