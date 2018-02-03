@@ -1012,7 +1012,7 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR))
             {
                 Boolean forStatusReport = !SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_TYRE_WEAR);
-                if (currentTyreConditionStatus != null)
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && currentTyreConditionStatus != null)
                 {
                     reportCurrentTyreConditionStatus(true, true, delayResponses, true);
                 }
@@ -1051,7 +1051,7 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
                 float maxWearPercent = getMaxWearPercent();
-                if (maxWearPercent < 1)
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING || maxWearPercent < 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
