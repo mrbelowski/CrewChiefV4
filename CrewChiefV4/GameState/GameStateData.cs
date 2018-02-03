@@ -731,6 +731,9 @@ namespace CrewChiefV4.GameState
 
         public int iRating = -1;
 
+        // hack for assetto corsa only. Lap count may be delayed so we capture it at the end of sector1 and use this at lap end
+        public int lapCountAtSector1End = -1;
+
         public override string ToString()
         {
             return DriverRawName + " " + CarClass.getClassIdentifier() + " class position " + ClassPosition + " overall position " 
