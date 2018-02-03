@@ -52,7 +52,7 @@ namespace CrewChiefV4.assetto
 
         public List<LapData> playerLapData = new List<LapData>();
 
-        private int lapCountAtSector1End = 0;
+        private int lapCountAtSector1End = -1;
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
@@ -999,7 +999,7 @@ namespace CrewChiefV4.assetto
                 {
                     Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
                 }
-                lapCountAtSector1End = 0;
+                lapCountAtSector1End = -1;
                 currentGameState.SessionData.IsNewSession = true;
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
@@ -1090,7 +1090,7 @@ namespace CrewChiefV4.assetto
                             currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                             currentGameState.SessionData.SessionStartPosition = playerVehicle.carLeaderboardPosition;
                         }
-                        lapCountAtSector1End = 0;
+                        lapCountAtSector1End = -1;
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.acsChief.numVehicles;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
@@ -1999,6 +1999,10 @@ namespace CrewChiefV4.assetto
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
             int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
+            if (opponentData.CurrentSectorNumber == 0)
+            {
+                opponentData.CurrentSectorNumber = sector;
+            }
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             Boolean validSpeed = true;
@@ -2027,7 +2031,6 @@ namespace CrewChiefV4.assetto
             bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                  previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
-
             if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
             {
                 // special case for s3 - need to invalidate lap immediately
@@ -2037,6 +2040,7 @@ namespace CrewChiefV4.assetto
             {
                 if (hasNewLapData)
                 {
+                    int correctedLapCount = Math.Max(completedLaps, opponentData.lapCountAtSector1End + 1);
                     // if we have new lap data, we must be in sector 1
                     opponentData.CurrentSectorNumber = 1;
                     if (opponentData.OpponentLapData.Count > 0)
@@ -2055,8 +2059,9 @@ namespace CrewChiefV4.assetto
                         }
                     }
 
-                    opponentData.StartNewLap(completedLaps + 1, leaderBoardPosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
+                    opponentData.StartNewLap(correctedLapCount + 1, leaderBoardPosition, isInPits, sessionRunningTime, false, trackTempreture, airTemperature);
                     opponentData.IsNewLap = true;
+                    opponentData.CompletedLaps = correctedLapCount;
                     // recheck the car class here?
                 }
                 else if (opponentData.OpponentLapData.Count > 0 &&
@@ -2067,12 +2072,19 @@ namespace CrewChiefV4.assetto
                     // special case for laps with 2 sectors - they are called sector 1 and sector 3. AC....
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, completedLapTime, sessionRunningTime,
                         lapIsValid && validSpeed, false, trackTempreture, airTemperature);
+
+                    // if we've just finished sector 1, capture the laps completed (and ensure the CompleteLaps count is up to date)
+                    if (opponentData.CurrentSectorNumber == 1)
+                    {
+                        opponentData.lapCountAtSector1End = completedLaps;
+                        opponentData.CompletedLaps = completedLaps;
+                    }
+
                     // only update the sector number if it's one of the above cases. This prevents us from moving the opponent sector number to 1 before
                     // he has new lap data
                     opponentData.CurrentSectorNumber = sector;
                 }
             }
-            opponentData.CompletedLaps = completedLaps;
             if (sector == trackNumberOfSectors && isInPits)
             {
                 opponentData.setInLap();
