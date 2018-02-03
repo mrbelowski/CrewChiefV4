@@ -606,55 +606,58 @@ namespace CrewChiefV4.Events
 
         private void readStatus()
         {
-            List<QueuedMessage> damageMessages = new List<QueuedMessage>();
-            switch (lastReportedPunctureCorner)
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
             {
-                case CornerData.Corners.FRONT_LEFT:
-                    damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, this));
-                    break;
-                case CornerData.Corners.FRONT_RIGHT:
-                    damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, this));
-                    break;
-                case CornerData.Corners.REAR_LEFT:
-                    damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, this));
-                    break;
-                case CornerData.Corners.REAR_RIGHT:
-                    damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, this));
-                    break;
-            }
-            QueuedMessage aero = getDamageMessage(Component.AERO, false);
-            if (aero != null)
-            {
-                damageMessages.Add(aero);
-            }
-            QueuedMessage tranny = getDamageMessage(Component.TRANNY, false);
-            if (tranny != null)
-            {
-                damageMessages.Add(tranny);
-            }
-            QueuedMessage engine = getDamageMessage(Component.ENGINE, false);
-            if (engine != null)
-            {
-                damageMessages.Add(engine);
-            }
-            QueuedMessage sus = getDamageMessage(Component.SUSPENSION, false);
-            if (sus != null)
-            {
-                damageMessages.Add(sus);
-            }
-            QueuedMessage brakes = getDamageMessage(Component.BRAKES, false);
-            if (brakes != null)
-            {
-                damageMessages.Add(brakes);
-            }           
-            if (damageMessages.Count == 0)
-            {
-                // no damage
-                damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, this));
-            }
-            foreach (QueuedMessage message in damageMessages)
-            {
-                audioPlayer.playMessageImmediately(message);
+                List<QueuedMessage> damageMessages = new List<QueuedMessage>();
+                switch (lastReportedPunctureCorner)
+                {
+                    case CornerData.Corners.FRONT_LEFT:
+                        damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, this));
+                        break;
+                    case CornerData.Corners.FRONT_RIGHT:
+                        damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, this));
+                        break;
+                    case CornerData.Corners.REAR_LEFT:
+                        damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, this));
+                        break;
+                    case CornerData.Corners.REAR_RIGHT:
+                        damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, this));
+                        break;
+                }
+                QueuedMessage aero = getDamageMessage(Component.AERO, false);
+                if (aero != null)
+                {
+                    damageMessages.Add(aero);
+                }
+                QueuedMessage tranny = getDamageMessage(Component.TRANNY, false);
+                if (tranny != null)
+                {
+                    damageMessages.Add(tranny);
+                }
+                QueuedMessage engine = getDamageMessage(Component.ENGINE, false);
+                if (engine != null)
+                {
+                    damageMessages.Add(engine);
+                }
+                QueuedMessage sus = getDamageMessage(Component.SUSPENSION, false);
+                if (sus != null)
+                {
+                    damageMessages.Add(sus);
+                }
+                QueuedMessage brakes = getDamageMessage(Component.BRAKES, false);
+                if (brakes != null)
+                {
+                    damageMessages.Add(brakes);
+                }
+                if (damageMessages.Count == 0)
+                {
+                    // no damage
+                    damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, this));
+                }
+                foreach (QueuedMessage message in damageMessages)
+                {
+                    audioPlayer.playMessageImmediately(message);
+                }
             }
         }
 
@@ -689,7 +692,7 @@ namespace CrewChiefV4.Events
                 {
                     damageMessage = getDamageMessage(Component.BRAKES, true);
                 }
-                if (damageMessage != null)
+                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && damageMessage != null)
                 {
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))

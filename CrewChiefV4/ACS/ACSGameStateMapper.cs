@@ -52,6 +52,8 @@ namespace CrewChiefV4.assetto
 
         public List<LapData> playerLapData = new List<LapData>();
 
+        private int lapCountAtSector1End = 0;
+
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
 
@@ -836,7 +838,6 @@ namespace CrewChiefV4.assetto
 
             playerName = getNameFromBytes(playerVehicle.driverName);
             Validator.validate(playerName);
-            currentGameState.SessionData.CompletedLaps = (int)shared.acsGraphic.completedLaps;
             AC_SESSION_TYPE sessionType = shared.acsGraphic.session;
 
             SessionPhase lastSessionPhase = SessionPhase.Unavailable;
@@ -998,6 +999,7 @@ namespace CrewChiefV4.assetto
                 {
                     Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
                 }
+                lapCountAtSector1End = 0;
                 currentGameState.SessionData.IsNewSession = true;
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
@@ -1088,6 +1090,7 @@ namespace CrewChiefV4.assetto
                             currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                             currentGameState.SessionData.SessionStartPosition = playerVehicle.carLeaderboardPosition;
                         }
+                        lapCountAtSector1End = 0;
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
                         currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.acsChief.numVehicles;
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.acsStatic.track + ":" + shared.acsStatic.trackConfiguration, shared.acsStatic.trackSPlineLength, shared.acsStatic.sectorCount);
@@ -1174,6 +1177,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
                     currentGameState.SessionData.SessionStartClassPosition = previousGameState.SessionData.SessionStartClassPosition;
                     currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = previousGameState.SessionData.ClassPositionAtStartOfCurrentLap;
+                    currentGameState.SessionData.CompletedLaps = previousGameState.SessionData.CompletedLaps;
 
                     currentGameState.OpponentData = previousGameState.OpponentData;
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
@@ -1232,6 +1236,12 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.LeaderSectorNumber = currentGameState.SessionData.SectorNumber;
                 }
                 currentGameState.SessionData.IsNewSector = previousGameState == null || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
+                if (currentGameState.SessionData.IsNewSector && previousGameState.SessionData.SectorNumber == 1)
+                {
+                    lapCountAtSector1End = shared.acsGraphic.completedLaps;
+                    // belt & braces, just in case we never had 'new lap data' so never updated the lap count on crossing the line
+                    currentGameState.SessionData.CompletedLaps = lapCountAtSector1End;
+                }
                 currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(shared.acsGraphic.iCurrentTime);
                 bool hasCrossedSFLine = currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1;
                 currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, mapToFloatTime(shared.acsGraphic.iLastTime), hasCrossedSFLine)
@@ -1243,6 +1253,8 @@ namespace CrewChiefV4.assetto
                     currentGameState.readLandmarksForThisLap = false;
                     // correct IsNewSector so it's in sync with IsNewLap
                     currentGameState.SessionData.IsNewSector = true;
+                    // if we have new lap data, update the lap count using the laps completed at sector1 end + 1, or the game provided data (whichever is bigger)
+                    currentGameState.SessionData.CompletedLaps = Math.Max(lapCountAtSector1End + 1, shared.acsGraphic.completedLaps);
                 }
                 else if (previousGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.IsNewSector)
                 {
@@ -1352,10 +1364,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.YellowFlagStartTime = currentGameState.Now;
                 }*/
                 currentGameState.SessionData.NumCarsOverall = shared.acsChief.numVehicles;
-
-                currentGameState.SessionData.CompletedLaps = shared.acsGraphic.completedLaps;
-
-
+                
                 /*previousGameState != null && previousGameState.SessionData.IsNewLap == false &&
                     (shared.acsGraphic.completedLaps == previousGameState.SessionData.CompletedLaps + 1 || ((lastSessionPhase == SessionPhase.Countdown)
                     && (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow)));
