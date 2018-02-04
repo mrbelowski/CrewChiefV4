@@ -30,6 +30,10 @@ namespace CrewChiefV4.GameState
 
         public abstract SessionType mapToSessionType(Object memoryMappedFileStruct);
 
+        private DateTime nextOpponentBehindPitMessageDue = DateTime.MinValue;
+        private DateTime nextOpponentAheadPitMessageDue = DateTime.MinValue;
+        private DateTime nextLeaderPitMessageDue = DateTime.MinValue;
+
         public virtual void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
         {
             this.speechRecogniser = speechRecogniser;
@@ -82,8 +86,9 @@ namespace CrewChiefV4.GameState
                             currentGameState.SessionData.HasLeadChanged = true;
                         }
                         currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
-                        if (opponent.JustEnteredPits)
+                        if (opponent.JustEnteredPits && currentGameState.Now > nextLeaderPitMessageDue)
                         {
+                            nextLeaderPitMessageDue = currentGameState.Now.AddMinutes(1);
                             currentGameState.PitData.LeaderIsPitting = true;
                             currentGameState.PitData.OpponentForLeaderPitting = opponent;
                         }
@@ -96,8 +101,9 @@ namespace CrewChiefV4.GameState
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                     {
                         currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        if (opponent.JustEnteredPits)
+                        if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentAheadPitMessageDue)
                         {
+                            nextOpponentAheadPitMessageDue = currentGameState.Now.AddMinutes(1);
                             currentGameState.PitData.CarInFrontIsPitting = true;
                             currentGameState.PitData.OpponentForCarAheadPitting = opponent;
                         }
@@ -110,8 +116,9 @@ namespace CrewChiefV4.GameState
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
                     {
                         currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        if (opponent.JustEnteredPits)
+                        if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentBehindPitMessageDue)
                         {
+                            nextOpponentBehindPitMessageDue = currentGameState.Now.AddMinutes(1);
                             currentGameState.PitData.CarBehindIsPitting = true;
                             currentGameState.PitData.OpponentForCarBehindPitting = opponent;
                         }
