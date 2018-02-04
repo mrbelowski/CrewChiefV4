@@ -1077,7 +1077,7 @@ namespace CrewChiefV4.Events
             // the sector times must be > 5 seconds to be considered valid
             if (playerTime > 5 && comparisonTime > 5)
             {
-                float delta = ((float)Math.Round((playerTime - comparisonTime) * 10)) / 10f;
+                float delta = getAutoRoundedDelta(playerTime, comparisonTime);
                 if (delta < 0.05)
                 {
                     if (sector == SectorSet.ONE) {
@@ -1162,6 +1162,21 @@ namespace CrewChiefV4.Events
             }
             return messages;
         }
+
+        private static float getAutoRoundedDelta(float time1, float time2)
+        {
+            float unroundedDelta = time1 - time2;
+            float delta;
+            if (Math.Abs(unroundedDelta) < 0.5)
+            {
+                delta = ((float)Math.Round(unroundedDelta * 100)) / 100f;
+            }
+            else
+            {
+                delta = ((float)Math.Round(unroundedDelta * 10)) / 10f;
+            }
+            return delta;
+        }
         
         public static List<MessageFragment> getSectorDeltaMessages(SectorReportOption reportOption, float playerSector1, float comparisonSector1, float playerSector2,
             float comparisonSector2, float playerSector3, float comparisonSector3, Boolean comparisonIncludesAllLaps)
@@ -1179,7 +1194,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    delta1 = ((float)Math.Round((playerSector1 - comparisonSector1) * 10)) / 10f;
+                    delta1 = getAutoRoundedDelta(playerSector1, comparisonSector1);
                 }
             } if (playerSector2 > 5 && comparisonSector2 > 5)
             {
@@ -1189,7 +1204,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    delta2 = ((float)Math.Round((playerSector2 - comparisonSector2) * 10)) / 10f;
+                    delta2 = getAutoRoundedDelta(playerSector2, comparisonSector2);
                 }
             }
             if (playerSector3 > 5 && comparisonSector3 > 5)
@@ -1200,7 +1215,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    delta3 = ((float)Math.Round((playerSector3 - comparisonSector3) * 10)) / 10f;
+                    delta3 = getAutoRoundedDelta(playerSector3, comparisonSector3);
                 }
             }
 

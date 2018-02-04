@@ -71,6 +71,8 @@ namespace CrewChiefV4.GameState
                 }
                 if (singleClass || CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
+                    // special hack for iRacing until we finally kill those bastard opponent pitting spam messages
+                    int minSecondsBetweenOpponentPitMessages = CrewChief.gameDefinition.gameEnum == GameEnum.IRACING ? 40 : 20;
                     // don't care about other classes
                     numCarsInPlayerClass++;
                     if (PitApproachPosition != -1
@@ -88,7 +90,7 @@ namespace CrewChiefV4.GameState
                         currentGameState.SessionData.LeaderSectorNumber = opponent.CurrentSectorNumber;
                         if (opponent.JustEnteredPits && currentGameState.Now > nextLeaderPitMessageDue)
                         {
-                            nextLeaderPitMessageDue = currentGameState.Now.AddMinutes(1);
+                            nextLeaderPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
                             currentGameState.PitData.LeaderIsPitting = true;
                             currentGameState.PitData.OpponentForLeaderPitting = opponent;
                         }
@@ -103,7 +105,7 @@ namespace CrewChiefV4.GameState
                         currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentAheadPitMessageDue)
                         {
-                            nextOpponentAheadPitMessageDue = currentGameState.Now.AddMinutes(1);
+                            nextOpponentAheadPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
                             currentGameState.PitData.CarInFrontIsPitting = true;
                             currentGameState.PitData.OpponentForCarAheadPitting = opponent;
                         }
@@ -118,7 +120,7 @@ namespace CrewChiefV4.GameState
                         currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentBehindPitMessageDue)
                         {
-                            nextOpponentBehindPitMessageDue = currentGameState.Now.AddMinutes(1);
+                            nextOpponentBehindPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
                             currentGameState.PitData.CarBehindIsPitting = true;
                             currentGameState.PitData.OpponentForCarBehindPitting = opponent;
                         }
