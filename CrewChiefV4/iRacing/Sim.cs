@@ -20,9 +20,13 @@ namespace CrewChiefV4.iRacing
             _paceCar = null;
         }
 
+        enum RaceEndState {NONE, WAITING_TO_CROSS_LINE, FINISHED}
+        private RaceEndState raceEndState = RaceEndState.NONE;
+
         private iRacingData _telemetry;
 
         private int _infoUpdate, _sessionId;
+
 
         private int? _currentSessionNumber;
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
@@ -180,7 +184,34 @@ namespace CrewChiefV4.iRacing
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
             SessionFlags flag = (SessionFlags)telemetry.SessionFlags;
-            if (this.SessionData.EventType == "Race" && !flag.HasFlag(SessionFlags.Checkered))
+            if (this.SessionData.EventType == "Race" && flag.HasFlag(SessionFlags.Checkered))
+            {
+                if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE)
+                {
+                    foreach (var driver in _drivers)
+                    {
+                        if (driver.IsCurrentDriver)
+                        {
+                            if (driver.Live.HasCrossedSFLine)
+                            {
+                                Console.WriteLine("player just crossed line to finish race");
+                                raceEndState = RaceEndState.FINISHED;
+                            }
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Starting wait for player crossing line");
+                    raceEndState = RaceEndState.WAITING_TO_CROSS_LINE;
+                }
+            }
+            else
+            {
+                raceEndState = RaceEndState.NONE;
+            }
+            if (this.SessionData.EventType == "Race" && raceEndState == RaceEndState.NONE)
             {
                 // Determine live position from lapdistance
                 int pos = 1;
