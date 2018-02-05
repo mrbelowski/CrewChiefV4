@@ -679,7 +679,7 @@ namespace CrewChiefV4.iRacing
                             currentOpponentData.IsActive = true;
                             bool previousOpponentLapValid = driver.Live.PreviousLapWasValid;
 
-                            currentOpponentData.isApporchingPits = driver.Live.TrackSurface == TrackSurfaces.AproachingPits;
+                            currentOpponentData.isApporchingPits = driver.Live.TrackSurface == TrackSurfaces.AproachingPits && !shared.Telemetry.CarIdxOnPitRoad[driver.Id];
                             // TODO:
                             // reset to to pitstall
                             bool currentOpponentLapValid = true;
@@ -719,9 +719,6 @@ namespace CrewChiefV4.iRacing
                                 currentGameState.SessionData.LeaderHasFinishedRace = true;
                             }
 
-                            Boolean isEnteringPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 3;
-                            Boolean isLeavingPits = shared.Telemetry.CarIdxOnPitRoad[driver.Id] && currentOpponentSector == 1;
-
                             currentOpponentData.LicensLevel = driver.licensLevel;
                             currentOpponentData.iRating = driver.IRating;
 
@@ -738,20 +735,8 @@ namespace CrewChiefV4.iRacing
                             {
                                 currentOpponentData.ClassPosition = driver.Live.ClassPosition;
                             }
-
-                            if (currentGameState.SessionData.SessionType == SessionType.Race)
-                            {
-                                if (currentOpponentOverallPosition == currentGameState.SessionData.OverallPosition + 1)
-                                {
-                                    currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                                }
-                                if (currentOpponentOverallPosition == currentGameState.SessionData.OverallPosition - 1)
-                                {
-                                    currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                                }
-                            }
                             //allow gaps in qual and prac, delta here is not on track delta but diff on fastest time 
-                            else if (carIsSameAsPlayer)
+                            else if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
                                 if (currentOpponentOverallPosition == currentGameState.SessionData.ClassPosition + 1)
                                 {
@@ -966,7 +951,11 @@ namespace CrewChiefV4.iRacing
                 opponentData.NumPitStops++;
             }
             //Check that previous state was IsApporchingPits, this includes the zone befor the pitlane(striped lines on track)
-            opponentData.JustEnteredPits = previousIsApporchingPits && isInPits;
+            opponentData.JustEnteredPits = previousIsApporchingPits && isInPits && !opponentData.InPits;
+            if (opponentData.JustEnteredPits)
+            {
+                Console.WriteLine(opponentData.DriverRawName + " has entered the pitlane with sane flags");
+            }
             opponentData.InPits = isInPits;
             bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
