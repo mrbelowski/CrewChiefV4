@@ -1287,7 +1287,7 @@ namespace CrewChiefV4.assetto
 
                     sectorTimeToUse = addPlayerLapdata(previousGameState.SessionData.SectorNumber, sectorTimeToUse, currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.OverallPosition);
 
-                    if (currentGameState.SessionData.IsNewLap && shared.acsGraphic.numberOfLaps > 0)
+                    if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack];
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
@@ -1308,11 +1308,9 @@ namespace CrewChiefV4.assetto
                                 currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
                                 currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
                             }
-
                         }
                         else if (numberOfSectorsOnTrack == 2)
                         {
-
                             currentGameState.SessionData.LastSector2Time = sectorTimeToUse;
 
                             if (currentGameState.SessionData.LastSector2Time > 0 &&
@@ -1327,13 +1325,10 @@ namespace CrewChiefV4.assetto
                                 currentGameState.SessionData.PlayerBestLapSector1Time = currentGameState.SessionData.LastSector1Time;
                                 currentGameState.SessionData.PlayerBestLapSector2Time = currentGameState.SessionData.LastSector2Time;
                             }
-
                         }
-
                     }
                     else if (currentGameState.SessionData.SectorNumber == 2)
                     {
-
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                         currentGameState.SessionData.LastSector1Time = sectorTimeToUse;
 
@@ -1345,8 +1340,6 @@ namespace CrewChiefV4.assetto
                     }
                     if (currentGameState.SessionData.SectorNumber == 3)
                     {
-
-
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
                         currentGameState.SessionData.LastSector2Time = sectorTimeToUse;
 
@@ -1538,7 +1531,7 @@ namespace CrewChiefV4.assetto
                                         currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                         previousOpponentCompletedLaps, previousOpponentDataWaitingForNewLapData,
                                         previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue,
-                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine);
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine, numberOfSectorsOnTrack);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1997,7 +1990,8 @@ namespace CrewChiefV4.assetto
             /* previous tick data for hasNewLapData check*/
             int previousOpponentDataLapsCompleted, Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
-            int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
+            int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine,
+            int numSectors)
         {
             if (opponentData.CurrentSectorNumber == 0)
             {
@@ -2026,12 +2020,13 @@ namespace CrewChiefV4.assetto
             opponentData.IsNewLap = false;
             opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
             opponentData.InPits = isInPits;
-            bool hasCrossedSFline = opponentData.CurrentSectorNumber == 3 && sector == 1;
+
+            bool hasCrossedSFline = opponentData.CurrentSectorNumber == numSectors && sector == 1;
 
             bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                  previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
-            if (opponentData.CurrentSectorNumber == 3 && sector == 3 && (!lapIsValid || !validSpeed))
+            if (opponentData.CurrentSectorNumber == numSectors && sector == numSectors && (!lapIsValid || !validSpeed))
             {
                 // special case for s3 - need to invalidate lap immediately
                 opponentData.InvalidateCurrentLap();
@@ -2066,10 +2061,8 @@ namespace CrewChiefV4.assetto
                 }
                 else if (opponentData.OpponentLapData.Count > 0 &&
                     ((opponentData.CurrentSectorNumber == 1 && sector == 2) || 
-                     (opponentData.CurrentSectorNumber == 2 && sector == 3) || 
-                     (opponentData.CurrentSectorNumber == 1 && sector == 3)))
+                     (opponentData.CurrentSectorNumber == 2 && sector == 3)))
                 {
-                    // special case for laps with 2 sectors - they are called sector 1 and sector 3. AC....
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, completedLapTime, sessionRunningTime,
                         lapIsValid && validSpeed, false, trackTempreture, airTemperature);
 
@@ -2318,7 +2311,7 @@ namespace CrewChiefV4.assetto
             {
                 ret = 1;
             }
-            if (distanceRoundtrack >= trackDef.sectorPoints[0] && distanceRoundtrack < trackDef.sectorPoints[1])
+            if (distanceRoundtrack >= trackDef.sectorPoints[0] && (trackDef.sectorPoints[1] == 0 || distanceRoundtrack < trackDef.sectorPoints[1]))
             {
                 ret = 2;
             }
