@@ -201,7 +201,7 @@ namespace CrewChiefV4.iRacing
                         }
                     }
                 }
-                else
+                else if (raceEndState == RaceEndState.NONE)
                 {
                     Console.WriteLine("Starting wait for player crossing line");
                     raceEndState = RaceEndState.WAITING_TO_CROSS_LINE;
@@ -211,7 +211,7 @@ namespace CrewChiefV4.iRacing
             {
                 raceEndState = RaceEndState.NONE;
             }
-            if (this.SessionData.EventType == "Race" && raceEndState == RaceEndState.NONE)
+            if (this.SessionData.EventType == "Race" && raceEndState != RaceEndState.FINISHED)
             {
                 // Determine live position from lapdistance
                 int pos = 1;
