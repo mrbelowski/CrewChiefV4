@@ -679,7 +679,7 @@ namespace CrewChiefV4.iRacing
                             currentOpponentData.IsActive = true;
                             bool previousOpponentLapValid = driver.Live.PreviousLapWasValid;
 
-                            currentOpponentData.isApporchingPits = shared.Telemetry.CarIdxTrackSurface[driver.Id].HasFlag(TrackSurfaces.AproachingPits);
+                            currentOpponentData.isApporchingPits = driver.Live.TrackSurface == TrackSurfaces.AproachingPits;
                             // TODO:
                             // reset to to pitstall
                             bool currentOpponentLapValid = true;
@@ -727,7 +727,7 @@ namespace CrewChiefV4.iRacing
 
                             updateOpponentData(currentOpponentData, driverName, driver.CustId, currentOpponentOverallPosition, currentOpponentLapsCompleted,
                                         currentOpponentSector, (float)driver.Live.LapTimePrevious, hasCrossedSFLine,
-                                        shared.Telemetry.CarIdxOnPitRoad[driver.Id], previousIsInPits, previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
+                                        shared.Telemetry.CarIdxOnPitRoad[driver.Id] || driver.Live.TrackSurface == TrackSurfaces.InPitStall, previousIsApporchingPits, previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                         currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
                                         shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, (float)driver.Live.Speed,
@@ -919,7 +919,7 @@ namespace CrewChiefV4.iRacing
         }
 
         private void updateOpponentData(OpponentData opponentData, String driverName, int CostId, int racePosition, int completedLaps,
-            int sector, float completedLapTime, Boolean hasCrossedSFLine, Boolean isInPits, bool previousIsInPits,
+            int sector, float completedLapTime, Boolean hasCrossedSFLine, Boolean isInPits, bool previousIsApporchingPits,
             Boolean previousLapWasValid, Boolean currentLapValid, float sessionRunningTime,
             float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             Boolean isRace, float airTemperature, float trackTempreture, float nearPitEntryPointDistance, float speed,
@@ -928,7 +928,7 @@ namespace CrewChiefV4.iRacing
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
             int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
-            if (opponentData.CostId !=  CostId)
+            if (opponentData.CostId != CostId)
             {
                 Console.WriteLine("Driver " + opponentData.DriverRawName + " has been swapped for " + driverName);
                 opponentData.DriverRawName = driverName;
@@ -965,7 +965,8 @@ namespace CrewChiefV4.iRacing
             {
                 opponentData.NumPitStops++;
             }
-            opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
+            //Check that previous state was IsApporchingPits, this includes the zone befor the pitlane(striped lines on track)
+            opponentData.JustEnteredPits = previousIsApporchingPits && isInPits;
             opponentData.InPits = isInPits;
             bool hasNewLapData = opponentData.HasNewLapData(completedLapTime, hasCrossedSFLine, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                 previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
