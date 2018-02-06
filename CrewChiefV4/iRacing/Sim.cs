@@ -188,17 +188,10 @@ namespace CrewChiefV4.iRacing
             {
                 if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE)
                 {
-                    foreach (var driver in _drivers)
+                    if (_driver.Live.HasCrossedSFLine)
                     {
-                        if (driver.IsCurrentDriver)
-                        {
-                            if (driver.Live.HasCrossedSFLine)
-                            {
-                                Console.WriteLine("player just crossed line to finish race");
-                                raceEndState = RaceEndState.FINISHED;
-                            }
-                            break;
-                        }
+                        Console.WriteLine("player just crossed line to finish race");
+                        raceEndState = RaceEndState.FINISHED;
                     }
                 }
                 else if (raceEndState == RaceEndState.NONE)
