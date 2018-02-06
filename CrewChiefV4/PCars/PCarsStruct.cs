@@ -267,46 +267,30 @@ namespace CrewChiefV4.PCars
             return existingState;
         }
 
-        public static String getNameFromBytes(byte[] name)
+        public static String getNameFromBytes(byte[] bytes)
         {
-            //return Encoding.UTF8.GetString(name).TrimEnd('\0').Trim();
-            if (name == null || name.Length == 0)
+            if (bytes == null || bytes.Length == 0)
             {
                 return "";
             }
-            String firstChar = ENCODING.GetString(name, 0, 1).TrimEnd('\0');
-            if (name.Length == 1)
+            // check if the first char is null and skip it if so
+            int startIndex = bytes[0] == (byte)0 ? 1 : 0;
+            // get the first (or second if char[0] is null) null char
+            int numBytesToDecode = Array.IndexOf(bytes, (byte)0, startIndex);
+            if (numBytesToDecode == 0)
             {
-                return firstChar;
+                // first and second chars are null. Return empty string
+                return "";
             }
-            String rest = ENCODING.GetString(name, 1, name.Length - 1).TrimEnd('\0');
-            if ((firstChar == null || firstChar.Trim().Length == 0) && (rest != null && rest.Trim().Length > 0))
+            if (numBytesToDecode == -1)
             {
-                firstChar = PCarsGameStateMapper.NULL_CHAR_STAND_IN;
+                // no null char after char 0, so we want the whole array. Note that the number of bytes we want
+                // here will be 1 less if we've skipped char 0
+                numBytesToDecode = startIndex == 1 ? bytes.Length - 1 : bytes.Length;
             }
-            else
-            {
-                firstChar = firstChar.Trim();
-            }
-            // the game sometimes doesn't clear the byte array for a string when this string changes. This means we sometimes get the 
-            // actual string bytes, followed by whatever was in the remaining positions in that byte array from the previous String it
-            // contained. We can't do much about this except trim off any remaining characters after the first null. 
-            int nullCharIndex = rest.IndexOf(NULL_CHAR);
-            if (nullCharIndex != -1)
-            {
-                rest = rest.Substring(0, nullCharIndex);
-            }
-            return (firstChar + rest).Trim();
-        } 
-
-        private static float[] toFloatArray(int[] intArray, float factor)
-        {
-            List<float> l = new List<float>();
-            foreach (int i in intArray)
-            {
-                l.Add(((float)i) / factor);
-            }
-            return l.ToArray();
+            // If start index is 1, prefix the decoded string with the magic null-standin-char
+            return startIndex == 1 ? PCarsGameStateMapper.NULL_CHAR_STAND_IN + ENCODING.GetString(bytes, startIndex, numBytesToDecode) :
+                ENCODING.GetString(bytes, startIndex, numBytesToDecode);
         }
 
         private static float[] toFloatArray(byte[] byteArray, float factor)
