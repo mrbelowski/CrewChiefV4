@@ -18,7 +18,7 @@ namespace CrewChiefV4
  
           public static void validate(String str)
           {
-             if (wankers.Contains(str) || wankers.Contains(str.Trim()))
+             if (wankers.Contains(str.Trim()))
              {
                  throw new ValidationException();
              }
