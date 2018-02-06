@@ -20,6 +20,7 @@ namespace CrewChiefV4.PCars
     {
         public static String NULL_CHAR_STAND_IN = "?";
 
+
         public static int FIRST_VIEWED_PARTICIPANT_INDEX = -1;
         public static String FIRST_VIEWED_PARTICIPANT_NAME = null;
         public static Boolean WARNED_ABOUT_MISSING_STEAM_ID = false;
