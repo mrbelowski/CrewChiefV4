@@ -291,9 +291,10 @@ namespace CrewChiefV4.PCars
             // the game sometimes doesn't clear the byte array for a string when this string changes. This means we sometimes get the 
             // actual string bytes, followed by whatever was in the remaining positions in that byte array from the previous String it
             // contained. We can't do much about this except trim off any remaining characters after the first null. 
-            if (rest.Contains(NULL_CHAR))
+            int nullCharIndex = rest.IndexOf(NULL_CHAR);
+            if (nullCharIndex != -1)
             {
-                rest = rest.Substring(0, rest.IndexOf(NULL_CHAR));
+                rest = rest.Substring(0, nullCharIndex);
             }
             return (firstChar + rest).Trim();
         } 
