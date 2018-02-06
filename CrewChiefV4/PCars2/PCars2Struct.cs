@@ -401,10 +401,12 @@ namespace CrewChiefV4.PCars2
             }
             if (numBytesToDecode == -1)
             {
-                // no null char after char 0, so we want the whole array. Note that the number of bytes we want
-                // here will be 1 less if we've skipped char 0
-                numBytesToDecode = startIndex == 1 ? bytes.Length - 1 : bytes.Length;
+                // no nulls, we want the whole array
+                numBytesToDecode = bytes.Length;
             }
+            // if we've skipped the first char, reduce the number of bytes to decode
+            numBytesToDecode = numBytesToDecode - startIndex;
+
             // If start index is 1, prefix the decoded string with the magic null-standin-char
             return startIndex == 1 ? PCars2GameStateMapper.NULL_CHAR_STAND_IN + ENCODING.GetString(bytes, startIndex, numBytesToDecode) :
                 ENCODING.GetString(bytes, startIndex, numBytesToDecode);
