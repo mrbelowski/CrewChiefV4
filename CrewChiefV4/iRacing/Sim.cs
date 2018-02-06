@@ -186,8 +186,9 @@ namespace CrewChiefV4.iRacing
             SessionFlags flag = (SessionFlags)telemetry.SessionFlags;
             if (this.SessionData.EventType == "Race" && flag.HasFlag(SessionFlags.Checkered))
             {
-                if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE)
-                {
+                //we need to check if player is the first(p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
+                if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.HasCrossedSFLine)
+                {                    
                     if (_driver.Live.HasCrossedSFLine)
                     {
                         Console.WriteLine("player just crossed line to finish race");
