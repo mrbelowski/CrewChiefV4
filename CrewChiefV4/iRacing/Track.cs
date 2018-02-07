@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-
+using iRSDKSharp;
 namespace CrewChiefV4.iRacing
 {
     public class Track
@@ -17,18 +17,16 @@ namespace CrewChiefV4.iRacing
         public bool NightMode { get; set; }
         public bool IsOval { get; set; }
         public string Category { get; set; }
-        public static Track FromSessionInfo(SessionInfo info)
+        public static Track FromSessionInfo(string sessionString)
         {
             var track = new Track();
-
-            var query = info["WeekendInfo"];
-            track.Id = Parser.ParseInt(query["TrackID"].GetValue());
-            track.Name = query["TrackDisplayName"].GetValue();
-            track.CodeName = query["TrackName"].GetValue();
-            track.Length = Parser.ParseTrackLength(query["TrackLength"].GetValue());
-            track.NightMode = query["WeekendOptions"]["NightMode"].GetValue() == "1";
-            track.Category = query["Category"].GetValue();
-            track.IsOval = query["Category"].GetValue().ToLower().Contains("oval");
+            track.Id = Parser.ParseInt(YamlParser.Parse(sessionString, "WeekendInfo:TrackID:"));
+            track.Name = YamlParser.Parse(sessionString, "WeekendInfo:TrackDisplayName:");
+            track.CodeName = YamlParser.Parse(sessionString, "WeekendInfo:TrackName:");
+            track.Length = Parser.ParseTrackLength(YamlParser.Parse(sessionString, "WeekendInfo:TrackLength:"));            
+            track.NightMode = YamlParser.Parse(sessionString, "WeekendInfo:NightMode:") == "1";
+            track.Category = YamlParser.Parse(sessionString, "WeekendInfo:Category:");
+            track.IsOval = track.Category.ToLower().Contains("oval");
 
             return track;
         }
