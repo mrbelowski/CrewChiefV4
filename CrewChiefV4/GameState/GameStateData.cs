@@ -1135,7 +1135,7 @@ namespace CrewChiefV4.GameState
                 // the timer has expired or we have new data
                 this.WaitingForNewLapData = false;
                 this.LastLapTime = gameProvidedLastLapTime;
-                this.LastLapValid = gameProvidedLastLapTime > 0;
+                this.LastLapValid = gameProvidedLastLapTime > 1;
                 this.CompleatedLapsWhenHasNewLapDataWasLastTrue = compleatedLaps;
                 return true;
             }
