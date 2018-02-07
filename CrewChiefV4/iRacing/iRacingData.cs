@@ -24,7 +24,6 @@ namespace CrewChiefV4.iRacing
 
             SessionInfoUpdate = sdk.Header.SessionInfoUpdate;
             IsNewSession = isNewSession;
-    
 
             SessionTime = (System.Double)sdk.GetData("SessionTime");
             SessionTick = (System.Int32)sdk.GetData("SessionTick");

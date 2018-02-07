@@ -89,7 +89,7 @@ namespace CrewChiefV4.iRacing
                 if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate && structDumpWrapperData.data.SessionInfo.Length > 0)
                 {
                     SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
-                    IsNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx, structDumpWrapperData.data.SessionInfoUpdate);
+                    IsNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo._yaml, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                     lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
@@ -154,7 +154,7 @@ namespace CrewChiefV4.iRacing
                 return initialised;
             }
         }
-
+        
         public override Object ReadGameData(Boolean forSpotter)
         {
             lock (this)
@@ -189,9 +189,8 @@ namespace CrewChiefV4.iRacing
                         if (newUpdate != lastUpdate)
                         {
                             // Get the session info string
-                            SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
-                            // Raise the SessionInfoUpdated event and pass along the session info and session time.
-                            isNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo, (int)TryGetSessionNum(), DriverId, newUpdate);
+                            //SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
+                            isNewSession = sim.SdkOnSessionInfoUpdated(sdk.GetSessionInfoString(), (int)TryGetSessionNum(), DriverId);
                             lastUpdate = newUpdate;
                             hasNewSessionData = true;
                         }

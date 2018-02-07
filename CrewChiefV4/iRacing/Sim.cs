@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using iRSDKSharp;
 
 namespace CrewChiefV4.iRacing
 {
@@ -49,13 +49,13 @@ namespace CrewChiefV4.iRacing
         private readonly List<Driver> _drivers;
         public List<Driver> Drivers { get { return _drivers; } }
 
-        private void UpdateDriverList(SessionInfo info, bool reloadDrivers)
+        private void UpdateDriverList(string sessionInfo, bool reloadDrivers)
         {
-            this.GetDrivers(info, reloadDrivers);
-            this.GetResults(info);
+            this.GetDrivers(sessionInfo, reloadDrivers);
+            this.GetResults(sessionInfo);
         }
 
-        private void GetDrivers(SessionInfo info, bool reloadDrivers)
+        private void GetDrivers(string sessionInfo, bool reloadDrivers)
         {
             if (reloadDrivers)
             {
@@ -71,7 +71,7 @@ namespace CrewChiefV4.iRacing
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver == null)
                 {
-                    driver = Driver.FromSessionInfo(info, id);
+                    driver = Driver.FromSessionInfo(sessionInfo, id);
 
                     if (driver == null || driver.IsPacecar)
                     {
@@ -83,9 +83,7 @@ namespace CrewChiefV4.iRacing
                 }
                 else
                 {
-                    var oldId = driver.CustId;
-                    var oldName = driver.Name;
-                    driver.ParseDynamicSessionInfo(info);
+                    driver.ParseDynamicSessionInfo(sessionInfo);
                 }
                 
                 if (DriverId == driver.Id)
@@ -96,65 +94,62 @@ namespace CrewChiefV4.iRacing
             }
         }
 
-        private void GetResults(SessionInfo info)
+        private void GetResults(string sessionInfo)
         {
             if (_currentSessionNumber == null) 
                 return;
-            this.GetRaceResults(info);
+            this.GetRaceResults(sessionInfo);
 
             if (this.SessionData.EventType == "Race" || this.SessionData.EventType == "Open Qualify" || this.SessionData.EventType == "Lone Qualify")
             {
-                this.GetQualyResults(info);
+                this.GetQualyResults(sessionInfo);
             }
             
         }
 
-        private void GetQualyResults(SessionInfo info)
+        private void GetQualyResults(string sessionInfo)
         {
             // TODO: stop if qualy is finished
-            var query = info["QualifyResultsInfo"]["Results"];
-            if(_driver.CurrentResults.QualifyingPosition != -1)
-            {
-                return;
-            }
-
             for (int position = 0; position < _drivers.Count; position++)
             {
-                var positionQuery = query["Position", position];
 
-                string idValue;
-                if (!positionQuery["CarIdx"].TryGetValue(out idValue))
+                string idValue = "0";
+                if (!YamlParser.TryGetValue(sessionInfo, string.Format("QualifyResultsInfo:Results:Position:{{{0}}}CarIdx:", position ), out idValue))
                 {
-                    // Driver not found
                     continue;
                 }
-
                 // Find driver and update results
                 int id = int.Parse(idValue);
-
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver != null)
-                {
-                    driver.CurrentResults.QualifyingPosition = position + 1; 
+                {                   
+                    driver.CurrentResults.QualifyingPosition = position + 1;
                 }
             }
         }
-        private void GetRaceResults(SessionInfo info)
+
+        private void GetRaceResults(string sessionInfo)
         {
-            var query = info["SessionInfo"]["Sessions"]["SessionNum", _currentSessionNumber]["ResultsPositions"];
-            //Console.WriteLine(info.Yaml);
+
             for (int position = 1; position <= _drivers.Count; position++)
             {
-                var positionQuery = query["Position", position];
-
-                //string idValue;
-                string idValue = positionQuery["CarIdx"].GetValue("0");
-                string reasonOut;
-                if(!positionQuery["ReasonOutId"].TryGetValue(out reasonOut))
-                    continue;
                 
-                if (int.Parse(reasonOut) != 0)
+                string reasonOut;
+                if (!YamlParser.TryGetValue(sessionInfo, string.Format("SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}ReasonOutId:",
+                    _currentSessionNumber, position), out reasonOut))
+                {
                     continue;
+                }                    
+                if (int.Parse(reasonOut) != 0)
+                {
+                    continue;
+                }
+                string idValue = "0";
+                if (!YamlParser.TryGetValue(sessionInfo, string.Format("SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}CarIdx:",
+                    _currentSessionNumber, position), out idValue))
+                {
+                    continue;
+                }
                 // Driver not found
 
                 // Find driver and update results
@@ -163,7 +158,7 @@ namespace CrewChiefV4.iRacing
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver != null)
                 {
-                    driver.UpdateResultsInfo(_currentSessionNumber.Value, positionQuery, position);
+                    driver.UpdateResultsInfo(sessionInfo, _currentSessionNumber.Value, position);
                 }
             }
         }
@@ -248,16 +243,15 @@ namespace CrewChiefV4.iRacing
                 }
             }
         }
-        
-        public bool SdkOnSessionInfoUpdated(SessionInfo sessionInfo, int sessionNumber, int driverId, int infoUpdate)
+
+        public bool SdkOnSessionInfoUpdated(string sessionInfo, int sessionNumber, int driverId)
         {           
             _DriverId = driverId;
             bool reloadDrivers = false;
             
-            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber) /*|| infoUpdate > _infoUpdate + 2*/)
+            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber))
             {
                 // Session changed, reset session info
-                _infoUpdate = infoUpdate;
                 reloadDrivers = true;
                 _sessionData.Update(sessionInfo, sessionNumber);
             }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
+using iRSDKSharp;
 namespace CrewChiefV4.iRacing
 {
     public class SessionData
@@ -21,33 +21,20 @@ namespace CrewChiefV4.iRacing
         public string IncidentLimitString { get; set; }
         public int IncidentLimit { get; set; }
         public bool IsTeamRacing { get; set; }
-
-        public void Update(SessionInfo info, int sessionNumber)
+        const string sessionInfoYamlPath = "SessionInfo:Sessions:SessionNum:{{{0}}}{1}:";
+        public void Update(string sessionString, int sessionNumber)
         {
-            this.Track = Track.FromSessionInfo(info);
+            this.Track = Track.FromSessionInfo(sessionString);            
+            this.SubsessionId = Parser.ParseInt(YamlParser.Parse(sessionString, "WeekendInfo:SubSessionID:"));
+            this.SessionId = Parser.ParseInt(YamlParser.Parse(sessionString, "WeekendInfo:SessionID:"));            
+            this.IsTeamRacing = Parser.ParseInt(YamlParser.Parse(sessionString, "WeekendInfo:TeamRacing:")) == 1;
+            this.EventType = YamlParser.Parse(sessionString, "WeekendInfo:EventType:");
+            this.SessionType = YamlParser.Parse(sessionString, string.Format(sessionInfoYamlPath, sessionNumber, "SessionType"));
+            this.RaceLaps = YamlParser.Parse(sessionString, string.Format(sessionInfoYamlPath, sessionNumber, "SessionLaps"));
+            this.SessionTimeString = YamlParser.Parse(sessionString, string.Format(sessionInfoYamlPath, sessionNumber, "SessionTime"));
+            this.RaceTime = Parser.ParseSec(SessionTimeString);            
+            this.IncidentLimitString = YamlParser.Parse(sessionString, "WeekendInfo:WeekendOptions:IncidentLimit:");;
 
-            var weekend = info["WeekendInfo"];
-            this.SubsessionId = Parser.ParseInt(weekend["SubSessionID"].GetValue());
-            this.SessionId = Parser.ParseInt(weekend["SessionID"].GetValue());
-
-            this.IsTeamRacing = Parser.ParseInt(weekend["TeamRacing"].GetValue()) == 1;
-
-            this.EventType = weekend["EventType"].GetValue();
-
-            var session = info["SessionInfo"]["Sessions"]["SessionNum", sessionNumber];
-            this.SessionType = session["SessionType"].GetValue();
-
-            var laps = session["SessionLaps"].GetValue();
-            this.SessionTimeString = session["SessionTime"].GetValue();
-            
-            var time = Parser.ParseSec(SessionTimeString);
-            
-            this.RaceLaps = laps;
-            this.RaceTime = time;
-
-            var weekendOptions = weekend["WeekendOptions"];
-
-            this.IncidentLimitString = weekendOptions["IncidentLimit"].GetValue();
             if(IsLimitedIncidents)
             {
                 IncidentLimit = Parser.ParseInt(IncidentLimitString);
