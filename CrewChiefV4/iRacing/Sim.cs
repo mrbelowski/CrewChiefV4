@@ -118,10 +118,8 @@ namespace CrewChiefV4.iRacing
                 int id = int.Parse(idValue);
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver != null)
-                {
-                   
+                {                   
                     driver.CurrentResults.QualifyingPosition = position + 1;
-                    Console.WriteLine("position: " + driver.CurrentResults.QualifyingPosition + " id: " + id);
                 }
             }
         }
