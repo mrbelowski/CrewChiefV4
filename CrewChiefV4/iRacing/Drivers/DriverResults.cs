@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using iRSDKSharp;
 
 
 namespace CrewChiefV4.iRacing
@@ -11,10 +11,7 @@ namespace CrewChiefV4.iRacing
         public DriverSessionResults()
         {
             this.IsEmpty = true;
-            this.FastestLap = -1;
-            this.Time = -1;
             this.LastTime = -1;
-            this.FastestTime = -1;
             this.QualifyingPosition = -1;
             this.Sectors = new[]
                     {
@@ -28,45 +25,28 @@ namespace CrewChiefV4.iRacing
         public int Position { get; set; }
         public int ClassPosition { get; set; }
         public int QualifyingPosition { get; set; }
-
-        public int Lap { get; set; }
-        public float Time { get; set; }
-
-        public int FastestLap { get; set; }
-        public float FastestTime { get; set; }
-        public float  LastTime { get; set; }
-        public int LapsLed { get; set; }
-        public int LapsComplete { get; set; }
-        public int LapsDriven { get; set; }
-        
-
+        public float  LastTime { get; set; }        
         public Sector[] Sectors { get; set; }
-
         public int Incidents { get; set; }
         public string OutReason { get; set; }
         public int OutReasonId { get; set; }
         public bool IsOut { get { return this.OutReasonId != 0; } }
 
-        internal void ParseYaml(YamlQuery query, int position)
+        const string driverResultYamlPath = "SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}{2}:";
+        private string ParseRaceResultsYaml(string sessionInfo, int sessionnumber, int position, string node)
+        {
+            return YamlParser.Parse(sessionInfo, string.Format(driverResultYamlPath, sessionnumber, position, node));
+        }
+
+        internal void ParseYaml(string sessionInfo, int sessionnumber, int position)
         {
             this.IsEmpty = false;
-
             this.Position = position;
-            this.ClassPosition = Parser.ParseInt(query["ClassPosition"].GetValue()) + 1;
-
-            this.Lap = Parser.ParseInt(query["Lap"].GetValue());
-            this.Time = Parser.ParseFloat(query["Time"].GetValue());
-            this.FastestLap = Parser.ParseInt(query["FastestLap"].GetValue());
-            this.FastestTime = Parser.ParseFloat(query["FastestTime"].GetValue());
-            this.LastTime = Parser.ParseFloat(query["LastTime"].GetValue());
-            this.LapsLed = Parser.ParseInt(query["LapsLed"].GetValue());
-
-            this.LapsComplete = Parser.ParseInt(query["LapsComplete"].GetValue());
-            this.LapsDriven = Parser.ParseInt(query["LapsDriven"].GetValue());
-
-            this.Incidents = Parser.ParseInt(query["Incidents"].GetValue());;
-            this.OutReasonId = Parser.ParseInt(query["ReasonOutId"].GetValue());
-            this.OutReason = query["ReasonOutStr"].GetValue();
+            this.ClassPosition = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ClassPosition")) + 1;
+            this.LastTime = Parser.ParseFloat(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "LastTime"));
+            this.Incidents = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "Incidents"));
+            this.OutReasonId = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutId"));
+            this.OutReason = ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutStr");
         }
     }
 }

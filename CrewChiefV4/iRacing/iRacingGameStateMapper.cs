@@ -1120,7 +1120,7 @@ namespace CrewChiefV4.iRacing
             opponentData.DriverRawName = driverName;
             opponentData.CostId = driver.CustId;
             opponentData.OverallPosition = driver.Live.Position;
-            opponentData.CompletedLaps = driver.CurrentResults.LapsComplete;
+            opponentData.CompletedLaps = driver.Live.LapsCompleted;
             opponentData.DistanceRoundTrack = driver.Live.CorrectedLapDistance * trackLength;
             opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
             opponentData.CarClass = CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId);

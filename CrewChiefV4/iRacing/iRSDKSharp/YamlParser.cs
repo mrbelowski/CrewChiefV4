@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace iRSDKSharp
 {
@@ -165,6 +163,20 @@ namespace iRSDKSharp
             }
 
             return new string(val, 0, len);
+        }
+
+        public static bool TryGetValue(string yaml, string query, out string value)
+        {
+            try
+            {
+                value = Parse(yaml, query);
+                return value != null;
+            }
+            catch (Exception)
+            {
+                value = null;
+                return false;
+            }
         }
     }
 }

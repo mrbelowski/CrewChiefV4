@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-
+using iRSDKSharp;
 
 namespace CrewChiefV4.iRacing
 {
     [Serializable]
     public partial class Driver
     {
+        const string driverYamlPath = "DriverInfo:Drivers:CarIdx:{{{0}}}{1}:";
+
         public Driver()
         {
             this.Car = new DriverCarInfo();
@@ -24,7 +26,6 @@ namespace CrewChiefV4.iRacing
         public int Id { get; set; }
         public int CustId { get; set; }
         public string Name { get; set; }
-        public string ShortName { get; set; }
         public string CarNumber { get { return this.Car.CarNumber; } }
 
         public int TeamId { get; set; }
@@ -37,80 +38,55 @@ namespace CrewChiefV4.iRacing
         public bool IsSpectator { get; set; }
         public bool IsPacecar { get; set; }
 
-        public string ClubName { get; set; }
-        public string DivisionName { get; set; }
-
         public DriverCarInfo Car { get; set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
-
+        private string ParseDriverYaml(string sessionInfo, string Node)
+        {
+            return YamlParser.Parse(sessionInfo, string.Format(driverYamlPath, this.Id, Node));
+        }
         
         private double _prevPos;
-        private double _prevTime;
-        private double _prevSpeed;
-        private double _prevDistance;
-
-        public void ParseDynamicSessionInfo(SessionInfo info)
+        public void ParseDynamicSessionInfo(string sessionInfo)
         {
             // Parse only session info that could have changed (driver dependent)
-            var query = info["DriverInfo"]["Drivers"]["CarIdx", this.Id];
-
-            this.Name = query["UserName"].GetValue("");
-            this.CustId = Parser.ParseInt(query["UserID"].GetValue("0"));
-            this.ShortName = query["AbbrevName"].GetValue();
-
-            this.IRating = Parser.ParseInt(query["IRating"].GetValue());
-            this.LicensLevelString = query["LicString"].GetValue();
-
+            this.Name = ParseDriverYaml(sessionInfo, "UserName");
+            this.CustId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "UserID"));
+            this.IRating = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IRating"));
+            this.LicensLevelString = ParseDriverYaml(sessionInfo, "LicString");
             this.licensLevel = Parser.ParseLicens(LicensLevelString);
-
-            this.IsSpectator = Parser.ParseInt(query["IsSpectator"].GetValue()) == 1;
-
-            this.ClubName = query["ClubName"].GetValue();
-            this.DivisionName = query["DivisionName"].GetValue();            
+            this.IsSpectator = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IsSpectator")) == 1;         
         }
 
-        public void ParseStaticSessionInfo(SessionInfo info)
+        public void ParseStaticSessionInfo(string sessionInfo)
         {
-            // Parse only static session info that never changes (car dependent)
-            var query = info["DriverInfo"]["Drivers"]["CarIdx", this.Id];
-            
-            this.TeamId = Parser.ParseInt(query["TeamID"].GetValue());
-            this.TeamName = query["TeamName"].GetValue();
-
-            this.Car.CarId = Parser.ParseInt(query["CarID"].GetValue());
-            this.Car.CarNumber = query["CarNumber"].GetValue();
-            this.Car.CarNumberRaw = Parser.ParseInt(query["CarNumberRaw"].GetValue());
-            this.Car.CarName = query["CarScreenName"].GetValue();
-            this.Car.CarClassId = Parser.ParseInt(query["CarClassID"].GetValue());
-            this.Car.CarClassShortName = query["CarClassShortName"].GetValue();
-            this.Car.CarShortName = query["CarScreenNameShort"].GetValue();
-            this.Car.CarClassRelSpeed = Parser.ParseInt(query["CarClassRelSpeed"].GetValue());            
-            bool isPaceCar = Parser.ParseInt(query["CarIsPaceCar"].GetValue()) == 1;
+            this.TeamId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "TeamID"));
+            this.TeamName = ParseDriverYaml(sessionInfo, "TeamName");
+            this.Car.CarId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarID"));
+            this.Car.CarNumber = ParseDriverYaml(sessionInfo, "CarNumber");
+            this.Car.CarClassId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassID"));
+            this.Car.CarClassRelSpeed = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassRelSpeed"));
+            bool isPaceCar = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarIsPaceCar")) == 1;
             this.IsPacecar = this.CustId == -1 || isPaceCar;
         }
-
-        public static Driver FromSessionInfo(SessionInfo info, int carIdx)
-        {
-            var query = info["DriverInfo"]["Drivers"]["CarIdx", carIdx];
-
+        public static Driver FromSessionInfo(string sessionInfo, int carIdx)
+        {            
             string name;
-            if (!query["UserName"].TryGetValue(out name))
+            if (!YamlParser.TryGetValue(sessionInfo, string.Format(driverYamlPath, carIdx, "UserName"), out name))
             {
                 // Driver not found
                 return null;
             }
-
             var driver = new Driver();
             driver.Id = carIdx;
-            driver.ParseStaticSessionInfo(info);
-            driver.ParseDynamicSessionInfo(info);
+            driver.ParseStaticSessionInfo(sessionInfo);
+            driver.ParseDynamicSessionInfo(sessionInfo);
             return driver;
         }
 
-        internal void UpdateResultsInfo(int sessionNumber, YamlQuery query, int position)
+        internal void UpdateResultsInfo(string sessionInfo, int sessionNumber, int position)
         {
-            this.CurrentResults.ParseYaml( query, position);
+            this.CurrentResults.ParseYaml(sessionInfo, sessionNumber, position);
         }
 
         internal void UpdateLiveInfo(iRacingData e)
@@ -118,35 +94,6 @@ namespace CrewChiefV4.iRacing
             this.Live.ParseTelemetry(e);
         }
 
-        
-        /*
-        public double InterpolateTimeExact(TelemetryUpdate prev, TelemetryUpdate cur, double targetPos)
-        {
-            var t0 = _prevTime;
-            var t1 = cur.Time;
-            var p0 = _prevDistance;
-            var p1 = cur.LapDistance;
-            var v0 = _prevSpeed;
-            var v1 = cur.Speed;
-            var p = targetPos;
-
-            var dv = v0 - v1;
-            var dt = t0 - t1;
-
-            var term1 = t0 * v0 - 2 * t0 * v1 + t1 * v0;
-            var term2 = Math.Sqrt(dt * (4 * dv * (p + p0) + v0 * v0 * dt));
-            var term3 = 2 * (v0 - v1);
-
-            // Two possible answers
-            var timePos = (term1 + term2) / term3;
-            var timeNeg = (term1 - term2) / term3;
-
-            // Take the one that is in between t0 and t1
-            if (timePos > t1 || timePos < t0)
-                return timeNeg;
-            return timePos;
-        }
-        */
         public void UpdateSector(Track track, iRacingData telemetry)
         {
             if (track == null) 
