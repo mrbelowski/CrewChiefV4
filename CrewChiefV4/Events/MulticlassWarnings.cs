@@ -658,8 +658,7 @@ namespace CrewChiefV4.Events
                         if (opponentClassAverageSpeed > playerClassAverageSpeed)
                         {
                             separationForFasterClassWarning[carClass] =
-                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed) + classSeparationAdjustment#
-                                );
+                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed) + classSeparationAdjustment);
                         }
                         else
                         {
