@@ -15,6 +15,13 @@ namespace CrewChiefV4.Events
         private Dictionary<CarData.CarClass, float> separationForFasterClassWarning = new Dictionary<CarData.CarClass, float>();
         private Dictionary<CarData.CarClass, float> separationForSlowerClassWarning = new Dictionary<CarData.CarClass, float>();
 
+        // when calling multi-class warnings, our warning target time is the time between calling the warning, and the
+        // gap between the faster and slower car being 'small' - that is, I don't care how long it'll be before I'm passed
+        // by the faster guy, I want to know how long it'll be before he's pressuring me to let him through. So we add this
+        // many metres to the calculated value.
+        // Shit name for this. Use 10 metres because, reasons.
+        private float classSeparationAdjustment = 10f;
+
         private Boolean enableMulticlassWarnings = UserSettings.GetUserSettings().getBoolean("enable_multiclass_messages");
         private int targetWarningTimeForFasterClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_faster_class_car");
         private int targetWarningTimeForSlowerClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_slower_class_car");
@@ -651,13 +658,14 @@ namespace CrewChiefV4.Events
                         if (opponentClassAverageSpeed > playerClassAverageSpeed)
                         {
                             separationForFasterClassWarning[carClass] =
-                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed));
+                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed) + classSeparationAdjustment#
+                                );
                         }
                         else
                         {
                             // this will be negative, because we're behind
                             separationForSlowerClassWarning[carClass] =
-                                Math.Min(slowerCarWarningZoneEndMax, targetWarningTimeForSlowerClass * (opponentClassAverageSpeed - playerClassAverageSpeed));
+                                Math.Min(slowerCarWarningZoneEndMax, targetWarningTimeForSlowerClass * (opponentClassAverageSpeed - playerClassAverageSpeed) - classSeparationAdjustment);
                         }
                     }
                 }                
