@@ -12,7 +12,20 @@ namespace CrewChiefV4.Events
 {
     class MulticlassWarnings : AbstractEvent
     {
+        private Dictionary<CarData.CarClass, float> separationForFasterClassWarning = new Dictionary<CarData.CarClass, float>();
+        private Dictionary<CarData.CarClass, float> separationForSlowerClassWarning = new Dictionary<CarData.CarClass, float>();
+
+        // when calling multi-class warnings, our warning target time is the time between calling the warning, and the
+        // gap between the faster and slower car being 'small' - that is, I don't care how long it'll be before I'm passed
+        // by the faster guy, I want to know how long it'll be before he's pressuring me to let him through. So we add this
+        // many metres to the calculated value.
+        // Shit name for this. Use 10 metres because, reasons.
+        private float classSeparationAdjustment = 10f;
+
         private Boolean enableMulticlassWarnings = UserSettings.GetUserSettings().getBoolean("enable_multiclass_messages");
+        private int targetWarningTimeForFasterClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_faster_class_car");
+        private int targetWarningTimeForSlowerClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_slower_class_car");
+
 
         private String folderFasterCarsFightingBehindIncludingClassLeader = "multiclass/faster_cars_fighting_behind_inc_class_leader";
         private String folderFasterCarsBehindIncludingClassLeader = "multiclass/faster_cars_behind_inc_class_leader";
@@ -130,7 +143,8 @@ namespace CrewChiefV4.Events
         }
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
-        private float slowerCarWarningZoneStart = -30;        
+        private float slowerCarWarningZoneStart = -15;
+        private float slowerCarWarningZoneEndMax = -70;
         private float slowerCarWarningZoneEndShortTracks = -150;
         private float slowerCarWarningZoneEndNormalTracks = -200;
         private float slowerCarWarningZoneEndLongTracks = -300;
@@ -138,10 +152,11 @@ namespace CrewChiefV4.Events
 
         // distance behind where we consider faster cars
         private float fasterCarWarningZoneStartShortTracks = 100;
+        private float fasterCarWarningZoneStartMin = 70;
         private float fasterCarWarningZoneStartNormalTracks = 200;
         private float fasterCarWarningZoneStartLongTracks = 250;
         private float fasterCarWarningZoneStartToUse = 200;
-        private float fasterCarWarningZoneEnd = 30;
+        private float fasterCarWarningZoneEnd = 15;
 
         // cars within this many metres of each other will be considered as 'fighting for position'
         private float maxSeparateToBeConsideredFighting = 30;
@@ -174,6 +189,8 @@ namespace CrewChiefV4.Events
             caughtByFasterClassInThisSession = false;
             caughtSlowerClassInThisSession = false;
             bestTimesByClass.Clear();
+            separationForFasterClassWarning.Clear();
+            separationForSlowerClassWarning.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -627,6 +644,30 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+                float playerClassBestLap;
+                if (bestTimesByClass.TryGetValue(playerCarClass, out playerClassBestLap))
+                {
+                    float playerClassAverageSpeed = currentGameState.SessionData.TrackDefinition.trackLength / playerClassBestLap;
+                    foreach (CarData.CarClass carClass in bestTimesByClass.Keys)
+                    {
+                        if (CarData.IsCarClassEqual(playerCarClass, carClass))
+                        {
+                            continue;
+                        }
+                        float opponentClassAverageSpeed = currentGameState.SessionData.TrackDefinition.trackLength / bestTimesByClass[carClass];
+                        if (opponentClassAverageSpeed > playerClassAverageSpeed)
+                        {
+                            separationForFasterClassWarning[carClass] =
+                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed) + classSeparationAdjustment);
+                        }
+                        else
+                        {
+                            // this will be negative, because we're behind
+                            separationForSlowerClassWarning[carClass] =
+                                Math.Min(slowerCarWarningZoneEndMax, targetWarningTimeForSlowerClass * (opponentClassAverageSpeed - playerClassAverageSpeed) - classSeparationAdjustment);
+                        }
+                    }
+                }                
             }
         }
 
@@ -720,7 +761,22 @@ namespace CrewChiefV4.Events
                 {
                     separation = trackLength + separation;
                 }
-                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < fasterCarWarningZoneStartToUse)
+                float separationToUse;
+                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER)
+                {
+                    if (!separationForFasterClassWarning.TryGetValue(opponentData.CarClass, out separationToUse))
+                    {
+                        separationToUse = fasterCarWarningZoneStartToUse;
+                    }   
+                }
+                else
+                {
+                    if (!separationForSlowerClassWarning.TryGetValue(opponentData.CarClass, out separationToUse))
+                    {
+                        separationToUse = slowerCarWarningZoneEndToUse;
+                    }
+                }
+                if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < separationToUse)
                 {
                     // player is ahead of a faster class car
                     numFasterCars++;
@@ -764,7 +820,7 @@ namespace CrewChiefV4.Events
                     }
                 }
                 // this separation check looks odd because the separation value is negative (player is behind) so the < and > appear reversed
-                else if (classSpeedComparisonToPlayer == ClassSpeedComparison.SLOWER && separation < slowerCarWarningZoneStart && separation > slowerCarWarningZoneEndToUse)
+                else if (classSpeedComparisonToPlayer == ClassSpeedComparison.SLOWER && separation < slowerCarWarningZoneStart && separation > separationToUse)
                 {
                     // player is behind a slower class car
                     numSlowerCars++;
