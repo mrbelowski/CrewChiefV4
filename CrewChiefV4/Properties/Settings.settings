@@ -776,5 +776,11 @@
     <Setting Name="allow_macros_to_trigger_automatically" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="target_warning_time_for_faster_class_car" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="target_warning_time_for_slower_class_car" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
