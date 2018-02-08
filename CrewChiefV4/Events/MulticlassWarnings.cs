@@ -136,7 +136,8 @@ namespace CrewChiefV4.Events
         }
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
-        private float slowerCarWarningZoneStart = -30;        
+        private float slowerCarWarningZoneStart = -15;
+        private float slowerCarWarningZoneEndMax = -70;
         private float slowerCarWarningZoneEndShortTracks = -150;
         private float slowerCarWarningZoneEndNormalTracks = -200;
         private float slowerCarWarningZoneEndLongTracks = -300;
@@ -144,10 +145,11 @@ namespace CrewChiefV4.Events
 
         // distance behind where we consider faster cars
         private float fasterCarWarningZoneStartShortTracks = 100;
+        private float fasterCarWarningZoneStartMin = 70;
         private float fasterCarWarningZoneStartNormalTracks = 200;
         private float fasterCarWarningZoneStartLongTracks = 250;
         private float fasterCarWarningZoneStartToUse = 200;
-        private float fasterCarWarningZoneEnd = 30;
+        private float fasterCarWarningZoneEnd = 15;
 
         // cars within this many metres of each other will be considered as 'fighting for position'
         private float maxSeparateToBeConsideredFighting = 30;
@@ -645,15 +647,17 @@ namespace CrewChiefV4.Events
                         {
                             continue;
                         }
-                        float averageSpeed = currentGameState.SessionData.TrackDefinition.trackLength / bestTimesByClass[carClass];
-                        if (averageSpeed > playerClassAverageSpeed)
+                        float opponentClassAverageSpeed = currentGameState.SessionData.TrackDefinition.trackLength / bestTimesByClass[carClass];
+                        if (opponentClassAverageSpeed > playerClassAverageSpeed)
                         {
-                            separationForFasterClassWarning[carClass] = targetWarningTimeForFasterClass * (averageSpeed - playerClassAverageSpeed);
+                            separationForFasterClassWarning[carClass] =
+                                Math.Max(fasterCarWarningZoneStartMin, targetWarningTimeForFasterClass * (opponentClassAverageSpeed - playerClassAverageSpeed));
                         }
                         else
                         {
                             // this will be negative, because we're behind
-                            separationForSlowerClassWarning[carClass] = targetWarningTimeForSlowerClass * (averageSpeed - playerClassAverageSpeed);
+                            separationForSlowerClassWarning[carClass] =
+                                Math.Min(slowerCarWarningZoneEndMax, targetWarningTimeForSlowerClass * (opponentClassAverageSpeed - playerClassAverageSpeed));
                         }
                     }
                 }                
@@ -756,23 +760,13 @@ namespace CrewChiefV4.Events
                     if (!separationForFasterClassWarning.TryGetValue(opponentData.CarClass, out separationToUse))
                     {
                         separationToUse = fasterCarWarningZoneStartToUse;
-                        Console.WriteLine("Using track-length based separation to faster car of " + separationToUse);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Using lap speed based separation to faster car of " + separationToUse);
-                    }        
+                    }   
                 }
                 else
                 {
                     if (!separationForSlowerClassWarning.TryGetValue(opponentData.CarClass, out separationToUse))
                     {
                         separationToUse = slowerCarWarningZoneEndToUse;
-                        Console.WriteLine("Using track-length based separation to slower car of " + separationToUse);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Using lap speed based separation to slower car of " + separationToUse);
                     }
                 }
                 if (classSpeedComparisonToPlayer == ClassSpeedComparison.FASTER && separation > fasterCarWarningZoneEnd && separation < separationToUse)
