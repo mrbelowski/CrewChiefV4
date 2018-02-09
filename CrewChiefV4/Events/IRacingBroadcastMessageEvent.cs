@@ -50,6 +50,7 @@ namespace CrewChiefV4.Events
         private int maxIncidentCount = -1;
         private int incidentsCount = -1;
         private int iRating = -1;
+        private int strenghtOfField = -1; 
         private Boolean hasLimitedIncidents = false;
         
         private Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
@@ -102,6 +103,7 @@ namespace CrewChiefV4.Events
             hasLimitedIncidents = currentGameState.SessionData.HasLimitedIncidents;
             licenseLevel = currentGameState.SessionData.LicenseLevel;
             iRating = currentGameState.SessionData.iRating;
+            strenghtOfField = currentGameState.SessionData.StrengthOfField;
 /*
             if (hasLimitedIncidents)
             {
@@ -409,6 +411,19 @@ namespace CrewChiefV4.Events
                     audioPlayer.playDelayedImmediateMessage(licenceLevelMessage);
                 }
                 return;
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_SOF))
+            {
+                if (strenghtOfField != -1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", MessageContents(strenghtOfField), 0, null));
+                    return;
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    return;
+                }
             }
         }
 

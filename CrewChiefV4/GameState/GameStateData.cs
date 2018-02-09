@@ -420,7 +420,9 @@ namespace CrewChiefV4.GameState
         public Tuple<String, float> LicenseLevel = new Tuple<String, float>("invalid", -1);
 
         public int iRating = 0;
-        
+
+        public int StrengthOfField = 0;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);
