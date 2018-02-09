@@ -356,6 +356,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.HasLimitedIncidents = previousGameState.SessionData.HasLimitedIncidents;
                     currentGameState.SessionData.StrengthOfField = previousGameState.SessionData.StrengthOfField;
                     currentGameState.Conditions.samples = previousGameState.Conditions.samples;
+                    currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
                 }
             }
 

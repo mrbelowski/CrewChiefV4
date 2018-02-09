@@ -14,8 +14,7 @@ namespace CrewChiefV4.iRacing
         {
             _drivers = new List<Driver>();
             _sessionData = new SessionData();
-            _infoUpdate = -1;
-            _sessionId = -1;
+            _sessionId = null;
             _driver = null;
             _paceCar = null;
         }
@@ -25,8 +24,8 @@ namespace CrewChiefV4.iRacing
 
         private iRacingData _telemetry;
 
-        private int _infoUpdate, _sessionId;
-
+        private int? _sessionId;
+        public int? SessionId { get { return _sessionId; } }
 
         private int? _currentSessionNumber;
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
@@ -248,12 +247,13 @@ namespace CrewChiefV4.iRacing
         {           
             _DriverId = driverId;
             bool reloadDrivers = false;
-            
-            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber))
+            //also need 
+            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber) || _sessionId == null || _sessionData.SessionId != _sessionId )
             {
                 // Session changed, reset session info
                 reloadDrivers = true;
                 _sessionData.Update(sessionInfo, sessionNumber);
+                _sessionId = _sessionData.SessionId;
             }
             _currentSessionNumber = sessionNumber;
             // Update drivers

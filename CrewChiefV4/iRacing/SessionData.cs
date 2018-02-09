@@ -7,7 +7,7 @@ namespace CrewChiefV4.iRacing
     {
         public SessionData()
         {
-
+            this.SessionId = -1;
         }
 
         public Track Track { get; set; }
