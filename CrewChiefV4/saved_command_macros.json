@@ -132,9 +132,14 @@
 		    "action": "Decrement Selected Control",
 			"key": "LEFT"
 		},
+        {
+            "action": "Toggle Selected Control",
+            "key": "SPACE_BAR"
+        }
+        ,
 		{
-		    "action": "Toggle Selected Control",
-			"key": "SPACE_BAR"
+		    "action": "Get Out Of Car",
+			"key": "ESC"
 		}
 		]
 	}],
@@ -612,18 +617,31 @@
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200
 		}]
-	}
-	,
+	},
+    {
+        "name": "Toggle Selected Control",
+        "description": "Toggles The Selected Control",
+        "voiceTriggers": [ "menu toggle" ],
+        "commandSets": [
+            {
+                "description": "iRacing only",
+                "gameDefinition": "IRACING",
+                "actionSequence": [ "Toggle Selected Control" ],
+                "keyPressTime": 10,
+                "waitBetweenEachCommand": 200
+            }
+        ]
+    },
 	{
-		"name": "Toggle Selected Control",
-		"description": "Toggles The Selected Control",
-		"voiceTriggers": [ "menu toggle" ],
+		"name": "Get Out Of Car",
+		"description": "Presses ESC key for 2 sec.",
+		"voiceTriggers": [ "get out" ],
 		"commandSets": [
 		{
 			"description": "iRacing only",
 			"gameDefinition": "IRACING",
-			"actionSequence": [ "Toggle Selected Control" ],
-			"keyPressTime": 10,
+			"actionSequence": [ "Get Out Of Car" ],
+			"keyPressTime": 2000,
 			"waitBetweenEachCommand": 200
 		}]
 	}]

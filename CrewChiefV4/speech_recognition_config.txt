@@ -255,7 +255,7 @@ GALLONS = gallons
 
 HOW_MANY_INCIDENT_POINTS = how many incidents do i have:what's my incident count
 WHATS_THE_INCIDENT_LIMIT = what's the incident limit
-
+WHATS_THE_SOF = what's the sof:what is the strength of field
 
 #################################################
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)
