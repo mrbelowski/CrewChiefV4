@@ -12,18 +12,15 @@ namespace CrewChiefV4.PCars2
     public class StructHelper
     {
         public static Encoding ENCODING;
-        public static String NULL_CHAR;
                    
         static StructHelper() {
             try {
                 ENCODING = Encoding.GetEncoding(UserSettings.GetUserSettings().getString("pcars_character_encoding"));
-                NULL_CHAR = ENCODING.GetString(new byte[] { 0 }, 0, 1);
             }
             catch (System.ArgumentException)
             {
                 Console.WriteLine("Using default encoding");
                 ENCODING = Encoding.Default;
-                NULL_CHAR = ENCODING.GetString(new byte[] { 0 }, 0, 1);
             }
         }
         public static pCars2APIStruct Clone<pCars2APIStruct>(pCars2APIStruct pcars2Struct)
@@ -387,31 +384,19 @@ namespace CrewChiefV4.PCars2
         public static String getNameFromBytes(byte[] bytes)
         {
             byte zero = (byte)0;
-            // if the byte array is empty, or the first 2 chars are null, return empty string
-            if (bytes == null || bytes.Length == 0 || (bytes.Length > 1 && bytes[0] == zero && bytes[1] == zero))
+            // if the byte array is empty, or the first char is null, return empty string
+            if (bytes == null || bytes.Length == 0 || (bytes.Length > 0 && bytes[0] == zero))
             {
                 return "";
-            }
-            // check if the first char is null and skip it if so
-            int startIndex = bytes[0] == zero ? 1 : 0;
-            // get the first (or second if char[0] is null) null char
-            int numBytesToDecode = Array.IndexOf(bytes, zero, startIndex);
-            if (numBytesToDecode == 0)
-            {
-                // first and second chars are null. Return empty string
-                return "";
-            }
+            }            
+            int numBytesToDecode = Array.IndexOf(bytes, zero, 0);
+            
             if (numBytesToDecode == -1)
             {
                 // no nulls, we want the whole array
                 numBytesToDecode = bytes.Length;
             }
-            // if we've skipped the first char, reduce the number of bytes to decode
-            numBytesToDecode = numBytesToDecode - startIndex;
-
-            // If start index is 1, prefix the decoded string with the magic null-standin-char
-            return startIndex == 1 ? PCars2GameStateMapper.NULL_CHAR_STAND_IN + ENCODING.GetString(bytes, startIndex, numBytesToDecode) :
-                ENCODING.GetString(bytes, startIndex, numBytesToDecode);
+            return ENCODING.GetString(bytes, 0, numBytesToDecode);
         }
 
         private static float[] toFloatArray(int[] intArray, float factor)
