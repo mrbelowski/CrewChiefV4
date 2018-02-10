@@ -45,6 +45,7 @@ namespace CrewChiefV4.Audio
         public static String folderDeltasDisabled = "acknowledge/deltasDisabled";
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
         public static String folderStandBy = "acknowledge/stand_by";
+        public static String folderFuelToEnd = "acknowledge/fuel_to_end";
 
         private String folderRants = "rants/general";
         private Boolean playedRantInThisSession = false;
