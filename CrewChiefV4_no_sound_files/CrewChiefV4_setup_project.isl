@@ -342,6 +342,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>ACInternalMemoryReader.dll</td><td>{1AA1F849-CE38-40CA-B78F-6FC20F96ADC4}</td><td>STDLIB64</td><td>2</td><td/><td>acinternalmemoryreader.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>CrewChiefV4.Debug_Symbols</td><td>{A8259881-E6B8-42F8-A31D-D8277EB3556F}</td><td>INSTALLDIR</td><td>2</td><td/><td>crewchiefv4.debug_symbols</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CrewChiefV4.Primary_output</td><td>{E3B09293-F596-47FA-A2B7-A1877CE005A6}</td><td>INSTALLDIR</td><td>2</td><td/><td>CrewChiefV4.primary_output</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td>{12984750-B4AB-4871-999A-6845E4545202}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{1FE0B6F4-5BC1-44E0-BE11-303BEE7E5E5E}</td><td>PLUGINS</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1912,6 +1913,7 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
 		<row><td>AlwaysInstall</td><td>ACInternalMemoryReader.dll</td></row>
+		<row><td>AlwaysInstall</td><td>CrewChiefV4.Debug_Symbols</td></row>
 		<row><td>AlwaysInstall</td><td>CrewChiefV4.Primary_output</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
@@ -1952,6 +1954,7 @@
 		<row><td>carclassdata.json</td><td>ISX_DEFAULTCOMPONENT</td><td>CARCLA~1.JSO|carClassData.json</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\carClassData.json</td><td>1</td><td/></row>
 		<row><td>config.txt</td><td>ISX_DEFAULTCOMPONENT5</td><td>config.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\config.txt</td><td>1</td><td/></row>
 		<row><td>crewchiefex.py</td><td>ISX_DEFAULTCOMPONENT5</td><td>CREWCH~1.PY|CrewChiefEx.py</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\CrewChiefV4\plugins\assettocorsa\apps\python\CrewChiefEx\CrewChiefEx.py</td><td>1</td><td/></row>
+		<row><td>crewchiefv4.debug_symbols</td><td>CrewChiefV4.Debug_Symbols</td><td>CrewChiefV4.Debug Symbols</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CrewChiefV4&gt;|Symbols</td><td>3</td><td/></row>
 		<row><td>help.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>help.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\help.txt</td><td>1</td><td/></row>
 		<row><td>newtonsoft_json_licence.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>NEWTON~1.TXT|Newtonsoft_Json_licence.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\Newtonsoft_Json_licence.txt</td><td>1</td><td/></row>
 		<row><td>readme.txt</td><td>ISX_DEFAULTCOMPONENT</td><td>README.txt</td><td>0</td><td/><td/><td/><td>1</td><td>C:\projects\crewchief_c_sharp\CrewChiefV4\README.txt</td><td>1</td><td/></row>
@@ -2109,6 +2112,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>ACInternalMemoryReader.dll</td><td/><td/><td>_58ABD0CA_5103_46FF_92B4_A497758F2790_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>CrewChiefV4.Debug_Symbols</td><td/><td/><td>_709FDC3A_194B_4FF7_9EA8_4305A190168D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CrewChiefV4.Primary_output</td><td/><td/><td>_1BE3BD1C_4227_4FE6_BB02_03E27B339B9B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_39277B58_FECF_4923_974B_A82625C8FD8E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_17079E2E_65A0_4D11_8179_7C0F2FD00F6E_FILTER</td><td/><td/><td/><td/></row>
@@ -4476,9 +4480,9 @@ RABWAEQALQA1AAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]CrewChiefV4.Primary output</td><td/></row>
-		<row><td>ProductCode</td><td>{0D3FA5CA-8B56-45A6-A909-8AD064E82A89}</td><td/></row>
+		<row><td>ProductCode</td><td>{89B2F870-FCF4-4F3E-9A03-64C57A016C97}</td><td/></row>
 		<row><td>ProductName</td><td>CrewChiefV4</td><td/></row>
-		<row><td>ProductVersion</td><td>4.9.1.4</td><td/></row>
+		<row><td>ProductVersion</td><td>4.9.1.5</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
