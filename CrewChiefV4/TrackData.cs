@@ -59,10 +59,12 @@ namespace CrewChiefV4
                         break;
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
-                    case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
-                    case GameEnum.PCARS2_NETWORK:
                         currentRecording.pcarsTrackName = trackName;
+                        break;
+                    case GameEnum.PCARS2:
+                    case GameEnum.PCARS2_NETWORK:
+                        currentRecording.pcars2TrackName = trackName;
                         break;
                     case GameEnum.RF1:
                         currentRecording.rf1TrackNames = new string[] { trackName };
@@ -205,6 +207,7 @@ namespace CrewChiefV4
         public String[] acTrackNames { get; set; }
         public String irTrackName { get; set; }
         public String pcarsTrackName { get; set; }
+        public String pcars2TrackName { get; set; }
         public int raceroomLayoutId { get; set; }
         public float approximateTrackLength { get; set; }   // this is optional and used to differentiate duplicated names
         public List<TrackLandmark> trackLandmarks { get; set; }
@@ -218,6 +221,7 @@ namespace CrewChiefV4
             this.rf1TrackNames = new string[] { };
             this.rf2TrackNames = new string[] { };
             this.pcarsTrackName = "";
+            this.pcars2TrackName = "";
             this.irTrackName = "";
             this.isOval = false;
         }
@@ -279,10 +283,17 @@ namespace CrewChiefV4
                         break;
                     case GameEnum.PCARS_32BIT:
                     case GameEnum.PCARS_64BIT:
-                    case GameEnum.PCARS2:
                     case GameEnum.PCARS_NETWORK:
-                    case GameEnum.PCARS2_NETWORK:
                         if (String.Equals(trackLandmarksForTrack.pcarsTrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                            && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
+                        {
+                            Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
+                            return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
+                        }
+                        break;
+                    case GameEnum.PCARS2:
+                    case GameEnum.PCARS2_NETWORK:
+                        if (String.Equals(trackLandmarksForTrack.pcars2TrackName, trackName, StringComparison.OrdinalIgnoreCase)
                             && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
                         {
                             Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
@@ -614,7 +625,9 @@ namespace CrewChiefV4
 
         public static TrackDefinition getTrackDefinition(String trackName, int trackId, float trackLength)
         {
-            if (CrewChief.isPCars())
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || 
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || 
+                CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
             {
                 List<TrackDefinition> defsWhichMatchName = new List<TrackDefinition>();
                 foreach (TrackDefinition def in pCarsTracks)
