@@ -144,7 +144,7 @@ namespace CrewChiefV4.Events
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
         private float slowerCarWarningZoneStart = -15;
-        private float slowerCarWarningZoneEndMax = -70;
+        private float slowerCarWarningZoneEndMax = -100;
         private float slowerCarWarningZoneEndShortTracks = -150;
         private float slowerCarWarningZoneEndNormalTracks = -200;
         private float slowerCarWarningZoneEndLongTracks = -300;
@@ -152,7 +152,7 @@ namespace CrewChiefV4.Events
 
         // distance behind where we consider faster cars
         private float fasterCarWarningZoneStartShortTracks = 100;
-        private float fasterCarWarningZoneStartMin = 70;
+        private float fasterCarWarningZoneStartMin = 100;
         private float fasterCarWarningZoneStartNormalTracks = 200;
         private float fasterCarWarningZoneStartLongTracks = 250;
         private float fasterCarWarningZoneStartToUse = 200;
