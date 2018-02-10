@@ -1383,7 +1383,7 @@
 		{
 			"rf1TrackNames": ["Road America 2016"],
 			"pcarsTrackName": "Road America:",
-			"pcars2TrackName": "Road_America:?P",
+			"pcars2TrackName": "Road_America:",
 			"irTrackName": "roadamerica full",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",

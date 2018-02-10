@@ -13,8 +13,6 @@ namespace CrewChiefV4.PCars2
 {
     class PCars2GameStateMapper : GameStateMapper
     {
-        public static String NULL_CHAR_STAND_IN = "?";
-
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> tyreWearThresholds = new List<CornerData.EnumWithThresholds>();
         private List<CornerData.EnumWithThresholds> brakeDamageThresholds = new List<CornerData.EnumWithThresholds>();
@@ -88,7 +86,7 @@ namespace CrewChiefV4.PCars2
         private float lastCollisionMagnitude = 0;
         private Boolean collisionOnThisLap = false;
         // TODO: what to use for this value
-        private float collisionMagnitudeThreshold = 0.1f;
+        private float collisionMagnitudeThreshold = 0.05f;
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
@@ -802,7 +800,7 @@ namespace CrewChiefV4.PCars2
                                     {
                                         lastSectorTime = shared.mCurrentSector2Times[i];
                                     }
-                                    updateOpponentData(currentOpponentData, participantName, currentOpponentRacePosition, currentOpponentLapsCompleted,
+                                    updateOpponentData(currentOpponentData, currentOpponentRacePosition, currentOpponentLapsCompleted,
                                             currentOpponentSector, isEnteringPits, isInPits, isLeavingPits, currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
                                             shared.mSpeeds[i], shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
@@ -1306,7 +1304,7 @@ namespace CrewChiefV4.PCars2
             }
         }
 
-        private void updateOpponentData(OpponentData opponentData, String name, int racePosition, int completedLaps, int sector, Boolean isEnteringPits,
+        private void updateOpponentData(OpponentData opponentData, int racePosition, int completedLaps, int sector, Boolean isEnteringPits,
             Boolean isInPits, Boolean isLeavingPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
@@ -1314,14 +1312,7 @@ namespace CrewChiefV4.PCars2
             Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
-            if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
-            {
-                opponentData.DriverRawName = name;
-                if (CrewChief.enableDriverNames)
-                {
-                    speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
-                }
-            }
+            
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             opponentData.Speed = speed;
             opponentData.OverallPosition = racePosition;
@@ -1376,7 +1367,7 @@ namespace CrewChiefV4.PCars2
             String participantName = StructHelper.getNameFromBytes(participantStruct.mName).ToLower();
             opponentData.DriverRawName = participantName;
             opponentData.DriverNameSet = true;
-            if (participantName != null && participantName.Length > 0 && !participantName.StartsWith(NULL_CHAR_STAND_IN) && loadDriverName && CrewChief.enableDriverNames)
+            if (participantName != null && participantName.Length > 0 && loadDriverName && CrewChief.enableDriverNames)
             {
                 speechRecogniser.addNewOpponentName(opponentData.DriverRawName);
             }
