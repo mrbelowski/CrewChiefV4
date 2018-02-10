@@ -540,15 +540,18 @@ namespace CrewChiefV4.Events
                                     // shouldn't need this, but just in case...
                                     cutoffForRefuelCall = 120;
                                 }
-                                if (currentGameState.SessionData.SessionTimeRemaining > cutoffForRefuelCall)
+                                if (!currentGameState.PitData.InPitlane)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
-                                        MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
-                                }
-                                else
-                                {
-                                    // going to run out, but don't call the player into the pits - it's up to him
-                                    audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_fuel", MessageContents(folderAboutToRunOut), 0, this));
+                                    if (currentGameState.SessionData.SessionTimeRemaining > cutoffForRefuelCall)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
+                                            MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                                    }
+                                    else
+                                    {
+                                        // going to run out, but don't call the player into the pits - it's up to him
+                                        audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_fuel", MessageContents(folderAboutToRunOut), 0, this));
+                                    }
                                 }
                             }
                             if (estimatedFuelMinutesLeft <= 2 && estimatedFuelMinutesLeft > 1.8 && !playedTwoMinutesRemaining)
