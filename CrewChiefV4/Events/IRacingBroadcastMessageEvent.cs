@@ -148,13 +148,15 @@ namespace CrewChiefV4.Events
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
                 {
                     AddFuel(amount);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
+                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres), 0, null));
                     return;
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.GALLONS))
                 {
                     AddFuel(convertGallonsToLitres(amount));
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
+                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallon), 0, null));
                     return;
                 }
             }
@@ -174,7 +176,7 @@ namespace CrewChiefV4.Events
                 else if(litresNeeded > 0)
                 {
                     AddFuel(litresNeeded);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
                     return;
                 }
 
