@@ -269,14 +269,16 @@ namespace CrewChiefV4.PCars
 
         public static String getNameFromBytes(byte[] bytes)
         {
-            if (bytes == null || bytes.Length == 0)
+            byte zero = (byte)0;
+            // if the byte array is empty, or the first 2 chars are null, return empty string
+            if (bytes == null || bytes.Length == 0 || (bytes.Length > 1 && bytes[0] == zero && bytes[1] == zero))
             {
                 return "";
             }
             // check if the first char is null and skip it if so
-            int startIndex = bytes[0] == (byte)0 ? 1 : 0;
+            int startIndex = bytes[0] == zero ? 1 : 0;
             // get the first (or second if char[0] is null) null char
-            int numBytesToDecode = Array.IndexOf(bytes, (byte)0, startIndex);
+            int numBytesToDecode = Array.IndexOf(bytes, zero, startIndex);
             if (numBytesToDecode == 0)
             {
                 // first and second chars are null. Return empty string
