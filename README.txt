@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.1.5: More detailed error messages; pCars and pCars2 performance improvements; iRacing performance improvements; AC fixes for shorter tracks (2 sectors); Fixed inaccurate race position messages in iRacing 'checkered flag' phase; Some iRacing stability improvements; Use relative lap time difference when working out when to give multi-class warnings. This uses 2 new Properties - 'Multi-class slower car warning time' and 'Multi-class faster car warning time' - this is the approximate average amount of notice you want the app to give you when approaching a different class car; Added iRacing voice commands to get out of car ('get out') and get the average SoF ('what's the sof' / 'what is the strength of field')
+
 Version 4.9.1.4: Workaround for iRacing 'opponent pitting now' message spam
 
 Version 4.9.1.3: Minor multi-class tweaks; Assume single class if all car classes in a race are unknown to the app (AC, rF2 and rF1 only); Added button to save console output to a file (in Documents/ CrewChiefV4/debug/); Some AC internal fixes; Don't give damage and tyre wear responses in iRacing; Added Lee spotter (in latest sound pack update)
