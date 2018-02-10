@@ -501,7 +501,7 @@ namespace CrewChiefV4.iRacing
             int currentSector = playerCar.Live.CurrentSector;
 
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector;
-            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, playerCar.Live.HasCrossedSFLine);
+            currentGameState.SessionData.IsNewLap = currentGameState.HasNewLapData(previousGameState, playerCar.Live.LapTimePrevious, playerCar.Live.HasCrossedSFLine) && playerCar.Live.Lap >=1;
 
             if (currentGameState.SessionData.IsNewLap)
             {
@@ -509,7 +509,7 @@ namespace CrewChiefV4.iRacing
             }
 
             currentGameState.SessionData.SectorNumber = currentSector;
-            currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
+            currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] || playerCar.Live.TrackSurface == TrackSurfaces.InPitStall;
 
             if (currentGameState.SessionData.IsNewSector || currentGameState.SessionData.IsNewLap)
             {
@@ -574,7 +574,7 @@ namespace CrewChiefV4.iRacing
                 String stoppedInLandmark = currentGameState.SessionData.trackLandmarksTiming.updateLandmarkTiming(currentGameState.SessionData.TrackDefinition,
                     currentGameState.SessionData.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.CarSpeed);
-                currentGameState.SessionData.stoppedInLandmark = shared.Telemetry.OnPitRoad ? null : stoppedInLandmark;
+                currentGameState.SessionData.stoppedInLandmark = currentGameState.PitData.InPitlane ? null : stoppedInLandmark;
             }
 
             if (currentGameState.PitData.InPitlane)
