@@ -1042,7 +1042,75 @@
 				}
 			]
 		},
-		{
+        {
+            "pcarsTrackName": "Mazda Raceway:Laguna Seca",
+            "acTrackNames": [ "ks_laguna_seca:" ],
+            "raceroomLayoutId": 1856,
+            "irTrackName": "lagunaseca",
+            "trackLandmarks": [
+                {
+                    "landmarkName": "turn1",
+                    "distanceRoundLapStart": 160,
+                    "distanceRoundLapEnd": 260,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_andretti_hairpin",
+                    "distanceRoundLapStart": 410,
+                    "distanceRoundLapEnd": 560,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn3",
+                    "distanceRoundLapStart": 730,
+                    "distanceRoundLapEnd": 850,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn4",
+                    "distanceRoundLapStart": 1000,
+                    "distanceRoundLapEnd": 1130,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn5",
+                    "distanceRoundLapStart": 1480,
+                    "distanceRoundLapEnd": 1640,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "turn6",
+                    "distanceRoundLapStart": 1910,
+                    "distanceRoundLapEnd": 2000,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "the_corkscrew",
+                    "distanceRoundLapStart": 2420,
+                    "distanceRoundLapEnd": 2530,
+                    "isCommonOvertakingSpot": true
+                },
+                {
+                    "landmarkName": "rainey_curve",
+                    "distanceRoundLapStart": 2640,
+                    "distanceRoundLapEnd": 2820,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn10",
+                    "distanceRoundLapStart": 2930,
+                    "distanceRoundLapEnd": 3030,
+                    "isCommonOvertakingSpot": false
+                },
+                {
+                    "landmarkName": "turn11",
+                    "distanceRoundLapStart": 3230,
+                    "distanceRoundLapEnd": 3310,
+                    "isCommonOvertakingSpot": true
+                }
+            ]
+        },
+        {
 			"pcarsTrackName": "Laguna_Seca:",
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
