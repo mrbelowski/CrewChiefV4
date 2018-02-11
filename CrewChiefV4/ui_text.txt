@@ -577,3 +577,6 @@ target_warning_time_for_slower_class_car = Multi-class slower car warning time
 target_warning_time_for_slower_class_car_help = Try and warn this many seconds in advance when passing slower class cars
 target_warning_time_for_faster_class_car = Multi-class faster car warning time
 target_warning_time_for_faster_class_car_help = Try and warn this many seconds in advance when being passed by faster class cars
+
+max_unknown_car_classes_for_assetto = Max unknown car models in ACS multi-class races
+max_unknown_car_classes_for_assetto_help = Assume single-class race if there are more than this many unknown car models in Assetto Corsa

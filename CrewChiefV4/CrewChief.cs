@@ -46,6 +46,7 @@ namespace CrewChiefV4
         private Boolean displaySessionLapTimes = UserSettings.GetUserSettings().getBoolean("display_session_lap_times");
 
         public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
+        public static int maxUnknownClassesForAC = UserSettings.GetUserSettings().getInt("max_unknown_car_classes_for_assetto");
         
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
