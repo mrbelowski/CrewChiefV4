@@ -156,7 +156,7 @@ namespace CrewChiefV4.Events
                 {
                     AddFuel(convertGallonsToLitres(amount));
                     audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
-                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallon), 0, null));
+                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons), 0, null));
                     return;
                 }
             }
