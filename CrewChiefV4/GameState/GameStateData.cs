@@ -2408,10 +2408,24 @@ namespace CrewChiefV4.GameState
         {
             if (CrewChief.gameDefinition.allowsUserCreatedCars)
             {
-                // for games that allow user-created cars, if the number of unknown class IDs exceeds the number of known class IDs, disable multiclass
                 int numberOfUnknownClassIds = unknownClassIds.Count;
-                int numberOfKnownClassIds = totalNumberOfClassesIds - numberOfUnknownClassIds;
-                return numberOfUnknownClassIds > numberOfKnownClassIds;
+                if (numberOfUnknownClassIds == 0)
+                {
+                    return false;
+                }
+                // For games that allow user-created cars but that still have sensible 'car class' data,
+                // if the number of unknown class IDs exceeds the number of known class IDs, disable multiclass.
+                // Assetto has no car class concept, only car model. So we need to quite strict here
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
+                {
+                    return numberOfUnknownClassIds > CrewChief.maxUnknownClassesForAC;
+                }
+                else
+                {
+                    
+                    int numberOfKnownClassIds = totalNumberOfClassesIds - numberOfUnknownClassIds;
+                    return numberOfUnknownClassIds > numberOfKnownClassIds;
+                }
             }
             return false;
         }

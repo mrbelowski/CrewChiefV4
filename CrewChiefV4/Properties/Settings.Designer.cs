@@ -3142,5 +3142,17 @@ namespace CrewChiefV4.Properties {
                 this["target_warning_time_for_slower_class_car"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int max_unknown_car_classes_for_assetto {
+            get {
+                return ((int)(this["max_unknown_car_classes_for_assetto"]));
+            }
+            set {
+                this["max_unknown_car_classes_for_assetto"] = value;
+            }
+        }
     }
 }

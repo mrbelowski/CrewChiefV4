@@ -782,5 +782,8 @@
     <Setting Name="target_warning_time_for_slower_class_car" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
+    <Setting Name="max_unknown_car_classes_for_assetto" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

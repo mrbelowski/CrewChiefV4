@@ -11,6 +11,7 @@
 	<li>Some iRacing stability improvements</li>
 	<li>Use relative lap time difference when working out when to give multi-class warnings. This uses 2 new Properties - 'Multi-class slower car warning time' and 'Multi-class faster car warning time' - this is the approximate average amount of notice you want the app to give you when approaching a different class car</li>
 	<li>Added iRacing voice commands to get out of car ('get out') and get the average SoF ('what's the sof' / 'what is the strength of field')</li>
+	<li>For Assetto Corsa, only allow multi-class races if the number of unknown car models is less than property 'Max unknown car models in ACS multi-class races' (default 0) - this is necessary because Assetto doesn't expose proper class data. This prevents the app dividing participants into different classes unless the app recognises all the car models in the session</li>
 </ul>
 <h2>Version 4.9.1.4</h2>
 <ul>
