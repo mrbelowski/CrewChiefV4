@@ -2422,7 +2422,6 @@ namespace CrewChiefV4.GameState
                 }
                 else
                 {
-                    
                     int numberOfKnownClassIds = totalNumberOfClassesIds - numberOfUnknownClassIds;
                     return numberOfUnknownClassIds > numberOfKnownClassIds;
                 }
