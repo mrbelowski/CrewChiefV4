@@ -817,17 +817,18 @@ namespace CrewChiefV4.iRacing
             {
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
-                foreach (KeyValuePair<string, OpponentData> entry in currentGameState.OpponentData)
+                foreach (string opponentDataKey in currentGameState.OpponentData.Keys)
                 {
                     DateTime lastTimeForOpponent = DateTime.MinValue;
-                    if (!lastActiveTimeForOpponents.TryGetValue(entry.Key, out lastTimeForOpponent) || (lastTimeForOpponent < oldestAllowedUpdate && entry.Value.IsActive))
+                    OpponentData currentOpponent = null;
+                    if (!lastActiveTimeForOpponents.TryGetValue(opponentDataKey, out lastTimeForOpponent) || (lastTimeForOpponent < oldestAllowedUpdate && currentGameState.OpponentData.TryGetValue(opponentDataKey, out currentOpponent) && currentOpponent.IsActive))
                     {
-                        entry.Value.IsActive = false;
-                        entry.Value.InPits = true;
-                        entry.Value.Speed = 0;
-                        entry.Value.stoppedInLandmark = null;
-                        entry.Value.DeltaTime.SetNextDeltaPoint(0, entry.Value.CompletedLaps, 0, currentGameState.Now);
-                        Console.WriteLine("Opponent " + entry.Value.DriverRawName + "(index " + entry.Key + ") has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
+                        currentOpponent.IsActive = false;
+                        currentOpponent.InPits = true;
+                        currentOpponent.Speed = 0;
+                        currentOpponent.stoppedInLandmark = null;
+                        currentOpponent.DeltaTime.SetNextDeltaPoint(0, currentOpponent.CompletedLaps, 0, currentGameState.Now);
+                        Console.WriteLine("Opponent " + currentOpponent.DriverRawName + "(index " + opponentDataKey +") has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
                     }
                 }
             }
@@ -922,6 +923,7 @@ namespace CrewChiefV4.iRacing
             {
                 Console.WriteLine("Driver " + opponentData.DriverRawName + " has been swapped for " + driverName);
                 opponentData.DriverRawName = driverName;
+                opponentData.CostId = CostId;
                 speechRecogniser.addNewOpponentName(driverName);
             }
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
