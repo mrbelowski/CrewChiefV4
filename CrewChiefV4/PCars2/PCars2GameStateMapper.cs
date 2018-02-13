@@ -1049,7 +1049,19 @@ namespace CrewChiefV4.PCars2
 
             //------------------------ Tyre data -----------------------          
             currentGameState.TyreData.HasMatchedTyreTypes = true;
+            // TODO: unmatched tyres
             currentGameState.TyreData.TyreWearActive = true;
+
+            // only map to tyre type every sector or on pit exit
+            TyreType tyreType;
+            if (previousGameState == null || currentGameState.SessionData.IsNewSector || currentGameState.PitData.IsAtPitExit || currentGameState.SessionData.JustGoneGreen)
+            {
+                tyreType = mapToTyreType(shared.mLFTyreCompoundName);
+            }
+            else
+            {
+                tyreType = previousGameState.TyreData.FrontLeftTyreType;
+            }
 
             currentGameState.TyreData.LeftFrontAttached = (shared.mTyreFlags[0] & 1) == 1;
             currentGameState.TyreData.RightFrontAttached = (shared.mTyreFlags[1] & 1) == 1;
@@ -1059,7 +1071,7 @@ namespace CrewChiefV4.PCars2
             currentGameState.TyreData.FrontLeft_CenterTemp = shared.mTyreTreadTemp[0] - 273;
             currentGameState.TyreData.FrontLeft_LeftTemp = shared.mTyreTreadTemp[0] - 273;
             currentGameState.TyreData.FrontLeft_RightTemp = shared.mTyreTreadTemp[0] - 273;
-            currentGameState.TyreData.FrontLeftTyreType = defaultTyreTypeForPlayersCar;
+            currentGameState.TyreData.FrontLeftTyreType = tyreType;
             currentGameState.TyreData.FrontLeftPressure = -1; // not in the block
             currentGameState.TyreData.FrontLeftPercentWear = Math.Min(100, shared.mTyreWear[0] * 100 / wornOutTyreWearLevel);
             if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontLeftTemperatureForLap == 0)
@@ -1074,7 +1086,7 @@ namespace CrewChiefV4.PCars2
             currentGameState.TyreData.FrontRight_CenterTemp = shared.mTyreTreadTemp[1] - 273;
             currentGameState.TyreData.FrontRight_LeftTemp = shared.mTyreTreadTemp[1] - 273;
             currentGameState.TyreData.FrontRight_RightTemp = shared.mTyreTreadTemp[1] - 273;
-            currentGameState.TyreData.FrontRightTyreType = defaultTyreTypeForPlayersCar;
+            currentGameState.TyreData.FrontRightTyreType = tyreType;
             currentGameState.TyreData.FrontRightPressure = -1; // not in the block
             currentGameState.TyreData.FrontRightPercentWear = Math.Min(100, shared.mTyreWear[1] * 100 / wornOutTyreWearLevel);
             if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakFrontRightTemperatureForLap == 0)
@@ -1089,7 +1101,7 @@ namespace CrewChiefV4.PCars2
             currentGameState.TyreData.RearLeft_CenterTemp = shared.mTyreTreadTemp[2] - 273;
             currentGameState.TyreData.RearLeft_LeftTemp = shared.mTyreTreadTemp[2] - 273;
             currentGameState.TyreData.RearLeft_RightTemp = shared.mTyreTreadTemp[2] - 273;
-            currentGameState.TyreData.RearLeftTyreType = defaultTyreTypeForPlayersCar;
+            currentGameState.TyreData.RearLeftTyreType = tyreType;
             currentGameState.TyreData.RearLeftPressure = -1; // not in the block
             currentGameState.TyreData.RearLeftPercentWear = Math.Min(100, shared.mTyreWear[2] * 100 / wornOutTyreWearLevel);
             if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearLeftTemperatureForLap == 0)
@@ -1104,7 +1116,7 @@ namespace CrewChiefV4.PCars2
             currentGameState.TyreData.RearRight_CenterTemp = shared.mTyreTreadTemp[3] - 273;
             currentGameState.TyreData.RearRight_LeftTemp = shared.mTyreTreadTemp[3] - 273;
             currentGameState.TyreData.RearRight_RightTemp = shared.mTyreTreadTemp[3] - 273;
-            currentGameState.TyreData.RearRightTyreType = defaultTyreTypeForPlayersCar;
+            currentGameState.TyreData.RearRightTyreType = tyreType;
             currentGameState.TyreData.RearRightPressure = -1; // not in the block
             currentGameState.TyreData.RearRightPercentWear = Math.Min(100, shared.mTyreWear[3] * 100 / wornOutTyreWearLevel);
             if (currentGameState.SessionData.IsNewLap || currentGameState.TyreData.PeakRearRightTemperatureForLap == 0)
@@ -1119,7 +1131,8 @@ namespace CrewChiefV4.PCars2
             currentGameState.TyreData.TyreConditionStatus = CornerData.getCornerData(tyreWearThresholds, currentGameState.TyreData.FrontLeftPercentWear, 
                 currentGameState.TyreData.FrontRightPercentWear, currentGameState.TyreData.RearLeftPercentWear, currentGameState.TyreData.RearRightPercentWear);
 
-            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass);
+
+            var tyreTempThresholds = CarData.getTyreTempThresholds(currentGameState.carClass, tyreType);
             currentGameState.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 currentGameState.TyreData.PeakFrontLeftTemperatureForLap, currentGameState.TyreData.PeakFrontRightTemperatureForLap,
                 currentGameState.TyreData.PeakRearLeftTemperatureForLap, currentGameState.TyreData.PeakRearRightTemperatureForLap);
@@ -1667,6 +1680,60 @@ namespace CrewChiefV4.PCars2
                 mean += d;
             }
             return mean / count;
+        }
+
+        private TyreType mapToTyreType(byte[] lfTyreName)
+        {
+            if (lfTyreName != null && lfTyreName.Length > 0 && lfTyreName[0] != (byte)0)
+            {
+                String tyreName = StructHelper.getNameFromBytes(lfTyreName).ToLower();
+                if (tyreName.Contains("wet"))
+                {
+                    return TyreType.Wet;
+                }
+                else if (tyreName.Contains("hard"))
+                {
+                    return TyreType.Hard;
+                }
+                else if (tyreName.Contains("medium"))
+                {
+                    return TyreType.Medium;
+                }
+                else if (tyreName.Contains("soft"))
+                {
+                    return TyreType.Soft;
+                }
+                else if (tyreName.Contains("inter"))
+                {
+                    return TyreType.Intermediate;
+                }
+                else if (tyreName.Contains("road") || tyreName.Contains("street"))
+                {
+                    return TyreType.Road;
+                }
+                else if (tyreName.Contains("ice"))
+                {
+                    return TyreType.Ice;
+                }
+                else if (tyreName.Contains("snow"))
+                {
+                    return TyreType.Snow;
+                }
+                else if (tyreName.Contains("terrain"))
+                {
+                    return TyreType.AllTerrain;
+                }
+                else if (tyreName.Contains("bias") || tyreName.Contains("vintage")) 
+                {
+                    return TyreType.Bias_Ply;
+                }
+                else if (tyreName.Contains("dry") || tyreName.Contains("track"))
+                {
+                    // no idea what these are - they're fitted to older cars, so lets assume they're bias ply
+                    return TyreType.Bias_Ply;
+                }
+            }
+            return defaultTyreTypeForPlayersCar;            
         }
     }
 }
