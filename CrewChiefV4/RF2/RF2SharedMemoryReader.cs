@@ -376,8 +376,12 @@ namespace CrewChiefV4.rFactor2
             }
         }
 
-        // TODO: This needs review.  We need to keep last buffer values because new reader version skips reads.  However, not entirely sure what are side effects of this. (dump to file scenario, read from file scenario etc).
-        RF2StructWrapper wrapper = new RF2StructWrapper();
+        // Marshalled views:
+        // TODO: shall those be reset on disconnect?
+        private rF2Telemetry telemetry;
+        private rF2Scoring scoring;
+        private rF2Rules rules;
+        private rF2Extended extended;
 
         public override Object ReadGameData(Boolean forSpotter)
         {
@@ -392,15 +396,25 @@ namespace CrewChiefV4.rFactor2
                 }
                 try 
                 {
-                    extendedBuffer.GetMappedData(ref wrapper.extended);
-                    telemetryBuffer.GetMappedData(ref wrapper.telemetry);
-                    rulesBuffer.GetMappedData(ref wrapper.rules);
+                    extendedBuffer.GetMappedData(ref this.extended);
+                    telemetryBuffer.GetMappedData(ref this.telemetry);
+                    rulesBuffer.GetMappedData(ref this.rules);
 
                     // Scoring is the most important game data in Crew Chief sense, 
                     // so acquire it last, hoping it will be most recent view of all buffer types.
-                    scoringBuffer.GetMappedData(ref wrapper.scoring);
+                    scoringBuffer.GetMappedData(ref this.scoring);
 
-                    wrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    // Create a new copy marshalled views.  Thia is necessary because core code caches states, so each
+                    // state has to be an individual object.  We can't avoid copy by marshalling directly into wrapper,
+                    // because not all marshalling calls fetch new buffer.
+                    var wrapper = new RF2StructWrapper()
+                    {
+                        extended = this.extended,
+                        telemetry = this.telemetry,
+                        rules = this.rules,
+                        scoring = this.scoring,
+                        ticksWhenRead = DateTime.Now.Ticks
+                    };
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)
                     {
