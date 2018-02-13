@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.1.7: Added tyre temperature thresholds for some missing tyre types (including wets) - should fix incorrect temperature warnings on wets and some other tyres; Mapped player tyre type in pCars 2 (note this doesn't support mixed tyre types); Fixed an issue with iRacing driver swaps that caused log-spam and performance issues
+
 Version 4.9.1.6: iRacing hotfix for crash in mapper
 
 Version 4.9.1.5: More detailed error messages; pCars and pCars2 performance improvements; iRacing performance improvements; AC fixes for shorter tracks (2 sectors); Fixed inaccurate race position messages in iRacing 'checkered flag' phase; Some iRacing stability improvements; Use relative lap time difference when working out when to give multi-class warnings. This uses 2 new Properties - 'Multi-class slower car warning time' and 'Multi-class faster car warning time' - this is the approximate average amount of notice you want the app to give you when approaching a different class car; Added iRacing voice commands to get out of car ('get out') and get the average SoF ('what's the sof' / 'what is the strength of field'); For Assetto Corsa, only allow multi-class races if the number of unknown car models does not exceed property 'Max unknown car models in ACS multi-class races' (default 0) - this is necessary because Assetto doesn't expose proper class data. This prevents the app dividing participants into different classes unless the app recognises all the car models in the session
