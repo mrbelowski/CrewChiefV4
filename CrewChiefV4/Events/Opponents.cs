@@ -547,14 +547,18 @@ namespace CrewChiefV4.Events
                 }
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
-                    string opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
-                    if (opponentKey != null)
+                    // only have data here for r3e and rf2, other games don't expose opponent tyre types
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
                     {
-                        OpponentData opponentData = currentGameState.OpponentData[opponentKey];
-                        if (opponentData != null)
+                        string opponentKey = getOpponentKey(voiceMessage, " " + SpeechRecogniser.ON).Item1;
+                        if (opponentKey != null)
                         {
-                            gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0, null));
+                            OpponentData opponentData = currentGameState.OpponentData[opponentKey];
+                            if (opponentData != null)
+                            {
+                                gotData = true;
+                                audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0, null));
+                            }
                         }
                     }
                 }
