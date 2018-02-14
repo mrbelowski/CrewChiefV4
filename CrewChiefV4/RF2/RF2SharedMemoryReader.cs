@@ -524,6 +524,9 @@ namespace CrewChiefV4.rFactor2
             {
                 Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
             }
+
+            // Hack to re-check plugin version.
+            RF2GameStateMapper.pluginVerified = false;
         }
 
         private void DisconnectInternal()
@@ -537,9 +540,6 @@ namespace CrewChiefV4.rFactor2
                 this.scoringBuffer.Disconnect();
                 this.rulesBuffer.Disconnect();
                 this.extendedBuffer.Disconnect();
-
-                // Hack to re-check plugin version.
-                RF2GameStateMapper.pluginVerified = false;
             }
         }
 
