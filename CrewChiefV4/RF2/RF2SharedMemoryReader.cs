@@ -1,4 +1,6 @@
-﻿using CrewChiefV4.rFactor2;
+﻿//#define TRACE_BUFFER_READ_ELAPSED_TIME
+
+using CrewChiefV4.rFactor2;
 using CrewChiefV4.rFactor2.rFactor2Data;
 using System;
 using System.Collections.Generic;
@@ -359,6 +361,12 @@ namespace CrewChiefV4.rFactor2
                         this.rulesBuffer.Connect();
                         this.extendedBuffer.Connect();
 
+                        // Clear mapped views.
+                        this.telemetry = new rF2Telemetry();
+                        this.scoring = new rF2Scoring();
+                        this.extended = new rF2Extended();
+                        this.rules = new rF2Rules();
+
                         if (dumpToFile)
                             this.dataToDump = new List<RF2StructWrapper>();
 
@@ -396,6 +404,9 @@ namespace CrewChiefV4.rFactor2
                 }
                 try 
                 {
+#if TRACE_BUFFER_READ_ELAPSED_TIME
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+#endif
                     extendedBuffer.GetMappedData(ref this.extended);
                     telemetryBuffer.GetMappedData(ref this.telemetry);
                     rulesBuffer.GetMappedData(ref this.rules);
@@ -465,6 +476,11 @@ namespace CrewChiefV4.rFactor2
                         }
                     }
 
+#if TRACE_BUFFER_READ_ELAPSED_TIME
+                    watch.Stop();
+                    var microseconds = watch.ElapsedTicks * 1000000 / System.Diagnostics.Stopwatch.Frequency;
+                    System.Console.WriteLine("Buffer read microseconds: " + microseconds);
+#endif
                     return wrapper;
                 }
                 catch (Exception ex)
