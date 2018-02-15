@@ -190,8 +190,13 @@ namespace CrewChiefV4.iRacing
                             var sessionNum = TryGetSessionNum();
                             if(sessionNum != null)
                             {
-
-                                isNewSession = sim.SdkOnSessionInfoUpdated(new SessionInfo(sdk.GetSessionInfoString()).Yaml, (int)sessionNum, DriverId);
+                                string sessionInfoUnFiltred = sdk.GetSessionInfoString();
+                                if(sessionInfoUnFiltred == null)
+                                {
+                                    return null;
+                                }
+                                string sessionInfoFiltred = new SessionInfo(sessionInfoUnFiltred).Yaml;
+                                isNewSession = sim.SdkOnSessionInfoUpdated(sessionInfoFiltred, (int)sessionNum, DriverId);
                                 lastUpdate = newUpdate;
                                 hasNewSessionData = true;
                             }

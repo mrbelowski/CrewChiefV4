@@ -36,6 +36,7 @@ namespace iRSDKSharp
     public enum TelemCommandModeTypes { Stop = 0, Start, Restart };
     public class Defines
     {
+        public const uint DesiredAccess = 2031619;
         public const string DataValidEventName = "Local\\IRSDKDataValidEvent";
         public const string MemMapFileName = "Local\\IRSDKMemMapFileName";
         public const string BroadcastMessageName = "IRSDK_BROADCASTMSG";
@@ -73,6 +74,15 @@ namespace iRSDKSharp
                 iRacingFile = MemoryMappedFile.OpenExisting(Defines.MemMapFileName);
                 FileMapView = iRacingFile.CreateViewAccessor();
                 VarHeaderSize = Marshal.SizeOf(typeof(VarHeader));
+
+                var hEvent = OpenEvent(Defines.DesiredAccess, false, Defines.DataValidEventName);
+                var are = new AutoResetEvent(false);
+                are.Handle = hEvent;
+
+                var wh = new WaitHandle[1];
+                wh[0] = are;
+
+                WaitHandle.WaitAny(wh);
 
                 Header = new CiRSDKHeader(FileMapView);
                 GetVarHeaders();
@@ -253,6 +263,9 @@ namespace iRSDKSharp
 
         [DllImport("user32.dll")]
         private static extern IntPtr PostMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr OpenEvent(UInt32 dwDesiredAccess, Boolean bInheritHandle, String lpName);
 
         public static int MakeLong(short lowPart, short highPart)
         {
