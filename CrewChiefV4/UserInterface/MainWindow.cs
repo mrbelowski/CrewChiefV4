@@ -703,8 +703,8 @@ namespace CrewChiefV4
             }
 
             CheckForIllegalCrossThreadCalls = false;
-            cw = new ControlWriter(textBoxConsole);
-            textBoxConsole.KeyDown += TextBoxConsole_KeyDown;
+            cw = new ControlWriter(consoleTextBox);
+            consoleTextBox.KeyDown += TextBoxConsole_KeyDown;
             Console.SetOut(cw);
 
             // if we can't init the UserSettings the app will basically be fucked. So try to nuke the Britton_IT_Ltd directory from
@@ -954,11 +954,11 @@ namespace CrewChiefV4
         {
             if (e.Control && e.KeyCode == Keys.A)
             {
-                textBoxConsole.SelectAll();
+                consoleTextBox.SelectAll();
             }
             else if (e.KeyCode == Keys.Escape)
             {
-                textBoxConsole.DeselectAll();
+                consoleTextBox.DeselectAll();
             }
         }
 
@@ -1539,7 +1539,7 @@ namespace CrewChiefV4
         {
             try
             {
-                if(textBoxConsole.Text.Length > 0) 
+                if(consoleTextBox.Text.Length > 0) 
                 {
                     String filename = "console_" + DateTime.Now.ToString("yyyy_MM_dd-HH-mm-ss") + ".txt";
                     String path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "debugLogs");
@@ -1548,7 +1548,7 @@ namespace CrewChiefV4
                         Directory.CreateDirectory(path);
                     }
                     path = System.IO.Path.Combine(path, filename);
-                    File.WriteAllText(path, textBoxConsole.Text);
+                    File.WriteAllText(path, consoleTextBox.Text);
                     Console.WriteLine("Console output saved to " + path);
                 }
             }
@@ -1725,13 +1725,13 @@ namespace CrewChiefV4
 
         private void clearConsole(object sender, EventArgs e)
         {
-            if (!textBoxConsole.IsDisposed)
+            if (!consoleTextBox.IsDisposed)
             {
                 try
                 {
                     lock (this)
                     {
-                        textBoxConsole.Text = "";
+                        consoleTextBox.Text = "";
                     }
                 }
                 catch (Exception)
