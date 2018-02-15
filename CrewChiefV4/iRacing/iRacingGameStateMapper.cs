@@ -759,7 +759,7 @@ namespace CrewChiefV4.iRacing
                                 String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                     currentGameState.SessionData.TrackDefinition, currentGameState.SessionData.SessionRunningTime,
                                     previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
-                                currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
+                                currentOpponentData.stoppedInLandmark = shared.Telemetry.CarIdxOnPitRoad[driver.Id] ? null : stoppedInLandmark;
                             }
                             if (currentGameState.SessionData.JustGoneGreen)
                             {
@@ -934,7 +934,7 @@ namespace CrewChiefV4.iRacing
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
                 validSpeed = false;
                 opponentData.Speed = 0;
-                Console.WriteLine("Speed of car when invalidated" + speed);
+                Console.WriteLine(opponentData.DriverRawName + " invalidating lap based of car speed = " + speed + "m/s");
             }
             else
             {
