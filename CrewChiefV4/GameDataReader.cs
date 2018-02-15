@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-
+using System.IO.Compression;
 namespace CrewChiefV4
 {
     public abstract class GameDataReader
@@ -61,7 +61,7 @@ namespace CrewChiefV4
             }
             if (initialised && dumpToFile)
             {
-                filenameToDump = dataFilesPath + "\\" + CrewChief.gameDefinition.gameEnum.ToString() + "_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xml";
+                filenameToDump = dataFilesPath + "\\" + CrewChief.gameDefinition.gameEnum.ToString() + "_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".gz";
                 Console.WriteLine("session recording will be dumped to file: " + filenameToDump);
             }
             return initialised;
@@ -75,9 +75,13 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("About to dump game data - this may take a while");
                 XmlSerializer serializer = new XmlSerializer(serializableObject.GetType());
+                
                 using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
                 {
-                    serializer.Serialize(fileStream, serializableObject);
+                    using (GZipStream zipStream = new GZipStream(fileStream, CompressionLevel.Optimal) )
+                    {
+                        serializer.Serialize(zipStream, serializableObject);
+                    }                    
                 }
                 Console.WriteLine("Done writing session data log to: " + fileName);
                 Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");
@@ -94,18 +98,38 @@ namespace CrewChiefV4
             Console.WriteLine("About to load recorded game data from file " + fileName + " - this may take a while");
             if (string.IsNullOrEmpty(fileName)) { return default(T); }
 
+
             T objectOut = default(T);
 
             try
             {
-                using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
-                {
-                    Type outType = typeof(T);
-
-                    XmlSerializer serializer = new XmlSerializer(outType);
-                    using (XmlReader reader = new XmlTextReader(fileStream))
+                if(Path.GetExtension(fileName) == ".gz")
+                {            
+                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open))                
                     {
-                        objectOut = (T)serializer.Deserialize(reader);
+                        using(GZipStream zipStream = new GZipStream(fileStream, CompressionMode.Decompress))
+                        {
+                            Type outType = typeof(T);
+
+                            XmlSerializer serializer = new XmlSerializer(outType);
+                            using (XmlReader reader = new XmlTextReader(zipStream))
+                            {
+                                objectOut = (T)serializer.Deserialize(reader);
+                            }
+                        }
+                    }
+                }
+                else //assume xml 
+                {
+                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
+                    {
+                        Type outType = typeof(T);
+
+                        XmlSerializer serializer = new XmlSerializer(outType);
+                        using (XmlReader reader = new XmlTextReader(fileStream))
+                        {
+                            objectOut = (T)serializer.Deserialize(reader);
+                        }
                     }
                 }
                 Console.WriteLine("Done reading session data from: " + fileName);
