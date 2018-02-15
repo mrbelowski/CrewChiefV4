@@ -63,7 +63,7 @@ namespace CrewChiefV4.iRacing
             this.TeamId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "TeamID"));
             this.TeamName = ParseDriverYaml(sessionInfo, "TeamName");
             this.Car.CarId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarID"));
-            this.Car.CarNumber = ParseDriverYaml(sessionInfo, "CarNumber");
+            this.Car.CarNumber = ParseDriverYaml(sessionInfo, "CarNumberRaw");
             this.Car.CarClassId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassID"));
             this.Car.CarClassRelSpeed = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassRelSpeed"));
             bool isPaceCar = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarIsPaceCar")) == 1;
