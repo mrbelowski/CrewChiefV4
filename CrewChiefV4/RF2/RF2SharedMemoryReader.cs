@@ -385,7 +385,6 @@ namespace CrewChiefV4.rFactor2
         }
 
         // Marshalled views:
-        // TODO: shall those be reset on disconnect?
         private rF2Telemetry telemetry;
         private rF2Scoring scoring;
         private rF2Rules rules;
@@ -521,9 +520,7 @@ namespace CrewChiefV4.rFactor2
 
             // There's still possibility of double message, but who cares.
             if (wasInitialised)
-            {
                 Console.WriteLine("Disconnected from rFactor 2 Shared Memory");
-            }
 
             // Hack to re-check plugin version.
             RF2GameStateMapper.pluginVerified = false;
