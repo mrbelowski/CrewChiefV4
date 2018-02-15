@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace iRSDKSharp
 {
@@ -37,11 +38,11 @@ namespace iRSDKSharp
 
             bool ok = false;
             bool end = false;
-
+            
             fixed (char* pathptrFixed = path.ToCharArray())
             {
                 int pathdepth = 0;
-
+                GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 fixed (char* dataptrFixed = data.ToCharArray())
                 {
 
@@ -155,14 +156,15 @@ namespace iRSDKSharp
                         dataPtr++;
                     }
                 }
+                dataHandle.Free();
             }
 
-            if (!ok)
+            if (!ok || val == null)
             {
                 return null;
             }
-
             return new string(val, 0, len);
+            
         }
 
         public static bool TryGetValue(string yaml, string query, out string value)

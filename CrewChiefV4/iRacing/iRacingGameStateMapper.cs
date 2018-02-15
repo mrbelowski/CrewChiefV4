@@ -759,7 +759,7 @@ namespace CrewChiefV4.iRacing
                                 String stoppedInLandmark = currentOpponentData.trackLandmarksTiming.updateLandmarkTiming(
                                     currentGameState.SessionData.TrackDefinition, currentGameState.SessionData.SessionRunningTime,
                                     previousDistanceRoundTrack, currentOpponentData.DistanceRoundTrack, currentOpponentData.Speed);
-                                currentOpponentData.stoppedInLandmark = currentOpponentData.InPits ? null : stoppedInLandmark;
+                                currentOpponentData.stoppedInLandmark = shared.Telemetry.CarIdxOnPitRoad[driver.Id] ? null : stoppedInLandmark;
                             }
                             if (currentGameState.SessionData.JustGoneGreen)
                             {
@@ -817,18 +817,18 @@ namespace CrewChiefV4.iRacing
             {
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
                 DateTime oldestAllowedUpdate = currentGameState.Now - opponentCleanupInterval;
-                foreach (string opponentDataKey in currentGameState.OpponentData.Keys)
+                foreach (KeyValuePair<string, OpponentData> entry in currentGameState.OpponentData)
                 {
                     DateTime lastTimeForOpponent = DateTime.MinValue;
-                    OpponentData currentOpponent = null;
-                    if (!lastActiveTimeForOpponents.TryGetValue(opponentDataKey, out lastTimeForOpponent) || (lastTimeForOpponent < oldestAllowedUpdate && currentGameState.OpponentData.TryGetValue(opponentDataKey, out currentOpponent) && currentOpponent.IsActive))
+                    if (!lastActiveTimeForOpponents.TryGetValue(entry.Key, out lastTimeForOpponent) || (lastTimeForOpponent < oldestAllowedUpdate && entry.Value.IsActive))
                     {
-                        currentOpponent.IsActive = false;
-                        currentOpponent.InPits = true;
-                        currentOpponent.Speed = 0;
-                        currentOpponent.stoppedInLandmark = null;
-                        currentOpponent.DeltaTime.SetNextDeltaPoint(0, currentOpponent.CompletedLaps, 0, currentGameState.Now);
-                        Console.WriteLine("Opponent " + currentOpponent.DriverRawName + "(index " + opponentDataKey +") has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
+                        entry.Value.IsActive = false;
+                        entry.Value.InPits = true;
+                        entry.Value.Speed = 0;
+                        entry.Value.stoppedInLandmark = null;
+                        entry.Value.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                        entry.Value.DeltaTime.SetNextDeltaPoint(0, entry.Value.CompletedLaps, 0, currentGameState.Now);
+                        Console.WriteLine("Opponent " + entry.Value.DriverRawName + "(index " + entry.Key + ") has been inactive for " + opponentCleanupInterval + ", sending him back to pits");
                     }
                 }
             }
@@ -934,7 +934,7 @@ namespace CrewChiefV4.iRacing
                 // faster than 500m/s (1000+mph) suggests the player has quit to the pit. Might need to reassess this as the data are quite noisy
                 validSpeed = false;
                 opponentData.Speed = 0;
-                Console.WriteLine("Speed of car when invalidated" + speed);
+                Console.WriteLine(opponentData.DriverRawName + " invalidating lap based of car speed = " + speed + "m/s");
             }
             else
             {

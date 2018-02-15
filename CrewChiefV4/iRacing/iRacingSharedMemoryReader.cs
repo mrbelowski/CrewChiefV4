@@ -88,8 +88,7 @@ namespace CrewChiefV4.iRacing
                 iRacingStructDumpWrapper structDumpWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 if (structDumpWrapperData.data.SessionInfoUpdate != lastUpdate && structDumpWrapperData.data.SessionInfo.Length > 0)
                 {
-                    SessionInfo sessionInfo = new SessionInfo(structDumpWrapperData.data.SessionInfo);
-                    IsNewSession = sim.SdkOnSessionInfoUpdated(sessionInfo._yaml, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
+                    IsNewSession = sim.SdkOnSessionInfoUpdated(structDumpWrapperData.data.SessionInfo, structDumpWrapperData.data.SessionNum, structDumpWrapperData.data.PlayerCarIdx);
                     lastUpdate = structDumpWrapperData.data.SessionInfoUpdate;
                 }
                 sim.SdkOnTelemetryUpdated(structDumpWrapperData.data);
@@ -188,11 +187,23 @@ namespace CrewChiefV4.iRacing
                         bool isNewSession = false;
                         if (newUpdate != lastUpdate)
                         {
-                            // Get the session info string
-                            //SessionInfo sessionInfo = new SessionInfo(sdk.GetSessionInfoString());
-                            isNewSession = sim.SdkOnSessionInfoUpdated(sdk.GetSessionInfoString(), (int)TryGetSessionNum(), DriverId);
-                            lastUpdate = newUpdate;
-                            hasNewSessionData = true;
+                            var sessionNum = TryGetSessionNum();
+                            if(sessionNum != null)
+                            {
+                                string sessionInfoUnFiltred = sdk.GetSessionInfoString();
+                                if(sessionInfoUnFiltred == null)
+                                {
+                                    return null;
+                                }
+                                string sessionInfoFiltred = new SessionInfo(sessionInfoUnFiltred).Yaml;
+                                isNewSession = sim.SdkOnSessionInfoUpdated(sessionInfoFiltred, (int)sessionNum, DriverId);
+                                lastUpdate = newUpdate;
+                                hasNewSessionData = true;
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
                         iRacingData irData = new iRacingData(sdk, hasNewSessionData && dumpToFile, isNewSession);
 
