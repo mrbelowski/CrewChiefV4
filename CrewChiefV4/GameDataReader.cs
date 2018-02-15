@@ -84,7 +84,7 @@ namespace CrewChiefV4
                     }
                 }
 
-                File.WriteAllText(fileName.Substring(0, fileName.LastIndexOf(".")) + ".txt", MainWindow.instance.consoleTextBox.Text);
+                File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleTextBox.Text);
 
                 Console.WriteLine("Done writing session data log to: " + fileName);
                 Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");
