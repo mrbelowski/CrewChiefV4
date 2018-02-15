@@ -41,7 +41,7 @@ namespace CrewChiefV4
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxConsole = new System.Windows.Forms.TextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.saveConsoleOutputButton = new System.Windows.Forms.Button();
@@ -96,14 +96,14 @@ namespace CrewChiefV4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(41, 215);
-            this.textBox1.MaxLength = 99999999;
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(1093, 285);
-            this.textBox1.TabIndex = 1;
+            this.textBoxConsole.Location = new System.Drawing.Point(41, 215);
+            this.textBoxConsole.MaxLength = 99999999;
+            this.textBoxConsole.Multiline = true;
+            this.textBoxConsole.Name = "textBox1";
+            this.textBoxConsole.ReadOnly = true;
+            this.textBoxConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxConsole.Size = new System.Drawing.Size(1093, 285);
+            this.textBoxConsole.TabIndex = 1;
             // 
             // startApplicationButton
             // 
@@ -610,7 +610,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.saveConsoleOutputButton);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.textBoxConsole);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.spotterNameBox);
             this.Controls.Add(this.personalisationLabel);
@@ -635,7 +635,7 @@ namespace CrewChiefV4
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        public System.Windows.Forms.TextBox textBoxConsole;
         private System.Windows.Forms.Button startApplicationButton;
         private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.Button saveConsoleOutputButton;
