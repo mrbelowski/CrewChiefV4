@@ -24,6 +24,7 @@ namespace iRSDKSharp
 
         public static unsafe string Parse(string data, string path)
         {
+            GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
             char* val = null;
             int len = 0;
 
@@ -45,7 +46,6 @@ namespace iRSDKSharp
             fixed (char* pathptrFixed = path.ToCharArray())
             {
                 int pathdepth = 0;
-                GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
                 fixed (char* dataptrFixed = data.ToCharArray())
                 {
 
@@ -160,15 +160,15 @@ namespace iRSDKSharp
                         dataPtr++;
                     }
                 }
-                dataHandle.Free();
             }
 
             if (!ok || val == null || len == 0 || pointerPosition + len > dataStringLength)
             {
                 return null;
             }
-            return new string(val, 0, len);
-            
+            String s = new string(val, 0, len);
+            dataHandle.Free();
+            return s;
         }
 
         public static bool TryGetValue(string yaml, string query, out string value)
