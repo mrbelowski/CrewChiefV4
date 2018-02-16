@@ -258,7 +258,7 @@ namespace CrewChiefV4
 
             Boolean hasAlternate = primaryAndAlternateMessages.Item2 != null && primaryAndAlternateMessages.Item2.Count > 0;
             this.messageFolders = getMessageFolders(primaryAndAlternateMessages.Item1, hasAlternate);
-            if (!canBePlayed)
+            if (!canBePlayed && hasAlternate)
             {
                 Console.WriteLine("Using secondary messages for delayed message resolution event " + messageName);
                 canBePlayed = true;
