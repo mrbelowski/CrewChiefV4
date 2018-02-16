@@ -99,7 +99,8 @@ namespace CrewChiefV4
         private ToolStripItem contextMenuStopItem;
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
-        
+
+        public static MainWindow instance = null;
         private void FormMain_Load(object sender, EventArgs e)
         {
             if (forceMinWindowSize)
@@ -689,6 +690,8 @@ namespace CrewChiefV4
 
         public MainWindow()
         {
+            MainWindow.instance = this;
+
             InitializeComponent();
             SetupNotificationTrayIcon();
 
@@ -700,8 +703,8 @@ namespace CrewChiefV4
             }
 
             CheckForIllegalCrossThreadCalls = false;
-            cw = new ControlWriter(textBox1);
-            textBox1.KeyDown += TextBox1_KeyDown;
+            cw = new ControlWriter(consoleTextBox);
+            consoleTextBox.KeyDown += TextBoxConsole_KeyDown;
             Console.SetOut(cw);
 
             // if we can't init the UserSettings the app will basically be fucked. So try to nuke the Britton_IT_Ltd directory from
@@ -947,15 +950,15 @@ namespace CrewChiefV4
                 this.HideToTray();
         }
 
-        private void TextBox1_KeyDown(object sender, KeyEventArgs e)
+        private void TextBoxConsole_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.A)
             {
-                textBox1.SelectAll();
+                consoleTextBox.SelectAll();
             }
             else if (e.KeyCode == Keys.Escape)
             {
-                textBox1.DeselectAll();
+                consoleTextBox.DeselectAll();
             }
         }
 
@@ -1536,7 +1539,7 @@ namespace CrewChiefV4
         {
             try
             {
-                if(textBox1.Text.Length > 0) 
+                if(consoleTextBox.Text.Length > 0) 
                 {
                     String filename = "console_" + DateTime.Now.ToString("yyyy_MM_dd-HH-mm-ss") + ".txt";
                     String path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "debugLogs");
@@ -1545,7 +1548,7 @@ namespace CrewChiefV4
                         Directory.CreateDirectory(path);
                     }
                     path = System.IO.Path.Combine(path, filename);
-                    File.WriteAllText(path, textBox1.Text);
+                    File.WriteAllText(path, consoleTextBox.Text);
                     Console.WriteLine("Console output saved to " + path);
                 }
             }
@@ -1722,13 +1725,13 @@ namespace CrewChiefV4
 
         private void clearConsole(object sender, EventArgs e)
         {
-            if (!textBox1.IsDisposed)
+            if (!consoleTextBox.IsDisposed)
             {
                 try
                 {
                     lock (this)
                     {
-                        textBox1.Text = "";
+                        consoleTextBox.Text = "";
                     }
                 }
                 catch (Exception)
