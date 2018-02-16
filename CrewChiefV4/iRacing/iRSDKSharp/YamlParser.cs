@@ -41,7 +41,7 @@ namespace iRSDKSharp
             bool end = false;
 
             int dataStringLength = data.Length;
-            int pointerPosition = -1;
+            int pointerPosition = 0;
 
             fixed (char* pathptrFixed = path.ToCharArray())
             {
@@ -52,9 +52,8 @@ namespace iRSDKSharp
                     char* pathPtr = pathptrFixed;
                     char* dataPtr = dataptrFixed;
 
-                    while (*dataPtr > 0)
+                    while (pointerPosition < dataStringLength && *dataPtr > 0)
                     {
-                        pointerPosition++;
                         switch (*dataPtr)
                         {
                             case ' ':
@@ -158,6 +157,7 @@ namespace iRSDKSharp
 
                         // important, increment our pointer
                         dataPtr++;
+                        pointerPosition++;
                     }
                 }
             }
