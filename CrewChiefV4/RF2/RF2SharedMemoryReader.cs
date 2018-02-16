@@ -28,8 +28,7 @@ namespace CrewChiefV4.rFactor2
 
             // Holds the entire byte array that can be marshalled to a MappedBufferT.  Partial updates
             // only read changed part of buffer, ignoring trailing uninteresting bytes.  However,
-            // to marshal we still need to supply entire structure size.  So, on update new bytes are copied
-            // (outside of the mutex).
+            // to marshal we still need to supply entire structure size.  So, on update only new bytes are copied.
             byte[] fullSizeBuffer = null;
 
             MemoryMappedFile memoryMappedFile = null;
