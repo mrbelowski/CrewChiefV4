@@ -162,13 +162,14 @@ namespace iRSDKSharp
                 }
             }
 
-            if (!ok || val == null || len == 0 || pointerPosition + len > dataStringLength)
+            String extractedString = null;
+
+            if (ok && val != null && len > 0 && pointerPosition + len <= dataStringLength)
             {
-                return null;
+                extractedString = new string(val, 0, len);
             }
-            String s = new string(val, 0, len);
             dataHandle.Free();
-            return s;
+            return extractedString;
         }
 
         public static bool TryGetValue(string yaml, string query, out string value)
