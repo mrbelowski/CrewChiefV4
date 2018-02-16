@@ -580,3 +580,6 @@ target_warning_time_for_faster_class_car_help = Try and warn this many seconds i
 
 max_unknown_car_classes_for_assetto = Max unknown car models in ACS multi-class races
 max_unknown_car_classes_for_assetto_help = Assume single-class race if there are more than this many unknown car models in Assetto Corsa
+
+iracing_fast_parsing = iRacing faster parser
+iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)

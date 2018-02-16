@@ -3154,5 +3154,17 @@ namespace CrewChiefV4.Properties {
                 this["max_unknown_car_classes_for_assetto"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool iracing_fast_parsing {
+            get {
+                return ((bool)(this["iracing_fast_parsing"]));
+            }
+            set {
+                this["iracing_fast_parsing"] = value;
+            }
+        }
     }
 }
