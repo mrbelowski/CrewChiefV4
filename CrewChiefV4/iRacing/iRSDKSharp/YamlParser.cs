@@ -38,7 +38,10 @@ namespace iRSDKSharp
 
             bool ok = false;
             bool end = false;
-            
+
+            int dataStringLength = data.Length;
+            int pointerPosition = -1;
+
             fixed (char* pathptrFixed = path.ToCharArray())
             {
                 int pathdepth = 0;
@@ -51,6 +54,7 @@ namespace iRSDKSharp
 
                     while (*dataPtr > 0)
                     {
+                        pointerPosition++;
                         switch (*dataPtr)
                         {
                             case ' ':
@@ -159,7 +163,7 @@ namespace iRSDKSharp
                 dataHandle.Free();
             }
 
-            if (!ok || val == null)
+            if (!ok || val == null || len == 0 || pointerPosition + len > dataStringLength)
             {
                 return null;
             }
