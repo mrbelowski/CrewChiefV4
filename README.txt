@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.1.8: New RF2 shared memory plugin with better performance; More work to fix iRacing crashes since switching to the faster parser; Reinstated an iRacing crash fix that got lost in a previous update
+
 Version 4.9.1.7: Added tyre temperature thresholds for some missing tyre types (including wets) - should fix incorrect temperature warnings on wets and some other tyres; Mapped player tyre type in pCars 2 (note this doesn't support mixed tyre types); Fixed an issue with iRacing driver swaps that caused log-spam and performance issues
 
 Version 4.9.1.6: iRacing hotfix for crash in mapper
