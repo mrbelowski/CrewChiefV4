@@ -172,7 +172,7 @@ namespace iRSDKSharp
         private static unsafe string UnsafeParse(string data, string path)
         {
             GCHandle dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            GCHandle pathHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            GCHandle pathHandle = GCHandle.Alloc(path, GCHandleType.Pinned);
             char* val = null;
             int len = 0;
 
