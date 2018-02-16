@@ -320,7 +320,9 @@ namespace CrewChiefV4.Events
                     }
                     else if (currentGameState.PitData.IsAtPitExit && currentGameState.PitData.limiterStatus == 1 && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                     {
-                        timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(4);
+                        // TODO: this needs a bit more investigation. We have 2 separate blocks here because the time delay may need to be different for iRacing. 
+                        // I know this looks like a fucking retarded if-else statement but I don't care. It's all Morten's fault anyway. Just like the AccessViolationErrors
+                        timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
                     }
                 }
             }
