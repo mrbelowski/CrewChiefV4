@@ -119,9 +119,8 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 2, 4, 0, 0 };
+        private int[] minimumSupportedVersionParts = new int[] { 3, 0, 0, 0 };
         public static bool pluginVerified = false;
-        private string lastVersionString;
         public override void versionCheck(Object memoryMappedFileStruct)
         {
             if (RF2GameStateMapper.pluginVerified)
@@ -129,10 +128,6 @@ namespace CrewChiefV4.rFactor2
 
             var shared = memoryMappedFileStruct as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var versionStr = RF2GameStateMapper.GetStringFromBytes(shared.extended.mVersion);
-            if (this.lastVersionString == versionStr)
-                return;
-
-            this.lastVersionString = versionStr;
 
             var versionParts = versionStr.Split('.');
             if (versionParts.Length != 4)

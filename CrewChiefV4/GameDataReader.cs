@@ -81,8 +81,11 @@ namespace CrewChiefV4
                     using (GZipStream zipStream = new GZipStream(fileStream, CompressionLevel.Optimal) )
                     {
                         serializer.Serialize(zipStream, serializableObject);
-                    }                    
+                    }
                 }
+
+                File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleTextBox.Text);
+
                 Console.WriteLine("Done writing session data log to: " + fileName);
                 Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");
             }
@@ -103,9 +106,9 @@ namespace CrewChiefV4
 
             try
             {
-                if(Path.GetExtension(fileName) == ".gz")
-                {            
-                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open))                
+                if (Path.GetExtension(fileName) == ".gz")
+                {
+                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
                     {
                         using(GZipStream zipStream = new GZipStream(fileStream, CompressionMode.Decompress))
                         {
@@ -119,7 +122,7 @@ namespace CrewChiefV4
                         }
                     }
                 }
-                else //assume xml 
+                else // assume xml
                 {
                     using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
                     {

@@ -23,23 +23,13 @@ namespace CrewChiefV4.rFactor2
     // bool          ->    byte
     // long          ->    int
     // ULONGLONG     ->    Int64
+    // unsigned long ->    uint
     public class rFactor2Constants
     {
-        public const string MM_TELEMETRY_FILE_NAME1 = "$rFactor2SMMP_TelemetryBuffer1$";
-        public const string MM_TELEMETRY_FILE_NAME2 = "$rFactor2SMMP_TelemetryBuffer2$";
-        public const string MM_TELEMETRY_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_TelemeteryMutex";
-
-        public const string MM_SCORING_FILE_NAME1 = "$rFactor2SMMP_ScoringBuffer1$";
-        public const string MM_SCORING_FILE_NAME2 = "$rFactor2SMMP_ScoringBuffer2$";
-        public const string MM_SCORING_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ScoringMutex";
-
-        public const string MM_RULES_FILE_NAME1 = "$rFactor2SMMP_RulesBuffer1$";
-        public const string MM_RULES_FILE_NAME2 = "$rFactor2SMMP_RulesBuffer2$";
-        public const string MM_RULES_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_RulesMutex";
-
-        public const string MM_EXTENDED_FILE_NAME1 = "$rFactor2SMMP_ExtendedBuffer1$";
-        public const string MM_EXTENDED_FILE_NAME2 = "$rFactor2SMMP_ExtendedBuffer2$";
-        public const string MM_EXTENDED_FILE_ACCESS_MUTEX = @"Global\$rFactor2SMMP_ExtendedMutex";
+        public const string MM_TELEMETRY_FILE_NAME = "$rFactor2SMMP_Telemetry$";
+        public const string MM_SCORING_FILE_NAME = "$rFactor2SMMP_Scoring$";
+        public const string MM_RULES_FILE_NAME = "$rFactor2SMMP_Rules$";
+        public const string MM_EXTENDED_FILE_NAME = "$rFactor2SMMP_Extended$";
 
         public const int MAX_MAPPED_VEHICLES = 128;
         public const int MAX_MAPPED_IDS = 512;
@@ -732,17 +722,22 @@ namespace CrewChiefV4.rFactor2
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
-        public struct rF2MappedBufferHeader
+        public struct rF2MappedBufferVersionBlock
         {
-            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
+            // If both version variables are equal, buffer is not being written to, or we're extremely unlucky and second check is necessary.
+            // If versions don't match, buffer is being written to, or is incomplete (game crash, or missed transition).
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
         }
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
-        public struct rF2MappedBufferHeaderWithSize
+        public struct rF2MappedBufferVersionBlockWithSize
         {
-            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
-            public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
+
+            [XmlIgnore] public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
                                                       // 0 means unknown (whole buffer should be considered as updated).
         }
 
@@ -750,9 +745,11 @@ namespace CrewChiefV4.rFactor2
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Telemetry
         {
-            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
-            public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
-                                                      // 0 means unknown (whole buffer should be considered as updated).
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
+
+            [XmlIgnore] public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
+                                                                  // 0 means unknown (whole buffer should be considered as updated).
 
             public int mNumVehicles;                  // current number of vehicles
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = rFactor2Constants.MAX_MAPPED_VEHICLES)]
@@ -763,9 +760,10 @@ namespace CrewChiefV4.rFactor2
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Scoring
         {
-            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
-            public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
-                                                      // 0 means unknown (whole buffer should be considered as updated).
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
+
+            [XmlIgnore] public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
 
             public rF2ScoringInfo mScoringInfo;
 
@@ -777,9 +775,10 @@ namespace CrewChiefV4.rFactor2
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Rules
         {
-            public byte mCurrentRead;                 // True indicates buffer is safe to read under mutex.
-            public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
-                                                      // 0 means unknown (whole buffer should be considered as updated).
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
+
+            [XmlIgnore] public int mBytesUpdatedHint;             // How many bytes of the structure were written during the last update.
 
             public rF2TrackRules mTrackRules;
 
@@ -835,7 +834,8 @@ namespace CrewChiefV4.rFactor2
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 4)]
         public struct rF2Extended
         {
-            public byte mCurrentRead;                          // True indicates buffer is safe to read under mutex.
+            [XmlIgnore] public uint mVersionUpdateBegin;          // Incremented right before buffer is written to.
+            [XmlIgnore] public uint mVersionUpdateEnd;            // Incremented after buffer write is done.
 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 8)]
             public byte[] mVersion;                            // API version
@@ -863,13 +863,6 @@ namespace CrewChiefV4.rFactor2
             public byte[] mDisplayedMessageUpdateCapture;
 
             public rF2HostedPluginVars mHostedPluginVars;
-        }
-
-
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public struct rF2BufferHeader
-        {
-            internal byte mCurrentRead;                        // True indicates buffer is safe to read under mutex.
         }
     }
 }
