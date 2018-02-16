@@ -313,10 +313,14 @@ namespace CrewChiefV4.Events
                         }
                     }
                     else if (currentGameState.SessionData.SectorNumber == 1 &&
-                        previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
+                        previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1 && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
                     {
                         // just left the pitlane with the limiter active - wait 2 seconds then warn
                         timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
+                    }
+                    else if (currentGameState.PitData.IsAtPitExit && currentGameState.PitData.limiterStatus == 1 && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
+                    {
+                        timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(4);
                     }
                 }
             }
