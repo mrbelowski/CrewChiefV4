@@ -109,12 +109,20 @@ The app understands lots of command including:
 "where's [opponent driver last name]"
 "what's [opponent driver last name]'s last lap"
 "what's [opponent driver last name]'s best lap"
+"what's [opponent driver last name]'s irating"
+"what's [opponent driver last name]'s licens class"
 "what's [opponent race position]'s last lap" (for example, "what's p 4's best lap", or "what's position 4's last lap")
 "what's [opponent race position]'s best lap"
+"what's [opponent race position]'s irating"
+"what's [opponent race position]'s licens class"
 "what's [the car in front / the guy in front / the car ahead / the guy ahead]'s last lap"
 "what's [the car in front / the guy in front / the car ahead / the guy ahead]'s best lap"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s irating"
+"what's [the car in front / the guy in front / the car ahead / the guy ahead]'s licens class"
 "what's [the car behind / the guy behind]'s last lap"
 "what's [the car behind / the guy behind]'s best lap"
+"what's [the car behind / the guy behind]'s irating"
+"what's [the car behind / the guy behind]'s licens class"
 "what tyre(s) is [opponent driver last name / opponent race position] on"
 "what are my sector times"
 "what's my last sector time"
@@ -144,6 +152,10 @@ The app understands lots of command including:
 "is the car behind in my class" / "is the car behind my class" / "is the car behind the same class as me" - responds yes or no
 "what class is the car ahead" / "what class is the guy ahead" / "what class is the car in front" / "what class is the guy in front" - reports class name, or "faster" / "slower" if the app doesn't have the class name
 "what class is the car behind" / "what class is the guy behind"- reports class name, or "faster" / "slower" if the app doesn't have the class name
+"what's the sof" / "what is the strength of field" (iRacing only)
+"how many incidents do i have" / "what's my incident count" (iRacing only)
+"what's the incident limit" (iRacing only) 
+
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
