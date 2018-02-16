@@ -101,6 +101,12 @@ namespace CrewChiefV4
         private ToolStripItem contextMenuPreferencesItem;
 
         public static MainWindow instance = null;
+
+        public void killChief()
+        {
+            crewChief.stop();
+        }
+
         private void FormMain_Load(object sender, EventArgs e)
         {
             if (forceMinWindowSize)

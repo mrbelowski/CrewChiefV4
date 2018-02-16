@@ -721,7 +721,14 @@ namespace CrewChiefV4
                         
                         if (loadDataFromFile)
                         {
-                            latestRawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun);
+                            try
+                            {
+                                latestRawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Error reading game data: " + e.StackTrace);
+                            }
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
@@ -1030,6 +1037,5 @@ namespace CrewChiefV4
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK;
         }
-
     }
 }

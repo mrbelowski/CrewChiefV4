@@ -165,6 +165,11 @@ namespace iRSDKSharp
             catch (Exception e)
             {
                 Console.WriteLine("Error parsing session info: " + e.StackTrace);
+                Console.WriteLine("Path = " + path);
+                Console.WriteLine("Data = " + data);
+                Console.WriteLine("Critical error in YAML parser");
+                Console.WriteLine("PLEASE FORWARD ALL OF THIS CONSOLE LOG TO THE CC DEV TEAM");
+                MainWindow.instance.killChief();
             }
             return null;
         }
