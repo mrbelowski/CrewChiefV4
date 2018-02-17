@@ -208,7 +208,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.1.9: New RF2 shared memory plugin with better performance; More work to fix iRacing crashes since switching to the faster parser; Reinstated an iRacing crash fix that got lost in a previous update; Added an option to fall back to a slower, safer session info parser method in iRacing (property 'iRacing faster parser'). If the app crashes for you, uncheck this option to use the slower parse method and please post your findings a debug log in our forums so we can track the issue down
+Version 4.9.2.0: New RF2 shared memory plugin with better performance; More work to fix iRacing crashes since switching to the faster parser; Reinstated an iRacing crash fix that got lost in a previous update; Added an option to fall back to a slower, safer session info parser method in iRacing (property 'iRacing faster parser'). If the app crashes for you, uncheck this option to use the slower parse method and please post your findings a debug log in our forums so we can track the issue down
 
 Version 4.9.1.7: Added tyre temperature thresholds for some missing tyre types (including wets) - should fix incorrect temperature warnings on wets and some other tyres; Mapped player tyre type in pCars 2 (note this doesn't support mixed tyre types); Fixed an issue with iRacing driver swaps that caused log-spam and performance issues
 

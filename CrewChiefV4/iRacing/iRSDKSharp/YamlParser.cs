@@ -9,6 +9,9 @@ namespace iRSDKSharp
     // Written by Tomasz Terlecki
     public class YamlParser
     {
+        // only allow the yaml + path to be dumped once per run
+        private static Boolean dumpedYamlInThisSession = false;
+
         public static Boolean useUnsafeParser = UserSettings.GetUserSettings().getBoolean("iracing_fast_parsing");
 
         enum StateType { Space, Key, KeySep, Value, NewLine };
@@ -317,9 +320,24 @@ namespace iRSDKSharp
 
             String extractedString = null;
 
-            if (ok && val != null && len > 0 && pointerPosition + len <= dataStringLength)
+            if (ok && val != null && len > 0)
             {
-                extractedString = new string(val, 0, len);
+                if (pointerPosition + len > dataStringLength)
+                {
+                    Console.WriteLine("Pointer position error in Yaml parser");
+                    if (!dumpedYamlInThisSession)
+                    {
+                        dumpedYamlInThisSession = true;
+                        Console.WriteLine("Path = " + path);
+                        Console.WriteLine("Data = " + data);
+                        Console.WriteLine("Critical error in YAML parser");
+                        Console.WriteLine("PLEASE FORWARD ALL OF THIS CONSOLE LOG TO THE CC DEV TEAM");
+                    }
+                }
+                else
+                {
+                    extractedString = new string(val, 0, len);
+                }
             }
             dataHandle.Free();
             pathHandle.Free();
