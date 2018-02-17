@@ -85,7 +85,12 @@ namespace CrewChiefV4.Events
         private Boolean played2LitreWarning;
         
         // base fuel use by lap estimates on the last 3 laps
-        private int fuelUseByLapsWindowLength = 3;
+        private int fuelUseByLapsWindowLengthToUse = 3;
+        private int fuelUseByLapsWindowLengthVeryShort = 5;
+        private int fuelUseByLapsWindowLengthShort = 4;
+        private int fuelUseByLapsWindowLengthMedium = 3;
+        private int fuelUseByLapsWindowLengthLong = 2;
+        private int fuelUseByLapsWindowLengthVeryLong = 1;
         
         // base fuel use by time estimates on the last 6 samples (6 minutes)
         private int fuelUseByTimeWindowLength = 6;
@@ -252,6 +257,27 @@ namespace CrewChiefV4.Events
                     // if this is the first time we've initialised the fuel stats (start of session), get the half way point of this session
                     if (!initialised)
                     {
+                        if (currentGameState.SessionData.TrackDefinition != null)
+                        {
+                            switch (currentGameState.SessionData.TrackDefinition.trackLengthClass)
+                            {
+                                case TrackData.TrackLengthClass.VERY_SHORT:
+                                    fuelUseByLapsWindowLengthToUse = fuelUseByLapsWindowLengthVeryShort;
+                                    break;
+                                case TrackData.TrackLengthClass.SHORT:
+                                    fuelUseByLapsWindowLengthToUse = fuelUseByLapsWindowLengthShort;
+                                    break;
+                                case TrackData.TrackLengthClass.MEDIUM:
+                                    fuelUseByLapsWindowLengthToUse = fuelUseByLapsWindowLengthMedium;
+                                    break;
+                                case TrackData.TrackLengthClass.LONG:
+                                    fuelUseByLapsWindowLengthToUse = fuelUseByLapsWindowLengthLong;
+                                    break;
+                                case TrackData.TrackLengthClass.VERY_LONG:
+                                    fuelUseByLapsWindowLengthToUse = fuelUseByLapsWindowLengthVeryLong;
+                                    break;
+                            }
+                        }
                         if (currentGameState.SessionData.SessionNumberOfLaps > 1)
                         {
                             sessionHasFixedNumberOfLaps = true;
@@ -291,14 +317,14 @@ namespace CrewChiefV4.Events
                         // have one extra), get the average difference between each pair of values
 
                         // only do this if we have a full window of data + one extra start point
-                        if (fuelLevelWindowByLap.Count > fuelUseByLapsWindowLength)
+                        if (fuelLevelWindowByLap.Count > fuelUseByLapsWindowLengthToUse)
                         {
                             averageUsagePerLap = 0;
-                            for (int i = 0; i < fuelUseByLapsWindowLength; i++)
+                            for (int i = 0; i < fuelUseByLapsWindowLengthToUse; i++)
                             {
                                 averageUsagePerLap += (fuelLevelWindowByLap[i + 1] - fuelLevelWindowByLap[i]);
                             }
-                            averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLength;
+                            averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLengthToUse;
                             if(fuelReportsInGallon)
                             {
                                 Console.WriteLine("fuel use per lap (windowed calc) = " + convertLitersToGallons(averageUsagePerLap) + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft));
