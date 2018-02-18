@@ -29,8 +29,8 @@ namespace CrewChiefV4.iRacing
         public Sector[] Sectors { get; set; }
         public int Incidents { get; set; }
         public string OutReason { get; set; }
-        public int OutReasonId { get; set; }
-        public bool IsOut { get { return this.OutReasonId != 0; } }
+        public ReasonOutId OutReasonId { get; set; }
+        public bool IsOut { get { return this.OutReasonId != ReasonOutId.IDS_REASON_OUT_NOT_OUT; } }
 
         const string driverResultYamlPath = "SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}{2}:";
         private string ParseRaceResultsYaml(string sessionInfo, int sessionnumber, int position, string node)
@@ -45,7 +45,7 @@ namespace CrewChiefV4.iRacing
             this.ClassPosition = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ClassPosition")) + 1;
             this.LastTime = Parser.ParseFloat(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "LastTime"));
             this.Incidents = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "Incidents"));
-            this.OutReasonId = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutId"));
+            this.OutReasonId = (ReasonOutId)Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutId"));
             this.OutReason = ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutStr");
         }
     }
