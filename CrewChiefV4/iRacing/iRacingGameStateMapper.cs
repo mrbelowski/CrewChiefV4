@@ -620,10 +620,11 @@ namespace CrewChiefV4.iRacing
             }
 
             GameStateData.Multiclass = false;
+            List<double> combinedStrengthOfField = new List<double>();
             foreach (Driver driver in shared.Drivers)
             {
                 String opponentDataKey = driver.Id.ToString();
-                List<int> combinedStrengthOfField = new List<int>();
+                
                 if(driver.IsPacecar || driver.IsSpectator)
                 {
                     continue;
@@ -820,7 +821,8 @@ namespace CrewChiefV4.iRacing
                             false, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
-                currentGameState.SessionData.StrengthOfField = (int)combinedStrengthOfField.Average();
+                
+
             }
             if (currentGameState.Now > nextOpponentCleanupTime)
             {
@@ -841,6 +843,20 @@ namespace CrewChiefV4.iRacing
                     }
                 }
             }
+
+            //Sof calculations
+            if (combinedStrengthOfField.Count > 0)
+            {
+                double baseSof = 1600 / Math.Log(2);
+                double sofExpSum = 0;
+                foreach (double ir in combinedStrengthOfField)
+                {
+                    sofExpSum += Math.Exp(-ir / baseSof);
+                }
+                currentGameState.SessionData.StrengthOfField = (int)Math.Round(Math.Floor(baseSof * Math.Log(combinedStrengthOfField.Count / sofExpSum))); 
+            }
+            
+
             //Sort class positions
             if(currentGameState.SessionData.SessionType == SessionType.Race)
             {
