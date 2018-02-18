@@ -128,7 +128,9 @@ namespace CrewChiefV4.Events
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
         private Boolean played100MetreWarning = false;
         private Boolean played50MetreWarning = false;
-        
+
+        private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
+
         public PitStops(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -144,6 +146,7 @@ namespace CrewChiefV4.Events
             timeOfLastLimiterWarning = DateTime.MinValue;
             timeOfDisengageCheck = DateTime.MaxValue;
             timeOfPitRequestOrCancel = DateTime.MinValue;
+            timeStartedAppoachingPitsCheck = DateTime.MaxValue;
             pitWindowOpenLap = 0;
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;
@@ -613,11 +616,20 @@ namespace CrewChiefV4.Events
                 }
             }
             if (previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race)
-            {
-                if (!previousGameState.PitData.IsApproachingPitlane
-                    && currentGameState.PitData.IsApproachingPitlane)
+            {                
+                if ((!previousGameState.PitData.IsApproachingPitlane
+                    && currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING) 
+                    //Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
+                    || currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING 
+                    && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0 )
                 {
+                    timeStartedAppoachingPitsCheck = DateTime.MaxValue;
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
+                }
+                if(!previousGameState.PitData.IsApproachingPitlane
+                    && currentGameState.PitData.IsApproachingPitlane && timeStartedAppoachingPitsCheck == DateTime.MaxValue)
+                {
+                    timeStartedAppoachingPitsCheck = currentGameState.Now + TimeSpan.FromSeconds(1);
                 }
                 // different logic for PCars2 pit-crew-ready checks
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
