@@ -149,7 +149,12 @@ namespace CrewChiefV4.Events
 
         private GameStateData currentGameState;
 
-        private int paceCheckLapsWindowForRace = 3;
+        private int paceCheckLapsWindowForRaceToUse = 3;
+        private int paceCheckLapsWindowForRaceVeryShort = 6;
+        private int paceCheckLapsWindowForRaceShort = 5;
+        private int paceCheckLapsWindowForRaceMedium = 4;
+        private int paceCheckLapsWindowForRaceLong = 3;
+        private int paceCheckLapsWindowForRaceVeryLong = 2;
 
         private Boolean isHotLapping;
 
@@ -226,6 +231,27 @@ namespace CrewChiefV4.Events
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)
             {
+                if (currentGameState.SessionData.TrackDefinition != null)
+                {
+                    switch (currentGameState.SessionData.TrackDefinition.trackLengthClass)
+                    {
+                        case TrackData.TrackLengthClass.VERY_SHORT:
+                            paceCheckLapsWindowForRaceToUse = paceCheckLapsWindowForRaceVeryShort;
+                            break;
+                        case TrackData.TrackLengthClass.SHORT:
+                            paceCheckLapsWindowForRaceToUse = paceCheckLapsWindowForRaceShort;
+                            break;
+                        case TrackData.TrackLengthClass.MEDIUM:
+                            paceCheckLapsWindowForRaceToUse = paceCheckLapsWindowForRaceMedium;
+                            break;
+                        case TrackData.TrackLengthClass.LONG:
+                            paceCheckLapsWindowForRaceToUse = paceCheckLapsWindowForRaceLong;
+                            break;
+                        case TrackData.TrackLengthClass.VERY_LONG:
+                            paceCheckLapsWindowForRaceToUse = paceCheckLapsWindowForRaceVeryLong;
+                            break;
+                    }
+                }
                 deltaPlayerLastToSessionBestInClassSet = false;
                 if (currentGameState.SessionData.LapTimePrevious > 0)
                 {
@@ -282,7 +308,9 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.SessionType == SessionType.Race)
                     {
-                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass);
+                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
+                        Console.WriteLine("Opponents best sectors = " + lapAndSectorsComparisonData[1] + ", " + lapAndSectorsComparisonData[2] + ", " + lapAndSectorsComparisonData[3]);
+                        Console.WriteLine("Player best sectors = " + currentGameState.SessionData.PlayerBestSector1Time + ", " + currentGameState.SessionData.PlayerBestSector2Time + ", " + currentGameState.SessionData.PlayerBestSector3Time);
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
@@ -887,7 +915,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRace, currentGameState.carClass);
+                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
 
                         if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
                         {
@@ -1435,6 +1463,8 @@ namespace CrewChiefV4.Events
             }
             if (messageFragments.Count > 0)
             {
+                Console.WriteLine("player best sectors " + playerSector1 + ", " + playerSector2 + ", " + playerSector3);
+                Console.WriteLine("opponent best sectors " + comparisonSector1 + ", " + comparisonSector2 + ", " + comparisonSector3);
                 Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1) +
                     " s2 delta  = " + (playerSector2 - comparisonSector2) +
                     " s3 delta  = " + (playerSector3 - comparisonSector3));
