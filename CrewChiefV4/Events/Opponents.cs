@@ -618,7 +618,7 @@ namespace CrewChiefV4.Events
                             {
                                 messageFragments.Add(MessageFragment.Text(folderLicenseR));
                             }
-                            else if (licenseLevel.Item1.ToLower() == "pro")
+                            else if (licenseLevel.Item1.ToLower() == "wc")
                             {
                                 messageFragments.Add(MessageFragment.Text(folderLicensePro));
                             }
