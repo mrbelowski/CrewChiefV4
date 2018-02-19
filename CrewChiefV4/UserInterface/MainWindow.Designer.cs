@@ -357,6 +357,7 @@ namespace CrewChiefV4
             this.filenameTextbox.Name = "filenameTextbox";
             this.filenameTextbox.Size = new System.Drawing.Size(108, 20);
             this.filenameTextbox.TabIndex = 20;
+
             // 
             // filenameLabel
             // 
@@ -364,8 +365,9 @@ namespace CrewChiefV4
             this.filenameLabel.Location = new System.Drawing.Point(68, 5);
             this.filenameLabel.Name = "filenameLabel";
             this.filenameLabel.Size = new System.Drawing.Size(82, 13);
-            //this.filenameLabel.TabIndex = 20;
-            this.filenameLabel.Text = "File name to run";
+            this.filenameLabel.TabIndex = 19;  // Setting accelerator key on a Label, sets focus on the next control in the tab order.
+            this.filenameLabel.Text = "File &name to run";
+
             // 
             // recordSession
             // 
@@ -374,7 +376,7 @@ namespace CrewChiefV4
             this.recordSession.Name = "recordSession";
             this.recordSession.Size = new System.Drawing.Size(61, 17);
             this.recordSession.TabIndex = 10;
-            this.recordSession.Text = "Record";
+            this.recordSession.Text = "&Record";
             this.recordSession.UseVisualStyleBackColor = true;
             // 
             // playbackInterval
