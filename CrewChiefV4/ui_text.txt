@@ -583,3 +583,9 @@ max_unknown_car_classes_for_assetto_help = Assume single-class race if there are
 
 iracing_fast_parsing = iRacing faster parser
 iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)
+
+use_tight_fuel_calc = Use tight fuel calculations
+use_tight_fuel_calc_help = Enable this if you dont want the app to add additional fuel when asking for how much fuel is needed to end the race
+
+add_additional_fuel = Additional fuel to add to finish the race.
+add_additional_fuel_help = The amount of extra fuel(liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
