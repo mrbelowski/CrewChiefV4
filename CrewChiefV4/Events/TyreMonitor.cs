@@ -857,34 +857,20 @@ namespace CrewChiefV4.Events
         {
             if (immediate)
             {
-                if (minutesRemainingOnTheseTyres > (timeInSession - timeElapsed) / 60)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
-                    return;
-                }
-                else if (minutesRemainingOnTheseTyres <= 1)
+                if (minutesRemainingOnTheseTyres <= 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
-                    return;
-                }
-            }
-            if (minutesRemainingOnTheseTyres > 1 &&
-                        minutesRemainingOnTheseTyres <= (timeInSession - timeElapsed) / 60)
-            {
-                QueuedMessage queuedMessage = new QueuedMessage("minutes_on_current_tyres",
-                    MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, immediate ? null : this);
-                if (immediate)
-                {
-                    audioPlayer.playMessageImmediately(queuedMessage);
                 }
                 else
                 {
-                    audioPlayer.playMessage(queuedMessage);
+                    audioPlayer.playMessageImmediately(new QueuedMessage("minutes_on_current_tyres", MessageContents(folderMinutesOnCurrentTyresIntro, 
+                        minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0,  null));
                 }
             }
-            else if (immediate)
+            else if (minutesRemainingOnTheseTyres > 1 && minutesRemainingOnTheseTyres <= 4 + (timeInSession - timeElapsed) / 60)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                 audioPlayer.playMessage(new QueuedMessage("minutes_on_current_tyres", MessageContents(folderMinutesOnCurrentTyresIntro, 
+                     minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, this));                
             }
         }
 
@@ -892,34 +878,20 @@ namespace CrewChiefV4.Events
         {
             if (immediate)
             {
-                if (lapsRemainingOnTheseTyres > lapsInSession - completedLaps)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
-                    return;
-                }
-                else if (lapsRemainingOnTheseTyres <= 1)
+                if (lapsRemainingOnTheseTyres <= 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
-                    return;
-                }
-            }
-            if (lapsRemainingOnTheseTyres > 1 &&
-                        lapsRemainingOnTheseTyres <= lapsInSession - completedLaps)
-            {
-                QueuedMessage queuedMessage = new QueuedMessage("laps_on_current_tyres",
-                    MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, immediate ? null : this);
-                if (immediate)
-                {
-                    audioPlayer.playMessageImmediately(queuedMessage);
                 }
                 else
                 {
-                    audioPlayer.playMessage(queuedMessage);
-                }                
+                    audioPlayer.playMessageImmediately(new QueuedMessage("laps_on_current_tyres", MessageContents(folderLapsOnCurrentTyresIntro,
+                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null));
+                }
             }
-            else if (immediate)
+            else if (lapsRemainingOnTheseTyres > 1 && lapsRemainingOnTheseTyres <= 2 + lapsInSession - completedLaps)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(folderLapsOnCurrentTyresIntro, 
+                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, this));              
             }
         }
 
@@ -1051,9 +1023,13 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
                 float maxWearPercent = getMaxWearPercent();
-                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING || maxWearPercent < 1)
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+                else if (maxWearPercent < 1)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                 }
                 else 
                 {
