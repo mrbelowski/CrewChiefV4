@@ -233,7 +233,6 @@ namespace CrewChiefV4
             this.alwaysOnButton.Location = new System.Drawing.Point(7, 91);
             this.alwaysOnButton.Name = "alwaysOnButton";
             this.alwaysOnButton.Size = new System.Drawing.Size(75, 17);
-            //this.alwaysOnButton.TabIndex = 3;
             this.alwaysOnButton.TabStop = true;
             this.alwaysOnButton.Text = Configuration.getUIString("always_on");
             this.alwaysOnButton.UseVisualStyleBackColor = true;
@@ -245,7 +244,6 @@ namespace CrewChiefV4
             this.toggleButton.Location = new System.Drawing.Point(7, 67);
             this.toggleButton.Name = "toggleButton";
             this.toggleButton.Size = new System.Drawing.Size(90, 17);
-            //this.toggleButton.TabIndex = 2;
             this.toggleButton.TabStop = true;
             this.toggleButton.Text = Configuration.getUIString("toggle_button");
             this.toggleButton.UseVisualStyleBackColor = true;
@@ -257,7 +255,6 @@ namespace CrewChiefV4
             this.holdButton.Location = new System.Drawing.Point(7, 44);
             this.holdButton.Name = "holdButton";
             this.holdButton.Size = new System.Drawing.Size(81, 17);
-            //this.holdButton.TabIndex = 1;
             this.holdButton.TabStop = true;
             this.holdButton.Text = Configuration.getUIString("hold_button");
             this.holdButton.UseVisualStyleBackColor = true;
@@ -269,7 +266,6 @@ namespace CrewChiefV4
             this.voiceDisableButton.Location = new System.Drawing.Point(7, 20);
             this.voiceDisableButton.Name = "voiceDisableButton";
             this.voiceDisableButton.Size = new System.Drawing.Size(64, 17);
-            //this.voiceDisableButton.TabIndex = 0;
             this.voiceDisableButton.TabStop = true;
             this.voiceDisableButton.Text = Configuration.getUIString("disabled");
             this.voiceDisableButton.UseVisualStyleBackColor = true;
@@ -393,7 +389,6 @@ namespace CrewChiefV4
             this.app_version.Location = new System.Drawing.Point(1045, 650);
             this.app_version.Name = "app_version";
             this.app_version.Size = new System.Drawing.Size(65, 13);
-            //this.app_version.TabIndex = 27;
             this.app_version.Text = Configuration.getUIString("app_version");
             // 
             // reset_app_version
@@ -423,7 +418,6 @@ namespace CrewChiefV4
             this.soundPackProgressBar.Location = new System.Drawing.Point(39, 176);
             this.soundPackProgressBar.Name = "soundPackProgressBar";
             this.soundPackProgressBar.Size = new System.Drawing.Size(220, 23);
-            //this.soundPackProgressBar.TabIndex = 28;
             // 
             // downloadSoundPackButton
             // 
@@ -452,7 +446,6 @@ namespace CrewChiefV4
             this.driverNamesProgressBar.Location = new System.Drawing.Point(295, 176);
             this.driverNamesProgressBar.Name = "driverNamesProgressBar";
             this.driverNamesProgressBar.Size = new System.Drawing.Size(220, 23);
-            //this.driverNamesProgressBar.TabIndex = 31;
             // 
             // downloadPersonalisationsButton
             // 
@@ -470,7 +463,6 @@ namespace CrewChiefV4
             this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 176);
             this.personalisationsProgressBar.Name = "personalisationsProgressBar";
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
-            //this.personalisationsProgressBar.TabIndex = 31;
 
             this.personalisationBox.Location = new System.Drawing.Point(991, 28);
             this.personalisationBox.IntegralHeight = false;
@@ -541,16 +533,6 @@ namespace CrewChiefV4
             this.messagesAudioDeviceLabel.TabIndex = 149;
             this.messagesAudioDeviceLabel.Text = Configuration.getUIString("messages_audio_device_label");
             this.messagesAudioDeviceLabel.Visible = false;
-
-            /*this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
-            this.messagesAudioDeviceBox.IntegralHeight = false;
-            this.messagesAudioDeviceBox.MaxDropDownItems = 5;
-            this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.messagesAudioDeviceBox.Name = "messagesAudioDeviceBox";
-            this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
-            //this.messagesAudioDeviceBox.TabIndex = 94;
-            this.messagesAudioDeviceBox.Visible = false;
-            this.messagesAudioDeviceBox.Enabled = false;*/
 
             this.backgroundAudioDeviceLabel.AutoSize = true;
             this.backgroundAudioDeviceLabel.Location = new System.Drawing.Point(550, 70);
