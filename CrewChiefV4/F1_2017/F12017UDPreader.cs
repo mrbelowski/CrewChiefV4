@@ -98,6 +98,7 @@ namespace CrewChiefV4.F1_2017
                 {
                     dataToDump = new List<F12017StructWrapper>();
                 }
+                // TODO: f1 2017 can operate in broadcast or point to point mode, need to add options here so we're not tied to broadcast
                 this.broadcastAddress = new IPEndPoint(IPAddress.Any, udpPort);
                 this.udpClient = new UdpClient();
                 this.udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
