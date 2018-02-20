@@ -1137,7 +1137,7 @@ namespace CrewChiefV4.Events
 
         private int convertGallonsToLitres(float gallons)
         {
-            return (int)Math.Round(gallons * litresPerGallon);
+            return (int)Math.Ceiling(gallons * litresPerGallon);
         }
     }
 }
