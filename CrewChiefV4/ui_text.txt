@@ -111,8 +111,8 @@ integer_prop_type = (integer)
 real_number_prop_type = (real number)
 
 save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these changes and restart the application. Click 'No' to discard these changes
-save_changes = Save changes
-save_and_restart = Save and restart
+save_changes = &Save changes
+save_and_restart = S&ave and restart
 
 unknown_sound_pack_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English Sound Pack update files and set the language to English). Click "No" to cancel.
 unknown_sound_pack_language_title = No Sound Pack language defined
@@ -438,8 +438,8 @@ minimize_on_startup = Minimize on startup
 minimize_to_tray_help = Starts Crew Chief minimized to task bar or system tray.
 
 properties_form = Crew Chief Configuration Properties
-exit_without_saving = Exit without Saving
-restore_default_settings = Restore Default Settings
+exit_without_saving = E&xit without Saving
+restore_default_settings = &Restore Default Settings
 
 search_box_default_text = Search for property (Ctrl+E)
 search_box_tooltip_line1 = Hint:

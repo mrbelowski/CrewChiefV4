@@ -31,17 +31,19 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
+            this.MinimizeBox = false;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(30, 24);
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Name = "textBox1";
             this.textBox1.Multiline = true;
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(794, 450);
             this.textBox1.TabIndex = 0;
             this.textBox1.MaxLength = 99999999;
+            this.Padding = new System.Windows.Forms.Padding(10, 10, 10, 10);
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             // 
             // Readme
             // 
