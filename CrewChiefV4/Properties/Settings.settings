@@ -788,6 +788,12 @@
     <Setting Name="iracing_fast_parsing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="enable_tight_fuel_calc" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="add_additional_fuel" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
     <Setting Name="f1_2017_launch_exe" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -799,6 +805,6 @@
     </Setting>
     <Setting Name="f1_2017_udp_data_port" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20777</Value>
-    </Setting>
+	</Setting>
   </Settings>
 </SettingsFile>

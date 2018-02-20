@@ -52,6 +52,7 @@ namespace CrewChiefV4.Events
         private int iRating = -1;
         private int strenghtOfField = -1; 
         private Boolean hasLimitedIncidents = false;
+        private float fuelCapacity = -1;
         
         private Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
 
@@ -69,6 +70,7 @@ namespace CrewChiefV4.Events
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
             this.playedIncidentsWarning = false;
             this.playedLastIncidentsLeftWarning = false;
+            this.fuelCapacity = -1;
         }
 
         public override void clearState()
@@ -104,6 +106,7 @@ namespace CrewChiefV4.Events
             licenseLevel = currentGameState.SessionData.LicenseLevel;
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
+            fuelCapacity = currentGameState.FuelData.FuelCapacity;
 /*
             if (hasLimitedIncidents)
             {
@@ -176,7 +179,15 @@ namespace CrewChiefV4.Events
                 else if(litresNeeded > 0)
                 {
                     AddFuel(litresNeeded);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
+                    if (litresNeeded > (int)fuelCapacity)
+                    {
+                        // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
+                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
+                    }                    
                     return;
                 }
 
@@ -508,7 +519,7 @@ namespace CrewChiefV4.Events
 
         private int convertGallonsToLitres(int gallons)
         {
-            return (int)Math.Round(gallons * litresPerGallon);
+            return (int)Math.Ceiling(gallons * litresPerGallon);
         }
     }
 }

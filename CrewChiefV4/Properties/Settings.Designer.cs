@@ -3167,6 +3167,30 @@ namespace CrewChiefV4.Properties {
             }
         }
         
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_tight_fuel_calc {
+            get {
+                return ((bool)(this["enable_tight_fuel_calc"]));
+            }
+            set {
+                this["enable_tight_fuel_calc"] = value;
+            }
+        }
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float add_additional_fuel {
+            get {
+                return ((float)(this["add_additional_fuel"]));
+            }
+            set {
+                this["add_additional_fuel"] = value;
+            }
+        }
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
@@ -3200,9 +3224,9 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["launch_f1_2017"] = value;
+				
             }
         }
-        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("20777")]
@@ -3212,6 +3236,7 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["f1_2017_udp_data_port"] = value;
+				
             }
         }
     }
