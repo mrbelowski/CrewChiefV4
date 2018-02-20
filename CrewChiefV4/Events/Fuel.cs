@@ -126,6 +126,10 @@ namespace CrewChiefV4.Events
 
         private Boolean fuelReportsInGallon = UserSettings.GetUserSettings().getBoolean("report_fuel_in_gallons");
 
+        private Boolean useTightFuelCalc = UserSettings.GetUserSettings().getBoolean("enable_tight_fuel_calc");
+
+        private float addAdditionalFuel = UserSettings.GetUserSettings().getFloat("add_additional_fuel");
+
         private Boolean hasBeenRefuelled = false;
 
         // checking if we need to read fuel messages involves a bit of arithmetic and stuff, so only do this every few seconds
@@ -1062,17 +1066,18 @@ namespace CrewChiefV4.Events
             int additionalLitresNeeded = -1;
             if (fuelUseActive)
             {
+                int additionalFuelLiters = fuelReportsInGallon ? convertGallonsToLitres(addAdditionalFuel) : (int)addAdditionalFuel;
+                int reserve = !useTightFuelCalc ? 2 : additionalFuelLiters;
                 if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
-                    float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + 2f;
+                    float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + reserve;
                     additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
                     Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " +
                         currentFuel + " additional fuel needed = " + additionalLitresNeeded);
                 }
                 else if (averageUsagePerMinute > 0)
                 {
-                    int reserve = 2;
-                    if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+                    if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null && !useTightFuelCalc)
                     {
                         TrackData.TrackLengthClass trackLengthClass = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass;
                         if (trackLengthClass < TrackData.TrackLengthClass.MEDIUM)
@@ -1127,6 +1132,11 @@ namespace CrewChiefV4.Events
                 return ((float)Math.Round(gallons * 10f)) / 10f;
             }
             return gallons;
+        }
+
+        private int convertGallonsToLitres(float gallons)
+        {
+            return (int)Math.Ceiling(gallons * litresPerGallon);
         }
     }
 }

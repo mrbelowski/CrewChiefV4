@@ -3166,5 +3166,29 @@ namespace CrewChiefV4.Properties {
                 this["iracing_fast_parsing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_tight_fuel_calc {
+            get {
+                return ((bool)(this["enable_tight_fuel_calc"]));
+            }
+            set {
+                this["enable_tight_fuel_calc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float add_additional_fuel {
+            get {
+                return ((float)(this["add_additional_fuel"]));
+            }
+            set {
+                this["add_additional_fuel"] = value;
+            }
+        }
     }
 }
