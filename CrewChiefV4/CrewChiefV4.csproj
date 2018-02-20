@@ -123,6 +123,10 @@
     <Compile Include="Events\Opponents.cs" />
     <Compile Include="Events\FlagsMonitor.cs" />
     <Compile Include="Events\Spotter.cs" />
+    <Compile Include="F1_2017\F12017GameStateMapper.cs" />
+    <Compile Include="F1_2017\F12017Spotter.cs" />
+    <Compile Include="F1_2017\F12017Struct.cs" />
+    <Compile Include="F1_2017\F12017UDPreader.cs" />
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
@@ -368,6 +372,7 @@
     <Content Include="..\help.txt" />
     <Content Include="..\README.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
