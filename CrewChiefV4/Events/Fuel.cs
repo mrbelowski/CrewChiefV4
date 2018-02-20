@@ -1068,7 +1068,6 @@ namespace CrewChiefV4.Events
             {
                 int additionalFuelLiters = fuelReportsInGallon ? convertGallonsToLitres(addAdditionalFuel) : (int)addAdditionalFuel;
                 int reserve = !useTightFuelCalc ? 2 : additionalFuelLiters;
-                Console.WriteLine("Additional Fuel added on getLitresToEndOfRace = " + reserve);
                 if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
                     float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + reserve;
