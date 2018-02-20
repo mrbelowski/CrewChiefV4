@@ -29,6 +29,7 @@ namespace CrewChiefV4.iRacing
         public Sector[] Sectors { get; set; }
         public int Incidents { get; set; }
         public string OutReason { get; set; }
+        public int LapsComplete { get; set; }
         public ReasonOutId OutReasonId { get; set; }
         public bool IsOut { get { return this.OutReasonId != ReasonOutId.IDS_REASON_OUT_NOT_OUT; } }
 
@@ -47,6 +48,7 @@ namespace CrewChiefV4.iRacing
             this.Incidents = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "Incidents"));
             this.OutReasonId = (ReasonOutId)Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutId"));
             this.OutReason = ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "ReasonOutStr");
+            this.LapsComplete = Parser.ParseInt(ParseRaceResultsYaml(sessionInfo, sessionnumber, position, "LapsComplete"));
         }
     }
 }
