@@ -160,7 +160,7 @@ namespace CrewChiefV4
             this.label1.Location = new System.Drawing.Point(38, 500);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(138, 17);
-            //this.label1.TabIndex = 11;
+            this.label1.TabIndex = 209;
             this.label1.Text = Configuration.getUIString("available_controllers");
 
             this.scanControllersButton.Location = new System.Drawing.Point(38, 610);
@@ -178,7 +178,7 @@ namespace CrewChiefV4
             this.label2.Location = new System.Drawing.Point(323, 501);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 17);
-            //this.label2.TabIndex = 12;
+            this.label2.TabIndex = 229;
             this.label2.Text = Configuration.getUIString("available_actions");
             // 
             // button1
@@ -212,14 +212,14 @@ namespace CrewChiefV4
             this.aboutButton.Text = Configuration.getUIString("about");
             this.aboutButton.UseVisualStyleBackColor = true;
             this.aboutButton.Click += new System.EventHandler(this.aboutButtonClicked);
-            
+
             // 
             // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.alwaysOnButton);
-            this.groupBox1.Controls.Add(this.toggleButton);
-            this.groupBox1.Controls.Add(this.holdButton);
+            //
             this.groupBox1.Controls.Add(this.voiceDisableButton);
+            this.groupBox1.Controls.Add(this.holdButton);
+            this.groupBox1.Controls.Add(this.toggleButton);
+            this.groupBox1.Controls.Add(this.alwaysOnButton);
             this.groupBox1.Location = new System.Drawing.Point(970, 520);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(164, 121);
@@ -299,7 +299,7 @@ namespace CrewChiefV4
             this.label3.Location = new System.Drawing.Point(367, 12);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(94, 13);
-            //this.label3.TabIndex = 18;
+            this.label3.TabIndex = 59;
             this.label3.Text = Configuration.getUIString("messages_volume");
             // 
             // backgroundVolumeSlider
@@ -316,7 +316,7 @@ namespace CrewChiefV4
             this.label4.Location = new System.Drawing.Point(567, 11);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(104, 13);
-            //this.label4.TabIndex = 20;
+            this.label4.TabIndex = 69;
             this.label4.Text = Configuration.getUIString("background_volume");
             // 
             // gameDefinitionList
@@ -337,7 +337,7 @@ namespace CrewChiefV4
             this.label5.Location = new System.Drawing.Point(779, 9);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(33, 13);
-            //this.label5.TabIndex = 22;
+            this.label5.TabIndex = 79;
             this.label5.Text = Configuration.getUIString("game");
 
             // 
@@ -347,7 +347,7 @@ namespace CrewChiefV4
             this.personalisationLabel.Location = new System.Drawing.Point(991, 9);
             this.personalisationLabel.Name = "personalisationLabel";
             this.personalisationLabel.Size = new System.Drawing.Size(33, 13);
-            //this.personalisationLabel.TabIndex = 90;
+            this.personalisationLabel.TabIndex = 89;
             this.personalisationLabel.Text = Configuration.getUIString("personalisation_label");
 
             // 
@@ -484,7 +484,7 @@ namespace CrewChiefV4
             this.spotterNameLabel.Location = new System.Drawing.Point(991, 55);
             this.spotterNameLabel.Name = "spotterNameLabel";
             this.spotterNameLabel.Size = new System.Drawing.Size(33, 13);
-            //this.spotterNameLabel.TabIndex = 22;
+            this.spotterNameLabel.TabIndex = 99;
             this.spotterNameLabel.Text = Configuration.getUIString("spotter_name_label");
 
             this.spotterNameBox.Location = new System.Drawing.Point(991, 70);
@@ -510,7 +510,7 @@ namespace CrewChiefV4
             this.speechRecognitionDeviceLabel.Location = new System.Drawing.Point(115, 70);
             this.speechRecognitionDeviceLabel.Name = "speechRecognitionDeviceLabel";
             this.speechRecognitionDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            //this.speechRecognitionDeviceLabel.TabIndex = 101;
+            this.speechRecognitionDeviceLabel.TabIndex = 139;
             this.speechRecognitionDeviceLabel.Text = Configuration.getUIString("speech_recognition_device_label");
             this.speechRecognitionDeviceLabel.Visible = false;
 
@@ -538,11 +538,11 @@ namespace CrewChiefV4
             this.messagesAudioDeviceLabel.Location = new System.Drawing.Point(330, 70);
             this.messagesAudioDeviceLabel.Name = "messagesAudioDeviceLabel";
             this.messagesAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            //this.messagesAudioDeviceLabel.TabIndex = 22;
+            this.messagesAudioDeviceLabel.TabIndex = 149;
             this.messagesAudioDeviceLabel.Text = Configuration.getUIString("messages_audio_device_label");
             this.messagesAudioDeviceLabel.Visible = false;
 
-            this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
+            /*this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
             this.messagesAudioDeviceBox.IntegralHeight = false;
             this.messagesAudioDeviceBox.MaxDropDownItems = 5;
             this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -550,13 +550,13 @@ namespace CrewChiefV4
             this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
             //this.messagesAudioDeviceBox.TabIndex = 94;
             this.messagesAudioDeviceBox.Visible = false;
-            this.messagesAudioDeviceBox.Enabled = false;
+            this.messagesAudioDeviceBox.Enabled = false;*/
 
             this.backgroundAudioDeviceLabel.AutoSize = true;
             this.backgroundAudioDeviceLabel.Location = new System.Drawing.Point(550, 70);
             this.backgroundAudioDeviceLabel.Name = "backgroundAudioDeviceLabel";
             this.backgroundAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            //this.backgroundAudioDeviceLabel.TabIndex = 22;
+            this.backgroundAudioDeviceLabel.TabIndex = 159;
             this.backgroundAudioDeviceLabel.Text = Configuration.getUIString("background_audio_device_label");
             this.backgroundAudioDeviceLabel.Visible = false;
 

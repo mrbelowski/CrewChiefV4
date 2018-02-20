@@ -956,9 +956,9 @@ namespace CrewChiefV4
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Alt && e.KeyCode == Keys.I && this.playbackInterval.Visible)
+            if ( e.KeyCode == Keys.F1)
             {
-                this.playbackInterval.Focus();
+                this.helpButtonClicked(sender, e);
                 e.Handled = true;
             }
         }
