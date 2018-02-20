@@ -3166,5 +3166,53 @@ namespace CrewChiefV4.Properties {
                 this["iracing_fast_parsing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2017_launch_exe {
+            get {
+                return ((string)(this["f1_2017_launch_exe"]));
+            }
+            set {
+                this["f1_2017_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2017_launch_params {
+            get {
+                return ((string)(this["f1_2017_launch_params"]));
+            }
+            set {
+                this["f1_2017_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_f1_2017 {
+            get {
+                return ((bool)(this["launch_f1_2017"]));
+            }
+            set {
+                this["launch_f1_2017"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20777")]
+        public int f1_2017_udp_data_port {
+            get {
+                return ((int)(this["f1_2017_udp_data_port"]));
+            }
+            set {
+                this["f1_2017_udp_data_port"] = value;
+            }
+        }
     }
 }
