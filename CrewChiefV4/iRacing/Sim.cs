@@ -70,7 +70,7 @@ namespace CrewChiefV4.iRacing
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
                 if (driver == null)
                 {
-                    driver = Driver.FromSessionInfo(sessionInfo, id);
+                    driver = Driver.FromSessionInfo(sessionInfo, id, DriverId);
 
                     if (driver == null || driver.IsPacecar)
                     {
@@ -131,18 +131,7 @@ namespace CrewChiefV4.iRacing
         {
 
             for (int position = 1; position <= _drivers.Count; position++)
-            {
-                
-                string reasonOut;
-                if (!YamlParser.TryGetValue(sessionInfo, string.Format("SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}ReasonOutId:",
-                    _currentSessionNumber, position), out reasonOut))
-                {
-                    continue;
-                }                    
-                if (int.Parse(reasonOut) != 0)
-                {
-                    continue;
-                }
+            {                
                 string idValue = "0";
                 if (!YamlParser.TryGetValue(sessionInfo, string.Format("SessionInfo:Sessions:SessionNum:{{{0}}}ResultsPositions:Position:{{{1}}}CarIdx:",
                     _currentSessionNumber, position), out idValue))
@@ -205,7 +194,9 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
-                    if(driver.IsSpectator || driver.IsPacecar)
+                    //this is a test to try and combad some of the wrong position messages so also check TrackSurfaces == NotInWorld as we also do that in mapper(skip entries),
+                    //and thats a bit bad since we sort class positions in races internaly.
+                    if(driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut || driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
                     {
                         continue;
                     }
@@ -222,7 +213,7 @@ namespace CrewChiefV4.iRacing
                     {
                         continue;
                     }
-                    if (telemetry.CarIdxPosition[driver.Id] > 0)
+                    if (telemetry.CarIdxPosition[driver.Id] > 0 && raceEndState != RaceEndState.FINISHED)
                     {
                         driver.Live.Position = telemetry.CarIdxPosition[driver.Id];
                     }
@@ -231,7 +222,7 @@ namespace CrewChiefV4.iRacing
                         driver.Live.Position = driver.CurrentResults.Position;
                     }
 
-                    if (telemetry.CarIdxClassPosition[driver.Id] > 0)
+                    if (telemetry.CarIdxClassPosition[driver.Id] > 0 && raceEndState != RaceEndState.FINISHED)
                     {
                         driver.Live.ClassPosition = telemetry.CarIdxClassPosition[driver.Id];
                     }

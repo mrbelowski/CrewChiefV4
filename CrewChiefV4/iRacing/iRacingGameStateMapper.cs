@@ -177,18 +177,9 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PitData.InPitlane = shared.Telemetry.OnPitRoad;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
-                if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
-                     && playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0)
-                {
-                    currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
-                    Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
-                }
-                else if (previousGameState != null)
-                {
-                    // if we're entering a race session or rolling qually, copy the value from the previous field
-                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
-                }
-
+                currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
+                Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                
                 //TODO update car classes
                 currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
                 CarData.IRACING_CLASS_ID = playerCar.Car.CarClassId;
@@ -253,6 +244,9 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
                         currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
+                        
+                        currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
+                        Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
 
                         if (previousGameState != null)
                         {
@@ -260,7 +254,6 @@ namespace CrewChiefV4.iRacing
                             currentGameState.OpponentData = previousGameState.OpponentData;
                             currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                             currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
-                            currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
                         }
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
 
@@ -500,6 +493,7 @@ namespace CrewChiefV4.iRacing
 
             int currentSector = playerCar.Live.CurrentSector;
 
+            currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
             currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] || playerCar.Live.TrackSurface == TrackSurfaces.InPitStall;
             currentGameState.PitData.IsApproachingPitlane = playerCar.Live.TrackSurface == TrackSurfaces.AproachingPits && !shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] && currentSector == 3;
             Boolean jumpToPits = previousGameState != null && !previousGameState.PitData.IsApproachingPitlane && shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
@@ -565,16 +559,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
-
-            //experimantal
-            if((playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null && previousGameState.PitData.PitBoxPositionEstimate == -1) ||
-                (playerCar.Live.TrackSurface == TrackSurfaces.InPitStall && previousGameState != null &&
-                Math.Abs(previousGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack) > 5 && currentGameState.PositionAndMotionData.DistanceRoundTrack != 0))
-            {
-                currentGameState.PitData.PitBoxPositionEstimate = currentGameState.PositionAndMotionData.DistanceRoundTrack;
-                Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
-            }
-
+                       
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
                 (float)playerCar.Live.Speed, currentGameState.Now);
 
@@ -888,6 +873,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.FuelData.FuelUseActive = true;
             currentGameState.FuelData.FuelPressure = shared.Telemetry.FuelPress;
             currentGameState.FuelData.FuelLeft = shared.Telemetry.FuelLevel;
+            currentGameState.FuelData.FuelCapacity = playerCar.Car.DriverCarFuelMaxLtr * playerCar.Car.DriverCarMaxFuelPct;
 
             currentGameState.PitData.limiterStatus = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.PitSpeedLimiter) == true ? 1 : 0;
 
