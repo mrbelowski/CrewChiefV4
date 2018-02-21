@@ -42,7 +42,7 @@ iracing = iRacing
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
-scan_controllers = Scan for cont&rollers
+scan_controllers = Scan for contro&llers
 
 waiting_for_button_click_to_cancel = Waiting for button, click to cancel
 assign = Assign
@@ -51,7 +51,7 @@ delete_assignment = &Delete assignment
 available_controllers = Available &controllers
 available_actions = Available ac&tions
 properties = &Properties
-voice_recognition_mode = &Voice recognition mode
+voice_recognition_mode = Voice &recognition mode
 always_on = Always on
 toggle_button = Press and release button
 hold_button = Hold button
@@ -392,7 +392,7 @@ enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
 enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
 
 personalisations_are_up_to_date = Personalisations are up to date
-personalisation_label = &My name (requires restart)
+personalisation_label = M&y name (requires restart)
 
 install_plugin_popup_text = Crew Chief needs additional files to be installed or updated for the selected game. Click OK to install or Cancel to Return
 install_plugin_popup_title = Plugin Needed
@@ -455,7 +455,7 @@ no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
 reset_warning_title = Reset All Settings to Default Values
 
-spotter_name_label = &Spotter voice (requires restart)
+spotter_name_label = Spotter &voice (requires restart)
 get_fuel_status = Report fuel/battery status
 
 toggle_manual_formation_lap = Toggle manual formation lap mode
