@@ -58,7 +58,7 @@ namespace CrewChiefV4.iRacing
             this.IsSpectator = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IsSpectator")) == 1;         
         }
 
-        public void ParseStaticSessionInfo(string sessionInfo)
+        public void ParseStaticSessionInfo(string sessionInfo, bool isPlayerCar)
         {
             this.TeamId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "TeamID"));
             this.TeamName = ParseDriverYaml(sessionInfo, "TeamName");
@@ -66,10 +66,16 @@ namespace CrewChiefV4.iRacing
             this.Car.CarNumber = ParseDriverYaml(sessionInfo, "CarNumberRaw");
             this.Car.CarClassId = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassID"));
             this.Car.CarClassRelSpeed = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassRelSpeed"));
+            if (isPlayerCar)
+            {
+                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"));
+                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"));
+                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"));
+            }
             bool isPaceCar = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarIsPaceCar")) == 1;
             this.IsPacecar = this.CustId == -1 || isPaceCar;
         }
-        public static Driver FromSessionInfo(string sessionInfo, int carIdx)
+        public static Driver FromSessionInfo(string sessionInfo, int carIdx, int playerCarIdx)
         {            
             string name;
             if (!YamlParser.TryGetValue(sessionInfo, string.Format(driverYamlPath, carIdx, "UserName"), out name))
@@ -79,7 +85,7 @@ namespace CrewChiefV4.iRacing
             }
             var driver = new Driver();
             driver.Id = carIdx;
-            driver.ParseStaticSessionInfo(sessionInfo);
+            driver.ParseStaticSessionInfo(sessionInfo, playerCarIdx == carIdx);
             driver.ParseDynamicSessionInfo(sessionInfo);
             return driver;
         }
