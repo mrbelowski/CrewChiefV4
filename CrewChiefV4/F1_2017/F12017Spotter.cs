@@ -12,6 +12,8 @@ namespace CrewChiefV4.F1_2017
 {
     class F12017Spotter : Spotter
     {
+        private float twoPi = (float)(2 * Math.PI);
+
         public F12017Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
