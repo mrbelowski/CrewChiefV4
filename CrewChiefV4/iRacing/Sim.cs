@@ -196,7 +196,7 @@ namespace CrewChiefV4.iRacing
                 {
                     //this is a test to try and combad some of the wrong position messages so also check TrackSurfaces == NotInWorld as we also do that in mapper(skip entries),
                     //and thats a bit bad since we sort class positions in races internaly.
-                    if(driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut || driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
+                    if(driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut /*|| driver.Live.TrackSurface == TrackSurfaces.NotInWorld*/)
                     {
                         continue;
                     }

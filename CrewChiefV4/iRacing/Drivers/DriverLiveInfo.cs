@@ -15,6 +15,14 @@ namespace CrewChiefV4.iRacing
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
             _prevSector = -1;
+            LiveLapsCompleted = 0;
+            LapsCompleted = 0;
+            this.Sectors = new[]
+                    {
+                        new Sector() {Number = 0, StartPercentage = 0f},
+                        new Sector() {Number = 1, StartPercentage = 0.333f},
+                        new Sector() {Number = 2, StartPercentage = 0.666f}
+                    };
         }
 
         private readonly Driver _driver;
@@ -32,7 +40,7 @@ namespace CrewChiefV4.iRacing
         public float CorrectedLapDistance { get; private set; }
         public float TotalLapDistance
         {
-            get { return this.LapsCompleted + CorrectedLapDistance; }
+            get { return this.LiveLapsCompleted + CorrectedLapDistance; }
         }
 
         public TrackSurfaces TrackSurface { get; private set; }
@@ -44,11 +52,13 @@ namespace CrewChiefV4.iRacing
         public double SpeedKph { get; private set; }
         
         public int CurrentSector  { get; set; }
+        public int LiveLapsCompleted { get; set; }
         public int LapsCompleted { get; set; }
         public bool IsNewLap { get; set; }
         public bool PreviousLapWasValid { get; set; }
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
+        public Sector[] Sectors { get; set; }
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
@@ -59,9 +69,10 @@ namespace CrewChiefV4.iRacing
                      
             this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
             this.Lap = e.CarIdxLap[this.Driver.Id];
-
-            if (this._prevSector == 3 && (this.CurrentSector == 1))
-            {
+            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
+            if (this._prevSector == 3 && (this.CurrentSector == 1) || 
+                (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
+            {                
                 HasCrossedSFLine = true;
             }
             else
@@ -72,14 +83,14 @@ namespace CrewChiefV4.iRacing
             {
                 this._prevSector = this.CurrentSector;
             }
-
+            this.LapsCompleted = _driver.CurrentResults.LapsComplete;
             this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
-            this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
-            if (this.LapsCompleted < 0)
+            this.LiveLapsCompleted = e.CarIdxLapCompleted[this.Driver.Id] < LapsCompleted ? LapsCompleted : e.CarIdxLapCompleted[this.Driver.Id];
+            if (this.LiveLapsCompleted < 0)
             {
-                this.LapsCompleted = 0;
+                this.LiveLapsCompleted = 0;
             }
-            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];            
+                   
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
             this.SessionTime = (float)e.SessionTime;

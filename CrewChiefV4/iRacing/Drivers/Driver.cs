@@ -105,7 +105,7 @@ namespace CrewChiefV4.iRacing
             if (track == null) 
                 return;
 
-            var results = this.CurrentResults;
+            var results = this.Live;
             if (results != null)
             {
 
@@ -128,7 +128,7 @@ namespace CrewChiefV4.iRacing
                 }
                     
                 // Check 'fake' sectors (divide track into thirds)
-                foreach (var s in results.Sectors)
+                foreach (var s in Live.Sectors)
                 {
                     if (p1 > s.StartPercentage && p0 <= s.StartPercentage)
                     {                    
