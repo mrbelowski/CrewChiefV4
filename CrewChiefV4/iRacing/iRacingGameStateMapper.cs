@@ -757,7 +757,7 @@ namespace CrewChiefV4.iRacing
                                         shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, currentOpponentSpeed,
                                         previousOpponentDataWaitingForNewLapData, previousOpponentNewLapDataTimerExpiry,
                                         previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompleatedLapsWhenHasNewLapDataWasLastTrue,
-                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine, isInWorld);
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine, isInWorld, driver.Live.IsNewLap);
 
                             if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
@@ -956,7 +956,7 @@ namespace CrewChiefV4.iRacing
             /* previous tick data for hasNewLapData check*/
             Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
-            int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine, bool isInWorld)
+            int previousCompleatedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine, bool isInWorld, bool isNewLap)
         {
             if (opponentData.CostId != CostId)
             {
@@ -1013,8 +1013,8 @@ namespace CrewChiefV4.iRacing
             {
                 opponentData.GameTimeWhenLastCrossedStartFinishLine = previousOpponentGameTimeWhenLastCrossedStartFinishLine;
             }
-            
-            if (completedLaps > opponentData.CompletedLaps)
+
+            if (isNewLap)
             {
                 if (opponentData.OpponentLapData.Count > 0)
                 {

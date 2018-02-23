@@ -15,8 +15,8 @@ namespace CrewChiefV4.iRacing
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
             _prevSector = -1;
-            LiveLapsCompleted = 0;
-            LapsCompleted = 0;
+            LiveLapsCompleted = -1;
+            LapsCompleted = -1;
             this.Sectors = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
@@ -83,14 +83,20 @@ namespace CrewChiefV4.iRacing
             {
                 this._prevSector = this.CurrentSector;
             }
-            this.LapsCompleted = _driver.CurrentResults.LapsComplete;
-            this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
-            this.LiveLapsCompleted = e.CarIdxLapCompleted[this.Driver.Id] < LapsCompleted ? LapsCompleted : e.CarIdxLapCompleted[this.Driver.Id];
-            if (this.LiveLapsCompleted < 0)
+            
+            if (_driver.CurrentResults.LapsComplete > this.LapsCompleted)
             {
-                this.LiveLapsCompleted = 0;
+                this.IsNewLap = true;
             }
-                   
+            else
+            {
+                this.IsNewLap = false;
+            }
+            this.LapsCompleted = _driver.CurrentResults.LapsComplete;
+
+            this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
+            this.LiveLapsCompleted = e.CarIdxLapCompleted[this.Driver.Id] < this.LapsCompleted ? this.LapsCompleted : e.CarIdxLapCompleted[this.Driver.Id];
+                  
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
             this.SessionTime = (float)e.SessionTime;
