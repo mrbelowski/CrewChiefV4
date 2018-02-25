@@ -50,7 +50,7 @@ namespace CrewChiefV4.iRacing
 
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
-        
+        public float GameTimeWhenLastCrossedSFLine { get; private set; }
         public int CurrentSector  { get; set; }
         public int LiveLapsCompleted { get; set; }
         public int LapsCompleted { get; set; }
@@ -64,6 +64,7 @@ namespace CrewChiefV4.iRacing
         private double _prevSpeedUpdateDist;
         private int _prevLap;
         private int _prevSector;
+
         public void ParseTelemetry(iRacingData e)
         {   
                      
@@ -74,6 +75,9 @@ namespace CrewChiefV4.iRacing
                 (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
             {                
                 HasCrossedSFLine = true;
+                //this is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
+                GameTimeWhenLastCrossedSFLine = (float)e.SessionTime;
+
             }
             else
             {
@@ -99,18 +103,18 @@ namespace CrewChiefV4.iRacing
                   
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
-            this.SessionTime = (float)e.SessionTime;
 
             //for local player we use data from telemetry as its updated faster then session info,
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                this.LapTimePrevious = e.LapLastLapTime;                            
+                this.LapTimePrevious = e.LapLastLapTime;                           
             }
             else
             {
                 this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
-            }                
+            }
+            this.PreviousLapWasValid = this.LapTimePrevious > 1;     
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)

@@ -188,7 +188,8 @@ namespace CrewChiefV4.GameState
             }
             if (newPosition < 1)
             {
-                Console.WriteLine("Can't update position to " + newPosition);
+                //dont warn about this it happens a lot in iracing on session end. 
+                //Console.WriteLine("Can't update position to " + newPosition);
                 return oldPosition;
             }
             PendingRacePositionChange pendingRacePositionChange = null;
