@@ -1010,7 +1010,8 @@ namespace CrewChiefV4.iRacing
             {"Offline Testing", SessionType.Practice},
             {"Practice", SessionType.Practice},
             {"Lone Practice", SessionType.Practice},
-            {"Open Qualify", SessionType.Qualify},
+            {"Warmup", SessionType.Practice},
+            {"Open Qualify", SessionType.Qualify},            
             {"Lone Qualify", SessionType.Qualify},
             {"Race", SessionType.Race}
         };
