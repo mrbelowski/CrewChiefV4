@@ -72,6 +72,8 @@ namespace CrewChiefV4.Events
 
         private Boolean playCutTrackWarnings = UserSettings.GetUserSettings().getBoolean("play_cut_track_warnings");
 
+        private Boolean playedTrackCutWarningInPracticeOrQualOnThisLap = false;
+
         private DateTime lastCutTrackWarningTime;
 
         private Boolean playedNotServedPenalty;
@@ -90,6 +92,7 @@ namespace CrewChiefV4.Events
             cutTrackWarningsCount = 0;
             hasHadAPenalty = false;
             warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+            playedTrackCutWarningInPracticeOrQualOnThisLap = false;
         }
 
         private void clearPenaltyState()
@@ -146,6 +149,7 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.IsNewLap)
             {
                 warnedOfPossibleTrackLimitsViolationOnThisLap = false;
+                playedTrackCutWarningInPracticeOrQualOnThisLap = false;
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 (currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction))
@@ -255,17 +259,18 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderCutTrackInRace, 2, this));
                         }
-                        else
+                        else if (!playedTrackCutWarningInPracticeOrQualOnThisLap)
                         {
                             // cut track in prac / qual is the same as lap deleted. Rather than dick about with the sound files, just allow either here
                             audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                            playedTrackCutWarningInPracticeOrQualOnThisLap = true;
                         }
                     }
                     clearPenaltyState();
                 }
             }
-            else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
-              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
+            else if ((currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
+              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING))
             {
                 // JB: don't think we need this block - the previous block should always trigger in preference to this, but we'll leave it here just in case
                 cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
