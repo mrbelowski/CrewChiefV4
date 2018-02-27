@@ -895,14 +895,14 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings + 1;
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
-            if(shared.SessionData.IsTeamRacing)
-            {
-                currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarTeamIncidentCount;
-            }
-            else
-            {
+            //if(shared.SessionData.IsTeamRacing)
+            //{
+            //    currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarTeamIncidentCount;
+            //}
+            //else
+            //{
                 currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarMyIncidentCount;                
-            }
+            //}
             
 
             currentGameState.TyreData.FrontLeftPressure = shared.Telemetry.LFcoldPressure;
