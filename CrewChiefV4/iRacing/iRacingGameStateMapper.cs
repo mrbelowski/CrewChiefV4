@@ -33,13 +33,15 @@ namespace CrewChiefV4.iRacing
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(3);
         string prevTrackSurface = "";
-
+        
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
         private DateTime lastTimeEngineWaterTempWarning = DateTime.MaxValue;
         private DateTime lastTimeEngineOilPressureWarning = DateTime.MaxValue;
         private DateTime lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
+
+        private Boolean invalidateCutTrackLaps = UserSettings.GetUserSettings().getBoolean("iracing_invalidate_cut_track_laps"); 
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -888,7 +890,7 @@ namespace CrewChiefV4.iRacing
             }
 
             currentGameState.PenaltiesData.IsOffRacingSurface = shared.Telemetry.PlayerTrackSurface == TrackSurfaces.OffTrack;
-            if (!currentGameState.PitData.OnOutLap && previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface
+            if (invalidateCutTrackLaps && !currentGameState.PitData.OnOutLap && previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface
             && !(currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown))
             {
                 Console.WriteLine("Player off track");
