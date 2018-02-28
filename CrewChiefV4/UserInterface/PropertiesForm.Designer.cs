@@ -46,6 +46,8 @@ namespace CrewChiefV4
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
+            this.MinimizeBox = false;
+            this.MaximizeBox = false;
             // 
             // button1
             // 
