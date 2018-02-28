@@ -2730,6 +2730,70 @@
 			]
 		},
 		{
+			"irTrackName": "oulton inthislop",
+			"trackLandmarks": [{
+					"landmarkName": "old_hall",
+					"distanceRoundLapStart": 130,
+					"distanceRoundLapEnd": 310,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "dentons",
+					"distanceRoundLapStart": 480,
+					"distanceRoundLapEnd": 575,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "cascades",
+					"distanceRoundLapStart": 615,
+					"distanceRoundLapEnd": 845,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "lake_side",
+					"distanceRoundLapStart": 1240,
+					"distanceRoundLapEnd": 1490,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "shell_oils_corner",
+					"distanceRoundLapStart": 1525,
+					"distanceRoundLapEnd": 1720,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_chicane",
+					"distanceRoundLapStart": 2473,
+					"distanceRoundLapEnd": 2630,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "knickerbrook",
+					"distanceRoundLapStart": 2631,
+					"distanceRoundLapEnd": 2770,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "druids",
+					"distanceRoundLapStart": 3260,
+					"distanceRoundLapEnd": 3480,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "lodge",
+					"distanceRoundLapStart": 3845,
+					"distanceRoundLapEnd": 3960,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "deer_leap",
+					"distanceRoundLapStart": 4050,
+					"distanceRoundLapEnd": 4095,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
 			"rf2TrackNames": ["Oulton Park International NC"],
 			"trackLandmarks": [{
 					"landmarkName": "old_hall",

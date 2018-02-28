@@ -186,8 +186,8 @@ namespace CrewChiefV4.GameState
             {
                 return newPosition;
             }
-            if (newPosition < 1)
-            {
+            if (newPosition < 1 && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+            { 
                 Console.WriteLine("Can't update position to " + newPosition);
                 return oldPosition;
             }
