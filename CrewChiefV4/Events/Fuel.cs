@@ -436,7 +436,7 @@ namespace CrewChiefV4.Events
                             int raceLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
                             if (halfDistance != -1 && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps == halfDistance)
                             {
-                                if (estimatedFuelLapsLeft < halfDistance)
+                                if (estimatedFuelLapsLeft <= halfDistance)
                                 {
                                     if (currentGameState.PitData.IsRefuellingAllowed)
                                     {
@@ -536,7 +536,8 @@ namespace CrewChiefV4.Events
                                 playedHalfTimeFuelEstimate = true;
                                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                                 {
-                                    if (averageUsagePerMinute * halfTime / 60 > currentGameState.FuelData.FuelLeft)
+                                    // need a bit of slack in this estimate:
+                                    if (averageUsagePerMinute * (halfTime + currentGameState.SessionData.PlayerLapTimeSessionBest) / 60 > currentGameState.FuelData.FuelLeft)
                                     {
                                         if (currentGameState.PitData.IsRefuellingAllowed)
                                         {
