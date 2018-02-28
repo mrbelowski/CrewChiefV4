@@ -20,6 +20,21 @@ namespace CrewChiefV4.UserInterface
             String path = Configuration.getDefaultFileLocation(CrewChief.Debugging ? "..\\help.txt" : "help.txt");
             textBox1.Text = File.ReadAllText(path);
             textBox1.Select(0, 0);
+
+            this.KeyPreview = true;
+            this.KeyDown += ShowHelp_KeyDown;
+        }
+
+        private void ShowHelp_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                this.textBox1.SelectAll();
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+            }
         }
     }
 }
