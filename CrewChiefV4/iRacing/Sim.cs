@@ -14,7 +14,7 @@ namespace CrewChiefV4.iRacing
         {
             _drivers = new List<Driver>();
             _sessionData = new SessionData();
-            _sessionId = null;
+            _sessionId = -1;
             _driver = null;
             _paceCar = null;
         }
@@ -24,8 +24,11 @@ namespace CrewChiefV4.iRacing
 
         private iRacingData _telemetry;
 
-        private int? _sessionId;
-        public int? SessionId { get { return _sessionId; } }
+        private int _sessionId;
+        public int SessionId { get { return _sessionId; } }
+
+        private int _subSessionId;
+        public int SubSessionId { get { return _subSessionId; } }
 
         private int? _currentSessionNumber;
         public int? CurrentSessionNumber { get { return _currentSessionNumber; } }
@@ -170,9 +173,9 @@ namespace CrewChiefV4.iRacing
             if (this.SessionData.EventType == "Race" && flag.HasFlag(SessionFlags.Checkered))
             {
                 //we need to check if player is the first(p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
-                if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.HasCrossedSFLine)
-                {                    
-                    if (_driver.Live.HasCrossedSFLine)
+                if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.IsNewLap)
+                {
+                    if (_driver.Live.IsNewLap)
                     {
                         Console.WriteLine("player just crossed line to finish race");
                         raceEndState = RaceEndState.FINISHED;
@@ -194,9 +197,7 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
                 {
-                    //this is a test to try and combad some of the wrong position messages so also check TrackSurfaces == NotInWorld as we also do that in mapper(skip entries),
-                    //and thats a bit bad since we sort class positions in races internaly.
-                    if(driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut || driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
+                    if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                     {
                         continue;
                     }
@@ -235,16 +236,20 @@ namespace CrewChiefV4.iRacing
         }
 
         public bool SdkOnSessionInfoUpdated(string sessionInfo, int sessionNumber, int driverId)
-        {           
+        {
+
             _DriverId = driverId;
             bool reloadDrivers = false;
-            //also need 
-            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber) || _sessionId == null || _sessionData.SessionId != _sessionId )
+            //also need
+            int sessionId = Parser.ParseInt(YamlParser.Parse(sessionInfo, "WeekendInfo:SessionID:"));
+            int subSessionId = Parser.ParseInt(YamlParser.Parse(sessionInfo, "WeekendInfo:SubSessionID:"));
+            if (_currentSessionNumber == null || (_currentSessionNumber != sessionNumber) || sessionId != _sessionId || subSessionId != _subSessionId)
             {
                 // Session changed, reset session info
                 reloadDrivers = true;
                 _sessionData.Update(sessionInfo, sessionNumber);
-                _sessionId = _sessionData.SessionId;
+                _sessionId = sessionId;
+                _subSessionId = subSessionId;
             }
             _currentSessionNumber = sessionNumber;
             // Update drivers

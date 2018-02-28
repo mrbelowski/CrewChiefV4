@@ -988,7 +988,42 @@ namespace CrewChiefV4.GameState
                 isProbablyLastLap = true;
             }
         }
+        public void CompleteLapThatMightHaveMissingSectorTimes(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid,
+        Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+        {
+            if (OpponentLapData.Count > 0)
+            {
+                LapData lapData = OpponentLapData[OpponentLapData.Count - 1];
+                lapData.IsValid = lapWasValid;
+                if (!lapData.hasMissingSectors || lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
+                {
+                    AddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapData.IsValid, isRaining, trackTemp, airTemp);
+                }
+                else
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        lapData.SectorTimes[i] = -1;
+                        lapData.SectorPositions[i] = position;
+                        lapData.GameTimeAtSectorEnd[i] = gameTimeAtLapEnd;
+                        lapData.Conditions[i] = new LapConditions(isRaining, trackTemp, airTemp);
+                    }
+                }
+                lapData.LapTime = providedLapTime;
+                LastLapTime = providedLapTime;
+                if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                {
+                    PreviousBestLapTime = CurrentBestLapTime;
+                    CurrentBestLapTime = lapData.LapTime;
+                }
+                LastLapValid = lapData.IsValid;
 
+            }
+            if (sessionLengthIsTime && sessionTimeRemaining > 0 && CurrentBestLapTime > 0 && sessionTimeRemaining < CurrentBestLapTime - 5)
+            {
+                isProbablyLastLap = true;
+            }
+        }
         public void AddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, 
             Boolean isRaining, float trackTemp, float airTemp)
         {
