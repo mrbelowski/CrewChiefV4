@@ -3190,5 +3190,17 @@ namespace CrewChiefV4.Properties {
                 this["add_additional_fuel"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool iracing_invalidate_cut_track_laps {
+            get {
+                return ((bool)(this["iracing_invalidate_cut_track_laps"]));
+            }
+            set {
+                this["iracing_invalidate_cut_track_laps"] = value;
+            }
+        }
     }
 }

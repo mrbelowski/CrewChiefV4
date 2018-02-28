@@ -794,5 +794,8 @@
     <Setting Name="add_additional_fuel" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="iracing_invalidate_cut_track_laps" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
