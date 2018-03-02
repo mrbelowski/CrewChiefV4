@@ -950,6 +950,17 @@ namespace CrewChiefV4
             }
 
             this.Resize += MainWindow_Resize;
+            this.KeyPreview = true;
+            this.KeyDown += MainWindow_KeyDown;
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if ( e.KeyCode == Keys.F1)
+            {
+                this.helpButtonClicked(sender, e);
+                e.Handled = true;
+            }
         }
 
         private void MainWindow_TextChanged(object sender, EventArgs e)

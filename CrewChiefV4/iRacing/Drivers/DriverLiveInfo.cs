@@ -15,6 +15,14 @@ namespace CrewChiefV4.iRacing
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
             _prevSector = -1;
+            LiveLapsCompleted = -1;
+            LapsCompleted = -1;
+            this.Sectors = new[]
+                    {
+                        new Sector() {Number = 0, StartPercentage = 0f},
+                        new Sector() {Number = 1, StartPercentage = 0.333f},
+                        new Sector() {Number = 2, StartPercentage = 0.666f}
+                    };
         }
 
         private readonly Driver _driver;
@@ -32,7 +40,7 @@ namespace CrewChiefV4.iRacing
         public float CorrectedLapDistance { get; private set; }
         public float TotalLapDistance
         {
-            get { return this.LapsCompleted + CorrectedLapDistance; }
+            get { return this.LiveLapsCompleted + CorrectedLapDistance; }
         }
 
         public TrackSurfaces TrackSurface { get; private set; }
@@ -42,27 +50,34 @@ namespace CrewChiefV4.iRacing
 
         public double Speed { get; private set; }
         public double SpeedKph { get; private set; }
-        
+        public float GameTimeWhenLastCrossedSFLine { get; private set; }
         public int CurrentSector  { get; set; }
+        public int LiveLapsCompleted { get; set; }
         public int LapsCompleted { get; set; }
         public bool IsNewLap { get; set; }
         public bool PreviousLapWasValid { get; set; }
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
+        public Sector[] Sectors { get; set; }
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
         private int _prevLap;
         private int _prevSector;
+
         public void ParseTelemetry(iRacingData e)
         {   
                      
             this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
             this.Lap = e.CarIdxLap[this.Driver.Id];
-
-            if (this._prevSector == 3 && (this.CurrentSector == 1))
-            {
+            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
+            if (this._prevSector == 3 && (this.CurrentSector == 1) || 
+                (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
+            {                
                 HasCrossedSFLine = true;
+                //this is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
+                GameTimeWhenLastCrossedSFLine = (float)e.SessionTime;
+
             }
             else
             {
@@ -72,28 +87,34 @@ namespace CrewChiefV4.iRacing
             {
                 this._prevSector = this.CurrentSector;
             }
+            
+            if (_driver.CurrentResults.LapsComplete > this.LapsCompleted)
+            {
+                this.IsNewLap = true;
+            }
+            else
+            {
+                this.IsNewLap = false;
+            }
+            this.LapsCompleted = _driver.CurrentResults.LapsComplete;
 
             this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
-            this.LapsCompleted = e.CarIdxLapCompleted[this.Driver.Id];
-            if (this.LapsCompleted < 0)
-            {
-                this.LapsCompleted = 0;
-            }
-            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];            
+            this.LiveLapsCompleted = e.CarIdxLapCompleted[this.Driver.Id] < this.LapsCompleted ? this.LapsCompleted : e.CarIdxLapCompleted[this.Driver.Id];
+                  
             this.Gear = e.CarIdxGear[this.Driver.Id];
             this.Rpm = e.CarIdxRPM[this.Driver.Id];
-            this.SessionTime = (float)e.SessionTime;
 
             //for local player we use data from telemetry as its updated faster then session info,
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                this.LapTimePrevious = e.LapLastLapTime;                            
+                this.LapTimePrevious = e.LapLastLapTime;                           
             }
             else
             {
                 this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
-            }                
+            }
+            this.PreviousLapWasValid = this.LapTimePrevious > 1;     
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
