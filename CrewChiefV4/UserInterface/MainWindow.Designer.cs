@@ -94,7 +94,7 @@ namespace CrewChiefV4
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
             this.SuspendLayout();
             // 
-            // textBox1
+            // consoleTextBox
             // 
             this.consoleTextBox.Location = new System.Drawing.Point(41, 215);
             this.consoleTextBox.MaxLength = 99999999;
@@ -103,14 +103,14 @@ namespace CrewChiefV4
             this.consoleTextBox.ReadOnly = true;
             this.consoleTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
-            this.consoleTextBox.TabIndex = 1;
+            this.consoleTextBox.TabIndex = 200;
             // 
             // startApplicationButton
             // 
             this.startApplicationButton.Location = new System.Drawing.Point(41, 28);
             this.startApplicationButton.Name = "startApplicationButton";
             this.startApplicationButton.Size = new System.Drawing.Size(137, 38);
-            this.startApplicationButton.TabIndex = 5;
+            this.startApplicationButton.TabIndex = 40;
             this.startApplicationButton.Text = Configuration.getUIString("start_application");
             this.startApplicationButton.UseVisualStyleBackColor = true;
             this.startApplicationButton.Click += new System.EventHandler(this.startApplicationButton_Click);
@@ -121,7 +121,7 @@ namespace CrewChiefV4
             this.buttonActionSelect.Location = new System.Drawing.Point(295, 520);
             this.buttonActionSelect.Name = "buttonActionSelect";
             this.buttonActionSelect.Size = new System.Drawing.Size(528, 115);
-            this.buttonActionSelect.TabIndex = 7;
+            this.buttonActionSelect.TabIndex = 230;
             this.buttonActionSelect.SelectedIndexChanged += new System.EventHandler(this.buttonActionSelect_SelectedIndexChanged);
             // 
             // controllersList
@@ -130,7 +130,7 @@ namespace CrewChiefV4
             this.controllersList.Location = new System.Drawing.Point(41, 520);
             this.controllersList.Name = "controllersList";
             this.controllersList.Size = new System.Drawing.Size(248, 85);
-            this.controllersList.TabIndex = 8;
+            this.controllersList.TabIndex = 210;
             this.controllersList.SelectedIndexChanged += new System.EventHandler(this.controllersList_SelectedIndexChanged);
             // 
             // assignButtonToAction
@@ -138,7 +138,7 @@ namespace CrewChiefV4
             this.assignButtonToAction.Location = new System.Drawing.Point(830, 520);
             this.assignButtonToAction.Name = "assignButtonToAction";
             this.assignButtonToAction.Size = new System.Drawing.Size(130, 39);
-            this.assignButtonToAction.TabIndex = 9;
+            this.assignButtonToAction.TabIndex = 240;
             this.assignButtonToAction.Text = Configuration.getUIString("assign_control");
             this.assignButtonToAction.UseVisualStyleBackColor = true;
             this.assignButtonToAction.Click += new System.EventHandler(this.assignButtonToActionClick);
@@ -148,7 +148,7 @@ namespace CrewChiefV4
             this.deleteAssigmentButton.Location = new System.Drawing.Point(830, 564);
             this.deleteAssigmentButton.Name = "deleteAssigmentButton";
             this.deleteAssigmentButton.Size = new System.Drawing.Size(130, 40);
-            this.deleteAssigmentButton.TabIndex = 10;
+            this.deleteAssigmentButton.TabIndex = 250;
             this.deleteAssigmentButton.Text = Configuration.getUIString("delete_assignment");
             this.deleteAssigmentButton.UseVisualStyleBackColor = true;
             this.deleteAssigmentButton.Click += new System.EventHandler(this.deleteAssignmentButtonClicked);
@@ -160,13 +160,13 @@ namespace CrewChiefV4
             this.label1.Location = new System.Drawing.Point(38, 500);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(138, 17);
-            this.label1.TabIndex = 11;
+            this.label1.TabIndex = 209;
             this.label1.Text = Configuration.getUIString("available_controllers");
 
             this.scanControllersButton.Location = new System.Drawing.Point(38, 610);
             this.scanControllersButton.Name = "scan_controllers_button";
             this.scanControllersButton.Size = new System.Drawing.Size(143, 30);
-            this.scanControllersButton.TabIndex = 99;
+            this.scanControllersButton.TabIndex = 220;
             this.scanControllersButton.Text = Configuration.getUIString("scan_controllers");
             this.scanControllersButton.UseVisualStyleBackColor = true;
             this.scanControllersButton.Click += new System.EventHandler(this.scanControllersButtonClicked);
@@ -178,7 +178,7 @@ namespace CrewChiefV4
             this.label2.Location = new System.Drawing.Point(323, 501);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 17);
-            this.label2.TabIndex = 12;
+            this.label2.TabIndex = 229;
             this.label2.Text = Configuration.getUIString("available_actions");
             // 
             // button1
@@ -186,7 +186,7 @@ namespace CrewChiefV4
             this.button1.Location = new System.Drawing.Point(991, 105);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 31);
-            this.button1.TabIndex = 14;
+            this.button1.TabIndex = 110;
             this.button1.Text = Configuration.getUIString("properties");
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.editPropertiesButtonClicked);
@@ -197,7 +197,7 @@ namespace CrewChiefV4
             this.helpButton.Location = new System.Drawing.Point(991, 137);
             this.helpButton.Name = "help";
             this.helpButton.Size = new System.Drawing.Size(143, 31);
-            this.helpButton.TabIndex = 97;
+            this.helpButton.TabIndex = 120;
             this.helpButton.Text = Configuration.getUIString("help");
             this.helpButton.UseVisualStyleBackColor = true;
             this.helpButton.Click += new System.EventHandler(this.helpButtonClicked);
@@ -208,22 +208,22 @@ namespace CrewChiefV4
             this.aboutButton.Location = new System.Drawing.Point(991, 169);
             this.aboutButton.Name = "about";
             this.aboutButton.Size = new System.Drawing.Size(143, 31);
-            this.aboutButton.TabIndex = 98;
+            this.aboutButton.TabIndex = 130;
             this.aboutButton.Text = Configuration.getUIString("about");
             this.aboutButton.UseVisualStyleBackColor = true;
             this.aboutButton.Click += new System.EventHandler(this.aboutButtonClicked);
-            
+
             // 
             // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.alwaysOnButton);
-            this.groupBox1.Controls.Add(this.toggleButton);
-            this.groupBox1.Controls.Add(this.holdButton);
+            //
             this.groupBox1.Controls.Add(this.voiceDisableButton);
+            this.groupBox1.Controls.Add(this.holdButton);
+            this.groupBox1.Controls.Add(this.toggleButton);
+            this.groupBox1.Controls.Add(this.alwaysOnButton);
             this.groupBox1.Location = new System.Drawing.Point(970, 520);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(164, 121);
-            this.groupBox1.TabIndex = 15;
+            this.groupBox1.TabIndex = 260;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = Configuration.getUIString("voice_recognition_mode");
             // 
@@ -233,7 +233,6 @@ namespace CrewChiefV4
             this.alwaysOnButton.Location = new System.Drawing.Point(7, 91);
             this.alwaysOnButton.Name = "alwaysOnButton";
             this.alwaysOnButton.Size = new System.Drawing.Size(75, 17);
-            this.alwaysOnButton.TabIndex = 3;
             this.alwaysOnButton.TabStop = true;
             this.alwaysOnButton.Text = Configuration.getUIString("always_on");
             this.alwaysOnButton.UseVisualStyleBackColor = true;
@@ -245,7 +244,6 @@ namespace CrewChiefV4
             this.toggleButton.Location = new System.Drawing.Point(7, 67);
             this.toggleButton.Name = "toggleButton";
             this.toggleButton.Size = new System.Drawing.Size(90, 17);
-            this.toggleButton.TabIndex = 2;
             this.toggleButton.TabStop = true;
             this.toggleButton.Text = Configuration.getUIString("toggle_button");
             this.toggleButton.UseVisualStyleBackColor = true;
@@ -257,7 +255,6 @@ namespace CrewChiefV4
             this.holdButton.Location = new System.Drawing.Point(7, 44);
             this.holdButton.Name = "holdButton";
             this.holdButton.Size = new System.Drawing.Size(81, 17);
-            this.holdButton.TabIndex = 1;
             this.holdButton.TabStop = true;
             this.holdButton.Text = Configuration.getUIString("hold_button");
             this.holdButton.UseVisualStyleBackColor = true;
@@ -269,7 +266,6 @@ namespace CrewChiefV4
             this.voiceDisableButton.Location = new System.Drawing.Point(7, 20);
             this.voiceDisableButton.Name = "voiceDisableButton";
             this.voiceDisableButton.Size = new System.Drawing.Size(64, 17);
-            this.voiceDisableButton.TabIndex = 0;
             this.voiceDisableButton.TabStop = true;
             this.voiceDisableButton.Text = Configuration.getUIString("disabled");
             this.voiceDisableButton.UseVisualStyleBackColor = true;
@@ -280,7 +276,7 @@ namespace CrewChiefV4
             this.button2.Location = new System.Drawing.Point(184, 28);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(137, 38);
-            this.button2.TabIndex = 16;
+            this.button2.TabIndex = 50;
             this.button2.Text = Configuration.getUIString("clear_console");
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.clearConsole);
@@ -290,7 +286,7 @@ namespace CrewChiefV4
             this.messagesVolumeSlider.Location = new System.Drawing.Point(327, 28);
             this.messagesVolumeSlider.Name = "messagesVolumeSlider";
             this.messagesVolumeSlider.Size = new System.Drawing.Size(176, 45);
-            this.messagesVolumeSlider.TabIndex = 17;
+            this.messagesVolumeSlider.TabIndex = 60;
             this.messagesVolumeSlider.Scroll += new System.EventHandler(this.messagesVolumeSlider_Scroll);
             // 
             // label3
@@ -299,7 +295,7 @@ namespace CrewChiefV4
             this.label3.Location = new System.Drawing.Point(367, 12);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(94, 13);
-            this.label3.TabIndex = 18;
+            this.label3.TabIndex = 59;
             this.label3.Text = Configuration.getUIString("messages_volume");
             // 
             // backgroundVolumeSlider
@@ -307,7 +303,7 @@ namespace CrewChiefV4
             this.backgroundVolumeSlider.Location = new System.Drawing.Point(558, 28);
             this.backgroundVolumeSlider.Name = "backgroundVolumeSlider";
             this.backgroundVolumeSlider.Size = new System.Drawing.Size(184, 45);
-            this.backgroundVolumeSlider.TabIndex = 19;
+            this.backgroundVolumeSlider.TabIndex = 70;
             this.backgroundVolumeSlider.Scroll += new System.EventHandler(this.backgroundVolumeSlider_Scroll);
             // 
             // label4
@@ -316,7 +312,7 @@ namespace CrewChiefV4
             this.label4.Location = new System.Drawing.Point(567, 11);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(104, 13);
-            this.label4.TabIndex = 20;
+            this.label4.TabIndex = 69;
             this.label4.Text = Configuration.getUIString("background_volume");
             // 
             // gameDefinitionList
@@ -328,7 +324,7 @@ namespace CrewChiefV4
             this.gameDefinitionList.Name = "gameDefinitionList";
             this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 173);
             this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 173);
-            this.gameDefinitionList.TabIndex = 21;
+            this.gameDefinitionList.TabIndex = 80;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
             // label5
@@ -337,17 +333,17 @@ namespace CrewChiefV4
             this.label5.Location = new System.Drawing.Point(779, 9);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(33, 13);
-            this.label5.TabIndex = 22;
+            this.label5.TabIndex = 79;
             this.label5.Text = Configuration.getUIString("game");
 
             // 
-            // label5
+            // personalisationLabel
             // 
             this.personalisationLabel.AutoSize = true;
             this.personalisationLabel.Location = new System.Drawing.Point(991, 9);
             this.personalisationLabel.Name = "personalisationLabel";
             this.personalisationLabel.Size = new System.Drawing.Size(33, 13);
-            this.personalisationLabel.TabIndex = 22;
+            this.personalisationLabel.TabIndex = 89;
             this.personalisationLabel.Text = Configuration.getUIString("personalisation_label");
 
             // 
@@ -356,7 +352,8 @@ namespace CrewChiefV4
             this.filenameTextbox.Location = new System.Drawing.Point(150, 2);
             this.filenameTextbox.Name = "filenameTextbox";
             this.filenameTextbox.Size = new System.Drawing.Size(108, 20);
-            this.filenameTextbox.TabIndex = 23;
+            this.filenameTextbox.TabIndex = 20;
+
             // 
             // filenameLabel
             // 
@@ -364,8 +361,9 @@ namespace CrewChiefV4
             this.filenameLabel.Location = new System.Drawing.Point(68, 5);
             this.filenameLabel.Name = "filenameLabel";
             this.filenameLabel.Size = new System.Drawing.Size(82, 13);
-            this.filenameLabel.TabIndex = 24;
-            this.filenameLabel.Text = "File name to run";
+            this.filenameLabel.TabIndex = 19;  // Setting accelerator key on a Label, sets focus on the next control in the tab order.
+            this.filenameLabel.Text = "File &name to run";
+
             // 
             // recordSession
             // 
@@ -373,8 +371,8 @@ namespace CrewChiefV4
             this.recordSession.Location = new System.Drawing.Point(7, 4);
             this.recordSession.Name = "recordSession";
             this.recordSession.Size = new System.Drawing.Size(61, 17);
-            this.recordSession.TabIndex = 25;
-            this.recordSession.Text = "Record";
+            this.recordSession.TabIndex = 10;
+            this.recordSession.Text = "&Record";
             this.recordSession.UseVisualStyleBackColor = true;
             // 
             // playbackInterval
@@ -382,7 +380,7 @@ namespace CrewChiefV4
             this.playbackInterval.Location = new System.Drawing.Point(261, 2);
             this.playbackInterval.Name = "playbackInterval";
             this.playbackInterval.Size = new System.Drawing.Size(100, 20);
-            this.playbackInterval.TabIndex = 26;
+            this.playbackInterval.TabIndex = 30;
             this.playbackInterval.TextChanged += new System.EventHandler(this.playbackIntervalChanged);
             // 
             // app_version
@@ -391,7 +389,6 @@ namespace CrewChiefV4
             this.app_version.Location = new System.Drawing.Point(1045, 650);
             this.app_version.Name = "app_version";
             this.app_version.Size = new System.Drawing.Size(65, 13);
-            this.app_version.TabIndex = 27;
             this.app_version.Text = Configuration.getUIString("app_version");
             // 
             // reset_app_version
@@ -400,7 +397,7 @@ namespace CrewChiefV4
             this.forceVersionCheckButton.Location = new System.Drawing.Point(1030, 665);
             this.forceVersionCheckButton.Name = "forceVersionCheckButton";
             this.forceVersionCheckButton.Size = new System.Drawing.Size(65, 13);
-            this.forceVersionCheckButton.TabIndex = 90;
+            this.forceVersionCheckButton.TabIndex = 290;
             this.forceVersionCheckButton.Text = Configuration.getUIString("check_for_updates");
             this.forceVersionCheckButton.UseVisualStyleBackColor = true;
             this.forceVersionCheckButton.Click += new System.EventHandler(this.forceVersionCheckButtonClicked);
@@ -411,7 +408,7 @@ namespace CrewChiefV4
             this.saveConsoleOutputButton.Location = new System.Drawing.Point(925, 665);
             this.saveConsoleOutputButton.Name = "saveConsoleOutputButton";
             this.saveConsoleOutputButton.Size = new System.Drawing.Size(65, 13);
-            this.saveConsoleOutputButton.TabIndex = 101;
+            this.saveConsoleOutputButton.TabIndex = 280;
             this.saveConsoleOutputButton.Text = Configuration.getUIString("save_console_output");
             this.saveConsoleOutputButton.UseVisualStyleBackColor = true;
             this.saveConsoleOutputButton.Click += new System.EventHandler(this.saveConsoleOutputButtonClicked);
@@ -421,7 +418,6 @@ namespace CrewChiefV4
             this.soundPackProgressBar.Location = new System.Drawing.Point(39, 176);
             this.soundPackProgressBar.Name = "soundPackProgressBar";
             this.soundPackProgressBar.Size = new System.Drawing.Size(220, 23);
-            this.soundPackProgressBar.TabIndex = 28;
             // 
             // downloadSoundPackButton
             // 
@@ -429,7 +425,7 @@ namespace CrewChiefV4
             this.downloadSoundPackButton.Location = new System.Drawing.Point(39, 123);
             this.downloadSoundPackButton.Name = "downloadSoundPackButton";
             this.downloadSoundPackButton.Size = new System.Drawing.Size(220, 37);
-            this.downloadSoundPackButton.TabIndex = 29;
+            this.downloadSoundPackButton.TabIndex = 170;
             this.downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
             this.downloadSoundPackButton.UseVisualStyleBackColor = true;
             this.downloadSoundPackButton.Click += new System.EventHandler(this.downloadSoundPackButtonPress);
@@ -440,7 +436,7 @@ namespace CrewChiefV4
             this.downloadDriverNamesButton.Location = new System.Drawing.Point(295, 123);
             this.downloadDriverNamesButton.Name = "downloadDriverNamesButton";
             this.downloadDriverNamesButton.Size = new System.Drawing.Size(220, 37);
-            this.downloadDriverNamesButton.TabIndex = 30;
+            this.downloadDriverNamesButton.TabIndex = 180;
             this.downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
             this.downloadDriverNamesButton.UseVisualStyleBackColor = true;
             this.downloadDriverNamesButton.Click += new System.EventHandler(this.downloadDriverNamesButtonPress);
@@ -450,7 +446,6 @@ namespace CrewChiefV4
             this.driverNamesProgressBar.Location = new System.Drawing.Point(295, 176);
             this.driverNamesProgressBar.Name = "driverNamesProgressBar";
             this.driverNamesProgressBar.Size = new System.Drawing.Size(220, 23);
-            this.driverNamesProgressBar.TabIndex = 31;
             // 
             // downloadPersonalisationsButton
             // 
@@ -458,7 +453,7 @@ namespace CrewChiefV4
             this.downloadPersonalisationsButton.Location = new System.Drawing.Point(550, 123);
             this.downloadPersonalisationsButton.Name = "downloadPersonalisationsButton";
             this.downloadPersonalisationsButton.Size = new System.Drawing.Size(220, 37);
-            this.downloadPersonalisationsButton.TabIndex = 95;
+            this.downloadPersonalisationsButton.TabIndex = 190;
             this.downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
             this.downloadPersonalisationsButton.UseVisualStyleBackColor = true;
             this.downloadPersonalisationsButton.Click += new System.EventHandler(this.downloadPersonalisationsButtonPress);
@@ -468,7 +463,6 @@ namespace CrewChiefV4
             this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 176);
             this.personalisationsProgressBar.Name = "personalisationsProgressBar";
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
-            this.personalisationsProgressBar.TabIndex = 31;
 
             this.personalisationBox.Location = new System.Drawing.Point(991, 28);
             this.personalisationBox.IntegralHeight = false;
@@ -476,13 +470,13 @@ namespace CrewChiefV4
             this.personalisationBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.personalisationBox.Name = "personalisationBox";
             this.personalisationBox.Size = new System.Drawing.Size(142, 400);
-            this.personalisationBox.TabIndex = 94;
+            this.personalisationBox.TabIndex = 90;
 
             this.spotterNameLabel.AutoSize = true;
             this.spotterNameLabel.Location = new System.Drawing.Point(991, 55);
             this.spotterNameLabel.Name = "spotterNameLabel";
             this.spotterNameLabel.Size = new System.Drawing.Size(33, 13);
-            this.spotterNameLabel.TabIndex = 22;
+            this.spotterNameLabel.TabIndex = 99;
             this.spotterNameLabel.Text = Configuration.getUIString("spotter_name_label");
 
             this.spotterNameBox.Location = new System.Drawing.Point(991, 70);
@@ -491,13 +485,14 @@ namespace CrewChiefV4
             this.spotterNameBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.spotterNameBox.Name = "spotterNameBox";
             this.spotterNameBox.Size = new System.Drawing.Size(142, 400);
-            this.spotterNameBox.TabIndex = 93;
+            this.spotterNameBox.TabIndex = 100;
             this.spotterNameBox.SelectedIndexChanged += new System.EventHandler(this.spotterNameBox_SelectedIndexChanged);
 
             this.donateLink.Location = new System.Drawing.Point(35, 650);
             this.donateLink.Size = new System.Drawing.Size(250, 15);
             this.donateLink.Text = Configuration.getUIString("donate_link_text");
             this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
+            this.donateLink.TabIndex = 270;
             
             // Associate the event-handling method with the 
             // SelectedIndexChanged event.
@@ -507,7 +502,7 @@ namespace CrewChiefV4
             this.speechRecognitionDeviceLabel.Location = new System.Drawing.Point(115, 70);
             this.speechRecognitionDeviceLabel.Name = "speechRecognitionDeviceLabel";
             this.speechRecognitionDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            this.speechRecognitionDeviceLabel.TabIndex = 101;
+            this.speechRecognitionDeviceLabel.TabIndex = 139;
             this.speechRecognitionDeviceLabel.Text = Configuration.getUIString("speech_recognition_device_label");
             this.speechRecognitionDeviceLabel.Visible = false;
 
@@ -517,7 +512,7 @@ namespace CrewChiefV4
             this.speechRecognitionDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.speechRecognitionDeviceBox.Name = "speechRecognitionDeviceBox";
             this.speechRecognitionDeviceBox.Size = new System.Drawing.Size(190, 400);
-            this.speechRecognitionDeviceBox.TabIndex = 94;
+            this.speechRecognitionDeviceBox.TabIndex = 140;
             this.speechRecognitionDeviceBox.Visible = false;
             this.speechRecognitionDeviceBox.Enabled = false;
 
@@ -527,7 +522,7 @@ namespace CrewChiefV4
             this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.messagesAudioDeviceBox.Name = "messagesAudioDeviceBox";
             this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
-            this.messagesAudioDeviceBox.TabIndex = 94;
+            this.messagesAudioDeviceBox.TabIndex = 150;
             this.messagesAudioDeviceBox.Visible = false;
             this.messagesAudioDeviceBox.Enabled = false;
 
@@ -535,25 +530,15 @@ namespace CrewChiefV4
             this.messagesAudioDeviceLabel.Location = new System.Drawing.Point(330, 70);
             this.messagesAudioDeviceLabel.Name = "messagesAudioDeviceLabel";
             this.messagesAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            this.messagesAudioDeviceLabel.TabIndex = 22;
+            this.messagesAudioDeviceLabel.TabIndex = 149;
             this.messagesAudioDeviceLabel.Text = Configuration.getUIString("messages_audio_device_label");
             this.messagesAudioDeviceLabel.Visible = false;
-
-            this.messagesAudioDeviceBox.Location = new System.Drawing.Point(330, 90);
-            this.messagesAudioDeviceBox.IntegralHeight = false;
-            this.messagesAudioDeviceBox.MaxDropDownItems = 5;
-            this.messagesAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.messagesAudioDeviceBox.Name = "messagesAudioDeviceBox";
-            this.messagesAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
-            this.messagesAudioDeviceBox.TabIndex = 94;
-            this.messagesAudioDeviceBox.Visible = false;
-            this.messagesAudioDeviceBox.Enabled = false;
 
             this.backgroundAudioDeviceLabel.AutoSize = true;
             this.backgroundAudioDeviceLabel.Location = new System.Drawing.Point(550, 70);
             this.backgroundAudioDeviceLabel.Name = "backgroundAudioDeviceLabel";
             this.backgroundAudioDeviceLabel.Size = new System.Drawing.Size(100, 13);
-            this.backgroundAudioDeviceLabel.TabIndex = 22;
+            this.backgroundAudioDeviceLabel.TabIndex = 159;
             this.backgroundAudioDeviceLabel.Text = Configuration.getUIString("background_audio_device_label");
             this.backgroundAudioDeviceLabel.Visible = false;
 
@@ -563,7 +548,7 @@ namespace CrewChiefV4
             this.backgroundAudioDeviceBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.backgroundAudioDeviceBox.Name = "backgroundAudioDeviceBox";
             this.backgroundAudioDeviceBox.Size = new System.Drawing.Size(190, 400);
-            this.backgroundAudioDeviceBox.TabIndex = 94;
+            this.backgroundAudioDeviceBox.TabIndex = 160;
             this.backgroundAudioDeviceBox.Visible = false;
             this.backgroundAudioDeviceBox.Enabled = false;
             // the handler for this is added when we initialise

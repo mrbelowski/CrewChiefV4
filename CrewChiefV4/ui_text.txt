@@ -12,17 +12,17 @@ checking_personalisations_version = Checking personalisations version...
 sound_pack_is_up_to_date = Sound Pack is up to date
 no_sound_pack_detected_unable_to_locate_update = No Sound Pack detected, unable to locate update
 no_sound_pack_detected_press_to_download = No Sound Pack detected, press to download
-updated_sound_pack_available_press_to_download = Updated Sound Pack available, press to download
+updated_sound_pack_available_press_to_download = &Updated Sound Pack available, press to download
 no_driver_names_detected_unable_to_locate_update = No driver names detected, unable to locate update
 no_driver_names_detected_press_to_download = No driver names detected, press to download
-updated_driver_names_available_press_to_download = Updated driver names available, press to download
+updated_driver_names_available_press_to_download = Updated dr&iver names available, press to download
 driver_names_are_up_to_date = Driver names are up to date
 no_personalisations_detected_unable_to_locate_update = No personalisations detected, unable to locate update
 no_personalisations_detected_press_to_download = No personalisations detected, press to download
-updated_personalisations_available_press_to_download = Updated personalisations available, press to download
+updated_personalisations_available_press_to_download = Updated personalisations available, press to do&wnload
 personalisations_are_up_to_date = Personalisations are up to date
-stop = Stop
-start_application = Start application
+stop = &Stop
+start_application = &Start application
 
 pcars_64_bit = pCARS (64 bit)
 pcars_32_bit = pCARS (32 bit)
@@ -42,35 +42,32 @@ iracing = iRacing
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
-scan_controllers = Scan for controllers
+scan_controllers = Scan for contro&llers
 
 waiting_for_button_click_to_cancel = Waiting for button, click to cancel
 assign = Assign
-assign_control = Assign control
-delete_assignment = Delete assignment
-available_controllers = Available controllers
-available_actions = Available actions
-properties = Properties
-voice_recognition_mode = Voice recognition mode
+assign_control = Assi&gn control
+delete_assignment = &Delete assignment
+available_controllers = Available &controllers
+available_actions = Available ac&tions
+properties = &Properties
+voice_recognition_mode = Voice &recognition mode
 always_on = Always on
 toggle_button = Press and release button
 hold_button = Hold button
 disabled = Disabled
-clear_console = Clear console
-game = Game
+clear_console = Clear c&onsole
+game = &Game
 app_version = App version
-help = Help and getting started
-about = About Crew Chief
-save_console_output = Save console text
+help = &Help and getting started
+about = &About Crew Chief
+save_console_output = Save console &text
 
 restore_context_menu = Restore
 start_context_menu = Start {0} mode
 close_context_menu = Close
 running_context_menu = Crew Chief is running in {0} mode
 idling_context_menu = Crew Chief is idling
-
-messages_volume = Messages volume
-background_volume = Background volume
 
 extracting_sound_pack = Extracting Sound Pack
 
@@ -114,8 +111,8 @@ integer_prop_type = (integer)
 real_number_prop_type = (real number)
 
 save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these changes and restart the application. Click 'No' to discard these changes
-save_changes = Save changes
-save_and_restart = Save and restart
+save_changes = &Save changes
+save_and_restart = S&ave and restart
 
 unknown_sound_pack_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English Sound Pack update files and set the language to English). Click "No" to cancel.
 unknown_sound_pack_language_title = No Sound Pack language defined
@@ -200,7 +197,8 @@ rf1_spotter_car_length = rF1 Spotter default car length
 rf2_spotter_car_length = rF2 Spotter default car length
 spotter_gap_for_clear = Spotter gap for clear
 
-background_volume = Background volume
+messages_volume = &Messages volume
+background_volume = &Background volume
 background_volume_help = The volume of the background sounds (0 - 1)
 update_interval = Update interval
 update_interval_help = The time (milliseconds) between app updates
@@ -394,7 +392,7 @@ enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
 enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
 
 personalisations_are_up_to_date = Personalisations are up to date
-personalisation_label = My name (requires restart)
+personalisation_label = M&y name (requires restart)
 
 install_plugin_popup_text = Crew Chief needs additional files to be installed or updated for the selected game. Click OK to install or Cancel to Return
 install_plugin_popup_title = Plugin Needed
@@ -421,7 +419,7 @@ prefer_alternative_download_site_help = Use the secondary download location for 
 
 version = Version
 the_application_must_be_restarted_to_check_for_updates = The application must be restarted to check for updates. Click OK to restart the application.
-check_for_updates = Force update check
+check_for_updates = &Force update check
 donate_link_text = Donate to Support Crew Chief development
 
 use_american_terms = Use American terms
@@ -440,8 +438,8 @@ minimize_on_startup = Minimize on startup
 minimize_to_tray_help = Starts Crew Chief minimized to task bar or system tray.
 
 properties_form = Crew Chief Configuration Properties
-exit_without_saving = Exit without Saving
-restore_default_settings = Restore Default Settings
+exit_without_saving = E&xit without Saving
+restore_default_settings = &Restore Default Settings
 
 search_box_default_text = Search for property (Ctrl+E)
 search_box_tooltip_line1 = Hint:
@@ -457,7 +455,7 @@ no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
 reset_warning_title = Reset All Settings to Default Values
 
-spotter_name_label = Spotter voice (requires restart)
+spotter_name_label = Spotter &voice (requires restart)
 get_fuel_status = Report fuel/battery status
 
 toggle_manual_formation_lap = Toggle manual formation lap mode
@@ -496,8 +494,8 @@ use_verbose_responses_help = If enabled, will automatically request more info fo
 toggle_pace_notes_recording = Start / stop recording pace notes
 toggle_pace_notes_playback = Start / stop playing pace notes
 
-messages_audio_device_label = Messages playback device
-background_audio_device_label = Background playback device
+messages_audio_device_label = Messages playbac&k device
+background_audio_device_label = Background playback &device
 use_naudio = Use nAudio for playback
 use_naudio_help = nAudio playback library allows playback device selection and higher volumes
 
@@ -541,7 +539,7 @@ spotter_oval_clear_delay_help = You need to be clear for this many milliseconds 
 use_naudio_for_speech_recognition = Use nAudio for speech recognition
 use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
 
-speech_recognition_device_label = Speech input device
+speech_recognition_device_label = Sp&eech input device
 
 enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
 enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
@@ -589,3 +587,6 @@ enable_tight_fuel_calc_help = Enable this if you don't want the app to add addit
 
 add_additional_fuel = Additional fuel to add to finish the race.
 add_additional_fuel_help = The amount of extra fuel(liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
+
+iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
+iracing_invalidate_cut_track_laps = Disable this if you don't want the app to invalidate laps where you cut the track.
