@@ -893,6 +893,11 @@ namespace CrewChiefV4.rFactor1
                     CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
                     currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
+                    if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
+                        currentGameState.SessionData.PlayerClassSessionBestLapTime > opponent.CurrentBestLapTime)
+                    {
+                        currentGameState.SessionData.PlayerClassSessionBestLapTime = opponent.CurrentBestLapTime;
+                    }
                 }
 
                 if (opponentPrevious != null)
@@ -1035,11 +1040,17 @@ namespace CrewChiefV4.rFactor1
             // Improvised cut track warnings based on surface type.
             if (!currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane && incrementCutTrackCountWhenLeavingRacingSurface)
             {
+                rFactor1Constant.rfSurfaceType fl_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].surfaceType;
+                rFactor1Constant.rfSurfaceType fr_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].surfaceType;
+                rFactor1Constant.rfSurfaceType rl_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType;
+                rFactor1Constant.rfSurfaceType rr_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType;
+
+                // assume kerb is racing surface here - any wheel on a racing surface is OK
                 currentGameState.PenaltiesData.IsOffRacingSurface =
-                    shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
-                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.frontRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
-                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet
-                    && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.dry && shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType != (int)rFactor1Constant.rfSurfaceType.wet;
+                    fl_surface != rFactor1Constant.rfSurfaceType.dry && fl_surface != rFactor1Constant.rfSurfaceType.wet && fl_surface != rFactor1Constant.rfSurfaceType.kerb &&
+                    fr_surface != rFactor1Constant.rfSurfaceType.dry && fr_surface != rFactor1Constant.rfSurfaceType.wet && fr_surface != rFactor1Constant.rfSurfaceType.kerb &&
+                    rl_surface != rFactor1Constant.rfSurfaceType.dry && rl_surface != rFactor1Constant.rfSurfaceType.wet && rl_surface != rFactor1Constant.rfSurfaceType.kerb &&
+                    rr_surface != rFactor1Constant.rfSurfaceType.dry && rr_surface != rFactor1Constant.rfSurfaceType.wet && rr_surface != rFactor1Constant.rfSurfaceType.kerb;
 
                 if (previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface)
                 {

@@ -654,7 +654,8 @@
 		},
 		{
 			"carClassEnum": "ROAD_E",
-			"pCarsClassNames": ["Road E"],
+            "pCarsClassNames": [ "Road E" ],
+            "rf1ClassNames": ["P911T"],
 			"defaultTyreType": "Road",
 			"brakeType": "Iron_Road",
 			"maxSafeWaterTemp": 102,

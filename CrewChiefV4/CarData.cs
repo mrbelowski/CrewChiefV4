@@ -17,9 +17,9 @@ namespace CrewChiefV4
     {
         // some temperatures - maybe externalise these
         // These are the peaks. If the tyre exceeds these temps even for one tick over a lap, we'll warn about it. This is why they look so high
-        private static float maxColdRoadTyreTempPeak = 65;
-        private static float maxWarmRoadTyreTempPeak = 106;
-        private static float maxHotRoadTyreTempPeak = 120;
+        private static float maxColdRoadTyreTempPeak = 50;
+        private static float maxWarmRoadTyreTempPeak = 90;
+        private static float maxHotRoadTyreTempPeak = 110;
 
         // very wide range for unknown tyres
         private static float maxColdUnknownRaceTyreTempPeak = 70;
