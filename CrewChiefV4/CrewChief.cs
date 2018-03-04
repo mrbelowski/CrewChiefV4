@@ -652,7 +652,6 @@ namespace CrewChiefV4
 
             Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms");
             Boolean sessionFinished = false;
-
             while (running)
             {
                 DateTime now = DateTime.Now;
