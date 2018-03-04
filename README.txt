@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.2.2: AMS off-track warning tweak - make 'kerb' a legal surface to drive on (should make the warnings much less common); A few other AMS fixes; Half distance fuel calculation tweak to make it a little more conservative; iRacing workarounds for missing opponent data when cars aren't rendered by the game; A few other iRacing bug fixes; Some UI tweaks to fix tab ordering and add shortcut keys (underlined on the UI)
+
 Version 4.9.2.1: Fixed missing fuel data in RF2; Added option to specify how much 'reserve' to add when doing fuel calculations (enable the "Enable tight fuel calculations" property and set the reserve amount with the "Additional fuel to finish the race" property); Fixed iRacing SoF calculation; Various minor tweaks
 
 Version 4.9.2.0: New RF2 shared memory plugin with better performance; More work to fix iRacing crashes since switching to the faster parser; Reinstated an iRacing crash fix that got lost in a previous update; Added an option to fall back to a slower, safer session info parser method in iRacing (property 'iRacing faster parser'). If the app crashes for you, uncheck this option to use the slower parse method and please post your findings a debug log in our forums so we can track the issue down
