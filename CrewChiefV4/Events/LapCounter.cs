@@ -259,7 +259,8 @@ namespace CrewChiefV4.Events
                     possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, Battery.folderLaps), 0, this));
                 }
             }
-            else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
+            else if (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 && /* session time in gridwalk phase isn't usable in rf1 */
+                currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
             {
                 if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
                 {
