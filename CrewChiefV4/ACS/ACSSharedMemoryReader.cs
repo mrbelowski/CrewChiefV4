@@ -147,14 +147,6 @@ namespace CrewChiefV4.assetto
                 {
                     if(!forSpotter)
                     {
-                        using (var sharedMemoryStreamView = memoryMappedGraphicFile.CreateViewStream())
-                        {
-                            BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
-                            sharedMemoryGraphicReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryGraphicsize);
-                            handleGraphic = GCHandle.Alloc(sharedMemoryGraphicReadBuffer, GCHandleType.Pinned);
-                            acsShared.acsGraphic = (SPageFileGraphic)Marshal.PtrToStructure(handleGraphic.AddrOfPinnedObject(), typeof(SPageFileGraphic));
-                            handleGraphic.Free();
-                        }
                         using (var sharedMemoryStreamView = memoryMappedStaticFile.CreateViewStream())
                         {
                             BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -164,7 +156,14 @@ namespace CrewChiefV4.assetto
                             handleStatic.Free();
                         }
                     }
-
+                    using (var sharedMemoryStreamView = memoryMappedGraphicFile.CreateViewStream())
+                    {
+                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                        sharedMemoryGraphicReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryGraphicsize);
+                        handleGraphic = GCHandle.Alloc(sharedMemoryGraphicReadBuffer, GCHandleType.Pinned);
+                        acsShared.acsGraphic = (SPageFileGraphic)Marshal.PtrToStructure(handleGraphic.AddrOfPinnedObject(), typeof(SPageFileGraphic));
+                        handleGraphic.Free();
+                    }
                     using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
