@@ -59,12 +59,12 @@ namespace CrewChiefV4
         protected abstract List<String> GetSeconds(int seconds);
 
         /**
-         * Separate recordings for when we just want a number of seconds with hundreths. This is only used when we have no minutes part,
+         * Separate recordings for when we just want a number of seconds with hundredths. This is only used when we have no minutes part,
          * or we have a minutes part *and* the number of seconds is 10 or more (because these sounds have no "zero.." or "oh.." part.
          * This is (currently) only applicable to English numbers.
          *
          */
-        protected abstract List<String> GetSecondsWithHundreths(int seconds, int hundreths);
+        protected abstract List<String> GetSecondsWithHundredths(int seconds, int hundredths);
 
         /**
          * Separate recordings for when we just want a number of seconds with tenths with 1 or 2 minutes. 
@@ -99,7 +99,7 @@ namespace CrewChiefV4
                 }
                 // so now these tenths and hundredths can never be 10 or 100 respectively:
                 int tenths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 100f);
-                int hundreths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
+                int hundredths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
                 Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
@@ -107,14 +107,14 @@ namespace CrewChiefV4
 
                 Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
                     timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
-                    (precision == Precision.HUNDREDTHS && hundreths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
+                    (precision == Precision.HUNDREDTHS && hundredths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 if (useNewENSeconds)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
                     if (precision == Precision.HUNDREDTHS)
                     {
-                        messageFolders.AddRange(GetSecondsWithHundreths(timeSpanWrapper.timeSpan.Seconds, hundreths));
+                        messageFolders.AddRange(GetSecondsWithHundredths(timeSpanWrapper.timeSpan.Seconds, hundredths));
                     } 
                     else if (precision == Precision.TENTHS)
                     {
@@ -130,8 +130,8 @@ namespace CrewChiefV4
                     messageFolders.Add(AbstractEvent.Pause(50));
                     if (precision == Precision.HUNDREDTHS)
                     {
-                        String leadingZero = hundreths < 10 ? "0" : "";
-                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, leadingZero + hundreths));
+                        String leadingZero = hundredths < 10 ? "0" : "";
+                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, leadingZero + hundredths));
                     }
                     else if (precision == Precision.TENTHS)
                     {

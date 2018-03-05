@@ -245,12 +245,12 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * 
          */
-        protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        protected override List<String> GetSecondsWithHundredths(int seconds, int hundredths)
         {
-            String leadingZero = hundreths < 10 ? "0" : "";
+            String leadingZero = hundredths < 10 ? "0" : "";
             List<String> messages = new List<String>();
             messages.Add(folderNumbersStub + seconds);
-            messages.Add(folderPoint + leadingZero + hundreths);
+            messages.Add(folderPoint + leadingZero + hundredths);
             return messages;
         }
 

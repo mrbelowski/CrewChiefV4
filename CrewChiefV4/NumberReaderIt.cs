@@ -225,7 +225,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Not implemented for Italian number reader.
          * */
-        protected override List<String> GetSecondsWithHundreths(int seconds, int hundreths)
+        protected override List<String> GetSecondsWithHundredths(int seconds, int hundredths)
         {
             return null;
         }
