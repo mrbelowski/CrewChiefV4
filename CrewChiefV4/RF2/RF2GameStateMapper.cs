@@ -1437,7 +1437,8 @@ namespace CrewChiefV4.rFactor2
                 {
                     csd.OpponentsLapTimeSessionBestPlayerClass = opponent.CurrentBestLapTime;
 
-                    if (csd.OpponentsLapTimeSessionBestPlayerClass < csd.PlayerClassSessionBestLapTime)
+                    if (csd.PlayerClassSessionBestLapTime == -1.0f
+                        || csd.PlayerClassSessionBestLapTime > csd.OpponentsLapTimeSessionBestPlayerClass)
                         csd.PlayerClassSessionBestLapTime = csd.OpponentsLapTimeSessionBestPlayerClass;
 
                     if (opponent.IsNewLap && opponentPrevious != null && !opponentPrevious.IsNewLap)
@@ -1624,11 +1625,16 @@ namespace CrewChiefV4.rFactor2
                 && !cgs.PitData.InPitlane
                 && !cgs.PitData.OnOutLap)
             {
+                var wfls = wheelFrontLeft.mSurfaceType;
+                var wfrs = wheelFrontRight.mSurfaceType;
+                var wrls = wheelRearLeft.mSurfaceType;
+                var wrrs = wheelRearRight.mSurfaceType;
+
                 cgs.PenaltiesData.IsOffRacingSurface =
-                    wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelFrontRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearLeft.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet
-                    && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Dry && wheelRearRight.mSurfaceType != (int)rFactor2Constants.rF2SurfaceType.Wet;
+                    wfls != (int)rFactor2Constants.rF2SurfaceType.Dry && wfls != (int)rFactor2Constants.rF2SurfaceType.Wet && wfls != (int)rFactor2Constants.rF2SurfaceType.Kerb
+                    && wfrs != (int)rFactor2Constants.rF2SurfaceType.Dry && wfrs != (int)rFactor2Constants.rF2SurfaceType.Wet && wfrs != (int)rFactor2Constants.rF2SurfaceType.Kerb
+                    && wrls != (int)rFactor2Constants.rF2SurfaceType.Dry && wrls != (int)rFactor2Constants.rF2SurfaceType.Wet && wrls != (int)rFactor2Constants.rF2SurfaceType.Kerb
+                    && wrrs != (int)rFactor2Constants.rF2SurfaceType.Dry && wrrs != (int)rFactor2Constants.rF2SurfaceType.Wet && wrrs != (int)rFactor2Constants.rF2SurfaceType.Kerb;
 
                 if (this.enableCutTrackHeuristics)
                 {
