@@ -371,7 +371,7 @@
 			"carClassEnum": "F1",
 			"raceroomClassIds": [5824],
 			"pCarsClassNames": ["FA", "Formula A"],
-			"rf2ClassNames": ["Formula ISI 2012", "OW Formula 1 2017 Single Player", "OW Formula 1 2017 League Edition", "F1 2016 Single Player", "F1 2016 League Edition", "Mercedes Amg Petronas FW08", "Mclaren Honda Mcl32", "Toro-rosso STR12", "Ferrari SF70H", "Renault R.S 17", "Haas VF-17", "Force India VJM10", "Redbull Racing RB13", "Williams Racing FW40", "Sauber F1 c34 Hybrid"],
+			"rf2ClassNames": ["Formula ISI 2012", "OW Formula 1 2017 Single Player", "OW Formula 1 2017 League Edition", "F1 2016 Single Player", "F1 2016 League Edition", "Mercedes Amg Petronas FW08", "Mclaren Honda Mcl32", "Toro-rosso STR12", "Ferrari SF70H", "Renault R.S 17", "Haas VF-17", "Force India VJM10", "Redbull Racing RB13", "Williams Racing FW40", "Sauber F1 c34 Hybrid", "F1RFT 2013"],
 			"acClassNames": ["ks_ferrari_f138", "ferrari_f2002", "ks_ferrari_sf15t"],
 			"brakeType": "Carbon",
 			"maxSafeWaterTemp": 105,

@@ -527,6 +527,10 @@ namespace CrewChiefV4.rFactor2
                 foreach (var m in GlobalBehaviourSettings.enabledMessageTypes)
                     Console.WriteLine('\t' + m.ToString());
 
+                Console.WriteLine("Spotter enabled: " + GlobalBehaviourSettings.spotterEnabled);
+                Console.WriteLine("Oval logic enabled: " + GlobalBehaviourSettings.useOvalLogic);
+                Console.WriteLine("Using American terms: " + GlobalBehaviourSettings.useAmericanTerms);
+
                 // Initialize track landmarks for this session.
                 TrackDataContainer tdc = null;
                 if (this.lastSessionTrackDataContainer != null
