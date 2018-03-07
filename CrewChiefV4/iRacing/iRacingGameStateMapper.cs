@@ -32,7 +32,6 @@ namespace CrewChiefV4.iRacing
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(3);
-        string prevTrackSurface = "";
         
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
@@ -80,7 +79,6 @@ namespace CrewChiefV4.iRacing
                 lastSessionPhase = previousGameState.SessionData.SessionPhase;
                 lastSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
                 lastSessionType = previousGameState.SessionData.SessionType;
-                currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
                 previousSessionNumber = previousGameState.SessionData.SessionIteration;
                 previousSessionId = previousGameState.SessionData.SessionId;
@@ -151,15 +149,6 @@ namespace CrewChiefV4.iRacing
 
                 currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
-                if (currentGameState.SessionData.SessionType == SessionType.Race)
-                {
-                    currentGameState.SessionData.SessionStartPosition = playerCar.CurrentResults.QualifyingPosition;
-                }
-                else
-                {
-                    currentGameState.SessionData.SessionStartPosition = playerCar.Live.Position;
-                }
-                Console.WriteLine("SessionStartPosition = " + currentGameState.SessionData.SessionStartPosition);
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionTimeRemaining = (float)shared.Telemetry.SessionTimeRemain;
 
@@ -278,7 +267,6 @@ namespace CrewChiefV4.iRacing
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                        Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                         Console.WriteLine("TrackName " + trackName + " Track Reported Length " + currentGameState.SessionData.TrackDefinition.trackLength);
@@ -294,7 +282,6 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
                     currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
-                    currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
                     currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
@@ -1032,9 +1019,6 @@ namespace CrewChiefV4.iRacing
             }
             return SessionType.Unavailable;
         }
-
-        string prevSessionFlags = "";
-        string prevSessionStates = "";
 
         private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionStates sessionState,
             SessionType currentSessionType, bool isReplay, float thisSessionRunningTime,

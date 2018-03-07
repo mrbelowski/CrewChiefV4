@@ -313,7 +313,6 @@ namespace CrewChiefV4.RaceRoom
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
-                        currentGameState.SessionData.SessionStartPosition = shared.Position;
                         currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
@@ -386,7 +385,6 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                        Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                         Console.WriteLine("TrackName " + trackName);                        
@@ -399,7 +397,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
                     currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
-                    currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
                     currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
