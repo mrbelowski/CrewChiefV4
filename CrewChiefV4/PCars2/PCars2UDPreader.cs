@@ -40,9 +40,6 @@ namespace CrewChiefV4.PCars2
         private long discardedTelemCount = 0;
         private long acceptedOutOfSequenceTelemCount = 0;
 
-        private float lastValidTelemCurrentLapTime = -1;
-        private float lastValidTelemLapsCompleted = 0;
-
         private Boolean newSpotterData = true;
         private Boolean running = false;
         private Boolean initialised = false;
@@ -125,8 +122,6 @@ namespace CrewChiefV4.PCars2
                 vehicleNamesPacketCount = 0;
                 timeStatsPacketCount = 0;
                 participantVehicleNamesPacketCount = 0;
-                lastValidTelemCurrentLapTime = -1;
-                lastValidTelemLapsCompleted = 0;
 
                 packetCountAtStartOfCurrentRateCheck = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
@@ -443,8 +438,6 @@ namespace CrewChiefV4.PCars2
             vehicleNamesPacketCount = 0;
             timeStatsPacketCount = 0;
             participantVehicleNamesPacketCount = 0;
-            lastValidTelemCurrentLapTime = -1;
-            lastValidTelemLapsCompleted = 0; 
             buttonsState = new Boolean[24];
         }
 

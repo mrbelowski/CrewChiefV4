@@ -591,12 +591,7 @@ namespace CrewChiefV4.rFactor2
             csd.NumCarsOverall = shared.scoring.mScoringInfo.mNumVehicles;
             csd.NumCarsOverallAtStartOfSession = csd.IsNewSession ? csd.NumCarsOverall : psd.NumCarsOverallAtStartOfSession;
             csd.OverallPosition = playerScoring.mPlace;
-            csd.SessionStartPosition = csd.IsNewSession ? csd.OverallPosition : psd.SessionStartPosition;
-
-            // Position isn't accurate till ~1.5 secs since Gridwalk (for in-session restart case).  So, fix it up.
-            if (csd.SessionType == SessionType.Race && csd.SessionPhase == SessionPhase.Countdown)
-                csd.SessionStartPosition = csd.OverallPosition;
-
+            
             csd.SectorNumber = playerScoring.mSector == 0 ? 3 : playerScoring.mSector;
             csd.IsNewSector = csd.IsNewSession || csd.SectorNumber != psd.SectorNumber;
             csd.IsNewLap = csd.IsNewSession || (csd.IsNewSector && csd.SectorNumber == 1);
@@ -1676,7 +1671,6 @@ namespace CrewChiefV4.rFactor2
                 Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsOverallAtStartOfSession);
                 Console.WriteLine("SessionNumberOfLaps " + csd.SessionNumberOfLaps);
                 Console.WriteLine("SessionRunTime " + csd.SessionTotalRunTime);
-                Console.WriteLine("SessionStartPosition " + csd.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
                 Console.WriteLine("Track Name \"" + csd.TrackDefinition.name + "\"");
                 Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +

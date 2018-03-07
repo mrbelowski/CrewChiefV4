@@ -1004,7 +1004,6 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
-                currentGameState.SessionData.SessionStartPosition = (int)playerVehicle.carLeaderboardPosition;
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
                     currentGameState.SessionData.SessionTotalRunTime = sessionTimeRemaining;
@@ -1088,7 +1087,6 @@ namespace CrewChiefV4.assetto
                             }
                             currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                             currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
-                            currentGameState.SessionData.SessionStartPosition = playerVehicle.carLeaderboardPosition;
                         }
                         lapCountAtSector1End = -1;
                         currentGameState.SessionData.LeaderHasFinishedRace = false;
@@ -1157,7 +1155,6 @@ namespace CrewChiefV4.assetto
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                        Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                         Console.WriteLine("TrackName " + trackName);
@@ -1169,7 +1166,6 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
-                    currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
