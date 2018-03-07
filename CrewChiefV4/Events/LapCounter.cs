@@ -341,7 +341,7 @@ namespace CrewChiefV4.Events
         {
             if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
             {
-                Console.WriteLine("pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued + " to: " + this.currentSessionTotalRunTime);
+                Console.WriteLine("pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued.ToString("0.00") + " to: " + this.currentSessionTotalRunTime.ToString("0.00"));
             }
 
             int minutes = (int)this.currentSessionTotalRunTime / 60;

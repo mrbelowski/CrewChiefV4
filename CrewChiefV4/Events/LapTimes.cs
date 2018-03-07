@@ -309,8 +309,8 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionType == SessionType.Race)
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
-                        Console.WriteLine("Opponents best sectors = " + lapAndSectorsComparisonData[1] + ", " + lapAndSectorsComparisonData[2] + ", " + lapAndSectorsComparisonData[3]);
-                        Console.WriteLine("Player best sectors = " + currentGameState.SessionData.PlayerBestSector1Time + ", " + currentGameState.SessionData.PlayerBestSector2Time + ", " + currentGameState.SessionData.PlayerBestSector3Time);
+                        Console.WriteLine("Opponents best sectors = " + lapAndSectorsComparisonData[1].ToString("0.000") + ", " + lapAndSectorsComparisonData[2].ToString("0.000") + ", " + lapAndSectorsComparisonData[3].ToString("0.000"));
+                        Console.WriteLine("Player best sectors = " + currentGameState.SessionData.PlayerBestSector1Time.ToString("0.000") + ", " + currentGameState.SessionData.PlayerBestSector2Time.ToString("0.000") + ", " + currentGameState.SessionData.PlayerBestSector3Time.ToString("0.000"));
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
@@ -1185,8 +1185,8 @@ namespace CrewChiefV4.Events
             }
             if (messages.Count > 0)
             {
-                Console.WriteLine("sector = " + sector + " delta (-ve = player faster) = " + (playerTime - comparisonTime));
-                Console.WriteLine("resolved delta message: " + String.Join(", ", messages));
+                Console.WriteLine("Sector = " + sector + " delta (-ve = player faster) = " + (playerTime - comparisonTime).ToString("0.000"));
+                Console.WriteLine("Resolved delta message: " + String.Join(", ", messages));
             }
             return messages;
         }
@@ -1463,12 +1463,12 @@ namespace CrewChiefV4.Events
             }
             if (messageFragments.Count > 0)
             {
-                Console.WriteLine("player best sectors " + playerSector1 + ", " + playerSector2 + ", " + playerSector3);
-                Console.WriteLine("opponent best sectors " + comparisonSector1 + ", " + comparisonSector2 + ", " + comparisonSector3);
-                Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1) +
-                    " s2 delta  = " + (playerSector2 - comparisonSector2) +
-                    " s3 delta  = " + (playerSector3 - comparisonSector3));
-                Console.WriteLine("resolved delta message: " + String.Join(", ", messageFragments));
+                Console.WriteLine("Player best sectors " + playerSector1.ToString("0.000") + ", " + playerSector2.ToString("0.000") + ", " + playerSector3.ToString("0.000"));
+                Console.WriteLine("Opponent best sectors " + comparisonSector1.ToString("0.000") + ", " + comparisonSector2.ToString("0.000") + ", " + comparisonSector3.ToString("0.000"));
+                Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1).ToString("0.000") +
+                    " s2 delta  = " + (playerSector2 - comparisonSector2).ToString("0.000") +
+                    " s3 delta  = " + (playerSector3 - comparisonSector3).ToString("0.000"));
+                Console.WriteLine("Resolved delta message: " + String.Join(", ", messageFragments));
             }
             return messageFragments;
         }

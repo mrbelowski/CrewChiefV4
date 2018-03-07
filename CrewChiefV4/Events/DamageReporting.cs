@@ -302,8 +302,8 @@ namespace CrewChiefV4.Events
                         // if it doesn't increase in that time, we can assume it's a bad 'un
                         if (calculatedAcceleration > 400)
                         {
-                            Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed +
-                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed + " acceleration = " + calculatedAcceleration / 9.8f + "g");
+                            Console.WriteLine("Massive impact. Current speed = " + currentGameState.PositionAndMotionData.CarSpeed.ToString("0.000") +
+                                " previous speed = " + previousGameState.PositionAndMotionData.CarSpeed.ToString("0.000") + " acceleration = " + (calculatedAcceleration / 9.8f).ToString("0.0000") + "g");
                             if (currentGameState.PositionAndMotionData.CarSpeed < 3)
                             {
                                 timeOfDangerousAcceleration = currentGameState.Now;

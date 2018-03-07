@@ -827,7 +827,7 @@ namespace CrewChiefV4
         {
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = true;
-            Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence);
+            Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence.ToString("0.000"));
             try
             {
                 // special case when we're waiting for a message after a heavy crash:
