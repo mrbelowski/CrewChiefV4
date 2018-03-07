@@ -122,7 +122,7 @@ namespace CrewChiefV4.Events
                 // If, the moment message is about to play, the player has started a new lap, this message is no longer valid so shouldn't be played
                 if (eventSubType == folderThreeLapsToServe)
                 {
-                    Console.WriteLine("checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
+                    Console.WriteLine("Checking penalty validity, pen lap = " + penaltyLap + ", completed =" + lapsCompleted);
                     return hasOutstandingPenalty && lapsCompleted == penaltyLap && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
                 }
                 else if (eventSubType == folderCutTrackInRace)
