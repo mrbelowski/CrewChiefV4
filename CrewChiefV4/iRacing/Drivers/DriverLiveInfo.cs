@@ -179,7 +179,7 @@ namespace CrewChiefV4.iRacing
                 _prevSpeedUpdateTime = t1;
                 _prevSpeedUpdateDist = p1;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Log.Instance.LogError("Calculating speed of car " + this.Driver.Id, ex);
                 this.Speed = 0;

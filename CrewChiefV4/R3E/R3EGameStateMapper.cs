@@ -14,6 +14,11 @@ namespace CrewChiefV4.RaceRoom
 {
     public class R3EGameStateMapper : GameStateMapper
     {
+        // this is set when we first join a practice or qual session (or when the session first starts). All participants
+        // car classes are recalculated every tick for 5 seconds
+        private DateTime recheckCarClassesUntil = DateTime.MinValue;
+        private TimeSpan recheckCarClassesForSeconds = TimeSpan.FromSeconds(5);
+
         private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
 
         private List<CornerData.EnumWithThresholds> suspensionDamageThresholds = new List<CornerData.EnumWithThresholds>();
@@ -202,6 +207,17 @@ namespace CrewChiefV4.RaceRoom
                 lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)
             {                
                 currentGameState.SessionData.IsNewSession = true;
+                // if this is a new prac / qual session, we might have just joined a multiclass session so we need to keep
+                // updating the car class until it settles.
+                if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
+                {
+                    recheckCarClassesUntil = currentGameState.Now.Add(recheckCarClassesForSeconds);
+                }
+                else
+                {
+                    // probably don't need to reset this but it does no harm
+                    recheckCarClassesUntil = DateTime.MinValue;
+                }
                 Console.WriteLine("New session, trigger data:");
                 Console.WriteLine("lastSessionPhase = " + lastSessionPhase);
                 Console.WriteLine("lastSessionRunningTime = " + lastSessionRunningTime);
@@ -313,7 +329,6 @@ namespace CrewChiefV4.RaceRoom
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
-                        currentGameState.SessionData.SessionStartPosition = shared.Position;
                         currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
@@ -386,7 +401,6 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                        Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                         Console.WriteLine("TrackName " + trackName);                        
@@ -399,7 +413,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
                     currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
                     currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
-                    currentGameState.SessionData.SessionStartPosition = previousGameState.SessionData.SessionStartPosition;
                     currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
                     currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession;
                     currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
@@ -877,7 +890,8 @@ namespace CrewChiefV4.RaceRoom
                                 currentGameState.SessionData.SessionType == SessionType.Race,
                                 currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                 participantStruct.CarSpeed,
-                                participantStruct.LapTimeCurrentSelf);
+                                participantStruct.LapTimeCurrentSelf,
+                                participantStruct.DriverInfo.ClassId, currentGameState.Now);
 
                         currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
 
@@ -1299,7 +1313,20 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
                 lastTimeEngineWasRunning = DateTime.MaxValue;
-            }            
+            }
+
+            // hack to work around delayed car class data joining online multiclass sessions
+            if (currentGameState.Now < recheckCarClassesUntil)
+            {
+                CarData.CarClass correctedCarClass = CarData.getCarClassForRaceRoomId(playerDriverData.DriverInfo.ClassId);
+                if (!CarData.IsCarClassEqual(correctedCarClass, currentGameState.carClass))
+                {
+                    Console.WriteLine("Player car class in game data has changed. Updating to " + correctedCarClass.getClassIdentifier());
+                    currentGameState.carClass = correctedCarClass;
+                    CarData.RACEROOM_CLASS_ID = playerDriverData.DriverInfo.ClassId;
+                    GlobalBehaviourSettings.UpdateFromCarClass(correctedCarClass);
+                }
+            }
             return currentGameState;
         }
 
@@ -1571,8 +1598,22 @@ namespace CrewChiefV4.RaceRoom
             float completedLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition,
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
             Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance, float speed,
-            /* currentLapTime is used only to correct the game time at lap start */float currentLapTime)
+            /* currentLapTime is used only to correct the game time at lap start */float currentLapTime,
+            /* may need to recalculate car classes for a short time at session start */int carClassId, DateTime now)
         {
+            // hack to work around delayed car class data in online sessions
+            if (now < recheckCarClassesUntil)
+            {
+                CarData.CarClass correctedCarClass = CarData.getCarClassForRaceRoomId(carClassId);
+                if (!CarData.IsCarClassEqual(opponentData.CarClass, correctedCarClass)) 
+                {
+                    // note we're not correcting the tyre types here but this shouldn't matter as we don't announce them in 
+                    // practice and qually anyway
+                    Console.WriteLine("Correcting driver " + opponentData.DriverRawName + "'s car class to " + correctedCarClass.getClassIdentifier());
+                    opponentData.CarClass = correctedCarClass;
+                }
+            }
+
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             opponentData.Speed = speed;

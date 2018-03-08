@@ -382,7 +382,7 @@ namespace CrewChiefV4
                     names.Add(line.Trim());
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignore - file doesn't exist so it'll be created
             }

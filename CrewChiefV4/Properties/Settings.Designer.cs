@@ -3014,9 +3014,9 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public string enable_ams_pit_state_during_fcy {
+        public bool enable_ams_pit_state_during_fcy {
             get {
-                return ((string)(this["enable_ams_pit_state_during_fcy"]));
+                return ((bool)(this["enable_ams_pit_state_during_fcy"]));
             }
             set {
                 this["enable_ams_pit_state_during_fcy"] = value;
