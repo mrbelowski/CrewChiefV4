@@ -270,7 +270,6 @@ namespace CrewChiefV4.GameState
         // some timed sessions have an extra lap added after the timer reaches zero
         public Boolean HasExtraLap = false;
 
-        public int SessionStartPosition = 0;
         public int SessionStartClassPosition = 0;
 
         public int NumCarsOverallAtStartOfSession = 0;

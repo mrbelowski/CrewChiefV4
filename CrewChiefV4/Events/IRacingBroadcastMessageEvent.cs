@@ -39,9 +39,6 @@ namespace CrewChiefV4.Events
         public static String folderLicenseR = "licence/r_licence";
         public static String folderLicensePro = "licence/pro_licence";
 
-        private Boolean playedIncidentsWarning = false;
-        private Boolean playedLastIncidentsLeftWarning = false;
-
         private int lastColdFLPressure = -1;
         private int lastColdFRPressure = -1;
         private int lastColdRLPressure = -1;
@@ -68,8 +65,6 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
-            this.playedIncidentsWarning = false;
-            this.playedLastIncidentsLeftWarning = false;
             this.fuelCapacity = -1;
         }
 
@@ -84,8 +79,6 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
-            this.playedIncidentsWarning = false;
-            this.playedLastIncidentsLeftWarning = false;
         }
 
         public override List<SessionPhase> applicableSessionPhases

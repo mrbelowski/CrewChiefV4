@@ -243,7 +243,9 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.currentLapIsFCY = true;
             }
 
-            currentGameState.SessionData.TrackDefinition.setGapPoints();
+            // don't do this on every tick - assume the previous gamestate's data we copied earlier are still valid:
+            // currentGameState.SessionData.TrackDefinition.setGapPoints();
+
             currentGameState.SessionData.SessionNumberOfLaps = shared.maxLaps > 0 && shared.maxLaps < 1000 ? shared.maxLaps : 0;
             // default to 60:30 if both session time and number of laps undefined (test day)
             float defaultSessionTotalRunTime = 3630;
@@ -308,7 +310,6 @@ namespace CrewChiefV4.rFactor1
             currentGameState.SessionData.NumCarsOverallAtStartOfSession = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.NumCarsOverall : previousGameState.SessionData.NumCarsOverallAtStartOfSession;
 
             currentGameState.SessionData.OverallPosition = player.place;
-            currentGameState.SessionData.SessionStartPosition = currentGameState.SessionData.IsNewSession ? currentGameState.SessionData.OverallPosition : previousGameState.SessionData.SessionStartPosition;
             currentGameState.SessionData.SectorNumber = player.sector == 0 ? 3 : player.sector;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.IsNewSession || currentGameState.SessionData.SectorNumber != previousGameState.SessionData.SectorNumber;
             currentGameState.SessionData.IsNewLap = currentGameState.SessionData.IsNewSession || (currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == 1);
@@ -1111,7 +1112,6 @@ namespace CrewChiefV4.rFactor1
                 Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                 Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
                 Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                Console.WriteLine("SessionStartPosition " + currentGameState.SessionData.SessionStartPosition);
                 Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                 Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() +
