@@ -13,7 +13,7 @@ function GetScriptDirectory {
 
 function OverwriteFile($from, $to) {
 
-    Write-Host "Overwriting " $from " with " $to
+    Write-Host "Overwriting "  $to " with " $from
     Copy-Item $from -Destination $to -Force
     
     echo ""
