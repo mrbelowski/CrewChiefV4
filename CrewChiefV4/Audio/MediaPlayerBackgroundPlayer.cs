@@ -169,7 +169,7 @@ namespace CrewChiefV4.Audio
             {
                 this.mainThreadContext.Send(delegate
                 {
-                    Console.WriteLine("looping...");
+                    Console.WriteLine("Looping...");
                     backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
                 }, null);
             }

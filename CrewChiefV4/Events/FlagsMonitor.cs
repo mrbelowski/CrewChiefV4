@@ -1088,7 +1088,7 @@ namespace CrewChiefV4.Events
                                 namesToDebug.Add(opponentNamesToRead[i].DriverRawName);
                                 messageContents.AddRange(MessageContents(opponentNamesToRead[i]));
                             }
-                            Console.WriteLine("incident in " + waitingForCrashedDriverInCorner + " for drivers " + String.Join(",", namesToDebug));
+                            Console.WriteLine("Incident in " + waitingForCrashedDriverInCorner + " for drivers " + String.Join(",", namesToDebug));
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", messageContents, 0, this));
@@ -1104,7 +1104,7 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            Console.WriteLine("incident in " + waitingForCrashedDriverInCorner);
+                            Console.WriteLine("Incident in " + waitingForCrashedDriverInCorner);
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + waitingForCrashedDriverInCorner), 0, this));

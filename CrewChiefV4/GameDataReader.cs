@@ -52,7 +52,7 @@ namespace CrewChiefV4
         // NOTE: InitialiseInternal must be synchronized internally.
         public Boolean Initialise()
         {
-            Console.WriteLine("initialising");
+            Console.WriteLine("Initialising...");
             Boolean initialised = InitialiseInternal();
             if (dataFilesPath == null)
             {
@@ -62,7 +62,7 @@ namespace CrewChiefV4
             if (initialised && dumpToFile)
             {
                 filenameToDump = dataFilesPath + "\\" + CrewChief.gameDefinition.gameEnum.ToString() + "_" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".gz";
-                Console.WriteLine("session recording will be dumped to file: " + filenameToDump);
+                Console.WriteLine("Session recording will be dumped to file: " + filenameToDump);
             }
             return initialised;
         }

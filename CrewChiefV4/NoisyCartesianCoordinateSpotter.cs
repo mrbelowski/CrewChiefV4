@@ -552,7 +552,7 @@ namespace CrewChiefV4
         {
             if (carsOnLeftCount == 0 && carsOnRightCount == 0 && carsOnLeftAtPreviousTick > 0 && carsOnRightAtPreviousTick > 0)
             {
-                Console.WriteLine("clear all round");
+                Console.WriteLine("Clear all round");
                 nextMessageType = NextMessageType.clearAllRound;
                 nextMessageDue = now.Add(GlobalBehaviourSettings.useOvalLogic ? ovalClearMessageDelay : clearMessageDelay);
             }

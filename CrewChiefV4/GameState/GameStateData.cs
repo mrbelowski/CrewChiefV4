@@ -2474,10 +2474,10 @@ namespace CrewChiefV4.GameState
 
         public void displayOpponentData()
         {
-            Console.WriteLine("got " + OpponentData.Count + " opponents");
+            Console.WriteLine("Got " + OpponentData.Count + " opponents");
             foreach (KeyValuePair<string, OpponentData> opponent in OpponentData)
             {
-                Console.WriteLine("last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps +
+                Console.WriteLine("Last laptime " + opponent.Value.getLastLapTime() + " completed laps " + opponent.Value.CompletedLaps +
                     " ID " + opponent.Key + " name " + opponent.Value.DriverRawName + " active " + opponent.Value.IsActive +
                     " approx speed " + opponent.Value.Speed + " class position " + opponent.Value.ClassPosition +
                     " overall position " + opponent.Value.OverallPosition);
