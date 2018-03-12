@@ -827,7 +827,7 @@ namespace CrewChiefV4
         {
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = true;
-            Console.WriteLine("recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence.ToString("0.000"));
+            Console.WriteLine("Recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence.ToString("0.000"));
             try
             {
                 // special case when we're waiting for a message after a heavy crash:
@@ -917,7 +917,7 @@ namespace CrewChiefV4
             {
                 sre.RecognizeAsyncStop();
                 Thread.Sleep(500);
-                Console.WriteLine("stopping speech recognition");
+                Console.WriteLine("Stopping speech recognition");
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
@@ -925,7 +925,7 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    Console.WriteLine("restarting speech recognition");
+                    Console.WriteLine("Restarting speech recognition");
                     recognizeAsync();
                 }
                 // in always-on mode, we're now waiting-for-speech until we get another result
@@ -936,7 +936,7 @@ namespace CrewChiefV4
                 // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
                 if (SpeechRecogniser.keepRecognisingInHoldMode)
                 {
-                    Console.WriteLine("waiting for more speech");
+                    Console.WriteLine("Waiting for more speech");
                     waitingForSpeech = true;
                 }
             }
@@ -944,7 +944,7 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
-            Console.WriteLine("opened channel - waiting for speech");
+            Console.WriteLine("Opened channel - waiting for speech");
             SpeechRecogniser.waitingForSpeech = true;
             SpeechRecogniser.gotRecognitionResult = false;
             SpeechRecogniser.keepRecognisingInHoldMode = true;
@@ -990,7 +990,7 @@ namespace CrewChiefV4
 
         public void recognizeAsyncCancel()
         {
-            Console.WriteLine("cancelling wait for speech");
+            Console.WriteLine("Cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
             if (useNAudio)
             {

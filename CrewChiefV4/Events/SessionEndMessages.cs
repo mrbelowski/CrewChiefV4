@@ -63,12 +63,12 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        Console.WriteLine("skipping race session end message because the previous phase wasn't Finished");
+                        Console.WriteLine("Skipping race session end message because the previous phase wasn't Finished");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("skipping race session end message because it didn't run for a lap or " + minSessionRunTimeForEndMessages + " seconds");
+                    Console.WriteLine("Skipping race session end message because it didn't run for a lap or " + minSessionRunTimeForEndMessages + " seconds");
                 }
             }
             else if (sessionType == SessionType.Practice || sessionType == SessionType.Qualify)
@@ -83,12 +83,12 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        Console.WriteLine("skipping non-race session end message because the previous phase wasn't green, finished, or checkered");
+                        Console.WriteLine("Skipping non-race session end message because the previous phase wasn't green, finished, or checkered");
                     }
                 }
                 else
                 {
-                    Console.WriteLine("skipping non-race session end message because the session didn't run for " + minSessionRunTimeForEndMessages + " seconds");
+                    Console.WriteLine("Skipping non-race session end message because the session didn't run for " + minSessionRunTimeForEndMessages + " seconds");
                 }
             }
         }

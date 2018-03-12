@@ -738,7 +738,7 @@ namespace CrewChiefV4.Audio
                                 eventName == lastImmediateMessageName && GameStateData.CurrentTime - lastImmediateMessageTime < TimeSpan.FromSeconds(5);
                             if (messageHasExpired || !messageIsStillValid || hasJustPlayedAsAnImmediateMessage)
                             {
-                                Console.WriteLine("skipping message " + eventName +
+                                Console.WriteLine("Skipping message " + eventName +
                                     ", messageHasExpired:" + messageHasExpired + ", messageIsStillValid:" + messageIsStillValid + ", hasJustPlayedAsAnImmediateMessage:" + hasJustPlayedAsAnImmediateMessage);
                                 soundsProcessed.Add(eventName);
                                 continue;
@@ -821,7 +821,7 @@ namespace CrewChiefV4.Audio
                 }
                 else
                 {
-                    Console.WriteLine("we've been interrupted after playing " + playedEventCount + " events");
+                    Console.WriteLine("We've been interrupted after playing " + playedEventCount + " events");
                     wasInterrupted = true;
                     break;
                 }

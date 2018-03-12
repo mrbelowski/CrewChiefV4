@@ -365,7 +365,7 @@ namespace CrewChiefV4.Events
                                         opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
                                         (!onlyAnnounceOpponentAfter.TryGetValue(opponentName, out announceAfterTime) || currentGameState.Now > announceAfterTime))
                                     {
-                                        Console.WriteLine("new car ahead: " + opponentName);
+                                        Console.WriteLine("New car ahead: " + opponentName);
                                         audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                             Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                             new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));

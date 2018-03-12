@@ -674,7 +674,7 @@ namespace CrewChiefV4.Events
                 // check the lap time was recorded
                 if (lapTimesWindow[index] <= 0)
                 {
-                    Console.WriteLine("no data for consistency check");
+                    Console.WriteLine("No data for consistency check");
                     lastConsistencyMessage = ConsistencyResult.NOT_APPLICABLE;
                     return ConsistencyResult.NOT_APPLICABLE;
                 }
@@ -1465,9 +1465,9 @@ namespace CrewChiefV4.Events
             {
                 Console.WriteLine("Player best sectors " + playerSector1.ToString("0.000") + ", " + playerSector2.ToString("0.000") + ", " + playerSector3.ToString("0.000"));
                 Console.WriteLine("Opponent best sectors " + comparisonSector1.ToString("0.000") + ", " + comparisonSector2.ToString("0.000") + ", " + comparisonSector3.ToString("0.000"));
-                Console.WriteLine("s1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1).ToString("0.000") +
-                    " s2 delta  = " + (playerSector2 - comparisonSector2).ToString("0.000") +
-                    " s3 delta  = " + (playerSector3 - comparisonSector3).ToString("0.000"));
+                Console.WriteLine("S1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1).ToString("0.000") +
+                    " S2 delta  = " + (playerSector2 - comparisonSector2).ToString("0.000") +
+                    " S3 delta  = " + (playerSector3 - comparisonSector3).ToString("0.000"));
                 Console.WriteLine("Resolved delta message: " + String.Join(", ", messageFragments));
             }
             return messageFragments;

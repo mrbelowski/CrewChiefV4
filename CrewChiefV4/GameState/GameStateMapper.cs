@@ -48,6 +48,9 @@ namespace CrewChiefV4.GameState
             // always set the session start class position and lap start class position:
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {
+                // NOTE: on new session, ClassPosition in rF2 is not correct.  It is updated with a bit of a delay.
+                // Since this code triggers on JustGoneGreen as well, this is corrected at that point, but I am not yet sure
+                // there are no bad side effects.
                 currentGameState.SessionData.SessionStartClassPosition = currentGameState.SessionData.ClassPosition;
                 if (singleClass)
                 {

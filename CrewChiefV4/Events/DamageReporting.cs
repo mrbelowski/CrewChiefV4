@@ -437,7 +437,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (timeWhenDamageLastChanged.Add(timeToWaitForDamageToSettle) < currentGameState.Now)
                     {
-                        Console.WriteLine("reporting ...");
+                        Console.WriteLine("Reporting ...");
                         Console.WriteLine(damageToReportNext.Item1 + ", " + damageToReportNext.Item2);
 
                         // put *all* the damage levels in the 'reported' set, even though we haven't actually reported them.

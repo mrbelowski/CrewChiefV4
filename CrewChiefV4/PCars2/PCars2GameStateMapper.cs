@@ -1536,13 +1536,13 @@ namespace CrewChiefV4.PCars2
                                 }
                                 if (running) 
                                 {
-                                    waitingForCount++;                                    
+                                    waitingForCount++;
                                 }
                             }
                         }
                         if (waitingForCount == 0)
                         {
-                            Console.WriteLine("looks like session is finished - no activity in checkered phase");
+                            Console.WriteLine("Looks like session is finished - no activity in checkered phase");
                             currentPhase = SessionPhase.Finished;
                         }
                         else if (now > nextDebugCheckeredToFinishMessageTime)

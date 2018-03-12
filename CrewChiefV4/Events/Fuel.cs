@@ -331,11 +331,11 @@ namespace CrewChiefV4.Events
                             averageUsagePerLap = averageUsagePerLap / fuelUseByLapsWindowLengthToUse;
                             if(fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per lap (windowed calc) = " + convertLitersToGallons(averageUsagePerLap).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
+                                Console.WriteLine("Fuel use per lap (windowed calc) = " + convertLitersToGallons(averageUsagePerLap).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per lap (windowed calc) = " + averageUsagePerLap.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
+                                Console.WriteLine("Fuel use per lap (windowed calc) = " + averageUsagePerLap.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
                             }
                         }
                         else
@@ -343,11 +343,11 @@ namespace CrewChiefV4.Events
                             averageUsagePerLap = (initialFuelLevel - currentGameState.FuelData.FuelLeft) / lapsCompletedSinceFuelReset;
                             if (fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per lap (basic calc) = " + convertLitersToGallons(averageUsagePerLap).ToString("0.000") + " fuel left(gallons) = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
+                                Console.WriteLine("Fuel use per lap (basic calc) = " + convertLitersToGallons(averageUsagePerLap).ToString("0.000") + " fuel left(gallons) = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per lap (basic calc) = " + averageUsagePerLap.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
+                                Console.WriteLine("Fuel use per lap (basic calc) = " + averageUsagePerLap.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
                             }
                         }
                     }
@@ -371,11 +371,11 @@ namespace CrewChiefV4.Events
 
                             if (fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per minute (windowed calc) = " + convertLitersToGallons(averageUsagePerMinute).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
+                                Console.WriteLine("Fuel use per minute (windowed calc) = " + convertLitersToGallons(averageUsagePerMinute).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per minute (windowed calc) = " + averageUsagePerMinute.ToString("0.000") + " fuel left(liters) = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
+                                Console.WriteLine("Fuel use per minute (windowed calc) = " + averageUsagePerMinute.ToString("0.000") + " fuel left(liters) = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
                             }
                         }
                         else
@@ -384,13 +384,12 @@ namespace CrewChiefV4.Events
                             
                             if (fuelReportsInGallon)
                             {
-                                Console.WriteLine("fuel use per minute (basic calc) = " + convertLitersToGallons(averageUsagePerMinute).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
+                                Console.WriteLine("Fuel use per minute (basic calc) = " + convertLitersToGallons(averageUsagePerMinute).ToString("0.000") + " fuel(gallons) left = " + convertLitersToGallons(currentGameState.FuelData.FuelLeft).ToString("0.000"));
                             }
                             else
                             {
-                                Console.WriteLine("fuel use per minute (basic calc) = " + averageUsagePerMinute.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
+                                Console.WriteLine("Fuel use per minute (basic calc) = " + averageUsagePerMinute.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
                             }
-                            
                         }
                     }
 
@@ -1107,7 +1106,7 @@ namespace CrewChiefV4.Events
         public override int resolveMacroKeyPressCount(String macroName)
         {
             // only used for r3e auto-fuel amount selection at present
-            Console.WriteLine("getting fuel requirement keypress count");
+            Console.WriteLine("Getting fuel requirement keypress count");
             int litresToEnd = getLitresToEndOfRace();
 
             // limit the number of key presses to 200 here, or fuelCapacity

@@ -1469,12 +1469,16 @@ namespace CrewChiefV4.rFactor2
             if (pgs != null)
             {               
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
+
                 var stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,
                     csd.SessionRunningTime, previousGameState.PositionAndMotionData.DistanceRoundTrack, cgs.PositionAndMotionData.DistanceRoundTrack,
                     cgs.PositionAndMotionData.CarSpeed);
+
                 cgs.SessionData.stoppedInLandmark = cgs.PitData.InPitlane ? null : stoppedInLandmark;
+
                 if (csd.IsNewLap)
                     csd.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+
                 csd.SessionStartClassPosition = pgs.SessionData.SessionStartClassPosition;
                 csd.ClassPositionAtStartOfCurrentLap = pgs.SessionData.ClassPositionAtStartOfCurrentLap;
                 csd.NumCarsInPlayerClassAtStartOfSession = pgs.SessionData.NumCarsInPlayerClassAtStartOfSession;

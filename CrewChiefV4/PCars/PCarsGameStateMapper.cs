@@ -491,7 +491,7 @@ namespace CrewChiefV4.PCars
                 }
                 else if (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > lastSessionTimeRemaining + 1)
                 {
-                    Console.WriteLine("sessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
+                    Console.WriteLine("SessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
                 }
                 currentGameState.SessionData.IsNewSession = true;
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
@@ -1570,13 +1570,13 @@ namespace CrewChiefV4.PCars
                                 }
                                 if (running) 
                                 {
-                                    waitingForCount++;                                    
+                                    waitingForCount++;
                                 }
                             }
                         }
                         if (waitingForCount == 0)
                         {
-                            Console.WriteLine("looks like session is finished - no activity in checkered phase");
+                            Console.WriteLine("Looks like session is finished - no activity in checkered phase");
                             currentPhase = SessionPhase.Finished;
                         }
                         else if (now > nextDebugCheckeredToFinishMessageTime)

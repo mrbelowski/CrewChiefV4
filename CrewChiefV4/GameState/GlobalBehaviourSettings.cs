@@ -130,7 +130,7 @@ namespace CrewChiefV4.GameState
             spotterEnabled = useOvalLogic || !realisticMode;
             if (useOvalLogic)
             {
-                Console.WriteLine("track is marked as oval");
+                Console.WriteLine("Track is marked as oval");
             }
         }
 

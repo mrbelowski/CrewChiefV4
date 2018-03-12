@@ -191,7 +191,7 @@ namespace CrewChiefV4
                             }
                             catch (Exception)
                             {
-                                Console.WriteLine("no retry download location available");
+                                Console.WriteLine("No retry download location available");
                             }
 
                             try
@@ -1184,7 +1184,7 @@ namespace CrewChiefV4
                             }
                             if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
                             {
-                                Console.WriteLine("raceroomLayoutId: " + CrewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
+                                Console.WriteLine("RaceroomLayoutId: " + CrewChief.currentGameState.SessionData.TrackDefinition.id + ", distanceRoundLap = " +
                                     CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack + ", player's car ID: " + CrewChief.currentGameState.carClass.getClassIdentifier() + posInfo);
                             }
                             else
@@ -2109,7 +2109,7 @@ namespace CrewChiefV4
         {
             if (!cancelled && !usingRetryAddressForDriverNames && retryReplace != null && retryReplaceWith != null)
             {
-                Console.WriteLine("unable to get driver names from " + retryReplace + " will try from " + retryReplaceWith);
+                Console.WriteLine("Unable to get driver names from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForDriverNames = true;
                 baseDriverNamesDownloadLocation = baseDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
                 updateDriverNamesDownloadLocation = updateDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
@@ -2139,7 +2139,7 @@ namespace CrewChiefV4
         {
             if (!cancelled && !usingRetryAddressForSoundPack && retryReplace != null && retryReplaceWith != null)
             {
-                Console.WriteLine("unable to get sound pack from " + retryReplace + " will try from " + retryReplaceWith);
+                Console.WriteLine("Unable to get sound pack from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForSoundPack = true;
                 baseSoundPackDownloadLocation = baseSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
                 updateSoundPackDownloadLocation = updateSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
@@ -2170,7 +2170,7 @@ namespace CrewChiefV4
         {
             if (!cancelled && !usingRetryAddressForPersonalisations && retryReplace != null && retryReplaceWith != null)
             {
-                Console.WriteLine("unable to get personalisations from " + retryReplace + " will try from " + retryReplaceWith);
+                Console.WriteLine("Unable to get personalisations from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForPersonalisations = true;
                 basePersonalisationsDownloadLocation = basePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
                 updatePersonalisationsDownloadLocation = updatePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);

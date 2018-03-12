@@ -575,8 +575,8 @@ namespace CrewChiefV4
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("failed to get device info: " + e.Message);
-                        }                        
+                            Console.WriteLine("Failed to get device info: " + e.Message);
+                        }
                     }
                 }
             }

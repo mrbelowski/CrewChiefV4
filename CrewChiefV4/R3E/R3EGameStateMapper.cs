@@ -229,7 +229,7 @@ namespace CrewChiefV4.RaceRoom
                     && shared.InPitlane == 1)
                 {
                     currentGameState.PitData.PitBoxPositionEstimate = shared.LapDistance;
-                    Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                    Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
                 }
                 else if (previousGameState != null)
                 {
@@ -1422,7 +1422,7 @@ namespace CrewChiefV4.RaceRoom
                 if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                 {
                     // only allow a transition to checkered if the last state was green
-                    Console.WriteLine("checkered - completed " + currentLapsCompleted + " laps, session running time = " + thisSessionRunningTime);
+                    Console.WriteLine("Checkered - completed " + currentLapsCompleted + " laps, session running time = " + thisSessionRunningTime);
                     return SessionPhase.Checkered;
                 }
                 else if (SessionPhase.Checkered == lastSessionPhase)
@@ -1430,7 +1430,7 @@ namespace CrewChiefV4.RaceRoom
                     if (previousLapsCompleted != currentLapsCompleted || controlType == ControlType.AI ||
                         ((currentSessionType == SessionType.Qualify || currentSessionType == SessionType.Practice) && !isCarRunning))
                     {
-                        Console.WriteLine("finished - completed " + currentLapsCompleted + " laps (was " + previousLapsCompleted + "), session running time = " +
+                        Console.WriteLine("Finished - completed " + currentLapsCompleted + " laps (was " + previousLapsCompleted + "), session running time = " +
                             thisSessionRunningTime + " control type = " + controlType);
                         return SessionPhase.Finished;
                     }
