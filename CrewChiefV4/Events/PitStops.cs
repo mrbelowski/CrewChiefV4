@@ -338,7 +338,7 @@ namespace CrewChiefV4.Events
                     mandatoryStopCompleted = false;
                     mandatoryStopBoxThisLap = false;
                     mandatoryStopMissed = false;
-                    Console.WriteLine("pit start = " + currentGameState.PitData.PitWindowStart + ", pit end = " + currentGameState.PitData.PitWindowEnd);
+                    Console.WriteLine("Pit start = " + currentGameState.PitData.PitWindowStart + ", pit end = " + currentGameState.PitData.PitWindowEnd);
 
                     hasMandatoryPitStop = currentGameState.PitData.HasMandatoryPitStop;
                     hasMandatoryTyreChange = currentGameState.PitData.HasMandatoryTyreChange;

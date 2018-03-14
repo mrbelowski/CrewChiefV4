@@ -997,7 +997,7 @@ namespace CrewChiefV4.assetto
                 }
                 else if (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1)
                 {
-                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
+                    Console.WriteLine("sessionTimeRemaining = " + sessionTimeRemaining.ToString("0.000") + " lastSessionTimeRemaining = " + lastSessionTimeRemaining.ToString("0.000"));
                 }
                 lapCountAtSector1End = -1;
                 currentGameState.SessionData.IsNewSession = true;
@@ -1013,7 +1013,7 @@ namespace CrewChiefV4.assetto
                     {
                         Console.WriteLine("Setting session run time to 0");
                     }
-                    Console.WriteLine("Time in this new session = " + sessionTimeRemaining);
+                    Console.WriteLine("Time in this new session = " + sessionTimeRemaining.ToString("0.000"));
                 }
                 currentGameState.SessionData.DriverRawName = playerName;
                 currentGameState.PitData.IsRefuellingAllowed = true;
@@ -1154,8 +1154,8 @@ namespace CrewChiefV4.assetto
                         Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
                         Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
                         Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
-                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                        Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
+                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime.ToString("0.000"));
+                        Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime.ToString("0.000"));
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
                         Console.WriteLine("TrackName " + trackName);
                     }

@@ -177,7 +177,7 @@ namespace CrewChiefV4.iRacing
                 {
                     if (_driver.Live.IsNewLap)
                     {
-                        Console.WriteLine("player just crossed line to finish race");
+                        Console.WriteLine("Player just crossed line to finish race");
                         raceEndState = RaceEndState.FINISHED;
                     }
                 }

@@ -183,10 +183,10 @@ namespace CrewChiefV4.Events
             List<QueuedMessage> possibleMessages = new List<QueuedMessage>();
             if (currentConditions != null)
             {
-                Console.WriteLine("pre-start message for track temp");
+                Console.WriteLine("Pre-start message for track temp");
                 possibleMessages.Add(new QueuedMessage("trackTemp", MessageContents(ConditionsMonitor.folderTrackTempIs,
                     convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, this));
-                Console.WriteLine("pre-start message for air temp");
+                Console.WriteLine("Pre-start message for air temp");
                 possibleMessages.Add(new QueuedMessage("air_temp", MessageContents(ConditionsMonitor.folderAirTempIs,
                     convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
             }
@@ -194,13 +194,13 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.SessionHasFixedTime)
                 {
-                    Console.WriteLine("pre-start message for mandatory stop time");
+                    Console.WriteLine("Pre-start message for mandatory stop time");
                     possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(PitStops.folderMandatoryPitStopsPitWindowOpensAfter,
                         TimeSpan.FromMinutes(currentGameState.PitData.PitWindowStart)), 0, this));
                 } 
                 else
                 {
-                    Console.WriteLine("pre-start message for mandatory stop lap");
+                    Console.WriteLine("Pre-start message for mandatory stop lap");
                     possibleMessages.Add(new QueuedMessage("pit_window_lap", MessageContents(PitStops.folderMandatoryPitStopsPitWindowOpensOnLap,
                         currentGameState.PitData.PitWindowStart), 0, this));
                 }
@@ -209,7 +209,7 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.ClassPosition == 1)
                 {
-                    Console.WriteLine("pre-start message for pole");
+                    Console.WriteLine("Pre-start message for pole");
                     if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                     {
                         possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));
@@ -221,7 +221,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    Console.WriteLine("pre-start message for P " + currentGameState.SessionData.ClassPosition);
+                    Console.WriteLine("Pre-start message for P " + currentGameState.SessionData.ClassPosition);
                     if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                     {
                         possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro,
@@ -236,7 +236,7 @@ namespace CrewChiefV4.Events
             else
             {
                 // In rF2 there's a delay for position to get updated (usually by the end of a gridwalk).
-                Console.WriteLine("pre-start message for (delay evaluated)");
+                Console.WriteLine("Pre-start message for position (delay evaluated)");
 
                 DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] {
                     currentGameState.SessionData.ClassPosition }, this);
@@ -249,12 +249,12 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.TrackDefinition.trackLength * currentGameState.SessionData.SessionNumberOfLaps < 30000)
                 {
                     // anything less than 20000 metres worth of racing (e.g. 10 laps of Brands Indy) should have a 'make them count'
-                    Console.WriteLine("pre-start message for race laps + get on with it");
+                    Console.WriteLine("Pre-start message for race laps + get on with it");
                     possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, folderLapsMakeThemCount), 0, this));
                 }
                 else
                 {
-                    Console.WriteLine("pre-start message for race laps");
+                    Console.WriteLine("Pre-start message for race laps");
                     // use the 'Laps' sound from Battery here
                     possibleMessages.Add(new QueuedMessage("race_distance", MessageContents(currentGameState.SessionData.SessionNumberOfLaps, Battery.folderLaps), 0, this));
                 }
@@ -267,20 +267,20 @@ namespace CrewChiefV4.Events
                     int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
                     if (currentGameState.SessionData.ClassPosition > 3 && minutes < 20 && minutes > 1)
                     {
-                        Console.WriteLine("pre-start message for race time + get on with it");
+                        Console.WriteLine("Pre-start message for race time + get on with it");
                         possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
                     }
                     //dont play pre-start message for race time unless its more then 2 minuts
                     else
                     {
-                        Console.WriteLine("pre-start message for race time");
+                        Console.WriteLine("Pre-start message for race time");
                         possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, Battery.folderMinutes), 0, this));
                     }
                 }
                 else
                 {
                     // In rF2 there's a delay for timed session total running time to get updated (usually by the end of a gridwalk).
-                    Console.WriteLine("pre-start message for race time (delay evaluated)");
+                    Console.WriteLine("Pre-start message for race time (delay evaluated)");
 
                     DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getSessionTotalRunningTimeTimeMessages", new Object[] {
                         currentGameState.SessionData.SessionTotalRunTime }, this);
@@ -310,7 +310,7 @@ namespace CrewChiefV4.Events
         {
             if (this.currentPosition != positionWhenQueued)
             {
-                Console.WriteLine("pre-start delay-evaluated pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
+                Console.WriteLine("Pre-start delay-evaluated pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
             }
 
             if (this.currentPosition == 1)
@@ -341,19 +341,19 @@ namespace CrewChiefV4.Events
         {
             if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
             {
-                Console.WriteLine("pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued + " to: " + this.currentSessionTotalRunTime);
+                Console.WriteLine("Pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued.ToString("0.00") + " to: " + this.currentSessionTotalRunTime.ToString("0.00"));
             }
 
             int minutes = (int)this.currentSessionTotalRunTime / 60;
             if (this.currentPosition > 3 && minutes < 20 && minutes > 1)
             {
-                Console.WriteLine("pre-start message for race time + get on with it");
+                Console.WriteLine("Pre-start message for race time + get on with it");
                 return MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt);
             }
             //dont play pre-start message for race time unless its more then 2 minuts
             else
             {
-                Console.WriteLine("pre-start message for race time");
+                Console.WriteLine("Pre-start message for race time");
                 return MessageContents(minutes, Battery.folderMinutes);
             }
         }
@@ -562,7 +562,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5)
                     {
-                        // yuk... don't yell at the player for being shit if he's play Assetto. Because assetto drivers *are* shit, and also the SessionStartPosition
+                        // yuk... don't yell at the player for being shit if he's playing Assetto. Because assetto drivers *are* shit, and also the SessionStartClassPosition
                         // might be invalid so perhaps they're really not being shit. At the moment.
                         if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                         {

@@ -95,7 +95,7 @@ namespace CrewChiefV4.PCars2
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine("found PCars2 process, but can't find PCars2 shared memory - check the game isn't running in PCars1 mode");
+                        Console.WriteLine("Found PCars2 process, but can't find PCars2 shared memory - check the game isn't running in PCars1 mode");
                         initialised = false;
                     }
                 }

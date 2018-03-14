@@ -652,7 +652,7 @@ namespace CrewChiefV4.Audio
                         {
                             if (soundSets.ContainsKey(fullEventName))
                             {
-                                Console.WriteLine("event " + fullEventName + " sound set is already loaded");
+                                Console.WriteLine("Event " + fullEventName + " sound set is already loaded");
                             }
                             else 
                             {

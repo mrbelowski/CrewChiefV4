@@ -260,8 +260,8 @@ namespace CrewChiefV4.Events
                     (currentGameState.SessionData.PlayerLapTimeSessionBest - opponentBehindBestLap) * numLapsLeft > currentGameState.SessionData.TimeDeltaBehind)
                 {
                     // even with us going flat out, the guy behind is going to catch us before the end
-                    Console.WriteLine("might lose this position. Player best lap = " + currentGameState.SessionData.PlayerLapTimeSessionBest + " laps left = " + numLapsLeft +
-                        " opponent best lap = " + opponentBehindBestLap + " time delta = " + currentGameState.SessionData.TimeDeltaBehind);
+                    Console.WriteLine("Might lose this position. Player best lap = " + currentGameState.SessionData.PlayerLapTimeSessionBest.ToString("0.000") + " laps left = " + numLapsLeft +
+                        " opponent best lap = " + opponentBehindBestLap.ToString("0.000") + " time delta = " + currentGameState.SessionData.TimeDeltaBehind.ToString("0.000"));
                     audioPlayer.playMessage(new QueuedMessage(folderPushToHoldPosition, 0, this));
                     return true;
                 }

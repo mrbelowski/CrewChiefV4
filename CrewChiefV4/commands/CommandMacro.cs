@@ -123,7 +123,7 @@ namespace CrewChiefV4.commands
                                         CrewChief.currentGameState.SessionData.TrackDefinition != null &&
                                         CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack > CrewChief.currentGameState.SessionData.TrackDefinition.trackLength - 500)
                                     {
-                                        Console.WriteLine("skipping wait in R3E pit macro because we're close to the pit lane");
+                                        Console.WriteLine("Skipping wait in R3E pit macro because we're close to the pit lane");
                                         canPause = false;
                                     }
                                     if (canPause)
