@@ -267,7 +267,7 @@ namespace CrewChiefV4
             {
                 if (DriverTrainingService.isRecordingSound)
                 {
-                    Console.WriteLine("sound already being recorded");
+                    Console.WriteLine("Sound already being recorded");
                 }
                 else
                 {

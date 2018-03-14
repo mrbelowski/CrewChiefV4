@@ -111,6 +111,17 @@ namespace CrewChiefV4.GameState
             {
                 spotterVehicleWidth = defaultSpotterVehicleWidth;
             }
+
+            Console.WriteLine("Enabled message types:");
+            foreach (var m in GlobalBehaviourSettings.enabledMessageTypes)
+            {
+                Console.WriteLine('\t' + m.ToString());
+            }
+
+            Console.WriteLine("Spotter enabled: " + GlobalBehaviourSettings.spotterEnabled);
+            Console.WriteLine("Realistic mode: " + GlobalBehaviourSettings.realisticMode);
+            Console.WriteLine("Oval logic enabled: " + GlobalBehaviourSettings.useOvalLogic);
+            Console.WriteLine("Using American terms: " + GlobalBehaviourSettings.useAmericanTerms);
         }
 
         public static void UpdateFromTrackDefinition(TrackDefinition trackDefinition)
@@ -119,7 +130,7 @@ namespace CrewChiefV4.GameState
             spotterEnabled = useOvalLogic || !realisticMode;
             if (useOvalLogic)
             {
-                Console.WriteLine("track is marked as oval");
+                Console.WriteLine("Track is marked as oval");
             }
         }
 
@@ -152,7 +163,6 @@ namespace CrewChiefV4.GameState
                     Console.WriteLine("Unrecognised message type " + messageType);
                 }
             }
-            Console.WriteLine("enabling message types " + String.Join(", ", enabledMessageTypes));            
         }
     }
 

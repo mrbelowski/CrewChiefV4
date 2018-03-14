@@ -752,6 +752,7 @@ namespace CrewChiefV4
             {
                 if (carClass.raceroomClassIds.Contains(carClassId))
                 {
+                    Console.WriteLine("Mapped car class from ID:\"{0}\"  to:\"{1}\"", carClassId, carClass.getClassIdentifier());
                     intToCarClass.Add(carClassId, carClass);
                     return carClass;
                 }
@@ -759,6 +760,7 @@ namespace CrewChiefV4
 
             // create one if it doesn't exist
             CarClass newCarClass = new CarClass();
+            Console.WriteLine("Unmapped car class added:\"{0}\"", carClassId);
             intToCarClass.Add(carClassId, newCarClass);
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
@@ -844,6 +846,7 @@ namespace CrewChiefV4
                         {
                             if (string.Compare(thisClassName, className, StringComparison.InvariantCultureIgnoreCase) == 0)
                             {
+                                Console.WriteLine("Mapped car class from ID:\"{0}\"  to:\"{1}\"", className, carClass.getClassIdentifier());
                                 nameToCarClass.Add(className, carClass);
                                 return carClass;
                             }
@@ -856,6 +859,7 @@ namespace CrewChiefV4
                         {
                             if (regex.IsMatch(className))
                             {
+                                Console.WriteLine("Mapped car class from ID:\"{0}\"  to:\"{1}\"", className, carClass.getClassIdentifier());
                                 nameToCarClass.Add(className, carClass);
                                 return carClass;
                             }
@@ -866,6 +870,7 @@ namespace CrewChiefV4
                     if (Enum.TryParse<CarClassEnum>(className, out carClassID))
                     {
                         CarClass existingClass = CarData.getCarClassFromEnum(carClassID);
+                        Console.WriteLine("Mapped car class from ID:\"{0}\"  to:\"{1}\"", className, existingClass.getClassIdentifier());
                         nameToCarClass.Add(className, existingClass);
                         return existingClass;
                     }
@@ -874,6 +879,7 @@ namespace CrewChiefV4
                         // no match - we really don't know what this class is, so create one
                         CarClass newCarClass = new CarClass();
                         newCarClass.placeholderClassId = className;
+                        Console.WriteLine("Unmapped car class added:\"{0}\"", className);
                         nameToCarClass.Add(className, newCarClass);
                         return newCarClass;
                     }

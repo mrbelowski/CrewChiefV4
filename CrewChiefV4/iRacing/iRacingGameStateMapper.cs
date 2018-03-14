@@ -127,7 +127,7 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.SessionData.IsNewSession = true;
                 Console.WriteLine("New session, trigger data:");
-                Console.WriteLine("sessionType = " + currentGameState.SessionData.SessionType);
+                Console.WriteLine("SessionType = " + currentGameState.SessionData.SessionType);
                 Console.WriteLine("lastSessionPhase = " + lastSessionPhase);
                 Console.WriteLine("lastSessionRunningTime = " + lastSessionRunningTime);
                 Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
@@ -171,7 +171,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
                 currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
-                Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
                 
                 //TODO update car classes
                 currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
@@ -239,7 +239,7 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
                         
                         currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
-                        Console.WriteLine("pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                        Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
 
                         if (previousGameState != null)
                         {
@@ -1089,7 +1089,7 @@ namespace CrewChiefV4.iRacing
                         // for fixed number of laps, as soon as we've completed the required number end the session
                         if ((!fixedTimeSession && sessionNumberOfLaps > 0 && laps == sessionNumberOfLaps) || (fixedTimeSession && previousLapsCompleted != laps))
                         {
-                            Console.WriteLine("finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
+                            Console.WriteLine("Finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
                             return SessionPhase.Finished;
                         }

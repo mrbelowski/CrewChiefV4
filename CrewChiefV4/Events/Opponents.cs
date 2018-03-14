@@ -124,14 +124,14 @@ namespace CrewChiefV4.Events
                         {
                             if (actualOpponentName != null && expectedOpponentName != null)
                             {
-                                Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
+                                Console.WriteLine("New car in front message for opponent " + expectedOpponentName +
                                     " no longer valid - driver in front is now " + actualOpponentName);
                             }
                             return false;
                         }
                         else if (opponentInFront != null && (opponentInFront.InPits || opponentInFront.isEnteringPits()))
                         {
-                            Console.WriteLine("new car in front message for opponent " + expectedOpponentName +
+                            Console.WriteLine("New car in front message for opponent " + expectedOpponentName +
                                 " no longer valid - driver is " + (opponentInFront.InPits ? "in pits" : "is entering the pits"));
                         }
                     }
@@ -140,7 +140,7 @@ namespace CrewChiefV4.Events
                         String expectedLeaderName = (String)validationValue;
                         if (currentGameState.SessionData.ClassPosition == 1)
                         {
-                            Console.WriteLine("new leader message for opponent " + expectedLeaderName +
+                            Console.WriteLine("New leader message for opponent " + expectedLeaderName +
                                     " no longer valid - player is now leader");
                             return false;
                         }
@@ -150,7 +150,7 @@ namespace CrewChiefV4.Events
                         {
                             if (actualLeaderName != null && expectedLeaderName != null)
                             {
-                                Console.WriteLine("new leader message for opponent " + expectedLeaderName +
+                                Console.WriteLine("New leader message for opponent " + expectedLeaderName +
                                     " no longer valid - leader is now " + actualLeaderName);
                             }
                             return false;
@@ -365,7 +365,7 @@ namespace CrewChiefV4.Events
                                         opponentData.CanUseName && AudioPlayer.canReadName(opponentName) &&
                                         (!onlyAnnounceOpponentAfter.TryGetValue(opponentName, out announceAfterTime) || currentGameState.Now > announceAfterTime))
                                     {
-                                        Console.WriteLine("new car ahead: " + opponentName);
+                                        Console.WriteLine("New car ahead: " + opponentName);
                                         audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                             Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
                                             new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
