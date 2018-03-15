@@ -23,7 +23,7 @@ namespace CrewChiefV4.NumberProcessing
 
         public override string ToString()
         {
-            return this.timeSpan.ToString();
+            return this.timeSpan.ToString(@"mm\:ss\:fff");
         }
 
         public Precision getPrecision()
@@ -38,7 +38,7 @@ namespace CrewChiefV4.NumberProcessing
                     (timeSpan < gapsInHundredthsThreshold ||
                     (GlobalBehaviourSettings.useOvalLogic && timeSpan < ovalGapsInHundredthsThreshold)))
                 {
-                    Console.WriteLine("Using hundredths for gap of " + timeSpan);
+                    Console.WriteLine("Using hundredths for gap of " + timeSpan.ToString(@"mm\:ss\:fff"));
                     return Precision.HUNDREDTHS;
                 }
                 else
@@ -50,7 +50,7 @@ namespace CrewChiefV4.NumberProcessing
             {
                 if (GlobalBehaviourSettings.useHundredths)
                 {
-                    Console.WriteLine("Using hundredths for laptime of " + timeSpan);
+                    Console.WriteLine("Using hundredths for laptime of " + timeSpan.ToString(@"mm\:ss\:fff"));
                     return Precision.HUNDREDTHS;
                 }
                 else

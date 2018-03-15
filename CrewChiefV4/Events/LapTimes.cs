@@ -902,7 +902,6 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_PACE))
@@ -1084,6 +1083,190 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
+                }
+            }
+        }
+
+        public void tempHowsMyPace()
+        {
+            if (sessionType == SessionType.Race)
+            {
+                if (currentGameState == null)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+                else
+                {
+                    currentGameState.getTimeAndSectorsForSelfBestLapInWindow(1);
+                    float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
+                    //float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForSelfBestLapInWindow()
+
+                    if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
+                    {
+                        TimeSpan lapToCompare = TimeSpan.FromSeconds(lastLapTime - bestOpponentLapData[0]);
+                        String timeToFindFolder = null;
+                        if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 200)
+                        {
+                            timeToFindFolder = folderNeedToFindOneMoreTenth;
+                        }
+                        else if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 600)
+                        {
+                            timeToFindFolder = folderNeedToFindAFewMoreTenths;
+                        }
+                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds < 500) ||
+                            (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds >= 600))
+                        {
+                            timeToFindFolder = folderNeedToFindASecond;
+                        }
+                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds >= 500) ||
+                            lapToCompare.Seconds > 1)
+                        {
+                            timeToFindFolder = folderNeedToFindMoreThanASecond;
+                        }
+                        List<MessageFragment> messages = new List<MessageFragment>();
+                        switch (lastLapRating)
+                        {
+                            case LastLapRating.BEST_OVERALL:
+                            case LastLapRating.BEST_IN_CLASS:
+                            case LastLapRating.SETTING_CURRENT_PACE:
+                                audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null));
+                                break;
+                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
+                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
+                            case LastLapRating.CLOSE_TO_OVERALL_LEADER:
+                            case LastLapRating.CLOSE_TO_CLASS_LEADER:
+                            case LastLapRating.PERSONAL_BEST_STILL_SLOW:
+                            case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                            case LastLapRating.CLOSE_TO_CURRENT_PACE:
+                                if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
+                                {
+                                    if (lastLapRating == LastLapRating.CLOSE_TO_CURRENT_PACE)
+                                    {
+                                        messages.Add(MessageFragment.Text(folderMatchingCurrentRacePace));
+                                    }
+                                    else
+                                    {
+                                        messages.Add(MessageFragment.Text(folderPaceOK));
+                                    }
+                                }
+                                if (timeToFindFolder != null)
+                                {
+                                    messages.Add(MessageFragment.Text(timeToFindFolder));
+                                }
+                                if (messages.Count > 0)
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                }
+                                break;
+                            case LastLapRating.MEH:
+                                messages.Add(MessageFragment.Text(folderPaceBad));
+                                if (timeToFindFolder != null)
+                                {
+                                    messages.Add(MessageFragment.Text(timeToFindFolder));
+                                }
+                                audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                break;
+                            default:
+                                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                                break;
+                        }
+                        SectorReportOption reportOption = SectorReportOption.ALL;
+                        double r = Utilities.random.NextDouble();
+                        // usually report the combined sectors
+                        if (r > 0.33)
+                        {
+                            reportOption = SectorReportOption.WORST_ONLY;
+                        }
+                        List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
+                            currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], false);
+                        if (sectorDeltaMessages.Count > 0)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
+                        }
+
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    }
+                }
+            }
+            else
+            {
+                if (deltaPlayerLastToSessionBestInClassSet)
+                {
+                    if (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero)
+                    {
+                        if (sessionType == SessionType.Qualify && currentPosition == 1)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0, null));
+                        }
+                        TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
+                        if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
+                        {
+                            // delay this a bit...
+                            audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
+                                MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), 0, this));
+                        }
+                    }
+                    else if (deltaPlayerLastToSessionBestInClass.Seconds == 0 && deltaPlayerLastToSessionBestInClass.Milliseconds < 50)
+                    {
+                        if (currentPosition > 1)
+                        {
+                            // should always trigger
+                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                            }
+                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
+                    }
+                    else
+                    {
+                        if (currentPosition > 1)
+                        {
+                            // should always trigger
+                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                            }
+                        }
+                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
+                            MessageContents(new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, null));
+                    }
+
+                    // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
+                    try
+                    {
+
+                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
+                        List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
+                            currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], true);
+                        if (sectorDeltaMessages.Count > 0)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to get sector deltas: " + e.Message);
+                    }
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
             }
         }

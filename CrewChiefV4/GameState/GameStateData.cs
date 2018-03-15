@@ -2517,5 +2517,41 @@ namespace CrewChiefV4.GameState
             }
             return bestLapWithSectors;
         }
+
+        // TODO: Implement.
+        public float[] getTimeAndSectorsForSelfBestLapInWindow(int lapsToCheck)
+        {
+            float[] bestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
+
+            if (SessionData.PlayerLapData.Count > 1)
+            {
+                if (lapsToCheck == -1)
+                {
+                    lapsToCheck = SessionData.PlayerLapData.Count;
+                }
+                // count-2 because we're not interested in the current lap
+                for (int i = SessionData.PlayerLapData.Count - 2; i >= SessionData.PlayerLapData.Count - lapsToCheck - 1 && i >= 0; i--)
+                {
+                    LapData thisLapTime = SessionData.PlayerLapData[i];
+                    if (thisLapTime.IsValid)
+                    {
+                        // note the <= here. Because we're counting backwards this means we'll retrieve the earliest of any identical
+                        // laps. Bit of an edge case I suppose...
+                        if (bestLapTimeAndSectorsSectors[0] == -1 ||
+                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime <= bestLapTimeAndSectorsSectors[0]))
+                        {
+                            bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
+                            if (!thisLapTime.hasMissingSectors)
+                            {
+                                bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
+                                bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
+                                bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                            }
+                        }
+                    }
+                }
+            }
+            return bestLapTimeAndSectorsSectors;
+        }
     }
 }

@@ -305,7 +305,8 @@ namespace CrewChiefV4
             }
             else
             {
-                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+                //((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+                ((LapTimes)eventsList["LapTimes"]).tempHowsMyPace();
             }
         }
 
