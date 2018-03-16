@@ -2489,7 +2489,8 @@ namespace CrewChiefV4.GameState
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
-                if (CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck))
+                if (CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck)
+                    || CrewChief.forceSingleClass)
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))
