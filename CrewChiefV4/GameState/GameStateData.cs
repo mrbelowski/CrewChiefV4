@@ -2489,8 +2489,8 @@ namespace CrewChiefV4.GameState
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
-                if (CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck)
-                    || CrewChief.forceSingleClass)
+                if (CrewChief.forceSingleClass
+                    || CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck))
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))
@@ -2519,10 +2519,9 @@ namespace CrewChiefV4.GameState
             return bestLapWithSectors;
         }
 
-        // TODO: Implement.
         public float[] getTimeAndSectorsForSelfBestLapInWindow(int lapsToCheck)
         {
-            float[] bestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
+            float[] sefBestLapTimeAndSectorsSectors = new float[] { -1, -1, -1, -1 };
 
             if (SessionData.PlayerLapData.Count > 1)
             {
@@ -2538,21 +2537,21 @@ namespace CrewChiefV4.GameState
                     {
                         // note the <= here. Because we're counting backwards this means we'll retrieve the earliest of any identical
                         // laps. Bit of an edge case I suppose...
-                        if (bestLapTimeAndSectorsSectors[0] == -1 ||
-                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime <= bestLapTimeAndSectorsSectors[0]))
+                        if (sefBestLapTimeAndSectorsSectors[0] == -1 ||
+                            (thisLapTime.LapTime > 0 && thisLapTime.LapTime <= sefBestLapTimeAndSectorsSectors[0]))
                         {
-                            bestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
+                            sefBestLapTimeAndSectorsSectors[0] = thisLapTime.LapTime;
                             if (!thisLapTime.hasMissingSectors)
                             {
-                                bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
-                                bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
-                                bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
+                                sefBestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
+                                sefBestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
+                                sefBestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
                             }
                         }
                     }
                 }
             }
-            return bestLapTimeAndSectorsSectors;
+            return sefBestLapTimeAndSectorsSectors;
         }
     }
 }
