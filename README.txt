@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.2.4: Fixed incorrect car class data in R3E online practice and qualifying sessions; logging readability improvements; small AMS performance improvement; some code cleanup
+
 Version 4.9.2.3: Hotfix for Assetto Corsa broken spotter
 
 Version 4.9.2.2: AMS off-track warning tweak - make 'kerb' a legal surface to drive on (should make the warnings much less common); A few other AMS fixes; Half distance fuel calculation tweak to make it a little more conservative; iRacing workarounds for missing opponent data when cars aren't rendered by the game; A few other iRacing bug fixes; Some UI tweaks to fix tab ordering and add shortcut keys (underlined on the UI)
