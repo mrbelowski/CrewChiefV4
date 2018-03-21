@@ -234,6 +234,7 @@ namespace CrewChiefV4.Events
             lastConsistencyMessage = ConsistencyResult.NOT_APPLICABLE;
             lapIsValid = true;
             lastLapRating = LastLapRating.NO_DATA;
+            lastLapSelfRating = LastLapRating.NO_DATA;
             deltaPlayerLastToSessionBestInClass = TimeSpan.MaxValue;
             deltaPlayerLastToSessionBestInClassSet = false;
             lastLapTime = 0;
@@ -330,16 +331,22 @@ namespace CrewChiefV4.Events
                 return;
             }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
+            float[] lapAndSectorsSelfComparisonData = new float[] { -1, -1, -1, -1 };
             if (currentGameState.SessionData.IsNewSector)
             {
+                lapAndSectorsSelfComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                lapAndSectorsSelfComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
+                lapAndSectorsSelfComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
+                lapAndSectorsSelfComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
+
                 isHotLapping = currentGameState.SessionData.SessionType == SessionType.HotLap || (currentGameState.OpponentData.Count == 0 || (
                     currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLapping)
                 {
-                    lapAndSectorsComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                    lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
-                    lapAndSectorsComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
-                    lapAndSectorsComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
+                    lapAndSectorsComparisonData[0] = lapAndSectorsSelfComparisonData[0];
+                    lapAndSectorsComparisonData[1] = lapAndSectorsSelfComparisonData[1];
+                    lapAndSectorsComparisonData[2] = lapAndSectorsSelfComparisonData[2];
+                    lapAndSectorsComparisonData[3] = lapAndSectorsSelfComparisonData[3];
                 }
                 else
                 {
@@ -386,7 +393,8 @@ namespace CrewChiefV4.Events
                     {
                         lapTimesWindow = new List<float>(lapTimesWindowSize);
                     }                    
-                    lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData);
+                    lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData, false /*selfPace*/);
+                    lastLapSelfRating = getLastLapRating(currentGameState, lapAndSectorsSelfComparisonData, true /*selfPace*/);
 
                     if (currentGameState.SessionData.PreviousLapWasValid)
                     {
@@ -789,7 +797,7 @@ namespace CrewChiefV4.Events
             NOT_APPLICABLE, CONSISTENT, IMPROVING, WORSENING
         }
 
-        private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapDataForOpponents)
+        private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapComparisonData, Boolean selfPace)
         {
             if (currentGameState.SessionData.PreviousLapWasValid && currentGameState.SessionData.LapTimePrevious > 0)
             {
@@ -801,60 +809,87 @@ namespace CrewChiefV4.Events
                     && currentGameState.SessionData.LapTimePrevious > 0
                     && currentGameState.SessionData.PreviousLapWasValid;
                 Boolean sessionHasOpponents = currentGameState.SessionData.SessionType != SessionType.HotLap && currentGameState.OpponentData.Count > 0;
-                Boolean hasOpponentLapComparisonData = sessionHasOpponents && bestLapDataForOpponents[0] > 0;
+                Boolean hasComparisonData = (sessionHasOpponents || selfPace) && bestLapComparisonData[0] > 0;
 
-                if (!hasPlayerLapComparisonData && !hasOpponentLapComparisonData)
+                if (!hasPlayerLapComparisonData && !hasComparisonData)
                 {
                     return LastLapRating.NO_DATA;
                 }
 
-                if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
+                if (!selfPace)
                 {
-                    return LastLapRating.BEST_OVERALL;
-                }
-                else if (currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
-                {
-                    return LastLapRating.BEST_IN_CLASS;
-                }
-                else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapDataForOpponents[0] > 0 && bestLapDataForOpponents[0] >= currentGameState.SessionData.LapTimePrevious) 
-                {
-                    return LastLapRating.SETTING_CURRENT_PACE;                
-                }
-                else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapDataForOpponents[0] > 0 && bestLapDataForOpponents[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
-                {
-                    return LastLapRating.CLOSE_TO_CURRENT_PACE;
-                }
-                else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
-                {
-                    if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    if (!selfPace && currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER;
+                        return LastLapRating.BEST_OVERALL;
                     }
-                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    else if (!selfPace && currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER;
+                        return LastLapRating.BEST_IN_CLASS;
                     }
-                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > 0 || currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > 0)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_STILL_SLOW;
+                        return LastLapRating.SETTING_CURRENT_PACE;
+                    }
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_CURRENT_PACE;
+                    }
+                    else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
+                    {
+                        if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                        {
+                            return LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER;
+                        }
+                        else if (!selfPace && currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                        {
+                            return LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER;
+                        }
+                        else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > 0 || currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > 0)
+                        {
+                            return LastLapRating.PERSONAL_BEST_STILL_SLOW;
+                        }
+                    }
+                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_OVERALL_LEADER;
+                    }
+                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_CLASS_LEADER;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                        && currentGameState.SessionData.CompletedLaps > 1)
+                    {
+                        return LastLapRating.CLOSE_TO_PERSONAL_BEST;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    {
+                        return LastLapRating.MEH;
                     }
                 }
-                else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                else
                 {
-                    return LastLapRating.CLOSE_TO_OVERALL_LEADER;
-                }
-                else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
-                {
-                    return LastLapRating.CLOSE_TO_CLASS_LEADER;
-                }
-                else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
-                    && currentGameState.SessionData.CompletedLaps > 1)
-                {
-                    return LastLapRating.CLOSE_TO_PERSONAL_BEST;
-                }
-                else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
-                {
-                    return LastLapRating.MEH;
+                    if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious)
+                    {
+                        return LastLapRating.SETTING_SELF_PACE;
+                    }
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_SELF_PACE;
+                    }
+                    else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
+                    {
+                        return LastLapRating.PERSONAL_BEST;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                        && currentGameState.SessionData.CompletedLaps > 1)
+                    {
+                        return LastLapRating.CLOSE_TO_PERSONAL_BEST;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    {
+                        return LastLapRating.MEH;
+                    }
                 }
             }
             return LastLapRating.NO_DATA;
@@ -1139,7 +1174,8 @@ namespace CrewChiefV4.Events
 
         private enum LastLapRating
         {
-            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER, PERSONAL_BEST_CLOSE_TO_CLASS_LEADER,
+            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, SETTING_SELF_PACE, CLOSE_TO_SELF_PACE,
+            PERSONAL_BEST, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER, PERSONAL_BEST_CLOSE_TO_CLASS_LEADER,
             PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER, CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
         }
 
