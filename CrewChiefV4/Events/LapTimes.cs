@@ -63,6 +63,8 @@ namespace CrewChiefV4.Events
         private String folderPersonalBest = "lap_times/personal_best";
         private String folderSettingCurrentRacePace = "lap_times/setting_current_race_pace";
         private String folderMatchingCurrentRacePace = "lap_times/matching_race_pace";
+        private String folderSettingCurrentSelfPace = "lap_times/setting_current_self_pace";
+        private String folderMatchingCurrentSelfPace = "lap_times/matching_self_pace";
 
         public static String folderSector1Fastest = "lap_times/sector1_fastest";
         public static String folderSector2Fastest = "lap_times/sector2_fastest";
@@ -392,7 +394,7 @@ namespace CrewChiefV4.Events
                     if (lapTimesWindow == null)
                     {
                         lapTimesWindow = new List<float>(lapTimesWindowSize);
-                    }                    
+                    }
                     lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData, false /*selfPace*/);
                     lastLapSelfRating = getLastLapRating(currentGameState, lapAndSectorsSelfComparisonData, true /*selfPace*/);
 
@@ -1023,51 +1025,97 @@ namespace CrewChiefV4.Events
                             timeToFindFolder = folderNeedToFindMoreThanASecond;
                         }
                         List<MessageFragment> messages = new List<MessageFragment>();
-                        switch (lastLapRating)
+                        if (!selfPace)
                         {
-                            case LastLapRating.BEST_OVERALL:
-                            case LastLapRating.BEST_IN_CLASS:
-                            case LastLapRating.SETTING_CURRENT_PACE:
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null));
-                                break;
-                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
-                            case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
-                            case LastLapRating.CLOSE_TO_OVERALL_LEADER:
-                            case LastLapRating.CLOSE_TO_CLASS_LEADER:
-                            case LastLapRating.PERSONAL_BEST_STILL_SLOW:
-                            case LastLapRating.CLOSE_TO_PERSONAL_BEST:
-                            case LastLapRating.CLOSE_TO_CURRENT_PACE:
-                                if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
-                                {
-                                    if (lastLapRating == LastLapRating.CLOSE_TO_CURRENT_PACE)
+                            switch (lastLapRating)
+                            {
+                                case LastLapRating.BEST_OVERALL:
+                                case LastLapRating.BEST_IN_CLASS:
+                                case LastLapRating.SETTING_CURRENT_PACE:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null));
+                                    break;
+                                case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
+                                case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
+                                case LastLapRating.CLOSE_TO_OVERALL_LEADER:
+                                case LastLapRating.CLOSE_TO_CLASS_LEADER:
+                                case LastLapRating.PERSONAL_BEST_STILL_SLOW:
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                case LastLapRating.CLOSE_TO_CURRENT_PACE:
+                                    if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
                                     {
-                                        messages.Add(MessageFragment.Text(folderMatchingCurrentRacePace));
+                                        if (lastLapRating == LastLapRating.CLOSE_TO_CURRENT_PACE)
+                                        {
+                                            messages.Add(MessageFragment.Text(folderMatchingCurrentRacePace));
+                                        }
+                                        else
+                                        {
+                                            messages.Add(MessageFragment.Text(folderPaceOK));
+                                        }
                                     }
-                                    else
+                                    if (timeToFindFolder != null)
                                     {
-                                        messages.Add(MessageFragment.Text(folderPaceOK));
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
                                     }
-                                }
-                                if (timeToFindFolder != null)
-                                {
-                                    messages.Add(MessageFragment.Text(timeToFindFolder));
-                                }
-                                if (messages.Count > 0)
-                                {
+                                    if (messages.Count > 0)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    }
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
                                     audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
-                                }
-                                break;
-                            case LastLapRating.MEH:
-                                messages.Add(MessageFragment.Text(folderPaceBad));
-                                if (timeToFindFolder != null)
-                                {
-                                    messages.Add(MessageFragment.Text(timeToFindFolder));
-                                }
-                                audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
-                                break;
-                            default:
-                                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                                break;
+                                    break;
+                                default:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            switch (lastLapSelfRating)
+                            {
+                                case LastLapRating.PERSONAL_BEST:
+                                case LastLapRating.SETTING_SELF_PACE:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentSelfPace, 0, null));
+                                    break;
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                case LastLapRating.CLOSE_TO_SELF_PACE:
+                                    if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
+                                    {
+                                        if (lastLapRating == LastLapRating.CLOSE_TO_SELF_PACE)
+                                        {
+                                            messages.Add(MessageFragment.Text(folderMatchingCurrentSelfPace));
+                                        }
+                                        else
+                                        {
+                                            messages.Add(MessageFragment.Text(folderPaceOK));
+                                        }
+                                    }
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    if (messages.Count > 0)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    }
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                default:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                                    break;
+                            }
                         }
                         SectorReportOption reportOption = SectorReportOption.ALL;
                         double r = Utilities.random.NextDouble();
