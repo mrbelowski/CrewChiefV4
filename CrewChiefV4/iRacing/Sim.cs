@@ -85,7 +85,7 @@ namespace CrewChiefV4.iRacing
                 }
                 else
                 {
-                    driver.ParseDynamicSessionInfo(sessionInfo);
+                    driver.ParseDynamicSessionInfo(sessionInfo, DriverId == driver.Id);
                 }
                 
                 if (DriverId == driver.Id)

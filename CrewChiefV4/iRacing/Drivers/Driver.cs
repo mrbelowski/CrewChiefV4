@@ -47,7 +47,7 @@ namespace CrewChiefV4.iRacing
         }
         
         private double _prevPos;
-        public void ParseDynamicSessionInfo(string sessionInfo)
+        public void ParseDynamicSessionInfo(string sessionInfo, bool isPlayerCar)
         {
             // Parse only session info that could have changed (driver dependent)
             this.Name = ParseDriverYaml(sessionInfo, "UserName");
@@ -55,7 +55,13 @@ namespace CrewChiefV4.iRacing
             this.IRating = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IRating"));
             this.LicensLevelString = ParseDriverYaml(sessionInfo, "LicString");
             this.licensLevel = Parser.ParseLicens(LicensLevelString);
-            this.IsSpectator = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IsSpectator")) == 1;         
+            this.IsSpectator = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IsSpectator")) == 1;
+            if(isPlayerCar && (this.Car.DriverPitTrkPct <= 0 || this.Car.DriverCarMaxFuelPct <= 0 || this.Car.DriverCarFuelMaxLtr <= 0))
+            {
+                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"));
+                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"));
+                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"));
+            }         
         }
 
         public void ParseStaticSessionInfo(string sessionInfo, bool isPlayerCar)
@@ -86,7 +92,7 @@ namespace CrewChiefV4.iRacing
             var driver = new Driver();
             driver.Id = carIdx;
             driver.ParseStaticSessionInfo(sessionInfo, playerCarIdx == carIdx);
-            driver.ParseDynamicSessionInfo(sessionInfo);
+            driver.ParseDynamicSessionInfo(sessionInfo, playerCarIdx == carIdx);
             return driver;
         }
 
