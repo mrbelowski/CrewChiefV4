@@ -140,13 +140,6 @@ namespace CrewChiefV4.Events
         public static String folderSelfSector1and3ASecondOffThePace = "lap_times/sector1_and_3_a_second_off_self_pace";
         public static String folderSelfAllSectorsASecondOffThePace = "lap_times/sector_all_a_second_off_self_pace";
 
-        public static String folderSelfSector1Is = "lap_times/sector1_is";
-        public static String folderSelfSector2Is = "lap_times/sector2_is";
-        public static String folderSelfSector3Is = "lap_times/sector3_is";
-        public static String folderSelfSectors1And2Are = "lap_times/sector1_and_2_are";
-        public static String folderSelfSectors2And3Are = "lap_times/sector2_and_3_are";
-        public static String folderSelfSectors1And3Are = "lap_times/sector1_and_3_are";
-        public static String folderSelfAllThreeSectorsAre = "lap_times/sector_all_are";
         public static String folderSelfOffThePace = "lap_times/off_the_self_pace";
 
         // if the lap is within 0.3% of the best lap time play a message
