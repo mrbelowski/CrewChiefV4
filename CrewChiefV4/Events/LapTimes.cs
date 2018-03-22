@@ -354,6 +354,7 @@ namespace CrewChiefV4.Events
             float[] lapAndSectorsSelfComparisonData = new float[] { -1, -1, -1, -1 };
             if (currentGameState.SessionData.IsNewSector)
             {
+                // TODO: this probably needs to take windowed pace for player, although rating seems to oriented towards "best".
                 lapAndSectorsSelfComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
                 lapAndSectorsSelfComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
                 lapAndSectorsSelfComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
