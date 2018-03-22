@@ -115,6 +115,7 @@ namespace CrewChiefV4.Events
         public static String folderAllThreeSectorsAre = "lap_times/sector_all_are";
         public static String folderOffThePace = "lap_times/off_the_pace";
 
+        // TODO: I think we need self version of those messages, not yet sure though.
         public static String folderSelfSector1ATenthOffThePace = "lap_times/sector1_a_tenth_off_self_pace";
         public static String folderSelfSector2ATenthOffThePace = "lap_times/sector2_a_tenth_off_self_pace";
         public static String folderSelfSector3ATenthOffThePace = "lap_times/sector3_a_tenth_off_self_pace";
@@ -123,7 +124,6 @@ namespace CrewChiefV4.Events
         public static String folderSelfSector1and3ATenthOffThePace = "lap_times/sector1_and_3_a_tenth_off_self_pace";
         public static String folderSelfAllSectorsATenthOffThePace = "lap_times/sector_all_a_tenth_off_self_pace";
 
-        // TODO: I think we need self version of those messages, not yet sure though.
         public static String folderSelfSector1TwoTenthsOffThePace = "lap_times/sector1_two_tenths_off_self_pace";
         public static String folderSelfSector2TwoTenthsOffThePace = "lap_times/sector2_two_tenths_off_self_pace";
         public static String folderSelfSector3TwoTenthsOffThePace = "lap_times/sector3_two_tenths_off_self_pace";
@@ -141,6 +141,32 @@ namespace CrewChiefV4.Events
         public static String folderSelfAllSectorsASecondOffThePace = "lap_times/sector_all_a_second_off_self_pace";
 
         public static String folderSelfOffThePace = "lap_times/off_the_self_pace";
+
+        public static String folderSelfBestSector1ATenthOffThePace = "lap_times/sector1_a_tenth_off_self_best_pace";
+        public static String folderSelfBestSector2ATenthOffThePace = "lap_times/sector2_a_tenth_off_self_best_pace";
+        public static String folderSelfBestSector3ATenthOffThePace = "lap_times/sector3_a_tenth_off_self_best_pace";
+        public static String folderSelfBestSector1and2ATenthOffThePace = "lap_times/sector1_and_2_a_tenth_off_self_best_pace";
+        public static String folderSelfBestSector2and3ATenthOffThePace = "lap_times/sector2_and_3_a_tenth_off_self_best_pace";
+        public static String folderSelfBestSector1and3ATenthOffThePace = "lap_times/sector1_and_3_a_tenth_off_self_best_pace";
+        public static String folderSelfBestAllSectorsATenthOffThePace = "lap_times/sector_all_a_tenth_off_self_best_pace";
+
+        public static String folderSelfBestSector1TwoTenthsOffThePace = "lap_times/sector1_two_tenths_off_self_best_pace";
+        public static String folderSelfBestSector2TwoTenthsOffThePace = "lap_times/sector2_two_tenths_off_self_best_pace";
+        public static String folderSelfBestSector3TwoTenthsOffThePace = "lap_times/sector3_two_tenths_off_self_best_pace";
+        public static String folderSelfBestSector1and2TwoTenthsOffThePace = "lap_times/sector1_and_2_two_tenths_off_self_best_pace";
+        public static String folderSelfBestSector2and3TwoTenthsOffThePace = "lap_times/sector2_and_3_two_tenths_off_self_best_pace";
+        public static String folderSelfBestSector1and3TwoTenthsOffThePace = "lap_times/sector1_and_3_two_tenths_off_self_best_pace";
+        public static String folderSelfBestAllSectorsTwoTenthsOffThePace = "lap_times/sector_all_two_tenths_off_self_best_pace";
+
+        public static String folderSelfBestSector1ASecondOffThePace = "lap_times/sector1_a_second_off_self_best_pace";
+        public static String folderSelfBestSector2ASecondOffThePace = "lap_times/sector2_a_second_off_self_best_pace";
+        public static String folderSelfBestSector3ASecondOffThePace = "lap_times/sector3_a_second_off_self_best_pace";
+        public static String folderSelfBestSector1and2ASecondOffThePace = "lap_times/sector1_and_2_a_second_off_self_best_pace";
+        public static String folderSelfBestSector2and3ASecondOffThePace = "lap_times/sector2_and_3_a_second_off_self_best_pace";
+        public static String folderSelfBestSector1and3ASecondOffThePace = "lap_times/sector1_and_3_a_second_off_self_best_pace";
+        public static String folderSelfBestAllSectorsASecondOffThePace = "lap_times/sector_all_a_second_off_self_best_pace";
+
+        public static String folderSelfBestOffThePace = "lap_times/off_the_self_best_pace";
 
         // if the lap is within 0.3% of the best lap time play a message
         private Single goodLapPercent = 0.3f;
@@ -164,7 +190,6 @@ namespace CrewChiefV4.Events
 
         private LastLapRating lastLapRating;
 
-        // TODO: implement.
         private LastLapRating lastLapSelfRating;
 
         private TimeSpan deltaPlayerLastToSessionBestInClass;
@@ -389,6 +414,7 @@ namespace CrewChiefV4.Events
                         lapTimesWindow = new List<float>(lapTimesWindowSize);
                     }
                     lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData, false /*selfPace*/);
+                    // TODO: not sure if we should rate against personal best or windowed pace for self pace here?
                     lastLapSelfRating = getLastLapRating(currentGameState, lapAndSectorsSelfComparisonData, true /*selfPace*/);
 
                     if (currentGameState.SessionData.PreviousLapWasValid)
@@ -447,7 +473,7 @@ namespace CrewChiefV4.Events
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/, true /*windowed*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
                                             audioPlayer.playMessage(new QueuedMessage("sectorsHotLap", sectorMessageFragments, 0, this));
@@ -526,7 +552,7 @@ namespace CrewChiefV4.Events
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/, true /*windowed*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
                                             audioPlayer.playMessage(new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this));
@@ -603,7 +629,7 @@ namespace CrewChiefV4.Events
                                     }
                                     
                                     List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], false, false /*selfPace*/);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], false, false /*selfPace*/, true /*windowed*/);
                                     if (sectorMessageFragments.Count > 0)
                                     {
                                         QueuedMessage message = new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this);
@@ -813,11 +839,11 @@ namespace CrewChiefV4.Events
 
                 if (!selfPace)
                 {
-                    if (!selfPace && currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
+                    if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
                         return LastLapRating.BEST_OVERALL;
                     }
-                    else if (!selfPace && currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
+                    else if (currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
                         return LastLapRating.BEST_IN_CLASS;
                     }
@@ -835,7 +861,7 @@ namespace CrewChiefV4.Events
                         {
                             return LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER;
                         }
-                        else if (!selfPace && currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                        else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
                         {
                             return LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER;
                         }
@@ -1118,7 +1144,7 @@ namespace CrewChiefV4.Events
                             reportOption = SectorReportOption.WORST_ONLY;
                         }
                         List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],
-                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], false, selfPace);
+                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], false, selfPace, true /*windowed*/);
                         if (sectorDeltaMessages.Count > 0)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
@@ -1195,7 +1221,7 @@ namespace CrewChiefV4.Events
                             : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
 
                         List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],
-                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], true, selfPace);
+                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], true, selfPace, false /*windowed*/);
                         if (sectorDeltaMessages.Count > 0)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
@@ -1333,7 +1359,7 @@ namespace CrewChiefV4.Events
         }
         
         public static List<MessageFragment> getSectorDeltaMessages(SectorReportOption reportOption, float playerSector1, float comparisonSector1, float playerSector2,
-            float comparisonSector2, float playerSector3, float comparisonSector3, Boolean comparisonIncludesAllLaps, bool selfPace)
+            float comparisonSector2, float playerSector3, float comparisonSector3, Boolean comparisonIncludesAllLaps, bool selfPace, bool windowed)
         {
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             float delta1 = float.MaxValue;
@@ -1412,21 +1438,21 @@ namespace CrewChiefV4.Events
                     }
                     else if (nearlyEqual(delta1, 0.1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsATenthOffThePace : folderAllSectorsATenthOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfAllSectorsATenthOffThePace : folderSelfBestAllSectorsATenthOffThePace) : folderAllSectorsATenthOffThePace));
                     }
                     else if (nearlyEqual(delta1, 0.2f))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsTwoTenthsOffThePace : folderAllSectorsTwoTenthsOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfAllSectorsTwoTenthsOffThePace : folderSelfBestAllSectorsTwoTenthsOffThePace) : folderAllSectorsTwoTenthsOffThePace));
                     }
                     else if (nearlyEqual(delta1, 1))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsASecondOffThePace : folderAllSectorsASecondOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfAllSectorsASecondOffThePace : folderSelfBestAllSectorsASecondOffThePace) : folderAllSectorsASecondOffThePace));
                     }
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllThreeSectorsAre));
                         messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                     }
                 }
                 else
@@ -1439,21 +1465,21 @@ namespace CrewChiefV4.Events
                     }
                     else if (nearlyEqual(delta1, 0.1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2ATenthOffThePace : folderSector1and2ATenthOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and2ATenthOffThePace : folderSelfBestSector1and2ATenthOffThePace) : folderSector1and2ATenthOffThePace));
                     }
                     else if (nearlyEqual(delta1, 0.2f))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2TwoTenthsOffThePace : folderSector1and2TwoTenthsOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and2TwoTenthsOffThePace : folderSelfBestSector1and2TwoTenthsOffThePace) : folderSector1and2TwoTenthsOffThePace));
                     }
                     else if (nearlyEqual(delta1, 1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2ASecondOffThePace : folderSector1and2ASecondOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and2ASecondOffThePace : folderSelfBestSector1and2ASecondOffThePace) : folderSector1and2ASecondOffThePace));
                     }
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderSectors1And2Are));
                         messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                     }
                 }
             }
@@ -1467,21 +1493,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta2, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3ATenthOffThePace : folderSector2and3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2and3ATenthOffThePace : folderSelfBestSector2and3ATenthOffThePace) : folderSector2and3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta2, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3TwoTenthsOffThePace : folderSector2and3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2and3TwoTenthsOffThePace : folderSelfBestSector2and3TwoTenthsOffThePace) : folderSector2and3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta2, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3ASecondOffThePace : folderSector2and3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2and3ASecondOffThePace : folderSelfBestSector2and3ASecondOffThePace) : folderSector2and3ASecondOffThePace));
                 }
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors2And3Are));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                 }
             }
             else if (nearlyEqual(delta1, delta3))
@@ -1494,21 +1520,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta1, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3ATenthOffThePace : folderSector1and3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and3ATenthOffThePace : folderSelfBestSector1and3ATenthOffThePace) : folderSector1and3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta1, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3TwoTenthsOffThePace : folderSector1and3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and3TwoTenthsOffThePace : folderSelfBestSector1and3TwoTenthsOffThePace) : folderSector1and3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta1, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3ASecondOffThePace : folderSector1and3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1and3ASecondOffThePace : folderSelfBestSector1and3ASecondOffThePace) : folderSector1and3ASecondOffThePace));
                 }
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors1And3Are));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                 }
             }
 
@@ -1520,21 +1546,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta1, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1ATenthOffThePace : folderSector1ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1ATenthOffThePace : folderSelfBestSector1ATenthOffThePace) : folderSector1ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta1, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1TwoTenthsOffThePace : folderSector1TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1TwoTenthsOffThePace : folderSelfBestSector1TwoTenthsOffThePace) : folderSector1TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta1, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1ASecondOffThePace : folderSector1ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector1ASecondOffThePace : folderSelfBestSector1ASecondOffThePace) : folderSector1ASecondOffThePace));
                 }
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector1Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                 }
             }
             if (!reportedDelta2)
@@ -1545,21 +1571,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta2, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2ATenthOffThePace : folderSector2ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2ATenthOffThePace : folderSelfBestSector2ATenthOffThePace) : folderSector2ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta2, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2TwoTenthsOffThePace : folderSector2TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2TwoTenthsOffThePace : folderSelfBestSector2TwoTenthsOffThePace) : folderSector2TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta2, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2ASecondOffThePace : folderSector2ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector2ASecondOffThePace : folderSelfBestSector2ASecondOffThePace) : folderSector2ASecondOffThePace));
                 }
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector2Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta2, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                 }
             }
             if (!reportedDelta3)
@@ -1570,21 +1596,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta3, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3ATenthOffThePace : folderSector3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector3ATenthOffThePace : folderSelfBestSector3ATenthOffThePace) : folderSector3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta3, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3TwoTenthsOffThePace : folderSector3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector3TwoTenthsOffThePace : folderSelfBestSector3TwoTenthsOffThePace) : folderSector3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta3, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3ASecondOffThePace : folderSector3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfSector3ASecondOffThePace : folderSelfBestSector3ASecondOffThePace) : folderSector3ASecondOffThePace));
                 }
                 else if (delta3 < 10 && delta3 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector3Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta3, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? (windowed ? folderSelfOffThePace : folderSelfBestOffThePace) : folderOffThePace));
                 }
             }
             if (messageFragments.Count > 0)
