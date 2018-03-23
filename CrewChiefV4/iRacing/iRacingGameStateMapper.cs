@@ -171,7 +171,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
                 currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
-                Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate.ToString("0.000"));
                 
                 //TODO update car classes
                 currentGameState.carClass = CarData.getCarClassForIRacingId(playerCar.Car.CarClassId, playerCar.Car.CarId);
@@ -239,7 +239,7 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
                         
                         currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
-                        Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                        Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate.ToString("0.000"));
 
                         if (previousGameState != null)
                         {
