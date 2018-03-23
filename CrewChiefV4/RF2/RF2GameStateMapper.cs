@@ -91,6 +91,8 @@ namespace CrewChiefV4.rFactor2
         private TrackDataContainer lastSessionTrackDataContainer = null;
         private double lastSessionTrackLength = -1.0;
 
+        private double lastPitBoxPositionEstimate = -1.0;
+
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
 
@@ -523,6 +525,15 @@ namespace CrewChiefV4.rFactor2
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
 
+                var inPitStall = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
+
+                // TODO: This needs testing, I am suspecting that mLapDist is only correct in Practice or Quali.
+                if (inPitStall)
+                {
+                    cgs.PitData.PitBoxPositionEstimate = (float)playerScoring.mLapDist;
+                    this.lastPitBoxPositionEstimate = cgs.PitData.PitBoxPositionEstimate;
+                }
+
                 // Initialize track landmarks for this session.
                 TrackDataContainer tdc = null;
                 if (this.lastSessionTrackDataContainer != null
@@ -533,6 +544,11 @@ namespace CrewChiefV4.rFactor2
 
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+
+                    // Also, if this is the same track as previously, and we are not in a garage stall (restart without
+                    // going back to monitor) restore old (last captured) Pit Stall position.
+                    if (!inPitStall && this.lastPitBoxPositionEstimate > 0.0)
+                        cgs.PitData.PitBoxPositionEstimate = (float)this.lastPitBoxPositionEstimate;
                 }
                 else
                 {
@@ -548,6 +564,8 @@ namespace CrewChiefV4.rFactor2
                 csd.TrackDefinition.setGapPoints();
 
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
+
+                Console.WriteLine("Pit box position = " + (cgs.PitData.PitBoxPositionEstimate < 0.0f ? "Unknown" : cgs.PitData.PitBoxPositionEstimate.ToString("0.000")));
             }
 
             // Restore cumulative data.
@@ -573,6 +591,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.FlagData.previousLapWasFCY = pgs.FlagData.previousLapWasFCY;
 
                 cgs.Conditions.samples = pgs.Conditions.samples;
+
+                cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
