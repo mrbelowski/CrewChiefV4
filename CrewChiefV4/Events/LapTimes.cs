@@ -324,14 +324,9 @@ namespace CrewChiefV4.Events
                 return;
             }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
-            float[] lapAndSectorsSelfComparisonData = new float[] { -1, -1, -1, -1 };
+            float[] lapAndSectorsSelfComparisonData = currentGameState.getTimeAndSectorsForSelfBestLap();
             if (currentGameState.SessionData.IsNewSector)
             {
-                lapAndSectorsSelfComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                lapAndSectorsSelfComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
-                lapAndSectorsSelfComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
-                lapAndSectorsSelfComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
-
                 isHotLapping = currentGameState.SessionData.SessionType == SessionType.HotLap || (currentGameState.OpponentData.Count == 0 || (
                     currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLapping)
@@ -862,19 +857,12 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious)
-                    {
-                        return LastLapRating.SETTING_SELF_PACE;
-                    }
-                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
-                    {
-                        return LastLapRating.CLOSE_TO_SELF_PACE;
-                    }
-                    else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
+                    // TODO: do we need more sub states for Self lap?
+                    if (bestLapComparisonData[0] > 0 && currentGameState.SessionData.LapTimePrevious == bestLapComparisonData[0])
                     {
                         return LastLapRating.PERSONAL_BEST;
                     }
-                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                    else if (bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious - closeThreshold
                         && currentGameState.SessionData.CompletedLaps > 1)
                     {
                         return LastLapRating.CLOSE_TO_PERSONAL_BEST;
@@ -990,7 +978,7 @@ namespace CrewChiefV4.Events
                 else
                 {
                     float[] bestComparisonLapData = selfPace
-                        ? currentGameState.getTimeAndSectorsForSelfBestLapInWindow(paceCheckLapsWindowForRaceToUse)
+                        ? currentGameState.getTimeAndSectorsForSelfBestLap()
                         : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
 
                     if (bestComparisonLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
@@ -1070,21 +1058,12 @@ namespace CrewChiefV4.Events
                             switch (lastLapSelfRating)
                             {
                                 case LastLapRating.PERSONAL_BEST:
-                                case LastLapRating.SETTING_SELF_PACE:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentSelfPace, 0, null));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentSelfPace, 0, null)); // TODO: is this the right phrase?
                                     break;
                                 case LastLapRating.CLOSE_TO_PERSONAL_BEST:
-                                case LastLapRating.CLOSE_TO_SELF_PACE:
                                     if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
                                     {
-                                        if (lastLapRating == LastLapRating.CLOSE_TO_SELF_PACE)
-                                        {
-                                            messages.Add(MessageFragment.Text(folderMatchingCurrentSelfPace));
-                                        }
-                                        else
-                                        {
-                                            messages.Add(MessageFragment.Text(folderPaceOK));
-                                        }
+                                        messages.Add(MessageFragment.Text(folderPaceOK));
                                     }
                                     if (timeToFindFolder != null)
                                     {
@@ -1189,7 +1168,7 @@ namespace CrewChiefV4.Events
                     {
 
                         float[] bestComparisonLapData = selfPace
-                            ? currentGameState.getTimeAndSectorsForSelfBestLapInWindow(-1)
+                            ? currentGameState.getTimeAndSectorsForSelfBestLap()
                             : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
 
                         List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],
@@ -1213,9 +1192,9 @@ namespace CrewChiefV4.Events
 
         private enum LastLapRating
         {
-            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, SETTING_SELF_PACE, CLOSE_TO_SELF_PACE,
-            PERSONAL_BEST, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER, PERSONAL_BEST_CLOSE_TO_CLASS_LEADER,
-            PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER, CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
+            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, PERSONAL_BEST, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER,
+            PERSONAL_BEST_CLOSE_TO_CLASS_LEADER, PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER,
+            CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
         }
 
         public enum SectorSet
