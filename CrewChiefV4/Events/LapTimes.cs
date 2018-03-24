@@ -64,7 +64,6 @@ namespace CrewChiefV4.Events
         private String folderSettingCurrentRacePace = "lap_times/setting_current_race_pace";
         private String folderMatchingCurrentRacePace = "lap_times/matching_race_pace";
         private String folderSettingCurrentSelfPace = "lap_times/setting_current_self_pace";
-        private String folderMatchingCurrentSelfPace = "lap_times/matching_self_pace";
 
         public static String folderSector1Fastest = "lap_times/sector1_fastest";
         public static String folderSector2Fastest = "lap_times/sector2_fastest";
