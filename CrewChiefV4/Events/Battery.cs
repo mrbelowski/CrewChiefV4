@@ -208,7 +208,8 @@ namespace CrewChiefV4.Events
                      currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify ||
                    currentGameState.SessionData.SessionType == SessionType.Practice ||
-                   currentGameState.SessionData.SessionType == SessionType.HotLap) &&
+                   currentGameState.SessionData.SessionType == SessionType.HotLap ||
+                   currentGameState.SessionData.SessionType == SessionType.LonePractice) &&
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green ||
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow ||
                      currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
@@ -407,7 +408,9 @@ namespace CrewChiefV4.Events
 
                     // Warnings for fixed lap sessions.
                     if (this.averageUsagePerLap > 0.0f
-                        && (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap))
+                        && (currentGameState.SessionData.SessionNumberOfLaps > 0
+                            || currentGameState.SessionData.SessionType == SessionType.HotLap
+                            || currentGameState.SessionData.SessionType == SessionType.LonePractice))
                     {
                         var battStatusMsg = string.Format("windowed avg charge = {0}%  previous lap avg charge = {1}%,  previous lap min charge = {2}%, current battery level = {3}%,  prev lap usage = {4}%,  usage per lap = {5}%",
                             this.windowedAverageChargeLeft.ToString("0.000"),

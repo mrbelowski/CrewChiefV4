@@ -186,7 +186,7 @@ namespace CrewChiefV4.Events
             fuelCapacity = 0;
         }
 
-        // fuel not implemented for HotLap modes
+        // fuel not implemented for HotLap/LonePractice modes
         public override List<SessionType> applicableSessionTypes
         {
             get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
@@ -230,7 +230,8 @@ namespace CrewChiefV4.Events
                      currentGameState.SessionData.SessionPhase == SessionPhase.Checkered)) ||
                  ((currentGameState.SessionData.SessionType == SessionType.Qualify ||
                    currentGameState.SessionData.SessionType == SessionType.Practice || 
-                   currentGameState.SessionData.SessionType == SessionType.HotLap) &&
+                   currentGameState.SessionData.SessionType == SessionType.HotLap ||
+                   currentGameState.SessionData.SessionType == SessionType.LonePractice) &&
                     (currentGameState.SessionData.SessionPhase == SessionPhase.Green || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow || 
                      currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
@@ -428,7 +429,9 @@ namespace CrewChiefV4.Events
 
                         // warnings for fixed lap sessions
                         if (currentGameState.SessionData.IsNewLap && averageUsagePerLap > 0 &&
-                            (currentGameState.SessionData.SessionNumberOfLaps > 0 || currentGameState.SessionData.SessionType == SessionType.HotLap) &&
+                            (currentGameState.SessionData.SessionNumberOfLaps > 0 ||
+                                currentGameState.SessionData.SessionType == SessionType.HotLap ||
+                                currentGameState.SessionData.SessionType == SessionType.LonePractice) &&
                             lapsCompletedSinceFuelReset > 0)
                         {
                             int estimatedFuelLapsLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerLap);

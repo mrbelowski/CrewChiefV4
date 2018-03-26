@@ -550,8 +550,8 @@ enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace
 bring_game_window_to_front_for_macros = Ensure game is on top for command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
 
-report_all_laps_in_hotlap_mode = Report all laps when hotlapping
-report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap mode or when we have no opponents in the session
+report_all_laps_in_hotlap_mode = Report all laps when hotlapping/lone practice
+report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap/lone practice mode or when we have no opponents in the session
 
 enable_crash_messages = Enable crash messages
 enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily
