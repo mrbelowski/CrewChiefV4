@@ -12,7 +12,7 @@ namespace CrewChiefV4.GameState
 {
     public enum SessionType
     {
-        Unavailable, Practice, Qualify, Race, HotLap
+        Unavailable, Practice, Qualify, Race, HotLap, LonePractice
     }
     public enum SessionPhase
     {

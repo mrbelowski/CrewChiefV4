@@ -996,9 +996,9 @@ namespace CrewChiefV4.iRacing
 
         private static Dictionary<String, SessionType> sessionTypeMap = new Dictionary<String, SessionType>()
         {
-            {"Offline Testing", SessionType.HotLap},
+            {"Offline Testing", SessionType.LonePractice},
             {"Practice", SessionType.Practice},
-            {"Lone Practice", SessionType.HotLap},
+            {"Lone Practice", SessionType.LonePractice},
             {"Warmup", SessionType.Practice},
             {"Open Qualify", SessionType.Qualify},
             {"Lone Qualify", SessionType.Qualify},
