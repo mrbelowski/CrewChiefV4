@@ -818,6 +818,23 @@
 			"raceroomClassIds": [1717],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
-		}
+		},
+		{
+			"carClassEnum": "SKIP_BARBER",
+			"iracingCarIds": [1],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "FUEL",
+			"spotterVehicleLength": 4.34,
+			"spotterVehicleWidth": 1.75,
+			"limiterAvailable": false
+		},
+		{
+			"carClassEnum": "SPEC_MIATA",
+			"iracingCarIds": [67],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "FUEL",
+			"limiterAvailable": false
+		},
+
 	]
 }
