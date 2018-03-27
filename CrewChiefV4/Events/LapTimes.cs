@@ -63,7 +63,6 @@ namespace CrewChiefV4.Events
         private String folderPersonalBest = "lap_times/personal_best";
         private String folderSettingCurrentRacePace = "lap_times/setting_current_race_pace";
         private String folderMatchingCurrentRacePace = "lap_times/matching_race_pace";
-        private String folderSettingCurrentSelfPace = "lap_times/setting_current_self_pace";
 
         public static String folderSector1Fastest = "lap_times/sector1_fastest";
         public static String folderSector2Fastest = "lap_times/sector2_fastest";
@@ -1057,7 +1056,7 @@ namespace CrewChiefV4.Events
                             switch (lastLapSelfRating)
                             {
                                 case LastLapRating.PERSONAL_BEST:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentSelfPace, 0, null)); // TODO: is this the right phrase?
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, null));
                                     break;
                                 case LastLapRating.CLOSE_TO_PERSONAL_BEST:
                                     if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
@@ -1110,62 +1109,92 @@ namespace CrewChiefV4.Events
             {
                 if (deltaPlayerLastToSessionBestInClassSet)
                 {
-                    if (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero)
+                    if (!selfPace)
                     {
-                        if (sessionType == SessionType.Qualify && currentPosition == 1)
+                        if (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null));
+                            if (sessionType == SessionType.Qualify && currentPosition == 1)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0, null));
+                            }
+                            TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
+                            if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
+                            {
+                                // delay this a bit...
+                                audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
+                                    MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), 0, this));
+                            }
+                        }
+                        else if (deltaPlayerLastToSessionBestInClass.Seconds == 0 && deltaPlayerLastToSessionBestInClass.Milliseconds < 50)
+                        {
+                            if (currentPosition > 1)
+                            {
+                                // should always trigger
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                }
+                            }
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
                         }
                         else
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0, null));
-                        }
-                        TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
-                        if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
-                        {
-                            // delay this a bit...
-                            audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), 0, this));
-                        }
-                    }
-                    else if (deltaPlayerLastToSessionBestInClass.Seconds == 0 && deltaPlayerLastToSessionBestInClass.Milliseconds < 50)
-                    {
-                        if (currentPosition > 1)
-                        {
-                            // should always trigger
-                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                            if (currentPosition > 1)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                                // should always trigger
+                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
+                                }
+                                else
+                                {
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                }
                             }
-                            else
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
-                            }
+                            audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
+                                MessageContents(new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, null));
                         }
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
                     }
                     else
                     {
-                        if (currentPosition > 1)
+                        // Fors self pace case, announce last lap time.
+                        if (lastLapTime > 0)
                         {
-                            // should always trigger
-                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                            audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
+                                MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+
+                            // We also neeed to announce how good it is.
+                            List<MessageFragment> messages = new List<MessageFragment>();
+                            switch (lastLapSelfRating)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition), 0, null));
-                            }
-                            else
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                case LastLapRating.PERSONAL_BEST:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, this));
+                                    break;
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPaceOK, 0, this));
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                default:
+                                    break;
                             }
                         }
-                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
-                            MessageContents(new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, null));
+
                     }
 
                     // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
                     try
                     {
-
                         float[] bestComparisonLapData = selfPace
                             ? currentGameState.getTimeAndSectorsForSelfBestLap()
                             : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
