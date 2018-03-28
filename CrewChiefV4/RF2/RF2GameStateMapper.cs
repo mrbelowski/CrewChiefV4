@@ -531,6 +531,9 @@ namespace CrewChiefV4.rFactor2
                 if (inPitStall)
                 {
                     cgs.PitData.PitBoxPositionEstimate = (float)playerScoring.mLapDist;
+                    if (cgs.PitData.PitBoxPositionEstimate < 0.0f)
+                        cgs.PitData.PitBoxPositionEstimate += (float)shared.scoring.mScoringInfo.mLapDist;
+
                     this.lastPitBoxPositionEstimate = cgs.PitData.PitBoxPositionEstimate;
                 }
 
