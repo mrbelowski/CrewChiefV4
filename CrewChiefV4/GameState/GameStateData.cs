@@ -2489,7 +2489,8 @@ namespace CrewChiefV4.GameState
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
-                if (CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck))
+                if (CrewChief.forceSingleClass
+                    || CarData.IsCarClassEqual(entry.Value.CarClass, carClassToCheck))
                 {
                     float[] thisOpponentsBest = entry.Value.getTimeAndSectorsForBestLapInWindow(lapsToCheck);
                     if (bestLapWithSectors[0] == -1 || (thisOpponentsBest[0] > 0 && thisOpponentsBest[0] < bestLapWithSectors[0]))
@@ -2516,6 +2517,16 @@ namespace CrewChiefV4.GameState
                 }
             }
             return bestLapWithSectors;
+        }
+
+        public float[] getTimeAndSectorsForSelfBestLap()
+        {
+            return new float[] {
+                SessionData.PlayerLapTimeSessionBest,
+                SessionData.PlayerBestSector1Time,
+                SessionData.PlayerBestSector2Time,
+                SessionData.PlayerBestSector3Time
+            };
         }
     }
 }
