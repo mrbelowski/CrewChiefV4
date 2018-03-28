@@ -446,7 +446,7 @@ namespace CrewChiefV4.Events
                                         }
                                     }
                                 }
-                                    // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
+                                // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
                                 else if (currentGameState.SessionData.ClassPosition == 1) 
                                 {
                                     // TODO: rework this grotty logic...
