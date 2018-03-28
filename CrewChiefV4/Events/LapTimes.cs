@@ -113,6 +113,32 @@ namespace CrewChiefV4.Events
         public static String folderAllThreeSectorsAre = "lap_times/sector_all_are";
         public static String folderOffThePace = "lap_times/off_the_pace";
 
+        public static String folderSelfSector1ATenthOffThePace = "lap_times/sector1_a_tenth_off_self_pace";
+        public static String folderSelfSector2ATenthOffThePace = "lap_times/sector2_a_tenth_off_self_pace";
+        public static String folderSelfSector3ATenthOffThePace = "lap_times/sector3_a_tenth_off_self_pace";
+        public static String folderSelfSector1and2ATenthOffThePace = "lap_times/sector1_and_2_a_tenth_off_self_pace";
+        public static String folderSelfSector2and3ATenthOffThePace = "lap_times/sector2_and_3_a_tenth_off_self_pace";
+        public static String folderSelfSector1and3ATenthOffThePace = "lap_times/sector1_and_3_a_tenth_off_self_pace";
+        public static String folderSelfAllSectorsATenthOffThePace = "lap_times/sector_all_a_tenth_off_self_pace";
+
+        public static String folderSelfSector1TwoTenthsOffThePace = "lap_times/sector1_two_tenths_off_self_pace";
+        public static String folderSelfSector2TwoTenthsOffThePace = "lap_times/sector2_two_tenths_off_self_pace";
+        public static String folderSelfSector3TwoTenthsOffThePace = "lap_times/sector3_two_tenths_off_self_pace";
+        public static String folderSelfSector1and2TwoTenthsOffThePace = "lap_times/sector1_and_2_two_tenths_off_self_pace";
+        public static String folderSelfSector2and3TwoTenthsOffThePace = "lap_times/sector2_and_3_two_tenths_off_self_pace";
+        public static String folderSelfSector1and3TwoTenthsOffThePace = "lap_times/sector1_and_3_two_tenths_off_self_pace";
+        public static String folderSelfAllSectorsTwoTenthsOffThePace = "lap_times/sector_all_two_tenths_off_self_pace";
+
+        public static String folderSelfSector1ASecondOffThePace = "lap_times/sector1_a_second_off_self_pace";
+        public static String folderSelfSector2ASecondOffThePace = "lap_times/sector2_a_second_off_self_pace";
+        public static String folderSelfSector3ASecondOffThePace = "lap_times/sector3_a_second_off_self_pace";
+        public static String folderSelfSector1and2ASecondOffThePace = "lap_times/sector1_and_2_a_second_off_self_pace";
+        public static String folderSelfSector2and3ASecondOffThePace = "lap_times/sector2_and_3_a_second_off_self_pace";
+        public static String folderSelfSector1and3ASecondOffThePace = "lap_times/sector1_and_3_a_second_off_self_pace";
+        public static String folderSelfAllSectorsASecondOffThePace = "lap_times/sector_all_a_second_off_self_pace";
+
+        public static String folderSelfOffThePace = "lap_times/off_the_self_pace";
+
         // if the lap is within 0.3% of the best lap time play a message
         private Single goodLapPercent = 0.3f;
 
@@ -134,7 +160,9 @@ namespace CrewChiefV4.Events
         private Boolean lapIsValid;
 
         private LastLapRating lastLapRating;
-        
+
+        private LastLapRating lastLapSelfRating;
+
         private TimeSpan deltaPlayerLastToSessionBestInClass;
 
         private Boolean deltaPlayerLastToSessionBestInClassSet = false;
@@ -197,6 +225,7 @@ namespace CrewChiefV4.Events
             lastConsistencyMessage = ConsistencyResult.NOT_APPLICABLE;
             lapIsValid = true;
             lastLapRating = LastLapRating.NO_DATA;
+            lastLapSelfRating = LastLapRating.NO_DATA;
             deltaPlayerLastToSessionBestInClass = TimeSpan.MaxValue;
             deltaPlayerLastToSessionBestInClassSet = false;
             lastLapTime = 0;
@@ -293,16 +322,17 @@ namespace CrewChiefV4.Events
                 return;
             }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
+            float[] lapAndSectorsSelfComparisonData = currentGameState.getTimeAndSectorsForSelfBestLap();
             if (currentGameState.SessionData.IsNewSector)
             {
                 isHotLappingOrLonePractice = currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.LonePractice ||
                     (currentGameState.OpponentData.Count == 0 || (currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLappingOrLonePractice)
                 {
-                    lapAndSectorsComparisonData[0] = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                    lapAndSectorsComparisonData[1] = currentGameState.SessionData.PlayerBestSector1Time;
-                    lapAndSectorsComparisonData[2] = currentGameState.SessionData.PlayerBestSector2Time;
-                    lapAndSectorsComparisonData[3] = currentGameState.SessionData.PlayerBestSector3Time;
+                    lapAndSectorsComparisonData[0] = lapAndSectorsSelfComparisonData[0];
+                    lapAndSectorsComparisonData[1] = lapAndSectorsSelfComparisonData[1];
+                    lapAndSectorsComparisonData[2] = lapAndSectorsSelfComparisonData[2];
+                    lapAndSectorsComparisonData[3] = lapAndSectorsSelfComparisonData[3];
                 }
                 else
                 {
@@ -349,8 +379,9 @@ namespace CrewChiefV4.Events
                     if (lapTimesWindow == null)
                     {
                         lapTimesWindow = new List<float>(lapTimesWindowSize);
-                    }                    
-                    lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData);
+                    }
+                    lastLapRating = getLastLapRating(currentGameState, lapAndSectorsComparisonData, false /*selfPace*/);
+                    lastLapSelfRating = getLastLapRating(currentGameState, lapAndSectorsSelfComparisonData, true /*selfPace*/);
 
                     if (currentGameState.SessionData.PreviousLapWasValid)
                     {
@@ -409,7 +440,7 @@ namespace CrewChiefV4.Events
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, isHotLapping /*selfPace*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
                                             audioPlayer.playMessage(new QueuedMessage("sectorsHotLap", sectorMessageFragments, 0, this));
@@ -417,13 +448,13 @@ namespace CrewChiefV4.Events
                                         }
                                     }
                                 }
-                                    // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
+                                // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
                                 else if (currentGameState.SessionData.ClassPosition == 1) 
                                 {
                                     // TODO: rework this grotty logic...
                                     Boolean newGapToSecond = false;
                                     if (previousGameState != null && previousGameState.SessionData.ClassPosition > 1)
-                                    {                                        
+                                    {
                                         newGapToSecond = true;
                                         if (currentGameState.SessionData.SessionType == SessionType.Qualify)
                                         {
@@ -488,7 +519,7 @@ namespace CrewChiefV4.Events
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
                                             audioPlayer.playMessage(new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this));
@@ -565,7 +596,7 @@ namespace CrewChiefV4.Events
                                     }
                                     
                                     List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], false);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], false, false /*selfPace*/);
                                     if (sectorMessageFragments.Count > 0)
                                     {
                                         QueuedMessage message = new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this);
@@ -755,7 +786,7 @@ namespace CrewChiefV4.Events
             NOT_APPLICABLE, CONSISTENT, IMPROVING, WORSENING
         }
 
-        private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapDataForOpponents)
+        private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapComparisonData, Boolean selfPace)
         {
             if (currentGameState.SessionData.PreviousLapWasValid && currentGameState.SessionData.LapTimePrevious > 0)
             {
@@ -768,63 +799,82 @@ namespace CrewChiefV4.Events
                     && currentGameState.SessionData.PreviousLapWasValid;
 
                 Boolean sessionHasOpponents = currentGameState.SessionData.SessionType != SessionType.HotLap
-                    && currentGameState.SessionData.SessionType != SessionType.LonePractice
-                    && currentGameState.OpponentData.Count > 0;
+					&& currentGameState.SessionData.SessionType != SessionType.LonePractice
+					&& currentGameState.OpponentData.Count > 0;
+                Boolean hasComparisonData = (sessionHasOpponents || selfPace) && bestLapComparisonData[0] > 0;
 
-                Boolean hasOpponentLapComparisonData = sessionHasOpponents && bestLapDataForOpponents[0] > 0;
-
-                if (!hasPlayerLapComparisonData && !hasOpponentLapComparisonData)
+                if (!hasPlayerLapComparisonData && !hasComparisonData)
                 {
                     return LastLapRating.NO_DATA;
                 }
 
-                if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
+                if (!selfPace)
                 {
-                    return LastLapRating.BEST_OVERALL;
-                }
-                else if (currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
-                {
-                    return LastLapRating.BEST_IN_CLASS;
-                }
-                else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapDataForOpponents[0] > 0 && bestLapDataForOpponents[0] >= currentGameState.SessionData.LapTimePrevious) 
-                {
-                    return LastLapRating.SETTING_CURRENT_PACE;                
-                }
-                else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapDataForOpponents[0] > 0 && bestLapDataForOpponents[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
-                {
-                    return LastLapRating.CLOSE_TO_CURRENT_PACE;
-                }
-                else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
-                {
-                    if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER;
+                        return LastLapRating.BEST_OVERALL;
                     }
-                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    else if (currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER;
+                        return LastLapRating.BEST_IN_CLASS;
                     }
-                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > 0 || currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > 0)
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious)
                     {
-                        return LastLapRating.PERSONAL_BEST_STILL_SLOW;
+                        return LastLapRating.SETTING_CURRENT_PACE;
+                    }
+                    else if (currentGameState.SessionData.SessionType == SessionType.Race && bestLapComparisonData[0] > 0 && bestLapComparisonData[0] > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_CURRENT_PACE;
+                    }
+                    else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
+                    {
+                        if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                        {
+                            return LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER;
+                        }
+                        else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                        {
+                            return LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER;
+                        }
+                        else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > 0 || currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > 0)
+                        {
+                            return LastLapRating.PERSONAL_BEST_STILL_SLOW;
+                        }
+                    }
+                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_OVERALL_LEADER;
+                    }
+                    else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                    {
+                        return LastLapRating.CLOSE_TO_CLASS_LEADER;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                        && currentGameState.SessionData.CompletedLaps > 1)
+                    {
+                        return LastLapRating.CLOSE_TO_PERSONAL_BEST;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    {
+                        return LastLapRating.MEH;
                     }
                 }
-                else if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
+                else
                 {
-                    return LastLapRating.CLOSE_TO_OVERALL_LEADER;
-                }
-                else if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass >= currentGameState.SessionData.LapTimePrevious - closeThreshold)
-                {
-                    return LastLapRating.CLOSE_TO_CLASS_LEADER;
-                }
-                else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
-                    && currentGameState.SessionData.CompletedLaps > 1)
-                {
-                    return LastLapRating.CLOSE_TO_PERSONAL_BEST;
-                }
-                else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
-                {
-                    return LastLapRating.MEH;
+                    // TODO: do we need more sub states for Self lap?
+                    if (bestLapComparisonData[0] > 0 && currentGameState.SessionData.LapTimePrevious == bestLapComparisonData[0])
+                    {
+                        return LastLapRating.PERSONAL_BEST;
+                    }
+                    else if (bestLapComparisonData[0] > 0 && bestLapComparisonData[0] >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                        && currentGameState.SessionData.CompletedLaps > 1)
+                    {
+                        return LastLapRating.CLOSE_TO_PERSONAL_BEST;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+                    {
+                        return LastLapRating.MEH;
+                    }
                 }
             }
             return LastLapRating.NO_DATA;
@@ -909,44 +959,57 @@ namespace CrewChiefV4.Events
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_PACE))
             {
-                if (sessionType == SessionType.Race)
-                {
-                    if (currentGameState == null)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
-                    }
-                    else
-                    {
-                        float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
+                reportPace(false /*selfPace*/);
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_SELF_PACE))
+            {
+                reportPace(true /*selfPace*/);
+            }
+        }
 
-                        if (bestOpponentLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
+        public void reportPace(bool selfPace)
+        {
+            if (sessionType == SessionType.Race)
+            {
+                if (currentGameState == null)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
+                else
+                {
+                    float[] bestComparisonLapData = selfPace
+                        ? currentGameState.getTimeAndSectorsForSelfBestLap()
+                        : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
+
+                    if (bestComparisonLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
+                    {
+                        TimeSpan lapToCompare = TimeSpan.FromSeconds(lastLapTime - bestComparisonLapData[0]);
+                        String timeToFindFolder = null;
+                        if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 200)
                         {
-                            TimeSpan lapToCompare = TimeSpan.FromSeconds(lastLapTime - bestOpponentLapData[0]);
-                            String timeToFindFolder = null;
-                            if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 200)
-                            {
-                                timeToFindFolder = folderNeedToFindOneMoreTenth;
-                            }
-                            else if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 600)
-                            {
-                                timeToFindFolder = folderNeedToFindAFewMoreTenths;
-                            }
-                            else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds < 500) ||
-                                (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds >= 600))
-                            {
-                                timeToFindFolder = folderNeedToFindASecond;
-                            }
-                            else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds >= 500) ||
-                                lapToCompare.Seconds > 1)
-                            {
-                                timeToFindFolder = folderNeedToFindMoreThanASecond;
-                            }
-                            List<MessageFragment> messages = new List<MessageFragment>();
+                            timeToFindFolder = folderNeedToFindOneMoreTenth;
+                        }
+                        else if (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds < 600)
+                        {
+                            timeToFindFolder = folderNeedToFindAFewMoreTenths;
+                        }
+                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds < 500) ||
+                            (lapToCompare.Seconds == 0 && lapToCompare.Milliseconds >= 600))
+                        {
+                            timeToFindFolder = folderNeedToFindASecond;
+                        }
+                        else if ((lapToCompare.Seconds == 1 && lapToCompare.Milliseconds >= 500) ||
+                            lapToCompare.Seconds > 1)
+                        {
+                            timeToFindFolder = folderNeedToFindMoreThanASecond;
+                        }
+                        List<MessageFragment> messages = new List<MessageFragment>();
+                        if (!selfPace)
+                        {
                             switch (lastLapRating)
                             {
                                 case LastLapRating.BEST_OVERALL:
@@ -993,33 +1056,69 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                                     break;
                             }
-                            SectorReportOption reportOption = SectorReportOption.ALL;
-                            double r = Utilities.random.NextDouble();
-                            // usually report the combined sectors
-                            if (r > 0.33)
-                            {
-                                reportOption = SectorReportOption.WORST_ONLY;
-                            }
-                            List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
-                                currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], false);
-                            if (sectorDeltaMessages.Count > 0)
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
-                            }
-
                         }
                         else
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                            switch (lastLapSelfRating)
+                            {
+                                case LastLapRating.PERSONAL_BEST:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, null));
+                                    break;
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                    if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
+                                    {
+                                        messages.Add(MessageFragment.Text(folderPaceOK));
+                                    }
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    if (messages.Count > 0)
+                                    {
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    }
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                default:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                                    break;
+                            }
+                        }
+                        SectorReportOption reportOption = SectorReportOption.ALL;
+                        double r = Utilities.random.NextDouble();
+                        // usually report the combined sectors
+                        if (r > 0.33)
+                        {
+                            reportOption = SectorReportOption.WORST_ONLY;
+                        }
+                        List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(reportOption, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],
+                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], false, selfPace);
+                        if (sectorDeltaMessages.Count > 0)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
                         }
                     }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    }
                 }
-                else
+            }
+            else
+            {
+                if (deltaPlayerLastToSessionBestInClassSet)
                 {
-                    if (deltaPlayerLastToSessionBestInClassSet)
+                    if (!selfPace)
                     {
                         if (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero)
-                        {   
+                        {
                             if (sessionType == SessionType.Qualify && currentPosition == 1)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0, null));
@@ -1069,36 +1168,67 @@ namespace CrewChiefV4.Events
                             audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
                                 MessageContents(new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, null));
                         }
-
-                        // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
-                        try
-                        {
-
-                            float[] bestOpponentLapData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
-                            List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestOpponentLapData[1],
-                                currentGameState.SessionData.LastSector2Time, bestOpponentLapData[2], currentGameState.SessionData.LastSector3Time, bestOpponentLapData[3], true);
-                            if (sectorDeltaMessages.Count > 0)
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Unable to get sector deltas: " + e.Message);
-                        }
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        // Fors self pace case, announce last lap time.
+                        if (lastLapTime > 0)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
+                                MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+
+                            // We also neeed to announce how good it is.
+                            List<MessageFragment> messages = new List<MessageFragment>();
+                            switch (lastLapSelfRating)
+                            {
+                                case LastLapRating.PERSONAL_BEST:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, this));
+                                    break;
+                                case LastLapRating.CLOSE_TO_PERSONAL_BEST:
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPaceOK, 0, this));
+                                    break;
+                                case LastLapRating.MEH:
+                                    messages.Add(MessageFragment.Text(folderPaceBad));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
                     }
+
+                    // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
+                    try
+                    {
+                        float[] bestComparisonLapData = selfPace
+                            ? currentGameState.getTimeAndSectorsForSelfBestLap()
+                            : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
+
+                        List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],
+                            currentGameState.SessionData.LastSector2Time, bestComparisonLapData[2], currentGameState.SessionData.LastSector3Time, bestComparisonLapData[3], true, selfPace);
+                        if (sectorDeltaMessages.Count > 0)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage("sectorDeltas", sectorDeltaMessages, 0, null));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to get sector deltas: " + e.Message);
+                    }
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
             }
         }
 
         private enum LastLapRating
         {
-            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER, PERSONAL_BEST_CLOSE_TO_CLASS_LEADER,
-            PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER, CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
+            BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, PERSONAL_BEST, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER,
+            PERSONAL_BEST_CLOSE_TO_CLASS_LEADER, PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER,
+            CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
         }
 
         public enum SectorSet
@@ -1214,7 +1344,7 @@ namespace CrewChiefV4.Events
         }
         
         public static List<MessageFragment> getSectorDeltaMessages(SectorReportOption reportOption, float playerSector1, float comparisonSector1, float playerSector2,
-            float comparisonSector2, float playerSector3, float comparisonSector3, Boolean comparisonIncludesAllLaps)
+            float comparisonSector2, float playerSector3, float comparisonSector3, Boolean comparisonIncludesAllLaps, bool selfPace)
         {
             List<MessageFragment> messageFragments = new List<MessageFragment>();
             float delta1 = float.MaxValue;
@@ -1293,21 +1423,21 @@ namespace CrewChiefV4.Events
                     }
                     else if (nearlyEqual(delta1, 0.1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderAllSectorsATenthOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsATenthOffThePace : folderAllSectorsATenthOffThePace));
                     }
                     else if (nearlyEqual(delta1, 0.2f))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderAllSectorsTwoTenthsOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsTwoTenthsOffThePace : folderAllSectorsTwoTenthsOffThePace));
                     }
                     else if (nearlyEqual(delta1, 1))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderAllSectorsASecondOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfAllSectorsASecondOffThePace : folderAllSectorsASecondOffThePace));
                     }
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderAllThreeSectorsAre));
                         messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                        messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                     }
                 }
                 else
@@ -1320,21 +1450,21 @@ namespace CrewChiefV4.Events
                     }
                     else if (nearlyEqual(delta1, 0.1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderSector1and2ATenthOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2ATenthOffThePace : folderSector1and2ATenthOffThePace));
                     }
                     else if (nearlyEqual(delta1, 0.2f))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderSector1and2TwoTenthsOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2TwoTenthsOffThePace : folderSector1and2TwoTenthsOffThePace));
                     }
                     else if (nearlyEqual(delta1, 1f))
                     {
-                        messageFragments.Add(MessageFragment.Text(folderSector1and2ASecondOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and2ASecondOffThePace : folderSector1and2ASecondOffThePace));
                     }
                     else if (delta1 < 10 && delta1 > 0)
                     {
                         messageFragments.Add(MessageFragment.Text(folderSectors1And2Are));
                         messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                        messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                        messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                     }
                 }
             }
@@ -1348,21 +1478,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta2, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2and3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3ATenthOffThePace : folderSector2and3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta2, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2and3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3TwoTenthsOffThePace : folderSector2and3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta2, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2and3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2and3ASecondOffThePace : folderSector2and3ASecondOffThePace));
                 }
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors2And3Are));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
             else if (nearlyEqual(delta1, delta3))
@@ -1375,21 +1505,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta1, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1and3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3ATenthOffThePace : folderSector1and3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta1, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1and3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3TwoTenthsOffThePace : folderSector1and3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta1, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1and3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1and3ASecondOffThePace : folderSector1and3ASecondOffThePace));
                 }
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSectors1And3Are));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
 
@@ -1401,21 +1531,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta1, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1ATenthOffThePace : folderSector1ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta1, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1TwoTenthsOffThePace : folderSector1TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta1, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector1ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector1ASecondOffThePace : folderSector1ASecondOffThePace));
                 }
                 else if (delta1 < 10 && delta1 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector1Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta1, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
             if (!reportedDelta2)
@@ -1426,21 +1556,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta2, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2ATenthOffThePace : folderSector2ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta2, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2TwoTenthsOffThePace : folderSector2TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta2, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector2ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector2ASecondOffThePace : folderSector2ASecondOffThePace));
                 }
                 else if (delta2 < 10 && delta2 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector2Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta2, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
             if (!reportedDelta3)
@@ -1451,21 +1581,21 @@ namespace CrewChiefV4.Events
                 }
                 else if (nearlyEqual(delta3, 0.1f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector3ATenthOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3ATenthOffThePace : folderSector3ATenthOffThePace));
                 }
                 else if (nearlyEqual(delta3, 0.2f))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector3TwoTenthsOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3TwoTenthsOffThePace : folderSector3TwoTenthsOffThePace));
                 }
                 else if (nearlyEqual(delta3, 1))
                 {
-                    messageFragments.Add(MessageFragment.Text(folderSector3ASecondOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfSector3ASecondOffThePace : folderSector3ASecondOffThePace));
                 }
                 else if (delta3 < 10 && delta3 > 0)
                 {
                     messageFragments.Add(MessageFragment.Text(folderSector3Is));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta3, Precision.AUTO_GAPS)));
-                    messageFragments.Add(MessageFragment.Text(folderOffThePace));
+                    messageFragments.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
             if (messageFragments.Count > 0)

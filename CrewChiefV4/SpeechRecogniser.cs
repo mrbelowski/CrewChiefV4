@@ -42,6 +42,7 @@ namespace CrewChiefV4
         public static String[] HOWS_MY_FUEL = Configuration.getSpeechRecognitionPhrases("HOWS_MY_FUEL");
         public static String[] HOWS_MY_BATTERY = Configuration.getSpeechRecognitionPhrases("HOWS_MY_BATTERY");
         public static String[] HOWS_MY_PACE = Configuration.getSpeechRecognitionPhrases("HOWS_MY_PACE");
+        public static String[] HOWS_MY_SELF_PACE = Configuration.getSpeechRecognitionPhrases("HOWS_MY_SELF_PACE");
         public static String[] HOW_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_TYRE_TEMPS");
         public static String[] WHAT_ARE_MY_TYRE_TEMPS = Configuration.getSpeechRecognitionPhrases("WHAT_ARE_MY_TYRE_TEMPS");
         public static String[] HOW_ARE_MY_BRAKE_TEMPS = Configuration.getSpeechRecognitionPhrases("HOW_ARE_MY_BRAKE_TEMPS");
@@ -511,6 +512,7 @@ namespace CrewChiefV4
                 validateAndAdd(HOWS_MY_FUEL, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_BATTERY, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_PACE, staticSpeechChoices);
+                validateAndAdd(HOWS_MY_SELF_PACE, staticSpeechChoices);
                 validateAndAdd(HOW_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_MY_TYRE_TEMPS, staticSpeechChoices);
                 validateAndAdd(HOW_ARE_MY_BRAKE_TEMPS, staticSpeechChoices);
@@ -1122,6 +1124,7 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME) ||
                 ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME) ||
                 ResultContains(recognisedSpeech, HOWS_MY_PACE) ||
+                ResultContains(recognisedSpeech, HOWS_MY_SELF_PACE) ||
                 ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES) ||
                 ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME))
             {
