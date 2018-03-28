@@ -22,7 +22,6 @@ namespace CrewChiefV4.Events
 
         Boolean reportAllLaptimesInHotlapMode = UserSettings.GetUserSettings().getBoolean("report_all_laps_in_hotlap_mode");
 
-
         int maxQueueLengthForRaceSectorDeltaReports = 0;
         int maxQueueLengthForRaceLapTimeReports = 0;
 
@@ -32,10 +31,16 @@ namespace CrewChiefV4.Events
         public static String folderGapIntro = "lap_times/gap_intro";
 
         public static String folderGapOutroOffPace = "lap_times/gap_outro_off_pace";
+        // TODO: add real sound
+        public static String folderSelfGapOutroOffPace = "lap_times/off_the_self_pace";
+        
         // "that was a 1:34.2, you're fastest in your class"
         private String folderFastestInClass = "lap_times/fastest_in_your_class";
 
         private String folderLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_the_pace";
+
+        // TODO: add real sound
+        private String folderSelfLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_the_pace";
 
         private String folderQuickerThanSecondPlace = "lap_times/quicker_than_second_place";
 
@@ -429,18 +434,19 @@ namespace CrewChiefV4.Events
                                     }
                                     else if (deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderLessThanATenthOffThePace, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage((isHotLappingOrLonePractice ? folderSelfLessThanATenthOffThePace : folderLessThanATenthOffThePace), 0, this));
                                     }
                                     else if (deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                            MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), 0, this));
+                                            MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS),
+                                            isHotLappingOrLonePractice ? folderSelfGapOutroOffPace : folderGapOutroOffPace), 0, this));
                                     }
                                     if (!GlobalBehaviourSettings.useOvalLogic &&
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                     {
                                         List<MessageFragment> sectorMessageFragments = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, lapAndSectorsComparisonData[1],
-                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, isHotLapping /*selfPace*/);
+                                            currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, isHotLappingOrLonePractice /*selfPace*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
                                             audioPlayer.playMessage(new QueuedMessage("sectorsHotLap", sectorMessageFragments, 0, this));
@@ -681,7 +687,7 @@ namespace CrewChiefV4.Events
                                 sectorEnum = SectorSet.TWO;
                                 break;
                         }
-                        List<MessageFragment> messageFragments = getSingleSectorDeltaMessages(sectorEnum, playerSector, comparisonSector);
+                        List<MessageFragment> messageFragments = getSingleSectorDeltaMessages(sectorEnum, playerSector, comparisonSector, isHotLappingOrLonePractice /*selfPace*/);
                         if (!GlobalBehaviourSettings.useOvalLogic && 
                             messageFragments.Count() > 0)
                         {
@@ -1236,7 +1242,7 @@ namespace CrewChiefV4.Events
             ONE, TWO, THREE, NONE
         }
 
-        public static List<MessageFragment> getSingleSectorDeltaMessages(SectorSet sector, float playerTime, float comparisonTime)
+        public static List<MessageFragment> getSingleSectorDeltaMessages(SectorSet sector, float playerTime, float comparisonTime, bool selfPace)
         {
             List<MessageFragment> messages = new List<MessageFragment>();
             // the sector times must be > 5 seconds to be considered valid
@@ -1261,45 +1267,45 @@ namespace CrewChiefV4.Events
                 {
                     if (sector == SectorSet.ONE)
                     {
-                        messages.Add(MessageFragment.Text(folderSector1ATenthOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector1ATenthOffThePace : folderSector1ATenthOffThePace));
                     }
                     else if (sector == SectorSet.TWO)
                     {
-                        messages.Add(MessageFragment.Text(folderSector2ATenthOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector2ATenthOffThePace : folderSector2ATenthOffThePace));
                     }
                     else
                     {
-                        messages.Add(MessageFragment.Text(folderSector3ATenthOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector3ATenthOffThePace : folderSector3ATenthOffThePace));
                     }
                 }
                 else if (nearlyEqual(delta, 0.2f))
                 {
                     if (sector == SectorSet.ONE)
                     {
-                        messages.Add(MessageFragment.Text(folderSector1TwoTenthsOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector1TwoTenthsOffThePace : folderSector1TwoTenthsOffThePace));
                     }
                     else if (sector == SectorSet.TWO)
                     {
-                        messages.Add(MessageFragment.Text(folderSector2TwoTenthsOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector2TwoTenthsOffThePace : folderSector2TwoTenthsOffThePace));
                     }
                     else
                     {
-                        messages.Add(MessageFragment.Text(folderSector3TwoTenthsOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector3TwoTenthsOffThePace : folderSector3TwoTenthsOffThePace));
                     }
                 }
                 else if (nearlyEqual(delta, 1))
                 {
                     if (sector == SectorSet.ONE)
                     {
-                        messages.Add(MessageFragment.Text(folderSector1ASecondOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector1ASecondOffThePace : folderSector1ASecondOffThePace));
                     }
                     else if (sector == SectorSet.TWO)
                     {
-                        messages.Add(MessageFragment.Text(folderSector2ASecondOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector2ASecondOffThePace : folderSector2ASecondOffThePace));
                     }
                     else
                     {
-                        messages.Add(MessageFragment.Text(folderSector3ASecondOffThePace));
+                        messages.Add(MessageFragment.Text(selfPace ? folderSelfSector3ASecondOffThePace : folderSector3ASecondOffThePace));
                     }
                 }
                 else
@@ -1317,7 +1323,7 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(folderSector3Is));
                     }
                     messages.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta, Precision.AUTO_GAPS)));
-                    messages.Add(MessageFragment.Text(folderOffThePace));
+                    messages.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));  // TODO: Off personal best?
                 }
             }
             if (messages.Count > 0)

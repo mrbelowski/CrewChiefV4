@@ -1055,6 +1055,23 @@ namespace CrewChiefV4.iRacing
 
                 return SessionPhase.Green;
             }
+            else if (currentSessionType == SessionType.LonePractice)
+            {
+                if (sessionState == SessionStates.CoolDown)
+                {
+                    return SessionPhase.Finished;
+                }
+                else if (sessionState.HasFlag(SessionStates.Checkered))
+                {
+                    return SessionPhase.Checkered;
+                }
+                else if (/*isInPit || laps <= 0 && */lastSessionPhase == SessionPhase.Unavailable)
+                {
+                    return SessionPhase.Countdown;
+                }
+
+                return SessionPhase.Green;
+            }
             else if (currentSessionType == SessionType.Qualify)
             {
                 if (sessionState == SessionStates.GetInCar)
