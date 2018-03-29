@@ -21,9 +21,9 @@ namespace CrewChiefV4
             "CrewChiefV4.PCars2.PCars2Spotterv2", "pcars2_launch_exe", "pcars2_launch_params", "launch_pcars2",
             new String[] { "pCARS2", "pCARS2Gld" }, false, new String[] { });
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "race_room", "RRRE64", "CrewChiefV4.RaceRoom.R3ESpotterv2",
-            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] { "RRRE" }, false, new String[] { "CrewChiefV4.RestDataReader" });
+            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] { "RRRE" }, false, new String[] { "CrewChiefV4.HttpEventListener" });
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "pcars_udp", null, "CrewChiefV4.PCars.PCarsSpotterv2",
-            null, null, null, false, new String[] { "CrewChiefV4.RestDataReader" });
+            null, null, null, false, new String[] { "CrewChiefV4.HttpEventListener" });
         public static GameDefinition pCars2Network = new GameDefinition(GameEnum.PCARS2_NETWORK, "pcars2_udp", null, "CrewChiefV4.PCars2.PCars2Spotterv2",
             null, null, null, false, new String[] { });
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, "rfactor1", "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",
@@ -37,9 +37,9 @@ namespace CrewChiefV4
         public static GameDefinition ftruck = new GameDefinition(GameEnum.RF1, "ftruck", "FTRUCK", "CrewChiefV4.rFactor1.RF1Spotter",
             "ftruck_launch_exe", "ftruck_launch_params", "launch_ftruck", true, new String[] { });
         public static GameDefinition assetto64Bit = new GameDefinition(GameEnum.ASSETTO_64BIT, "assetto_64_bit", "acs", "CrewChiefV4.assetto.ACSSpotter",
-            "acs_launch_exe", "acs_launch_params", "launch_acs", true, new String[] { "CrewChiefV4.ACS.KMRRemoteReader" }, "assettocorsa");
+            "acs_launch_exe", "acs_launch_params", "launch_acs", true, new String[] { "CrewChiefV4.ACS.KMREventListener" }, "assettocorsa");
         public static GameDefinition assetto32Bit = new GameDefinition(GameEnum.ASSETTO_32BIT, "assetto_32_bit", "acs_x86", "CrewChiefV4.assetto.ACSSpotter",
-            "acs_launch_exe", "acs_launch_params", "launch_acs", true, new String[] { "CrewChiefV4.ACS.KMRRemoteReader" }, "assettocorsa");
+            "acs_launch_exe", "acs_launch_params", "launch_acs", true, new String[] { "CrewChiefV4.ACS.KMREventListener" }, "assettocorsa");
         public static GameDefinition rfactor2_64bit = new GameDefinition(GameEnum.RF2_64BIT, "rfactor2_64_bit", "rFactor2", "CrewChiefV4.rFactor2.RF2Spotter",
             "rf2_launch_exe", "rf2_launch_params", "launch_rfactor2", true, new String[] {}, "rFactor 2");
         public static GameDefinition iracing = new GameDefinition(GameEnum.IRACING, "iracing", "iRacingSim64DX11", "CrewChiefV4.iRacing.iRacingSpotter",

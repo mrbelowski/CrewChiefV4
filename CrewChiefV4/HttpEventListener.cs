@@ -19,7 +19,6 @@ namespace CrewChiefV4
         public String changePacenotes(String name)
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            RestDataReader.changePacenotes(name);
             return "OK";
         }
 
@@ -28,7 +27,6 @@ namespace CrewChiefV4
         public String enablePacenotes()
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            RestDataReader.enablePacenotes();
             return "OK";
         }
 
@@ -37,7 +35,6 @@ namespace CrewChiefV4
         public String disablePacenotes()
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            RestDataReader.disablePacenotes();
             return "OK";
         }
     }
@@ -59,37 +56,13 @@ namespace CrewChiefV4
             host.Close();
         }
     }
-    public class RestDataReader : RemoteDataReader
+    public class HttpEventListener : EventListener
     {
-        // set to true when a Rest call is made, then false once that data has been read by the main loop
-        private static Boolean hasNewData = false;
-
         private RestController controller;
-
-        private static String pacenotesNameToUpdate;
-
-        private static Boolean pacenotesEnabled;
-
-        public static void enablePacenotes() {
-            RestDataReader.pacenotesEnabled = true;
-            RestDataReader.hasNewData = true;
-        }
-
-        public static void disablePacenotes()
-        {
-            RestDataReader.pacenotesEnabled = false;
-            RestDataReader.hasNewData = true;
-        }
 
         public override Boolean autoStart()
         {
             return true;
-        }
-
-        public static void changePacenotes(String name)
-        {
-            RestDataReader.pacenotesNameToUpdate = name;
-            RestDataReader.hasNewData = true;
         }
 
         public override void deactivate()
@@ -107,21 +80,6 @@ namespace CrewChiefV4
             controller = new RestController();
             controller.start();
             base.activate(activationData);
-        }
-
-        public override RemoteData getRemoteDataInternal(RemoteData remoteData, Object rawGameData)
-        {
-            if (RestDataReader.hasNewData)
-            {
-                // move received data into the remoteData object
-                remoteData.restData.pacenotesEnabled = RestDataReader.pacenotesEnabled;
-                if (RestDataReader.pacenotesNameToUpdate != null)
-                {
-                    remoteData.restData.pacenotesSet = RestDataReader.pacenotesNameToUpdate;
-                }
-                RestDataReader.hasNewData = false;
-            }
-            return remoteData;
         }
     }
 }

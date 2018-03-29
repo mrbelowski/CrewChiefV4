@@ -100,7 +100,7 @@
     <Compile Include="ACS\ACSGameStateMapper.cs" />
     <Compile Include="ACS\ACSSharedMemoryReader.cs" />
     <Compile Include="ACS\ACSSpotter.cs" />
-    <Compile Include="ACS\KMRRemoteReader.cs" />
+    <Compile Include="ACS\KMREventListener.cs" />
     <Compile Include="Audio\BackgroundPlayer.cs" />
     <Compile Include="Audio\MediaPlayerBackgroundPlayer.cs" />
     <Compile Include="Audio\NAudioBackgroundPlayer.cs" />
@@ -129,7 +129,6 @@
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
-    <Compile Include="GameState\RemoteData.cs" />
     <Compile Include="iRacing\Bitfields\CameraState.cs" />
     <Compile Include="iRacing\Bitfields\EngineWarning.cs" />
     <Compile Include="iRacing\Bitfields\PitServiceFlag.cs" />
@@ -156,8 +155,8 @@
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
-    <Compile Include="RemoteDataReader.cs" />
-    <Compile Include="RestDataReader.cs" />
+    <Compile Include="EventListener.cs" />
+    <Compile Include="HttpEventListener.cs" />
     <Compile Include="Validator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />

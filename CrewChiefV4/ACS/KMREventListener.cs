@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CrewChiefV4.ACS
 {
-    public class KMRRemoteReader : RemoteDataReader
+    public class KMREventListener : EventListener
     {
         private String remoteAddress;
         private int remotePort;
@@ -83,16 +83,6 @@ namespace CrewChiefV4.ACS
             Array.Copy(registerBytes, registerDatagramContent, registerBytes.Length);
             registerDatagramContent[registerDatagramContent.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
             return registerDatagramContent;
-        }
-
-        public override GameState.RemoteData getRemoteDataInternal(GameState.RemoteData remoteData, object rawGameData)
-        {
-            if (hasNewData)
-            {
-                // move received data into the remote object
-                hasNewData = false;
-            }
-            return remoteData;
         }
     }
 

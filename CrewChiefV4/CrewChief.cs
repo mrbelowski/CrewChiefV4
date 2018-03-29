@@ -77,10 +77,7 @@ namespace CrewChiefV4
 
         private GameDataReader gameDataReader;
 
-        private RemoteData previousRemoteData = null;
-        private RemoteData currentRemoteData = null;
-
-        private RemoteDataReader[] remoteDataReaders;
+        private EventListener[] remoteDataReaders;
 
         // hmm....
         public static GameStateData currentGameState = null;
@@ -611,15 +608,6 @@ namespace CrewChiefV4
             return this.spotter.getGridSide(this.latestRawGameData);
         }
 
-        private void getRemoteData(Object rawGameStateData)
-        {
-            previousRemoteData = currentRemoteData;
-            currentRemoteData = null;
-            foreach (RemoteDataReader rdr in remoteDataReaders) {
-                currentRemoteData = rdr.getRemoteData(currentRemoteData, rawGameStateData);
-            }
-        }
-
         public Boolean Run(String filenameToRun, Boolean dumpToFile)
         {
             loadDataFromFile = false;
@@ -640,13 +628,13 @@ namespace CrewChiefV4
             SpeechRecogniser.keepRecognisingInHoldMode = false;
 
             if (remoteDataReaders != null) {
-                foreach (RemoteDataReader rdr in remoteDataReaders) {
+                foreach (EventListener rdr in remoteDataReaders) {
                     rdr.deactivate();
                 }
             }
             remoteDataReaders = GameStateReaderFactory.getInstance().getRemoteDataReaders(gameDefinition);
             // TODO: activate and enable all these
-            foreach (RemoteDataReader remoteDataReader in remoteDataReaders)
+            foreach (EventListener remoteDataReader in remoteDataReaders)
             {
                 if (remoteDataReader.autoStart())
                 {
@@ -785,18 +773,6 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Error reading game data " + e.cause.StackTrace);
                                 continue;
-                            }
-                            try
-                            {
-                                getRemoteData(latestRawGameData);
-                                if (currentRemoteData != null) {
-                                    Console.WriteLine("enabled = " + currentRemoteData.restData.pacenotesEnabled + " name = "+  currentRemoteData.restData.pacenotesSet);
-                                }
-                            }
-                            catch (GameDataReadException e)
-                            {
-                                Console.WriteLine("Error reading remote data " + e.cause.StackTrace);
-                                // log and swallow?
                             }
                         }
                         // another Thread may have stopped the app - check here before processing the game data
@@ -981,7 +957,7 @@ namespace CrewChiefV4
             }
             if (remoteDataReaders != null)
             {
-                foreach (RemoteDataReader rdr in remoteDataReaders)
+                foreach (EventListener rdr in remoteDataReaders)
                 {
                     rdr.deactivate();
                 }
