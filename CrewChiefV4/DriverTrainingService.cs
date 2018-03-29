@@ -29,6 +29,13 @@ namespace CrewChiefV4
 
         private static Object _lock = new Object();
 
+        private static String requestedPacenotesSubfolder = null;
+
+        public static void setPacenotesSubfolder(String subfolder)
+        {
+            requestedPacenotesSubfolder = subfolder;
+        }
+
         public static Boolean loadPaceNotes(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
             if (!isRecordingPaceNotes && !isPlayingPaceNotes)
@@ -202,16 +209,47 @@ namespace CrewChiefV4
 
         private static String getCarSpecificFolderPath(GameEnum gameEnum, String trackName, CarData.CarClassEnum carClass)
         {
-            return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes", 
-                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(carClass.ToString()), makeValidForPathName(trackName));
+            String pathNoSubfolder = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
+                    makeValidForPathName(gameEnum.ToString()), makeValidForPathName(carClass.ToString()), makeValidForPathName(trackName));
+            if (requestedPacenotesSubfolder != null)
+            {
+                String pathWithSubfolder = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
+                    makeValidForPathName(gameEnum.ToString()), makeValidForPathName(carClass.ToString()), makeValidForPathName(trackName),
+                    makeValidForPathName(requestedPacenotesSubfolder));
+                if (Directory.Exists(pathWithSubfolder))
+                {
+                    return pathWithSubfolder;
+                }
+                else
+                {
+                    Console.WriteLine("No pace notes subfolder " + requestedPacenotesSubfolder + " exists for set " + pathNoSubfolder);
+                }
+            }
+            return pathNoSubfolder;
         }
 
         private static String getAnyCarFolderPath(GameEnum gameEnum, String trackName)
         {
-            return System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
-                makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
+            String pathNoSubfolder = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
+                    makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
+            if (requestedPacenotesSubfolder != null)
+            {
+                String pathWithSubfolder = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pace_notes",
+                    makeValidForPathName(gameEnum.ToString()), makeValidForPathName(trackName));
+                if (Directory.Exists(pathWithSubfolder))
+                {
+                    return pathWithSubfolder;
+                }
+                else
+                {
+                    Console.WriteLine("No pace notes subfolder " + requestedPacenotesSubfolder + " exists for set " + pathNoSubfolder);
+                }
+            }
+            return pathNoSubfolder;
         }
 
         public static void abortRecordingPaceNotes()

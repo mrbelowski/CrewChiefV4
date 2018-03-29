@@ -19,22 +19,35 @@ namespace CrewChiefV4
         public String changePacenotes(String name)
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            DriverTrainingService.stopPlayingPaceNotes();
+            DriverTrainingService.setPacenotesSubfolder(name);
+            if (CrewChief.currentGameState != null)
+            {
+                DriverTrainingService.loadPaceNotes(CrewChief.gameDefinition.gameEnum, CrewChief.currentGameState.SessionData.TrackDefinition.name,
+                        CrewChief.currentGameState.carClass.carClassEnum);
+            }
             return "OK";
         }
 
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/enablePacenotes")]
+        [WebInvoke(Method = "GET", UriTemplate = "/pacenotes/enable")]
         public String enablePacenotes()
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            if (!DriverTrainingService.isPlayingPaceNotes && CrewChief.currentGameState != null)
+            {
+                DriverTrainingService.loadPaceNotes(CrewChief.gameDefinition.gameEnum, CrewChief.currentGameState.SessionData.TrackDefinition.name,
+                    CrewChief.currentGameState.carClass.carClassEnum);
+            }
             return "OK";
         }
 
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/disablePacenotes")]
+        [WebInvoke(Method = "GET", UriTemplate = "/pacenotes/disable")]
         public String disablePacenotes()
         {
             WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            DriverTrainingService.stopPlayingPaceNotes();
             return "OK";
         }
     }
