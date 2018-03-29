@@ -15,11 +15,30 @@ namespace CrewChiefV4
     public class RestService
     {
         [OperationContract]
-        [WebGet(UriTemplate="test")]
-        public String test()
+        [WebInvoke(Method="GET", UriTemplate="/pacenotes?name={name}")]
+        public String changePacenotes(String name)
         {
-            //WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
-            return "hello";
+            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            RestDataReader.changePacenotes(name);
+            return "OK";
+        }
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/enablePacenotes")]
+        public String enablePacenotes()
+        {
+            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            RestDataReader.enablePacenotes();
+            return "OK";
+        }
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/disablePacenotes")]
+        public String disablePacenotes()
+        {
+            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            RestDataReader.disablePacenotes();
+            return "OK";
         }
     }
 
@@ -42,18 +61,41 @@ namespace CrewChiefV4
     }
     public class RestDataReader : RemoteDataReader
     {
-        System.ServiceModel.ServiceHost serviceHost;
-        private Boolean pacenotesEnabled = false;
-        private String latestRequestedPacenotesSet;
-
         // set to true when a Rest call is made, then false once that data has been read by the main loop
-        private Boolean hasNewData = false;
+        private static Boolean hasNewData = false;
 
         private RestController controller;
+
+        private static String pacenotesNameToUpdate;
+
+        private static Boolean pacenotesEnabled;
+
+        public static void enablePacenotes() {
+            RestDataReader.pacenotesEnabled = true;
+            RestDataReader.hasNewData = true;
+        }
+
+        public static void disablePacenotes()
+        {
+            RestDataReader.pacenotesEnabled = false;
+            RestDataReader.hasNewData = true;
+        }
 
         public override Boolean autoStart()
         {
             return true;
+        }
+
+        public static void changePacenotes(String name)
+        {
+            RestDataReader.pacenotesNameToUpdate = name;
+            RestDataReader.hasNewData = true;
+        }
+
+        public override void deactivate()
+        {
+            controller.stop();
+            base.deactivate();
         }
 
         public override void activate(object activationData)
@@ -69,10 +111,15 @@ namespace CrewChiefV4
 
         public override RemoteData getRemoteDataInternal(RemoteData remoteData, Object rawGameData)
         {
-            if (hasNewData)
+            if (RestDataReader.hasNewData)
             {
                 // move received data into the remoteData object
-                hasNewData = false;
+                remoteData.restData.pacenotesEnabled = RestDataReader.pacenotesEnabled;
+                if (RestDataReader.pacenotesNameToUpdate != null)
+                {
+                    remoteData.restData.pacenotesSet = RestDataReader.pacenotesNameToUpdate;
+                }
+                RestDataReader.hasNewData = false;
             }
             return remoteData;
         }

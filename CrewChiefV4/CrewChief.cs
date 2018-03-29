@@ -789,6 +789,9 @@ namespace CrewChiefV4
                             try
                             {
                                 getRemoteData(latestRawGameData);
+                                if (currentRemoteData != null) {
+                                    Console.WriteLine("enabled = " + currentRemoteData.restData.pacenotesEnabled + " name = "+  currentRemoteData.restData.pacenotesSet);
+                                }
                             }
                             catch (GameDataReadException e)
                             {
