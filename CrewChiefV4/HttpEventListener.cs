@@ -49,11 +49,14 @@ namespace CrewChiefV4
 
     public class RestController
     {
+        private int port = UserSettings.GetUserSettings().getInt("http_event_listener_port");
+
         private ServiceHost host;
         
         public void start()
         {
-            host = new ServiceHost(typeof(RestService), new Uri("http://localhost:8080/"));
+            Console.WriteLine("Listening for HTTP events on port " + port);
+            host = new ServiceHost(typeof(RestService), new Uri("http://localhost:" + port));
             var endpoint = host.AddServiceEndpoint(typeof(RestService), new WebHttpBinding(), "service");
             endpoint.EndpointBehaviors.Add(new WebHttpBehavior());
             host.Open();

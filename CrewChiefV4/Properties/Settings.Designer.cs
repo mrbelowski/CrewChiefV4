@@ -3202,5 +3202,17 @@ namespace CrewChiefV4.Properties {
                 this["iracing_invalidate_cut_track_laps"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9123")]
+        public int http_event_listener_port {
+            get {
+                return ((int)(this["http_event_listener_port"]));
+            }
+            set {
+                this["http_event_listener_port"] = value;
+            }
+        }
     }
 }

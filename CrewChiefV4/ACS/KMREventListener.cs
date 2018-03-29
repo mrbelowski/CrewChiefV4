@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace CrewChiefV4.ACS
 {
+    // this is just a placeholder. KMR will provide appID, address, port & API token 
+    // either by the user copy/pasting some magic String or via some Python call. CC 
+    // will connect to the provided URL and send a 'go' package to register to receive
+    // events. Not sure if these are keep-alives sent by the server (as suggested in forum).
+    // Also need a "user guid". No idea what this is.
+    // As all this shizzle is event based, need to check that a given event only triggers
+    // a single message from the remote.
     public class KMREventListener : EventListener
     {
         private String remoteAddress;

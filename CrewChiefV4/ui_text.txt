@@ -590,3 +590,6 @@ add_additional_fuel_help = The amount of extra fuel(liters or gallons) you want 
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
 iracing_invalidate_cut_track_laps = Disable this if you don't want the app to invalidate laps where you cut the track.
+
+http_event_listener_port = HTTP event listener port
+http_event_listener_port_help = REST server listen port
