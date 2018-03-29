@@ -20,7 +20,11 @@ namespace CrewChiefV4.ACS
 
         private Task<UdpReceiveResult> receiveResultTask;
 
-        public override void activate(object activationData)
+        private UTF8Encoding encoder = new UTF8Encoding(false);
+
+        private Boolean hasNewData = false;
+
+        public override void activate(Object activationData)
         {
             if (active)
             {
@@ -33,8 +37,14 @@ namespace CrewChiefV4.ACS
             this.apiToken = handshakeData.apiToken;
             this.appId = handshakeData.appId;
             this.clientGUID = handshakeData.clientGUID;
-            base.activate(activationData);
             sendRegisterUDPPacket(this.remoteAddress, this.remotePort, true);
+            base.activate(activationData);
+        }
+
+        public override void deactivate()
+        {
+            sendRegisterUDPPacket(this.remoteAddress, this.remotePort, false);
+            base.deactivate();
         }
 
         private void sendRegisterUDPPacket(String address, int port, Boolean start)
@@ -68,8 +78,21 @@ namespace CrewChiefV4.ACS
         {
             // construct from member vars + start / stop flag
             String fullRegisterStr = this.appId + this.clientGUID + this.apiToken;
-            byte registerBytes = UTF8Encoding.GetBytes(fullRegisterStr);
-            return new byte[registerBytes + 1];
+            byte[] registerBytes = encoder.GetBytes(fullRegisterStr);
+            byte[] registerDatagramContent = new byte[registerBytes.Length + 1];
+            Array.Copy(registerBytes, registerDatagramContent, registerBytes.Length);
+            registerDatagramContent[registerDatagramContent.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
+            return registerDatagramContent;
+        }
+
+        public override GameState.RemoteData getRemoteDataInternal(GameState.RemoteData remoteData, object rawGameData)
+        {
+            if (hasNewData)
+            {
+                // move received data into the remote object
+                hasNewData = false;
+            }
+            return remoteData;
         }
     }
 

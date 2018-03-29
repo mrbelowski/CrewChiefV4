@@ -107,6 +107,21 @@ namespace CrewChiefV4
             return null;
         }
 
+        public RemoteDataReader[] getRemoteDataReaders(GameDefinition gameDefinition)
+        {
+            if (gameDefinition.remoteDataReaders.Length > 0)
+            {
+                int index = 0;
+                RemoteDataReader[] rdrs = new RemoteDataReader[gameDefinition.remoteDataReaders.Length];
+                foreach (String rdrClass in gameDefinition.remoteDataReaders)
+                {
+                    rdrs[index] = (RemoteDataReader) Activator.CreateInstance(Type.GetType(rdrClass));
+                }
+                return rdrs;
+            }
+            return new RemoteDataReader[]{};
+        }
+
         public GameStateMapper getGameStateMapper(GameDefinition gameDefinition)
         {
             lock (this)

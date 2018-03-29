@@ -77,6 +77,11 @@ namespace CrewChiefV4
 
         private GameDataReader gameDataReader;
 
+        private RemoteData previousRemoteData = null;
+        private RemoteData currentRemoteData = null;
+
+        private RemoteDataReader[] remoteDataReaders;
+
         // hmm....
         public static GameStateData currentGameState = null;
 
@@ -606,6 +611,15 @@ namespace CrewChiefV4
             return this.spotter.getGridSide(this.latestRawGameData);
         }
 
+        private void getRemoteData(Object rawGameStateData)
+        {
+            previousRemoteData = currentRemoteData;
+            currentRemoteData = null;
+            foreach (RemoteDataReader rdr in remoteDataReaders) {
+                currentRemoteData = rdr.getRemoteData(currentRemoteData, rawGameStateData);
+            }
+        }
+
         public Boolean Run(String filenameToRun, Boolean dumpToFile)
         {
             loadDataFromFile = false;
@@ -624,6 +638,23 @@ namespace CrewChiefV4
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = false;
             SpeechRecogniser.keepRecognisingInHoldMode = false;
+
+            if (remoteDataReaders != null) {
+                foreach (RemoteDataReader rdr in remoteDataReaders) {
+                    rdr.deactivate();
+                }
+            }
+            remoteDataReaders = GameStateReaderFactory.getInstance().getRemoteDataReaders(gameDefinition);
+            // TODO: activate and enable all these
+            foreach (RemoteDataReader remoteDataReader in remoteDataReaders)
+            {
+                if (remoteDataReader.autoStart())
+                {
+                    remoteDataReader.enable();
+                    remoteDataReader.activate(null);
+                }
+            }
+            
             gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
             gameStateMapper.setSpeechRecogniser(speechRecogniser);
             gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
@@ -754,6 +785,15 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Error reading game data " + e.cause.StackTrace);
                                 continue;
+                            }
+                            try
+                            {
+                                getRemoteData(latestRawGameData);
+                            }
+                            catch (GameDataReadException e)
+                            {
+                                Console.WriteLine("Error reading remote data " + e.cause.StackTrace);
+                                // log and swallow?
                             }
                         }
                         // another Thread may have stopped the app - check here before processing the game data
@@ -934,6 +974,13 @@ namespace CrewChiefV4
                     int threadSleepTime = 5 + Utilities.random.Next(10);
                     Thread.Sleep(threadSleepTime);
                     continue;
+                }
+            }
+            if (remoteDataReaders != null)
+            {
+                foreach (RemoteDataReader rdr in remoteDataReaders)
+                {
+                    rdr.deactivate();
                 }
             }
             foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)

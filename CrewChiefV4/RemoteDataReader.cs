@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.GameState;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,14 @@ namespace CrewChiefV4
 {
     public class RemoteDataReader
     {
-        // reads data from server or other remote location to augment local game data
+        // reads data from server or other remote location. This is separate from the game state,
+        // but is available to the mappers
         protected Boolean enabled = false;
         protected Boolean active = false;
+
+        public virtual Boolean autoStart() {
+            return false;
+        }
 
         public void enable()
         {
@@ -31,16 +37,35 @@ namespace CrewChiefV4
         }
         // all game-specific readers use their own internal wrapper class, so we can't do this in a generic 
         // way without a substantial refactor. This call in each subclass will probably look quite similar
-        public void populateRemoteData(Object dataDataWrapper)
+        public RemoteData getRemoteData(RemoteData remoteData, Object rawGameData)
         {
-            if (active && enabled)
+            try
             {
-                populateRemoteDataInternal(dataDataWrapper);
+                if (active && enabled)
+                {
+                    // if this is the first reader in the chain, initialise the remoteData object.
+                    // Subsequent readers in the chain will append their own data to this object.
+                    if (remoteData == null)
+                    {
+                        remoteData = new RemoteData();
+                    }
+                    return getRemoteDataInternal(remoteData, rawGameData);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new GameDataReadException(e.Message, e);
             }
         }
 
-        private virtual void populateRemoteDataInternal(Object dataWrapper) {
+        public virtual RemoteData getRemoteDataInternal(RemoteData remoteData, Object rawGameData)
+        {
             // no-op in base class
+            return remoteData;
         }
     }
 }
