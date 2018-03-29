@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -21,8 +20,6 @@ namespace CrewChiefV4.ACS
         private Task<UdpReceiveResult> receiveResultTask;
 
         private UTF8Encoding encoder = new UTF8Encoding(false);
-
-        private Boolean hasNewData = false;
 
         public override void activate(Object activationData)
         {
