@@ -530,9 +530,27 @@ namespace CrewChiefV4.rFactor2
                 // TODO: This needs testing, I am suspecting that mLapDist is only correct in Practice or Quali.
                 if (inPitStall)
                 {
-                    cgs.PitData.PitBoxPositionEstimate = (float)playerScoring.mLapDist;
-                    if (cgs.PitData.PitBoxPositionEstimate < 0.0f)
-                        cgs.PitData.PitBoxPositionEstimate += (float)shared.scoring.mScoringInfo.mLapDist;
+                    var lapDistEstimate = playerScoring.mLapDist;
+
+                    if (lapDistEstimate > shared.scoring.mScoringInfo.mLapDist)
+                    {
+                        // This is complete bullshit, but turns out sometimes, we get mLapDist
+                        // while in pits, looking like lap distance measured twice.  Try this:
+                        Console.WriteLine("Pit box detection: distance is above track length, fixign up.  Reported: "
+                            + lapDistEstimate.ToString("0.000") + "  Track Length: " + shared.scoring.mScoringInfo.mLapDist.ToString("0.000"));
+
+                        lapDistEstimate -= shared.scoring.mScoringInfo.mLapDist;
+                    }
+                    else if (lapDistEstimate < 0.0)
+                    {
+                        // And, that's not all.   Sometimes, we get what looks like negative offset from s/f line.
+                        Console.WriteLine("Pit box detection: distance is negative, fixign up.  Reported: "
+                            + lapDistEstimate.ToString("0.000") + "  Track Length: " + shared.scoring.mScoringInfo.mLapDist.ToString("0.000"));
+
+                        lapDistEstimate += shared.scoring.mScoringInfo.mLapDist;
+                    }
+
+                    cgs.PitData.PitBoxPositionEstimate = (float)lapDistEstimate;
 
                     this.lastPitBoxPositionEstimate = cgs.PitData.PitBoxPositionEstimate;
                 }
