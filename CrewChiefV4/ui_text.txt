@@ -562,8 +562,8 @@ force_single_class_help = Don't allow participants to be grouped by their car cl
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 
-pit_box_position_countdown = Pit box position countdown (R3E and iRacing only)
-pit_box_position_countdown_help = Play distance in metres to box as you approach
+pit_box_position_countdown = Pit box countdown (R3E, rF2 and iRacing only)
+pit_box_position_countdown_help = Play distance in metres to box as you approach.  Note: in rF2 may not work on all tracks.
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
