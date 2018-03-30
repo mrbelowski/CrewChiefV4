@@ -128,6 +128,7 @@ namespace CrewChiefV4.Events
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
         private Boolean played100MetreWarning = false;
         private Boolean played50MetreWarning = false;
+        private Boolean playedMoreThan150MetreWarning = false;
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -173,6 +174,7 @@ namespace CrewChiefV4.Events
             pitStallOccupied = false;
             warnedAboutOccupiedPitOnThisLap = false;
             previousDistanceToBox = -1;
+            playedMoreThan150MetreWarning = false;
             played100MetreWarning = false;
             played50MetreWarning = false;
             playedLimiterLineToPitBoxDistanceWarning = false;
@@ -217,7 +219,6 @@ namespace CrewChiefV4.Events
             if (previousGameState != null && pitBoxPositionCountdown && 
                 currentGameState.PositionAndMotionData.CarSpeed > 2 &&
                 currentGameState.PitData.PitBoxPositionEstimate > 0 && 
-                currentGameState.SessionData.CompletedLaps > 0 &&
                 !currentGameState.PenaltiesData.HasDriveThrough)
             {
                 if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
@@ -237,6 +238,7 @@ namespace CrewChiefV4.Events
                 {
                     // just entered the pitlane
                     previousDistanceToBox = 0;
+                    playedMoreThan150MetreWarning = false;
                     played100MetreWarning = false;
                     played50MetreWarning = false;
                     if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
@@ -252,7 +254,9 @@ namespace CrewChiefV4.Events
                         messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                         messageContents.Add(MessageFragment.Text(folderMetres));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));
+
+                        playedMoreThan150MetreWarning = true;
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
                 }
@@ -262,6 +266,11 @@ namespace CrewChiefV4.Events
                     {
                         List<MessageFragment> messageContents = new List<MessageFragment>();
                         messageContents.Add(MessageFragment.Integer(100, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
+                        if (!playedMoreThan150MetreWarning)
+                        {
+                            // Skip "meters" once if there was a message before.
+                            messageContents.Add(MessageFragment.Text(folderMetres));
+                        }
                         audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", messageContents, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
