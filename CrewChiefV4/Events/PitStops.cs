@@ -275,6 +275,7 @@ namespace CrewChiefV4.Events
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
                     }
+                    // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50, folderMetres), 0, null));
