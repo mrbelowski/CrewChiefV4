@@ -81,9 +81,9 @@ def updateSharedMemory():
     sharedmem = sharedMem.getsharedmem()
 	#KMR stuff
 	if connectToKMR and kmr_got_magic_message:
-	    sharedmem.kmrData.applink_ip = kmr_applink_ip
+	    sharedmem.kmrData.applink_ip = kmr_applink_ip.encode('utf-8')
 	    sharedmem.kmrData.applink_port = kmr_applink_port
-	    sharedmem.kmrData.applink_token = kmr_applink_token
+	    sharedmem.kmrData.applink_token = kmr_applink_token.encode('utf-8')
 
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()

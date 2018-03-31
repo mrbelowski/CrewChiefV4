@@ -295,6 +295,17 @@ namespace CrewChiefV4.assetto
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
+        public struct kmrData
+        {
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
+            public byte[] applinkIP;
+            public int applinkPort;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
+            public byte[] applinkToken;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
+        [Serializable]
         public struct SPageFileCrewChief
         {
             public int numVehicles;
@@ -308,6 +319,7 @@ namespace CrewChiefV4.assetto
             public int isInternalMemoryModuleLoaded;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] pluginVersion;
+            public kmrData kmrData;
         }
 
         public class AssettoCorsaShared
