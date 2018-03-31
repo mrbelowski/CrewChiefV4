@@ -1,2 +1,3 @@
 [CrewChief]
 LoadMemoryModule=1
+ConnectToKMR=0

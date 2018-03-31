@@ -21,7 +21,7 @@ from shared_mem import CrewChiefShared
 
 sharedMem = CrewChiefShared()
 
-pluginVersion = "1.0.0"
+pluginVersion = "1.1.0"
 
 timer = 0
 lib = None
