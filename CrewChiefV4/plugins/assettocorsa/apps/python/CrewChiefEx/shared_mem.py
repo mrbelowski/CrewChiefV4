@@ -43,6 +43,14 @@ class acsVehicleInfo(ctypes.Structure):
         ('engineLifeLeft', c_float),
         ('tyreInflation', c_float * 4),
     ]
+
+class kmrData(ctypes.Structure):
+    _pack_ = 4
+    _fields_ = [
+        ('applink_ip', c_char * 32),
+        ('applink_port', c_int32),
+        ('applink_token', c_char * 32)
+    ]
       
 class SPageFileCrewChief(ctypes.Structure):
     _pack_ = 4
@@ -53,7 +61,8 @@ class SPageFileCrewChief(ctypes.Structure):
         ('vehicleInfo', acsVehicleInfo * 64),
         ('acInstallPath', c_char * 512),
         ('isInternalMemoryModuleLoaded', c_int32),
-        ('pluginVersion', c_char * 32)		
+        ('pluginVersion', c_char * 32),
+        ('kmrData', kmrData)
     ]
 
 class CrewChiefShared:

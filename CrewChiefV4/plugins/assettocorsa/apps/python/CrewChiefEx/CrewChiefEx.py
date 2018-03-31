@@ -27,16 +27,32 @@ timer = 0
 lib = None
 libInit = 0
 loadMemoryModule = 0
+connectToKMR = 0
 configPath = "apps/python/CrewChiefEx/config.txt"
 
 config = configparser.ConfigParser()
 config.read(configPath)
+
+# globals pasted from KMR demo
+kmr_applink_app_id = "CrewChief"
+kmr_applink_ip = ""
+kmr_applink_port = 0
+kmr_applink_token = ""
+kmr_applink_chat_fail_counter = 99
+kmr_timer = 0
+kmr_got_magic_message = 0
 
 try:
   loadMemoryModule = config.getint("CrewChief", "LoadMemoryModule")
 except:
   config.set("CrewChief", "LoadMemoryModule", str(0))
   loadMemoryModule = 0
+
+try:
+  connectToKMR = config.getint("CrewChief", "ConnectToKMR")
+except:
+  config.set("CrewChief", "ConnectToKMR", str(0))
+  connectToKMR = 0
 
 if platform.architecture()[0] == "64bit" and loadMemoryModule == 1:
     lib = ctypes.WinDLL(sysdir + '/ACInternalMemoryReader.dll')
@@ -63,6 +79,12 @@ if libInit == 1:
 def updateSharedMemory():
     global sharedMem
     sharedmem = sharedMem.getsharedmem()
+	#KMR stuff
+	if connectToKMR and kmr_got_magic_message:
+	    sharedmem.kmrData.applink_ip = kmr_applink_ip
+	    sharedmem.kmrData.applink_port = kmr_applink_port
+	    sharedmem.kmrData.applink_token = kmr_applink_token
+
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
     #now we'll build the slots, so we later know every single (possible) car
@@ -116,13 +138,45 @@ def acMain(ac_version):
   sharedmem.acInstallPath = os.path.abspath(os.curdir).encode('utf-8')
   sharedmem.isInternalMemoryModuleLoaded = libInit
   sharedmem.pluginVersion = pluginVersion.encode('utf-8')
+
+  # chat listener for KMR
+  ac.addOnChatMessageListener(appWindow, onMessage)
   return "CrewChiefEx"
 
 def acUpdate(deltaT):
-  global timer
+  global timer, kmr_timer, kmr_got_magic_message
   timer += deltaT
   if timer > 0.025:
       updateSharedMemory()
       timer = 0
+  if not kmr_got_magic_message and connectToKMR:
+      # send the magic KMR message every 6 seconds until we get a happy response
+      if kmr_timer < 6:
+         kmr_timer += deltaT
+      else:
+         # initialize the applink.
+		 kmr_timer = 0
+         SendKMRChatMessage()
 
+def onMessage(message, by):
+    global kmr_applink_ip, kmr_applink_port, kmr_applink_token, \
+        kmr_applink_sock, kmr_applink_app_id, kmr_applink_chat_fail_counter, timer
+    if not kmr_applink_token and by == "SERVER" and kmr_applink_chat_fail_counter < 9:
+        # AppLink is not initialized but there is still hope (less than 9 messages since the request)
+        m = re.search("AppLink: ([^:]+):([\d]+) ([^ ]+)$", message)
+        if m:
+            # this is the message we're looking for
+            kmr_applink_ip = m.group(1)
+            kmr_applink_port = int(m.group(2))
+            kmr_applink_token = m.group(3)
+			kmr_got_magic_message = 1
+        else:
+            # too bad the message is not the right one, let's increment the fail counter
+            kmr_applink_chat_fail_counter += 1
 
+def SendKMRChatMessage():
+    global kmr_applink_chat_fail_counter
+    # let's reset the fail counter
+    kmr_applink_chat_fail_counter = 0
+    # and send the initialization chat message
+    ac.sendChatMessage("/kmr applink")
