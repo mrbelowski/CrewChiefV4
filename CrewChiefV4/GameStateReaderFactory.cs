@@ -107,19 +107,17 @@ namespace CrewChiefV4
             return null;
         }
 
-        public EventListener[] getRemoteDataReaders(GameDefinition gameDefinition)
+        public Dictionary<String, EventListener> getEventListenersForGame(GameDefinition gameDefinition)
         {
-            if (gameDefinition.remoteDataReaders.Length > 0)
+            Dictionary<String, EventListener> eventListenersForGame = new Dictionary<string, EventListener>();
+            if (gameDefinition.eventListeners.Length > 0)
             {
-                int index = 0;
-                EventListener[] rdrs = new EventListener[gameDefinition.remoteDataReaders.Length];
-                foreach (String rdrClass in gameDefinition.remoteDataReaders)
+                foreach (String rdrClass in gameDefinition.eventListeners)
                 {
-                    rdrs[index] = (EventListener) Activator.CreateInstance(Type.GetType(rdrClass));
+                    eventListenersForGame[rdrClass] = (EventListener)Activator.CreateInstance(Type.GetType(rdrClass));
                 }
-                return rdrs;
             }
-            return new EventListener[]{};
+            return eventListenersForGame;
         }
 
         public GameStateMapper getGameStateMapper(GameDefinition gameDefinition)

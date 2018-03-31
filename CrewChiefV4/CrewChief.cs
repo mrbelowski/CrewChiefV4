@@ -77,7 +77,8 @@ namespace CrewChiefV4
 
         private GameDataReader gameDataReader;
 
-        private EventListener[] remoteDataReaders;
+        public static Dictionary<String, EventListener> globalEventListeners = new Dictionary<string, EventListener>();
+        public static Dictionary<String, EventListener> eventListenersForGame = new Dictionary<string, EventListener>();
 
         // hmm....
         public static GameStateData currentGameState = null;
@@ -127,6 +128,18 @@ namespace CrewChiefV4
             eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
+
+            HttpEventListener httpEventListener = new HttpEventListener();
+            // more global listeners?
+            globalEventListeners["HttpEventListener"] = httpEventListener;
+            foreach (EventListener listener in globalEventListeners.Values)
+            {
+                if (listener.autoStart())
+                {
+                    listener.enable();
+                    listener.activate(null);
+                }
+            }
         }
 
         public void setGameDefinition(GameDefinition gameDefinition)
@@ -157,6 +170,14 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            foreach (EventListener listener in globalEventListeners.Values)
+            {
+                try
+                {
+                    listener.deactivate();
+                }
+                catch (Exception e) { }
+            }
             running = false;
             spotterIsRunning = false;
             if (gameDataReader != null)
@@ -627,19 +648,23 @@ namespace CrewChiefV4
             SpeechRecogniser.gotRecognitionResult = false;
             SpeechRecogniser.keepRecognisingInHoldMode = false;
 
-            if (remoteDataReaders != null) {
-                foreach (EventListener rdr in remoteDataReaders) {
+            foreach (EventListener rdr in eventListenersForGame.Values)
+            {
+                try
+                {
                     rdr.deactivate();
                 }
+                catch (Exception)
+                { }
             }
-            remoteDataReaders = GameStateReaderFactory.getInstance().getRemoteDataReaders(gameDefinition);
-            // TODO: activate and enable all these
-            foreach (EventListener remoteDataReader in remoteDataReaders)
+            
+            eventListenersForGame = GameStateReaderFactory.getInstance().getEventListenersForGame(gameDefinition);
+            foreach (EventListener eventListener in eventListenersForGame.Values)
             {
-                if (remoteDataReader.autoStart())
+                if (eventListener.autoStart())
                 {
-                    remoteDataReader.enable();
-                    remoteDataReader.activate(null);
+                    eventListener.enable();
+                    eventListener.activate(null);
                 }
             }
             
@@ -781,7 +806,7 @@ namespace CrewChiefV4
                             continue;
                         }
                         gameStateMapper.versionCheck(latestRawGameData);
-
+                                                
                         GameStateData nextGameState = null;
                         try
                         {
@@ -955,12 +980,13 @@ namespace CrewChiefV4
                     continue;
                 }
             }
-            if (remoteDataReaders != null)
+            foreach (EventListener listener in eventListenersForGame.Values)
             {
-                foreach (EventListener rdr in remoteDataReaders)
+                try
                 {
-                    rdr.deactivate();
+                    listener.deactivate();
                 }
+                catch (Exception) { }
             }
             foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
             {

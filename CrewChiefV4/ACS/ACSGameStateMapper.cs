@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Events;
 using CrewChiefV4.assetto.assettoData;
+using CrewChiefV4.ACS;
 
 /**
  * Maps memory mapped file to a local game-agnostic representation.
@@ -48,7 +49,7 @@ namespace CrewChiefV4.assetto
 
         private List<CornerData.EnumWithThresholds> brakeTempThresholdsForPlayersCar = null;
         private static string expectedVersion = "1.7";
-        private static string expectedPluginVersion = "1.0.0";
+        private static string expectedPluginVersion = "1.1.0";
 
         public List<LapData> playerLapData = new List<LapData>();
 
@@ -811,6 +812,25 @@ namespace CrewChiefV4.assetto
             ACSSharedMemoryReader.ACSStructWrapper wrapper = (ACSSharedMemoryReader.ACSStructWrapper)memoryMappedFileStruct;
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             AssettoCorsaShared shared = wrapper.data;
+
+            KMREventListener kmrListener = (KMREventListener)CrewChief.eventListenersForGame["CrewChiefV4.ACS.KMREventListener"];
+            String kmrRemoteAddress = getNameFromBytes(shared.acsChief.kmrData.applinkIP);
+            int kmrRemotePort = shared.acsChief.kmrData.applinkPort;
+
+            if (kmrListener.remoteAddress != kmrRemoteAddress || kmrListener.remotePort != kmrRemotePort)
+            {
+                try 
+                {
+                    kmrListener.deactivate();
+                }
+                catch (Exception) {}
+                KMRHandshakeData handshakeData = new KMRHandshakeData();
+                handshakeData.remoteAddress = kmrRemoteAddress;
+                handshakeData.remotePort = kmrRemotePort;
+                handshakeData.appId = getNameFromBytes(shared.acsChief.kmrData.applinkAppId);
+                handshakeData.apiToken = getNameFromBytes(shared.acsChief.kmrData.applinkToken);
+                kmrListener.activate(handshakeData);
+            }
             AC_STATUS status = shared.acsGraphic.status;
             /*if (status == AC_STATUS.AC_OFF)
             {

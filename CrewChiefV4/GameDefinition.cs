@@ -21,9 +21,9 @@ namespace CrewChiefV4
             "CrewChiefV4.PCars2.PCars2Spotterv2", "pcars2_launch_exe", "pcars2_launch_params", "launch_pcars2",
             new String[] { "pCARS2", "pCARS2Gld" }, false, new String[] { });
         public static GameDefinition raceRoom = new GameDefinition(GameEnum.RACE_ROOM, "race_room", "RRRE64", "CrewChiefV4.RaceRoom.R3ESpotterv2",
-            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] { "RRRE" }, false, new String[] { "CrewChiefV4.HttpEventListener" });
+            "r3e_launch_exe", "r3e_launch_params", "launch_raceroom", new String[] { "RRRE" }, false, new String[] { });
         public static GameDefinition pCarsNetwork = new GameDefinition(GameEnum.PCARS_NETWORK, "pcars_udp", null, "CrewChiefV4.PCars.PCarsSpotterv2",
-            null, null, null, false, new String[] { "CrewChiefV4.HttpEventListener" });
+            null, null, null, false, new String[] { });
         public static GameDefinition pCars2Network = new GameDefinition(GameEnum.PCARS2_NETWORK, "pcars2_udp", null, "CrewChiefV4.PCars2.PCars2Spotterv2",
             null, null, null, false, new String[] { });
         public static GameDefinition rFactor1 = new GameDefinition(GameEnum.RF1, "rfactor1", "rFactor", "CrewChiefV4.rFactor1.RF1Spotter",
@@ -111,11 +111,11 @@ namespace CrewChiefV4
         public String gameInstallDirectory;
         public String[] alternativeProcessNames;
         public Boolean allowsUserCreatedCars;
-        public String[] remoteDataReaders;
+        public String[] eventListeners;
 
         public GameDefinition(GameEnum gameEnum, String lookupName, String processName,
             String spotterName, String gameStartCommandProperty, String gameStartCommandOptionsProperty, String gameStartEnabledProperty, Boolean allowsUserCreatedCars,
-            String[] remoteDataReaders, String gameInstallDirectory = "")
+            String[] eventListeners, String gameInstallDirectory = "")
         {
             this.gameEnum = gameEnum;
             this.lookupName = lookupName;
@@ -127,12 +127,12 @@ namespace CrewChiefV4
             this.gameStartEnabledProperty = gameStartEnabledProperty;
             this.gameInstallDirectory = gameInstallDirectory;
             this.allowsUserCreatedCars = allowsUserCreatedCars;
-            this.remoteDataReaders = remoteDataReaders;
+            this.eventListeners = eventListeners;
         }
 
         public GameDefinition(GameEnum gameEnum, String lookupName, String processName,
             String spotterName, String gameStartCommandProperty, String gameStartCommandOptionsProperty, String gameStartEnabledProperty, String[] alternativeProcessNames,
-            Boolean allowsUserCreatedCars, String[] remoteDataReaders, String gameInstallDirectory = "")
+            Boolean allowsUserCreatedCars, String[] eventListeners, String gameInstallDirectory = "")
         {
             this.gameEnum = gameEnum;
             this.lookupName = lookupName;
@@ -145,7 +145,7 @@ namespace CrewChiefV4
             this.alternativeProcessNames = alternativeProcessNames;
             this.gameInstallDirectory = gameInstallDirectory;
             this.allowsUserCreatedCars = allowsUserCreatedCars;
-            this.remoteDataReaders = remoteDataReaders;
+            this.eventListeners = eventListeners;
         }
 
         public bool HasAnyProcessNameAssociated()

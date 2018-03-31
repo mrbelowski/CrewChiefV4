@@ -32,6 +32,8 @@ namespace CrewChiefV4
         {
             this.active = true;
         }
+
+        // note that calling this method should put the listener in a state where it can be GC'ed
         public virtual void deactivate()
         {
             this.active = false;

@@ -16,17 +16,17 @@ namespace CrewChiefV4.ACS
     // a single message from the remote.
     public class KMREventListener : EventListener
     {
-        private String remoteAddress;
-        private int remotePort;
-        private String appId;
-        private String clientGUID;
-        private String apiToken;
+        private static Boolean listening = false;
+        public String remoteAddress = "";
+        public int remotePort = 0;
+        public String appId = "";
+        public String apiToken = "";
 
-        private UdpClient udpListenClient;
+        private static UdpClient udpListenClient;
 
         private Task<UdpReceiveResult> receiveResultTask;
 
-        private UTF8Encoding encoder = new UTF8Encoding(false);
+        private UTF32Encoding encoder = new UTF32Encoding(false, false);
 
         public override void activate(Object activationData)
         {
@@ -40,7 +40,6 @@ namespace CrewChiefV4.ACS
             this.remotePort = handshakeData.remotePort;
             this.apiToken = handshakeData.apiToken;
             this.appId = handshakeData.appId;
-            this.clientGUID = handshakeData.clientGUID;
             sendRegisterUDPPacket(this.remoteAddress, this.remotePort, true);
             base.activate(activationData);
         }
@@ -48,40 +47,60 @@ namespace CrewChiefV4.ACS
         public override void deactivate()
         {
             sendRegisterUDPPacket(this.remoteAddress, this.remotePort, false);
+            listening = false;
+            this.remoteAddress = "";
+            this.remotePort = 0;
+            this.apiToken = "";
             base.deactivate();
         }
 
         private void sendRegisterUDPPacket(String address, int port, Boolean start)
         {
+            if ((listening && start) || (!listening && !start))
+            {
+                Console.WriteLine("Bugger off");
+                return;
+            }
             byte[] contents = getRegisterDatagram(start);
             UdpClient client = new UdpClient();
-            client.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
-            client.Close();
+            if (this.remoteAddress != null && this.remotePort > 0)
+            {
+                client.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
+                client.Close();
+            }
 
             if (this.receiveResultTask != null)
             {
                 // proper way to cancel this task?
                 receiveResultTask.Dispose();
             }
-            if (this.udpListenClient != null)
+            if (udpListenClient != null)
             {
-                this.udpListenClient.Close();
+                udpListenClient.Close();
             }
 
             if (start) {
                 // initialise the receiving socket
-                this.udpListenClient = new UdpClient();
+                udpListenClient = new UdpClient();
                 IPEndPoint remoteAddress = new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort);
                 udpListenClient.Connect(remoteAddress);
-                this.receiveResultTask = this.udpListenClient.ReceiveAsync();
-                // TODO: add callbacks to the receive task to populate the local data
+                listening = true;
+                Task.Run(async () =>
+                {
+                    while (listening)
+                    {
+                        //IPEndPoint object will allow us to read datagrams sent from any source.
+                        var receivedResults = await KMREventListener.udpListenClient.ReceiveAsync();
+                        Console.WriteLine("Got some data");
+                    }
+                });
             }
         }
 
         private byte[] getRegisterDatagram(Boolean start)
         {
             // construct from member vars + start / stop flag
-            String fullRegisterStr = this.appId + this.clientGUID + this.apiToken;
+            String fullRegisterStr = this.appId + this.apiToken;
             byte[] registerBytes = encoder.GetBytes(fullRegisterStr);
             byte[] registerDatagramContent = new byte[registerBytes.Length + 1];
             Array.Copy(registerBytes, registerDatagramContent, registerBytes.Length);
@@ -95,7 +114,6 @@ namespace CrewChiefV4.ACS
         public String remoteAddress;
         public int remotePort;
         public String appId;
-        public String clientGUID;
         public String apiToken;
     }
 }

@@ -89,8 +89,15 @@ namespace CrewChiefV4
                 controller.stop();
             }
             controller = new RestController();
-            controller.start();
-            base.activate(activationData);
+            try
+            {
+                controller.start();
+                base.activate(activationData);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to start http listener " + e.Message);
+            }
         }
     }
 }
