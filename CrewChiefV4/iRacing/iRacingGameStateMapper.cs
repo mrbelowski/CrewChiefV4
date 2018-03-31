@@ -107,12 +107,8 @@ namespace CrewChiefV4.iRacing
 
             int sessionNumber = shared.Telemetry.SessionNum;
 
-
             currentGameState.SessionData.SessionIteration = sessionNumber;
-
             currentGameState.SessionData.SessionId = shared.SessionData.SessionId;
-
-
 
             /*
             if (!prevTrackSurface.Equals(playerCar.Live.TrackSurface.ToString()))
@@ -135,6 +131,7 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 Console.WriteLine("NumCarsAtStartOfSession = " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
 
+                currentGameState.SessionData.DriverRawName = playerName;
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.PlayerLapData.Clear();
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
@@ -445,6 +442,11 @@ namespace CrewChiefV4.iRacing
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 currentGameState.SessionData.OverallPosition = playerCar.CurrentResults.QualifyingPosition;
+            }
+            else if (currentGameState.SessionData.SessionPhase == SessionPhase.Finished && currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                // Once we cross s/f line, use live position instead of delayed one, it seems to be correct.
+                currentGameState.SessionData.OverallPosition = playerCar.Live.Position;
             }
             else
             {
@@ -1101,7 +1103,8 @@ namespace CrewChiefV4.iRacing
             {
                 if (sessionState.HasFlag(SessionStates.Checkered) || sessionState.HasFlag(SessionStates.CoolDown))
                 {
-                    if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
+                    if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow
+                         || lastSessionPhase == SessionPhase.Checkered)
                     {
                         // for fixed number of laps, as soon as we've completed the required number end the session
                         if ((!fixedTimeSession && sessionNumberOfLaps > 0 && laps == sessionNumberOfLaps) || (fixedTimeSession && previousLapsCompleted != laps))
@@ -1109,6 +1112,15 @@ namespace CrewChiefV4.iRacing
                             Console.WriteLine("Finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
                             return SessionPhase.Finished;
+                        }
+                        else if (sessionState.HasFlag(SessionStates.Checkered))
+                        {
+                            if (lastSessionPhase != SessionPhase.Checkered)
+                            {
+                                Console.WriteLine("Checkered flag - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
+                                    thisSessionRunningTime);
+                            }
+                            return SessionPhase.Checkered;
                         }
                     }
                 }
