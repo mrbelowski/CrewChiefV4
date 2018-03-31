@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrewChiefV4.ACS
@@ -22,7 +23,7 @@ namespace CrewChiefV4.ACS
         public String appId = "";
         public String apiToken = "";
 
-        private static UdpClient udpListenClient;
+        private static UdpClient udpClient;
 
         private Task<UdpReceiveResult> receiveResultTask;
 
@@ -62,50 +63,43 @@ namespace CrewChiefV4.ACS
                 return;
             }
             byte[] contents = getRegisterDatagram(start);
-            UdpClient client = new UdpClient();
+            udpClient = new UdpClient();
             if (this.remoteAddress != null && this.remotePort > 0)
             {
-                client.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
-                client.Close();
+                udpClient.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
             }
-
-            if (this.receiveResultTask != null)
+            udpClient.Close();
+            if (start)
             {
-                // proper way to cancel this task?
-                receiveResultTask.Dispose();
-            }
-            if (udpListenClient != null)
-            {
-                udpListenClient.Close();
-            }
-
-            if (start) {
-                // initialise the receiving socket
-                udpListenClient = new UdpClient();
-                IPEndPoint remoteAddress = new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort);
-                udpListenClient.Connect(remoteAddress);
                 listening = true;
-                Task.Run(async () =>
+                new Thread(() =>
                 {
+                    Thread.CurrentThread.IsBackground = true;
+                    UdpClient receiver = new UdpClient(this.remotePort);
                     while (listening)
                     {
-                        //IPEndPoint object will allow us to read datagrams sent from any source.
-                        var receivedResults = await KMREventListener.udpListenClient.ReceiveAsync();
+                        var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                        var receivedResults = receiver.Receive(ref remoteEndPoint);
                         Console.WriteLine("Got some data");
                     }
-                });
+                    receiver.Close();
+                }).Start();
             }
         }
 
         private byte[] getRegisterDatagram(Boolean start)
         {
             // construct from member vars + start / stop flag
-            String fullRegisterStr = this.appId + this.apiToken;
-            byte[] registerBytes = encoder.GetBytes(fullRegisterStr);
-            byte[] registerDatagramContent = new byte[registerBytes.Length + 1];
-            Array.Copy(registerBytes, registerDatagramContent, registerBytes.Length);
-            registerDatagramContent[registerDatagramContent.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
-            return registerDatagramContent;
+            byte[] appIdBytes = encoder.GetBytes(this.appId);
+            byte[] apiTokenBytes = encoder.GetBytes(apiToken);
+
+            byte[] fullBytes = new byte[appIdBytes.Length + apiTokenBytes.Length + 3];  // + 3 because 1 byte for each str len + 1 byte for start / stop
+            fullBytes[0] = (byte) this.appId.Length;
+            Array.Copy(appIdBytes, 0, fullBytes, 1, appIdBytes.Length);
+            fullBytes[appIdBytes.Length] = (byte)this.apiToken.Length;
+            Array.Copy(apiTokenBytes, 0, fullBytes, appIdBytes.Length + 1, apiTokenBytes.Length);
+            fullBytes[fullBytes.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
+            return fullBytes;
         }
     }
 
