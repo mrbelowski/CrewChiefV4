@@ -587,7 +587,14 @@ namespace CrewChiefV4.rFactor2
 
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
 
-                Console.WriteLine("Pit box position = " + (cgs.PitData.PitBoxPositionEstimate < 0.0f ? "Unknown" : cgs.PitData.PitBoxPositionEstimate.ToString("0.000")));
+                if (!csd.TrackDefinition.isOval)
+                    Console.WriteLine("Pit box position = " + (cgs.PitData.PitBoxPositionEstimate < 0.0f ? "Unknown" : cgs.PitData.PitBoxPositionEstimate.ToString("0.000")));
+                else
+                {
+                    cgs.PitData.PitBoxPositionEstimate = -1.0f;
+                    this.lastPitBoxPositionEstimate = -1.0;
+                    Console.WriteLine("Pit box position: detection disabled due to oval track detected.");
+                }
             }
 
             // Restore cumulative data.

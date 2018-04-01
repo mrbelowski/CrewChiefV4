@@ -823,7 +823,7 @@ namespace CrewChiefV4
                                     // It appears to be correct on session finish though.
                                     if (currentGameState.SessionData.ClassPosition != previousGameState.SessionData.ClassPosition)
                                     {
-                                        Console.WriteLine("iRacing finish position updated at session finish from: {0}  to: {1}", previousGameState.SessionData.ClassPosition, currentGameState.SessionData.ClassPosition);
+                                        Console.WriteLine("Finish position updated from: {0}  to: {1}", previousGameState.SessionData.ClassPosition, currentGameState.SessionData.ClassPosition);
                                     }
                                     sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
                                         previousGameState.SessionData.SessionStartClassPosition, currentGameState.SessionData.ClassPosition,
