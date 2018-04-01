@@ -874,10 +874,6 @@ namespace CrewChiefV4.iRacing
             {
                 currentGameState.PitData.limiterStatus = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.PitSpeedLimiter) == true ? 1 : 0;
             }
-            else
-            {
-                currentGameState.PitData.limiterStatus = -1;
-            }
 
             //conditions
             if (currentGameState.Now > nextConditionsSampleDue)

@@ -346,7 +346,9 @@ namespace CrewChiefV4.Events
             else if (previousGameState != null 
                 && currentGameState.PitData.limiterStatus == -1  // If limiter is not available
                 && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane  // Just entered the pits
-                && currentGameState.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(120)) // We did not play this on pit approach
+                && currentGameState.Now > timeSpeedInPitsWarning + TimeSpan.FromSeconds(120)  // We did not play this on pit approach
+                && previousGameState.PositionAndMotionData.CarSpeed > 2.0f  // Guard against tow, teleport and other bullshit
+                && currentGameState.SessionData.SessionRunningTime > 30.0f)  // Sanity check !inPts -> inPits flip on session start.
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
             }
