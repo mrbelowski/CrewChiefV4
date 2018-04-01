@@ -23,10 +23,6 @@ namespace CrewChiefV4.ACS
         public String appId = "";
         public String apiToken = "";
 
-        private static UdpClient udpClient;
-
-        private Task<UdpReceiveResult> receiveResultTask;
-
         private UTF32Encoding encoder = new UTF32Encoding(false, false);
 
         public override void activate(Object activationData)
@@ -48,7 +44,7 @@ namespace CrewChiefV4.ACS
         public override void deactivate()
         {
             sendRegisterUDPPacket(this.remoteAddress, this.remotePort, false);
-            listening = false;
+            KMREventListener.listening = false;
             this.remoteAddress = "";
             this.remotePort = 0;
             this.apiToken = "";
@@ -57,33 +53,39 @@ namespace CrewChiefV4.ACS
 
         private void sendRegisterUDPPacket(String address, int port, Boolean start)
         {
-            if ((listening && start) || (!listening && !start))
+            if ((KMREventListener.listening && start) || (!KMREventListener.listening && !start))
             {
-                Console.WriteLine("Bugger off");
                 return;
             }
             byte[] contents = getRegisterDatagram(start);
-            udpClient = new UdpClient();
+            UdpClient registerUdpClient = new UdpClient(this.remotePort);
             if (this.remoteAddress != null && this.remotePort > 0)
             {
-                udpClient.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
+                registerUdpClient.Send(contents, contents.Length, new IPEndPoint(IPAddress.Parse(this.remoteAddress), this.remotePort));
             }
-            udpClient.Close();
+            registerUdpClient.Close();
             if (start)
             {
-                listening = true;
-                new Thread(() =>
+                KMREventListener.listening = true;
+                Task.Run(async () =>
                 {
-                    Thread.CurrentThread.IsBackground = true;
-                    UdpClient receiver = new UdpClient(this.remotePort);
-                    while (listening)
+                    using (var receiveUdpClient = new UdpClient(this.remotePort))
                     {
-                        var remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                        var receivedResults = receiver.Receive(ref remoteEndPoint);
-                        Console.WriteLine("Got some data");
+                        while (KMREventListener.listening)
+                        {
+                            try
+                            {
+                                var receivedResults = await receiveUdpClient.ReceiveAsync();
+                                String message = encoder.GetString(receivedResults.Buffer);
+                                Console.WriteLine("Got some data: " + message);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Error receiving " + e.Message);
+                            }
+                        }
                     }
-                    receiver.Close();
-                }).Start();
+                });
             }
         }
 
@@ -96,8 +98,8 @@ namespace CrewChiefV4.ACS
             byte[] fullBytes = new byte[appIdBytes.Length + apiTokenBytes.Length + 3];  // + 3 because 1 byte for each str len + 1 byte for start / stop
             fullBytes[0] = (byte) this.appId.Length;
             Array.Copy(appIdBytes, 0, fullBytes, 1, appIdBytes.Length);
-            fullBytes[appIdBytes.Length] = (byte)this.apiToken.Length;
-            Array.Copy(apiTokenBytes, 0, fullBytes, appIdBytes.Length + 1, apiTokenBytes.Length);
+            fullBytes[appIdBytes.Length + 1] = (byte)this.apiToken.Length;
+            Array.Copy(apiTokenBytes, 0, fullBytes, appIdBytes.Length + 2, apiTokenBytes.Length);
             fullBytes[fullBytes.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
             return fullBytes;
         }

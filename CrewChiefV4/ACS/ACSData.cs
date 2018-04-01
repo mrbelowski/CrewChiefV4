@@ -297,14 +297,13 @@ namespace CrewChiefV4.assetto
         [Serializable]
         public struct kmrData
         {
-            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] applinkAppId;
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] applinkIP;
             public int applinkPort;
-            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 32)]
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 64)]
             public byte[] applinkToken;
-            public int newServerData;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]

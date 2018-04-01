@@ -34,14 +34,16 @@ configPath = "apps/python/CrewChiefEx/config.txt"
 config = configparser.ConfigParser()
 config.read(configPath)
 
-# globals pasted from KMR demo
+#KMR stuff
 kmr_applink_app_id = "CrewChief"
+kmr_applink_app_id_encoded = kmr_applink_app_id.encode('utf-8')
 kmr_applink_ip = ""
 kmr_applink_port = 0
 kmr_applink_token = ""
 kmr_applink_new_server_data = 0
 kmr_applink_chat_fail_counter = 99
 kmr_timer = 0
+kmr_sent_chat_message = 0
 
 try:
   loadMemoryModule = config.getint("CrewChief", "LoadMemoryModule")
@@ -78,16 +80,14 @@ if libInit == 1:
     funcGetTyreInflation.argtypes = [ctypes.c_int32, ctypes.c_int32]
 
 def updateSharedMemory():
-    global sharedMem, kmr_applink_new_server_data
+    global sharedMem
     sharedmem = sharedMem.getsharedmem()
     #KMR stuff
-    if connectToKMR:
-        sharedmem.kmrData.applink_appId = kmr_applink_app_id.encode('utf-8')
+    if connectToKMR and kmr_applink_port:
+        sharedmem.kmrData.applink_app_id = kmr_applink_app_id_encoded
         sharedmem.kmrData.applink_ip = kmr_applink_ip.encode('utf-8')
         sharedmem.kmrData.applink_port = kmr_applink_port
         sharedmem.kmrData.applink_token = kmr_applink_token.encode('utf-8')
-        sharedmem.kmrData.applink_new_server_data = kmr_applink_new_server_data
-        kmr_applink_new_server_data = 0
 
     sharedmem.numVehicles = ac.getCarsCount()
     sharedmem.focusVehicle = ac.getFocusedCar()
@@ -148,41 +148,40 @@ def acMain(ac_version):
   return "CrewChiefEx"
 
 def acUpdate(deltaT):
-  global timer, kmr_timer
+  global timer, kmr_sent_chat_message, kmr_timer
   timer += deltaT
-  if connectToKMR:
-      # send the magic KMR message every 2 seconds (approriate frequency?)
-      if kmr_timer < 2:
-         kmr_timer += deltaT
+  kmr_timer += deltaT
+  if not kmr_sent_chat_message and connectToKMR:
+      if kmr_timer > 6:
+          # send the magic KMR message after a few seconds
+          kmr_sent_chat_message = 1
+          sendKMRChatMessage()
       else:
-         kmr_timer = 0
-         SendKMRChatMessage()
+          kmr_timer += deltaT
   if timer > 0.025:
       updateSharedMemory()
       timer = 0
 
 def onMessage(message, by):
-    global kmr_applink_ip, kmr_applink_port, kmr_applink_token, kmr_applink_app_id, kmr_applink_new_server_data, kmr_applink_chat_fail_counter
+    global kmr_applink_ip, kmr_applink_port, kmr_applink_token, kmr_applink_chat_fail_counter
     if by == "SERVER" and kmr_applink_chat_fail_counter < 9:
         m = re.search("AppLink: ([^:]+):([\d]+) ([^ ]+)$", message)
         if m:
-            # this is the message we're looking for. Check if the any of it has changed
-            ip = m.group(1)
-            port = int(m.group(2))
-            token = m.group(3)
-            if ip != kmr_applink_ip or port != kmr_applink_port or token != kmr_applink_token:
-                ac.log("New data " + ip + ":" + str(port) + ", " + token)
-                kmr_applink_ip = ip
-                kmr_applink_port = port
-                kmr_applink_token = token
-                kmr_applink_new_server_data = 1
+            # this is the message we're looking for. Parse it.
+            kmr_applink_ip = m.group(1)
+            kmr_applink_port = int(m.group(2))
+            kmr_applink_token = m.group(3)
+            ac.log("Got KMR response")
+            ac.console("Got KMR response")
         else:
             # too bad the message is not the right one, let's increment the fail counter
             kmr_applink_chat_fail_counter += 1
 
-def SendKMRChatMessage():
+def sendKMRChatMessage():
     global kmr_applink_chat_fail_counter
     # let's reset the fail counter
     kmr_applink_chat_fail_counter = 0
     # and send the initialization chat message
+    ac.log("Sending KMR chat message")
+    ac.console("Sending KMR chat message")
     ac.sendChatMessage("/kmr applink")

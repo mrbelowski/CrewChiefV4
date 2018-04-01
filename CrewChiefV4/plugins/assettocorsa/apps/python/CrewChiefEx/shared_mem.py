@@ -47,11 +47,10 @@ class acsVehicleInfo(ctypes.Structure):
 class kmrData(ctypes.Structure):
     _pack_ = 4
     _fields_ = [
-        ('applink_appId', c_char * 32),
+        ('applink_app_id', c_char * 64),
         ('applink_ip', c_char * 32),
         ('applink_port', c_int32),
-        ('applink_token', c_char * 32),
-        ('applink_new_server_data', c_int32)
+        ('applink_token', c_char * 64)
     ]
       
 class SPageFileCrewChief(ctypes.Structure):
