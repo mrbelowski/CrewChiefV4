@@ -43,11 +43,12 @@ namespace CrewChiefV4.ACS
 
         public override void deactivate()
         {
+            KMREventListener.listening = false;
             sendRegisterUDPPacket(this.remoteAddress, this.remotePort, false);
             KMREventListener.listening = false;
             this.remoteAddress = "";
             this.remotePort = 0;
-            this.apiToken = "";
+            this.apiToken = "";            
             base.deactivate();
         }
 
@@ -67,26 +68,46 @@ namespace CrewChiefV4.ACS
             if (start)
             {
                 KMREventListener.listening = true;
-                Task.Run(async () =>
+                UdpClient receiveClient = new UdpClient(this.remotePort);
+                receiveClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 5000);
+                new Thread(() =>
                 {
-                    using (var receiveUdpClient = new UdpClient(this.remotePort))
+                    Thread.CurrentThread.IsBackground = true;
+                    while (listening)
                     {
-                        while (KMREventListener.listening)
+                        IPEndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+                        try
                         {
-                            try
+                            byte[] bytes = receiveClient.Receive(ref ep);
+                            byte type = bytes[0];
+                            if (type == (byte)2)
                             {
-                                var receivedResults = await receiveUdpClient.ReceiveAsync();
-                                String message = encoder.GetString(receivedResults.Buffer);
-                                Console.WriteLine("Got some data: " + message);
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("Error receiving " + e.Message);
+                                List<String> messageFragments = decodeDataMessage(bytes);
                             }
                         }
+                        catch (TimeoutException e)
+                        {
+                            Console.WriteLine("No data received, terminating");
+                            deactivate();
+                        }
                     }
-                });
+                    receiveClient.Close();
+                }).Start();
             }
+        }
+
+        private List<String> decodeDataMessage(byte[] rawData)
+        {
+            List<String> messageFragments = new List<String>();
+            int start = 1;
+            while (start < rawData.Length)
+            {
+                int length = ((int)rawData[start]) * 4;
+                messageFragments.Add(encoder.GetString(rawData, start + 1, length));
+                start += 1 + length;
+
+            }
+            return messageFragments;
         }
 
         private byte[] getRegisterDatagram(Boolean start)
@@ -100,7 +121,7 @@ namespace CrewChiefV4.ACS
             Array.Copy(appIdBytes, 0, fullBytes, 1, appIdBytes.Length);
             fullBytes[appIdBytes.Length + 1] = (byte)this.apiToken.Length;
             Array.Copy(apiTokenBytes, 0, fullBytes, appIdBytes.Length + 2, apiTokenBytes.Length);
-            fullBytes[fullBytes.Length - 1] = start ? (byte)(uint)1 : (byte)(uint)0;
+            fullBytes[fullBytes.Length - 1] = start ? (byte)1 : (byte)0;
             return fullBytes;
         }
     }
