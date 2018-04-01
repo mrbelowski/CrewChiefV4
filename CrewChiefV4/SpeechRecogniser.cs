@@ -29,6 +29,7 @@ namespace CrewChiefV4
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
         private Boolean disable_alternative_voice_commands = UserSettings.GetUserSettings().getBoolean("disable_alternative_voice_commands");
+        private Boolean enable_iracing_pit_stop_commands = UserSettings.GetUserSettings().getBoolean("enable_iracing_pit_stop_commands");
         private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
         private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
@@ -739,52 +740,54 @@ namespace CrewChiefV4
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Failed to unload iracing grammar: " + e.Message);
+                    Console.WriteLine("Failed to unload iRacing grammar: " + e.Message);
                 }
             }
             try
             {
                 iracingPitstopGrammarList.Clear();
-                List<string> tyrePressureChangePhrases = new List<string>();
-                if (disable_alternative_voice_commands)
-                {
-                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_TYRE_PRESSURE[0]);
-                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE[0]);
-                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE[0]);
-                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE[0]);
-                    tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE[0]);
-                }
-                else
-                {
-                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_TYRE_PRESSURE);
-                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE);
-                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE);
-                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE);
-                    tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE);
-                }
-
-                iracingPitstopGrammarList.AddRange(addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true));
-                List<string> litresAndGallons = new List<string>();
-                litresAndGallons.AddRange(LITERS);
-                litresAndGallons.AddRange(GALLONS);
-                iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, litresAndGallons.ToArray(), true));
-
                 Choices iRacingChoices = new Choices();
-                validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
-                validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_ALL, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_TYRES, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
-                validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_ALL_TYRES, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_LEFT_SIDE_TYRES, iRacingChoices);
-                validateAndAdd(PIT_STOP_CHANGE_RIGHT_SIDE_TYRES, iRacingChoices);
-                
+                if (enable_iracing_pit_stop_commands)
+                {
+                    List<string> tyrePressureChangePhrases = new List<string>();
+                    if (disable_alternative_voice_commands)
+                    {
+                        tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_TYRE_PRESSURE[0]);
+                        tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE[0]);
+                        tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE[0]);
+                        tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE[0]);
+                        tyrePressureChangePhrases.Add(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE[0]);
+                    }
+                    else
+                    {
+                        tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_TYRE_PRESSURE);
+                        tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE);
+                        tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE);
+                        tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE);
+                        tyrePressureChangePhrases.AddRange(PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE);
+                    }
+
+                    iracingPitstopGrammarList.AddRange(addCompoundChoices(tyrePressureChangePhrases.ToArray(), true, this.digitsChoices, null, true));
+                    List<string> litresAndGallons = new List<string>();
+                    litresAndGallons.AddRange(LITERS);
+                    litresAndGallons.AddRange(GALLONS);
+                    iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, litresAndGallons.ToArray(), true));
+
+                    validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
+                    validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CLEAR_ALL, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CLEAR_TYRES, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CLEAR_WIND_SCREEN, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CLEAR_FAST_REPAIR, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CLEAR_FUEL, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_ALL_TYRES, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_FRONT_LEFT_TYRE, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_FRONT_RIGHT_TYRE, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_REAR_LEFT_TYRE, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_REAR_RIGHT_TYRE, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_LEFT_SIDE_TYRES, iRacingChoices);
+                    validateAndAdd(PIT_STOP_CHANGE_RIGHT_SIDE_TYRES, iRacingChoices);
+                }
 
                 validateAndAdd(HOW_MANY_INCIDENT_POINTS, iRacingChoices);
                 validateAndAdd(WHATS_THE_INCIDENT_LIMIT, iRacingChoices);
