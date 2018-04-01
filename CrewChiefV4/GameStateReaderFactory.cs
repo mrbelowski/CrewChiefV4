@@ -10,6 +10,7 @@ using System.Text;
 using CrewChiefV4.rFactor2;
 using CrewChiefV4.iRacing;
 using CrewChiefV4.PCars2;
+using CrewChiefV4.Audio;
 
 namespace CrewChiefV4
 {
@@ -107,14 +108,16 @@ namespace CrewChiefV4
             return null;
         }
 
-        public Dictionary<String, EventListener> getEventListenersForGame(GameDefinition gameDefinition)
+        public Dictionary<String, EventListener> getEventListenersForGame(GameDefinition gameDefinition, AudioPlayer audioPlayer)
         {
             Dictionary<String, EventListener> eventListenersForGame = new Dictionary<string, EventListener>();
             if (gameDefinition.eventListeners.Length > 0)
             {
                 foreach (String rdrClass in gameDefinition.eventListeners)
                 {
-                    eventListenersForGame[rdrClass] = (EventListener)Activator.CreateInstance(Type.GetType(rdrClass));
+                    EventListener eventListener = (EventListener)Activator.CreateInstance(Type.GetType(rdrClass));
+                    eventListener.setAudioPlayer(audioPlayer)
+                    eventListenersForGame[rdrClass] = eventListener;
                 }
             }
             return eventListenersForGame;

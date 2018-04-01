@@ -1,4 +1,5 @@
-﻿using CrewChiefV4.GameState;
+﻿using CrewChiefV4.Audio;
+using CrewChiefV4.GameState;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,14 @@ namespace CrewChiefV4
         // but is available to the mappers
         protected Boolean enabled = false;
         protected Boolean active = false;
+
+        private AudioPlayer audioPlayer;
+
+        // some events will trigger messages:
+        public void setAudioPlayer(AudioPlayer audioPlayer)
+        {
+            this.audioPlayer = audioPlayer;
+        }
 
         public virtual Boolean autoStart()
         {

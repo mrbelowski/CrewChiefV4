@@ -130,6 +130,7 @@ namespace CrewChiefV4
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
 
             HttpEventListener httpEventListener = new HttpEventListener();
+            httpEventListener.setAudioPlayer(this.audioPlayer);
             // more global listeners?
             globalEventListeners["HttpEventListener"] = httpEventListener;
             foreach (EventListener listener in globalEventListeners.Values)
@@ -658,7 +659,7 @@ namespace CrewChiefV4
                 { }
             }
             
-            eventListenersForGame = GameStateReaderFactory.getInstance().getEventListenersForGame(gameDefinition);
+            eventListenersForGame = GameStateReaderFactory.getInstance().getEventListenersForGame(gameDefinition, this.audioPlayer);
             foreach (EventListener eventListener in eventListenersForGame.Values)
             {
                 if (eventListener.autoStart())

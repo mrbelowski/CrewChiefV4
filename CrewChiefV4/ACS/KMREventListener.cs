@@ -52,7 +52,7 @@ namespace CrewChiefV4.ACS
             this.apiToken = "";            
             base.deactivate();
         }
-
+        
         private void sendRegisterUDPPacket(String address, int port, Boolean start)
         {
             if ((registered && start) || (!registered && !start))
@@ -84,11 +84,12 @@ namespace CrewChiefV4.ACS
                             byte type = bytes[0];
                             if (type == (byte)2)
                             {
-                                List<String> messageFragments = decodeDataMessage(bytes);
+                                List<String> decodedData = decodeDataMessage(bytes);
                             }
                         }
                         catch (Exception e)
                         {
+                            // timeout or whatever
                             Console.WriteLine("Error: " + e.Message);
                         }
                     }
@@ -122,7 +123,7 @@ namespace CrewChiefV4.ACS
             fullBytes[appIdBytes.Length + 1] = (byte)this.apiToken.Length;
             Array.Copy(apiTokenBytes, 0, fullBytes, appIdBytes.Length + 2, apiTokenBytes.Length);
             fullBytes[fullBytes.Length - 1] = start ? (byte)1 : (byte)0;
-            Console.WriteLine("Sending data: " + BitConverter.ToString(fullBytes));
+            //Console.WriteLine("Sending data: " + BitConverter.ToString(fullBytes));
             return fullBytes;
         }
     }

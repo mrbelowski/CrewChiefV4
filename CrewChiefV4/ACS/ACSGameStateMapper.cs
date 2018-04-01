@@ -831,6 +831,7 @@ namespace CrewChiefV4.assetto
                 handshakeData.apiToken = getNameFromBytes(shared.acsChief.kmrData.applinkToken);
                 kmrListener.activate(handshakeData);
             }
+            
             AC_STATUS status = shared.acsGraphic.status;
             /*if (status == AC_STATUS.AC_OFF)
             {
