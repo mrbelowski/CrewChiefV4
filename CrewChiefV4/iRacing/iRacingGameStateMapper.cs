@@ -163,7 +163,7 @@ namespace CrewChiefV4.iRacing
 
                 lastActiveTimeForOpponents.Clear();
                 nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
-                 
+
                 currentGameState.PitData.InPitlane = shared.Telemetry.OnPitRoad;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerCar.Live.CorrectedLapDistance * currentGameState.SessionData.TrackDefinition.trackLength);
 
@@ -185,7 +185,7 @@ namespace CrewChiefV4.iRacing
                     }
                     else
                     {
-                        currentGameState.OpponentData.Add(driver.Id.ToString(), createOpponentData(driver, true, 
+                        currentGameState.OpponentData.Add(driver.Id.ToString(), createOpponentData(driver, true,
                             CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
@@ -356,24 +356,24 @@ namespace CrewChiefV4.iRacing
 
             bool additionalEngineCheckFlags = shared.Telemetry.IsOnTrack && !shared.Telemetry.OnPitRoad && shared.Telemetry.Voltage > 0f;
 
-            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled)) 
-            { 
-                lastTimeEngineWasRunning = currentGameState.Now; 
-            } 
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled))
+            {
+                lastTimeEngineWasRunning = currentGameState.Now;
+            }
             if (previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
                 currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
                 lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
                 lastTimeEngineWasRunning = DateTime.MaxValue;
-                
+
             }
 
-            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) )
+            if (!shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning))
             {
                 lastTimeEngineWaterTempWarning = currentGameState.Now;
             }
-            
+
             if (previousGameState != null && !previousGameState.EngineData.EngineWaterTempWarning && !shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.EngineStalled) &&
                 currentGameState.SessionData.SessionRunningTime > 60 && shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.WaterTemperatureWarning) &&
                 lastTimeEngineWaterTempWarning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) && additionalEngineCheckFlags)
@@ -479,7 +479,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
             currentGameState.PitData.IsApproachingPitlane = playerCar.Live.TrackSurface == TrackSurfaces.AproachingPits && !shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] && currentSector == 3;
             Boolean jumpToPits = previousGameState != null && !previousGameState.PitData.IsApproachingPitlane && shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
-            
+
             currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector && currentSector != 1 || currentGameState.SessionData.IsNewLap;
 
@@ -496,7 +496,7 @@ namespace CrewChiefV4.iRacing
 
             if (currentGameState.SessionData.IsNewSector || currentGameState.SessionData.IsNewLap)
             {
-                Boolean validSpeed = true;                
+                Boolean validSpeed = true;
                 if (playerCar.Live.Speed > 500)
                 {
                     validSpeed = false;
@@ -543,7 +543,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.Telemetry.Roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.Telemetry.Yaw;
-                       
+
             currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps,
                 (float)playerCar.Live.Speed, currentGameState.Now);
 
@@ -593,16 +593,16 @@ namespace CrewChiefV4.iRacing
             foreach (Driver driver in shared.Drivers)
             {
                 String opponentDataKey = driver.Id.ToString();
-                
-                if(driver.IsPacecar || driver.IsSpectator)
+
+                if (driver.IsPacecar || driver.IsSpectator)
                 {
                     continue;
-                }                
+                }
                 combinedStrengthOfField.Add(driver.IRating);
 
                 if (driver.IsCurrentDriver || currentGameState.disqualifiedDriverNames.Contains(driver.Name) || currentGameState.retriedDriverNames.Contains(driver.Name))
                 {
-                    continue;                
+                    continue;
                 }
 
                 if (driver.CurrentResults.OutReasonId == ReasonOutId.IDS_DISQUALIFIED)
@@ -802,7 +802,7 @@ namespace CrewChiefV4.iRacing
                             false, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
-                
+
 
             }
             if (currentGameState.Now > nextOpponentCleanupTime)
@@ -834,11 +834,11 @@ namespace CrewChiefV4.iRacing
                 {
                     sofExpSum += Math.Exp(-ir / baseSof);
                 }
-                currentGameState.SessionData.StrengthOfField = (int)Math.Round(Math.Floor(baseSof * Math.Log(combinedStrengthOfField.Count / sofExpSum))); 
+                currentGameState.SessionData.StrengthOfField = (int)Math.Round(Math.Floor(baseSof * Math.Log(combinedStrengthOfField.Count / sofExpSum)));
             }
-            
+
             //Sort class positions
-            if(currentGameState.SessionData.SessionType == SessionType.Race)
+            if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 currentGameState.sortClassPositions();
             }
@@ -870,7 +870,14 @@ namespace CrewChiefV4.iRacing
             currentGameState.FuelData.FuelLeft = shared.Telemetry.FuelLevel;
             currentGameState.FuelData.FuelCapacity = playerCar.Car.DriverCarFuelMaxLtr * playerCar.Car.DriverCarMaxFuelPct;
 
-            currentGameState.PitData.limiterStatus = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.PitSpeedLimiter) == true ? 1 : 0;
+            if (currentGameState.carClass.limiterAvailable)
+            {
+                currentGameState.PitData.limiterStatus = shared.Telemetry.EngineWarnings.HasFlag(EngineWarnings.PitSpeedLimiter) == true ? 1 : 0;
+            }
+            else
+            {
+                currentGameState.PitData.limiterStatus = -1;
+            }
 
             //conditions
             if (currentGameState.Now > nextConditionsSampleDue)
