@@ -116,7 +116,7 @@ namespace CrewChiefV4
                 foreach (String rdrClass in gameDefinition.eventListeners)
                 {
                     EventListener eventListener = (EventListener)Activator.CreateInstance(Type.GetType(rdrClass));
-                    eventListener.setAudioPlayer(audioPlayer)
+                    eventListener.setAudioPlayer(audioPlayer);
                     eventListenersForGame[rdrClass] = eventListener;
                 }
             }
