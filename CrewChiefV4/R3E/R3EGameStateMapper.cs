@@ -229,7 +229,7 @@ namespace CrewChiefV4.RaceRoom
                     && shared.InPitlane == 1)
                 {
                     currentGameState.PitData.PitBoxPositionEstimate = shared.LapDistance;
-                    Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate);
+                    Console.WriteLine("Pit box position = " + currentGameState.PitData.PitBoxPositionEstimate.ToString("0.000"));
                 }
                 else if (previousGameState != null)
                 {

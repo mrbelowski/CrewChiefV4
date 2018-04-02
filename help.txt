@@ -95,7 +95,7 @@ If you want to test voice recognition, set it all up and press the Start button 
 
 The app understands lots of command including:
 
-"how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace ]"
+"how's my [fuel / tyre wear / body work / aero / engine / transmission / suspension / pace / delta best ]"
 "how are my [tyre temps / tyre temperatures / brakes / brake temps / brake temperatures / engine temps / engine temperatures]" (gives a good / bad type response)
 "What are my [brake temps / tyre temps]" (gives the actual temps)
 "what's my [gap in front / gap ahead / gap behind / last lap / last lap time / lap time / position / fuel level / best lap / best lap time]"
