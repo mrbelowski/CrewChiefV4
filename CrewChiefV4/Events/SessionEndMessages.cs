@@ -48,7 +48,7 @@ namespace CrewChiefV4.Events
             }
             if (lastSessionEndMessagesPlayedAt.AddSeconds(10) > now)
             {
-                Console.WriteLine("Skipping duplicate session end message call - last call was " + (now - lastSessionEndMessagesPlayedAt).TotalSeconds + " seconds ago");
+                Console.WriteLine("Skipping duplicate session end message call - last call was " + (now - lastSessionEndMessagesPlayedAt).TotalSeconds.ToString("0.00") + " seconds ago");
                 return;
             }
             if (sessionType == SessionType.Race)

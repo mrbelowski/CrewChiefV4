@@ -116,6 +116,9 @@ namespace CrewChiefV4.Events
         private DateTime timeOfDisengageCheck = DateTime.MaxValue;
 
         private DateTime timeOfPitRequestOrCancel = DateTime.MinValue;
+
+        private DateTime timeSpeedInPitsWarning = DateTime.MinValue;
+
         private const int minSecondsBetweenPitRequestCancel = 5;
 
         private Boolean enableWindowWarnings = true;
@@ -128,6 +131,7 @@ namespace CrewChiefV4.Events
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
         private Boolean played100MetreWarning = false;
         private Boolean played50MetreWarning = false;
+        private Boolean playedMoreThan150MetreWarning = false;
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -147,6 +151,7 @@ namespace CrewChiefV4.Events
             timeOfDisengageCheck = DateTime.MaxValue;
             timeOfPitRequestOrCancel = DateTime.MinValue;
             timeStartedAppoachingPitsCheck = DateTime.MaxValue;
+            timeSpeedInPitsWarning = DateTime.MinValue;
             pitWindowOpenLap = 0;
             pitWindowClosedLap = 0;
             pitWindowOpenTime = 0;
@@ -173,6 +178,7 @@ namespace CrewChiefV4.Events
             pitStallOccupied = false;
             warnedAboutOccupiedPitOnThisLap = false;
             previousDistanceToBox = -1;
+            playedMoreThan150MetreWarning = false;
             played100MetreWarning = false;
             played50MetreWarning = false;
             playedLimiterLineToPitBoxDistanceWarning = false;
@@ -217,7 +223,6 @@ namespace CrewChiefV4.Events
             if (previousGameState != null && pitBoxPositionCountdown && 
                 currentGameState.PositionAndMotionData.CarSpeed > 2 &&
                 currentGameState.PitData.PitBoxPositionEstimate > 0 && 
-                currentGameState.SessionData.CompletedLaps > 0 &&
                 !currentGameState.PenaltiesData.HasDriveThrough)
             {
                 if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
@@ -237,6 +242,7 @@ namespace CrewChiefV4.Events
                 {
                     // just entered the pitlane
                     previousDistanceToBox = 0;
+                    playedMoreThan150MetreWarning = false;
                     played100MetreWarning = false;
                     played50MetreWarning = false;
                     if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
@@ -252,7 +258,9 @@ namespace CrewChiefV4.Events
                         messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                         messageContents.Add(MessageFragment.Text(folderMetres));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));                        
+                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null));
+
+                        playedMoreThan150MetreWarning = true;
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
                 }
@@ -262,10 +270,16 @@ namespace CrewChiefV4.Events
                     {
                         List<MessageFragment> messageContents = new List<MessageFragment>();
                         messageContents.Add(MessageFragment.Integer(100, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
+                        if (!playedMoreThan150MetreWarning)
+                        {
+                            // Skip "meters" once if there was a message before.
+                            messageContents.Add(MessageFragment.Text(folderMetres));
+                        }
                         audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", messageContents, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
                     }
+                    // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50, folderMetres), 0, null));
@@ -329,12 +343,21 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+            else if (previousGameState != null 
+                && currentGameState.PitData.limiterStatus == -1  // If limiter is not available
+                && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane  // Just entered the pits
+                && currentGameState.Now > timeSpeedInPitsWarning + TimeSpan.FromSeconds(120)  // We did not play this on pit approach
+                && previousGameState.PositionAndMotionData.CarSpeed > 2.0f  // Guard against tow, teleport and other bullshit
+                && currentGameState.SessionData.SessionRunningTime > 30.0f)  // Sanity check !inPts -> inPits flip on session start.
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow))
             {                
                 // allow this data to be reinitialised during a race (hack for AMS)
                 if (!pitDataInitialised || currentGameState.PitData.ResetEvents)
-                {                    
+                {
                     mandatoryStopCompleted = false;
                     mandatoryStopBoxThisLap = false;
                     mandatoryStopMissed = false;
@@ -616,14 +639,16 @@ namespace CrewChiefV4.Events
                 }
             }
             if (previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race)
-            {                
+            {
                 if ((!previousGameState.PitData.IsApproachingPitlane
                     && currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING) 
-                    //Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
+                    // Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
                     || currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING 
-                    && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0 )
+                    && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0)
                 {
                     timeStartedAppoachingPitsCheck = DateTime.MaxValue;
+                    timeSpeedInPitsWarning = currentGameState.Now;
+
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this));
                 }
                 if(!previousGameState.PitData.IsApproachingPitlane

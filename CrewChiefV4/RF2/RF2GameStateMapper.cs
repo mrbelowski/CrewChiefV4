@@ -91,6 +91,8 @@ namespace CrewChiefV4.rFactor2
         private TrackDataContainer lastSessionTrackDataContainer = null;
         private double lastSessionTrackLength = -1.0;
 
+        private double lastPitBoxPositionEstimate = -1.0;
+
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
 
@@ -119,7 +121,7 @@ namespace CrewChiefV4.rFactor2
             this.suspensionDamageThresholds.Add(new CornerData.EnumWithThresholds(DamageLevel.DESTROYED, 1.0f, 2.0f));
         }
 
-        private int[] minimumSupportedVersionParts = new int[] { 3, 0, 0, 1 };
+        private int[] minimumSupportedVersionParts = new int[] { 3, 0, 1, 0 };
         public static bool pluginVerified = false;
         public override void versionCheck(Object memoryMappedFileStruct)
         {
@@ -523,6 +525,37 @@ namespace CrewChiefV4.rFactor2
 
                 GlobalBehaviourSettings.UpdateFromCarClass(cgs.carClass);
 
+                var inPitStall = playerScoring.mInPits == 1 || playerScoring.mInGarageStall == 1;
+
+                // NOTE: While pit stall hack seems to work for most tracks, some tracks don't, and haven't
+                // figure out logic, yet.  Example: "Indy Gp 2014".
+                if (inPitStall)
+                {
+                    var lapDistEstimate = playerScoring.mLapDist;
+
+                    if (lapDistEstimate > shared.scoring.mScoringInfo.mLapDist)
+                    {
+                        // This is complete bullshit, but turns out sometimes while in pits, we get mLapDist
+                        // of almost 2 track lenghts.  Try subtracting track length.
+                        Console.WriteLine("Pit box detection: reported distance is higher than track length, fixing up.  Reported: "
+                            + lapDistEstimate.ToString("0.000") + "  Track Length: " + shared.scoring.mScoringInfo.mLapDist.ToString("0.000"));
+
+                        lapDistEstimate -= shared.scoring.mScoringInfo.mLapDist;
+                    }
+                    else if (lapDistEstimate < 0.0)
+                    {
+                        // And, that's not all.   Sometimes, we get what looks like negative offset from s/f line.
+                        Console.WriteLine("Pit box detection: reported distance is negative, fixing up.  Reported: "
+                            + lapDistEstimate.ToString("0.000") + "  Track Length: " + shared.scoring.mScoringInfo.mLapDist.ToString("0.000"));
+
+                        lapDistEstimate += shared.scoring.mScoringInfo.mLapDist;
+                    }
+
+                    cgs.PitData.PitBoxPositionEstimate = (float)lapDistEstimate;
+
+                    this.lastPitBoxPositionEstimate = cgs.PitData.PitBoxPositionEstimate;
+                }
+
                 // Initialize track landmarks for this session.
                 TrackDataContainer tdc = null;
                 if (this.lastSessionTrackDataContainer != null
@@ -533,6 +566,11 @@ namespace CrewChiefV4.rFactor2
 
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+
+                    // Also, if this is the same track as previously, and we are not in a garage stall (restart without
+                    // going back to monitor) restore old (last captured) Pit Stall position.
+                    if (!inPitStall && this.lastPitBoxPositionEstimate > 0.0)
+                        cgs.PitData.PitBoxPositionEstimate = (float)this.lastPitBoxPositionEstimate;
                 }
                 else
                 {
@@ -548,6 +586,15 @@ namespace CrewChiefV4.rFactor2
                 csd.TrackDefinition.setGapPoints();
 
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(csd.TrackDefinition);
+
+                if (!csd.TrackDefinition.isOval)
+                    Console.WriteLine("Pit box position = " + (cgs.PitData.PitBoxPositionEstimate < 0.0f ? "Unknown" : cgs.PitData.PitBoxPositionEstimate.ToString("0.000")));
+                else
+                {
+                    cgs.PitData.PitBoxPositionEstimate = -1.0f;
+                    this.lastPitBoxPositionEstimate = -1.0;
+                    Console.WriteLine("Pit box position: detection disabled due to oval track detected.");
+                }
             }
 
             // Restore cumulative data.
@@ -573,6 +620,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.FlagData.previousLapWasFCY = pgs.FlagData.previousLapWasFCY;
 
                 cgs.Conditions.samples = pgs.Conditions.samples;
+
+                cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;

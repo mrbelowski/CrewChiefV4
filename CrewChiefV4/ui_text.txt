@@ -550,8 +550,8 @@ enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace
 bring_game_window_to_front_for_macros = Ensure game is on top for command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
 
-report_all_laps_in_hotlap_mode = Report all laps when hotlapping
-report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap mode or when we have no opponents in the session
+report_all_laps_in_hotlap_mode = Report all laps when hotlapping/lone practice
+report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap/lone practice mode or when we have no opponents in the session
 
 enable_crash_messages = Enable crash messages
 enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily
@@ -562,8 +562,8 @@ force_single_class_help = Don't allow participants to be grouped by their car cl
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 
-pit_box_position_countdown = Pit box position countdown (R3E and iRacing only)
-pit_box_position_countdown_help = Play distance in metres to box as you approach
+pit_box_position_countdown = Pit box countdown (R3E, rF2 and iRacing only)
+pit_box_position_countdown_help = Play distance in metres to box as you approach.  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
@@ -581,6 +581,9 @@ max_unknown_car_classes_for_assetto_help = Assume single-class race if there are
 
 iracing_fast_parsing = iRacing faster parser
 iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)
+
+enable_iracing_pit_stop_commands = Enable iRacing pit stop voice commands
+enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop commands, you may disable this.  If disabled, CC will exclude iRacing pit stop commands from the command set - may improve recognition accuracy
 
 enable_tight_fuel_calc = Enable tight fuel calculations
 enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
