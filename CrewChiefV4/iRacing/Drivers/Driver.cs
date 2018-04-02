@@ -58,10 +58,10 @@ namespace CrewChiefV4.iRacing
             this.IsSpectator = Parser.ParseInt(ParseDriverYaml(sessionInfo, "IsSpectator")) == 1;
             if(isPlayerCar && (this.Car.DriverPitTrkPct <= 0 || this.Car.DriverCarMaxFuelPct <= 0 || this.Car.DriverCarFuelMaxLtr <= 0))
             {
-                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"));
-                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"));
-                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"));
-            }         
+                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"), -1.0f);
+                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"), -1.0f);
+                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"), -1.0f);
+            }
         }
 
         public void ParseStaticSessionInfo(string sessionInfo, bool isPlayerCar)
@@ -74,9 +74,9 @@ namespace CrewChiefV4.iRacing
             this.Car.CarClassRelSpeed = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarClassRelSpeed"));
             if (isPlayerCar)
             {
-                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"));
-                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"));
-                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"));
+                this.Car.DriverCarFuelMaxLtr = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarFuelMaxLtr:"), -1.0f);
+                this.Car.DriverCarMaxFuelPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverCarMaxFuelPct:"), -1.0f);
+                this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"), -1.0f);
             }
             bool isPaceCar = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarIsPaceCar")) == 1;
             this.IsPacecar = this.CustId == -1 || isPaceCar;

@@ -35,6 +35,7 @@ HOWS_MY_BRAKES = how's my brakes:how are my brakes
 HOWS_MY_FUEL = how's my fuel:how's my fuel level
 HOWS_MY_BATTERY = how's my battery:how's my battery level:how's my energy level
 HOWS_MY_PACE = how's my pace
+HOWS_MY_SELF_PACE = how's my self gap:how's my personal pace:how's my delta best
 HOW_ARE_MY_TYRE_TEMPS = how are my tire temps:how are my tire temperatures
 WHAT_ARE_MY_TYRE_TEMPS = what are my tire temps:what are my tire temperatures:tire temps:tire temperatures
 HOW_ARE_MY_BRAKE_TEMPS = how are my brake temps:how are my brake temperatures
