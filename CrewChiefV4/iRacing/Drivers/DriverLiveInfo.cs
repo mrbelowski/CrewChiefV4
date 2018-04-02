@@ -59,6 +59,7 @@ namespace CrewChiefV4.iRacing
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
         public Sector[] Sectors { get; set; }
+        public int PlayerCarPosition { get; set; }
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
@@ -67,7 +68,6 @@ namespace CrewChiefV4.iRacing
 
         public void ParseTelemetry(iRacingData e)
         {   
-                     
             this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
             this.Lap = e.CarIdxLap[this.Driver.Id];
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
@@ -77,7 +77,6 @@ namespace CrewChiefV4.iRacing
                 HasCrossedSFLine = true;
                 //this is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
                 GameTimeWhenLastCrossedSFLine = (float)e.SessionTime;
-
             }
             else
             {
@@ -114,7 +113,9 @@ namespace CrewChiefV4.iRacing
             {
                 this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
             }
-            this.PreviousLapWasValid = this.LapTimePrevious > 1;     
+            this.PreviousLapWasValid = this.LapTimePrevious > 1;
+
+            this.PlayerCarPosition = e.PlayerCarPosition;
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)

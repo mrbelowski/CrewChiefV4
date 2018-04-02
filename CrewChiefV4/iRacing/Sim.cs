@@ -195,7 +195,7 @@ namespace CrewChiefV4.iRacing
             {
                 // Determine live position from lapdistance
                 int pos = 1;
-                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))                
+                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
                 {
                     if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                     {
