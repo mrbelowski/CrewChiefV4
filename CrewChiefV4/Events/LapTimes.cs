@@ -40,7 +40,7 @@ namespace CrewChiefV4.Events
         private String folderLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_the_pace";
 
         // TODO: add real sound
-        private String folderSelfLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_the_pace";
+        private String folderSelfLessThanATenthOffThePace = "lap_times/less_than_a_tenth_off_self_pace";
 
         private String folderQuickerThanSecondPlace = "lap_times/quicker_than_second_place";
 
