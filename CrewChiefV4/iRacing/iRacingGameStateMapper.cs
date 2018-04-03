@@ -622,7 +622,7 @@ namespace CrewChiefV4.iRacing
                     // remove this driver from the set immediately
                     if (!currentGameState.retriedDriverNames.Contains(driver.Name))
                     {
-                        Console.WriteLine("Opponent " + driver.Name + " has retried");
+                        Console.WriteLine("Opponent " + driver.Name + " has retired");
                         currentGameState.retriedDriverNames.Add(driver.Name);
                     }
                     currentGameState.OpponentData.Remove(opponentDataKey);
