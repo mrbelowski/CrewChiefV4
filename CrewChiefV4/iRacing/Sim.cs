@@ -170,7 +170,7 @@ namespace CrewChiefV4.iRacing
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
             SessionFlags flag = (SessionFlags)telemetry.SessionFlags;
-            if (this.SessionData.EventType == "Race" && flag.HasFlag(SessionFlags.Checkered))
+            if (this.SessionData.SessionType == "Race" && flag.HasFlag(SessionFlags.Checkered))
             {
                 //we need to check if player is the first(p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
                 if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.IsNewLap)
@@ -191,11 +191,29 @@ namespace CrewChiefV4.iRacing
             {
                 raceEndState = RaceEndState.NONE;
             }
-            if (this.SessionData.EventType == "Race" && raceEndState != RaceEndState.FINISHED)
+            if (this.SessionData.SessionType == "Race" && raceEndState != RaceEndState.FINISHED
+                && (flag.HasFlag(SessionFlags.StartGo) || flag.HasFlag(SessionFlags.StartHidden /*yellow?*/)))
             {
+                // When driver disconnects (or in other cases I am not sure about yet), TotalLapDitance
+                // gets ceiled to nearest integer.  Because of that, for the reminder of a lap such car is
+                // ahead of others by TotalLapDitance, which results incorrect positions announced.
+                //
+                // To mitigate that, try detecting such cases and using floor(TotalLapDitance) instead.
+                //
+                // TODO: Additionally, cars that finished and disconnected, should not be affected by above hack.
+                // For those, use their Position from YAML.
+                foreach (var driver in _drivers)
+                {
+                    if (Math.Floor(driver.Live.TotalLapDistanceCorrected) > driver.Live.LiveLapsCompleted)
+                    { 
+                        driver.Live.TotalLapDistanceCorrected = (float)driver.Live.LiveLapsCompleted;
+                    }
+                }
+
+
                 // Determine live position from lapdistance
                 int pos = 1;
-                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
+                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                 {
                     if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                     {

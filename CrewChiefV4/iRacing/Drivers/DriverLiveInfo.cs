@@ -43,6 +43,8 @@ namespace CrewChiefV4.iRacing
             get { return this.LiveLapsCompleted + CorrectedLapDistance; }
         }
 
+        public float TotalLapDistanceCorrected { get; set; }
+
         public TrackSurfaces TrackSurface { get; private set; }
         
         public int Gear { get; private set; }
@@ -114,8 +116,8 @@ namespace CrewChiefV4.iRacing
                 this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
             }
             this.PreviousLapWasValid = this.LapTimePrevious > 1;
-
             this.PlayerCarPosition = e.PlayerCarPosition;
+            this.TotalLapDistanceCorrected = this.TotalLapDistance;
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
