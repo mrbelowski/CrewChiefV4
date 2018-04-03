@@ -75,7 +75,7 @@ namespace CrewChiefV4.iRacing
                 (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
             {                
                 HasCrossedSFLine = true;
-                //this is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
+                // This is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
                 GameTimeWhenLastCrossedSFLine = (float)e.SessionTime;
             }
             else
