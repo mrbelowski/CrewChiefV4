@@ -16,6 +16,7 @@ namespace CrewChiefV4.iRacing
             this.Live = new DriverLiveInfo(this);
             this.CurrentResults = new DriverSessionResults();
             this.licensLevel = new Tuple<string, float>("invalid", -1);
+            this.FinishStatus = FinishState.Unknown;
         }
 
         /// <summary>
@@ -41,6 +42,15 @@ namespace CrewChiefV4.iRacing
         public DriverCarInfo Car { get; set; }
         public DriverSessionResults CurrentResults { get; set; }
         public DriverLiveInfo Live { get; private set; }
+
+        public enum FinishState
+        {
+            Unknown,
+            Finished
+        }
+        // Heuristically derived during Race position ordering, not coming from game data.
+        public FinishState FinishStatus { get; internal set; }
+
         private string ParseDriverYaml(string sessionInfo, string Node)
         {
             return YamlParser.Parse(sessionInfo, string.Format(driverYamlPath, this.Id, Node));
