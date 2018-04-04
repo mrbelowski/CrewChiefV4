@@ -45,6 +45,30 @@ namespace CrewChiefV4
             DriverTrainingService.stopPlayingPaceNotes();
             return "OK";
         }
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/start")]
+        public String startApp()
+        {
+            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            if (!MainWindow.instance.IsAppRunning)
+            {
+                MainWindow.instance.doStartAppStuff();
+            }
+            return "OK";
+        }
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/stop")]
+        public String stopApp()
+        {
+            WebOperationContext.Current.OutgoingResponse.StatusCode = System.Net.HttpStatusCode.OK;
+            if (MainWindow.instance.IsAppRunning)
+            {
+                MainWindow.instance.doStartAppStuff();
+            }
+            return "OK";
+        }
     }
 
     public class RestController

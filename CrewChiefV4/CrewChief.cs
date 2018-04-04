@@ -132,7 +132,10 @@ namespace CrewChiefV4
             HttpEventListener httpEventListener = new HttpEventListener();
             httpEventListener.setAudioPlayer(this.audioPlayer);
             // more global listeners?
-            globalEventListeners["HttpEventListener"] = httpEventListener;
+            if (UserSettings.GetUserSettings().getBoolean("enable_http_listener"))
+            {
+                globalEventListeners["HttpEventListener"] = httpEventListener;
+            }
             foreach (EventListener listener in globalEventListeners.Values)
             {
                 if (listener.autoStart())

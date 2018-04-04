@@ -1260,7 +1260,7 @@ namespace CrewChiefV4
             doStartAppStuff();
         }
 
-        private void doStartAppStuff()
+        public void doStartAppStuff()
         {
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
