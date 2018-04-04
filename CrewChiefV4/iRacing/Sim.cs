@@ -204,12 +204,14 @@ namespace CrewChiefV4.iRacing
                 // For those, use their Position from YAML.
                 foreach (var driver in _drivers)
                 {
+                    // Check if SessionData.RaceLaps => LiveLapsCompleted
+                    // Check if SessionData.RaceTime => ????
+                    // Use position from YAML for already finished.
                     if (Math.Floor(driver.Live.TotalLapDistanceCorrected) > driver.Live.LiveLapsCompleted)
                     { 
                         driver.Live.TotalLapDistanceCorrected = (float)driver.Live.LiveLapsCompleted;
                     }
                 }
-
 
                 // Determine live position from lapdistance
                 int pos = 1;
