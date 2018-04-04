@@ -202,14 +202,66 @@ namespace CrewChiefV4.iRacing
                 //
                 // TODO: Additionally, cars that finished and disconnected, should not be affected by above hack.
                 // For those, use their Position from YAML.
+
+                // First, figure out if it is lap or timed race.
+                var leaderFinishedTime = -1.0f;
+                Driver leaderFinished = null;
+                if (SessionData.IsLimitedSessionLaps)
+                {
+                    var numSessLaps = -1;
+                    if (int.TryParse(SessionData.RaceLaps, out numSessLaps))
+                    {
+                        // See if any driver completed numSessLaps, and save the leader's s/f crossing time.
+                        foreach (var driver in _drivers)
+                        {
+                            if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                            {
+                                continue;
+                            }
+
+                            if (driver.Live.LiveLapsCompleted >= numSessLaps)
+                            {
+                                if (leaderFinishedTime == -1.0f
+                                    || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinishedTime)
+                                {
+                                    // This guy crossed last lap earlier, save him as candiate.
+                                    leaderFinishedTime = driver.Live.GameTimeWhenLastCrossedSFLine;
+                                    leaderFinished = driver;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    /*SessionData.RaceTime
+                    // See if any driver crossed s/f line after race time expired.
+                    foreach (var driver in _drivers)
+                    {
+                        if (driver.Live.LiveLapsCompleted >= numSessLaps)
+                        {
+                            if (leaderFinishedTime == -1.0f
+                                || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinishedTime)
+                            {
+                                // This guy crossed last lap earlier, save him as candiate.
+                                leaderFinishedTime = driver.Live.GameTimeWhenLastCrossedSFLine;
+                                leaderFinished = driver;
+                            }
+                        }
+                    }*/
+                }
+
                 foreach (var driver in _drivers)
                 {
-                    // Check if SessionData.RaceLaps => LiveLapsCompleted
-                    // Check if SessionData.RaceTime => ????
-                    // Use position from YAML for already finished.
                     if (Math.Floor(driver.Live.TotalLapDistanceCorrected) > driver.Live.LiveLapsCompleted)
                     { 
                         driver.Live.TotalLapDistanceCorrected = (float)driver.Live.LiveLapsCompleted;
+                    }
+
+                    if (leaderFinished != null 
+                        && driver.Live.GameTimeWhenLastCrossedSFLine >= leaderFinishedTime)
+                    {
+                        driver.FinishStatus = Driver.FinishState.Finished;
                     }
                 }
 
@@ -221,7 +273,16 @@ namespace CrewChiefV4.iRacing
                     {
                         continue;
                     }
-                    driver.Live.Position = pos;
+                    if (driver.FinishStatus == Driver.FinishState.Finished)
+                    {
+                        // If driver finished, use position info from YAML.  This should work nicely,
+                        // because all the drivers are ordered by TotalLapDistanceCorrected.
+                        driver.Live.Position = driver.CurrentResults.Position;
+                    }
+                    else
+                    {
+                        driver.Live.Position = pos;
+                    }
                     pos++;
                 }
             }
