@@ -195,16 +195,14 @@ namespace CrewChiefV4.iRacing
                 && (flag.HasFlag(SessionFlags.StartGo) || flag.HasFlag(SessionFlags.StartHidden /*yellow?*/)))
             {
                 // When driver disconnects (or in other cases I am not sure about yet), TotalLapDitance
-                // gets ceiled to nearest integer.  Because of that, for the reminder of a lap such car is
+                // gets ceiled to the nearest integer.  Because of that, for the reminder of a lap such car is
                 // ahead of others by TotalLapDitance, which results incorrect positions announced.
                 //
                 // To mitigate that, try detecting such cases and using floor(TotalLapDitance) instead.
                 //
-                // TODO: Additionally, cars that finished and disconnected, should not be affected by above hack.
-                // For those, use their Position from YAML.
+                // Also, try detecting cars that finished and use YAML reported positions instead for those.
 
                 // First, figure out if it is lap or timed race.
-                var leaderFinishedTime = -1.0f;
                 Driver leaderFinished = null;
                 if (SessionData.IsLimitedSessionLaps)
                 {
@@ -221,11 +219,10 @@ namespace CrewChiefV4.iRacing
 
                             if (driver.Live.LiveLapsCompleted >= numSessLaps)
                             {
-                                if (leaderFinishedTime == -1.0f
-                                    || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinishedTime)
+                                if (leaderFinished == null
+                                    || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
                                 {
                                     // This guy crossed last lap earlier, save him as candiate.
-                                    leaderFinishedTime = driver.Live.GameTimeWhenLastCrossedSFLine;
                                     leaderFinished = driver;
                                 }
                             }
@@ -234,6 +231,7 @@ namespace CrewChiefV4.iRacing
                 }
                 else
                 {
+                    // TODO: timed race leader.
                     /*SessionData.RaceTime
                     // See if any driver crossed s/f line after race time expired.
                     foreach (var driver in _drivers)
@@ -259,8 +257,9 @@ namespace CrewChiefV4.iRacing
                     }
 
                     if (leaderFinished != null 
-                        && driver.Live.GameTimeWhenLastCrossedSFLine >= leaderFinishedTime)
+                        && driver.Live.GameTimeWhenLastCrossedSFLine >= leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
                     {
+                        // Everyone, who crosses s/f after leader finished, finishes too.
                         driver.FinishStatus = Driver.FinishState.Finished;
                     }
                 }
