@@ -489,7 +489,7 @@ namespace CrewChiefV4
             this.spotterNameBox.SelectedIndexChanged += new System.EventHandler(this.spotterNameBox_SelectedIndexChanged);
 
             this.donateLink.Location = new System.Drawing.Point(35, 650);
-            this.donateLink.Size = new System.Drawing.Size(250, 15);
+            this.donateLink.Size = new System.Drawing.Size(350, 20);
             this.donateLink.Text = Configuration.getUIString("donate_link_text");
             this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
             this.donateLink.TabIndex = 270;
