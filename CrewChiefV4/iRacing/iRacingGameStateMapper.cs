@@ -13,6 +13,7 @@ namespace CrewChiefV4.iRacing
     {
         public static String playerName = null;
         Driver playerCar = null;
+        Driver leaderCar = null;
         public iRacingGameStateMapper()
         {
 
@@ -95,6 +96,15 @@ namespace CrewChiefV4.iRacing
             {
                 playerCar = shared.Driver;
                 playerName = playerCar.Name.ToLower();
+            }
+
+            foreach (var driver in shared.Drivers)
+            {
+                if (driver.Live.Position == 1)
+                {
+                    leaderCar = driver;
+                    break;
+                }
             }
 
             Validator.validate(playerName);
@@ -1112,7 +1122,13 @@ namespace CrewChiefV4.iRacing
                          || lastSessionPhase == SessionPhase.Checkered)
                     {
                         // for fixed number of laps, as soon as we've completed the required number end the session
-                        if ((!fixedTimeSession && sessionNumberOfLaps > 0 && laps == sessionNumberOfLaps) || (fixedTimeSession && previousLapsCompleted != laps))
+                        if ((!fixedTimeSession 
+                                && sessionNumberOfLaps > 0 
+                                && leaderCar != null
+                                && leaderCar.FinishStatus == Driver.FinishState.Finished 
+                                && previousLapsCompleted != laps) 
+                            || (fixedTimeSession 
+                                && previousLapsCompleted != laps))
                         {
                             Console.WriteLine("Finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
