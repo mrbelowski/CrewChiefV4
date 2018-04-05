@@ -273,6 +273,24 @@
 			"enabledMessageTypes": "NONE"
 		},
 		{
+			"carClassEnum": "KART_X30_SENIOR",
+			"rf2ClassNames": ["Iame_Senior_X30"],
+			"minTyreCircumference": 0.72,
+			"maxTyreCircumference": 1.22,
+			"spotterVehicleLength": 2.0,
+			"spotterVehicleWidth": 1.5,
+			"enabledMessageTypes": "NONE"
+		},
+		{
+			"carClassEnum": "KART_X30_RENTAL",
+			"rf2ClassNames": ["Rental Kart"],
+			"minTyreCircumference": 0.72,
+			"maxTyreCircumference": 1.22,
+			"spotterVehicleLength": 2.0,
+			"spotterVehicleWidth": 1.5,
+			"enabledMessageTypes": "NONE"
+		},
+		{
 			"carClassEnum": "LMP1",
 			"raceroomClassIds": [1714],
 			"pCarsClassNames": ["LMP1"],
