@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.NumberProcessing;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -8,13 +9,6 @@ using System.Threading.Tasks;
 
 namespace CrewChiefV4.ACS
 {
-    // this is just a placeholder. KMR will provide appID, address, port & API token 
-    // either by the user copy/pasting some magic String or via some Python call. CC 
-    // will connect to the provided URL and send a 'go' package to register to receive
-    // events. Not sure if these are keep-alives sent by the server (as suggested in forum).
-    // Also need a "user guid". No idea what this is.
-    // As all this shizzle is event based, need to check that a given event only triggers
-    // a single message from the remote.
     public class KMREventListener : EventListener
     {
         private Boolean listening = false;
@@ -24,7 +18,15 @@ namespace CrewChiefV4.ACS
         public String appId = "";
         public String apiToken = "";
 
+        private Dictionary<String, String> kmrMessageFragmentToCCMessageFragment = new Dictionary<String, String>();
+
         private UTF32Encoding encoder = new UTF32Encoding(false, false);
+
+        public KMREventListener()
+        {
+            // set up kmr message fragment to CC message fragment mappings
+            kmrMessageFragmentToCCMessageFragment.Add("", "");
+        }
 
         public override void activate(Object activationData)
         {
@@ -85,6 +87,7 @@ namespace CrewChiefV4.ACS
                             if (type == (byte)2)
                             {
                                 List<String> decodedData = decodeDataMessage(bytes);
+                                
                             }
                         }
                         catch (Exception e)
@@ -94,6 +97,43 @@ namespace CrewChiefV4.ACS
                         }
                     }
                 }).Start();
+            }
+        }
+
+        private void playMessageFromReceivedData(List<String> receivedData)
+        {
+            // only allow the parse to succeed if we have something more than just a number or a timespan
+            Boolean gotSomeText = false;
+            List<MessageFragment> ccMessageContents = new List<MessageFragment>();
+            foreach (String kmrFragment in receivedData)
+            {
+                String ccFragement;
+                if (kmrMessageFragmentToCCMessageFragment.TryGetValue(kmrFragment, out ccFragement))
+                {
+                    gotSomeText = true;
+                    ccMessageContents.Add(MessageFragment.Text(ccFragement));
+                }
+                else
+                {
+                    // try and parse this as a number
+                    try 
+                    {
+                        ccMessageContents.Add(MessageFragment.Integer(int.Parse(kmrFragment)));
+                    }
+                    catch (Exception) 
+                    {
+                        try 
+                        {
+                            ccMessageContents.Add(MessageFragment.Time(
+                                new TimeSpanWrapper(TimeSpan.Parse(kmrFragment), Precision.AUTO_LAPTIMES)));
+                        }
+                        catch (Exception) {}
+                    }
+                }
+            }
+            if (gotSomeText) 
+            {
+                audioPlayer.playMessage(new QueuedMessage("KMR_event", ccMessageContents, 0, null));
             }
         }
 

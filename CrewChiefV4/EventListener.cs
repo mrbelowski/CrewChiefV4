@@ -15,7 +15,7 @@ namespace CrewChiefV4
         protected Boolean enabled = false;
         protected Boolean active = false;
 
-        private AudioPlayer audioPlayer;
+        protected AudioPlayer audioPlayer;
 
         // some events will trigger messages:
         public void setAudioPlayer(AudioPlayer audioPlayer)
