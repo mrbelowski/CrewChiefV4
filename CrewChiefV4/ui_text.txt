@@ -599,3 +599,6 @@ http_event_listener_port_help = REST server listen port
 
 enable_http_listener = Enable HTTP API
 enable_http_listener_help = Enable HTTP API
+
+enable_acs_kmr_listener = Enable KMR for ACS
+enable_acs_kmr_listener_help = Receive events from KissMyRank servers (experimental)

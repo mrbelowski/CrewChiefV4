@@ -3238,5 +3238,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_http_listener"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_acs_kmr_listener {
+            get {
+                return ((bool)(this["enable_acs_kmr_listener"]));
+            }
+            set {
+                this["enable_acs_kmr_listener"] = value;
+            }
+        }
     }
 }

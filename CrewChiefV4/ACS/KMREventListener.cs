@@ -18,6 +18,8 @@ namespace CrewChiefV4.ACS
         public String appId = "";
         public String apiToken = "";
 
+        private Boolean kmrListenerEnabled = UserSettings.GetUserSettings().getBoolean("enable_acs_kmr_listener");
+
         private Dictionary<String, String> kmrMessageFragmentToCCMessageFragment = new Dictionary<String, String>();
 
         private UTF32Encoding encoder = new UTF32Encoding(false, false);
@@ -30,6 +32,10 @@ namespace CrewChiefV4.ACS
 
         public override void activate(Object activationData)
         {
+            if (!kmrListenerEnabled)
+            {
+                return;
+            }
             if (active)
             {
                 deactivate();
@@ -57,6 +63,10 @@ namespace CrewChiefV4.ACS
         
         private void sendRegisterUDPPacket(String address, int port, Boolean start)
         {
+            if (!kmrListenerEnabled)
+            {
+                return;
+            }
             if ((registered && start) || (!registered && !start))
             {
                 return;
