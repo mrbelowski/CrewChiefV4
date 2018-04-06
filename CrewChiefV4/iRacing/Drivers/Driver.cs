@@ -46,6 +46,7 @@ namespace CrewChiefV4.iRacing
         public enum FinishState
         {
             Unknown,
+            Retired,
             Finished
         }
         // Heuristically derived during Race position ordering, not coming from game data.
