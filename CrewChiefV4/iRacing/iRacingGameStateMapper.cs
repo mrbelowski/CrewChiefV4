@@ -627,7 +627,7 @@ namespace CrewChiefV4.iRacing
                     continue;
                 }
 
-                if (driver.CurrentResults.IsOut)
+                if (driver.CurrentResults.IsOut || driver.FinishStatus == Driver.FinishState.Retired)
                 {
                     // remove this driver from the set immediately
                     if (!currentGameState.retriedDriverNames.Contains(driver.Name))
