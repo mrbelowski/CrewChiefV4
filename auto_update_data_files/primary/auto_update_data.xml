@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.2.4 updated 20 March 2018</title>
-<version>4.9.2.4</version>
+<title>Crew Chief 4.9.2.5 updated 07 April 2018</title>
+<version>4.9.2.5</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
