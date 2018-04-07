@@ -208,6 +208,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.2.5: Added commands to check self pace, ou can ask "how's my self gap/how's my personal pace/how's my delta best" to see how you're doing relative to your own best lap; iRacing - fixed pit stall countdown; fix finish position reporting; added ability to specify if car class has speed limiter via "limiterAvailable" class field; allow turning pit voice commands to remove them from grammar "Enable iRacing pit stop commands";  rF2 - enable pit stall countdown (doesn't work on some tracks, disabled on ovals);  add option to force Rolling Start start type.
+
 Version 4.9.2.4: Fixed incorrect car class data in R3E online practice and qualifying sessions; logging readability improvements; small AMS performance improvement; some code cleanup
 
 Version 4.9.2.3: Hotfix for Assetto Corsa broken spotter
