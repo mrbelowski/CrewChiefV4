@@ -16,7 +16,7 @@ secondary update sources) can still be updated. All downloads from this source w
 
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier-->
-<soundpackversion>144</soundpackversion>
+<soundpackversion>145</soundpackversion>
 <basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 <!-- sound pack update from base to version 121 will use this update pack -->
 <updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
@@ -32,7 +32,7 @@ secondary update sources) can still be updated. All downloads from this source w
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>144</soundpackversion>
+	<soundpackversion>145</soundpackversion>
 	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
