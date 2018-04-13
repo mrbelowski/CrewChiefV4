@@ -17,6 +17,7 @@ namespace CrewChiefV4.iRacing
             _sessionId = -1;
             _driver = null;
             _paceCar = null;
+            _raceSessionInProgress = false;
         }
 
         enum RaceEndState {NONE, WAITING_TO_CROSS_LINE, FINISHED}
@@ -47,9 +48,12 @@ namespace CrewChiefV4.iRacing
         private Driver _paceCar;
         public Driver PaceCar { get { return _paceCar; } }
 
-
         private readonly List<Driver> _drivers;
         public List<Driver> Drivers { get { return _drivers; } }
+
+        private Dictionary<int, double> _carIdxToGameTimeOffTrack = new Dictionary<int, double>();
+        private bool _raceSessionInProgress;
+        private const double SECONDS_OFF_WORLD_TILL_RETIRED = 20.0;
 
         private void UpdateDriverList(string sessionInfo, bool reloadDrivers)
         {
@@ -132,7 +136,6 @@ namespace CrewChiefV4.iRacing
 
         private void GetRaceResults(string sessionInfo)
         {
-
             for (int position = 1; position <= _drivers.Count; position++)
             {                
                 string idValue = "0";
@@ -166,11 +169,19 @@ namespace CrewChiefV4.iRacing
 
         private void CalculateLivePositions(iRacingData telemetry)
         {
+            if (!_raceSessionInProgress)
+            {
+                this._carIdxToGameTimeOffTrack.Clear();
+            }
+
+            // Assume race has finished.
+            this._raceSessionInProgress = false;
+
             // In a race that is not yet in checkered flag mode,
             // Live positions are determined from track position (total lap distance)
             // Any other conditions (race finished, P, Q, etc), positions are ordered as result positions
             SessionFlags flag = (SessionFlags)telemetry.SessionFlags;
-            if (this.SessionData.EventType == "Race" && flag.HasFlag(SessionFlags.Checkered))
+            if (this.SessionData.SessionType == "Race" && flag.HasFlag(SessionFlags.Checkered))
             {
                 //we need to check if player is the first(p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
                 if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.IsNewLap)
@@ -191,17 +202,130 @@ namespace CrewChiefV4.iRacing
             {
                 raceEndState = RaceEndState.NONE;
             }
-            if (this.SessionData.EventType == "Race" && raceEndState != RaceEndState.FINISHED)
+            if (this.SessionData.SessionType == "Race" && raceEndState != RaceEndState.FINISHED
+                && (flag.HasFlag(SessionFlags.StartGo) || flag.HasFlag(SessionFlags.StartHidden /*yellow?*/))
+                && telemetry.PlayerCarPosition > 0)
             {
+                this._raceSessionInProgress = true;
+                // When driver disconnects (or in other cases I am not sure about yet), TotalLapDitance
+                // gets ceiled to the nearest integer.  Because of that, for the reminder of a lap such car is
+                // ahead of others by TotalLapDitance, which results incorrect positions announced.
+                //
+                // To mitigate that, try detecting such cases and using floor(TotalLapDitance) instead.
+                //
+                // Also, try detecting cars that finished and use YAML reported positions instead for those.
+
+                // First, figure out if it is lap or timed race.
+                Driver leaderFinished = null;
+                if (this.SessionData.IsLimitedSessionLaps)
+                {
+                    var numSessLaps = -1;
+                    if (int.TryParse(SessionData.RaceLaps, out numSessLaps))
+                    {
+                        // See if any driver completed numSessLaps, and save the leader's s/f crossing time.
+                        foreach (var driver in _drivers)
+                        {
+                            if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                            {
+                                continue;
+                            }
+
+                            if (driver.Live.LiveLapsCompleted >= numSessLaps)
+                            {
+                                if (leaderFinished == null
+                                    || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
+                                {
+                                    // This guy crossed last lap earlier, save him as candiate.
+                                    leaderFinished = driver;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // TODO: timed race leader.
+                    /*SessionData.RaceTime
+                    // See if any driver crossed s/f line after race time expired.
+                    foreach (var driver in _drivers)
+                    {
+                        if (driver.Live.LiveLapsCompleted >= numSessLaps)
+                        {
+                            if (leaderFinishedTime == -1.0f
+                                || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinishedTime)
+                            {
+                                // This guy crossed last lap earlier, save him as candiate.
+                                leaderFinishedTime = driver.Live.GameTimeWhenLastCrossedSFLine;
+                                leaderFinished = driver;
+                            }
+                        }
+                    }*/
+                }
+
+                foreach (var driver in _drivers)
+                {
+                    if (Math.Floor(driver.Live.TotalLapDistanceCorrected) > driver.Live.LiveLapsCompleted)
+                    { 
+                        driver.Live.TotalLapDistanceCorrected = (float)driver.Live.LiveLapsCompleted;
+                    }
+
+                    if (leaderFinished != null 
+                        && driver.Live.GameTimeWhenLastCrossedSFLine >= leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
+                    {
+                        // Everyone, who crosses s/f after leader finished, finishes too.
+                        driver.FinishStatus = Driver.FinishState.Finished;
+                    }
+
+                    // Try detecting disconnects.  Save last time seen off world, and mark as disconnect if
+                    // stays off world long enough.
+                    if (driver.FinishStatus == Driver.FinishState.Unknown)  // Don't do any processing for Finished and Retired.
+                    {
+                        if (driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
+                        {
+                            var timeSinceOffWorld = -1.0;
+                            if (!this._carIdxToGameTimeOffTrack.TryGetValue(driver.Id, out timeSinceOffWorld))
+                            {
+                                this._carIdxToGameTimeOffTrack.Add(driver.Id, telemetry.SessionTime);
+                            }
+                            else if (telemetry.SessionTime - timeSinceOffWorld > SECONDS_OFF_WORLD_TILL_RETIRED)
+                            {
+                                driver.FinishStatus = Driver.FinishState.Retired;
+                                Console.WriteLine("Marking driver: " + driver.Name + " as retired.");
+                            }
+                        }
+                        else
+                        {
+                            this._carIdxToGameTimeOffTrack.Remove(driver.Id);
+                        }
+                    }
+
+                    if (driver.FinishStatus == Driver.FinishState.Retired
+                        && driver.Live.TrackSurface != TrackSurfaces.NotInWorld)
+                    {
+                        driver.FinishStatus = Driver.FinishState.Unknown;
+                        Console.WriteLine("Driver: " + driver.Name + " was previously marked as retired, shown up again.");
+                    }
+
+                }
+
                 // Determine live position from lapdistance
                 int pos = 1;
-                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistance))
+                foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                 {
                     if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                     {
                         continue;
                     }
-                    driver.Live.Position = pos;
+                    if (driver.FinishStatus == Driver.FinishState.Finished)
+                    {
+                        // If driver finished, use position info from YAML.  This should work nicely,
+                        // because all the drivers are ordered by TotalLapDistanceCorrected.
+                        driver.Live.Position = driver.CurrentResults.Position;
+                    }
+                    else
+                    {
+                        driver.Live.Position = pos;
+                    }
                     pos++;
                 }
             }

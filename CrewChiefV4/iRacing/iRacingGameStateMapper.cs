@@ -13,6 +13,7 @@ namespace CrewChiefV4.iRacing
     {
         public static String playerName = null;
         Driver playerCar = null;
+        Driver leaderCar = null;
         public iRacingGameStateMapper()
         {
 
@@ -95,6 +96,15 @@ namespace CrewChiefV4.iRacing
             {
                 playerCar = shared.Driver;
                 playerName = playerCar.Name.ToLower();
+            }
+
+            foreach (var driver in shared.Drivers)
+            {
+                if (driver.Live.Position == 1)
+                {
+                    leaderCar = driver;
+                    break;
+                }
             }
 
             Validator.validate(playerName);
@@ -617,7 +627,7 @@ namespace CrewChiefV4.iRacing
                     continue;
                 }
 
-                if (driver.CurrentResults.IsOut)
+                if (driver.CurrentResults.IsOut || driver.FinishStatus == Driver.FinishState.Retired)
                 {
                     // remove this driver from the set immediately
                     if (!currentGameState.retriedDriverNames.Contains(driver.Name))
@@ -1112,7 +1122,15 @@ namespace CrewChiefV4.iRacing
                          || lastSessionPhase == SessionPhase.Checkered)
                     {
                         // for fixed number of laps, as soon as we've completed the required number end the session
-                        if ((!fixedTimeSession && sessionNumberOfLaps > 0 && laps == sessionNumberOfLaps) || (fixedTimeSession && previousLapsCompleted != laps))
+                        if ((!fixedTimeSession 
+                                && (sessionNumberOfLaps > 0 
+                                    && leaderCar != null && leaderCar.FinishStatus == Driver.FinishState.Finished
+                                    && previousLapsCompleted != laps)  // If leader finished, and we just completed new lap
+                                // Or, if player is leading and marked as finished.  This check shouldn't be necessary, 
+                                // but it looks like there are weird delays in iR data, so this is corner case for player leading and finishing first.
+                                || (playerCar.Live.Position == 1 && playerCar.FinishStatus == Driver.FinishState.Finished)) 
+                            || (fixedTimeSession 
+                                && previousLapsCompleted != laps))
                         {
                             Console.WriteLine("Finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);
