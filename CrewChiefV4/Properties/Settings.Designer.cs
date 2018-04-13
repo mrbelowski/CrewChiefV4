@@ -3214,5 +3214,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_iracing_pit_stop_commands"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool force_rf2_rolling_start {
+            get {
+                return ((bool)(this["force_rf2_rolling_start"]));
+            }
+            set {
+                this["force_rf2_rolling_start"] = value;
+            }
+        }
     }
 }

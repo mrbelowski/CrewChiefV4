@@ -593,3 +593,6 @@ add_additional_fuel_help = The amount of extra fuel(liters or gallons) you want 
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
 iracing_invalidate_cut_track_laps = Disable this if you don't want the app to invalidate laps where you cut the track.
+
+force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
+force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.
