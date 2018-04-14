@@ -621,7 +621,7 @@ namespace CrewChiefV4
         #endregion
 
         public System.Windows.Forms.TextBox consoleTextBox;
-        private System.Windows.Forms.Button startApplicationButton;
+        public System.Windows.Forms.Button startApplicationButton;
         private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.Button saveConsoleOutputButton;
         private System.Windows.Forms.ListBox buttonActionSelect;

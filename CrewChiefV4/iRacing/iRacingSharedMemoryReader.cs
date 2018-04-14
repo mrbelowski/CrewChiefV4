@@ -11,7 +11,6 @@ namespace CrewChiefV4.iRacing
 {
     public class iRacingSharedMemoryReader : GameDataReader
     {
-
         private iRacingSDK sdk = null;
         private Sim sim = null; 
         private Boolean initialised = false;
@@ -58,8 +57,10 @@ namespace CrewChiefV4.iRacing
         }
         public override void DumpRawGameData()
         {
+            Console.WriteLine("TRACE_DEBUG DumpRawGameData: dumpToFile - " + dumpToFile + " dataToDump - " + dataToDump + " filenameToDump - " + filenameToDump + " count - " + dataToDump?.Count);
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
+                Console.WriteLine("TRACE_DEBUG DumpRawGameData: Attempting dump.");
                 SerializeObject(dataToDump.ToArray<iRacingStructDumpWrapper>(), filenameToDump);
             }
         }
@@ -106,10 +107,6 @@ namespace CrewChiefV4.iRacing
 
         protected override Boolean InitialiseInternal()
         {
-            if (dumpToFile)
-            {
-                dataToDump = new List<iRacingStructDumpWrapper>();
-            }
             lock (this)
             {
                 if (!initialised)
@@ -129,6 +126,11 @@ namespace CrewChiefV4.iRacing
                         if (sdk.IsConnected())
                         {
                             initialised = true;
+                            if (dumpToFile)
+                            {
+                                dataToDump = new List<iRacingStructDumpWrapper>();
+                            }
+;
                             int attempts = 0;
                             const int maxAttempts = 99;
 
@@ -255,9 +257,7 @@ namespace CrewChiefV4.iRacing
                     initialised = false;
                     Console.WriteLine("Disconnected from iRacing Shared Memory");
                 }
-
             }
-
         }
     }
 }

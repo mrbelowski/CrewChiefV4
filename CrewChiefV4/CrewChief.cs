@@ -970,6 +970,7 @@ namespace CrewChiefV4
                 audioPlayer.stopMonitor();
                 audioPlayer.disablePearlsOfWisdom = false;
             }
+            Console.WriteLine("TRACE_DEBUG Run: gameDataReader - " + gameDataReader);
             if (gameDataReader != null)
             {
                 if (gameDataReader.dumpToFile)
