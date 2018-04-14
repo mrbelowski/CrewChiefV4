@@ -1288,6 +1288,7 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
                 this.spotterNameBox.Enabled = false;
+                this.recordSession.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
 
@@ -1343,6 +1344,7 @@ namespace CrewChiefV4
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
+                this.recordSession.Enabled = true;
                 DriverTrainingService.completeRecordingPaceNotes();
                 DriverTrainingService.stopPlayingPaceNotes();
             }
@@ -1358,6 +1360,11 @@ namespace CrewChiefV4
 
         private void stopApp(object sender, FormClosedEventArgs e)
         {
+            if (this.recordSession.Checked)
+            {
+                // This will be reenabled once dump to file succeeds or fails.
+                this.startApplicationButton.Enabled = false;
+            }
             stopApp();
         }
 
@@ -1367,6 +1374,9 @@ namespace CrewChiefV4
             Boolean record = false;
             if (filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
             {
+                // This will be reenabled once file is deserialized or on failure.
+                this.startApplicationButton.Enabled = false;
+
                 filenameToRun = filenameTextbox.Text;
                 if (this.playbackInterval.Text.Length > 0)
                 {

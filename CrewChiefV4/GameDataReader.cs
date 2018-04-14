@@ -94,13 +94,16 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to write raw game data: " + ex.Message);
                 Console.WriteLine("Stack trace: " + ex.StackTrace);
             }
+            finally
+            {
+                MainWindow.instance.startApplicationButton.Enabled = true;
+            }
         }
 
         protected T DeSerializeObject<T>(string fileName)
         {
             Console.WriteLine("About to load recorded game data from file " + fileName + " - this may take a while");
             if (string.IsNullOrEmpty(fileName)) { return default(T); }
-
 
             T objectOut = default(T);
 
@@ -140,6 +143,10 @@ namespace CrewChiefV4
             catch (Exception ex)
             {
                 Console.WriteLine("Unable to read raw game data: " + ex.Message);
+            }
+            finally
+            {
+                MainWindow.instance.startApplicationButton.Enabled = true;
             }
 
             return objectOut;
