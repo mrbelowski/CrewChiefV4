@@ -145,6 +145,11 @@ namespace CrewChiefV4.Events
             get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
         }
 
+        public override List<SessionPhase> applicableSessionPhases
+        {
+            get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Countdown, SessionPhase.Finished, SessionPhase.Checkered }; }
+        }
+
         public override void clearState()
         {
             timeOfLastLimiterWarning = DateTime.MinValue;
