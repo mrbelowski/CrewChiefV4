@@ -1360,11 +1360,6 @@ namespace CrewChiefV4
 
         private void stopApp(object sender, FormClosedEventArgs e)
         {
-            if (this.recordSession.Checked)
-            {
-                // This will be reenabled once dump to file succeeds or fails.
-                this.startApplicationButton.Enabled = false;
-            }
             stopApp();
         }
 
@@ -1402,6 +1397,12 @@ namespace CrewChiefV4
 
         private void stopApp()
         {
+            if (this.recordSession.Checked)
+            {
+                // This will be reenabled once dump to file succeeds or fails.
+                this.startApplicationButton.Enabled = false;
+            }
+
             runListenForChannelOpenThread = false;
             runListenForButtonPressesThread = false;
             crewChief.stop();
