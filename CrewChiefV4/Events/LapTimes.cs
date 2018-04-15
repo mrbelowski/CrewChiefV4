@@ -1064,6 +1064,14 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
+                            // Fors self pace case, announce last lap time.
+                            // TODO: implement more info where we announce personal best lap time.
+                            if (lastLapTime > 0)
+                            {
+                                audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
+                                    MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                            }
+
                             switch (lastLapSelfRating)
                             {
                                 case LastLapRating.PERSONAL_BEST:
@@ -1200,7 +1208,6 @@ namespace CrewChiefV4.Events
                                     break;
                             }
                         }
-
                     }
 
                     // TODO: wrap this in a try-catch until I work out why the array indices are being screwed up in online races (yuk...)
