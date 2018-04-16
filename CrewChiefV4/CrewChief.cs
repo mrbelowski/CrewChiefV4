@@ -809,15 +809,7 @@ namespace CrewChiefV4
                                     Console.WriteLine("Session lap times:");
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
-                                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
-                                {
-                                    // For reasons I don't understand yet, it looks like position in iRacing is jumping during the last lap.
-                                    // It appears to be correct on session finish though.
-                                    if (currentGameState.SessionData.ClassPosition != previousGameState.SessionData.ClassPosition)
-                                    {
-                                        Console.WriteLine("Finish position updated from: {0}  to: {1}", previousGameState.SessionData.ClassPosition, currentGameState.SessionData.ClassPosition);
-                                    }
-                                }
+
                                 sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
                                     previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
                                     previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
