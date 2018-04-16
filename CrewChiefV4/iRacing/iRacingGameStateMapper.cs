@@ -439,22 +439,16 @@ namespace CrewChiefV4.iRacing
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
 
-
             currentGameState.SessionData.NumCarsOverall = shared.Drivers.Count;
 
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown && currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 currentGameState.SessionData.OverallPosition = playerCar.CurrentResults.QualifyingPosition;
             }
-            else if (currentGameState.SessionData.SessionPhase == SessionPhase.Finished && currentGameState.SessionData.SessionType == SessionType.Race)
-            {
-                // Once we cross s/f line, use live position instead of delayed one, it seems to be correct.
-                currentGameState.SessionData.OverallPosition = playerCar.Live.Position;
-            }
             else
             {
-                currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null ?
-                    getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now)
+                currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null
+                    ? getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now)
                     : playerCar.Live.Position;
             }
 

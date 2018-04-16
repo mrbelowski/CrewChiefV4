@@ -809,14 +809,7 @@ namespace CrewChiefV4
                                     Console.WriteLine("Session lap times:");
                                     Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
-                                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
-                                {
-                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                        previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
-                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
-                                }
-                                else
+                                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                                 {
                                     // For reasons I don't understand yet, it looks like position in iRacing is jumping during the last lap.
                                     // It appears to be correct on session finish though.
@@ -824,11 +817,11 @@ namespace CrewChiefV4
                                     {
                                         Console.WriteLine("Finish position updated from: {0}  to: {1}", previousGameState.SessionData.ClassPosition, currentGameState.SessionData.ClassPosition);
                                     }
-                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                        previousGameState.SessionData.SessionStartClassPosition, currentGameState.SessionData.ClassPosition,
-                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
                                 }
+                                sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
+                                    previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
+                                    previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                    currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
 
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;
@@ -885,7 +878,7 @@ namespace CrewChiefV4
                                 }
                             }
                             // TODO: for AC free practice sessions, the SessionRunningTime is set to 1 hour in the mapper and stays there so this block never triggers
-                            else if (!sessionFinished && previousGameState != null &&
+                            else if (previousGameState != null &&
                                         (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                                             currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
@@ -894,22 +887,26 @@ namespace CrewChiefV4
                                                 gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
                                             currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
                             {
-                                if (spotter != null)
+                                if (!sessionFinished)
                                 {
-                                    if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
+                                    if (spotter != null)
                                     {
-                                        spotter.pause();
+                                        if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
+                                        {
+                                            spotter.pause();
+                                        }
+                                        else
+                                        {
+                                            spotter.unpause();
+                                        }
                                     }
-                                    else
+                                    if (currentGameState.SessionData.IsNewLap)
                                     {
-                                        spotter.unpause();
+                                        currentGameState.display();
                                     }
+                                    stateCleared = false;
                                 }
-                                if (currentGameState.SessionData.IsNewLap)
-                                {
-                                    currentGameState.display();
-                                }
-                                stateCleared = false;
+                                // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
@@ -921,20 +918,23 @@ namespace CrewChiefV4
                                         }
                                     }
                                 }
-                                if (DriverTrainingService.isPlayingPaceNotes)
+                                if (!sessionFinished)
                                 {
-                                    DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
-                                        currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
-                                }
-                                if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
-                                {
-                                    Console.WriteLine("********** starting spotter***********");
-                                    spotter.clearState();
-                                    startSpotterThread();
-                                }
-                                else if (spotterIsRunning && !GlobalBehaviourSettings.spotterEnabled)
-                                {
-                                    runSpotterThread = false;
+                                    if (DriverTrainingService.isPlayingPaceNotes)
+                                    {
+                                        DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
+                                            currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
+                                    }
+                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
+                                    {
+                                        Console.WriteLine("********** starting spotter***********");
+                                        spotter.clearState();
+                                        startSpotterThread();
+                                    }
+                                    else if (spotterIsRunning && !GlobalBehaviourSettings.spotterEnabled)
+                                    {
+                                        runSpotterThread = false;
+                                    }
                                 }
                             }
                             else if (spotter != null)
