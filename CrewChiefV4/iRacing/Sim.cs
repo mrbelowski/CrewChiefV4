@@ -244,22 +244,24 @@ namespace CrewChiefV4.iRacing
                 }
                 else
                 {
-                    // TODO: timed race leader.
-                    /*SessionData.RaceTime
                     // See if any driver crossed s/f line after race time expired.
                     foreach (var driver in _drivers)
                     {
-                        if (driver.Live.LiveLapsCompleted >= numSessLaps)
+                        if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                         {
-                            if (leaderFinishedTime == -1.0f
-                                || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinishedTime)
+                            continue;
+                        }
+
+                        if (driver.Live.GameTimeWhenLastCrossedSFLine > SessionData.RaceTime)
+                        {
+                            if (leaderFinished == null
+                                || driver.Live.GameTimeWhenLastCrossedSFLine < leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
                             {
-                                // This guy crossed last lap earlier, save him as candiate.
-                                leaderFinishedTime = driver.Live.GameTimeWhenLastCrossedSFLine;
+                                // This guy crossed lap past session end time earlier, save him as a candiate.
                                 leaderFinished = driver;
                             }
                         }
-                    }*/
+                    }
                 }
 
                 foreach (var driver in _drivers)
@@ -318,8 +320,13 @@ namespace CrewChiefV4.iRacing
                     }
                     if (driver.FinishStatus == Driver.FinishState.Finished)
                     {
-                        // If driver finished, use position info from YAML.  This should work nicely,
-                        // because all the drivers are ordered by TotalLapDistanceCorrected.
+                        // If driver finished, use position info from YAML.  This should not mess up order of drivers
+                        // behind, because all the drivers are ordered by TotalLapDistanceCorrected.
+                        //
+                        // Note: there's a delay in driver.CurrentResults.Position actually becoming current, so 
+                        // this might be incorrect for a while.  However, iRacingGameStateMapper.getRacePosition
+                        // should take care of that part.
+                        // TODO: figure out the actual delay, it seems higher than 1 second.
                         driver.Live.Position = driver.CurrentResults.Position;
                     }
                     else
