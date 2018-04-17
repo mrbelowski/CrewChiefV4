@@ -343,8 +343,8 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionType == SessionType.Race)
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
-                        Console.WriteLine("Opponents best sectors = " + lapAndSectorsComparisonData[1].ToString("0.000") + ", " + lapAndSectorsComparisonData[2].ToString("0.000") + ", " + lapAndSectorsComparisonData[3].ToString("0.000"));
-                        Console.WriteLine("Player best sectors = " + currentGameState.SessionData.PlayerBestSector1Time.ToString("0.000") + ", " + currentGameState.SessionData.PlayerBestSector2Time.ToString("0.000") + ", " + currentGameState.SessionData.PlayerBestSector3Time.ToString("0.000"));
+                        Console.WriteLine("Opponents best sectors = " + lapAndSectorsComparisonData[1].ToString("0.000") + ",    " + lapAndSectorsComparisonData[2].ToString("0.000") + ",    " + lapAndSectorsComparisonData[3].ToString("0.000"));
+                        Console.WriteLine("Player best sectors = " + currentGameState.SessionData.PlayerBestSector1Time.ToString("0.000") + ",    " + currentGameState.SessionData.PlayerBestSector2Time.ToString("0.000") + ",    " + currentGameState.SessionData.PlayerBestSector3Time.ToString("0.000"));
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
