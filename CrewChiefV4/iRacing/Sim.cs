@@ -309,11 +309,12 @@ namespace CrewChiefV4.iRacing
                     {
                         continue;
                     }
-                    if (driver.FinishStatus == Driver.FinishState.Finished)
+                    if (driver.FinishStatus == Driver.FinishState.Finished
+                        && driver.Live.TrackSurface == TrackSurfaces.NotInWorld)
                     {
-                        // If driver finished, use position info from YAML.  This should not mess up order of drivers
-                        // behind, because all the drivers are ordered by TotalLapDistanceCorrected.
-                        // Note: There seems to be a delay of ~2.5s between s/f line crossing and YAML update, so position is incorrect for some time.
+                        // When finished driver disconnects, use game reported position.
+                        // This should not mess up order of drivers following, because all the
+                        // drivers are ordered by TotalLapDistanceCorrected.
                         driver.Live.Position = driver.CurrentResults.Position;
                     }
                     else
