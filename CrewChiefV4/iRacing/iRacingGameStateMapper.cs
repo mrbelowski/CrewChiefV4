@@ -457,6 +457,10 @@ namespace CrewChiefV4.iRacing
                     && currentGameState.SessionData.SessionType == SessionType.Race
                     && previousGameState.SessionData.OverallPosition != playerCar.Live.Position)
                 {
+                    // Note: resolved position at crossing the finish line will be incorrect if any of the cars ahead are disconnected.
+                    // Scoring position will be incorrect for ~2.5secs after crossing s/f, if it changed during the last lap.
+                    // Lastly, as long as we detect finish within the PositionChangeLag, finishing position will be correct (should be)
+                    // because disconnecters only affect race pos after s/f (due to lap dist falling behind player's).
                     Console.WriteLine("Finished position ambigous:  prev overall: {0}  curr overall (delayed): {1}  results pos: {2}  curr resolved: {3}",
                         previousGameState.SessionData.OverallPosition,
                         currentGameState.SessionData.OverallPosition,
