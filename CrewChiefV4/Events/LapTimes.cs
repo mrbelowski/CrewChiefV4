@@ -1612,11 +1612,11 @@ namespace CrewChiefV4.Events
             }
             if (messageFragments.Count > 0)
             {
-                Console.WriteLine("Player best sectors " + playerSector1.ToString("0.000") + ", " + playerSector2.ToString("0.000") + ", " + playerSector3.ToString("0.000"));
-                Console.WriteLine("Opponent best sectors " + comparisonSector1.ToString("0.000") + ", " + comparisonSector2.ToString("0.000") + ", " + comparisonSector3.ToString("0.000"));
+                Console.WriteLine("Player best sectors " + playerSector1.ToString("0.000") + ",    " + playerSector2.ToString("0.000") + ",    " + playerSector3.ToString("0.000"));
+                Console.WriteLine("Opponent best sectors " + comparisonSector1.ToString("0.000") + ",    " + comparisonSector2.ToString("0.000") + ",    " + comparisonSector3.ToString("0.000"));
                 Console.WriteLine("S1 delta (-ve = player faster) = " + (playerSector1 - comparisonSector1).ToString("0.000") +
-                    " S2 delta  = " + (playerSector2 - comparisonSector2).ToString("0.000") +
-                    " S3 delta  = " + (playerSector3 - comparisonSector3).ToString("0.000"));
+                    "    S2 delta  = " + (playerSector2 - comparisonSector2).ToString("0.000") +
+                    "    S3 delta  = " + (playerSector3 - comparisonSector3).ToString("0.000"));
                 Console.WriteLine("Resolved delta message: " + String.Join(", ", messageFragments));
             }
             return messageFragments;

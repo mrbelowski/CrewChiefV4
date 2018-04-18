@@ -19,6 +19,7 @@ namespace CrewChiefV4.iRacing
             _paceCar = null;
             _raceSessionInProgress = false;
             _leaderFinished = null;
+            _gameTimeWhenWhiteFlagTriggered = -1.0;
         }
 
         enum RaceEndState {NONE, WAITING_TO_CROSS_LINE, FINISHED}
@@ -55,6 +56,7 @@ namespace CrewChiefV4.iRacing
         private Dictionary<int, double> _carIdxToGameTimeOffTrack = new Dictionary<int, double>();
         private bool _raceSessionInProgress = false;
         private Driver _leaderFinished = null;
+        private double _gameTimeWhenWhiteFlagTriggered = -1.0;
         private const double SECONDS_OFF_WORLD_TILL_RETIRED = 20.0;
 
         private void UpdateDriverList(string sessionInfo, bool reloadDrivers)
@@ -218,6 +220,11 @@ namespace CrewChiefV4.iRacing
                 //
                 // Also, try detecting cars that finished and use YAML reported positions instead for those.
 
+                if (this._gameTimeWhenWhiteFlagTriggered == -1.0 && flag.HasFlag(SessionFlags.White))
+                {
+                    this._gameTimeWhenWhiteFlagTriggered = telemetry.SessionTime;
+                }
+
                 // Correct the distances
                 foreach (var driver in _drivers)
                 {
@@ -263,22 +270,24 @@ namespace CrewChiefV4.iRacing
                     }
                     else
                     {
-                        // See if leading driver crossed s/f line after race time expired.
-                        // TODO: looks like there's one more lap after time expired, need to think how to fix this.
-                        foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
+                        if (this._gameTimeWhenWhiteFlagTriggered != -1.0)
                         {
-                            if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                            // See if leading driver crossed s/f line after race time expired.
+                            foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                             {
-                                continue;
-                            }
+                                if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                                {
+                                    continue;
+                                }
 
-                            if (driver.Live.GameTimeWhenLastCrossedSFLine > SessionData.RaceTime)
-                            {
-                                _leaderFinished = driver;
-                            }
+                                if (driver.Live.GameTimeWhenLastCrossedSFLine > this._gameTimeWhenWhiteFlagTriggered)
+                                {
+                                    _leaderFinished = driver;
+                                }
 
-                            // Only check assumed leader by lapdist (skipping spectators etc).
-                            break;
+                                // Only check assumed leader by lapdist (skipping lapped vehicles, spectators etc).
+                                break;
+                            }
                         }
                     }
                 }
@@ -354,6 +363,7 @@ namespace CrewChiefV4.iRacing
             {
                 // Clear out cached finished leader.  Ugly data model, ugly workarounds :(
                 _leaderFinished = null;
+                _gameTimeWhenWhiteFlagTriggered = -1.0;
 
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 foreach (var driver in _drivers)
