@@ -240,55 +240,23 @@ namespace CrewChiefV4.iRacing
                 }
 
                 // If leader has not finished yet, check if he just did.
-                if (_leaderFinished == null)
+                if (_leaderFinished == null && this._gameTimeWhenWhiteFlagTriggered != -1.0)
                 {
-                    // First, figure out if it is lap or timed race.
-                    if (this.SessionData.IsLimitedSessionLaps)
+                    // See if leading driver crossed s/f line after race time expired.
+                    foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                     {
-                        var numSessLaps = -1;
-                        if (int.TryParse(SessionData.RaceLaps, out numSessLaps))
+                        if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                         {
-                            // See if any driver completed numSessLaps, and save the leader's s/f crossing time.
-                            foreach (var driver in _drivers)
-                            {
-                                if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
-                                {
-                                    continue;
-                                }
-
-                                if (driver.Live.LiveLapsCompleted >= numSessLaps)
-                                {
-                                    if (_leaderFinished == null
-                                        || driver.Live.GameTimeWhenLastCrossedSFLine < _leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
-                                    {
-                                        // This guy crossed last lap earlier, save him as candiate.
-                                        _leaderFinished = driver;
-                                    }
-                                }
-                            }
+                            continue;
                         }
-                    }
-                    else
-                    {
-                        if (this._gameTimeWhenWhiteFlagTriggered != -1.0)
+
+                        if (driver.Live.GameTimeWhenLastCrossedSFLine > this._gameTimeWhenWhiteFlagTriggered)
                         {
-                            // See if leading driver crossed s/f line after race time expired.
-                            foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
-                            {
-                                if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
-                                {
-                                    continue;
-                                }
-
-                                if (driver.Live.GameTimeWhenLastCrossedSFLine > this._gameTimeWhenWhiteFlagTriggered)
-                                {
-                                    _leaderFinished = driver;
-                                }
-
-                                // Only check assumed leader by lapdist (skipping lapped vehicles, spectators etc).
-                                break;
-                            }
+                            _leaderFinished = driver;
                         }
+
+                        // Only check assumed leader by lapdist (skipping lapped vehicles, spectators etc).
+                        break;
                     }
                 }
 
