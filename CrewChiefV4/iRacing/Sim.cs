@@ -309,12 +309,11 @@ namespace CrewChiefV4.iRacing
                     {
                         continue;
                     }
-                    if (driver.FinishStatus == Driver.FinishState.Finished
-                        && ((telemetry.SessionTime - driver.Live.GameTimeWhenLastCrossedSFLine) > 2.5))
+                    if (driver.FinishStatus == Driver.FinishState.Finished)
                     {
                         // If driver finished, use position info from YAML.  This should not mess up order of drivers
                         // behind, because all the drivers are ordered by TotalLapDistanceCorrected.
-                        // There seems to be a delay of ~2.5s between s/f line crossing and YAML update, so wait it out.
+                        // Note: There seems to be a delay of ~2.5s between s/f line crossing and YAML update, so position is incorrect for some time.
                         driver.Live.Position = driver.CurrentResults.Position;
                     }
                     else
