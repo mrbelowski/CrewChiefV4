@@ -455,9 +455,9 @@ namespace CrewChiefV4.iRacing
                     && previousGameState.SessionData.SessionPhase != SessionPhase.Finished
                     && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                     && currentGameState.SessionData.SessionType == SessionType.Race
-                    && previousGameState.SessionData.OverallPosition != currentGameState.SessionData.OverallPosition)
+                    && previousGameState.SessionData.OverallPosition != playerCar.Live.Position)
                 {
-                    Console.WriteLine("Finished position possibly ambigous:  prev overall: {0}  curr overall (delayed): {1}  results pos: {2}  curr resolved: {3}",
+                    Console.WriteLine("Finished position ambigous:  prev overall: {0}  curr overall (delayed): {1}  results pos: {2}  curr resolved: {3}",
                         previousGameState.SessionData.OverallPosition,
                         currentGameState.SessionData.OverallPosition,
                         playerCar.CurrentResults.Position,
