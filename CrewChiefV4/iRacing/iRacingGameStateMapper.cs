@@ -33,7 +33,7 @@ namespace CrewChiefV4.iRacing
         Dictionary<string, DateTime> lastActiveTimeForOpponents = new Dictionary<string, DateTime>();
         DateTime nextOpponentCleanupTime = DateTime.MinValue;
         TimeSpan opponentCleanupInterval = TimeSpan.FromSeconds(3);
-        
+
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
@@ -41,7 +41,7 @@ namespace CrewChiefV4.iRacing
         private DateTime lastTimeEngineOilPressureWarning = DateTime.MaxValue;
         private DateTime lastTimeEngineFuelPressureWarning = DateTime.MaxValue;
 
-        private Boolean invalidateCutTrackLaps = UserSettings.GetUserSettings().getBoolean("iracing_invalidate_cut_track_laps"); 
+        private Boolean invalidateCutTrackLaps = UserSettings.GetUserSettings().getBoolean("iracing_invalidate_cut_track_laps");
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -918,9 +918,9 @@ namespace CrewChiefV4.iRacing
             //}
             //else
             //{
-                currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarMyIncidentCount;                
+            currentGameState.PenaltiesData.NumPenalties = shared.Telemetry.PlayerCarMyIncidentCount;
             //}
-            
+
 
             currentGameState.TyreData.FrontLeftPressure = shared.Telemetry.LFcoldPressure;
             currentGameState.TyreData.FrontRightPressure = shared.Telemetry.RFcoldPressure;
@@ -928,8 +928,57 @@ namespace CrewChiefV4.iRacing
             currentGameState.TyreData.RearRightPressure = shared.Telemetry.RRcoldPressure;
             //Console.WriteLine("Speed:" + playerCar.SpeedKph);
 
-
             // Console.WriteLine("Session running time = " + currentGameState.SessionData.SessionRunningTime + " type = " + currentGameState.SessionData.SessionType + " phase " + currentGameState.SessionData.SessionPhase + " run time = " + currentGameState.SessionData.SessionTotalRunTime);
+
+            if (previousGameState != null
+                && currentGameState.SessionData.SessionType == SessionType.Race
+                && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
+                && previousGameState.SessionData.SessionPhase != SessionPhase.Finished)
+            {
+                var driverInfo = new List<Tuple<int, string, int, double, double, Driver.FinishState>>();
+                foreach (var driver in shared.Drivers)
+                {
+                    if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                    {
+                        continue;
+                    }
+
+                    var delayedPosition = -1;
+                    OpponentData od = null;
+                    if (currentGameState.OpponentData.TryGetValue(driver.Id.ToString(), out od))
+                    {
+                        delayedPosition = od.OverallPosition;
+                    }
+                    else if (driver.Id == playerCar.Id)  // Player.
+                    {
+                        delayedPosition = currentGameState.SessionData.OverallPosition;
+                    }
+                    else  // Retired
+                    {
+                        delayedPosition = driver.Live.Position;
+                    }
+
+                    driverInfo.Add(new Tuple<int, string, int, double, double, Driver.FinishState>(
+                        delayedPosition,
+                        driver.Name,
+                        driver.Live.LiveLapsCompleted,
+                        driver.Live.TotalLapDistance,
+                        driver.Live.TotalLapDistanceCorrected,
+                        driver.FinishStatus));
+                }
+
+                Console.WriteLine("Estimated standings:");
+                foreach (var driver in driverInfo.OrderBy(d => d.Item1))
+                {
+                    Console.WriteLine("P:{0}  Name:{1}  LLC:{2}  TLD:{3}  TLDC:{4}  FS:{5}",
+                        driver.Item1,
+                        driver.Item2,
+                        driver.Item3,
+                        driver.Item4,
+                        driver.Item5,
+                        driver.Item6);
+                }
+            }
 
             if (currentGameState.SessionData.TrackDefinition != null)
             {
