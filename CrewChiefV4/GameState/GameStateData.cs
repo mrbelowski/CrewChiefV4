@@ -422,6 +422,8 @@ namespace CrewChiefV4.GameState
 
         public int StrengthOfField = 0;
 
+        public Boolean IsLastLap = false;
+
         public SessionData()
         {
             SessionTimesAtEndOfSectors.Add(1, -1);

@@ -588,11 +588,11 @@ enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop comma
 enable_tight_fuel_calc = Enable tight fuel calculations
 enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
 
-add_additional_fuel = Additional fuel to add to finish the race.
-add_additional_fuel_help = The amount of extra fuel(liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
+add_additional_fuel = Additional fuel to add to finish the race
+add_additional_fuel_help = The amount of extra fuel (liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
-iracing_invalidate_cut_track_laps = Disable this if you don't want the app to invalidate laps where you cut the track.
+iracing_invalidate_cut_track_laps_help = Disable this if you don't want the app to invalidate laps where you cut the track.
 
 force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
 force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.

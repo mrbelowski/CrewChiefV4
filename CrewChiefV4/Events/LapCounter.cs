@@ -368,11 +368,11 @@ namespace CrewChiefV4.Events
             if (GameStateData.useManualFormationLap)
             {
                 // when the session is first cleared, this will be true if we're using manual formation laps:
-                if (GameStateData.onManualFormationLap) 
+                if (GameStateData.onManualFormationLap)
                 {
                     if (!playedPreLightsRollingStartWarning &&
                         !currentGameState.PitData.InPitlane &&
-                        currentGameState.SessionData.SessionType == SessionType.Race && 
+                        currentGameState.SessionData.SessionType == SessionType.Race &&
                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                          currentGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                          currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk))
@@ -520,7 +520,10 @@ namespace CrewChiefV4.Events
 
             // looks like belt n braces but there's a bug in R3E DTM 2015 race 1 which has a number of laps and a time remaining
             if (!currentGameState.SessionData.SessionHasFixedTime &&
-                currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 0)
+                currentGameState.SessionData.SessionType == SessionType.Race &&
+                currentGameState.SessionData.IsNewLap &&
+                currentGameState.SessionData.CompletedLaps > 0 &&
+                currentGameState.SessionData.SessionPhase != SessionPhase.Finished)
             {
                 // a new lap has been started in race mode
                 if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
@@ -529,7 +532,8 @@ namespace CrewChiefV4.Events
                     audioPlayer.disablePearlsOfWisdom = true;
                 }
                 int position = currentGameState.SessionData.ClassPosition;
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1)
+                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1
+                    || currentGameState.SessionData.IsLastLap)  // Note: this might trigger in timed race.  Is this desired?
                 {
                     Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)

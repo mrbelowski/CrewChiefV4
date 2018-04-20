@@ -15,13 +15,11 @@ namespace CrewChiefV4.iRacing
         Driver playerCar = null;
         Driver leaderCar = null;
         public iRacingGameStateMapper()
-        {
-
-        }
+        {}
 
         public override void versionCheck(Object memoryMappedFileStruct)
         {
-            // no version number in r3e shared data so this is a no-op
+            // no version number in iRacing shared data so this is a no-op
         }
 
         public override void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
@@ -434,6 +432,15 @@ namespace CrewChiefV4.iRacing
             else if (previousGameState != null && !previousGameState.SessionData.Flag.HasFlag(FlagEnum.BLUE) && flag.HasFlag(SessionFlags.Blue))
             {
                 currentGameState.SessionData.Flag = FlagEnum.BLUE;
+            }
+            if (flag.HasFlag(SessionFlags.White))
+            {
+                if (GlobalBehaviourSettings.useAmericanTerms)
+                {
+                    currentGameState.SessionData.Flag = FlagEnum.WHITE;
+                }
+
+                currentGameState.SessionData.IsLastLap = true;
             }
             currentGameState.SessionData.CompletedLaps = playerCar.Live.LiveLapsCompleted;
             //TODO validate laptimes
