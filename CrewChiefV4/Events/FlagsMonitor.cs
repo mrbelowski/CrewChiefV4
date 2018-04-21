@@ -360,8 +360,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
-            // TODO: what about white flag if American terms are enabled?
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !GlobalBehaviourSettings.useAmericanTerms)
+            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
             {
                 if (currentGameState.Now > disableWhiteFlagUntil)
                 {
