@@ -57,10 +57,8 @@ namespace CrewChiefV4.iRacing
         }
         public override void DumpRawGameData()
         {
-            Console.WriteLine("TRACE_DEBUG DumpRawGameData: dumpToFile - " + dumpToFile + " dataToDump - " + dataToDump + " filenameToDump - " + filenameToDump + " count - " + dataToDump?.Count);
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
-                Console.WriteLine("TRACE_DEBUG DumpRawGameData: Attempting dump.");
                 SerializeObject(dataToDump.ToArray<iRacingStructDumpWrapper>(), filenameToDump);
             }
         }
