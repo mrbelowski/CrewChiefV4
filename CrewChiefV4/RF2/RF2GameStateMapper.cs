@@ -782,10 +782,14 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.IsPitCrewReady = true;
 
             // This sometimes fires under Countdown, so limit to phases when message might make sense.
-            if (csd.SessionPhase == SessionPhase.Green
-                || csd.SessionPhase == SessionPhase.FullCourseYellow
-                || csd.SessionPhase == SessionPhase.Formation)
+            if ((csd.SessionPhase == SessionPhase.Green
+                    || csd.SessionPhase == SessionPhase.FullCourseYellow
+                    || csd.SessionPhase == SessionPhase.Formation)
+                && shared.extended.mInRealtimeFC == 1 && shared.scoring.mScoringInfo.mInRealtime == 1  // Limit this to Realtime only.
+                && csd.SessionType == SessionType.Race)  // Also, limit to race only, this helps with back and forth between returing to pits via exit to monitor.  
+            {                                            // There's also no real critical rush in quali or practice to stress about.
                 cgs.PitData.IsPitCrewDone = (rFactor2Constants.rF2PitState)playerScoring.mPitState == rFactor2Constants.rF2PitState.Exiting;
+            }
 
             if (csd.IsNewLap)
             {
