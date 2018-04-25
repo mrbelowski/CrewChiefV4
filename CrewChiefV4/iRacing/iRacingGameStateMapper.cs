@@ -1188,11 +1188,7 @@ namespace CrewChiefV4.iRacing
                     if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow
                          || lastSessionPhase == SessionPhase.Checkered)
                     {
-                        if ((leaderCar != null && leaderCar.FinishStatus == Driver.FinishState.Finished
-                                && previousLapsCompleted != laps)  // If leader finished, and we just completed new lap
-                                // Or, if player is leading and marked as finished.  This check shouldn't be necessary, 
-                                // but it looks like there are weird delays in iR data, so this is corner case for player leading and finishing first.
-                            || (playerCar.Live.Position == 1 && playerCar.FinishStatus == Driver.FinishState.Finished))
+                        if (playerCar.FinishStatus == Driver.FinishState.Finished)
                         {
                             Console.WriteLine("Finished - completed " + laps + " laps (was " + previousLapsCompleted + "), session running time = " +
                                 thisSessionRunningTime);

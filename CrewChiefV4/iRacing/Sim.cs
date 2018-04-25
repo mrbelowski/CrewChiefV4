@@ -187,13 +187,15 @@ namespace CrewChiefV4.iRacing
             SessionFlags flag = (SessionFlags)telemetry.SessionFlags;
             if (this.SessionData.SessionType == "Race" && flag.HasFlag(SessionFlags.Checkered))
             {
-                //we need to check if player is the first(p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
+                // We need to check if player is the first (p1) to cross the s/f line as HasCrossedSFLine is only true for 1 tick 
                 if (raceEndState == RaceEndState.WAITING_TO_CROSS_LINE || _driver.Live.IsNewLap)
                 {
-                    if (_driver.Live.IsNewLap)
+                    if (this._driver.Live.IsNewLap)
                     {
                         Console.WriteLine("Player just crossed line to finish race");
                         raceEndState = RaceEndState.FINISHED;
+
+                        this._driver.FinishStatus = Driver.FinishState.Finished;
                     }
                 }
                 else if (raceEndState == RaceEndState.NONE)
@@ -250,6 +252,13 @@ namespace CrewChiefV4.iRacing
                             continue;
                         }
 
+                        if (driver.Id == this._driver.Id)
+                        {
+                            // It appears that player s/f crossing time is set before the actual s/f crossing.  So, for player "Finished" state 
+                            // rely on logic that waits for new lap crossing.
+                            continue;
+                        }
+
                         if (driver.Live.GameTimeWhenLastCrossedSFLine > this._gameTimeWhenWhiteFlagTriggered)
                         {
                             _leaderFinished = driver;
@@ -266,6 +275,13 @@ namespace CrewChiefV4.iRacing
                     if (_leaderFinished != null 
                         && driver.Live.GameTimeWhenLastCrossedSFLine >= _leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
                     {
+                        if (driver.Id == this._driver.Id)
+                        {
+                            // It appears that player s/f crossing time is set before the actual s/f crossing.  So, for player "Finished" state 
+                            // rely on logic that waits for new lap crossing.
+                            continue;
+                        }
+
                         // Everyone, who crosses s/f after leader finished, finishes too.
                         driver.FinishStatus = Driver.FinishState.Finished;
                     }
@@ -307,6 +323,7 @@ namespace CrewChiefV4.iRacing
                 {
                     if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
                     {
+                        driver.Live.Position = 1001;  // Make it obvious those guys are not tracked.
                         continue;
                     }
                     if (driver.FinishStatus == Driver.FinishState.Finished
@@ -316,6 +333,11 @@ namespace CrewChiefV4.iRacing
                         // This should not mess up order of drivers following, because all the
                         // drivers are ordered by TotalLapDistanceCorrected.
                         driver.Live.Position = driver.CurrentResults.Position;
+
+                        if (driver.Live.Position == 0)
+                        {
+                            driver.Live.Position = 1000;  // Game sends nonsense again.  Mark those so that they don't interfere with sorting anywhere.
+                        }
                     }
                     else
                     {
@@ -335,6 +357,7 @@ namespace CrewChiefV4.iRacing
                 {
                     if (driver.IsSpectator || driver.IsPacecar)
                     {
+                        driver.Live.Position = 1001;  // Make it obvious those guys are not tracked.
                         continue;
                     }
                     if (telemetry.CarIdxPosition[driver.Id] > 0 && raceEndState != RaceEndState.FINISHED)
@@ -353,6 +376,16 @@ namespace CrewChiefV4.iRacing
                     else
                     {
                         driver.Live.ClassPosition = driver.CurrentResults.ClassPosition;
+                    }
+
+                    if (driver.Live.Position == 0)
+                    {
+                        driver.Live.Position = 1000;  // Game sends nonsense again.  Mark those so that they don't interfere with sorting anywhere.
+                    }
+
+                    if (driver.Live.ClassPosition == 0)
+                    {
+                        driver.Live.ClassPosition = 1000;  // Game sends nonsense again.  Mark those so that they don't interfere with sorting anywhere.
                     }
                 }
             }
