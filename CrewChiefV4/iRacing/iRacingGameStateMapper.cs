@@ -454,26 +454,27 @@ namespace CrewChiefV4.iRacing
             }
             else
             {
-                currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null
+                currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && previousGameState != null
                     ? getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now)
                     : playerCar.Live.Position;
 
-                if (previousGameState != null
-                    && previousGameState.SessionData.SessionPhase != SessionPhase.Finished
-                    && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
-                    && currentGameState.SessionData.SessionType == SessionType.Race
-                    && previousGameState.SessionData.OverallPosition != playerCar.Live.Position)
-                {
-                    // Note: resolved position at crossing the finish line will be incorrect if any of the cars ahead are disconnected.
-                    // Scoring position will be incorrect for ~2.5secs after crossing s/f, if it changed during the last lap.
-                    // Lastly, as long as we detect finish within the PositionChangeLag, finishing position will be correct (should be)
-                    // because disconnecters only affect race pos after s/f (due to lap dist falling behind player's).
-                    Console.WriteLine("Finished position ambigous:  prev overall: {0}  curr overall (delayed): {1}  results pos: {2}  curr resolved: {3}",
-                        previousGameState.SessionData.OverallPosition,
-                        currentGameState.SessionData.OverallPosition,
-                        playerCar.CurrentResults.Position,
-                        playerCar.Live.Position);
-                }
+            }
+
+            if (previousGameState != null
+                && previousGameState.SessionData.SessionPhase != SessionPhase.Finished
+                && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
+                && currentGameState.SessionData.SessionType == SessionType.Race
+                && previousGameState.SessionData.OverallPosition != playerCar.Live.Position)
+            {
+                // Note: resolved position at crossing the finish line will be incorrect if any of the cars ahead are disconnected.
+                // Scoring position will be incorrect for ~2.5secs after crossing s/f, if it changed during the last lap.
+                // Lastly, as long as we detect finish within the PositionChangeLag, finishing position will be correct (should be)
+                // because disconnecters only affect race pos after s/f (due to lap dist falling behind player's).
+                Console.WriteLine("Finished position ambigous:  prev overall: {0}  curr overall (delayed): {1}  results pos: {2}  curr resolved: {3}",
+                    previousGameState.SessionData.OverallPosition,
+                    currentGameState.SessionData.OverallPosition,
+                    playerCar.CurrentResults.Position,
+                    playerCar.Live.Position);
             }
 
             if (currentGameState.SessionData.SessionType != SessionType.Race)
@@ -714,7 +715,8 @@ namespace CrewChiefV4.iRacing
                             {
                                 currentOpponentLapValid = false;
                             }
-                            int currentOpponentOverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousOpponentOverallPosition > 0 ?
+
+                            int currentOpponentOverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && previousOpponentOverallPosition > 0 ?
                                 getRacePosition(opponentDataKey, previousOpponentOverallPosition, driver.Live.Position, currentGameState.Now)
                                 : driver.Live.Position;
 

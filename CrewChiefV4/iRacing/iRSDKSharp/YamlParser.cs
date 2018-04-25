@@ -199,6 +199,7 @@ namespace iRSDKSharp
             int dataStringLength = data.Length;
             int pointerPosition = 0;
 
+            String extractedString = null;
             fixed (char* pathptrFixed = path.ToCharArray())
             {
                 int pathdepth = 0;
@@ -275,6 +276,27 @@ namespace iRSDKSharp
                                                 len = valuelen;
                                                 ok = true;
                                                 end = true;
+
+                                                if (ok && val != null && len > 0)
+                                                {
+                                                    if (pointerPosition + len > dataStringLength)
+                                                    {
+                                                        Console.WriteLine("Pointer position error in Yaml parser");
+                                                        if (!dumpedYamlInThisSession)
+                                                        {
+                                                            dumpedYamlInThisSession = true;
+                                                            Console.WriteLine("Path = " + path);
+                                                            Console.WriteLine("Data = " + data);
+                                                            Console.WriteLine("Critical error in YAML parser");
+                                                            Console.WriteLine("PLEASE FORWARD ALL OF THIS CONSOLE LOG TO THE CC DEV TEAM");
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        extractedString = new string(val, 0, len);
+                                                    }
+                                                }
+
                                                 break;
                                             }
                                         }
@@ -318,27 +340,6 @@ namespace iRSDKSharp
                 }
             }
 
-            String extractedString = null;
-
-            if (ok && val != null && len > 0)
-            {
-                if (pointerPosition + len > dataStringLength)
-                {
-                    Console.WriteLine("Pointer position error in Yaml parser");
-                    if (!dumpedYamlInThisSession)
-                    {
-                        dumpedYamlInThisSession = true;
-                        Console.WriteLine("Path = " + path);
-                        Console.WriteLine("Data = " + data);
-                        Console.WriteLine("Critical error in YAML parser");
-                        Console.WriteLine("PLEASE FORWARD ALL OF THIS CONSOLE LOG TO THE CC DEV TEAM");
-                    }
-                }
-                else
-                {
-                    extractedString = new string(val, 0, len);
-                }
-            }
             dataHandle.Free();
             pathHandle.Free();
             return extractedString;
