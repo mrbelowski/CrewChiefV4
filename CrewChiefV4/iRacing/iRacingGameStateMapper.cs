@@ -457,7 +457,6 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase != SessionPhase.Finished && previousGameState != null
                     ? getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, playerCar.Live.Position, currentGameState.Now)
                     : playerCar.Live.Position;
-
             }
 
             if (previousGameState != null
