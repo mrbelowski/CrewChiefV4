@@ -494,7 +494,7 @@ namespace CrewChiefV4.iRacing
 
             int currentSector = playerCar.Live.CurrentSector;
 
-            if (playerCar.Car.DriverPitTrkPct != -1.0f)
+            if (playerCar.Car.DriverPitTrkPct != -1.0f && currentGameState.SessionData.TrackDefinition != null)
             {
                 currentGameState.PitData.PitBoxPositionEstimate = currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Car.DriverPitTrkPct;
                 if ((previousGameState != null && currentGameState.PitData.PitBoxPositionEstimate != previousGameState.PitData.PitBoxPositionEstimate)
@@ -565,7 +565,7 @@ namespace CrewChiefV4.iRacing
                     shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp);
             }
 
-            currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance);
+            currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition != null ? Math.Abs(currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance) : -1.0f;
             currentGameState.PositionAndMotionData.CarSpeed = (float)shared.Telemetry.Speed;
 
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.Telemetry.Pitch;
@@ -725,7 +725,7 @@ namespace CrewChiefV4.iRacing
                             {
                                 currentOpponentSector = previousOpponentSectorNumber;
                             }
-                            float currentOpponentLapDistance = isInWorld ? currentGameState.SessionData.TrackDefinition.trackLength * driver.Live.CorrectedLapDistance : 0;
+                            float currentOpponentLapDistance = isInWorld && currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.trackLength * driver.Live.CorrectedLapDistance : 0;
                             float currentOpponentSpeed = isInWorld ? (float)driver.Live.Speed : 0;
                             //Console.WriteLine("lapdistance:" + currentOpponentLapDistance);
                             currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentLapsCompleted, currentOpponentSpeed, currentGameState.Now);
@@ -753,8 +753,8 @@ namespace CrewChiefV4.iRacing
                                         previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                         currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
-                                        shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks, currentOpponentSpeed,
-                                        driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap);
+                                        shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1.0f,
+                                        currentOpponentSpeed, driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap);
 
                             if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
@@ -823,7 +823,7 @@ namespace CrewChiefV4.iRacing
                         currentGameState.OpponentData.Remove(opponentDataKey);
                     }
                 }
-                if (createNewDriver)
+                if (createNewDriver && currentGameState.SessionData.TrackDefinition != null)
                 {
                     if (!driver.CurrentResults.IsOut || !driver.IsPacecar || !driver.IsSpectator)
                     {
@@ -1100,7 +1100,7 @@ namespace CrewChiefV4.iRacing
             }
             else
             {
-                Console.WriteLine(sessionString);
+                Console.WriteLine("Unrecognized SessionType: " + sessionString);
             }
             return SessionType.Unavailable;
         }
