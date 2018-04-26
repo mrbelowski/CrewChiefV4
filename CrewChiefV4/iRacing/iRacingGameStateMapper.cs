@@ -208,6 +208,11 @@ namespace CrewChiefV4.iRacing
                 if (lastSessionPhase != currentGameState.SessionData.SessionPhase)
                 {
                     Console.WriteLine("New session phase, was " + lastSessionPhase + " now " + currentGameState.SessionData.SessionPhase);
+                    if (previousGameState != null && previousGameState.SessionData.TrackDefinition == null)
+                    {
+                        Console.WriteLine("New session phase without new session initialized previously.");
+                    }
+
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green && lastSessionPhase != SessionPhase.Finished)
                     {
                         currentGameState.SessionData.JustGoneGreen = true;
