@@ -807,13 +807,25 @@ namespace CrewChiefV4
                                 if (displaySessionLapTimes)
                                 {
                                     Console.WriteLine("Session lap times:");
-                                    Console.WriteLine(String.Join(";", currentGameState.SessionData.formattedPlayerLapTimes));
+                                    Console.WriteLine(String.Join(";    ", currentGameState.SessionData.formattedPlayerLapTimes));
                                 }
 
-                                sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                    previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
-                                    previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                    currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+                                {
+                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
+                                        previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
+                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                }
+                                else
+                                {
+                                    // In iRacing, use currentGameState.SessionData.ClassPosition.  I don't completely understand what is going on, but sometimes position is very wrong right
+                                    // before finishing line.
+                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
+                                        previousGameState.SessionData.SessionStartClassPosition, currentGameState.SessionData.ClassPosition,
+                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                }
 
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;
