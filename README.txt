@@ -208,7 +208,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.2.7: Allow pit countdown past session finish (for cooldown lap); iRacing - improve live position tracking; iRacing - improve retired vehicle detection; iRacing - race finish position improvements; iRacing - finishing position detection improvements; iRacing - reliability fixes; rF2 - suppress pit messages while in garage/monitor
+Version 4.9.2.7: Allow pit countdown past session finish (for cooldown lap); iRacing - improve live position tracking; iRacing - improve retired vehicle detection; iRacing - race finish position improvements; iRacing - finishing position detection improvements; iRacing - reliability fixes; rF2 - suppress pit messages while in garage/monitor; AC - fixed crash bug on 2-sector tracks; some additional checks to handle delayed opponent position data
 
 Version 4.9.2.5: Added commands to check self pace, you can ask "how's my self gap" / "how's my personal pace" / "how's my delta best" to see how you're doing relative to your own best lap; iRacing - fixed pit stall countdown; iRacing - fix finish position reporting; iRacing - allow pit voice commands to be enabled or disabled ("Enable iRacing pit stop commands", default enabled). Disabling them removes them from the phrases the speech recognition engine listens for, potentially improving accuracy for other phrases as well as preventing false positives; added ability to specify if car class has speed limiter via "limiterAvailable" class field; rF2 - enable pit stall countdown (doesn't work on some tracks, disabled on ovals); rF2 - add option to force Rolling Start start type.
 
