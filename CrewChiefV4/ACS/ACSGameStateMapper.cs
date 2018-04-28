@@ -1285,7 +1285,14 @@ namespace CrewChiefV4.assetto
 
                     if (currentGameState.SessionData.IsNewLap)
                     {
-                        currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack];
+                        float lastEndLapSessionTime;
+                        if (currentGameState.SessionData.SessionTimesAtEndOfSectors.TryGetValue(numberOfSectorsOnTrack, out lastEndLapSessionTime))
+                        {
+                            if (lastEndLapSessionTime > 0)
+                            {
+                                currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - lastEndLapSessionTime;
+                            }
+                        }
                         currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
                         if (numberOfSectorsOnTrack == 3)
                         {
