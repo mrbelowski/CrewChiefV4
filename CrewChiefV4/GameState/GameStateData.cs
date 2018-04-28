@@ -2313,13 +2313,38 @@ namespace CrewChiefV4.GameState
         {
             if (OpponentData.Count != 0)
             {
+                String opponentWithSamePositionAsPlayer = null;
+                int opponentsWithSamePositionAsPlayer = 0;
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
                     int opponentPosition = previousTick ? entry.Value.ClassPositionAtPreviousTick : entry.Value.ClassPosition;
-                    if (opponentPosition == position && CarData.IsCarClassEqual(entry.Value.CarClass, carClass))
+                    if (CarData.IsCarClassEqual(entry.Value.CarClass, carClass))
                     {
-                        return entry.Key;
+                        if (opponentPosition == position)
+                        {
+                            return entry.Key;
+                        }
+                        else if (!previousTick && opponentPosition == this.SessionData.ClassPosition &&
+                            this.SessionData.SessionType == SessionType.Race && this.SessionData.SessionRunningTime > 30)
+                        {
+                            // there's an opponent with the same position as the player - usually caused by delays in updating
+                            // opponent position data when the player passes an opponent car. Once the race start data have settled
+                            // down, this opponent key might be the one we want. Note that we can't use this hack when inspecting 
+                            // opponents' previous positions (previousTick == false) because the player position will be a tick newer
+                            if (opponentsWithSamePositionAsPlayer == 0)
+                            {
+                                opponentWithSamePositionAsPlayer = entry.Key;
+                            }
+                            opponentsWithSamePositionAsPlayer++;
+                        }
                     }
+                }
+                // if we reach this point there's no opponent car in that position, so we might want to return an opponent who has the same
+                // position as the player
+                if ((position == this.SessionData.ClassPosition + 1 || position == this.SessionData.ClassPosition - 1) && opponentsWithSamePositionAsPlayer == 1)
+                {
+                    // we've asked for a position that's +/-1 from the player's position, there is one opponent with the same position as player, so return him
+                    return opponentWithSamePositionAsPlayer;
                 }
             }
             return null;
@@ -2329,6 +2354,8 @@ namespace CrewChiefV4.GameState
         {
             if (OpponentData.Count != 0)
             {
+                String opponentWithSamePositionAsPlayer = null;
+                int opponentsWithSamePositionAsPlayer = 0;
                 foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
                 {
                     int opponentPosition = previousTick ? entry.Value.OverallPositionAtPreviousTick : entry.Value.OverallPosition;
@@ -2336,6 +2363,26 @@ namespace CrewChiefV4.GameState
                     {
                         return entry.Key;
                     }
+                    else if (!previousTick && opponentPosition == this.SessionData.OverallPosition && 
+                        this.SessionData.SessionType == SessionType.Race && this.SessionData.SessionRunningTime > 30)
+                    {
+                        // there's an opponent with the same position as the player - usually caused by delays in updating
+                        // opponent position data when the player passes an opponent car. Once the race start data have settled
+                        // down, this opponent key might be the one we want. Note that we can't use this hack when inspecting 
+                        // opponents' previous positions (previousTick == false) because the player position will be a tick newer
+                        if (opponentsWithSamePositionAsPlayer == 0)
+                        {
+                            opponentWithSamePositionAsPlayer = entry.Key;
+                        }
+                        opponentsWithSamePositionAsPlayer++;
+                    }
+                }
+                // if we reach this point there's no opponent car in that position, so we might want to return an opponent who has the same
+                // position as the player
+                if ((position == this.SessionData.OverallPosition + 1 || position == this.SessionData.OverallPosition - 1) && opponentsWithSamePositionAsPlayer == 1)
+                {
+                    // we've asked for a position that's +/-1 from the player's position, there is one opponent with the same position as player, so return him
+                    return opponentWithSamePositionAsPlayer;
                 }
             }
             return null;
