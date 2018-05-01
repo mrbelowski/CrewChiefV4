@@ -75,8 +75,9 @@ namespace CrewChiefV4.Events
         private Random random = new Random();
 
         private float currentGapInFront;
-
         private float currentGapBehind;
+        private int currentLapsDeltaBehind;
+        private int currentLapsDeltaInFront;
 
         private Boolean enableGapMessages = UserSettings.GetUserSettings().getBoolean("enable_gap_messages");
 
@@ -85,7 +86,6 @@ namespace CrewChiefV4.Events
         private Boolean isLast;
 
         private Boolean isRace;
-        
         private Boolean playedGapBehindForThisLap;
 
         private int closeAheadMinSectorWait;
@@ -165,6 +165,8 @@ namespace CrewChiefV4.Events
             }
             currentGapBehind = -1;
             currentGapInFront = -1;
+            currentLapsDeltaBehind = -1;
+            currentLapsDeltaInFront = -1;
             isLast = false;
             isLeading = false;
             isRace = false;
@@ -245,6 +247,8 @@ namespace CrewChiefV4.Events
             isRace = currentGameState.SessionData.SessionType == SessionType.Race;
             currentGapInFront = currentGameState.SessionData.TimeDeltaFront;
             currentGapBehind = currentGameState.SessionData.TimeDeltaBehind;
+            currentLapsDeltaBehind = currentGameState.SessionData.LapsDeltaBehind;
+            currentLapsDeltaInFront = currentGameState.SessionData.LapsDeltaFront;
 
             if (currentGameState.SessionData.IsNewLap)
             {
@@ -548,7 +552,7 @@ namespace CrewChiefV4.Events
                 if (isRace && CrewChief.readOpponentDeltasForEveryLap && currentGameState.SessionData.CompletedLaps > 0)
                 {
                     if (currentGameState.SessionData.ClassPosition > 1 && currentGameState.SessionData.IsNewLap) 
-                    {                            
+                    {
                         if (currentGapInFront > 0.05)
                         {
                             OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);

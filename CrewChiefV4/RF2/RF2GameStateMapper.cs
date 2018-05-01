@@ -1460,13 +1460,12 @@ namespace CrewChiefV4.rFactor2
                 }
 
                 if (opponent.OverallPosition == csd.OverallPosition + 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
+                    csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime).Item2;  // TODO_TIME_DELTA: why is this called in populateDerivedSessionData and here?
 
-                // Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
+                // TODO_TIME_DELTA: Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
                 if (opponent.OverallPosition == csd.OverallPosition - 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime);
+                    csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime).Item2;
 
-                
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0.0f
                     && (opponent.CurrentBestLapTime < csd.OpponentsLapTimeSessionBestOverall
