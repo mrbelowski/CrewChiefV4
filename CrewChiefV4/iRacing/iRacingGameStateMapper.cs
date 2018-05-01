@@ -650,7 +650,7 @@ namespace CrewChiefV4.iRacing
                     continue;
                 }
 
-                if (driver.CurrentResults.IsOut || driver.FinishStatus == Driver.FinishState.Retired)
+                if (driver.CurrentResults.IsOut/* || driver.FinishStatus == Driver.FinishState.Retired*/)  // Don't consider retired heuristics for now, more data needed to understand why it triggers in wrong cases.
                 {
                     // remove this driver from the set immediately
                     if (!currentGameState.retriedDriverNames.Contains(driver.Name))
