@@ -1515,11 +1515,12 @@ namespace CrewChiefV4.assetto
                                     
                                     if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition + 1 && !useCarLeaderBoardPosition)
                                     {
-                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                                        // TODO_TIME_DELTA: why is this called in populateDerivedSessionData and here?
+                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;
                                     }
                                     if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition - 1 && !useCarLeaderBoardPosition)
                                     {
-                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;
                                     }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;

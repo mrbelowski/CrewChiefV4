@@ -873,10 +873,10 @@ namespace CrewChiefV4.rFactor1
                 }
 
                 if (opponent.OverallPosition == currentGameState.SessionData.OverallPosition + 1 && currentGameState.SessionData.SessionType == SessionType.Race)
-                    currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                    currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;  // TODO_TIME_DELTA: why is this called in populateDerivedSessionData and here?
 
                 if (opponent.OverallPosition == currentGameState.SessionData.OverallPosition - 1 && currentGameState.SessionData.SessionType == SessionType.Race)
-                    currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                    currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;
 
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0 && (opponent.CurrentBestLapTime < currentGameState.SessionData.OpponentsLapTimeSessionBestOverall || 
