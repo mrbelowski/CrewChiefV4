@@ -16,7 +16,7 @@ namespace CrewChiefV4.Events
         public static String folderGapInFrontIsNow = "timings/gap_in_front_is_now";
 
         public static String folderHeIsSlowerThroughCorner = "timings/he_is_slower_through_corner";
-        public static String folderHeIsFasterThroughCorner = "timings/he_is_faster_through_corner"; 
+        public static String folderHeIsFasterThroughCorner = "timings/he_is_faster_through_corner";
         public static String folderHeIsSlowerEnteringCorner = "timings/he_is_slower_entering_corner";
         public static String folderHeIsFasterEnteringCorner = "timings/he_is_faster_entering_corner";
 
@@ -28,7 +28,7 @@ namespace CrewChiefV4.Events
         public static String folderTheGapTo = "timings/the_gap_to";   // "the gap to..."
         public static String folderAheadIsIncreasing = "timings/ahead_is_increasing"; // [bob] "ahead is increasing, it's now..."
         public static String folderBehindIsIncreasing = "timings/behind_is_increasing"; // [bob] "behind is increasing, it's now..."
-        
+
         public static String folderAheadIsNow = "timings/ahead_is_now"; // [bob] "ahead is increasing, it's now..."
         public static String folderBehindIsNow = "timings/behind_is_now"; // [bob] "behind is increasing, it's now..."
 
@@ -48,9 +48,15 @@ namespace CrewChiefV4.Events
         // if true, don't give as many gap reports at the start/finish - stops the lap start getting too crowded with messages
         private Boolean preferGapReportsMidLap = true;
 
-        private List<float> gapsInFront;
+        private class Gap
+        {
+            public float timeDelta = -1.0f;
+            public int lapDelta = -1;
+        }
 
-        private List<float> gapsBehind;
+        private List<Gap> gapsInFront;
+
+        private List<Gap> gapsBehind;
 
         private float gapBehindAtLastReport;
 
@@ -121,8 +127,8 @@ namespace CrewChiefV4.Events
 
         public override void clearState()
         {
-            gapsInFront = new List<float>();
-            gapsBehind = new List<float>();            
+            gapsInFront = new List<Gap>();
+            gapsBehind = new List<Gap>();
             gapBehindAtLastReport = -1;
             gapInFrontAtLastReport = -1;
             sectorsSinceLastGapAheadReport = 0;
@@ -254,7 +260,7 @@ namespace CrewChiefV4.Events
             {
                 playedGapBehindForThisLap = false;
             }
-            
+
             if (gapsInFront == null || gapsBehind == null)
             {
                 clearState();
@@ -287,25 +293,32 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.ClassPosition != 1)
                     {
                         // AMS / RF1 hack - sometimes the gap data is stale, so don't put the exact same gap in the list
-                        if (gapsInFront.Count == 0 || gapsInFront[0] != currentGameState.SessionData.TimeDeltaFront)
+                        if (gapsInFront.Count == 0 || gapsInFront[0].timeDelta != currentGameState.SessionData.TimeDeltaFront)
                         {
-                            gapsInFront.Insert(0, currentGameState.SessionData.TimeDeltaFront);
+                            gapsInFront.Insert(0, new Gap() {
+                                timeDelta = currentGameState.SessionData.TimeDeltaFront,
+                                lapDelta = currentGameState.SessionData.LapsDeltaFront });
+
                             gapInFrontStatus = getGapStatus(gapsInFront, gapInFrontAtLastReport);
                         }
                     }
                     if (!isLast)
                     {
                         // AMS / RF1 hack - sometimes the gap data is stale, so don't put the exact same gap in the list
-                        if (gapsBehind.Count == 0 || gapsBehind[0] != currentGameState.SessionData.TimeDeltaBehind)
+                        if (gapsBehind.Count == 0 || gapsBehind[0].timeDelta != currentGameState.SessionData.TimeDeltaBehind)
                         {
-                            gapsBehind.Insert(0, currentGameState.SessionData.TimeDeltaBehind);
+                            gapsBehind.Insert(0, new Gap()
+                            {
+                                timeDelta = currentGameState.SessionData.TimeDeltaBehind,
+                                lapDelta = currentGameState.SessionData.LapsDeltaBehind
+                            });
                             gapBehindStatus = getGapStatus(gapsBehind, gapBehindAtLastReport);
                         }
                     }
 
                     // Play which ever is the smaller gap, but we're not interested if the gap is < 0.5 or > 20 seconds or hasn't changed:
                     Boolean playGapInFront = gapInFrontStatus != GapStatus.NONE &&
-                        (gapBehindStatus == GapStatus.NONE || (gapsInFront.Count() > 0 && gapsBehind.Count() > 0 && gapsInFront[0] < gapsBehind[0]));
+                        (gapBehindStatus == GapStatus.NONE || (gapsInFront.Count() > 0 && gapsBehind.Count() > 0 && gapsInFront[0].timeDelta < gapsBehind[0].timeDelta && gapsInFront[0].lapDelta == 0));
 
                     Boolean playGapBehind = !playGapInFront && gapBehindStatus != GapStatus.NONE;
                     if (playGapInFront)
@@ -319,8 +332,8 @@ namespace CrewChiefV4.Events
                                 if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
                                 {
                                     sectorsUntilNextCloseCarAheadReport = Utilities.random.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait);
-                                } 
-                                else 
+                                }
+                                else
                                 {
                                     sectorsUntilNextCloseCarAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                         Utilities.random.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
@@ -344,7 +357,7 @@ namespace CrewChiefV4.Events
                                         }
                                     }
                                 }
-                                gapInFrontAtLastReport = gapsInFront[0];
+                                gapInFrontAtLastReport = gapsInFront[0].timeDelta;
                             }
                         }
                         else if (gapInFrontStatus != GapStatus.NONE && sectorsSinceLastGapAheadReport >= sectorsUntilNextGapAheadReport)
@@ -360,7 +373,7 @@ namespace CrewChiefV4.Events
                                 sectorsUntilNextGapAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                     Utilities.random.Next(gapAheadMinSectorWait, gapAheadMaxSectorWait));
                             }
-                            TimeSpanWrapper gapInFront = TimeSpanWrapper.FromMilliseconds(gapsInFront[0] * 1000, Precision.AUTO_GAPS);
+                            TimeSpanWrapper gapInFront = TimeSpanWrapper.FromMilliseconds(gapsInFront[0].timeDelta * 1000, Precision.AUTO_GAPS);
                             Boolean readGap = gapInFront.timeSpan.Seconds > 0 || gapInFront.timeSpan.Milliseconds > 50;
                             if (readGap)
                             {
@@ -373,7 +386,7 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIncreasing);
                                         int primaryGapIndex = 3;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
@@ -388,11 +401,11 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontDecreasing);
                                         int primaryGapIndex = 3;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
-                                        
+
                                         DateTime lastTimeDriverNameUsed = DateTime.MinValue;
                                         if (!trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
                                             lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
@@ -418,14 +431,14 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIsNow);
                                         int primaryGapIndex = 3;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_in_front", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                             }
-                            gapInFrontAtLastReport = gapsInFront[0];
+                            gapInFrontAtLastReport = gapsInFront[0].timeDelta;
                         }
                     }
                     else if (playGapBehind)
@@ -439,8 +452,8 @@ namespace CrewChiefV4.Events
                                 if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0)
                                 {
                                     sectorsUntilNextCloseCarBehindReport = Utilities.random.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait);
-                                } 
-                                else 
+                                }
+                                else
                                 {
                                     sectorsUntilNextCloseCarBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                         Utilities.random.Next(closeBehindMinSectorWait, closeBehindMaxSectorWait));
@@ -464,7 +477,7 @@ namespace CrewChiefV4.Events
                                         }
                                     }
                                 }
-                                gapBehindAtLastReport = gapsBehind[0];
+                                gapBehindAtLastReport = gapsBehind[0].timeDelta;
                             }
                         }
                         else if (gapBehindStatus != GapStatus.NONE && sectorsSinceLastGapBehindReport >= sectorsUntilNextGapBehindReport)
@@ -480,7 +493,7 @@ namespace CrewChiefV4.Events
                                 sectorsUntilNextGapBehindReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                     Utilities.random.Next(gapBehindMinSectorWait, gapBehindMaxSectorWait));
                             }
-                            TimeSpanWrapper gapBehind = TimeSpanWrapper.FromMilliseconds(gapsBehind[0] * 1000, Precision.AUTO_GAPS);
+                            TimeSpanWrapper gapBehind = TimeSpanWrapper.FromMilliseconds(gapsBehind[0].timeDelta * 1000, Precision.AUTO_GAPS);
                             Boolean readGap = gapBehind.timeSpan.Seconds > 0 || gapBehind.timeSpan.Milliseconds > 50;
                             if (readGap)
                             {
@@ -493,7 +506,7 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIncreasing);
                                         int primaryGapIndex = 3;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
@@ -508,11 +521,11 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindDecreasing);
                                         int primaryGapIndex = 2;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
-                                        
+
                                         DateTime lastTimeDriverNameUsed = DateTime.MinValue;
                                         if (!trackLandmarkDefendDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
                                             lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
@@ -538,20 +551,20 @@ namespace CrewChiefV4.Events
                                         List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIsNow);
                                         int primaryGapIndex = 3;
                                         int alternateGapIndex = 1;
-                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                         audioPlayer.playMessage(new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } }));
                                     }
                                 }
                             }
-                            gapBehindAtLastReport = gapsBehind[0];
+                            gapBehindAtLastReport = gapsBehind[0].timeDelta;
                         }
                     }
                 }
                 if (isRace && CrewChief.readOpponentDeltasForEveryLap && currentGameState.SessionData.CompletedLaps > 0)
                 {
-                    if (currentGameState.SessionData.ClassPosition > 1 && currentGameState.SessionData.IsNewLap) 
+                    if (currentGameState.SessionData.ClassPosition > 1 && currentGameState.SessionData.IsNewLap)
                     {
                         if (currentGapInFront > 0.05)
                         {
@@ -562,7 +575,7 @@ namespace CrewChiefV4.Events
                                 List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapInFrontIsNow);
                                 int primaryGapIndex = 3;
                                 int alternateGapIndex = 1;
-                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             true, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                 QueuedMessage message = new QueuedMessage("Timings/gap_ahead", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
@@ -574,18 +587,18 @@ namespace CrewChiefV4.Events
                     if (!currentGameState.isLast())
                     {
                         if (!playedGapBehindForThisLap && currentGapBehind > 0.05 && currentGameState.SessionData.LapTimeCurrent > 0 &&
-                            currentGameState.SessionData.LapTimeCurrent >= currentGapBehind && 
+                            currentGameState.SessionData.LapTimeCurrent >= currentGapBehind &&
                             currentGameState.SessionData.LapTimeCurrent <= currentGapBehind + CrewChief._timeInterval.TotalSeconds)
                         {
                             playedGapBehindForThisLap = true;
                             OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);
                             if (opponent != null)
-                            {                                
+                            {
                                 List<MessageFragment> primaryPartialMessageContents = MessageContents(folderTheGapTo, opponent, folderBehindIsNow);
                                 List<MessageFragment> alternatePartialMessageContents = MessageContents(folderGapBehindIsNow);
                                 int primaryGapIndex = 3;
                                 int alternateGapIndex = 1;
-                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] { 
+                                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("resolveGapAmount", new Object[] {
                                             false, primaryPartialMessageContents, primaryGapIndex, alternatePartialMessageContents, alternateGapIndex }, this);
 
                                 QueuedMessage message = new QueuedMessage("Timings/gap_behind", delayedMessageEvent, 0, this, new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } });
@@ -598,36 +611,37 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private GapStatus getGapStatus(List<float> gaps, float lastReportedGap)
+        private GapStatus getGapStatus(List<Gap> gaps, float lastReportedGap)
         {
-            // if we have less than 3 gaps in the list, or the last gap is too big, or the change in the gap is too big,
-            // we don't want to report anything
-
             // when comparing gaps round to 1 decimal place
-            if (gaps.Count < 3 || gaps[0] <= 0 || gaps[1] <= 0 || gaps[2] <= 0 || gaps[0] > 20 || Math.Abs(gaps[0] - gaps[1]) > 5)
+            if (gaps.Count < 3  // if we have less than 3 gaps in the list
+                || gaps[0].timeDelta <= 0 || gaps[1].timeDelta <= 0 || gaps[2].timeDelta <= 0 || gaps[0].lapDelta < 0  // or not fully initialized
+                || gaps[0].lapDelta > 0  // or at the last gap cars weren't on a same lap
+                || gaps[0].timeDelta > 20  // or the last gap is too big
+                || Math.Abs(gaps[0].timeDelta - gaps[1].timeDelta) > 5)  // or the change in the gap is too big, we don't want to report anything
             {
                 return GapStatus.NONE;
             }
-            else if (gaps[0] < 0.5 && gaps[1] < 0.5)
+            else if (gaps[0].timeDelta < 0.5 && gaps[1].timeDelta < 0.5)
             {
                 // this car has been close for 2 sectors
                 return GapStatus.CLOSE;
             }
-            else if ((lastReportedGap == -1 || Math.Round(gaps[0], 1) > Math.Round(lastReportedGap)) &&
-                Math.Round(gaps[0], 1) > Math.Round(gaps[1], 1) && Math.Round(gaps[1], 1) > Math.Round(gaps[2], 1))
+            else if ((lastReportedGap == -1 || Math.Round(gaps[0].timeDelta, 1) > Math.Round(lastReportedGap)) &&
+                Math.Round(gaps[0].timeDelta, 1) > Math.Round(gaps[1].timeDelta, 1) && Math.Round(gaps[1].timeDelta, 1) > Math.Round(gaps[2].timeDelta, 1))
             {
                 return GapStatus.INCREASING;
             }
-            else if ((lastReportedGap == -1 || Math.Round(gaps[0], 1) < Math.Round(lastReportedGap)) &&
-                Math.Round(gaps[0], 1) < Math.Round(gaps[1], 1) && Math.Round(gaps[1], 1) < Math.Round(gaps[2], 1))
+            else if ((lastReportedGap == -1 || Math.Round(gaps[0].timeDelta, 1) < Math.Round(lastReportedGap)) &&
+                Math.Round(gaps[0].timeDelta, 1) < Math.Round(gaps[1].timeDelta, 1) && Math.Round(gaps[1].timeDelta, 1) < Math.Round(gaps[2].timeDelta, 1))
             {
                 return GapStatus.DECREASING;
             }
-            else if (Math.Abs(gaps[0] - gaps[1]) < 1 && Math.Abs(gaps[0] - gaps[1]) < 1 && Math.Abs(gaps[0] - gaps[2]) < 1)
+            else if (Math.Abs(gaps[0].timeDelta - gaps[1].timeDelta) < 1 && Math.Abs(gaps[0].timeDelta - gaps[1].timeDelta) < 1 && Math.Abs(gaps[0].timeDelta - gaps[2].timeDelta) < 1)
             {
                 // If the gap hasn't changed by more than a second we can report it with no 'increasing' or 'decreasing' prefix
                 return GapStatus.OTHER;
-            }            
+            }
             else
             {
                 return GapStatus.NONE;
