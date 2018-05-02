@@ -295,10 +295,11 @@ namespace CrewChiefV4.Events
                         // AMS / RF1 hack - sometimes the gap data is stale, so don't put the exact same gap in the list
                         if (gapsInFront.Count == 0 || gapsInFront[0].timeDelta != currentGameState.SessionData.TimeDeltaFront)
                         {
-                            gapsInFront.Insert(0, new Gap() {
+                            gapsInFront.Insert(0, new Gap()
+                            {
                                 timeDelta = currentGameState.SessionData.TimeDeltaFront,
-                                lapDelta = currentGameState.SessionData.LapsDeltaFront });
-
+                                lapDelta = currentGameState.SessionData.LapsDeltaFront
+                            });
                             gapInFrontStatus = getGapStatus(gapsInFront, gapInFrontAtLastReport);
                         }
                     }
