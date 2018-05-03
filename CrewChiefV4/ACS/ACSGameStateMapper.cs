@@ -1512,16 +1512,6 @@ namespace CrewChiefV4.assetto
                                     
                                     Boolean isEnteringPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == numberOfSectorsOnTrack;
                                     Boolean isLeavingPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == 1;
-                                    
-                                    if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition + 1 && !useCarLeaderBoardPosition)
-                                    {
-                                        // TODO_TIME_DELTA: why is this called in populateDerivedSessionData and here?
-                                        currentGameState.SessionData.TimeDeltaBehind = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;
-                                    }
-                                    if (currentOpponentRacePosition == currentGameState.SessionData.OverallPosition - 1 && !useCarLeaderBoardPosition)
-                                    {
-                                        currentGameState.SessionData.TimeDeltaFront = currentOpponentData.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime).Item2;
-                                    }
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
 
@@ -1613,6 +1603,7 @@ namespace CrewChiefV4.assetto
                 }
 
                 currentGameState.sortClassPositions();
+                currentGameState.setPracOrQualiDeltas();
                 
                 // more to come here 
                 //currentGameState.SessionData.LapTimePrevious = mapToFloatTime(shared.acsGraphic.iLastTime);
