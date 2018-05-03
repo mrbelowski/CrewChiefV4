@@ -677,8 +677,6 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[playerIndex] +
                 shared.mCurrentSector3Times[playerIndex] + shared.mCurrentSector3Times[playerIndex];
-            currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
-            currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
 
             opponentDriverNamesProcessedForThisTick.Clear();
             opponentDriverNamesProcessedForThisTick.Add(playerName);
@@ -890,6 +888,7 @@ namespace CrewChiefV4.PCars2
             }
 
             currentGameState.sortClassPositions();
+            currentGameState.setPracOrQualiDeltas();
 
             currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)

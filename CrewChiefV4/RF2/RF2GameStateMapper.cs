@@ -1459,12 +1459,12 @@ namespace CrewChiefV4.rFactor2
                     opponent.setInLap();
                 }
 
-                if (opponent.OverallPosition == csd.OverallPosition + 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime).Item2;  // TODO_TIME_DELTA: why is this called in populateDerivedSessionData and here?
+                //  Allow gaps in qual and prac, delta here is not on track delta but diff on fastest time.  Race gaps are set in populateDerivedRaceSessionData.
+                if (opponent.ClassPosition == csd.ClassPosition + 1 && csd.SessionType != SessionType.Race)
+                    csd.TimeDeltaBehind = Math.Abs(opponent.CurrentBestLapTime - csd.PlayerLapTimeSessionBest);
 
-                // TODO_TIME_DELTA: Note the game exposes a value for this directly (mTimeBehindNext) - do we want to use it?
-                if (opponent.OverallPosition == csd.OverallPosition - 1 && csd.SessionType == SessionType.Race)
-                    csd.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(csd.DeltaTime).Item2;
+                if (opponent.ClassPosition == csd.ClassPosition - 1 && csd.SessionType != SessionType.Race)
+                    csd.TimeDeltaFront = Math.Abs(csd.PlayerLapTimeSessionBest - opponent.CurrentBestLapTime);
 
                 // session best lap times
                 if (opponent.CurrentBestLapTime > 0.0f
@@ -1518,9 +1518,10 @@ namespace CrewChiefV4.rFactor2
             }
 
             cgs.sortClassPositions();
+            cgs.setPracOrQualiDeltas();
 
             if (pgs != null)
-            {               
+            {
                 csd.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
 
                 var stoppedInLandmark = csd.trackLandmarksTiming.updateLandmarkTiming(csd.TrackDefinition,

@@ -2493,6 +2493,29 @@ namespace CrewChiefV4.GameState
             sortClassPositionsCompleted = true;
         }
 
+        public void setPracOrQualiDeltas()
+        {
+            if (this.SessionData.SessionType != SessionType.Race)
+            {
+                //  Allow gaps in qual and prac, delta here is not on track delta but diff on fastest time.  Race gaps are set in populateDerivedRaceSessionData.
+                foreach (var opponent in this.OpponentData.Values)
+                {
+                    if (opponent.ClassPosition == this.SessionData.ClassPosition + 1)
+                    {
+                        this.SessionData.TimeDeltaBehind = Math.Abs(opponent.CurrentBestLapTime - this.SessionData.PlayerLapTimeSessionBest);
+                        this.SessionData.LapsDeltaBehind = 0;
+                    }
+
+                    if (opponent.ClassPosition == this.SessionData.ClassPosition - 1)
+                    {
+                        this.SessionData.TimeDeltaFront = Math.Abs(this.SessionData.PlayerLapTimeSessionBest - opponent.CurrentBestLapTime);
+                        this.SessionData.LapsDeltaFront = 0;
+                    }
+                }
+            }
+
+        }
+
         private Boolean hasTooManyUnknownClasses(int totalNumberOfClassesIds, HashSet<String> unknownClassIds)
         {
             if (CrewChief.gameDefinition.allowsUserCreatedCars)
