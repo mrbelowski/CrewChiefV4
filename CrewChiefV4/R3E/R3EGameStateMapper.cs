@@ -93,6 +93,7 @@ namespace CrewChiefV4.RaceRoom
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
 
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
+        private int numCarsAtSessionStart = -1;
 
         class PendingRacePositionChange
         {
@@ -162,6 +163,8 @@ namespace CrewChiefV4.RaceRoom
                     GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                 }
                 currentGameState.readLandmarksForThisLap = previousGameState.readLandmarksForThisLap;
+
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
             }
             else
             {
@@ -171,9 +174,16 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+
+                // Used by mapToSessionType.
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
             }
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
+
+            if (previousGameState != null && currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType)
+                Console.WriteLine("SESSION TYPE CHANGED FROM: " + previousGameState.SessionData.SessionType + "  TO:" + currentGameState.SessionData.SessionType);
+
             currentGameState.SessionData.SessionRunningTime = (float)shared.Player.GameSimulationTime;
             currentGameState.ControlData.ControlType = mapToControlType(shared.ControlType); // TODO: the rest of the control data
 
@@ -182,6 +192,7 @@ namespace CrewChiefV4.RaceRoom
 
             DriverData playerDriverData = new DriverData();
             int playerDriverDataIndex = 0;
+            // In hotlap/leaderboard challenge, this contains duplicate entries.  Do we want this?
             string[] driverNames = new string[shared.DriverData.Length];
             for (int i = 0; i < shared.DriverData.Length; i++)
             {
@@ -195,7 +206,6 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
 
-            currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, currentGameState.SessionData.SessionType, lastSessionRunningTime,
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
@@ -240,6 +250,7 @@ namespace CrewChiefV4.RaceRoom
                 // reset the flag to allow the improvised blue flag calling
                 useImprovisedBlueFlagDetection = true;
 
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
                 currentGameState.SessionData.EventIndex = shared.EventIndex;
                 currentGameState.SessionData.SessionIteration = shared.SessionIteration;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
@@ -329,7 +340,7 @@ namespace CrewChiefV4.RaceRoom
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
-                        currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
+                        currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
                         CarData.RACEROOM_CLASS_ID = shared.VehicleInfo.ClassId;
@@ -1477,14 +1488,13 @@ namespace CrewChiefV4.RaceRoom
         {
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
             int r3eSessionType = shared.SessionType;
-            int numCars = shared.NumCars;
             if ((int)RaceRoomConstant.Session.Practice == r3eSessionType || (int)RaceRoomConstant.Session.Warmup == r3eSessionType)
             {
                 return SessionType.Practice;
             }
-            else if ((int)RaceRoomConstant.Session.Qualify == r3eSessionType && (numCars == 1 || numCars == 2))
+            else if ((int)RaceRoomConstant.Session.Qualify == r3eSessionType && numCarsAtSessionStart <= 2)
             {
-                // hotlap sessions are not explicity declared in R3E - have to check if it's qual and there are 1 or 2 cars
+                // hotlap sessions are not explicity declared in R3E - have to check if it's qual and there are no more than 2 cars.
                 return SessionType.HotLap;
             }
             else if ((int)RaceRoomConstant.Session.Qualify == r3eSessionType)

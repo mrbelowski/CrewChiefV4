@@ -98,7 +98,8 @@ namespace CrewChiefV4.RaceRoom
             
             if (!enabled || currentState.Player.GameSimulationTime < timeAfterRaceStartToActivate ||
                 currentState.ControlType != (int)RaceRoomConstant.Control.Player || 
-                ((int)RaceRoomConstant.Session.Qualify == currentState.SessionType && (currentState.NumCars == 1 || currentState.NumCars == 2)))
+                ((int)RaceRoomConstant.Session.Qualify == currentState.SessionType && (currentState.NumCars == 1 || currentState.NumCars == 2)) ||
+                currentGameState.SessionData.SessionType == SessionType.HotLap)
             {
                 return;
             }
