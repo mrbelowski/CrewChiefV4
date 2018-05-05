@@ -342,11 +342,15 @@ namespace CrewChiefV4.GameState
 
         public Single PlayerLapTimeSessionBestPrevious = -1;
 
-        // ...
+        // Absolute time delta within a lap.
         public Single TimeDeltaFront = -1;
+        // O means vehicles are on the same lap. >= 1 means user is lapped.
+        public int LapsDeltaFront = -1;
 
-        // ...
+        // Absolute time delta within a lap.
         public Single TimeDeltaBehind = -1;
+        // O means vehicles are on the same lap. >= 1 means user lapped car behind him/her.
+        public int LapsDeltaBehind = -1;
 
         // 0 means we don't know what sector we're in. This is 1-indexed
         public int SectorNumber = 0;
@@ -1996,9 +2000,11 @@ namespace CrewChiefV4.GameState
         }
 
         // get the time difference between this car and another car, allowing for partial laps completed differences
-        public float GetAbsoluteTimeDeltaAllowingForLapDifferences(DeltaTime otherCarDelta)
+        public Tuple<int, float> GetAbsoluteTimeDeltaAllowingForLapDifferences(DeltaTime otherCarDelta)
         {
-            return Math.Abs(GetSignedDeltaTimeWithLapDifference(otherCarDelta).Item2);
+            var deltaTime = GetSignedDeltaTimeWithLapDifference(otherCarDelta);
+            // TODO_TIME_DELTA: not sure lap delta needs to be absolute.
+            return new Tuple<int, float>(Math.Abs(deltaTime.Item1), Math.Abs(deltaTime.Item2));
         }
         
         // return a signed delta based only on track position
@@ -2485,6 +2491,29 @@ namespace CrewChiefV4.GameState
                 GameStateData.Multiclass = GameStateData.NumberOfClasses > 1;
             }
             sortClassPositionsCompleted = true;
+        }
+
+        public void setPracOrQualiDeltas()
+        {
+            if (this.SessionData.SessionType != SessionType.Race)
+            {
+                //  Allow gaps in qual and prac, delta here is not on track delta but diff on fastest time.  Race gaps are set in populateDerivedRaceSessionData.
+                foreach (var opponent in this.OpponentData.Values)
+                {
+                    if (opponent.ClassPosition == this.SessionData.ClassPosition + 1)
+                    {
+                        this.SessionData.TimeDeltaBehind = Math.Abs(opponent.CurrentBestLapTime - this.SessionData.PlayerLapTimeSessionBest);
+                        this.SessionData.LapsDeltaBehind = 0;
+                    }
+
+                    if (opponent.ClassPosition == this.SessionData.ClassPosition - 1)
+                    {
+                        this.SessionData.TimeDeltaFront = Math.Abs(this.SessionData.PlayerLapTimeSessionBest - opponent.CurrentBestLapTime);
+                        this.SessionData.LapsDeltaFront = 0;
+                    }
+                }
+            }
+
         }
 
         private Boolean hasTooManyUnknownClasses(int totalNumberOfClassesIds, HashSet<String> unknownClassIds)

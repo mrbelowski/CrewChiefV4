@@ -105,7 +105,9 @@ namespace CrewChiefV4.GameState
                     }
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                     {
-                        currentGameState.SessionData.TimeDeltaFront = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        currentGameState.SessionData.LapsDeltaFront = timeDelta.Item1;
+                        currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentAheadPitMessageDue)
                         {
                             nextOpponentAheadPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
@@ -120,7 +122,9 @@ namespace CrewChiefV4.GameState
                     }
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
                     {
-                        currentGameState.SessionData.TimeDeltaBehind = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                        currentGameState.SessionData.LapsDeltaBehind = timeDelta.Item1;
+                        currentGameState.SessionData.TimeDeltaBehind = timeDelta.Item2;
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentBehindPitMessageDue)
                         {
                             nextOpponentBehindPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
