@@ -678,6 +678,9 @@ namespace CrewChiefV4.PCars2
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentSector1Times[playerIndex] +
                 shared.mCurrentSector3Times[playerIndex] + shared.mCurrentSector3Times[playerIndex];
 
+            currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
+            currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
+
             opponentDriverNamesProcessedForThisTick.Clear();
             opponentDriverNamesProcessedForThisTick.Add(playerName);
             positionsFilledForThisTick.Clear();

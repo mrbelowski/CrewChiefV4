@@ -107,7 +107,14 @@ namespace CrewChiefV4.GameState
                     {
                         var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         currentGameState.SessionData.LapsDeltaFront = timeDelta.Item1;
-                        currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
+                        // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                        // (already set in the mapper) if the opponent is on the same lap
+                        if (timeDelta.Item1 != 0 ||
+                            (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                        {
+                            currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
+                        }
+
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentAheadPitMessageDue)
                         {
                             nextOpponentAheadPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
@@ -124,7 +131,13 @@ namespace CrewChiefV4.GameState
                     {
                         var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                         currentGameState.SessionData.LapsDeltaBehind = timeDelta.Item1;
-                        currentGameState.SessionData.TimeDeltaBehind = timeDelta.Item2;
+                        // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                        // (already set in the mapper) if the opponent is on the same lap
+                        if (timeDelta.Item1 != 0 ||
+                            (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                        {
+                            currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
+                        }
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentBehindPitMessageDue)
                         {
                             nextOpponentBehindPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);

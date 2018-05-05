@@ -567,6 +567,8 @@ namespace CrewChiefV4.RaceRoom
                 getRacePosition(currentGameState.SessionData.DriverRawName, previousGameState.SessionData.OverallPosition, shared.Position, currentGameState.Now)
                 : shared.Position;
             // currentGameState.SessionData.Position = shared.Position;
+            currentGameState.SessionData.TimeDeltaBehind = shared.TimeDeltaBehind;
+            currentGameState.SessionData.TimeDeltaFront = shared.TimeDeltaFront;
 
             currentGameState.SessionData.SessionFastestLapTimeFromGame = shared.LapTimeBestLeader;
             currentGameState.SessionData.SessionFastestLapTimeFromGamePlayerClass = shared.LapTimeBestLeaderClass;
