@@ -106,9 +106,9 @@ namespace CrewChiefV4.GameState
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                     {
                         var useDerivedDeltas = true;
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                         {
-                            // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                            // special case for R3E, RF1, RF2 and PCars2 - gap ahead is provided by the game - use these 
                             // (already set in the mapper) if the opponent is on the same lap
                             var lapDifference = opponent.DeltaTime.GetSignedLapDifference(currentGameState.SessionData.DeltaTime);
                             if (lapDifference == 0)
@@ -117,14 +117,12 @@ namespace CrewChiefV4.GameState
                                 useDerivedDeltas = false;
                             }
                         }
-                        
                         if (useDerivedDeltas)
                         {
                             var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
                             currentGameState.SessionData.LapsDeltaFront = timeDelta.Item1;
                             currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
                         }
-
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentAheadPitMessageDue)
                         {
                             nextOpponentAheadPitMessageDue = currentGameState.Now.AddSeconds(minSecondsBetweenOpponentPitMessages);
@@ -142,7 +140,7 @@ namespace CrewChiefV4.GameState
                         var useDerivedDeltas = true;
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
                         {
-                            // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                            // special case for R3E and PCars2 - gap behind is provided by the game - use these 
                             // (already set in the mapper) if the opponent is on the same lap
                             var lapDifference = opponent.DeltaTime.GetSignedLapDifference(currentGameState.SessionData.DeltaTime);
                             if (lapDifference == 0)
