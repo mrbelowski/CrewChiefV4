@@ -1968,20 +1968,8 @@ namespace CrewChiefV4.GameState
             int lapDifference = 0;
             if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0 && currentDeltaPoint != -1 && otherCarDelta.currentDeltaPoint != -1)
             {
-                // +ve means I've travelled further than him:
-                float totalDistanceTravelledDifference = totalDistanceTravelled - otherCarDelta.totalDistanceTravelled;
-                // +ve means I've completed more laps:
-                lapDifference = lapsCompleted - otherCarDelta.lapsCompleted;
-                if (lapDifference > 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
-                {
-                    // OK, I've completed more laps, but I'm one less complete lap ahead than the lapDifference suggests
-                    lapDifference--;
-                }
-                else if (lapDifference < 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
-                {
-                    // I've completed less laps, but I'm one less complete lap behind than the lapDifference suggests
-                    lapDifference++;
-                }
+                lapDifference = GetSignedLapDifference(otherCarDelta);
+
                 if (totalDistanceTravelled < otherCarDelta.totalDistanceTravelled)
                 {
                     // I'm behind otherCar, so we want to know time between otherCar reaching the last deltaPoint I've just hit, and me reaching it.
@@ -1999,11 +1987,35 @@ namespace CrewChiefV4.GameState
             return new Tuple<int, float>(lapDifference, (float) splitTime.TotalSeconds);
         }
 
+        public int GetSignedLapDifference(DeltaTime otherCarDelta)
+        {
+            int lapDifference = 0;
+            if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0 && currentDeltaPoint != -1 && otherCarDelta.currentDeltaPoint != -1)
+            {
+                // +ve means I've travelled further than him:
+                float totalDistanceTravelledDifference = totalDistanceTravelled - otherCarDelta.totalDistanceTravelled;
+                // +ve means I've completed more laps:
+                lapDifference = lapsCompleted - otherCarDelta.lapsCompleted;
+                if (lapDifference > 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
+                {
+                    // OK, I've completed more laps, but I'm one less complete lap ahead than the lapDifference suggests
+                    lapDifference--;
+                }
+                else if (lapDifference < 0 && Math.Abs(totalDistanceTravelledDifference) < this.trackLength)
+                {
+                    // I've completed less laps, but I'm one less complete lap behind than the lapDifference suggests
+                    lapDifference++;
+                }
+            }
+
+            return lapDifference;
+        }
+
         // get the time difference between this car and another car, allowing for partial laps completed differences
         public Tuple<int, float> GetAbsoluteTimeDeltaAllowingForLapDifferences(DeltaTime otherCarDelta)
         {
             var deltaTime = GetSignedDeltaTimeWithLapDifference(otherCarDelta);
-            // TODO_TIME_DELTA: not sure lap delta needs to be absolute.
+            // Not sure lap delta needs to be absolute.
             return new Tuple<int, float>(Math.Abs(deltaTime.Item1), Math.Abs(deltaTime.Item2));
         }
         
