@@ -105,13 +105,23 @@ namespace CrewChiefV4.GameState
                     }
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition - 1)
                     {
-                        var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        currentGameState.SessionData.LapsDeltaFront = timeDelta.Item1;
-                        // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
-                        // (already set in the mapper) if the opponent is on the same lap
-                        if (timeDelta.Item1 != 0 ||
-                            (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                        var useDerivedDeltas = true;
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
                         {
+                            // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                            // (already set in the mapper) if the opponent is on the same lap
+                            var lapDifference = opponent.DeltaTime.GetSignedLapDifference(currentGameState.SessionData.DeltaTime);
+                            if (lapDifference == 0)
+                            {
+                                currentGameState.SessionData.LapsDeltaFront = 0;
+                                useDerivedDeltas = false;
+                            }
+                        }
+                        
+                        if (useDerivedDeltas)
+                        {
+                            var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                            currentGameState.SessionData.LapsDeltaFront = timeDelta.Item1;
                             currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
                         }
 
@@ -129,14 +139,23 @@ namespace CrewChiefV4.GameState
                     }
                     else if (opponent.ClassPosition == currentGameState.SessionData.ClassPosition + 1)
                     {
-                        var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
-                        currentGameState.SessionData.LapsDeltaBehind = timeDelta.Item1;
-                        // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
-                        // (already set in the mapper) if the opponent is on the same lap
-                        if (timeDelta.Item1 != 0 ||
-                            (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                        var useDerivedDeltas = true;
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
                         {
-                            currentGameState.SessionData.TimeDeltaFront = timeDelta.Item2;
+                            // special case for R3E and PCars2 - gap ahead and behind is provided by the game - use these 
+                            // (already set in the mapper) if the opponent is on the same lap
+                            var lapDifference = opponent.DeltaTime.GetSignedLapDifference(currentGameState.SessionData.DeltaTime);
+                            if (lapDifference == 0)
+                            {
+                                currentGameState.SessionData.LapsDeltaBehind = 0;
+                                useDerivedDeltas = false;
+                            }
+                        }
+                        if (useDerivedDeltas)
+                        {
+                            var timeDelta = opponent.DeltaTime.GetAbsoluteTimeDeltaAllowingForLapDifferences(currentGameState.SessionData.DeltaTime);
+                            currentGameState.SessionData.LapsDeltaBehind = timeDelta.Item1;
+                            currentGameState.SessionData.TimeDeltaBehind = timeDelta.Item2;
                         }
                         if (opponent.JustEnteredPits && currentGameState.Now > nextOpponentBehindPitMessageDue)
                         {
