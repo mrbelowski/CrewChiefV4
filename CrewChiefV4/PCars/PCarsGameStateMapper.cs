@@ -780,8 +780,6 @@ namespace CrewChiefV4.PCars
                 }
             }
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentTime;
-            currentGameState.SessionData.TimeDeltaBehind = shared.mSplitTimeBehind;
-            currentGameState.SessionData.TimeDeltaFront = shared.mSplitTimeAhead;
 
             // NOTE: the shared.mSessionFastestLapTime is JUST FOR THE PLAYER so the code below is not going to work:
             // currentGameState.SessionData.SessionFastestLapTimeFromGame = shared.mSessionFastestLapTime;
@@ -975,6 +973,7 @@ namespace CrewChiefV4.PCars
             }
 
             currentGameState.sortClassPositions();
+            currentGameState.setPracOrQualiDeltas();
 
             currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)

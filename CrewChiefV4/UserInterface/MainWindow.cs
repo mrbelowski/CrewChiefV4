@@ -731,10 +731,11 @@ namespace CrewChiefV4
                 }
             }
 
-            Console.WriteLine("Starting app");
             controllerConfiguration = new ControllerConfiguration(this);
             setSelectedGameType();
+
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Console.WriteLine("Starting app.  " + this.app_version.Text);
             this.filenameLabel.Visible = CrewChief.Debugging;
             this.filenameTextbox.Visible = CrewChief.Debugging;
             this.playbackInterval.Visible = CrewChief.Debugging;
