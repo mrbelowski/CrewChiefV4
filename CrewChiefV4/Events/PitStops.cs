@@ -321,12 +321,6 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SectorNumber == 3 &&
                         !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
-                        // just passed the limiter line. Nasty hack - if we're playing Raceroom, confirm the pit actions using the macro if it exists:
-                        if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("confirm pit")
-                            && CrewChiefV4.commands.MacroManager.macros["confirm pit"].allowAutomaticTriggering)
-                        {
-                            CrewChiefV4.commands.MacroManager.macros["confirm pit"].execute(true);
-                        }
                         if (currentGameState.PitData.limiterStatus == 0)
                         {
                             // just entered the pit lane with no limiter active
