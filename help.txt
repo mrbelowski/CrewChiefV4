@@ -211,7 +211,7 @@ default key bindings:
 
 Ensure that there's a least one Pitstop Preset defined (from the in-game pit menu).
 
-You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again after a few seconds' delay (so you can see what's selected). When you enter the pitlane the app will automatically open select 'confirm pit actions' from the pit menu so you don't have to fumble around.
+You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again after a few seconds' delay (so you can see what's selected).
 
 If you get a drive through or stop-go penalty, the app will automatically open the pit menu and select 'serve penalty', and close it again. When you then enter the pitlane it'll automatically confirm that action. So you don't need to do anything to serve a drive through other than enter the pitlane (at the right speed of course).
 
