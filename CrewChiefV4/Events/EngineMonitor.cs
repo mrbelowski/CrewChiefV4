@@ -74,7 +74,9 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.CarDamageData.OverallEngineDamage < DamageLevel.DESTROYED &&
                     !currentGameState.PitData.InPitlane &&
-                    currentGameState.EngineData.EngineStalledWarning && currentGameState.Now > nextStalledCheck)
+                    currentGameState.EngineData.EngineStalledWarning && 
+                    currentGameState.Now > nextStalledCheck &&
+                    currentGameState.PositionAndMotionData.CarSpeed < 5)
                 {
                     // Play stalled warning straight away
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 0, this));
