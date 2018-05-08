@@ -95,7 +95,7 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
+                           // Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
                         }
                     }
                     else if (currentGameState.SessionData.TimeDeltaFront < 0.6 + currentGameState.OvertakingAids.DrsRange &&
@@ -108,7 +108,7 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                            Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
+                           // Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
                         }
                     }
                 }
