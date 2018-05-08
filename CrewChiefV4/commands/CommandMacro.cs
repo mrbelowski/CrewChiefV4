@@ -111,25 +111,8 @@ namespace CrewChiefV4.commands
                                     break;
                                 }
                                 if (actionItem.pauseMillis > 0)
-                                {
-                                    // special case here. If we're raceroom and we're near the pitlane, don't pause because this can
-                                    // leave the pit menu open when we enter the pits, which prevents the confirm pit macro working properly. Nasty nasty nasty
-                                    Boolean canPause = true;
-                                    if (CrewChief.gameDefinition != null &&
-                                        CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM &&
-                                        CrewChief.currentGameState != null &&
-                                        CrewChief.currentGameState.SessionData.SectorNumber == 3 &&
-                                        !CrewChief.currentGameState.PitData.InPitlane &&
-                                        CrewChief.currentGameState.SessionData.TrackDefinition != null &&
-                                        CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack > CrewChief.currentGameState.SessionData.TrackDefinition.trackLength - 500)
-                                    {
-                                        Console.WriteLine("Skipping wait in R3E pit macro because we're close to the pit lane");
-                                        canPause = false;
-                                    }
-                                    if (canPause)
-                                    {
-                                        Thread.Sleep(actionItem.pauseMillis);
-                                    }
+                                {                                   
+                                    Thread.Sleep(actionItem.pauseMillis);
                                 }
                                 else
                                 {
