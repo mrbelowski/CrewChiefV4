@@ -262,7 +262,17 @@ namespace CrewChiefV4.Events
                         else if (!playedTrackCutWarningInPracticeOrQualOnThisLap)
                         {
                             // cut track in prac / qual is the same as lap deleted. Rather than dick about with the sound files, just allow either here
-                            audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                            if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM
+                                && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
+                                && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
+                            {
+                                Console.WriteLine("THIS AND NEXT DELETED");
+                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                            }
+                            else
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                            }
                             playedTrackCutWarningInPracticeOrQualOnThisLap = true;
                         }
                     }
@@ -280,7 +290,18 @@ namespace CrewChiefV4.Events
                 {
                     lastCutTrackWarningTime = currentGameState.Now;
                     // cut track in prac / qual is the same as lap deleted. Rather than dick about with the sound files, just allow either here
-                    audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM
+                        && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
+                        && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
+                    {
+                        Console.WriteLine("THIS AND NEXT DELETED");
+
+                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                    }
                     clearPenaltyState();
                 }
             }
