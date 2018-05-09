@@ -353,6 +353,7 @@
 			"pcarsTrackName": "Red Bull Ring:Grand Prix",
 			"pcars2TrackName": "Red_Bull_Ring:GP",
 			"raceroomLayoutId": 2556,
+			"raceroomRollingStartLapDistance": 3476,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 310,
