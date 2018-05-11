@@ -8,6 +8,7 @@
 			"pcars2TrackName": "Bathurst:Mount_Panorama",
 			"irTrackName": "bathurst",
 			"raceroomLayoutId": 1846,
+			"raceroomRollingStartLapDistance": 5655,
 			"trackLandmarks": [{
 					"landmarkName": "hell_corner",
 					"distanceRoundLapStart": 210,
@@ -154,6 +155,7 @@
 			"pcarsTrackName": "Brands Hatch:Indy",
 			"pcars2TrackName": "Brands_Hatch:Indy",
 			"raceroomLayoutId": 2520,
+			"raceroomRollingStartLapDistance": 1063,
 			"trackLandmarks": [{
 					"landmarkName": "paddock_hill",
 					"distanceRoundLapStart": 2000,
@@ -415,6 +417,7 @@
 			"pcarsTrackName": "Hockenheim:Grand Prix",
 			"pcars2TrackName": "Hockenheim:GP",
 			"raceroomLayoutId": 1693,
+			"raceroomRollingStartLapDistance": 4145,
 			"trackLandmarks": [{
 					"landmarkName": "nord_kurve",
 					"distanceRoundLapStart": 200,
@@ -938,6 +941,7 @@
 			"raceroomLayoutId": 1678,
 			"rf2TrackNames": ["Zandvoort"],
 			"irTrackName": "zandvoort grandprix",
+			"raceroomRollingStartLapDistance": 3572,
 			"trackLandmarks": [{
 					"landmarkName": "tarzanbocht",
 					"distanceRoundLapStart": 370,
@@ -1140,6 +1144,7 @@
 			"rf2TrackNames": ["RaceRfactor Monza 2014"],
 			"irTrackName": "monza full",
 			"raceroomLayoutId": 1671,
+			"raceroomRollingStartLapDistance": 4285,
 			"trackLandmarks": [{
 					"landmarkName": "the_first_chicane",
 					"distanceRoundLapStart": 590,
@@ -1259,6 +1264,7 @@
 			"pcarsTrackName": "Zolder:Grand Prix",
 			"pcars2TrackName": "Zolder:GP",
 			"raceroomLayoutId": 1684,
+			"raceroomRollingStartLapDistance": 3347,
 			"rf2TrackNames": ["Zolder"],
 			"irTrackName": "zolder gp",
 			"trackLandmarks": [{
@@ -1625,6 +1631,7 @@
 			"rf1TrackNames": ["Mid-Ohio With Chicane"],
 			"rf2TrackNames": ["Mid-Ohio With Chicane"],
 			"raceroomLayoutId": 1676,
+			"raceroomRollingStartLapDistance": 3325,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 219,
@@ -1695,6 +1702,7 @@
 				"Mid-Ohio Miller 200"
 			],
 			"raceroomLayoutId": 1674,
+			"raceroomRollingStartLapDistance": 3331,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 239,
@@ -2156,6 +2164,7 @@
 		{
 			"pcarsTrackName": "Hungaroring:Grand Prix",
 			"raceroomLayoutId": 1866,
+			"raceroomRollingStartLapDistance": 3828,
 			"rf2TrackNames": ["RaceRfactor Hungaroring 2013"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -9994,6 +10003,8 @@
 		},
 		{
 			"rf2TrackNames": ["Lausitzring"],
+			"raceroomLayoutId": 6166,
+			"raceroomRollingStartLapDistance": 3571,
 			"approximateTrackLength": 4528,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -10083,6 +10094,8 @@
 		},
 		{
 			"rf2TrackNames": ["Lausitzring"],
+			"raceroomLayoutId": 2468,
+			"raceroomRollingStartLapDistance": 2467,
 			"approximateTrackLength": 3356,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -10161,6 +10174,8 @@
 		{
 			"rf2TrackNames": ["lausitzring superspeedway"],
 			"approximateTrackLength": 3256,
+			"raceroomLayoutId": 3291,
+			"raceroomRollingStartLapDistance": 2441,
 			"isOval": true,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
