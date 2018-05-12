@@ -264,6 +264,7 @@
 			"pcarsTrackName": "Silverstone:National",
 			"pcars2TrackName": "Silverstone:Nat",
 			"raceroomLayoutId": 5817,
+			"raceroomRollingStartLapDistance": 1460,
 			"trackLandmarks": [{
 					"landmarkName": "copse",
 					"distanceRoundLapStart": 180,
@@ -293,6 +294,7 @@
 		{
 			"acTrackNames": ["ks_silverstone:stowe_long"],
 			"raceroomLayoutId": 6055,
+			"raceroomRollingStartLapDistance": 1316,
 			"trackLandmarks": [{
 					"landmarkName": "the_first_chicane",
 					"distanceRoundLapStart": 100,
@@ -514,6 +516,7 @@
 			"acTrackNames": ["spa:"],
 			"irTrackName": "spa up",
 			"raceroomLayoutId": 3870,
+			"raceroomRollingStartLapDistance": 6367,
 			"pcars2TrackName": "Spa_Francorchamps:GP",
 			"trackLandmarks": [{
 					"landmarkName": "la_source",
@@ -1075,6 +1078,7 @@
 		{
 			"acTrackNames": ["suzuka:"],
 			"raceroomLayoutId": 1841,
+			"raceroomRollingStartLapDistance": 4882,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 350,
@@ -1832,6 +1836,7 @@
 		},
 		{
 			"raceroomLayoutId": 3683,
+			"raceroomRollingStartLapDistance": 3238,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 200,
@@ -1914,6 +1919,7 @@
 		},
 		{
 			"raceroomLayoutId": 3383,
+			"raceroomRollingStartLapDistance": 3265,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 200,
@@ -2074,6 +2080,7 @@
 			"pcarsTrackName": "Nürburgring:Grand Prix",
 			"pcars2TrackName": "Nurburgring:GP",
 			"raceroomLayoutId": 1691,
+			"raceroomRollingStartLapDistance": 4591,
 			"rf2TrackNames": ["Nuerburg GP"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -2301,6 +2308,7 @@
 		},
 		{
 			"raceroomLayoutId": 3538,
+			"raceroomRollingStartLapDistance": 2975,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 280,
@@ -2383,6 +2391,7 @@
 		},
 		{
 			"raceroomLayoutId": 2518,
+			"raceroomRollingStartLapDistance": 1456,
 			"rf2TrackNames": ["Norisring"],
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
@@ -4381,6 +4390,7 @@
 		},
 		{
 			"raceroomLayoutId": 4039,
+			"raceroomRollingStartLapDistance": 5217,
 			"pcarsTrackName": "Silverstone:Grand Prix",
 			"pcars2TrackName": "Silverstone:GP",
 			"acTrackNames": ["ks_silverstone:gp"],
@@ -4673,6 +4683,7 @@
 		{
 			"rf2TrackNames": ["RaceRfactor China 2014"],
 			"raceroomLayoutId": 2027,
+			"raceroomRollingStartLapDistance": 4756,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 470,
@@ -5996,6 +6007,8 @@
 		},
 		{
 			"rf2TrackNames": ["Portimao Circuit"],
+			"raceroomLayoutId": 1778,
+			"raceroomRollingStartLapDistance": 3555,
 			"trackLandmarks": [{
 					"landmarkName": "primeira",
 					"distanceRoundLapStart": 615,
@@ -12729,6 +12742,8 @@
 		},
 		{
 			"rf2TrackNames": [" Nuerburg Sprint"],
+			"raceroomLayoutId": 2011,
+			"raceroomRollingStartLapDistance": 3100,
 			"trackLandmarks": [{
 					"landmarkName": "haug_Hhken",
 					"distanceRoundLapStart": 545,
@@ -12979,6 +12994,7 @@
 			"pcarsTrackName": "Oschersleben:Grand Prix",
 			"pcars2TrackName": "Oschersleben:A_Course",
 			"raceroomLayoutId": 2384,
+			"raceroomRollingStartLapDistance": 3181,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 430,
