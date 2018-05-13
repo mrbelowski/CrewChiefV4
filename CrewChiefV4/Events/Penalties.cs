@@ -42,6 +42,8 @@ namespace CrewChiefV4.Events
 
         public static String folderCutTrackPracticeOrQual = "penalties/cut_track_in_prac_or_qual";
 
+        public static String folderCutTrackPracticeOrQualNextLapInvalid = "penalties/cut_track_in_prac_or_qual_next_invalid";
+
         private String folderPenaltyNotServed = "penalties/penalty_not_served";
 
         // for voice requests
@@ -267,7 +269,7 @@ namespace CrewChiefV4.Events
                                 && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
                             {
                                 Console.WriteLine("THIS AND NEXT DELETED");
-                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
                             }
                             else
                             {
@@ -296,7 +298,7 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("THIS AND NEXT DELETED");
 
-                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
                     }
                     else
                     {
