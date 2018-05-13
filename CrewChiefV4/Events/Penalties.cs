@@ -268,7 +268,6 @@ namespace CrewChiefV4.Events
                                 && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
                                 && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
                             {
-                                Console.WriteLine("THIS AND NEXT DELETED");
                                 audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
                             }
                             else
@@ -296,8 +295,6 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
                         && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
                     {
-                        Console.WriteLine("THIS AND NEXT DELETED");
-
                         audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
                     }
                     else
