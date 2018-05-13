@@ -34,6 +34,9 @@ namespace CrewChiefV4.Events
         public static String folderTheCarBehindHasJustDoneA = "opponents/the_car_behind_has_just_done_a";
         public static String folderNewFastestLapFor = "opponents/new_fastest_lap_for";
 
+        public static String folderOneLapBehind = "opponents/one_lap_behind";
+        public static String folderOneLapAhead = "opponents/one_lap_ahead";
+
         public static String folderIsNowLeading = "opponents/is_now_leading";
         public static String folderNextCarIs = "opponents/next_car_is";
 
@@ -686,17 +689,17 @@ namespace CrewChiefV4.Events
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapBehind), 0, null));
                                         }
                                         else
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                               MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapBehind), 0, null));
+                                               MessageContents(Position.folderStub + position, Pause(200), folderOneLapBehind), 0, null));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapBehind), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(folderOneLapBehind), 0, null));
                                     }
                                 }
                                 else if (lapDifference > 1)
@@ -727,17 +730,17 @@ namespace CrewChiefV4.Events
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
+                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapAhead), 0, null));
                                         }
                                         else
                                         {
                                             audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(Position.folderStub + position, Pause(200), Position.folderOneLapAhead), 0, null));
+                                                MessageContents(Position.folderStub + position, Pause(200), folderOneLapAhead), 0, null));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(Position.folderOneLapAhead), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(folderOneLapAhead), 0, null));
                                     }
                                 }
                                 else if (lapDifference < -1)
