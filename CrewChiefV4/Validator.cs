@@ -16,7 +16,8 @@ namespace CrewChiefV4
          private static HashSet<String> wankers = new HashSet<String>(StringComparer.InvariantCultureIgnoreCase) { "mr.sisterfister", "bigsilverhotdog", 
              "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "peter koch",
              "andreas christiansen", "greg metcalf" /* twat...*/, "Aditas H1Z1Cases.com.", /* TODO: remove bruno in a future update */"Bruno Bæ",
-             "maciej bugno" /* shouty entitled mong */, "patrick schilhan" /*as reward for your "make r3e app free" campaign. You turd.*/};
+             "maciej bugno" /* shouty entitled mong */, "patrick schilhan" /*as reward for your "make r3e app free" campaign. You turd.*/,
+             "tim heinemann" /* shit head */};
  
           public static void validate(String str)
           {
