@@ -1212,7 +1212,11 @@ namespace CrewChiefV4.Events
                 }
             }
             driversInvolvedInCurrentIncident = driversInvolvedAndConnected;
-
+            if (driversInvolvedInCurrentIncident.Count == 0)
+            {
+                // Corner case for all involved drivers disconnected.
+                return;
+            }
             // no pileup so read name / positions / corners as appropriate
             // there may be many of these, so we need to sort the list then pick the top few
             driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(playerClassPositionAtStartOfIncident));
