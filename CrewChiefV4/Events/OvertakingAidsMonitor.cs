@@ -88,14 +88,12 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, true /*inFront*/))
                         {
-                            // I am hearing those messages firing a bit past s/f line with no one ahead.  It is likely because oponent is pitting.
-                            // We might need to delay evaluate those, so that opponent reaches the pits.
                             audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", MessageContents(folderASecondOffDRSRange), 0, this));
                             playedGetCloserForDRSOnThisLap = true;
                         }
                         else
                         {
-                           // Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
+                            Console.WriteLine("Skip DRS second out of range message as opponet appears to be pitting.");
                         }
                     }
                     else if (currentGameState.SessionData.TimeDeltaFront < 0.6 + currentGameState.OvertakingAids.DrsRange &&
@@ -108,7 +106,7 @@ namespace CrewChiefV4.Events
                         }
                         else
                         {
-                           // Console.WriteLine("SKIP DRS OUT OF RANGE MSG");
+                            Console.WriteLine("Skip DRS few tenths out of range message as opponet appears to be pitting.");
                         }
                     }
                 }
@@ -118,9 +116,16 @@ namespace CrewChiefV4.Events
                     currentGameState.OvertakingAids.DrsAvailable)
                 {
                     playedOpponentHasDRSOnThisLap = true;
-                    if (Utilities.random.NextDouble() >= 0.4 && ImmediateOpponentIsValidForDRSMessage(currentGameState, false /*inFront*/))
+                    if (Utilities.random.NextDouble() >= 0.4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this));
+                        if (ImmediateOpponentIsValidForDRSMessage(currentGameState, false /*inFront*/))
+                        {
+                            audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Skip opponent has DRS message as opponent appears to be pitting.");
+                        }
                     }
                 }
             }
@@ -162,7 +167,7 @@ namespace CrewChiefV4.Events
             string opponentKey = inFront ? currentGameState.getOpponentKeyInFront(currentGameState.carClass) : currentGameState.getOpponentKeyBehind(currentGameState.carClass);
             OpponentData opponent;
             return opponentKey != null && currentGameState.OpponentData.TryGetValue(opponentKey, out opponent) &&
-                opponent != null && !opponent.isEnteringPits() && !opponent.isExitingPits() && !opponent.InPits;
+                opponent != null && !opponent.isEnteringPits() && !opponent.isExitingPits() && !opponent.InPits && !opponent.isApporchingPits;
         }
 
         public override void respond(string voiceMessage)
