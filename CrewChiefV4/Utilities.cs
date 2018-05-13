@@ -147,5 +147,29 @@ namespace CrewChiefV4
             return new Tuple<int, int>(wholePart, fractionalPart);
         }
 
+        internal static void ReportException(Exception e, string msg, bool needReport)
+        {
+            Console.WriteLine(
+                Environment.NewLine + "==================================================================" + Environment.NewLine
+                + (needReport ? ("PLEASE REPORT THIS ERROR TO CC DEV TEAM." + Environment.NewLine) : "")
+                + "Error message: " + msg + Environment.NewLine
+                + e.ToString() + Environment.NewLine
+                + e.Message + Environment.NewLine
+                + e.StackTrace + Environment.NewLine
+            );
+
+            if (e.InnerException != null)
+            {
+                Console.WriteLine(
+                    "Inner exception: " + e.InnerException.ToString() + Environment.NewLine
+                    + e.InnerException.Message + Environment.NewLine
+                    + e.InnerException.StackTrace + Environment.NewLine
+                );
+            }
+
+            Console.WriteLine(
+                "==================================================================" + Environment.NewLine
+            );
+        }
     }
 }

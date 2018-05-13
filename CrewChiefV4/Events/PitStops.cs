@@ -212,6 +212,12 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (currentGameState.SessionData.SessionPhase == SessionPhase.Finished
+                && currentGameState.ControlData.ControlType == ControlType.AI)
+            {
+                return;
+            }
+
             this.pitStallOccupied = currentGameState.PitData.PitStallOccupied;
             if (currentGameState.SessionData.IsNewLap)
             {

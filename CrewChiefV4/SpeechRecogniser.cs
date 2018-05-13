@@ -975,16 +975,31 @@ namespace CrewChiefV4
                                     new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
                                 sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
-                                sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                                try
+                                {
+                                    sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                                }
+                                catch (Exception e)
+                                {
+                                    Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", true /*needReport*/);
+                                }
                             }
                             waveIn.StopRecording();
-                        })).Start();                    
+                        })).Start();
                     }
                 }
                 else
                 {
                     Console.WriteLine("Getting audio from default device");
-                    sre.RecognizeAsync(RecognizeMode.Multiple);
+                    try
+                    {
+                        sre.RecognizeAsync(RecognizeMode.Multiple);
+                    }
+                    catch (Exception e)
+                    {
+                        Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", false /*needReport*/);
+                        throw e;
+                    }
                 }
             }
             catch (Exception e)
@@ -1006,7 +1021,14 @@ namespace CrewChiefV4
                     Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
                     sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
-                    sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                    try
+                    {
+                        sre.RecognizeAsync(RecognizeMode.Multiple); // before this call
+                    }
+                    catch (Exception e)
+                    {
+                        Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", true /*needReport*/);
+                    }
                 }
                 else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
                 {

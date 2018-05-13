@@ -82,7 +82,6 @@ namespace CrewChiefV4.Events
                 if (!hasUsedDrsOnThisLap && !drsAvailableOnThisLap && !playedGetCloserForDRSOnThisLap &&
                     currentGameState.PositionAndMotionData.DistanceRoundTrack > trackDistanceToCheckDRSGapFrontAt)
                 {
-
                     if (currentGameState.SessionData.TimeDeltaFront < 1.3 + currentGameState.OvertakingAids.DrsRange &&
                         currentGameState.SessionData.TimeDeltaFront >= 0.6 + currentGameState.OvertakingAids.DrsRange)
                     {
@@ -90,10 +89,6 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", MessageContents(folderASecondOffDRSRange), 0, this));
                             playedGetCloserForDRSOnThisLap = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Skip DRS second out of range message as opponet appears to be pitting.");
                         }
                     }
                     else if (currentGameState.SessionData.TimeDeltaFront < 0.6 + currentGameState.OvertakingAids.DrsRange &&
@@ -103,10 +98,6 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.playMessage(new QueuedMessage("drs_a_few_tenths_out_of_range", MessageContents(folderAFewTenthsOffDRSRange), 0, this));
                             playedGetCloserForDRSOnThisLap = true;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Skip DRS few tenths out of range message as opponet appears to be pitting.");
                         }
                     }
                 }
@@ -121,10 +112,6 @@ namespace CrewChiefV4.Events
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, false /*inFront*/))
                         {
                             audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this));
-                        }
-                        else
-                        {
-                            Console.WriteLine("Skip opponent has DRS message as opponent appears to be pitting.");
                         }
                     }
                 }
