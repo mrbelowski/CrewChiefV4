@@ -212,11 +212,12 @@ namespace CrewChiefV4
         public float approximateTrackLength { get; set; }   // this is optional and used to differentiate duplicated names
         public List<TrackLandmark> trackLandmarks { get; set; }
         public Boolean isOval { get; set; }
+        public float raceroomRollingStartLapDistance { get; set; }   // this is optional and used to detect "this lap invalidated" vs "this and next lap invalidated" in R3E
         public TrackLandmarksForTrack()
         {
             this.trackLandmarks = new List<TrackLandmark>();
             this.raceroomLayoutId = -1;
-            this.approximateTrackLength = -1;
+            this.approximateTrackLength = -1.0f;
             this.acTrackNames = new string[] { };
             this.rf1TrackNames = new string[] { };
             this.rf2TrackNames = new string[] { };
@@ -224,6 +225,7 @@ namespace CrewChiefV4
             this.pcars2TrackName = "";
             this.irTrackName = "";
             this.isOval = false;
+            this.raceroomRollingStartLapDistance = -1.0f;
         }
     }
 
@@ -231,10 +233,12 @@ namespace CrewChiefV4
     {
         public List<TrackLandmark> trackLandmarks;
         public Boolean isOval = false;
-        public TrackDataContainer(List<TrackLandmark> trackLandmarks, Boolean isOval)
+        public float raceroomRollingStartLapDistance = -1.0f;
+        public TrackDataContainer(List<TrackLandmark> trackLandmarks, Boolean isOval, float raceroomRollingStartLapDistance = -1.0f)
         {
             this.trackLandmarks = trackLandmarks;
             this.isOval = isOval;
+            this.raceroomRollingStartLapDistance = raceroomRollingStartLapDistance;
         }
     }
 
@@ -354,7 +358,7 @@ namespace CrewChiefV4
                 if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
                 {
                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
+                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval, trackLandmarksForTrack.raceroomRollingStartLapDistance);
                 }
             }
             return new TrackDataContainer(new List<TrackLandmark>(), false);
@@ -732,6 +736,7 @@ namespace CrewChiefV4
         // this is the distance round the track where we save the opponent's race position before he slows for pit entry
         public float distanceForNearPitEntryChecks;
         public TrackData.TrackLengthClass trackLengthClass = TrackData.TrackLengthClass.MEDIUM;
+        public float raceroomRollingStartLapDistance = -1.0f;
 
         public TrackDefinition(String name, float pitEntryExitPointsDiameter, float trackLength, float[] pitEntryPoint, float[] pitExitPoint)
         {
