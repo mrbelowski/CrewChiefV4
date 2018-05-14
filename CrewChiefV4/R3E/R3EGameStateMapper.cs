@@ -184,7 +184,10 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.SessionType = mapToSessionType(shared);
 
             if (previousGameState != null && currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType)
-                Console.WriteLine("SESSION TYPE CHANGED FROM: " + previousGameState.SessionData.SessionType + "  TO:" + currentGameState.SessionData.SessionType);
+            {
+                Console.WriteLine("Session type changed from: " + previousGameState.SessionData.SessionType + "  to: " + currentGameState.SessionData.SessionType
+                    + "  Last session phase: " + previousGameState.SessionData.SessionPhase + "  new session phase: " + currentGameState.SessionData.SessionPhase);
+            }
 
             currentGameState.SessionData.SessionRunningTime = (float)shared.Player.GameSimulationTime;
             currentGameState.ControlData.ControlType = mapToControlType(shared.ControlType); // TODO: the rest of the control data
@@ -627,7 +630,8 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.SessionData.CurrentLapIsValid = true;
                     }
                     
-                    if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1) {
+                    if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1)
+                    {
                         currentGameState.SessionData.CurrentLapIsValid = false;
                     }
                     if (currentGameState.SessionData.IsNewSector)
@@ -674,7 +678,7 @@ namespace CrewChiefV4.RaceRoom
                             else
                             {
                                 currentGameState.SessionData.LastSector1Time = -1;
-                            }                        
+                            }
                         }
                         else if (participantStruct.TrackSector == 3)
                         {
