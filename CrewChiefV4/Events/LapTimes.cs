@@ -312,15 +312,16 @@ namespace CrewChiefV4.Events
             {
                 lapIsValid = false;
             }
-            if (currentGameState.SessionData.IsNewLap)
-            {
+            //if (currentGameState.SessionData.IsNewLap)
+            //{
                 lastLapTime = currentGameState.SessionData.LapTimePrevious;
                 if (lastLapTime > 0 && lapIsValid) {
                     if (bestLapTime == 0 || lastLapTime < bestLapTime) {
                         bestLapTime = lastLapTime;
                     }
                 }
-            }
+            //}
+
             if (previousGameState != null && previousGameState.SessionData.CompletedLaps <= currentGameState.FlagData.lapCountWhenLastWentGreen)
             {
                 return;
