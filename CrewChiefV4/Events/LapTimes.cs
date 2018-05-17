@@ -315,8 +315,10 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.IsNewLap)
             {
                 lastLapTime = currentGameState.SessionData.LapTimePrevious;
-                if (lastLapTime > 0 && lapIsValid) {
-                    if (bestLapTime == 0 || lastLapTime < bestLapTime) {
+                if (lastLapTime > 0 && lapIsValid)
+                {
+                    if (bestLapTime == 0 || lastLapTime < bestLapTime)
+                    {
                         bestLapTime = lastLapTime;
                     }
                 }
@@ -649,7 +651,6 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    lapIsValid = true;
                 }
                 // report sector delta at the completion of a sector?
                 if (!sectorsReportedForLap && currentGameState.SessionData.IsNewSector && 
@@ -696,8 +697,14 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
+            if (currentGameState.SessionData.IsNewLap && !currentGameState.PitData.OnOutLap)
+            {
+                // lapIsValid has mixed use.  It is used to track if current lap is valid, but is also used
+                // to decide if previous lap was valid when the new lap begins.  So reset it here.
+                lapIsValid = true;
+            }
         }
-               
+
         private ConsistencyResult checkAgainstPreviousLaps()
         {
             if (conditionsWindow.Count() >= lapTimesWindowSize && ConditionsHaveChanged(conditionsWindow[0], conditionsWindow[lapTimesWindowSize - 1]))
