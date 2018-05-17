@@ -14,11 +14,6 @@ namespace CrewChiefV4.RaceRoom
 {
     public class R3EGameStateMapper : GameStateMapper
     {
-        // we're timing the player laptimes. This is because the game-provided LapTimePrevious and
-        // SectorTimeSelfPrevious objects may be updated after we've started a new lap. The sector1 and sector2 data
-        // are always current so we can use these directly
-        private double gameTimeAtLapStart = -1;
-
         // this is set when we first join a practice or qual session (or when the session first starts). All participants
         // car classes are recalculated every tick for 5 seconds
         private DateTime recheckCarClassesUntil = DateTime.MinValue;
@@ -225,8 +220,7 @@ namespace CrewChiefV4.RaceRoom
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
                     currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                 lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)
-            {
-                gameTimeAtLapStart = -1;
+            {                
                 currentGameState.SessionData.IsNewSession = true;
                 // if this is a new prac / qual session, we might have just joined a multiclass session so we need to keep
                 // updating the car class until it settles.
@@ -333,7 +327,6 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         currentGameState.SessionData.JustGoneGreen = true;
-                        gameTimeAtLapStart = -1;
                         // just gone green, so get the session data
                         if (shared.sessionLengthFormat == 0 || shared.sessionLengthFormat == 2 || shared.SessionTimeRemaining > 0)
                         {
@@ -573,11 +566,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.SessionData.CompletedLaps = shared.CompletedLaps;
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
-
-            // this may be overridden by a calculated (timed) value for the IsNewLap tick. This is because it
-            // may be updated too late. 
             currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
-
             currentGameState.SessionData.NumCarsOverall = shared.NumCars;
 
             currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null ?
@@ -649,18 +638,6 @@ namespace CrewChiefV4.RaceRoom
                     {
                         if (participantStruct.TrackSector == 1)
                         {
-                            double gameTimeAtLapEnd = shared.Player.GameSimulationTime - 
-                                (participantStruct.LapTimeCurrentSelf > 0 ? participantStruct.LapTimeCurrentSelf : 0);
-                            if (gameTimeAtLapStart != -1 && previousGameState != null && !previousGameState.PitData.OnOutLap)
-                            {
-                                // override the game-provided laptime with the calculated laptime, but not on the out lap (as our 
-                                // gameTimeAtLapStart will be unusable)
-                                float calculatedLapTime = (float) (gameTimeAtLapEnd - gameTimeAtLapStart);
-                                // Console.WriteLine("Lap delta = " + string.Format("{0:0.000}", (currentGameState.SessionData.LapTimePrevious - calculatedLapTime)));
-                                currentGameState.SessionData.LapTimePrevious = calculatedLapTime;
-                            }
-                            gameTimeAtLapStart = gameTimeAtLapEnd;
-
                             if (currentGameState.SessionData.SessionTimesAtEndOfSectors[3] != -1)
                             {
                                 currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
@@ -669,7 +646,7 @@ namespace CrewChiefV4.RaceRoom
                             if (participantStruct.SectorTimePreviousSelf.Sector3 > 0 && participantStruct.SectorTimeCurrentSelf.Sector2 > 0 &&
                                 previousGameState != null && previousGameState.SessionData.CurrentLapIsValid)
                             {
-                                currentGameState.SessionData.LastSector3Time = currentGameState.SessionData.LapTimePrevious - participantStruct.SectorTimeCurrentSelf.Sector2;
+                                currentGameState.SessionData.LastSector3Time = participantStruct.SectorTimePreviousSelf.Sector3 - participantStruct.SectorTimeCurrentSelf.Sector2;
                                 if (currentGameState.SessionData.PlayerBestSector3Time == -1 || currentGameState.SessionData.LastSector3Time < currentGameState.SessionData.PlayerBestSector3Time)
                                 {
                                     currentGameState.SessionData.PlayerBestSector3Time = currentGameState.SessionData.LastSector3Time;
