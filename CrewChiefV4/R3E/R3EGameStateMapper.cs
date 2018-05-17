@@ -484,7 +484,6 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
-                    currentGameState.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
 
                     currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
 
@@ -575,6 +574,10 @@ namespace CrewChiefV4.RaceRoom
 
             currentGameState.SessionData.LapTimeCurrent = shared.LapTimeCurrentSelf;
 
+            // this may be overridden by a calculated (timed) value for the IsNewLap tick. This is because it
+            // may be updated too late. 
+            currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
+
             currentGameState.SessionData.NumCarsOverall = shared.NumCars;
 
             currentGameState.SessionData.OverallPosition = currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null ?
@@ -653,14 +656,8 @@ namespace CrewChiefV4.RaceRoom
                                 // override the game-provided laptime with the calculated laptime, but not on the out lap (as our 
                                 // gameTimeAtLapStart will be unusable)
                                 float calculatedLapTime = (float) (gameTimeAtLapEnd - gameTimeAtLapStart);
-                                // Console.WriteLine("Updating laptimeprev, calc value = " + calculatedLapTime + ", prev value was " + currentGameState.SessionData.LapTimePrevious +
-                                //    " delta from game = " + string.Format("{0:0.000}", (shared.LapTimePreviousSelf - calculatedLapTime)));
+                                // Console.WriteLine("Lap delta = " + string.Format("{0:0.000}", (currentGameState.SessionData.LapTimePrevious - calculatedLapTime)));
                                 currentGameState.SessionData.LapTimePrevious = calculatedLapTime;
-                            }
-                            else
-                            {
-                                // Console.WriteLine("Updating laptimeprev from provided value " + shared.LapTimePreviousSelf + ", prev value was " + currentGameState.SessionData.LapTimePrevious);
-                                currentGameState.SessionData.LapTimePrevious = shared.LapTimePreviousSelf;
                             }
                             gameTimeAtLapStart = gameTimeAtLapEnd;
 
