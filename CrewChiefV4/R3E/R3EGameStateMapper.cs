@@ -899,7 +899,7 @@ namespace CrewChiefV4.RaceRoom
                         upateOpponentData(currentOpponentData, currentOpponentRacePosition,
                                 participantStruct.Place, currentOpponentLapsCompleted,
                                 currentOpponentSector, sectorTime, participantStruct.SectorTimePreviousSelf.Sector3,
-                                participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1,
+                                participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1 && participantStruct.LapTimeCurrentSelf != -1,
                                 currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                 new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                 participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
