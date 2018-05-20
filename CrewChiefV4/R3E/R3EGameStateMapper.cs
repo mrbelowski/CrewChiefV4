@@ -630,7 +630,7 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.SessionData.CurrentLapIsValid = true;
                     }
                     
-                    if (currentGameState.SessionData.CurrentLapIsValid && participantStruct.CurrentLapValid != 1)
+                    if (currentGameState.SessionData.CurrentLapIsValid && (participantStruct.CurrentLapValid != 1 || participantStruct.LapTimeCurrentSelf == -1))
                     {
                         currentGameState.SessionData.CurrentLapIsValid = false;
                     }
