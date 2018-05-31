@@ -75,8 +75,12 @@ namespace CrewChiefV4.Events
                 if (currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane)
                 {
                     // we've entered the pit. If we've not already given a call, provide the post-pit estimate here
-                    reportPostPitEstimates(false, currentGameState.SessionData.ClassPosition, currentGameState.OpponentData, 
-                        currentGameState.SessionData.DeltaTime, currentGameState.Now);
+                    Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition,
+                        currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now);
+                    if (postRacePositions != null && postRacePositions.expectedRacePosition != -1)
+                    {
+                        // we have some estimated data about where we'll be after our stop, so report it
+                    }
                 }
                 if (nextPitTimingCheckDue > currentGameState.Now)
                 {
@@ -102,22 +106,14 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportPostPitEstimates(Boolean fromVoiceCommand, int currentRacePosition,
-            Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now)
+        // all the nasty logic is in this method - refactor?
+        private Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition,
+            CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now)
         {
             float expectedPlayerTimeLoss = -1;
             if (playerTimeLostForStop == -1)
             {
-                // we have no idea how much we'll lose in a stop, so derive this from the closet opponent
-                if (opponentsTimeLostForStop.Count == 0)
-                {
-                    // oh dear
-                    if (fromVoiceCommand)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
-                    }
-                }
-                else
+                if (opponentsTimeLostForStop.Count != 0) 
                 {
                     // select the best opponent to compare with
                     foreach (KeyValuePair<String, float> entry in opponentsTimeLostForStop)
@@ -158,40 +154,64 @@ namespace CrewChiefV4.Events
 
                 List<Tuple<float, OpponentData>> opponentsAhead = new List<Tuple<float, OpponentData>>();
                 List<Tuple<float, OpponentData>> opponentsBehind = new List<Tuple<float, OpponentData>>();
-                
+
+                String playerClassId = playerClass.getClassIdentifier();
                 foreach (OpponentData opponent in opponents.Values)
                 {
-                    float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
-                    float absDelta = Math.Abs(opponentPositionDelta);
-                    if (opponentPositionDelta > 0)
+                    if (opponent.CarClass.getClassIdentifier() == playerClassId)
                     {
-                        // he'll be ahead
-                        opponentsAhead.Add(new Tuple<float, OpponentData>(absDelta, opponent));
-                    }
-                    else
-                    {
-                        // he'll be behind (TODO: work out which way the delta-points lag will bias this)
-                        opponentsBehind.Add(new Tuple<float, OpponentData>(absDelta, opponent));
+                        float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
+                        float absDelta = Math.Abs(opponentPositionDelta);
+                        if (opponentPositionDelta > 0)
+                        {
+                            // he'll be ahead
+                            opponentsAhead.Add(new Tuple<float, OpponentData>(absDelta, opponent));
+                        }
+                        else
+                        {
+                            // he'll be behind (TODO: work out which way the delta-points lag will bias this)
+                            opponentsBehind.Add(new Tuple<float, OpponentData>(absDelta, opponent));
+                        }
                     }
                 }
-                // TODO: sort each of these by the delta, smallest first
+                // sort each of these by the delta, smallest first
+                opponentsAhead.Sort(delegate(Tuple<float, OpponentData> t1, Tuple<float, OpponentData> t2)
+                {
+                    return t1.Item1.CompareTo(t2.Item2);
+                });
+                opponentsBehind.Sort(delegate(Tuple<float, OpponentData> t1, Tuple<float, OpponentData> t2)
+                {
+                    return t1.Item1.CompareTo(t2.Item2);
+                });
 
                 // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
                 // now the expected distance between us and them (in metres) when we emerge.
+                return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind);
             }
+            // oh dear
+            return null;
         }
 
-        private static class PostPitRacePosition
+        public class PostPitRacePosition
         {
-            // these may have zero or more entries - these are the opponents who'll
-            // be 'interesting' (close, racing for position, etc)
-            List<Tuple<String, float>> opponentsFrontAfterStop = new List<Tuple<string,float>>();
-            List<Tuple<String, float>> opponentsBehindAfterStop = new List<Tuple<string, float>>();
-            int expectedRacePosition = -1;
+            public List<Tuple<float, OpponentData>> opponentsFrontAfterStop;
+            public List<Tuple<float, OpponentData>> opponentsBehindAfterStop;
+            public int expectedRacePosition = -1;
 
-            public PostPitRacePosition()
+            public PostPitRacePosition(List<Tuple<float, OpponentData>> opponentsFrontAfterStop, List<Tuple<float, OpponentData>> opponentsBehindAfterStop)
             {
-
+                this.opponentsBehindAfterStop = opponentsBehindAfterStop;
+                this.opponentsFrontAfterStop = opponentsFrontAfterStop;
+                if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
+                {
+                    // we'll be in position - 1
+                    expectedRacePosition = opponentsBehindAfterStop[0].Item2.ClassPosition - 1;
+                }
+                else if (opponentsFrontAfterStop != null && opponentsFrontAfterStop.Count > 0)
+                {
+                    // we'll be in position + 1
+                    expectedRacePosition = opponentsFrontAfterStop[0].Item2.ClassPosition + 1;
+                }
             }
         }
 
