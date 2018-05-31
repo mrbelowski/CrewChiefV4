@@ -75,7 +75,8 @@ namespace CrewChiefV4.Events
                 if (currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane)
                 {
                     // we've entered the pit. If we've not already given a call, provide the post-pit estimate here
-                    reportPostPitEstimates();
+                    reportPostPitEstimates(false, currentGameState.SessionData.ClassPosition, currentGameState.OpponentData, 
+                        currentGameState.SessionData.DeltaTime, currentGameState.Now);
                 }
                 if (nextPitTimingCheckDue > currentGameState.Now)
                 {
@@ -101,7 +102,8 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportPostPitEstimates(Boolean fromVoiceCommand, int currentRacePosition, Dictionary<String, OpponentData> opponents)
+        private void reportPostPitEstimates(Boolean fromVoiceCommand, int currentRacePosition,
+            Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now)
         {
             float expectedPlayerTimeLoss = -1;
             if (playerTimeLostForStop == -1)
@@ -135,7 +137,47 @@ namespace CrewChiefV4.Events
             if (expectedPlayerTimeLoss != -1)
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
+                // in order to do this we need to know the real-time time gap to each opponent behind us. 
+                DateTime nowMinusExpectedLoss = now.AddSeconds(expectedPlayerTimeLoss * -1);
+                // get the track distanceRoundTrack at this point in history
+                TimeSpan closestDeltapointTimeDelta = TimeSpan.MaxValue;
+                float closestDeltapointPosition = -1;
+                foreach (KeyValuePair<float, DateTime> entry in playerDeltaTime.deltaPoints)
+                {
+                    TimeSpan timeDelta = nowMinusExpectedLoss - entry.Value;
+                    if (timeDelta < closestDeltapointTimeDelta)
+                    {
+                        closestDeltapointTimeDelta = timeDelta;
+                        closestDeltapointPosition = entry.Key;
+                    }
+                }
+                // this needs to be bounds-checked
 
+                // now we have an estimate of where we were on track this many seconds ago. Get the closest opponents
+                // to this position on track.
+
+                List<Tuple<float, OpponentData>> opponentsAhead = new List<Tuple<float, OpponentData>>();
+                List<Tuple<float, OpponentData>> opponentsBehind = new List<Tuple<float, OpponentData>>();
+                
+                foreach (OpponentData opponent in opponents.Values)
+                {
+                    float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
+                    float absDelta = Math.Abs(opponentPositionDelta);
+                    if (opponentPositionDelta > 0)
+                    {
+                        // he'll be ahead
+                        opponentsAhead.Add(new Tuple<float, OpponentData>(absDelta, opponent));
+                    }
+                    else
+                    {
+                        // he'll be behind (TODO: work out which way the delta-points lag will bias this)
+                        opponentsBehind.Add(new Tuple<float, OpponentData>(absDelta, opponent));
+                    }
+                }
+                // TODO: sort each of these by the delta, smallest first
+
+                // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
+                // now the expected distance between us and them (in metres) when we emerge.
             }
         }
 
