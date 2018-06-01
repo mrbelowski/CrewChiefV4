@@ -18,8 +18,11 @@ namespace CrewChiefV4.Events
         private float gameTimeAtPracticeStopTimerStart = -1;
         private float s3AndS1TimeOnStop = -1;
 
-        // when making 'box this lap' request or from an explict command, we may report post pit estimates - set this flag
-        private Boolean gavePostPitDataThisLap = false;
+        // this is set by the box-this-lap macro (eeewwww), and primes this event to play the position
+        // estimates when we hit S3
+        public static Boolean playPitPositionEstimates = false;
+
+        public static Boolean playedPitPositionEstimatesForThisLap = false;
 
         private HashSet<String> opponentsInPitCycle = new HashSet<string>();
 
@@ -43,6 +46,8 @@ namespace CrewChiefV4.Events
             gameTimeAtPracticeStopTimerStart = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
             opponentsInPitCycle.Clear();
+            playPitPositionEstimates = false;
+            playedPitPositionEstimatesForThisLap = false;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -63,23 +68,30 @@ namespace CrewChiefV4.Events
                     s3AndS1TimeOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
                     gameTimeAtPracticeStopTimerStart = -1;
                     isTimingPracticeStop = false;
+
+                    // TODO: if we have enough laps, we can do the calculation here and announce the result ("we think a pitstop
+                    // costs about X seconds overall"), but this is not so important
                 }
                 // nothing else to do unless we're in race mode
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
-                if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.IsNewLap)
+                if (currentGameState.SessionData.IsNewLap)
                 {
-                    gavePostPitDataThisLap = false;
+                    playedPitPositionEstimatesForThisLap = false;
                 }
-                if (currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane)
+                if (playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !playedPitPositionEstimatesForThisLap)
                 {
-                    // we've entered the pit. If we've not already given a call, provide the post-pit estimate here
+                    playPitPositionEstimates = false;
+                    // we requested a stop and we're in S3, so gather up the data we'll need and report it
+                    //
+                    // Note that we need to derive the position estimates here before we start slowing for pit entry
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition,
-                        currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now);
+                            currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now);
                     if (postRacePositions != null && postRacePositions.expectedRacePosition != -1)
                     {
                         // we have some estimated data about where we'll be after our stop, so report it
+
                     }
                 }
                 if (nextPitTimingCheckDue > currentGameState.Now)
@@ -155,6 +167,10 @@ namespace CrewChiefV4.Events
                 List<Tuple<float, OpponentData>> opponentsAhead = new List<Tuple<float, OpponentData>>();
                 List<Tuple<float, OpponentData>> opponentsBehind = new List<Tuple<float, OpponentData>>();
 
+                // TODO: as we'll be notifying about clear-air or coming out into traffic, we'll need all the opponents
+                // here, maybe as a Dictionary keyed on car class ID. This allows us to report info for same-class stuff
+                // as well as general traffic warnings
+
                 String playerClassId = playerClass.getClassIdentifier();
                 foreach (OpponentData opponent in opponents.Values)
                 {
@@ -217,7 +233,24 @@ namespace CrewChiefV4.Events
 
         public override void respond(string voiceMessage)
         {
-            // if voice message is 'practice pitstop' or something, set the boolean
+            // if voice message is 'practice pitstop' or something, set the boolean flag that makes the
+            // trigger-loop calculate the time loss
+            if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PRACTICE_PIT_STOP))
+            {
+                isTimingPracticeStop = true;
+            }
+
+            // if the voice message is 'where will I emerge' or something, get the PostPitRacePosition object
+            // and report some data from it, then set the playedPitPositionEstimatesForThisLap to true
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PLAY_POST_PIT_POSITION_ESTIMATE))
+            {
+                Strategy.PostPitRacePosition postPitPosition = getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
+                    CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData, CrewChief.currentGameState.SessionData.DeltaTime,
+                    CrewChief.currentGameState.Now);
+                // do some reporting
+
+                playedPitPositionEstimatesForThisLap = true;
+            }
         }
     }
 }
