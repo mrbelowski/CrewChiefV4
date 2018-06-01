@@ -116,6 +116,9 @@ MORE_INFO = clarify:tell me more:more information:more info
 
 I_AM_OK = yeah:yes:fine:I'm OK:I'm fine:yes I'm fine:shut up:yeah I'm fine
 
+PLAY_POST_PIT_POSITION_ESTIMATE = 
+PRACTICE_PIT_STOP = time this stop:practice pitstop:
+
 
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.
