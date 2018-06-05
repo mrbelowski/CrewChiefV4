@@ -41,11 +41,11 @@ namespace CrewChiefV4.Events
 
         // may be timed during practice.
         // Need to be careful here to ensure this is applicable to the session we've actually entered
-        private float playerTimeLostForStop = -1;
-        private CarData.CarClass carClassForLastPitstopTiming;
-        private String trackNameForLastPitstopTiming;
+        private static float playerTimeLostForStop = -1;
+        private static CarData.CarClass carClassForLastPitstopTiming;
+        private static String trackNameForLastPitstopTiming;
+        private static Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
 
-        private Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
         private Boolean isTimingPracticeStop = false;
         private float gameTimeAtPracticeStopTimerStart = -1;
         private float s3AndS1TimeOnStop = -1;
@@ -73,13 +73,13 @@ namespace CrewChiefV4.Events
         public override void clearState()
         {
             // don't wipe the time-lost-on-stop that may have been derived in a previous session
-            opponentsTimeLostForStop.Clear();
+            Strategy.opponentsTimeLostForStop.Clear();
             isTimingPracticeStop = false;
             gameTimeAtPracticeStopTimerStart = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
             opponentsInPitCycle.Clear();
-            playPitPositionEstimates = false;
-            playedPitPositionEstimatesForThisLap = false;
+            Strategy.playPitPositionEstimates = false;
+            Strategy.playedPitPositionEstimatesForThisLap = false;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -98,14 +98,16 @@ namespace CrewChiefV4.Events
                 else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1)
                 {
                     s3AndS1TimeOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
-                    playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector3Time);
+                    Strategy.playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector3Time);
                     gameTimeAtPracticeStopTimerStart = -1;
                     isTimingPracticeStop = false;
-                    carClassForLastPitstopTiming = currentGameState.carClass;
-                    trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
+                    Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
+                    Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
-                        MessageContents(MessageFragment.Time(TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)), MessageFragment.Text(NumberReader.folderSeconds)),
+                        MessageContents(MessageFragment.Text(folderPitStopCostsUsAbout),
+                        MessageFragment.Time(TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)), 
+                        MessageFragment.Text(NumberReader.folderSeconds)),
                         0, this));
                 }
                 // nothing else to do unless we're in race mode
@@ -114,16 +116,17 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.IsNewLap)
                 {
-                    playedPitPositionEstimatesForThisLap = false;
+                    Strategy.playedPitPositionEstimatesForThisLap = false;
                 }
-                if (playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !playedPitPositionEstimatesForThisLap)
+                if (Strategy.playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !Strategy.playedPitPositionEstimatesForThisLap)
                 {
-                    playPitPositionEstimates = false;
+                    Strategy.playPitPositionEstimates = false;
                     // we requested a stop and we're in S3, so gather up the data we'll need and report it
                     //
                     // Note that we need to derive the position estimates here before we start slowing for pit entry
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition,
-                            currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now);
+                            currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now,
+                            currentGameState.SessionData.TrackDefinition.name);
                     if (postRacePositions != null && postRacePositions.expectedRacePosition != -1)
                     {
                         // we have some estimated data about where we'll be after our stop, so report it
@@ -145,7 +148,7 @@ namespace CrewChiefV4.Events
                                 float bestS3AndS1Time = entry.Value.bestSector3Time + entry.Value.bestSector1Time;
                                 // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
                                 float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[1] - entry.Value.getLastLapData().GameTimeAtSectorEnd[2];
-                                opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
+                                Strategy.opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
                                 opponentsInPitCycle.Remove(entry.Key);
                             }
                             else if (entry.Value.InPits)
@@ -158,17 +161,27 @@ namespace CrewChiefV4.Events
             }
         }
 
+        private static float getExpectedPlayerTimeLoss(CarData.CarClass carClass, String trackName)
+        {
+            if (CarData.IsCarClassEqual(carClass, Strategy.carClassForLastPitstopTiming) && trackName == Strategy.trackNameForLastPitstopTiming)
+            {
+                return Strategy.playerTimeLostForStop;
+            }
+            return -1;
+        }
+
         // all the nasty logic is in this method - refactor?
-        private Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition,
-            CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now)
+        private static Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition,
+            CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
+            String trackName)
         {
             float expectedPlayerTimeLoss = -1;
-            if (playerTimeLostForStop == -1)
+            if (Strategy.playerTimeLostForStop == -1)
             {
-                if (opponentsTimeLostForStop.Count != 0) 
+                if (Strategy.opponentsTimeLostForStop.Count != 0) 
                 {
                     // select the best opponent to compare with
-                    foreach (KeyValuePair<String, float> entry in opponentsTimeLostForStop)
+                    foreach (KeyValuePair<String, float> entry in Strategy.opponentsTimeLostForStop)
                     {
                         if (Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition) < 2)
                         {
@@ -180,7 +193,7 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                expectedPlayerTimeLoss = playerTimeLostForStop;
+                expectedPlayerTimeLoss = Strategy.playerTimeLostForStop;
             }
             if (expectedPlayerTimeLoss != -1)
             {
@@ -206,10 +219,6 @@ namespace CrewChiefV4.Events
 
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
-
-                // TODO: as we'll be notifying about clear-air or coming out into traffic, we'll need all the opponents
-                // here, maybe as a Dictionary keyed on car class ID. This allows us to report info for same-class stuff
-                // as well as general traffic warnings
 
                 foreach (OpponentData opponent in opponents.Values)
                 {
@@ -302,7 +311,7 @@ namespace CrewChiefV4.Events
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
                     {
                         // we'll be in position - 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (opponent.isPlayerClass)
+                        if (opponent.isPlayerClass && opponentClosestBehindAfterStop == null)
                         {
                             expectedRacePosition = opponent.opponentData.ClassPosition - 1;
                             opponentClosestBehindAfterStop = opponent;
@@ -323,9 +332,10 @@ namespace CrewChiefV4.Events
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsFrontAfterStop)
                     {
                         // we'll be in position + 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (opponent.isPlayerClass)
+                        if (opponent.isPlayerClass && opponentClosestAheadAfterStop == null)
                         {
                             opponentClosestAheadAfterStop = opponent;
+                            // do we need this?
                             if (expectedRacePosition == -1)
                             {
                                 expectedRacePosition = opponent.opponentData.ClassPosition + 1;
@@ -464,9 +474,9 @@ namespace CrewChiefV4.Events
             // and report some data from it, then set the playedPitPositionEstimatesForThisLap to true
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PLAY_POST_PIT_POSITION_ESTIMATE))
             {
-                Strategy.PostPitRacePosition postPitPosition = getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
+                Strategy.PostPitRacePosition postPitPosition = Strategy.getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
                     CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData, CrewChief.currentGameState.SessionData.DeltaTime,
-                    CrewChief.currentGameState.Now);
+                    CrewChief.currentGameState.Now, CrewChief.currentGameState.SessionData.TrackDefinition.name);
                 // do some reporting
                 if (postPitPosition != null && postPitPosition.expectedRacePosition != -1)
                 {
