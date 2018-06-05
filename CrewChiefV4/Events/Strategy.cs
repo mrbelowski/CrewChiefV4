@@ -36,7 +36,7 @@ namespace CrewChiefV4.Events
         public static String folderAFewSecondsAheadOf = "strategy/a_few_seconds_ahead_of";
         public static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
 
-        private static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
+        public static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
 
 
         // may be timed during practice.
@@ -113,11 +113,9 @@ namespace CrewChiefV4.Events
                     Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
                     Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
-                    // TODO: why doesn't this play? Why is there no error message when it fails?
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
-                        MessageContents(MessageFragment.Text(folderPitStopCostsUsAbout),
-                        MessageFragment.Time(TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)), 
-                        MessageFragment.Text(NumberReader.folderSeconds)),
+                        MessageContents(folderPitStopCostsUsAbout,
+                        TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
                         0, this));
                 }
                 // nothing else to do unless we're in race mode
