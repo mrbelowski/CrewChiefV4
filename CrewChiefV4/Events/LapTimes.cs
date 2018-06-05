@@ -288,7 +288,8 @@ namespace CrewChiefV4.Events
                 deltaPlayerLastToSessionBestInClassSet = false;
                 if (currentGameState.SessionData.LapTimePrevious > 0)
                 {
-                    if (currentGameState.OpponentData.Count > 0)
+                    if (currentGameState.OpponentData.Count > 0
+                        && currentGameState.SessionData.SessionType != SessionType.LonePractice && currentGameState.SessionData.SessionType != SessionType.HotLap)
                     {
                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass > 0)
                         {
@@ -430,7 +431,8 @@ namespace CrewChiefV4.Events
                                     currentGameState.OpponentData.Count == 0)
                                 {
                                     if (currentGameState.SessionData.CompletedLaps > 1 && 
-                                        (lastLapRating == LastLapRating.BEST_IN_CLASS || deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
+                                        (isHotLappingOrLonePractice ? lastLapRating == LastLapRating.BEST_OVERALL : lastLapRating == LastLapRating.BEST_IN_CLASS 
+                                            || deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this));
                                     }
