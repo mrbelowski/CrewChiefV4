@@ -113,6 +113,7 @@ namespace CrewChiefV4.Events
                     Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
                     Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
+                    // TODO: why doesn't this play? Why is there no error message when it fails?
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
                         MessageContents(MessageFragment.Text(folderPitStopCostsUsAbout),
                         MessageFragment.Time(TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)), 
@@ -224,6 +225,8 @@ namespace CrewChiefV4.Events
             {
                 expectedPlayerTimeLoss = Strategy.playerTimeLostForStop;
             }
+            // TODO: if the expected player time loss is close to or greater than a laptime, the position estimate
+            // logic won't work in its current form
             if (expectedPlayerTimeLoss != -1)
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
@@ -251,6 +254,10 @@ namespace CrewChiefV4.Events
 
                 foreach (OpponentData opponent in opponents.Values)
                 {
+                    // TODO: major issue here when a car laps us or nearly laps us when we're in the pits - the position estimate
+                    // is nonsense. If we emerge just in front of the leader our position will be reported as p0.
+                    // Need to find some way to account for lapping or nearly lapping, or else block the position estimate
+                    // if we're unsure.
                     String opponentCarClassId = opponent.CarClass.getClassIdentifier();
                     
                     float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;

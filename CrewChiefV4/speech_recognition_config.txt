@@ -107,7 +107,7 @@ STATUS = full update:full status:update me
 START_PACE_NOTES_PLAYBACK = start pace notes
 STOP_PACE_NOTES_PLAYBACK = stop pace notes
 
-IS_CAR_AHEAD_MY_CLASS = is the car ahead in my class:is the car ahead my class:is the car ahead the same class as me:is the car in front in my class:is the car in front my class:is the car in front the same class as me:
+IS_CAR_AHEAD_MY_CLASS = is the car ahead in my class:is the car ahead my class:is the car ahead the same class as me:is the car in front in my class:is the car in front my class:is the car in front the same class as me
 IS_CAR_BEHIND_MY_CLASS = is the car behind in my class:is the car behind my class:is the car behind the same class as me
 WHAT_CLASS_IS_CAR_AHEAD = what class is the car ahead:what class is the guy ahead:what class is the car in front:what class is the guy in front
 WHAT_CLASS_IS_CAR_BEHIND = what class is the car behind:what class is the guy behind
