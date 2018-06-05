@@ -207,7 +207,7 @@ namespace CrewChiefV4.Events
                 float closestDeltapointPosition = -1;
                 foreach (KeyValuePair<float, DateTime> entry in playerDeltaTime.deltaPoints)
                 {
-                    TimeSpan timeDelta = nowMinusExpectedLoss - entry.Value;
+                    TimeSpan timeDelta = (nowMinusExpectedLoss - entry.Value).Duration();
                     if (timeDelta < closestDeltapointTimeDelta)
                     {
                         closestDeltapointTimeDelta = timeDelta;
