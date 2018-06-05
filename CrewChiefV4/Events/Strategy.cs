@@ -91,6 +91,13 @@ namespace CrewChiefV4.Events
             {
                 return;
             }
+            if (currentGameState.SessionData.TrackDefinition == null || 
+                ((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
+                    CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3))
+            {
+                // no track data, or track that doesn't have 3 sectors
+                return;
+            }
             if (currentGameState.SessionData.SessionType == SessionType.Practice && isTimingPracticeStop)
             {
                 if (currentGameState.SessionData.SectorNumber == 3 && previousGameState.SessionData.SectorNumber == 2)
