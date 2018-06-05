@@ -123,6 +123,7 @@ namespace CrewChiefV4
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
             eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));
+            eventsList.Add("Strategy", new Strategy(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }

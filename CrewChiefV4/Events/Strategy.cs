@@ -133,21 +133,21 @@ namespace CrewChiefV4.Events
                         reportPostPitData(postRacePositions, false);
                     }
                 }
-                if (nextPitTimingCheckDue > currentGameState.Now)
+                if (currentGameState.Now > nextPitTimingCheckDue)
                 {
                     nextPitTimingCheckDue = currentGameState.Now.AddSeconds(5);
                     // update opponent time lost
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
                         // only interested in opponent pit times for our class
-                        if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass))
+                        if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass) && entry.Value.CompletedLaps > 2)
                         {
                             if (opponentsInPitCycle.Contains(entry.Key) && entry.Value.CurrentSectorNumber == 2)
                             {
                                 // he's entered s2 since we last checked, so calculate how much time he's lost pitting
                                 float bestS3AndS1Time = entry.Value.bestSector3Time + entry.Value.bestSector1Time;
                                 // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
-                                float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[1] - entry.Value.getLastLapData().GameTimeAtSectorEnd[2];
+                                float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[0] - entry.Value.getLastLapData().GameTimeAtSectorEnd[1];
                                 Strategy.opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
                                 opponentsInPitCycle.Remove(entry.Key);
                             }
@@ -180,13 +180,15 @@ namespace CrewChiefV4.Events
             {
                 if (Strategy.opponentsTimeLostForStop.Count != 0) 
                 {
+                    int pittedOpponentPositionDiff = int.MaxValue;
                     // select the best opponent to compare with
                     foreach (KeyValuePair<String, float> entry in Strategy.opponentsTimeLostForStop)
                     {
-                        if (Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition) < 2)
+                        int positionDiff = Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition);
+                        if (positionDiff < pittedOpponentPositionDiff)
                         {
-                            // he'll do - probably need a better way to decide this
                             expectedPlayerTimeLoss = entry.Value;
+                            pittedOpponentPositionDiff = positionDiff;
                         }
                     }
                 }
@@ -235,7 +237,7 @@ namespace CrewChiefV4.Events
                     else
                     {
                         // he'll be behind (TODO: work out which way the delta-points lag will bias this)
-                        opponentsAhead.Add(new OpponentPositionAtPlayerPitExit(absDelta, false, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
+                        opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, false, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
                             opponentCarClassId, opponent));
                     }                    
                 }
