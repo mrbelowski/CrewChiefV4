@@ -10,7 +10,7 @@ namespace CrewChiefV4
         public static String folderPoint = "numbers/point";
         public static String folderMinutes = "numbers/minutes";
         public static String folderMinute = "numbers/minute";
-        public static String folderSeconds = "numbers/seconds";
+        private static String folderSeconds = "numbers/seconds";
         public static String folderOh = "numbers/oh";
 
         /**
