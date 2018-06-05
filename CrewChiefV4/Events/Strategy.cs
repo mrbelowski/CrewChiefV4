@@ -9,6 +9,32 @@ namespace CrewChiefV4.Events
 {
     class Strategy : AbstractEvent
     {
+        // less than 70m => 'just ahead' or 'just behind'
+        private static float distanceBehindToBeConsideredClose = 70;
+        private static float distanceAheadToBeConsideredClose = 70;
+
+        // assume speed at pit exit is 70m/s (mad, I know), so any distance > 200 and < 500 is a few seconds.
+        // < 200 means we'll give a simple non-commital ahead / behind
+        private static float minDistanceBehindToBeConsideredAFewSeconds= 200;
+        private static float minDistanceAheadToBeConsideredAFewSeconds = 200;
+        private static float maxDistanceBehindToBeConsideredAFewSeconds = 500;
+        private static float maxDistanceAheadToBeConsideredAFewSeconds = 500;
+
+        private static String folderExpectTrafficOnPitExit = "strategy/expect_traffic_on_pit_exit";
+        private static String folderClearTrackOnPitExit = "strategy/expect_clear_track_on_pit_exit";
+        private static String folderWeShouldEmergeInPosition = "strategy/we_should_emerge_in_position";
+        private static String folderBetween = "strategy/between";
+        private static String folderAnd = "strategy/and";
+        private static String folderJustAheadOf = "strategy/just_ahead_of";
+        private static String folderJustBehind = "strategy/just_behind";
+        private static String folderAheadOf = "strategy/ahead_of";
+        private static String folderBehind = "strategy/behind";
+
+        // these are a bit tricky as we only know the separation distance, not time
+        private static String folderAFewSecondsAheadOf = "strategy/a_few_seconds_ahead_of";
+        private static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
+
+
         // may be timed during practice.
         // Need to be careful here to ensure this is applicable to the session we've actually entered
         private float playerTimeLostForStop = -1;
@@ -91,7 +117,7 @@ namespace CrewChiefV4.Events
                     if (postRacePositions != null && postRacePositions.expectedRacePosition != -1)
                     {
                         // we have some estimated data about where we'll be after our stop, so report it
-
+                        reportPostPitData(postRacePositions);
                     }
                 }
                 if (nextPitTimingCheckDue > currentGameState.Now)
@@ -100,18 +126,22 @@ namespace CrewChiefV4.Events
                     // update opponent time lost
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
-                        if (opponentsInPitCycle.Contains(entry.Key) && entry.Value.CurrentSectorNumber == 2)
+                        // only interested in opponent pit times for our class
+                        if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass))
                         {
-                            // he's entered s2 since we last checked, so calculate how much time he's lost pitting
-                            float bestS3AndS1Time = entry.Value.bestSector3Time + entry.Value.bestSector1Time;
-                            // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
-                            float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[1] - entry.Value.getLastLapData().GameTimeAtSectorEnd[2];
-                            opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
-                            opponentsInPitCycle.Remove(entry.Key);
-                        }
-                        else if (entry.Value.InPits)
-                        {
-                            opponentsInPitCycle.Add(entry.Key);
+                            if (opponentsInPitCycle.Contains(entry.Key) && entry.Value.CurrentSectorNumber == 2)
+                            {
+                                // he's entered s2 since we last checked, so calculate how much time he's lost pitting
+                                float bestS3AndS1Time = entry.Value.bestSector3Time + entry.Value.bestSector1Time;
+                                // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
+                                float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[1] - entry.Value.getLastLapData().GameTimeAtSectorEnd[2];
+                                opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
+                                opponentsInPitCycle.Remove(entry.Key);
+                            }
+                            else if (entry.Value.InPits)
+                            {
+                                opponentsInPitCycle.Add(entry.Key);
+                            }
                         }
                     }
                 }
@@ -164,40 +194,40 @@ namespace CrewChiefV4.Events
                 // now we have an estimate of where we were on track this many seconds ago. Get the closest opponents
                 // to this position on track.
 
-                List<Tuple<float, OpponentData>> opponentsAhead = new List<Tuple<float, OpponentData>>();
-                List<Tuple<float, OpponentData>> opponentsBehind = new List<Tuple<float, OpponentData>>();
+                List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
+                List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
 
                 // TODO: as we'll be notifying about clear-air or coming out into traffic, we'll need all the opponents
                 // here, maybe as a Dictionary keyed on car class ID. This allows us to report info for same-class stuff
                 // as well as general traffic warnings
 
-                String playerClassId = playerClass.getClassIdentifier();
                 foreach (OpponentData opponent in opponents.Values)
                 {
-                    if (opponent.CarClass.getClassIdentifier() == playerClassId)
+                    String opponentCarClassId = opponent.CarClass.getClassIdentifier();
+                    
+                    float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
+                    float absDelta = Math.Abs(opponentPositionDelta);
+                    if (opponentPositionDelta > 0)
                     {
-                        float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
-                        float absDelta = Math.Abs(opponentPositionDelta);
-                        if (opponentPositionDelta > 0)
-                        {
-                            // he'll be ahead
-                            opponentsAhead.Add(new Tuple<float, OpponentData>(absDelta, opponent));
-                        }
-                        else
-                        {
-                            // he'll be behind (TODO: work out which way the delta-points lag will bias this)
-                            opponentsBehind.Add(new Tuple<float, OpponentData>(absDelta, opponent));
-                        }
+                        // he'll be ahead
+                        opponentsAhead.Add(new OpponentPositionAtPlayerPitExit(absDelta, true, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
+                            opponentCarClassId, opponent));
                     }
+                    else
+                    {
+                        // he'll be behind (TODO: work out which way the delta-points lag will bias this)
+                        opponentsAhead.Add(new OpponentPositionAtPlayerPitExit(absDelta, false, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
+                            opponentCarClassId, opponent));
+                    }                    
                 }
                 // sort each of these by the delta, smallest first
-                opponentsAhead.Sort(delegate(Tuple<float, OpponentData> t1, Tuple<float, OpponentData> t2)
+                opponentsAhead.Sort(delegate(OpponentPositionAtPlayerPitExit d1, OpponentPositionAtPlayerPitExit d2)
                 {
-                    return t1.Item1.CompareTo(t2.Item2);
+                    return d1.predictedDistanceGap.CompareTo(d2.predictedDistanceGap);
                 });
-                opponentsBehind.Sort(delegate(Tuple<float, OpponentData> t1, Tuple<float, OpponentData> t2)
+                opponentsBehind.Sort(delegate(OpponentPositionAtPlayerPitExit d1, OpponentPositionAtPlayerPitExit d2)
                 {
-                    return t1.Item1.CompareTo(t2.Item2);
+                    return d1.predictedDistanceGap.CompareTo(d2.predictedDistanceGap);
                 });
 
                 // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
@@ -208,26 +238,122 @@ namespace CrewChiefV4.Events
             return null;
         }
 
+        /**
+         * value object containing car class data, predicted post-pit distance gap, and opponent
+         */
+        public class OpponentPositionAtPlayerPitExit
+        {
+            // always positive:
+            public float predictedDistanceGap;
+            // probably don't need this:
+            public Boolean isAheadOfPlayer;
+            public Boolean isPlayerClass;
+            public String carClassId;
+            public OpponentData opponentData;
+            public OpponentPositionAtPlayerPitExit(float predictedDistanceGap, Boolean isAheadOfPlayer, Boolean isPlayerClass,
+                String carClassId, OpponentData opponentData)
+            {
+                this.predictedDistanceGap = predictedDistanceGap;
+                this.isAheadOfPlayer = isAheadOfPlayer;
+                this.isPlayerClass = isPlayerClass;
+                this.carClassId = carClassId;
+                this.opponentData = opponentData;
+            }
+        }
+
+        /**
+         * Helpfully organised post-pit position data.
+         */
         public class PostPitRacePosition
         {
-            public List<Tuple<float, OpponentData>> opponentsFrontAfterStop;
-            public List<Tuple<float, OpponentData>> opponentsBehindAfterStop;
+            public List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop;
+            public List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop;
             public int expectedRacePosition = -1;
 
-            public PostPitRacePosition(List<Tuple<float, OpponentData>> opponentsFrontAfterStop, List<Tuple<float, OpponentData>> opponentsBehindAfterStop)
+            // these are player class only
+            public List<OpponentData> opponentsCloseBehindAfterStop = new List<OpponentData>();
+            public List<OpponentData> opponentsCloseAheadAfterStop = new List<OpponentData>();
+
+            // this is based on any class
+            public float numCarsCloseBehindAfterStop = 0;
+            public float numCarsCloseAheadAfterStop = 0;
+
+            public float numCarsFairlyCloseAheadAfterStop = 0;
+
+            public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop)
             {
                 this.opponentsBehindAfterStop = opponentsBehindAfterStop;
                 this.opponentsFrontAfterStop = opponentsFrontAfterStop;
+
+                // derive the expected race position:
                 if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
-                {
-                    // we'll be in position - 1
-                    expectedRacePosition = opponentsBehindAfterStop[0].Item2.ClassPosition - 1;
+                {                    
+                    foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
+                    {
+                        // we'll be in position - 1 from the closest opponent behind in our class - set this if we haven't already
+                        if (expectedRacePosition == -1 && opponent.isPlayerClass)
+                        {
+                            expectedRacePosition = opponent.opponentData.ClassPosition - 1;
+                        }
+                        if (opponent.predictedDistanceGap < Strategy.distanceBehindToBeConsideredClose)
+                        {
+                            numCarsCloseBehindAfterStop++;
+                            if (opponent.isPlayerClass)
+                            {
+                                opponentsCloseBehindAfterStop.Add(opponent.opponentData);
+                            }
+                        }
+                    }
                 }
-                else if (opponentsFrontAfterStop != null && opponentsFrontAfterStop.Count > 0)
+                // if there's noone in our class behind us, get it from the cars expected to be in front
+                if (opponentsFrontAfterStop != null && opponentsFrontAfterStop.Count > 0)
                 {
-                    // we'll be in position + 1
-                    expectedRacePosition = opponentsFrontAfterStop[0].Item2.ClassPosition + 1;
+                    foreach (OpponentPositionAtPlayerPitExit opponent in opponentsFrontAfterStop)
+                    {
+                        // we'll be in position + 1 from the closest opponent behind in our class - set this if we haven't already
+                        if (expectedRacePosition == -1 && opponent.isPlayerClass)
+                        {
+                            expectedRacePosition = opponent.opponentData.ClassPosition + 1;
+                        }
+                        if (opponent.predictedDistanceGap < Strategy.distanceAheadToBeConsideredClose)
+                        {
+                            numCarsCloseAheadAfterStop++;
+                            if (opponent.isPlayerClass)
+                            {
+                                opponentsCloseAheadAfterStop.Add(opponent.opponentData);
+                            }
+                        }
+                        else if (opponent.predictedDistanceGap < Strategy.minDistanceAheadToBeConsideredAFewSeconds)
+                        {
+                            numCarsFairlyCloseAheadAfterStop++;
+                        }
+                    }
                 }
+            }
+
+            public Boolean willBeInTraffic()
+            {
+                return numCarsCloseAheadAfterStop > 0 && numCarsCloseBehindAfterStop > 0;
+            }
+        }
+
+        private void reportPostPitData(Strategy.PostPitRacePosition postPitData)
+        {
+            List<MessageFragment> fragments = new List<MessageFragment>();
+            if (postPitData.willBeInTraffic())
+            {
+                fragments.Add(MessageFragment.Text(folderExpectTrafficOnPitExit));
+            }
+            else if (postPitData.numCarsCloseAheadAfterStop == 0 && postPitData.numCarsFairlyCloseAheadAfterStop == 0 &&
+                postPitData.numCarsCloseBehindAfterStop == 0)
+            {
+                fragments.Add(MessageFragment.Text(folderClearTrackOnPitExit));
+            }
+            if (postPitData.expectedRacePosition != -1)
+            {
+                fragments.Add(MessageFragment.Text(folderWeShouldEmergeInPosition));
+                fragments.Add(MessageFragment.Integer(postPitData.expectedRacePosition));
+                
             }
         }
 
@@ -248,9 +374,12 @@ namespace CrewChiefV4.Events
                     CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData, CrewChief.currentGameState.SessionData.DeltaTime,
                     CrewChief.currentGameState.Now);
                 // do some reporting
-
-                playedPitPositionEstimatesForThisLap = true;
-            }
+                if (postPitPosition != null && postPitPosition.expectedRacePosition != -1)
+                {
+                    reportPostPitData(postPitPosition);
+                    playedPitPositionEstimatesForThisLap = true;
+                }
+            }                
         }
     }
 }
