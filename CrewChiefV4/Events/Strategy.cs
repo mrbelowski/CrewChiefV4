@@ -21,20 +21,20 @@ namespace CrewChiefV4.Events
         private static float maxDistanceBehindToBeConsideredAFewSeconds = 500;
         private static float maxDistanceAheadToBeConsideredAFewSeconds = 500;
 
-        private static String folderExpectTrafficOnPitExit = "strategy/expect_traffic_on_pit_exit";
-        private static String folderClearTrackOnPitExit = "strategy/expect_clear_track_on_pit_exit";
-        private static String folderWeShouldEmergeInPosition = "strategy/we_should_emerge_in_position";
-        private static String folderCloseBetween = "strategy/close_between";    // stuff like "right with" and "really close to..."
-        private static String folderBetween = "strategy/between";
-        private static String folderAnd = "strategy/and";
-        private static String folderJustAheadOf = "strategy/just_ahead_of";
-        private static String folderJustBehind = "strategy/just_behind";
-        private static String folderAheadOf = "strategy/ahead_of";
-        private static String folderBehind = "strategy/behind";
+        public static String folderExpectTrafficOnPitExit = "strategy/expect_traffic_on_pit_exit";
+        public static String folderClearTrackOnPitExit = "strategy/expect_clear_track_on_pit_exit";
+        public static String folderWeShouldEmergeInPosition = "strategy/we_should_emerge_in_position";
+        public static String folderCloseBetween = "strategy/close_between";    // stuff like "right with" and "really close to..."
+        public static String folderBetween = "strategy/between";
+        public static String folderAnd = "strategy/and";
+        public static String folderJustAheadOf = "strategy/just_ahead_of";
+        public static String folderJustBehind = "strategy/just_behind";
+        public static String folderAheadOf = "strategy/ahead_of";
+        public static String folderBehind = "strategy/behind";
 
         // these are a bit tricky as we only know the separation distance, not time
-        private static String folderAFewSecondsAheadOf = "strategy/a_few_seconds_ahead_of";
-        private static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
+        public static String folderAFewSecondsAheadOf = "strategy/a_few_seconds_ahead_of";
+        public static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
 
         private static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
 
