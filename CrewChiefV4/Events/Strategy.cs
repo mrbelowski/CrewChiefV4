@@ -132,6 +132,11 @@ namespace CrewChiefV4.Events
                 {
                     Strategy.playedPitPositionEstimatesForThisLap = false;
                 }
+                // if we've just requested a pit stop (and the game has this data), trigger the strategy data when we next hit sector3
+                else if (!previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
+                {
+                    Strategy.playPitPositionEstimates = true;
+                }
                 if (Strategy.playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !Strategy.playedPitPositionEstimatesForThisLap)
                 {
                     Strategy.playPitPositionEstimates = false;
