@@ -56,8 +56,9 @@ namespace CrewChiefV4.Events
 
         public static Boolean playedPitPositionEstimatesForThisLap = false;
 
+        // for timing opponent stops
+        private Boolean timeOpponentStops = true;
         private HashSet<String> opponentsInPitCycle = new HashSet<string>();
-
         private DateTime nextPitTimingCheckDue = DateTime.MinValue;
 
         public override List<SessionPhase> applicableSessionPhases
@@ -80,6 +81,7 @@ namespace CrewChiefV4.Events
             opponentsInPitCycle.Clear();
             Strategy.playPitPositionEstimates = false;
             Strategy.playedPitPositionEstimatesForThisLap = false;
+            timeOpponentStops = true;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -114,6 +116,11 @@ namespace CrewChiefV4.Events
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
+                // if we've timed our pitstop in practice, don't search for opponent stop times
+                if (currentGameState.SessionData.JustGoneGreen)
+                {
+                    timeOpponentStops = getExpectedPlayerTimeLoss(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name) == -1;
+                }
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     Strategy.playedPitPositionEstimatesForThisLap = false;
@@ -135,7 +142,8 @@ namespace CrewChiefV4.Events
                 }
                 if (currentGameState.Now > nextPitTimingCheckDue)
                 {
-                    nextPitTimingCheckDue = currentGameState.Now.AddSeconds(5);
+                    // check for opponent pit timings every 10 seconds if we don't have our own
+                    nextPitTimingCheckDue = currentGameState.Now.AddSeconds(10);
                     // update opponent time lost
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
@@ -147,11 +155,18 @@ namespace CrewChiefV4.Events
                                 // he's entered s2 since we last checked, so calculate how much time he's lost pitting
                                 float bestS3AndS1Time = entry.Value.bestSector3Time + entry.Value.bestSector1Time;
                                 // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
-                                float lastS3AndS1Time = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[0] - entry.Value.getLastLapData().GameTimeAtSectorEnd[1];
-                                Strategy.opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
+                                // Also note that these are zero-indexed - we want the game time at the end of sector2 on the previous lap and s1 on this lap
+                                float lastLapS2EndTime = entry.Value.getLastLapData().GameTimeAtSectorEnd[1];
+                                float thisLapS1EndTime = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[0];
+                                // only insert data here if we have sane times
+                                if (lastLapS2EndTime > 0 && thisLapS1EndTime > 0)
+                                {
+                                    float lastS3AndS1Time = thisLapS1EndTime - lastLapS2EndTime;
+                                    Strategy.opponentsTimeLostForStop[entry.Key] = lastS3AndS1Time - bestS3AndS1Time;
+                                }
                                 opponentsInPitCycle.Remove(entry.Key);
                             }
-                            else if (entry.Value.InPits)
+                            else if (!opponentsInPitCycle.Contains(entry.Key) && entry.Value.InPits)
                             {
                                 opponentsInPitCycle.Add(entry.Key);
                             }
@@ -160,7 +175,7 @@ namespace CrewChiefV4.Events
                 }
             }
         }
-
+        
         private static float getExpectedPlayerTimeLoss(CarData.CarClass carClass, String trackName)
         {
             if (CarData.IsCarClassEqual(carClass, Strategy.carClassForLastPitstopTiming) && trackName == Strategy.trackNameForLastPitstopTiming)
