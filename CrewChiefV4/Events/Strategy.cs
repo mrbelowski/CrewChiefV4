@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
     class Strategy : AbstractEvent
     {
         // less than 70m => 'just ahead' or 'just behind'
-        private static float distanceBehindToBeConsideredClose = 70;
-        private static float distanceAheadToBeConsideredClose = 70;
+        private static float distanceBehindToBeConsideredVeryClose = 70;
+        private static float distanceAheadToBeConsideredVeryClose = 70;
 
         // assume speed at pit exit is 70m/s (mad, I know), so any distance > 200 and < 500 is a few seconds.
         // < 200 means we'll give a simple non-commital ahead / behind
@@ -23,6 +24,7 @@ namespace CrewChiefV4.Events
         private static String folderExpectTrafficOnPitExit = "strategy/expect_traffic_on_pit_exit";
         private static String folderClearTrackOnPitExit = "strategy/expect_clear_track_on_pit_exit";
         private static String folderWeShouldEmergeInPosition = "strategy/we_should_emerge_in_position";
+        private static String folderCloseBetween = "strategy/close_between";    // stuff like "right with" and "really close to..."
         private static String folderBetween = "strategy/between";
         private static String folderAnd = "strategy/and";
         private static String folderJustAheadOf = "strategy/just_ahead_of";
@@ -34,10 +36,14 @@ namespace CrewChiefV4.Events
         private static String folderAFewSecondsAheadOf = "strategy/a_few_seconds_ahead_of";
         private static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
 
+        private static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
+
 
         // may be timed during practice.
         // Need to be careful here to ensure this is applicable to the session we've actually entered
         private float playerTimeLostForStop = -1;
+        private CarData.CarClass carClassForLastPitstopTiming;
+        private String trackNameForLastPitstopTiming;
 
         private Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
         private Boolean isTimingPracticeStop = false;
@@ -87,16 +93,20 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.SectorNumber == 3 && previousGameState.SessionData.SectorNumber == 2)
                 {
-                    gameTimeAtPracticeStopTimerStart = currentGameState.SessionData.SessionRunningTime;
+                    gameTimeAtPracticeStopTimerStart = currentGameState.SessionData.SessionRunningTime;                    
                 }
                 else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1)
                 {
                     s3AndS1TimeOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
+                    playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector3Time);
                     gameTimeAtPracticeStopTimerStart = -1;
                     isTimingPracticeStop = false;
+                    carClassForLastPitstopTiming = currentGameState.carClass;
+                    trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
-                    // TODO: if we have enough laps, we can do the calculation here and announce the result ("we think a pitstop
-                    // costs about X seconds overall"), but this is not so important
+                    audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
+                        MessageContents(MessageFragment.Time(TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)), MessageFragment.Text(NumberReader.folderSeconds)),
+                        0, this));
                 }
                 // nothing else to do unless we're in race mode
             }
@@ -117,7 +127,7 @@ namespace CrewChiefV4.Events
                     if (postRacePositions != null && postRacePositions.expectedRacePosition != -1)
                     {
                         // we have some estimated data about where we'll be after our stop, so report it
-                        reportPostPitData(postRacePositions);
+                        reportPostPitData(postRacePositions, false);
                     }
                 }
                 if (nextPitTimingCheckDue > currentGameState.Now)
@@ -270,15 +280,15 @@ namespace CrewChiefV4.Events
             public List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop;
             public int expectedRacePosition = -1;
 
-            // these are player class only
-            public List<OpponentData> opponentsCloseBehindAfterStop = new List<OpponentData>();
-            public List<OpponentData> opponentsCloseAheadAfterStop = new List<OpponentData>();
+            public OpponentPositionAtPlayerPitExit opponentClosestAheadAfterStop = null;
+            public OpponentPositionAtPlayerPitExit opponentClosestBehindAfterStop = null;
 
             // this is based on any class
+            public float numCarsVeryCloseBehindAfterStop = 0;
+            public float numCarsVeryCloseAheadAfterStop = 0;
+
             public float numCarsCloseBehindAfterStop = 0;
             public float numCarsCloseAheadAfterStop = 0;
-
-            public float numCarsFairlyCloseAheadAfterStop = 0;
 
             public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop)
             {
@@ -287,21 +297,23 @@ namespace CrewChiefV4.Events
 
                 // derive the expected race position:
                 if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
-                {                    
+                {
+                    // note these are sorted by distance (closest first)
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
                     {
                         // we'll be in position - 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (expectedRacePosition == -1 && opponent.isPlayerClass)
+                        if (opponent.isPlayerClass)
                         {
                             expectedRacePosition = opponent.opponentData.ClassPosition - 1;
+                            opponentClosestBehindAfterStop = opponent;
                         }
-                        if (opponent.predictedDistanceGap < Strategy.distanceBehindToBeConsideredClose)
+                        if (opponent.predictedDistanceGap < Strategy.distanceBehindToBeConsideredVeryClose)
+                        {
+                            numCarsVeryCloseBehindAfterStop++;                            
+                        }
+                        if (opponent.predictedDistanceGap < Strategy.minDistanceAheadToBeConsideredAFewSeconds)
                         {
                             numCarsCloseBehindAfterStop++;
-                            if (opponent.isPlayerClass)
-                            {
-                                opponentsCloseBehindAfterStop.Add(opponent.opponentData);
-                            }
                         }
                     }
                 }
@@ -311,21 +323,21 @@ namespace CrewChiefV4.Events
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsFrontAfterStop)
                     {
                         // we'll be in position + 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (expectedRacePosition == -1 && opponent.isPlayerClass)
+                        if (opponent.isPlayerClass)
                         {
-                            expectedRacePosition = opponent.opponentData.ClassPosition + 1;
-                        }
-                        if (opponent.predictedDistanceGap < Strategy.distanceAheadToBeConsideredClose)
-                        {
-                            numCarsCloseAheadAfterStop++;
-                            if (opponent.isPlayerClass)
+                            opponentClosestAheadAfterStop = opponent;
+                            if (expectedRacePosition == -1)
                             {
-                                opponentsCloseAheadAfterStop.Add(opponent.opponentData);
+                                expectedRacePosition = opponent.opponentData.ClassPosition + 1;
                             }
                         }
-                        else if (opponent.predictedDistanceGap < Strategy.minDistanceAheadToBeConsideredAFewSeconds)
+                        if (opponent.predictedDistanceGap < Strategy.distanceAheadToBeConsideredVeryClose)
                         {
-                            numCarsFairlyCloseAheadAfterStop++;
+                            numCarsVeryCloseAheadAfterStop++;
+                        }
+                        if (opponent.predictedDistanceGap < Strategy.minDistanceAheadToBeConsideredAFewSeconds)
+                        {
+                            numCarsCloseAheadAfterStop++;
                         }
                     }
                 }
@@ -337,15 +349,14 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportPostPitData(Strategy.PostPitRacePosition postPitData)
+        private void reportPostPitData(Strategy.PostPitRacePosition postPitData, Boolean immediate)
         {
             List<MessageFragment> fragments = new List<MessageFragment>();
             if (postPitData.willBeInTraffic())
             {
                 fragments.Add(MessageFragment.Text(folderExpectTrafficOnPitExit));
             }
-            else if (postPitData.numCarsCloseAheadAfterStop == 0 && postPitData.numCarsFairlyCloseAheadAfterStop == 0 &&
-                postPitData.numCarsCloseBehindAfterStop == 0)
+            else if (postPitData.numCarsCloseAheadAfterStop == 0 && postPitData.numCarsVeryCloseBehindAfterStop == 0)
             {
                 fragments.Add(MessageFragment.Text(folderClearTrackOnPitExit));
             }
@@ -353,7 +364,90 @@ namespace CrewChiefV4.Events
             {
                 fragments.Add(MessageFragment.Text(folderWeShouldEmergeInPosition));
                 fragments.Add(MessageFragment.Integer(postPitData.expectedRacePosition));
-                
+
+                // figure out what to read here
+                if (postPitData.opponentClosestAheadAfterStop != null && AudioPlayer.canReadName(postPitData.opponentClosestAheadAfterStop.opponentData.DriverRawName))
+                {
+                    float gapFront = postPitData.opponentClosestAheadAfterStop.predictedDistanceGap;
+                    if (postPitData.opponentClosestBehindAfterStop != null && AudioPlayer.canReadName(postPitData.opponentClosestBehindAfterStop.opponentData.DriverRawName))
+                    {
+                        // can read 2 driver names, so decide which to read (or both)
+                        float gapBehind = postPitData.opponentClosestBehindAfterStop.predictedDistanceGap;
+                        if (gapFront < distanceAheadToBeConsideredVeryClose) 
+                        {
+                            if (gapBehind < distanceBehindToBeConsideredVeryClose)
+                            {
+                                // both cars very close and can be read
+                                fragments.Add(MessageFragment.Text(folderCloseBetween));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                                fragments.Add(MessageFragment.Text(folderAnd));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                            }
+                            else
+                            {
+                                // car in front very close
+                                fragments.Add(MessageFragment.Text(folderJustBehind));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                            }
+                        }
+                        else if (gapBehind < distanceBehindToBeConsideredVeryClose)
+                        {
+                            // car behind very close
+                            fragments.Add(MessageFragment.Text(folderJustAheadOf));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                        }
+                        else if (gapFront < minDistanceAheadToBeConsideredAFewSeconds)
+                        {
+                            if (gapBehind < minDistanceBehindToBeConsideredAFewSeconds)
+                            {
+                                // both cars quite close
+                                fragments.Add(MessageFragment.Text(folderBetween));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                                fragments.Add(MessageFragment.Text(folderAnd));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                            }
+                            else
+                            {
+                                // car in front quite close
+                                fragments.Add(MessageFragment.Text(folderBehind));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                            }
+                        }
+                        else if (gapBehind < minDistanceBehindToBeConsideredAFewSeconds)
+                        {
+                            // car behind quite close
+                            fragments.Add(MessageFragment.Text(folderAheadOf));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                        }
+                        else if (gapFront < maxDistanceAheadToBeConsideredAFewSeconds)
+                        {
+                            // car in front a few seconds away
+                            fragments.Add(MessageFragment.Text(folderAFewSecondsBehind));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                        }
+                        else if (gapBehind < maxDistanceBehindToBeConsideredAFewSeconds)
+                        {
+                            // car behind a few seconds away
+                            fragments.Add(MessageFragment.Text(folderAFewSecondsAheadOf));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                        }
+                    }
+                }
+            }
+            if (fragments.Count > 0)
+            {
+                if (immediate)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", fragments, 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", fragments, 0, this));
+                }
+            }
+            else if (immediate)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
         }
 
@@ -376,7 +470,7 @@ namespace CrewChiefV4.Events
                 // do some reporting
                 if (postPitPosition != null && postPitPosition.expectedRacePosition != -1)
                 {
-                    reportPostPitData(postPitPosition);
+                    reportPostPitData(postPitPosition, true);
                     playedPitPositionEstimatesForThisLap = true;
                 }
             }                
