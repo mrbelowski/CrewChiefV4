@@ -497,6 +497,7 @@ namespace CrewChiefV4.Events
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PRACTICE_PIT_STOP))
             {
                 isTimingPracticeStop = true;
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
             }
 
             // if the voice message is 'where will I emerge' or something, get the PostPitRacePosition object

@@ -1240,6 +1240,11 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("MulticlassWarnings");
             }
+            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP) ||
+                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
+            {
+                return CrewChief.getEvent("Strategy");
+            }
             return null;
         }
     }
