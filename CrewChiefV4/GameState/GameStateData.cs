@@ -1970,18 +1970,37 @@ namespace CrewChiefV4.GameState
             {
                 lapDifference = GetSignedLapDifference(otherCarDelta);
 
+                DateTime otherCarTime;
+                DateTime thisCarTime;
+                var splitTimeSet = false;
                 if (totalDistanceTravelled < otherCarDelta.totalDistanceTravelled)
                 {
                     // I'm behind otherCar, so we want to know time between otherCar reaching the last deltaPoint I've just hit, and me reaching it.
                     // Because otherCar reached it further in the past than me, this will be negative
-                    splitTime = otherCarDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
+                    if (otherCarDelta.deltaPoints.TryGetValue(currentDeltaPoint, out otherCarTime)
+                        && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
+                    {
+                        splitTime = otherCarTime - thisCarTime;
+                        splitTimeSet = true;
+                    }
                 }
                 else if (totalDistanceTravelled > otherCarDelta.totalDistanceTravelled)
                 {
                     // I'm ahead of otherCar, so we want to know time between otherCar reaching the last deltaPoint he's just hit, and me reaching 
                     // that delta point.
                     // Because otherCar reached it more recently than me, this will be positive
-                    splitTime = otherCarDelta.deltaPoints[otherCarDelta.currentDeltaPoint] - deltaPoints[otherCarDelta.currentDeltaPoint];
+                    if (otherCarDelta.deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out otherCarTime)
+                        && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
+                    {
+                        splitTime = otherCarTime - thisCarTime;
+                        splitTimeSet = true;
+                    }
+                }
+
+                if (!splitTimeSet)
+                {
+                    // This might spam, but I think we need to get understanding when this happens.
+                    Console.WriteLine("Failed to calculate split time.");
                 }
             }
             return new Tuple<int, float>(lapDifference, (float) splitTime.TotalSeconds);
@@ -2025,18 +2044,37 @@ namespace CrewChiefV4.GameState
             TimeSpan splitTime = new TimeSpan(0);
             if (otherCarDelta.deltaPoints.Count > 0 && deltaPoints.Count > 0 && currentDeltaPoint != -1 && otherCarDelta.currentDeltaPoint != -1)
             {
+                DateTime otherCarTime;
+                DateTime thisCarTime;
+                var splitTimeSet = false;
                 //opponent is behind
                 if (distanceRoundTrackOnCurrentLap < otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
-                    splitTime = otherCarDelta.deltaPoints[currentDeltaPoint] - deltaPoints[currentDeltaPoint];
+                    if(otherCarDelta.deltaPoints.TryGetValue(currentDeltaPoint, out otherCarTime)
+                        && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
+                    {
+                        splitTime = otherCarTime - thisCarTime;
+                        splitTimeSet = true;
+                    }
                 }
                 else if (distanceRoundTrackOnCurrentLap > otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
-                    splitTime = otherCarDelta.deltaPoints[otherCarDelta.currentDeltaPoint] - deltaPoints[otherCarDelta.currentDeltaPoint];
+                    if (otherCarDelta.deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out otherCarTime)
+                        && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
+                    {
+                        splitTime = otherCarTime - thisCarTime;
+                        splitTimeSet = true;
+                    }
                 }
                 else
                 {
                     return 0f;
+                }
+
+                if (!splitTimeSet)
+                {
+                    // This might spam, but I think we need to get understanding when this happens.
+                    Console.WriteLine("Failed to calculate split time.");
                 }
             }
             return (float)splitTime.TotalSeconds;
