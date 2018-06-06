@@ -106,6 +106,8 @@ namespace CrewChiefV4
         public static String[] RADIO_CHECK = Configuration.getSpeechRecognitionPhrases("RADIO_CHECK");
 
         public static String[] IS_MY_PIT_BOX_OCCUPIED = Configuration.getSpeechRecognitionPhrases("IS_MY_PIT_BOX_OCCUPIED");
+        public static String[] PLAY_POST_PIT_POSITION_ESTIMATE = Configuration.getSpeechRecognitionPhrases("PLAY_POST_PIT_POSITION_ESTIMATE");
+        public static String[] PRACTICE_PIT_STOP = Configuration.getSpeechRecognitionPhrases("PRACTICE_PIT_STOP");
 
 
         public static String ON = Configuration.getSpeechRecognitionConfigOption("ON");
@@ -562,6 +564,8 @@ namespace CrewChiefV4
                 validateAndAdd(DO_I_HAVE_A_PENALTY, staticSpeechChoices);
                 validateAndAdd(DO_I_STILL_HAVE_A_PENALTY, staticSpeechChoices);
                 validateAndAdd(IS_MY_PIT_BOX_OCCUPIED, staticSpeechChoices);
+                validateAndAdd(PLAY_POST_PIT_POSITION_ESTIMATE, staticSpeechChoices);
+                validateAndAdd(PRACTICE_PIT_STOP, staticSpeechChoices);
                 validateAndAdd(DO_I_HAVE_A_MANDATORY_PIT_STOP, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_MY_SECTOR_TIMES, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_LAST_SECTOR_TIME, staticSpeechChoices);
@@ -1235,6 +1239,11 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND))
             {
                 return CrewChief.getEvent("MulticlassWarnings");
+            }
+            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP) ||
+                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
+            {
+                return CrewChief.getEvent("Strategy");
             }
             return null;
         }
