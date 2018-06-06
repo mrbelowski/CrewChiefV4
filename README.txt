@@ -153,6 +153,16 @@ Steps to enable Stock Car Rules in the Crew Chief:
 The SCR plugin and the messages associated with stock car rules will be enabled automatically for vehicle classes which have useAmericanTerms = true in their definition (some built in classes will have this). You can also force it to be enabled for all classes by selecting the "Use American terms" option in the Preferences screen.
 
 
+Pit exit position prediction
+----------------------------
+Version 4.9.3.0 adds rudamentary race and track position predictions for pit exit. This is based on a benchmark pitstop time which uses the time difference between your best lap's sector3 and sector1 times, and the corresponding times on your inlap & outlap.
+
+Benchmark pit times can be measured during a practice session with the 'time this stop' / 'practice pitstop' / 'time this pitstop' / 'pitstop benchmark' voice command. Do some hot laps to get a baseline laptime, then issue this after your 'box this lap' command, and do a full race-simulation pitstop. Maintain race pace on your outlap until you finish sector1. The app will calculate how much time you lost and use this when you pit in the race. If you don't measure your own benchmark pit time the app will measure the time your opponents lose due to pitting and use this instead - note that this means pit exit prediction data won't be available until after at least one of your opponents have completed a pitstop.
+
+If the app has usable benchmark data and you request a pitstop *before you reach sector3*, it'll tell you where you should come out and what the traffic will be like when you hit sector3. You can also request this data at any time with the 'Where will be be after a stop?' / 'Estimate pit exit positions' / 'What will happen if I pit?', even if you've not requested a pitstop (the app will derive its estimates on every lap regardless or whether you actually pit).
+
+At the time of writing there's more work to be done here and some more features that may be added.
+
 
 Known Issues Which Aren't Fixable
 ---------------------------------
@@ -208,6 +218,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.3.0: R3E - detect if this and next laps are invalidated due to cut track in quali/practice; R3E - disable pit stall position messages in post race; R3E - improve cut track detection; R3E -  fix best lap time not announced during leaderboard challenge; AC - fix crashes due to unexpected timings reported by the game; First cut of pit exit prediction - obtain a benchmark pit time in practice by making the 'time this stop' / 'practice pitstop' / 'time this pitstop' / 'pitstop benchmark' command. The pit exit prediction will play automatically some time after requsting a stop, or if you make the 'Where will be be after a stop?' / 'Estimate pit exit positions' / 'What will happen if I pit?' command (see 'Pit exit position prediction' section above); Suppress crashes when using Naudio Input - (but please send us log file if you get exceptions in log); Fix issue where best lap time is lost if it is set after an invalid lap; Fix incorrect gaps announced if vehicles aren't within the same lap; Fix DRS messages announced incorrectly if opponent is pitting; App wide bug fixes
+
 Version 4.9.2.9: Allow pit countdown past session finish (for cooldown lap); Don't grumble about a stopped engine if the car is still moving; some additional checks to handle delayed opponent position data; iRacing - improve live position tracking; iRacing - improve retired vehicle detection; iRacing - race finish position improvements; iRacing - finishing position detection improvements; iRacing - reliability fixes; rF2 - suppress pit messages while in garage/monitor; AC - fixed crash bug on 2-sector tracks; R3E & pCars2 - use game-provided time gaps to car in front / behind (more accurate than derived gaps); R3E - DRS message accuracy improvements; R3E - removed auto-confirm pit macro and associated logic (no longer needed, and can cause some issues with pitstops); R3E - disable spotter in hotlap mode
 
 Version 4.9.2.5: Added commands to check self pace, you can ask "how's my self gap" / "how's my personal pace" / "how's my delta best" to see how you're doing relative to your own best lap; iRacing - fixed pit stall countdown; iRacing - fix finish position reporting; iRacing - allow pit voice commands to be enabled or disabled ("Enable iRacing pit stop commands", default enabled). Disabling them removes them from the phrases the speech recognition engine listens for, potentially improving accuracy for other phrases as well as preventing false positives; added ability to specify if car class has speed limiter via "limiterAvailable" class field; rF2 - enable pit stall countdown (doesn't work on some tracks, disabled on ovals); rF2 - add option to force Rolling Start start type.
