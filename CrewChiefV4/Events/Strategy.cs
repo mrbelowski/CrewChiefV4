@@ -151,7 +151,7 @@ namespace CrewChiefV4.Events
                         reportPostPitData(postRacePositions, false);
                     }
                 }
-                if (currentGameState.Now > nextPitTimingCheckDue)
+                if (timeOpponentStops && currentGameState.Now > nextPitTimingCheckDue)
                 {
                     // check for opponent pit timings every 10 seconds if we don't have our own
                     nextPitTimingCheckDue = currentGameState.Now.AddSeconds(10);
