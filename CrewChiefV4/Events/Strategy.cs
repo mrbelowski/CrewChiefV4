@@ -44,10 +44,8 @@ namespace CrewChiefV4.Events
 
         public static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
         // stuff like: "ok, we'll time this stop", "understood, we'll use this stop as a benchmark, push until sector2" or something
-        // RECORD ME
         public static String folderTimePitstopAcknowledge = "strategy/acknowledge_time_pitstop";
         // used when we request a benchmark pitstop timing in practice, but we have no best lap data
-        // RECORD ME
         public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
 
 
