@@ -57,7 +57,7 @@ namespace CrewChiefV4.Events
         private static Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
 
         private Boolean isTimingPracticeStop = false;
-        private int lapsCompletedAtStartOfTimedStop = -1;
+        private Boolean hasPittedDuringPracticeStopProcess = false;
         private float gameTimeAtPracticeStopTimerStart = -1;
         private float s3AndS1TimeOnStop = -1;
 
@@ -107,7 +107,7 @@ namespace CrewChiefV4.Events
             timeOpponentStops = true;
             opponentsInS2.Clear();
             Strategy.opponentsWhoWillExitCloseBehind.Clear();
-            lapsCompletedAtStartOfTimedStop = -1;
+            hasPittedDuringPracticeStopProcess = false;
             Strategy.opponentsWhoWillExitCloseInFront.Clear();
         }
                 
@@ -127,19 +127,35 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice && isTimingPracticeStop)
             {
+                if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                {
+                    // sanity check
+                    if (currentGameState.PositionAndMotionData.CarSpeed > 1)
+                    {
+                        hasPittedDuringPracticeStopProcess = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Pitted during practice pitstop window but we appear to have quit-to-pit, cancelling");
+                        gameTimeAtPracticeStopTimerStart = -1;
+                        isTimingPracticeStop = false;
+                        hasPittedDuringPracticeStopProcess = false;
+                    }
+                }
                 if (currentGameState.SessionData.SectorNumber == 3 && previousGameState.SessionData.SectorNumber == 2)
                 {
                     gameTimeAtPracticeStopTimerStart = currentGameState.SessionData.SessionRunningTime;
-                    lapsCompletedAtStartOfTimedStop = currentGameState.SessionData.CompletedLaps;
+                    hasPittedDuringPracticeStopProcess = false;
+                    Console.WriteLine("Starting pitstop benchmark process");
                 }
                 else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1 && 
-                    currentGameState.SessionData.CompletedLaps == lapsCompletedAtStartOfTimedStop + 1)
+                    hasPittedDuringPracticeStopProcess)
                 {
                     s3AndS1TimeOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
                     Strategy.playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
                     gameTimeAtPracticeStopTimerStart = -1;
                     isTimingPracticeStop = false;
-                    lapsCompletedAtStartOfTimedStop = -1;
+                    hasPittedDuringPracticeStopProcess = false;
                     Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
                     Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
                     
@@ -148,13 +164,6 @@ namespace CrewChiefV4.Events
                         MessageContents(folderPitStopCostsUsAbout,
                         TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
                         0, this));
-                }
-                else if (currentGameState.SessionData.CompletedLaps > lapsCompletedAtStartOfTimedStop + 1)
-                {
-                    // something's gone very wrong here
-                    gameTimeAtPracticeStopTimerStart = -1;
-                    isTimingPracticeStop = false;
-                    lapsCompletedAtStartOfTimedStop = -1;
                 }
                 // nothing else to do unless we're in race mode
             }
