@@ -528,9 +528,35 @@ namespace CrewChiefV4.Events
                                 MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
                     }
                 }
+                else
+                {
+                    // only have a car in front here
+                    if (gapFront < distanceAheadToBeConsideredVeryClose)
+                    {
+                        // car in front very close
+                        fragments.Add(MessageFragment.Text(folderJustBehind));
+                        fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
+                             MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                    }
+                    else if (gapFront < minDistanceAheadToBeConsideredAFewSeconds)
+                    {
+                        // car in front quite close
+                        fragments.Add(MessageFragment.Text(folderBehind));
+                        fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
+                            MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                    }
+                    else if (gapFront < maxDistanceAheadToBeConsideredAFewSeconds)
+                    {
+                        // car in front a few seconds away
+                        fragments.Add(MessageFragment.Text(folderAFewSecondsBehind));
+                        fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
+                                MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                    }
+                }
             }
             else if (postPitData.opponentClosestBehindAfterStop != null)
             {
+                // only have a car behind here
                 Boolean canReadOpponentBehind = AudioPlayer.canReadName(postPitData.opponentClosestBehindAfterStop.opponentData.DriverRawName);
                 // can read 2 driver names, so decide which to read (or both)
                 float gapBehind = postPitData.opponentClosestBehindAfterStop.predictedDistanceGap;
