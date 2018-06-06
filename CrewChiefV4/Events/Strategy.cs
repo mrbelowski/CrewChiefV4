@@ -250,6 +250,8 @@ namespace CrewChiefV4.Events
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
 
+                int playerLapsCompletedAfterStop = 1 + lapsCompleted;
+
                 foreach (OpponentData opponent in opponents.Values)
                 {
                     // TODO: major issue here when a car laps us or nearly laps us when we're in the pits - the position estimate
@@ -257,6 +259,9 @@ namespace CrewChiefV4.Events
                     // Need to find some way to account for lapping or nearly lapping, or else block the position estimate
                     // if we're unsure.
                     String opponentCarClassId = opponent.CarClass.getClassIdentifier();
+                    Boolean isPlayerClass = CarData.IsCarClassEqual(opponent.CarClass, playerClass);
+
+                    int opponentLapsCompletedAfterStop = 1 + opponent.CompletedLaps;
 
                     // if there's any possibility of us being lapped during or shortly after the stop, or the cars around
                     // us might not be on the same lap, don't derive position data
@@ -267,13 +272,13 @@ namespace CrewChiefV4.Events
                     if (opponentPositionDelta > 0)
                     {
                         // he'll be ahead
-                        opponentsAhead.Add(new OpponentPositionAtPlayerPitExit(absDelta, positionDataCanBeUsed, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
+                        opponentsAhead.Add(new OpponentPositionAtPlayerPitExit(absDelta, opponentLapsCompletedAfterStop, isPlayerClass,
                             opponentCarClassId, opponent));
                     }
                     else
                     {
                         // he'll be behind (TODO: work out which way the delta-points lag will bias this)
-                        opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, positionDataCanBeUsed, CarData.IsCarClassEqual(opponent.CarClass, playerClass),
+                        opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, opponentLapsCompletedAfterStop, isPlayerClass,
                             opponentCarClassId, opponent));
                     }                    
                 }
@@ -289,7 +294,7 @@ namespace CrewChiefV4.Events
 
                 // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
                 // now the expected distance between us and them (in metres) when we emerge.
-                return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind);
+                return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind, playerLapsCompletedAfterStop);
             }
             // oh dear
             return null;
@@ -302,16 +307,15 @@ namespace CrewChiefV4.Events
         {
             // always positive:
             public float predictedDistanceGap;
-            // probably don't need this:
-            public Boolean positionDataCanBeUsed;
+            public int opponentLapsCompletedAfterStop;
             public Boolean isPlayerClass;
             public String carClassId;
             public OpponentData opponentData;
-            public OpponentPositionAtPlayerPitExit(float predictedDistanceGap, Boolean positionDataCanBeUsed, Boolean isPlayerClass,
+            public OpponentPositionAtPlayerPitExit(float predictedDistanceGap, int opponentLapsCompletedAfterStop, Boolean isPlayerClass,
                 String carClassId, OpponentData opponentData)
             {
                 this.predictedDistanceGap = predictedDistanceGap;
-                this.positionDataCanBeUsed = positionDataCanBeUsed;
+                this.opponentLapsCompletedAfterStop = opponentLapsCompletedAfterStop;
                 this.isPlayerClass = isPlayerClass;
                 this.carClassId = carClassId;
                 this.opponentData = opponentData;
@@ -337,10 +341,37 @@ namespace CrewChiefV4.Events
             public float numCarsCloseBehindAfterStop = 0;
             public float numCarsCloseAheadAfterStop = 0;
 
-            public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop)
+            public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop,
+                int playerLapsCompletedAfterStop)
             {
                 this.opponentsBehindAfterStop = opponentsBehindAfterStop;
                 this.opponentsFrontAfterStop = opponentsFrontAfterStop;
+
+                // work out which opponents we can use to derive player position. These are drivers who've completed
+                // the same (or closest) number of laps as us
+                int minLapsDiff = int.MaxValue;
+                if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
+                {
+                    foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
+                    {
+                        int lapDiff = Math.Abs(playerLapsCompletedAfterStop - opponent.opponentLapsCompletedAfterStop);
+                        if (lapDiff < minLapsDiff)
+                        {
+                            minLapsDiff = lapDiff;
+                        }
+                    }
+                }
+                if (opponentsFrontAfterStop != null && opponentsFrontAfterStop.Count > 0)
+                {
+                    foreach (OpponentPositionAtPlayerPitExit opponent in opponentsFrontAfterStop)
+                    {
+                        int lapDiff = Math.Abs(playerLapsCompletedAfterStop - opponent.opponentLapsCompletedAfterStop);
+                        if (lapDiff < minLapsDiff)
+                        {
+                            minLapsDiff = lapDiff;
+                        }
+                    }
+                }
 
                 // derive the expected race position:
                 if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
@@ -349,7 +380,7 @@ namespace CrewChiefV4.Events
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
                     {
                         // we'll be in position - 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (opponent.positionDataCanBeUsed && opponent.isPlayerClass && opponentClosestBehindAfterStop == null)
+                        if (opponent.opponentLapsCompletedAfterStop == minLapsDiff && opponent.isPlayerClass && opponentClosestBehindAfterStop == null)
                         {
                             expectedRacePosition = opponent.opponentData.ClassPosition - 1;
                             opponentClosestBehindAfterStop = opponent;
@@ -374,7 +405,7 @@ namespace CrewChiefV4.Events
                         {
                             opponentClosestAheadAfterStop = opponent;
                             // do we need this?
-                            if (opponent.positionDataCanBeUsed && expectedRacePosition == -1)
+                            if (opponent.opponentLapsCompletedAfterStop == minLapsDiff && expectedRacePosition == -1)
                             {
                                 expectedRacePosition = opponent.opponentData.ClassPosition + 1;
                             }
