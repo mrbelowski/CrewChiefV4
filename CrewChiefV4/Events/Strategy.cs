@@ -350,6 +350,7 @@ namespace CrewChiefV4.Events
                 // work out which opponents we can use to derive player position. These are drivers who've completed
                 // the same (or closest) number of laps as us
                 int minLapsDiff = int.MaxValue;
+                int closestOpponentLapsCompleted = -1;
                 if (opponentsBehindAfterStop != null && opponentsBehindAfterStop.Count > 0)
                 {
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
@@ -358,6 +359,7 @@ namespace CrewChiefV4.Events
                         if (lapDiff < minLapsDiff)
                         {
                             minLapsDiff = lapDiff;
+                            closestOpponentLapsCompleted = opponent.opponentLapsCompletedAfterStop;
                         }
                     }
                 }
@@ -369,6 +371,7 @@ namespace CrewChiefV4.Events
                         if (lapDiff < minLapsDiff)
                         {
                             minLapsDiff = lapDiff;
+                            closestOpponentLapsCompleted = opponent.opponentLapsCompletedAfterStop;
                         }
                     }
                 }
@@ -380,7 +383,7 @@ namespace CrewChiefV4.Events
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsBehindAfterStop)
                     {
                         // we'll be in position - 1 from the closest opponent behind in our class - set this if we haven't already
-                        if (opponent.opponentLapsCompletedAfterStop == minLapsDiff && opponent.isPlayerClass && opponentClosestBehindAfterStop == null)
+                        if (closestOpponentLapsCompleted == opponent.opponentLapsCompletedAfterStop && opponent.isPlayerClass && opponentClosestBehindAfterStop == null)
                         {
                             expectedRacePosition = opponent.opponentData.ClassPosition - 1;
                             opponentClosestBehindAfterStop = opponent;
@@ -405,7 +408,7 @@ namespace CrewChiefV4.Events
                         {
                             opponentClosestAheadAfterStop = opponent;
                             // do we need this?
-                            if (opponent.opponentLapsCompletedAfterStop == minLapsDiff && expectedRacePosition == -1)
+                            if (closestOpponentLapsCompleted == opponent.opponentLapsCompletedAfterStop && expectedRacePosition == -1)
                             {
                                 expectedRacePosition = opponent.opponentData.ClassPosition + 1;
                             }
