@@ -137,7 +137,8 @@ namespace CrewChiefV4.Events
                     isTimingPracticeStop = false;
                     Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
                     Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
-
+                    
+                    Console.WriteLine("Practice pitstop has cost us " + Strategy.playerTimeLostForStop + " seconds");
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
                         MessageContents(folderPitStopCostsUsAbout,
                         TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
@@ -311,7 +312,7 @@ namespace CrewChiefV4.Events
             if (timeLossEstimate == -1)
             {
                 if (Strategy.opponentsTimeLostForStop.Count != 0)
-                {
+                {                    
                     int pittedOpponentPositionDiff = int.MaxValue;
                     // select the best opponent to compare with
                     foreach (KeyValuePair<String, float> entry in Strategy.opponentsTimeLostForStop)
@@ -323,7 +324,12 @@ namespace CrewChiefV4.Events
                             pittedOpponentPositionDiff = positionDiff;
                         }
                     }
+                    Console.WriteLine("Got pitstop time loss estimate from opponent stop times - expect to lose " + timeLossEstimate + " seconds");
                 }
+            }
+            else
+            {
+                Console.WriteLine("Got pitstop time loss estimate from practice stop - expect to lose " + timeLossEstimate + " seconds");
             }
             return timeLossEstimate;
         }
@@ -404,6 +410,10 @@ namespace CrewChiefV4.Events
                 // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
                 // now the expected distance between us and them (in metres) when we emerge.
                 return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind, playerLapsCompletedAfterStop, currentRacePosition);
+            }
+            else
+            {
+                Console.WriteLine("Unable to get pitstop prediction - no pitstop time loss data available");
             }
             // oh dear
             return null;
