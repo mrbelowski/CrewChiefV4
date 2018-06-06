@@ -19,6 +19,8 @@ namespace CrewChiefV4.commands
         // another magic string...
         private static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
 
+        private Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
+
         private static Object mutex = new Object();
 
         Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
@@ -100,7 +102,7 @@ namespace CrewChiefV4.commands
                         audioPlayer.playMessageImmediately(new QueuedMessage(commandSet.confirmationMessage, 0, null));
                     }
                     // special case for 'request pit' macro - we might want to play the pitstop strategy estimate
-                    if (macro.name == REQUEST_PIT_IDENTIFIER)
+                    if (macro.name == REQUEST_PIT_IDENTIFIER && enablePitExitPositionEstimates)
                     {
                         Strategy.playPitPositionEstimates = true;
                     }

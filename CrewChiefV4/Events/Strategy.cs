@@ -10,6 +10,8 @@ namespace CrewChiefV4.Events
 {
     class Strategy : AbstractEvent
     {
+        private Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
+
         // if this is enabled, don't play the pit position estimates on pit entry. This is only a fallback in case
         // we haven't made a pit request
         private Boolean pitBoxPositionCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown");
@@ -157,11 +159,12 @@ namespace CrewChiefV4.Events
                     Strategy.playedPitPositionEstimatesForThisLap = false;
                 }
                 // if we've just requested a pit stop (and the game has this data), trigger the strategy data when we next hit sector3
-                else if (!previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
+                else if (playPitPositionEstimates &&
+                    !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
-                else if (!pitBoxPositionCountdown &&
+                else if (!pitBoxPositionCountdown && playPitPositionEstimates &&
                     !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
