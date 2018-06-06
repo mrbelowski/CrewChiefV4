@@ -63,6 +63,17 @@ namespace CrewChiefV4.Events
         private HashSet<String> opponentsInPitCycle = new HashSet<string>();
         private DateTime nextPitTimingCheckDue = DateTime.MinValue;
 
+        // for tracking opponent pitting
+        private DateTime nextOpponentS3TimingCheckDue = DateTime.MinValue;
+        // just used to track when an opponent transitions from S2 to S3
+        private HashSet<String> opponentsInS2 = new HashSet<string>();
+        // these are static because the opponents event needs to check them:
+        public static HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
+        public static HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
+
+        // this is disabled for now - it's unfinished and will probably spam messages
+        private Boolean warnAboutOpponentsExitingCloseToPlayer = false;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.FullCourseYellow }; }
@@ -80,10 +91,14 @@ namespace CrewChiefV4.Events
             isTimingPracticeStop = false;
             gameTimeAtPracticeStopTimerStart = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
+            nextOpponentS3TimingCheckDue = DateTime.MinValue;
             opponentsInPitCycle.Clear();
             Strategy.playPitPositionEstimates = false;
             Strategy.playedPitPositionEstimatesForThisLap = false;
             timeOpponentStops = true;
+            opponentsInS2.Clear();
+            Strategy.opponentsWhoWillExitCloseBehind.Clear();
+            Strategy.opponentsWhoWillExitCloseInFront.Clear();
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -153,6 +168,87 @@ namespace CrewChiefV4.Events
                         reportPostPitData(postRacePositions, false);
                     }
                 }
+                if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentS3TimingCheckDue)
+                {
+                    float expectedPlayerTimeLoss = -1;
+                    DateTime nowMinusExpectedLoss = DateTime.MinValue;
+                    Boolean doneTimeLossCalc = false;
+                    nextOpponentS3TimingCheckDue = currentGameState.Now.AddSeconds(5);
+                    foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
+                    {
+                        if (entry.Value.IsNewLap)
+                        {
+                            opponentsWhoWillExitCloseBehind.Remove(entry.Key);
+                            opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                        }
+                        else if (entry.Value.JustEnteredPits)
+                        {
+                            if (opponentsWhoWillExitCloseInFront.Contains(entry.Key))
+                            {
+                                // this guy has just entered the pit and we predict he'll exit just in front of us
+                                // TODO: report this, ensure we don't report more than 1 in a short time
+                            }
+                            opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                            if (opponentsWhoWillExitCloseBehind.Contains(entry.Key))
+                            {
+                                // this guy has just entered the pit and we predict he'll exit just behind us
+                                // TODO: report this, ensure we don't report more than 1 in a short time
+                            }
+                            opponentsWhoWillExitCloseBehind.Remove(entry.Key);
+                        }
+                        if (entry.Value.CurrentSectorNumber == 2 && !opponentsInS2.Contains(entry.Key))
+                        {
+                            opponentsInS2.Add(entry.Key);
+                        }
+                        else
+                        {
+                            if (opponentsInS2.Contains(entry.Key) && entry.Value.CurrentSectorNumber == 3)
+                            {
+                                // this guy has just hit S3, so do the count-back
+
+                                // lazily obtain the expected time loss
+                                if (!doneTimeLossCalc)
+                                {
+                                    expectedPlayerTimeLoss = getTimeLossEstimate(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name,
+                                        currentGameState.OpponentData, currentGameState.SessionData.ClassPosition);
+                                    nowMinusExpectedLoss = currentGameState.Now.AddSeconds(expectedPlayerTimeLoss * -1);
+                                    doneTimeLossCalc = true;
+                                }
+                                if (expectedPlayerTimeLoss == -1)
+                                {
+                                    // no loss data, can't continue
+                                    break;
+                                }
+                                // get his track distanceRoundTrack at this point in history
+                                TimeSpan closestDeltapointTimeDelta = TimeSpan.MaxValue;
+                                float closestDeltapointPosition = -1;
+                                foreach (KeyValuePair<float, DateTime> deltaPointEntry in entry.Value.DeltaTime.deltaPoints)
+                                {
+                                    TimeSpan timeDelta = (nowMinusExpectedLoss - deltaPointEntry.Value).Duration();
+                                    if (timeDelta < closestDeltapointTimeDelta)
+                                    {
+                                        closestDeltapointTimeDelta = timeDelta;
+                                        closestDeltapointPosition = deltaPointEntry.Key;
+                                    }
+                                }
+                                // this is the gap we expect to this guy when he leaves the pits. Negative gap means he'll be in front
+                                float expectedDistanceToPlayerOnPitExit = currentGameState.PositionAndMotionData.DistanceRoundTrack - closestDeltapointPosition;
+                                float absGap = Math.Abs(expectedDistanceToPlayerOnPitExit);
+                                if (expectedDistanceToPlayerOnPitExit > 0 && absGap < distanceAheadToBeConsideredVeryClose)
+                                {
+                                    // he'll come out of the pits right in front of us
+                                    opponentsWhoWillExitCloseInFront.Add(entry.Key);
+                                }
+                                else if (expectedDistanceToPlayerOnPitExit < 0 && absGap < distanceBehindToBeConsideredVeryClose)
+                                {
+                                    // he'll come out right behind us
+                                    opponentsWhoWillExitCloseBehind.Add(entry.Key);
+                                }
+                            }
+                            opponentsInS2.Remove(entry.Key);
+                        }
+                    }
+                }
                 if (timeOpponentStops && currentGameState.Now > nextPitTimingCheckDue)
                 {
                     // check for opponent pit timings every 10 seconds if we don't have our own
@@ -198,15 +294,12 @@ namespace CrewChiefV4.Events
             return -1;
         }
 
-        // all the nasty logic is in this method - refactor?
-        private static Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
-            CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
-            String trackName)
+        private static float getTimeLossEstimate(CarData.CarClass carClass, String trackName, Dictionary<String, OpponentData> opponents, int currentRacePosition)
         {
-            float expectedPlayerTimeLoss = -1;
-            if (Strategy.playerTimeLostForStop == -1)
+            float timeLossEstimate = getExpectedPlayerTimeLoss(carClass, trackName);
+            if (timeLossEstimate == -1)
             {
-                if (Strategy.opponentsTimeLostForStop.Count != 0) 
+                if (Strategy.opponentsTimeLostForStop.Count != 0)
                 {
                     int pittedOpponentPositionDiff = int.MaxValue;
                     // select the best opponent to compare with
@@ -215,18 +308,21 @@ namespace CrewChiefV4.Events
                         int positionDiff = Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition);
                         if (positionDiff < pittedOpponentPositionDiff)
                         {
-                            expectedPlayerTimeLoss = entry.Value;
+                            timeLossEstimate = entry.Value;
                             pittedOpponentPositionDiff = positionDiff;
                         }
                     }
                 }
             }
-            else
-            {
-                expectedPlayerTimeLoss = Strategy.playerTimeLostForStop;
-            }
-            // TODO: if the expected player time loss is close to or greater than a laptime, the position estimate
-            // logic won't work in its current form
+            return timeLossEstimate;
+        }
+
+        // all the nasty logic is in this method - refactor?
+        private static Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
+            CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
+            String trackName)
+        {
+            float expectedPlayerTimeLoss = getTimeLossEstimate(playerClass, trackName, opponents, currentRacePosition);
             if (expectedPlayerTimeLoss != -1)
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
