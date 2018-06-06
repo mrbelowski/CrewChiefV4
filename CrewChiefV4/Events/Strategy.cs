@@ -463,7 +463,7 @@ namespace CrewChiefV4.Events
                     {
                         if (gapBehind < distanceBehindToBeConsideredVeryClose)
                         {
-                            // both cars very close and can be read
+                            // both cars very close
                             fragments.Add(MessageFragment.Text(folderCloseBetween));
                             fragments.Add(canReadOpponentBehind ? MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData) :
                                 MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
@@ -490,28 +490,39 @@ namespace CrewChiefV4.Events
                     {
                         if (gapBehind < minDistanceBehindToBeConsideredAFewSeconds)
                         {
-                            // both cars quite close
-                            fragments.Add(MessageFragment.Text(folderBetween));
-                            fragments.Add(canReadOpponentBehind ? MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData) :
-                                MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
-                            fragments.Add(MessageFragment.Text(folderAnd));
-                            fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
-                                MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                            // both cars quite close. 
+                            // Additional check here. "you'll emerge in P4 between P5 and P3" is going to sound particularly shit, so if we have neither name,
+                            // don't announce this
+                            if (canReadOpponentAhead || canReadOpponentBehind)
+                            {
+                                fragments.Add(MessageFragment.Text(folderBetween));
+                                fragments.Add(canReadOpponentBehind ? MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData) :
+                                    MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
+                                fragments.Add(MessageFragment.Text(folderAnd));
+                                fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
+                                    MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                            }
                         }
                         else
                         {
                             // car in front quite close
-                            fragments.Add(MessageFragment.Text(folderBehind));
-                            fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
-                                MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                            // Only announce this if we can use the name
+                            if (canReadOpponentAhead)
+                            {
+                                fragments.Add(MessageFragment.Text(folderBehind));
+                                fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                            }
                         }
                     }
                     else if (gapBehind < minDistanceBehindToBeConsideredAFewSeconds)
                     {
                         // car behind quite close
-                        fragments.Add(MessageFragment.Text(folderAheadOf));
-                        fragments.Add(canReadOpponentBehind ? MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData) :
-                                MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
+                        // Only announce this if we can use the name
+                        if (canReadOpponentBehind)
+                        {
+                            fragments.Add(MessageFragment.Text(folderAheadOf));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                        }
                     }
                     else if (gapFront < maxDistanceAheadToBeConsideredAFewSeconds)
                     {
@@ -541,9 +552,12 @@ namespace CrewChiefV4.Events
                     else if (gapFront < minDistanceAheadToBeConsideredAFewSeconds)
                     {
                         // car in front quite close
-                        fragments.Add(MessageFragment.Text(folderBehind));
-                        fragments.Add(canReadOpponentAhead ? MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData) :
-                            MessageFragment.Text(Position.folderStub + postPitData.opponentClosestAheadAfterStop.opponentData.ClassPosition));
+                        // Only announce this if we have a name
+                        if (canReadOpponentAhead)
+                        {
+                            fragments.Add(MessageFragment.Text(folderBehind));
+                            fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestAheadAfterStop.opponentData));
+                        }
                     }
                     else if (gapFront < maxDistanceAheadToBeConsideredAFewSeconds)
                     {
@@ -570,9 +584,12 @@ namespace CrewChiefV4.Events
                 else if (gapBehind < minDistanceBehindToBeConsideredAFewSeconds)
                 {
                     // car behind quite close
-                    fragments.Add(MessageFragment.Text(folderAheadOf));
-                    fragments.Add(canReadOpponentBehind ? MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData) :
-                            MessageFragment.Text(Position.folderStub + postPitData.opponentClosestBehindAfterStop.opponentData.ClassPosition));
+                    // Only announce this if we have a name
+                    if (canReadOpponentBehind)
+                    {
+                        fragments.Add(MessageFragment.Text(folderAheadOf));
+                        fragments.Add(MessageFragment.Opponent(postPitData.opponentClosestBehindAfterStop.opponentData));
+                    }
                 }
                 else if (gapBehind < maxDistanceBehindToBeConsideredAFewSeconds)
                 {
