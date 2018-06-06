@@ -10,6 +10,10 @@ namespace CrewChiefV4.Events
 {
     class Strategy : AbstractEvent
     {
+        // if this is enabled, don't play the pit position estimates on pit entry. This is only a fallback in case
+        // we haven't made a pit request
+        private Boolean pitBoxPositionCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown");
+
         // less than 70m => 'just ahead' or 'just behind'
         private static float distanceBehindToBeConsideredVeryClose = 70;
         private static float distanceAheadToBeConsideredVeryClose = 70;
@@ -157,7 +161,8 @@ namespace CrewChiefV4.Events
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
-                else if (!Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                else if (!pitBoxPositionCountdown &&
+                    !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
