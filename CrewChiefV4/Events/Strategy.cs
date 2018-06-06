@@ -37,6 +37,8 @@ namespace CrewChiefV4.Events
         public static String folderAFewSecondsBehind = "strategy/a_few_seconds_behind";
 
         public static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
+        // stuff like: "ok, we'll time this stop", "understood, we'll use this stop as a benchmark, push until sector2" or something
+        public static String folderTimePitstopAcknowledge = "strategy/acknowledge_time_pitstop";
 
 
         // may be timed during practice.
@@ -540,7 +542,7 @@ namespace CrewChiefV4.Events
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PRACTICE_PIT_STOP))
             {
                 isTimingPracticeStop = true;
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
             }
 
             // if the voice message is 'where will I emerge' or something, get the PostPitRacePosition object
