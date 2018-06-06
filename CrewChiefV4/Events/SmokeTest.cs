@@ -120,6 +120,20 @@ namespace CrewChiefV4.Events
             //PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
+            // pit exit strategy debug stuff to see how it sounds
+            
+            /*List<String> rawDriverNames = new List<string>();
+            List<MessageFragment> fragments = new List<MessageFragment>();
+            fragments.Add(MessageFragment.Text(Strategy.folderClearTrackOnPitExit));
+            fragments.Add(MessageFragment.Text(Strategy.folderWeShouldEmergeInPosition));
+            fragments.Add(MessageFragment.Integer(12));
+            fragments.Add(MessageFragment.Text(Strategy.folderBetween));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("bakus", rawDriverNames)));
+            fragments.Add(MessageFragment.Text(Strategy.folderAnd));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
+            audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            */
+
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)

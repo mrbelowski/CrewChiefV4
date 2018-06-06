@@ -596,3 +596,6 @@ iracing_invalidate_cut_track_laps_help = Disable this if you don't want the app 
 
 force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
 force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.
+
+enable_pit_exit_position_estimates = Enable pit exit position estimates
+enable_pit_exit_position_estimates_help = Play pit exit position estimates

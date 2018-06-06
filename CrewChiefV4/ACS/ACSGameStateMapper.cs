@@ -17,6 +17,7 @@ namespace CrewChiefV4.assetto
         public static String playerName = null;
         public static Boolean versionChecked = false;
         public static double lastCountDown = 10000.0;
+        public static int numberOfSectorsOnTrack = 3;
 
         private class AcTyres
         {
@@ -949,7 +950,7 @@ namespace CrewChiefV4.assetto
             currentGameState.SessionData.IsDisqualified = currentFlag == AC_FLAG_TYPE.AC_BLACK_FLAG;
             bool isInPits = shared.acsGraphic.isInPit == 1;
             int lapsCompleted = shared.acsGraphic.completedLaps;
-            int numberOfSectorsOnTrack = shared.acsStatic.sectorCount;
+            ACSGameStateMapper.numberOfSectorsOnTrack = shared.acsStatic.sectorCount;
 
             Boolean raceFinished = lapsCompleted == numberOfLapsInSession || (previousGameState != null && previousGameState.SessionData.LeaderHasFinishedRace && previousGameState.SessionData.IsNewLap);
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(currentGameState.SessionData.SessionType, currentFlag, status, isCountDown, lastSessionPhase, sessionTimeRemaining, lastSessionTotalRunTime, isInPits, lapsCompleted, raceFinished);
@@ -1286,15 +1287,15 @@ namespace CrewChiefV4.assetto
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         float lastEndLapSessionTime;
-                        if (currentGameState.SessionData.SessionTimesAtEndOfSectors.TryGetValue(numberOfSectorsOnTrack, out lastEndLapSessionTime))
+                        if (currentGameState.SessionData.SessionTimesAtEndOfSectors.TryGetValue(ACSGameStateMapper.numberOfSectorsOnTrack, out lastEndLapSessionTime))
                         {
                             if (lastEndLapSessionTime > 0)
                             {
                                 currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - lastEndLapSessionTime;
                             }
                         }
-                        currentGameState.SessionData.SessionTimesAtEndOfSectors[numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
-                        if (numberOfSectorsOnTrack == 3)
+                        currentGameState.SessionData.SessionTimesAtEndOfSectors[ACSGameStateMapper.numberOfSectorsOnTrack] = currentGameState.SessionData.SessionRunningTime;
+                        if (ACSGameStateMapper.numberOfSectorsOnTrack == 3)
                         {
                             currentGameState.SessionData.LastSector3Time = sectorTimeToUse;
 
@@ -1312,7 +1313,7 @@ namespace CrewChiefV4.assetto
                                 currentGameState.SessionData.PlayerBestLapSector3Time = currentGameState.SessionData.LastSector3Time;
                             }
                         }
-                        else if (numberOfSectorsOnTrack == 2)
+                        else if (ACSGameStateMapper.numberOfSectorsOnTrack == 2)
                         {
                             currentGameState.SessionData.LastSector2Time = sectorTimeToUse;
 
@@ -1509,8 +1510,8 @@ namespace CrewChiefV4.assetto
                                     {
                                         currentGameState.SessionData.LeaderHasFinishedRace = true;
                                     }
-                                    
-                                    Boolean isEnteringPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == numberOfSectorsOnTrack;
+
+                                    Boolean isEnteringPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == ACSGameStateMapper.numberOfSectorsOnTrack;
                                     Boolean isLeavingPits = participantStruct.isCarInPitline == 1 && currentOpponentSector == 1;
 
                                     float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
@@ -1521,11 +1522,11 @@ namespace CrewChiefV4.assetto
                                         currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                         new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z }, participantStruct.speedMS, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                        numberOfSectorsOnTrack, shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, currentGameState.SessionData.SessionType == SessionType.Race,
+                                        shared.acsPhysics.airTemp, shared.acsPhysics.roadTemp, currentGameState.SessionData.SessionType == SessionType.Race,
                                         currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                         previousOpponentCompletedLaps, previousOpponentDataWaitingForNewLapData,
                                         previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompletedLapsWhenHasNewLapDataWasLastTrue,
-                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine, numberOfSectorsOnTrack);
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1678,7 +1679,7 @@ namespace CrewChiefV4.assetto
 
             if (currentGameState.PitData.InPitlane)
             {
-                if (currentGameState.SessionData.SectorNumber == numberOfSectorsOnTrack)
+                if (currentGameState.SessionData.SectorNumber == ACSGameStateMapper.numberOfSectorsOnTrack)
                 {
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
@@ -1981,12 +1982,11 @@ namespace CrewChiefV4.assetto
         private void upateOpponentData(OpponentData opponentData, OpponentData previousOpponentData, int racePosition, int leaderBoardPosition, int completedLaps, int sector,
             float completedLapTime, float lastLapTime, Boolean isInPits, Boolean lapIsValid, float sessionRunningTime, float secondsSinceLastUpdate,
             float[] currentWorldPosition, float speed, float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
-            int trackNumberOfSectors, float airTemperature, float trackTempreture, Boolean isRace, float nearPitEntryPointDistance,
+            float airTemperature, float trackTempreture, Boolean isRace, float nearPitEntryPointDistance,
             /* previous tick data for hasNewLapData check*/
             int previousOpponentDataLapsCompleted, Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
-            int previousCompletedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine,
-            int numSectors)
+            int previousCompletedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
         {
             if (opponentData.CurrentSectorNumber == 0)
             {
@@ -2016,12 +2016,12 @@ namespace CrewChiefV4.assetto
             opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
             opponentData.InPits = isInPits;
 
-            bool hasCrossedSFline = opponentData.CurrentSectorNumber == numSectors && sector == 1;
+            bool hasCrossedSFline = opponentData.CurrentSectorNumber == ACSGameStateMapper.numberOfSectorsOnTrack && sector == 1;
 
             bool hasNewLapData = opponentData.HasNewLapData(lastLapTime, hasCrossedSFline, completedLaps, isRace, sessionRunningTime, previousOpponentDataWaitingForNewLapData,
                  previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompletedLapsWhenHasNewLapDataWasLastTrue, previousOpponentGameTimeWhenLastCrossedStartFinishLine);
 
-            if (opponentData.CurrentSectorNumber == numSectors && sector == numSectors && (!lapIsValid || !validSpeed))
+            if (opponentData.CurrentSectorNumber == ACSGameStateMapper.numberOfSectorsOnTrack && sector == ACSGameStateMapper.numberOfSectorsOnTrack && (!lapIsValid || !validSpeed))
             {
                 // special case for s3 - need to invalidate lap immediately
                 opponentData.InvalidateCurrentLap();
@@ -2045,7 +2045,7 @@ namespace CrewChiefV4.assetto
                         else
                         {
                             opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
-                                false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, trackNumberOfSectors);
+                                false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, ACSGameStateMapper.numberOfSectorsOnTrack);
                         }
                     }
 
@@ -2073,7 +2073,7 @@ namespace CrewChiefV4.assetto
                     opponentData.CurrentSectorNumber = sector;
                 }
             }
-            if (sector == trackNumberOfSectors && isInPits)
+            if (sector == ACSGameStateMapper.numberOfSectorsOnTrack && isInPits)
             {
                 opponentData.setInLap();
             }
