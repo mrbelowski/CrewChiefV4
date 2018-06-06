@@ -162,7 +162,7 @@ namespace CrewChiefV4.Events
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
-                else if (!pitBoxPositionCountdown && playPitPositionEstimates &&
+                else if (!pitBoxPositionCountdown &&
                     !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
@@ -177,6 +177,7 @@ namespace CrewChiefV4.Events
                             currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now,
                             currentGameState.SessionData.TrackDefinition.name);
                     reportPostPitData(postRacePositions, false);
+                    playedPitPositionEstimatesForThisLap = true;
                 }
                 if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentS3TimingCheckDue)
                 {
@@ -402,7 +403,7 @@ namespace CrewChiefV4.Events
 
                 // phew... now we know who will be in front and who will be behind when we emerge from the pitlane. We also
                 // now the expected distance between us and them (in metres) when we emerge.
-                return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind, playerLapsCompletedAfterStop);
+                return new Strategy.PostPitRacePosition(opponentsAhead, opponentsBehind, playerLapsCompletedAfterStop, currentRacePosition);
             }
             // oh dear
             return null;
@@ -450,7 +451,7 @@ namespace CrewChiefV4.Events
             public float numCarsCloseAheadAfterStop = 0;
 
             public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop,
-                int playerLapsCompletedAfterStop)
+                int playerLapsCompletedAfterStop, int playerPositionBeforeStop)
             {
                 this.opponentsBehindAfterStop = opponentsBehindAfterStop;
                 this.opponentsFrontAfterStop = opponentsFrontAfterStop;
@@ -511,14 +512,23 @@ namespace CrewChiefV4.Events
                 {
                     foreach (OpponentPositionAtPlayerPitExit opponent in opponentsFrontAfterStop)
                     {
-                        // we'll be in position + 1 from the closest opponent behind in our class - set this if we haven't already
+                        // if we've not yet set the pit exit position from the car expected to be behind, set it from the 
+                        // car expected to be in front. If we're currently ahead of this guy, use his current position
                         if (opponent.isPlayerClass && opponentClosestAheadAfterStop == null)
                         {
                             opponentClosestAheadAfterStop = opponent;
                             // do we need this?
                             if (closestOpponentLapsCompleted == opponent.opponentLapsCompletedAfterStop && expectedRacePosition == -1)
                             {
-                                expectedRacePosition = opponent.opponentData.ClassPosition + 1;
+                                if (opponent.opponentData.ClassPosition > playerPositionBeforeStop)
+                                {
+                                    // he'll have overtaken us so we'll be in his race position
+                                    expectedRacePosition = opponent.opponentData.ClassPosition;
+                                }
+                                else
+                                {
+                                    expectedRacePosition = opponent.opponentData.ClassPosition + 1;
+                                }
                             }
                         }
                         if (opponent.predictedDistanceGap < Strategy.distanceAheadToBeConsideredVeryClose)
