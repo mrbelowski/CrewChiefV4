@@ -38,7 +38,11 @@ namespace CrewChiefV4.Events
 
         public static String folderPitStopCostsUsAbout = "strategy/a_pitstop_costs_us_about";
         // stuff like: "ok, we'll time this stop", "understood, we'll use this stop as a benchmark, push until sector2" or something
+        // RECORD ME
         public static String folderTimePitstopAcknowledge = "strategy/acknowledge_time_pitstop";
+        // used when we request a benchmark pitstop timing in practice, but we have no best lap data
+        // RECORD ME
+        public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
 
 
         // may be timed during practice.
@@ -124,7 +128,7 @@ namespace CrewChiefV4.Events
                 else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1)
                 {
                     s3AndS1TimeOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
-                    Strategy.playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector3Time);
+                    Strategy.playerTimeLostForStop = s3AndS1TimeOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
                     gameTimeAtPracticeStopTimerStart = -1;
                     isTimingPracticeStop = false;
                     Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
@@ -150,6 +154,10 @@ namespace CrewChiefV4.Events
                 }
                 // if we've just requested a pit stop (and the game has this data), trigger the strategy data when we next hit sector3
                 else if (!previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
+                {
+                    Strategy.playPitPositionEstimates = true;
+                }
+                else if (!Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
@@ -718,8 +726,16 @@ namespace CrewChiefV4.Events
             // trigger-loop calculate the time loss
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PRACTICE_PIT_STOP))
             {
-                isTimingPracticeStop = true;
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
+                if (CrewChief.currentGameState.SessionData.PlayerBestLapSector1Time > 0 && CrewChief.currentGameState.SessionData.PlayerBestLapSector3Time > 0)
+                {
+                    isTimingPracticeStop = true;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
+                }
+                else
+                {
+                    // can't get a benchmark as we have no best lap data in the session
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNeedMoreLapData, 0, null));
+                }
             }
 
             // if the voice message is 'where will I emerge' or something, get the PostPitRacePosition object
