@@ -3238,5 +3238,41 @@ namespace CrewChiefV4.Properties {
                 this["enable_pit_exit_position_estimates"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int PIT_PREDICTION_button_index {
+            get {
+                return ((int)(this["PIT_PREDICTION_button_index"]));
+            }
+            set {
+                this["PIT_PREDICTION_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PIT_PREDICTION_device_guid {
+            get {
+                return ((string)(this["PIT_PREDICTION_device_guid"]));
+            }
+            set {
+                this["PIT_PREDICTION_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PIT_PREDICTION_device_type {
+            get {
+                return ((string)(this["PIT_PREDICTION_device_type"]));
+            }
+            set {
+                this["PIT_PREDICTION_device_type"] = value;
+            }
+        }
     }
 }

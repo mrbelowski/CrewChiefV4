@@ -46,6 +46,8 @@ namespace CrewChiefV4
         public static String TOGGLE_TRACK_LANDMARKS_RECORDING = Configuration.getUIString("toggle_track_landmarks_recording");
         public static String ADD_TRACK_LANDMARK = Configuration.getUIString("add_track_landmark");
 
+        public static String PIT_PREDICTION = Configuration.getUIString("activate_pit_prediction");
+
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
         // yuk...
@@ -96,6 +98,7 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_PACE_NOTES_RECORDING);
             addButtonAssignment(TOGGLE_TRACK_LANDMARKS_RECORDING);
             addButtonAssignment(ADD_TRACK_LANDMARK);
+            addButtonAssignment(PIT_PREDICTION);
             controllers = loadControllers();
         }
 
@@ -136,6 +139,7 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_RECORDING]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_TRACK_LANDMARKS_RECORDING]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[ADD_TRACK_LANDMARK]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PIT_PREDICTION]]);
             
         }
 
@@ -308,6 +312,10 @@ namespace CrewChiefV4
                 {
                     actionId = "ADD_TRACK_LANDMARK";
                 }
+                else if (buttonAssignment.action == PIT_PREDICTION)
+                {
+                    actionId = "PIT_PREDICTION";
+                }
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
                     UserSettings.GetUserSettings().setProperty(actionId + "_button_index", buttonAssignment.buttonIndex);
@@ -460,6 +468,13 @@ namespace CrewChiefV4
             if (addTracklandmarkButtonIndex != -1 && addTracklandmarkDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, ADD_TRACK_LANDMARK, addTracklandmarkButtonIndex, addTracklandmarkDeviceGuid);
+            }
+
+            int pitPredictionButtonIndex = UserSettings.GetUserSettings().getInt("PIT_PREDICTION_button_index");
+            String pitPredictionDeviceGuid = UserSettings.GetUserSettings().getString("PIT_PREDICTION_device_guid");
+            if (pitPredictionButtonIndex != -1 && pitPredictionDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, PIT_PREDICTION, pitPredictionButtonIndex, pitPredictionDeviceGuid);
             }
         }
 

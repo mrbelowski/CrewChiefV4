@@ -99,6 +99,7 @@ volume_up = Increase messages volume
 volume_down = Decrease messages volume
 print_track_data = Print track and position info
 toggle_yellow_flag_messages = Toggle yellow flag messages
+activate_pit_prediction = Pitstop prediction
 
 custom_device = custom device
 assigned_to = assigned to

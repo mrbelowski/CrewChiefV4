@@ -17,6 +17,7 @@ using CrewChiefV4.UserInterface;
 using System.Diagnostics;
 using CrewChiefV4.commands;
 using CrewChiefV4.GameState;
+using CrewChiefV4.Events;
 
 namespace CrewChiefV4
 {
@@ -1171,7 +1172,24 @@ namespace CrewChiefV4
                         //dont confirm press here we do that in addLandmark
                         crewChief.toggleAddTrackLandmark();
                         nextPollWait = 1000;
-                    }    
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PIT_PREDICTION))
+                    {
+                        Console.WriteLine("pit prediction");
+                        if (CrewChief.currentGameState != null)
+                        {
+                            Strategy strategy = (Strategy) CrewChief.getEvent("Strategy");
+                            if (CrewChief.currentGameState.SessionData.SessionType == SessionType.Race)
+                            {
+                                strategy.respondRace();
+                            }
+                            else if (CrewChief.currentGameState.SessionData.SessionType == SessionType.Practice)
+                            {
+                                strategy.respondPracticeStop();
+                            }
+                        }
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.PRINT_TRACK_DATA))
                     {
                         if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData != null &&
