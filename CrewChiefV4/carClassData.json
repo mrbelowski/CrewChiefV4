@@ -150,10 +150,11 @@
 			"pCarsClassNames": ["*GTE*"],
 			"rf2ClassNames": ["*GTE*", "URD_EGT_Darche", "URD_EGT_AM", "URD_EGT_Bayro", "URD_EGT_Ferruccio", "URD_EGT_Venom", "URD_EGT_C7R"],
 			"acClassNames": ["ks_lamborghini_huracan_st", "ks_glickenhaus_scg003", "*GTE*"],
-			"iracingCarIds": [92, 93],
+			"iracingCarIds": [92, 93, 102],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+            "enabledMessageTypes": "ALL",
+            "maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "GTLM",
@@ -170,7 +171,8 @@
 			"acClassNames": ["ks_audi_r8_lms", "*GT3*"],
 			"iracingCarIds": [43, 55, 59, 72, 73, 94],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+            "enabledMessageTypes": "ALL",
+            "maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "CARRERA_CUP",
@@ -307,10 +309,11 @@
 			"raceroomClassIds": [1923],
 			"pCarsClassNames": ["LMP2"],
             "rf2ClassNames": [ "LMP2", "ES_P2" ],
-            "iracingCarIds": [70],
+            "iracingCarIds": [39, 70],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+            "enabledMessageTypes": "ALL",
+            "maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "LMP3",
