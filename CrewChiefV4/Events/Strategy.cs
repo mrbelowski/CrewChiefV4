@@ -360,11 +360,18 @@ namespace CrewChiefV4.Events
             CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
             String trackName)
         {
+            // check we have deltapoints first
+            if (playerDeltaTime == null || playerDeltaTime.deltaPoints == null || playerDeltaTime.deltaPoints.Count == 0)
+            {
+                Console.WriteLine("No usable deltapoints object, can't derive post-pit positions");
+                return null;
+            }
+
             float expectedPlayerTimeLoss = getTimeLossEstimate(playerClass, trackName, opponents, currentRacePosition);
             if (expectedPlayerTimeLoss != -1)
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
-                // in order to do this we need to know the real-time time gap to each opponent behind us. 
+                // in order to do this we need to know the real-time time gap to each opponent behind us.
                 DateTime nowMinusExpectedLoss = now.AddSeconds(expectedPlayerTimeLoss * -1);
                 // get the track distanceRoundTrack at this point in history
                 TimeSpan closestDeltapointTimeDelta = TimeSpan.MaxValue;
@@ -378,7 +385,6 @@ namespace CrewChiefV4.Events
                         closestDeltapointPosition = entry.Key;
                     }
                 }
-                // this needs to be bounds-checked
 
                 // now we have an estimate of where we were on track this many seconds ago. Get the closest opponents
                 // to this position on track.
@@ -403,8 +409,14 @@ namespace CrewChiefV4.Events
                     // us might not be on the same lap, don't derive position data
                     Boolean positionDataCanBeUsed = opponent.ClassPosition > currentRacePosition && Math.Abs(opponent.CompletedLaps - lapsCompleted) < 2;
 
+                    // check this opponent has deltapoint data
+                    if (opponent.DeltaTime == null || opponent.DeltaTime.deltaPoints == null || opponent.DeltaTime.deltaPoints.Count == 0 || opponent.DeltaTime.currentDeltaPoint == -1)
+                    {
+                        continue;
+                    }
                     float opponentPositionDelta = opponent.DeltaTime.currentDeltaPoint - closestDeltapointPosition;
                     float absDelta = Math.Abs(opponentPositionDelta);
+
                     if (opponentPositionDelta > 0)
                     {
                         // he'll be ahead
@@ -794,12 +806,20 @@ namespace CrewChiefV4.Events
             // and report some data from it, then set the playedPitPositionEstimatesForThisLap to true
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PLAY_POST_PIT_POSITION_ESTIMATE))
             {
-                Strategy.PostPitRacePosition postPitPosition = Strategy.getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
-                    CrewChief.currentGameState.SessionData.CompletedLaps, CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData, 
-                CrewChief.currentGameState.SessionData.DeltaTime, CrewChief.currentGameState.Now, CrewChief.currentGameState.SessionData.TrackDefinition.name);
-                // do some reporting
-                reportPostPitData(postPitPosition, true);
-                playedPitPositionEstimatesForThisLap = true;
+                if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
+                {
+                    Console.WriteLine("No data for pit estimate");
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                }
+                else
+                {
+                    Strategy.PostPitRacePosition postPitPosition = Strategy.getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
+                        CrewChief.currentGameState.SessionData.CompletedLaps, CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData,
+                    CrewChief.currentGameState.SessionData.DeltaTime, CrewChief.currentGameState.Now, CrewChief.currentGameState.SessionData.TrackDefinition.name);
+                    // do some reporting
+                    reportPostPitData(postPitPosition, true);
+                    playedPitPositionEstimatesForThisLap = true;
+                }
            }                
         }
     }
