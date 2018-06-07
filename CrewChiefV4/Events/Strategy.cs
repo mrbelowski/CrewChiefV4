@@ -64,6 +64,7 @@ namespace CrewChiefV4.Events
         // this is set by the box-this-lap macro (eeewwww), and primes this event to play the position
         // estimates when we hit S3
         public static Boolean playPitPositionEstimates = false;
+        private static Boolean pitPositionEstimatesRequested = false;
 
         public static Boolean playedPitPositionEstimatesForThisLap = false;
 
@@ -109,6 +110,7 @@ namespace CrewChiefV4.Events
             Strategy.opponentsWhoWillExitCloseBehind.Clear();
             hasPittedDuringPracticeStopProcess = false;
             Strategy.opponentsWhoWillExitCloseInFront.Clear();
+            Strategy.pitPositionEstimatesRequested = false;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -183,6 +185,7 @@ namespace CrewChiefV4.Events
                     !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
                 {
                     Strategy.playPitPositionEstimates = true;
+                    Strategy.pitPositionEstimatesRequested = false;
                 }
                 // if we've just entered the pitlane and the pit countdown is disabled, and we don't have a penalty, trigger
                 // the strategy stuff
@@ -190,6 +193,7 @@ namespace CrewChiefV4.Events
                     !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
+                    Strategy.pitPositionEstimatesRequested = false;
                 }
                 if (Strategy.playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !Strategy.playedPitPositionEstimatesForThisLap)
                 {
@@ -200,7 +204,7 @@ namespace CrewChiefV4.Events
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition, currentGameState.SessionData.CompletedLaps,
                             currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now,
                             currentGameState.SessionData.TrackDefinition.name);
-                    reportPostPitData(postRacePositions, false);
+                    reportPostPitData(postRacePositions);
                     playedPitPositionEstimatesForThisLap = true;
                 }
                 if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentS3TimingCheckDue)
@@ -594,7 +598,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportPostPitData(Strategy.PostPitRacePosition postPitData, Boolean immediate)
+        private void reportPostPitData(Strategy.PostPitRacePosition postPitData)
         {
             List<MessageFragment> fragments = new List<MessageFragment>();
             if (postPitData != null)
@@ -765,7 +769,7 @@ namespace CrewChiefV4.Events
             }
             if (fragments.Count > 0)
             {
-                if (immediate)
+                if (Strategy.pitPositionEstimatesRequested)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", fragments, 0, null));
                 }
@@ -774,7 +778,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", fragments, 0, this));
                 }
             }
-            else if (immediate)
+            else if (Strategy.pitPositionEstimatesRequested)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
@@ -805,11 +809,12 @@ namespace CrewChiefV4.Events
             if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
             {
                 Console.WriteLine("No data for pit estimate");
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
             else
             {
                 Strategy.playPitPositionEstimates = true;
+                Strategy.pitPositionEstimatesRequested = true;
             }
         }
 
