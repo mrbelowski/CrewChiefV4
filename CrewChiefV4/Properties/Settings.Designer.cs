@@ -229,7 +229,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int frequency_of_pearls_of_wisdom {
             get {
                 return ((int)(this["frequency_of_pearls_of_wisdom"]));
@@ -841,7 +841,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_race_sector_delta_reports {
             get {
                 return ((int)(this["frequency_of_race_sector_delta_reports"]));
@@ -853,7 +853,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_opponent_race_lap_times {
             get {
                 return ((int)(this["frequency_of_opponent_race_lap_times"]));
@@ -865,7 +865,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_player_race_lap_time_reports {
             get {
                 return ((int)(this["frequency_of_player_race_lap_time_reports"]));
@@ -877,7 +877,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int frequency_of_prac_and_qual_sector_delta_reports {
             get {
                 return ((int)(this["frequency_of_prac_and_qual_sector_delta_reports"]));
@@ -985,7 +985,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int frequency_of_opponent_practice_and_qual_lap_times {
             get {
                 return ((int)(this["frequency_of_opponent_practice_and_qual_lap_times"]));
@@ -1129,7 +1129,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int frequency_of_player_prac_and_qual_lap_time_reports {
             get {
                 return ((int)(this["frequency_of_player_prac_and_qual_lap_time_reports"]));
