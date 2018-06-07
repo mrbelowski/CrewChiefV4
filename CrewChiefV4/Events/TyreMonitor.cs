@@ -257,6 +257,17 @@ namespace CrewChiefV4.Events
         private int thisLapTyreConditionReportSector = 2;
         private int thisLapTyreTempReportSector = 3;
 
+        // don't warn about cold brakes for these car classes. This is in addition to the 'oval' check - some car classes
+        // (older stuff, road cars) will have brakes that never really get hot, resulting in lots of annoying messages.
+        private CarData.CarClassEnum[] ignoreColdBrakesForClasses = new CarData.CarClassEnum[] {
+            CarData.CarClassEnum.FORMULA_E, CarData.CarClassEnum.HISTORIC_TOURING_1, CarData.CarClassEnum.HISTORIC_TOURING_2, 
+            CarData.CarClassEnum.Kart_1, CarData.CarClassEnum.Kart_2, CarData.CarClassEnum.KART_F1, 
+            CarData.CarClassEnum.KART_JUNIOR, CarData.CarClassEnum.KART_X30_RENTAL, CarData.CarClassEnum.KART_X30_SENIOR,
+            CarData.CarClassEnum.NSU_TT, CarData.CarClassEnum.ROAD_G, CarData.CarClassEnum.ROAD_F,
+            CarData.CarClassEnum.ROAD_E, CarData.CarClassEnum.VINTAGE_GT_C, CarData.CarClassEnum.VINTAGE_GT_D,
+            CarData.CarClassEnum.VINTAGE_INDY_65, CarData.CarClassEnum.VINTAGE_STOCK_CAR
+        };
+
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -767,24 +778,25 @@ namespace CrewChiefV4.Events
 
         public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
         {
+            CarData.CarClassEnum carClassEnum = CrewChief.currentGameState.carClass.carClassEnum;
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (peak)
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
                 }
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
             }
             else
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
                 }
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
             }
             if (messageContents.Count == 0)
             {
@@ -1346,7 +1358,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents)
+        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, CarData.CarClassEnum carClassEnum)
         {
             switch (corners)
             {
@@ -1354,7 +1366,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotBrakesAllRound));
@@ -1370,7 +1385,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotFrontBrakes));
@@ -1386,7 +1404,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotRearBrakes));
