@@ -54,7 +54,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_pearls_of_wisdom" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">7</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="play_cut_track_warnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -207,16 +207,16 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_race_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_race_lap_times" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_player_race_lap_time_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_prac_and_qual_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">6</Value>
     </Setting>
     <Setting Name="race_sector_reports_at_each_sector" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -243,7 +243,7 @@
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_practice_and_qual_lap_times" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">7</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="enable_track_and_air_temp_reports" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -279,7 +279,7 @@
       <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="frequency_of_player_prac_and_qual_lap_time_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">6</Value>
     </Setting>
     <Setting Name="use_alternate_beeps" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
