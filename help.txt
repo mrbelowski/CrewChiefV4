@@ -77,6 +77,16 @@ Personalisations
 The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "Min time between personalised messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
 
 
+Pit exit position prediction
+----------------------------
+Version 4.9.3.0 adds rudamentary race and track position predictions for pit exit. This is based on a benchmark pitstop time which uses the time difference between your best lap's sector3 and sector1 times, and the corresponding times on your inlap & outlap.
+
+Benchmark pit times can be measured during a practice session with the 'time this stop' / 'practice pitstop' / 'time this pitstop' / 'pitstop benchmark' voice command. Do some hot laps to get a baseline laptime, then issue this after your 'box this lap' command, and do a full race-simulation pitstop. Maintain race pace on your outlap until you finish sector1. The app will calculate how much time you lost and use this when you pit in the race. If you don't measure your own benchmark pit time the app will measure the time your opponents lose due to pitting and use this instead - note that this means pit exit prediction data won't be available until after at least one of your opponents have completed a pitstop.
+
+If the app has usable benchmark data and you request a pitstop *before you reach sector3*, it'll tell you where you should come out and what the traffic will be like when you hit sector3. You can also request this data at any time with the 'Where will be be after a stop?' / 'Estimate pit exit positions' / 'What will happen if I pit?', even if you've not requested a pitstop (the app will derive its estimates on every lap regardless or whether you actually pit).
+
+At the time of writing there's more work to be done here and some more features that may be added.
+
 
 Voice Recognition
 -------------------------
@@ -155,7 +165,8 @@ The app understands lots of command including:
 "what's the sof" / "what is the strength of field" (iRacing only)
 "how many incidents do i have" / "what's my incident count" (iRacing only)
 "what's the incident limit" (iRacing only) 
-
+"time this stop" / "practice pitstop" / "time this pitstop" / "pitstop benchmark": time the next pitstop (sector 3 + sector 1 time) to work out home much tome overall a pitstop costs - practice session only
+"where will I be after a stop?" / "Estimate pit exit positions" / "What will happen if I pit?": play estimate of traffic and race positions on pit exit, if you were to pit on this lap
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
