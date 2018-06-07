@@ -606,8 +606,8 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderTenMinutesFuel, 0, this));
 
                             }
-                            else if (!playedHalfTankWarning && currentGameState.FuelData.FuelLeft / initialFuelLevel <= 0.55 && 
-                                currentGameState.FuelData.FuelLeft / initialFuelLevel >= 0.45 && !hasBeenRefuelled)
+                            else if (!playedHalfTankWarning && currentGameState.FuelData.FuelLeft / initialFuelLevel <= 0.50 && 
+                                currentGameState.FuelData.FuelLeft / initialFuelLevel >= 0.47 && !hasBeenRefuelled)
                             {
                                 // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
                                 playedHalfTankWarning = true;
