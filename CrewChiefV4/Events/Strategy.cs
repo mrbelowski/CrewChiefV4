@@ -184,7 +184,9 @@ namespace CrewChiefV4.Events
                 {
                     Strategy.playPitPositionEstimates = true;
                 }
-                else if (!pitBoxPositionCountdown &&
+                // if we've just entered the pitlane and the pit countdown is disabled, and we don't have a penalty, trigger
+                // the strategy stuff
+                else if (!pitBoxPositionCountdown && !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo &&
                     !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     Strategy.playPitPositionEstimates = true;
