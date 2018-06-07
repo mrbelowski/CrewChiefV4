@@ -56,7 +56,7 @@ namespace CrewChiefV4.Events
         private static String trackNameForLastPitstopTiming;
         private static Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
 
-        private Boolean isTimingPracticeStop = false;
+        public static Boolean isTimingPracticeStop = false;
         private Boolean hasPittedDuringPracticeStopProcess = false;
         private float gameTimeAtPracticeStopTimerStart = -1;
         private float s3AndS1TimeOnStop = -1;
@@ -780,49 +780,54 @@ namespace CrewChiefV4.Events
             }
         }
 
+        public void respondPracticeStop()
+        {
+            if ((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
+                    CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3)
+            {
+                // unable to use this track for pit benchmarks as it doesn't have 3 sectors
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+            }
+            else if (CrewChief.currentGameState.SessionData.PlayerBestLapSector1Time > 0 && CrewChief.currentGameState.SessionData.PlayerBestLapSector3Time > 0)
+            {
+                isTimingPracticeStop = true;
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
+            }
+            else
+            {
+                // can't get a benchmark as we have no best lap data in the session
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderNeedMoreLapData, 0, null));
+            }
+        }
+
+        public void respondRace()
+        {
+            if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
+            {
+                Console.WriteLine("No data for pit estimate");
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+            }
+            else
+            {
+                Strategy.playPitPositionEstimates = true;
+            }
+        }
+
         public override void respond(string voiceMessage)
         {
             // if voice message is 'practice pitstop' or something, set the boolean flag that makes the
             // trigger-loop calculate the time loss
             if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PRACTICE_PIT_STOP))
             {
-                if (CrewChief.currentGameState.SessionData.PlayerBestLapSector1Time > 0 && CrewChief.currentGameState.SessionData.PlayerBestLapSector3Time > 0)
-                {
-                    isTimingPracticeStop = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
-                }
-                else if ((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
-                    CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3)
-                {
-                    // unable to use this track for pit benchmarks as it doesn't have 3 sectors
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
-                }
-                else
-                {
-                    // can't get a benchmark as we have no best lap data in the session
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderNeedMoreLapData, 0, null));
-                }
+                respondPracticeStop();
             }
 
             // if the voice message is 'where will I emerge' or something, get the PostPitRacePosition object
             // and report some data from it, then set the playedPitPositionEstimatesForThisLap to true
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PLAY_POST_PIT_POSITION_ESTIMATE))
             {
-                if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
-                {
-                    Console.WriteLine("No data for pit estimate");
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
-                }
-                else
-                {
-                    Strategy.PostPitRacePosition postPitPosition = Strategy.getPostPitPositionData(true, CrewChief.currentGameState.SessionData.ClassPosition,
-                        CrewChief.currentGameState.SessionData.CompletedLaps, CrewChief.currentGameState.carClass, CrewChief.currentGameState.OpponentData,
-                    CrewChief.currentGameState.SessionData.DeltaTime, CrewChief.currentGameState.Now, CrewChief.currentGameState.SessionData.TrackDefinition.name);
-                    // do some reporting
-                    reportPostPitData(postPitPosition, true);
-                    playedPitPositionEstimatesForThisLap = true;
-                }
-           }                
+                respondRace();
+            }                
         }
     }
 }
