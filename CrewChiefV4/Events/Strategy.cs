@@ -195,10 +195,11 @@ namespace CrewChiefV4.Events
                     Strategy.playPitPositionEstimates = true;
                     Strategy.pitPositionEstimatesRequested = false;
                 }
-                if (Strategy.playPitPositionEstimates && currentGameState.SessionData.SectorNumber == 3 && !Strategy.playedPitPositionEstimatesForThisLap)
+                if (Strategy.playPitPositionEstimates &&
+                    (Strategy.pitPositionEstimatesRequested || (currentGameState.SessionData.SectorNumber == 3 && !Strategy.playedPitPositionEstimatesForThisLap)))
                 {
                     Strategy.playPitPositionEstimates = false;
-                    // we requested a stop and we're in S3, so gather up the data we'll need and report it
+                    // we requested a stop and we're in S3, or we requested data, so gather up the data we'll need and report it
                     //
                     // Note that we need to derive the position estimates here before we start slowing for pit entry
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition, currentGameState.SessionData.CompletedLaps,
@@ -324,7 +325,7 @@ namespace CrewChiefV4.Events
             }
         }
         
-        private static float getExpectedPlayerTimeLoss(CarData.CarClass carClass, String trackName)
+        private float getExpectedPlayerTimeLoss(CarData.CarClass carClass, String trackName)
         {
             if (CarData.IsCarClassEqual(carClass, Strategy.carClassForLastPitstopTiming) && trackName == Strategy.trackNameForLastPitstopTiming)
             {
@@ -333,7 +334,7 @@ namespace CrewChiefV4.Events
             return -1;
         }
 
-        private static float getTimeLossEstimate(CarData.CarClass carClass, String trackName, Dictionary<String, OpponentData> opponents, int currentRacePosition)
+        private float getTimeLossEstimate(CarData.CarClass carClass, String trackName, Dictionary<String, OpponentData> opponents, int currentRacePosition)
         {
             float timeLossEstimate = getExpectedPlayerTimeLoss(carClass, trackName);
             if (timeLossEstimate == -1)
@@ -362,7 +363,7 @@ namespace CrewChiefV4.Events
         }
 
         // all the nasty logic is in this method - refactor?
-        private static Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
+        private Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
             CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
             String trackName)
         {
