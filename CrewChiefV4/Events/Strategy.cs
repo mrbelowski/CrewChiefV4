@@ -483,6 +483,7 @@ namespace CrewChiefV4.Events
 
                 int expectedPlayerRacePosition = 1;
                 float closestTotalRaceDistance = float.MaxValue;
+                OpponentData derivedRacePositionFromOpponent = null;
 
                 foreach (OpponentData opponent in opponents.Values)
                 {
@@ -504,19 +505,30 @@ namespace CrewChiefV4.Events
                                 if (opponent.ClassPosition > currentRacePosition)
                                 {
                                     expectedPlayerRacePosition = opponent.ClassPosition;
+                                    derivedRacePositionFromOpponent = opponent;
                                 }
                                 else
                                 {
                                     expectedPlayerRacePosition = opponent.ClassPosition + 1;
+                                    derivedRacePositionFromOpponent = opponent;
                                 }
                             }
                             else
                             {
                                 // this guy will be in behind us.
                                 expectedPlayerRacePosition = opponent.ClassPosition - 1;
+                                derivedRacePositionFromOpponent = opponent;
                             }
                         }
                     }
+
+                    if (derivedRacePositionFromOpponent != null)
+                    {
+                        Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
+                            opponent.DriverRawName + " who's in P" + opponent.ClassPosition + ". Completed laps player " + lapsCompleted + " opponent " + 
+                            opponent.CompletedLaps + " track position player = "+ currentDistanceRoundTrack + " opponent = " + opponent.DistanceRoundTrack);
+                    }
+
                     // want to know how far the opponent is from this closestDeltapointPosition right now
                     // fuck me this is a retarded way to do this, but it's late and my brain has given up
                     float opponentPositionDelta = opponent.DistanceRoundTrack - closestDeltapointPosition;
