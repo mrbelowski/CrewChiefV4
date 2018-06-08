@@ -551,8 +551,8 @@ namespace CrewChiefV4.Events
                 {
                     Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
                         derivedRacePositionFromOpponent.DriverRawName + " who's in P" + derivedRacePositionFromOpponent.ClassPosition + 
-                        ". Completed laps player " + lapsCompleted + " opponent " +
-                        derivedRacePositionFromOpponent.CompletedLaps + " track position player = " + currentDistanceRoundTrack + " opponent = " +
+                        ". Completed laps player: " + lapsCompleted + " opponent: " +
+                        derivedRacePositionFromOpponent.CompletedLaps + " track position player: " + currentDistanceRoundTrack + " opponent: " +
                         derivedRacePositionFromOpponent.DistanceRoundTrack);
                 }
 
