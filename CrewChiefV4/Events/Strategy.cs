@@ -490,52 +490,42 @@ namespace CrewChiefV4.Events
 
                 float closestDeltapointPosition = positionAndTotalDistanceForTimeLoss.Item1;
 
+                float distanceCorrectionForPittingOpponents = (((trackLength * lapsCompleted) + currentDistanceRoundTrack) - positionAndTotalDistanceForTimeLoss.Item2) / 2;
+
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
+                List<Tuple<OpponentData, float>> totalRaceDistances = new List<Tuple<OpponentData, float>>();
 
-                int expectedPlayerRacePosition = 1;
-                float closestTotalRaceDistance = float.MaxValue;
                 OpponentData derivedRacePositionFromOpponent = null;
-
+                
                 foreach (OpponentData opponent in opponents.Values)
                 {
                     String opponentCarClassId = opponent.CarClass.getClassIdentifier();
                     Boolean isPlayerClass = CarData.IsCarClassEqual(opponent.CarClass, playerClass);
 
+                    float correction = 0;
+                    if (opponent.InPits)
+                    {
+                        // this makes things awkward. He'll be some distance behind where we predicted him to be.
+                        // The best we can do here is move him back half the distance we'd expect to lose by pitting
+                        correction = distanceCorrectionForPittingOpponents;
+                    }
+
                     if (isPlayerClass)
                     {
-                        // work out where we'll be by inspecting the predicted total race distance of the nearest opponent car
-                        float opponentTotalRaceDistance = (opponent.CompletedLaps) * trackLength + opponent.DistanceRoundTrack;
-                        float raceDistanceDiff = positionAndTotalDistanceForTimeLoss.Item2 - opponentTotalRaceDistance;
-                        float absRaceDistanceDiff = Math.Abs(raceDistanceDiff);
-                        if (absRaceDistanceDiff < closestTotalRaceDistance)
-                        {
-                            closestTotalRaceDistance = absRaceDistanceDiff;
-                            if (raceDistanceDiff < 0)
-                            {
-                                // this guy will be in front of us. If he was behind us before our stop, we'll have exchanged positions
-                                if (opponent.ClassPosition > currentRacePosition)
-                                {
-                                    expectedPlayerRacePosition = opponent.ClassPosition;
-                                    derivedRacePositionFromOpponent = opponent;
-                                }
-                                else
-                                {
-                                    expectedPlayerRacePosition = opponent.ClassPosition + 1;
-                                    derivedRacePositionFromOpponent = opponent;
-                                }
-                            }
-                            else
-                            {
-                                // this guy will be in behind us.
-                                expectedPlayerRacePosition = opponent.ClassPosition - 1;
-                                derivedRacePositionFromOpponent = opponent;
-                            }
-                        }
+                        // get this guy's predicted total distance travelled.
+                        //
+                        // If this car is in the pits, he will be further back due to this stop. We don't know where he is in the 
+                        // pit stop cycle, so the best we can do here is move him back 1/2 the distance we'd expect to lose
+                        float opponentTotalRaceDistance = ((opponent.CompletedLaps) * trackLength) + opponent.DistanceRoundTrack - correction;
+                        totalRaceDistances.Add(new Tuple<OpponentData, float>(opponent, opponentTotalRaceDistance));                        
                     }
+                    
                     // want to know how far the opponent is from this closestDeltapointPosition right now
-                    // fuck me this is a retarded way to do this, but it's late and my brain has given up
-                    float opponentPositionDelta = opponent.DistanceRoundTrack - closestDeltapointPosition;
+                    // fuck me this is a retarded way to do this, but it's late and my brain has given up.
+
+                    // additional hack here - if he's in the pit we need to correct this position
+                    float opponentPositionDelta = opponent.DistanceRoundTrack - closestDeltapointPosition - correction;
                     if (opponentPositionDelta < halfTrackLength * -1)
                     {
                         opponentPositionDelta = (trackLength - closestDeltapointPosition) + opponent.DistanceRoundTrack;
@@ -559,10 +549,34 @@ namespace CrewChiefV4.Events
                     }                    
                 }
 
-                if (derivedRacePositionFromOpponent != null)
+                // now work out the race position of the player, from the expected distance covered of all the drivers
+                totalRaceDistances.Sort(delegate(Tuple<OpponentData, float> t1, Tuple<OpponentData, float> t2)
+                {
+                    return t2.Item2.CompareTo(t1.Item2);
+                });
+                int expectedPlayerRacePosition = 1;
+                OpponentData opponentAheadExpected = null;
+                foreach (Tuple<OpponentData, float> opponentAndDistance in totalRaceDistances)
+                {                    
+                    if (opponentAndDistance.Item2 < positionAndTotalDistanceForTimeLoss.Item2)
+                    {
+                        // we'll be ahead of this car, and he's the car who'll have travelled the furthest
+                        // of all the cars we'll be ahead of
+                        opponentAheadExpected = opponentAndDistance.Item1;
+                        break;
+                    }
+                    expectedPlayerRacePosition++;
+                }
+                if (opponentAheadExpected == null)
+                {
+                    // we're going to be last
+                    opponentAheadExpected = totalRaceDistances.Last().Item1;
+                }
+
+                if (opponentAheadExpected != null)
                 {
                     Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
-                        derivedRacePositionFromOpponent.DriverRawName + " who's in P" + derivedRacePositionFromOpponent.ClassPosition + 
+                        opponentAheadExpected.DriverRawName + " who's in P" + derivedRacePositionFromOpponent.ClassPosition + 
                         ". Completed laps player: " + lapsCompleted + " opponent: " +
                         derivedRacePositionFromOpponent.CompletedLaps + " track position player: " + currentDistanceRoundTrack + " opponent: " +
                         derivedRacePositionFromOpponent.DistanceRoundTrack);
