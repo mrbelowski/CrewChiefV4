@@ -118,15 +118,15 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
         {
             // can't be arsed to keep checking this:
-            if (previousGameState == null)
+            if (previousGameState == null || currentGameState.SessionData.TrackDefinition == null)
             {
+                // no track data
                 return;
             }
-            if (currentGameState.SessionData.TrackDefinition == null || 
-                ((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
+            if (((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
                     CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3))
             {
-                // no track data, or track that doesn't have 3 sectors
+                // track that doesn't have 3 sectors
                 return;
             }
             if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1)
@@ -804,6 +804,13 @@ namespace CrewChiefV4.Events
 
         public void respondPracticeStop()
         {
+            if (((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
+                    CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3))
+            {
+                // track that doesn't have 3 sectors
+                Console.WriteLine("Track must have 3 sectors to use pit strategy, this one has " + CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack);
+                return;
+            }
             if ((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
                     CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3)
             {
@@ -824,6 +831,13 @@ namespace CrewChiefV4.Events
 
         public void respondRace()
         {
+            if (((CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT) &&
+                    CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack != 3))
+            {
+                // track that doesn't have 3 sectors
+                Console.WriteLine("Track must have 3 sectors to use pit strategy, this one has " + CrewChiefV4.assetto.ACSGameStateMapper.numberOfSectorsOnTrack);
+                return;
+            }
             if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
             {
                 Console.WriteLine("No data for pit estimate");
