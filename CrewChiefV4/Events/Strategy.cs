@@ -598,6 +598,21 @@ namespace CrewChiefV4.Events
             public float numCarsCloseBehindAfterStop = 0;
             public float numCarsCloseAheadAfterStop = 0;
 
+            public void print()
+            {
+                Console.WriteLine("Pistop predition: position " + expectedRacePosition + ", " + numCarsVeryCloseAheadAfterStop + " cars very close ahead, " + 
+                    numCarsVeryCloseBehindAfterStop + " cars very close behind, " + numCarsCloseAheadAfterStop + " cars close ahead, " + 
+                    numCarsCloseBehindAfterStop + " cars close behind");
+                if (opponentClosestAheadAfterStop != null)
+                {
+                    Console.WriteLine("opponent " + opponentClosestAheadAfterStop.opponentData.DriverRawName + " will be " + opponentClosestAheadAfterStop.predictedDistanceGap + " metres ahead");
+                }
+                if (opponentClosestBehindAfterStop != null)
+                {
+                    Console.WriteLine("opponent " + opponentClosestBehindAfterStop.opponentData.DriverRawName + " will be " + opponentClosestBehindAfterStop.predictedDistanceGap + " metres behind");
+                }
+            }
+
             public PostPitRacePosition(List<OpponentPositionAtPlayerPitExit> opponentsFrontAfterStop, List<OpponentPositionAtPlayerPitExit> opponentsBehindAfterStop,
                 int expectedRacePosition)
             {
@@ -662,6 +677,7 @@ namespace CrewChiefV4.Events
             List<MessageFragment> fragments = new List<MessageFragment>();
             if (postPitData != null)
             {
+                postPitData.print();
                 if (postPitData.willBeInTraffic())
                 {
                     fragments.Add(MessageFragment.Text(folderExpectTrafficOnPitExit));
