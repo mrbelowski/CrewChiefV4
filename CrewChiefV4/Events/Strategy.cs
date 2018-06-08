@@ -58,7 +58,7 @@ namespace CrewChiefV4.Events
 
         public static Boolean isTimingPracticeStop = false;
         private Boolean hasPittedDuringPracticeStopProcess = false;
-        private float gameTimeAtPracticeStopTimerStart = -1;
+        private float gameTimeWhenEnteringLastSectorInPractice = -1;
         private float lastAndFirstSectorTimesOnStop = -1;
 
         // this is set by the box-this-lap macro (eeewwww), and primes this event to play the position
@@ -101,7 +101,7 @@ namespace CrewChiefV4.Events
             // don't wipe the time-lost-on-stop that may have been derived in a previous session
             Strategy.opponentsTimeLostForStop.Clear();
             isTimingPracticeStop = false;
-            gameTimeAtPracticeStopTimerStart = -1;
+            gameTimeWhenEnteringLastSectorInPractice = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
             nextOpponentFinalSectorTimingCheckDue = DateTime.MinValue;
             opponentsInPitCycle.Clear();
@@ -132,53 +132,57 @@ namespace CrewChiefV4.Events
                     return;
                 }
             }
-            if (currentGameState.SessionData.SessionType == SessionType.Practice && isTimingPracticeStop)
+            if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
-                if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
-                {
-                    // sanity check
-                    if (currentGameState.PositionAndMotionData.CarSpeed > 1)
-                    {
-                        hasPittedDuringPracticeStopProcess = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Pitted during practice pitstop window but we appear to have quit-to-pit, cancelling");
-                        gameTimeAtPracticeStopTimerStart = -1;
-                        isTimingPracticeStop = false;
-                        hasPittedDuringPracticeStopProcess = false;
-                    }
-                }
+                // always log the game time at start of final sector, in case we make a late decision to time a stop
                 if (enteredLastSector(previousGameState, currentGameState))
                 {
-                    gameTimeAtPracticeStopTimerStart = currentGameState.SessionData.SessionRunningTime;
+                    gameTimeWhenEnteringLastSectorInPractice = currentGameState.SessionData.SessionRunningTime;
                     hasPittedDuringPracticeStopProcess = false;
-                    Console.WriteLine("Starting pitstop benchmark process");
                 }
-                else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1 && 
-                    hasPittedDuringPracticeStopProcess)
+                if (isTimingPracticeStop)
                 {
-                    lastAndFirstSectorTimesOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeAtPracticeStopTimerStart;
-                    
-                    if (sectorCount == 2)
+                    if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
-                        Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                        // sanity check
+                        if (currentGameState.PositionAndMotionData.CarSpeed > 1)
+                        {
+                            Console.WriteLine("Pitting - this stop will be used as a benchmark. Game time = " + gameTimeWhenEnteringLastSectorInPractice);
+                            hasPittedDuringPracticeStopProcess = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Pitted during practice pitstop window but we appear to have quit-to-pit, cancelling");
+                            gameTimeWhenEnteringLastSectorInPractice = -1;
+                            isTimingPracticeStop = false;
+                            hasPittedDuringPracticeStopProcess = false;
+                        }
                     }
-                    else
+                    else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1 &&
+                        hasPittedDuringPracticeStopProcess && gameTimeWhenEnteringLastSectorInPractice != -1)
                     {
-                        Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                        lastAndFirstSectorTimesOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeWhenEnteringLastSectorInPractice;
+
+                        if (sectorCount == 2)
+                        {
+                            Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                        }
+                        else
+                        {
+                            Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                        }
+                        gameTimeWhenEnteringLastSectorInPractice = -1;
+                        isTimingPracticeStop = false;
+                        hasPittedDuringPracticeStopProcess = false;
+                        Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
+                        Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
+
+                        Console.WriteLine("Practice pitstop has cost us " + Strategy.playerTimeLostForStop + " seconds");
+                        audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
+                            MessageContents(folderPitStopCostsUsAbout,
+                            TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
+                            0, this));
                     }
-                    gameTimeAtPracticeStopTimerStart = -1;
-                    isTimingPracticeStop = false;
-                    hasPittedDuringPracticeStopProcess = false;
-                    Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
-                    Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
-                    
-                    Console.WriteLine("Practice pitstop has cost us " + Strategy.playerTimeLostForStop + " seconds");
-                    audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 
-                        MessageContents(folderPitStopCostsUsAbout,
-                        TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
-                        0, this));
                 }
                 // nothing else to do unless we're in race mode
             }
