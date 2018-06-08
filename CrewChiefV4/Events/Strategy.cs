@@ -355,7 +355,12 @@ namespace CrewChiefV4.Events
                                 if (lastLapPenultimateSectorEndTime > 0 && thisLapS1EndTime > 0)
                                 {
                                     float lastPenultimateSectorAndS1Time = thisLapS1EndTime - lastLapPenultimateSectorEndTime;
-                                    Strategy.opponentsTimeLostForStop[entry.Key] = lastPenultimateSectorAndS1Time - bestLastAndFirstSectorTime;
+                                    float timeLost = lastPenultimateSectorAndS1Time - bestLastAndFirstSectorTime;
+                                    // if this opponent has lost less than 5 seconds due to pitting, something has gone wrong in the calculations
+                                    if (timeLost > 5)
+                                    {
+                                        Strategy.opponentsTimeLostForStop[entry.Key] = timeLost;
+                                    }
                                 }
                                 opponentsInPitCycle.Remove(entry.Key);
                             }
