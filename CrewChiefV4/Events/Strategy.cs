@@ -495,8 +495,6 @@ namespace CrewChiefV4.Events
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
                 List<Tuple<OpponentData, float>> totalRaceDistances = new List<Tuple<OpponentData, float>>();
-
-                OpponentData derivedRacePositionFromOpponent = null;
                 
                 foreach (OpponentData opponent in opponents.Values)
                 {
@@ -576,10 +574,10 @@ namespace CrewChiefV4.Events
                 if (opponentAheadExpected != null)
                 {
                     Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
-                        opponentAheadExpected.DriverRawName + " who's in P" + derivedRacePositionFromOpponent.ClassPosition + 
+                        opponentAheadExpected.DriverRawName + " who's currently in P" + opponentAheadExpected.ClassPosition + 
                         ". Completed laps player: " + lapsCompleted + " opponent: " +
-                        derivedRacePositionFromOpponent.CompletedLaps + " track position player: " + currentDistanceRoundTrack + " opponent: " +
-                        derivedRacePositionFromOpponent.DistanceRoundTrack);
+                        opponentAheadExpected.CompletedLaps + " track position player: " + currentDistanceRoundTrack + " opponent: " +
+                        opponentAheadExpected.DistanceRoundTrack);
                 }
 
                 // sort each of these by the delta, smallest first
