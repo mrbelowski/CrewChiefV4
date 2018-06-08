@@ -370,13 +370,18 @@ namespace CrewChiefV4.Events
             return timeLossEstimate;
         }
 
+        /**
+         * Get the track position (distance round lap) and the total distance covered. Allow for whole laps difference
+         * by assuming we'd have been travelling at bestLap pace if we were not stopping
+         */
         private Tuple<float, float> getPositionAndTotalDistanceForTimeLoss(float expectedPlayerTimeLoss, float trackLength,
             float currentDistanceRoundTrack, float bestLapTime, int currentLapsCompleted, DateTime now, DeltaTime playerDeltaTime)
         {
             int fullLapsLost = (int) (expectedPlayerTimeLoss / bestLapTime);
 
-            // need to allow for losing 1 or more complete laps:
-            DateTime nowMinusExpectedLoss = now.AddSeconds((fullLapsLost * bestLapTime) + (expectedPlayerTimeLoss * -1));
+            // need to allow for losing 1 or more complete laps. This adjustment is required because the DeltaTimes stuff only
+            // holds the last lap's worth of data
+            DateTime nowMinusExpectedLoss = now.AddSeconds((fullLapsLost * bestLapTime) - expectedPlayerTimeLoss);
             // get the track distanceRoundTrack at this point in history
             TimeSpan closestDeltapointTimeDelta = TimeSpan.MaxValue;
             float closestDeltapointPosition = float.MaxValue;
@@ -389,8 +394,9 @@ namespace CrewChiefV4.Events
                     closestDeltapointPosition = entry.Key;
                 }
             }
-            float totalRaceDistanceAtExpectedLoss;
 
+            // work out how far we'd have travelled if we were expectedPlayerTimeLoss seconds behind where we are now
+            float totalRaceDistanceAtExpectedLoss;
             // also need to allow for this deltapoint position being in front of us
             if (closestDeltapointPosition > currentDistanceRoundTrack)
             {
@@ -420,8 +426,8 @@ namespace CrewChiefV4.Events
             if (expectedPlayerTimeLoss != -1)
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
-                // in order to do this we need to know the real-time time gap to each opponent behind us.
-
+                // in order to do this we need to know the total race distance at the point where we'd have been
+                // expectedPlayerTimeLoss seconds ago
                 Tuple<float, float> positionAndTotalDistanceForTimeLoss = getPositionAndTotalDistanceForTimeLoss(
                     expectedPlayerTimeLoss, trackLength, currentDistanceRoundTrack, bestLapTime, lapsCompleted, now, playerDeltaTime);
 
@@ -440,6 +446,7 @@ namespace CrewChiefV4.Events
 
                     if (isPlayerClass)
                     {
+                        // work out where we'll be by inspecting the predicted total race distance of the nearest opponent car
                         float opponentTotalRaceDistance = (opponent.CompletedLaps) * trackLength + opponent.DistanceRoundTrack;
                         float raceDistanceDiff = positionAndTotalDistanceForTimeLoss.Item2 - opponentTotalRaceDistance;
                         float absRaceDistanceDiff = Math.Abs(raceDistanceDiff);
