@@ -115,30 +115,6 @@ namespace CrewChiefV4.Events
             Strategy.pitPositionEstimatesRequested = false;
         }
 
-        private Boolean enteredLastSector(GameStateData previousGameState, GameStateData currentGameState)
-        {
-            if (sectorCount == 2)
-            {
-                return currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1;
-            }
-            else
-            {
-                return currentGameState.SessionData.SectorNumber == 3 && previousGameState.SessionData.SectorNumber == 2;
-            }
-        }
-
-        private Boolean inFinalSector(GameStateData currentGameState)
-        {
-            if (sectorCount == 2)
-            {
-                return currentGameState.SessionData.SectorNumber == 2;
-            }
-            else
-            {
-                return currentGameState.SessionData.SectorNumber == 3;
-            }
-        }
-
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
         {
             // can't be arsed to keep checking this:
@@ -256,6 +232,10 @@ namespace CrewChiefV4.Events
                     playedPitPositionEstimatesForThisLap = true;
                 }
 
+
+
+                //-------------------------------
+                // this block is currently unused
                 if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentFinalSectorTimingCheckDue)
                 {
                     float expectedPlayerTimeLoss = -1;
@@ -339,6 +319,11 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
+                //------------------------------
+
+
+
+
                 if (timeOpponentStops && currentGameState.Now > nextPitTimingCheckDue)
                 {
                     // check for opponent pit timings every 10 seconds if we don't have our own
@@ -349,10 +334,9 @@ namespace CrewChiefV4.Events
                         // only interested in opponent pit times for our class
                         if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass) && entry.Value.CompletedLaps > 2)
                         {
-                            if (opponentsInPitCycle.Contains(entry.Key) && 
-                                ((sectorCount == 3 && entry.Value.CurrentSectorNumber == 2) || (sectorCount == 2 && entry.Value.CurrentSectorNumber == 1)))
+                            if (opponentsInPitCycle.Contains(entry.Key) && entry.Value.CurrentSectorNumber == 2)
                             {
-                                // he's entered the penultimate sector since we last checked, so calculate how much time he's lost pitting
+                                // he's just pitted and has entered the finished the first sector since we last checked, so calculate how much time he's lost pitting
                                 float bestLastAndFirstSectorTime;
                                 if (sectorCount == 3)
                                 {
@@ -851,6 +835,30 @@ namespace CrewChiefV4.Events
             else if (Strategy.pitPositionEstimatesRequested)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+            }
+        }
+
+        private Boolean enteredLastSector(GameStateData previousGameState, GameStateData currentGameState)
+        {
+            if (sectorCount == 2)
+            {
+                return currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1;
+            }
+            else
+            {
+                return currentGameState.SessionData.SectorNumber == 3 && previousGameState.SessionData.SectorNumber == 2;
+            }
+        }
+
+        private Boolean inFinalSector(GameStateData currentGameState)
+        {
+            if (sectorCount == 2)
+            {
+                return currentGameState.SessionData.SectorNumber == 2;
+            }
+            else
+            {
+                return currentGameState.SessionData.SectorNumber == 3;
             }
         }
 
