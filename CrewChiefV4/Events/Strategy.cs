@@ -89,6 +89,8 @@ namespace CrewChiefV4.Events
         public static String opponentFrontToWatchForPitting = null;
         public static String opponentBehindToWatchForPitting = null;
 
+        private Boolean printS1Positions = false;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.FullCourseYellow }; }
@@ -118,6 +120,7 @@ namespace CrewChiefV4.Events
             Strategy.pitPositionEstimatesRequested = false;
             Strategy.opponentFrontToWatchForPitting = null;
             Strategy.opponentBehindToWatchForPitting = null;
+            printS1Positions = false;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -193,6 +196,11 @@ namespace CrewChiefV4.Events
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
+                if (printS1Positions && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
+                {
+                    printS1Positions = false;
+                    Console.WriteLine("After exiting pit, we're in P " + currentGameState.SessionData.ClassPosition);
+                }
                 if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
                 {
                     // just left the pits, clear our hack
@@ -579,6 +587,8 @@ namespace CrewChiefV4.Events
                         opponentAheadExpected.CompletedLaps + " track position player: " + currentDistanceRoundTrack + " opponent: " +
                         opponentAheadExpected.DistanceRoundTrack);
                 }
+
+                printS1Positions = true;
 
                 // sort each of these by the delta, smallest first
                 opponentsAhead.Sort(delegate(OpponentPositionAtPlayerPitExit d1, OpponentPositionAtPlayerPitExit d2)
