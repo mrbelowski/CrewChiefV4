@@ -86,6 +86,9 @@ namespace CrewChiefV4.Events
 
         private int sectorCount = 3;
 
+        public static String opponentFrontToWatchForPitting = null;
+        public static String opponentBehindToWatchForPitting = null;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.FullCourseYellow }; }
@@ -113,6 +116,8 @@ namespace CrewChiefV4.Events
             hasPittedDuringPracticeStopProcess = false;
             Strategy.opponentsWhoWillExitCloseInFront.Clear();
             Strategy.pitPositionEstimatesRequested = false;
+            Strategy.opponentFrontToWatchForPitting = null;
+            Strategy.opponentBehindToWatchForPitting = null;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -188,6 +193,13 @@ namespace CrewChiefV4.Events
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
+                if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
+                {
+                    // just left the pits, clear our hack
+                    opponentBehindToWatchForPitting = null;
+                    opponentFrontToWatchForPitting = null;
+                }
+
                 // if we've timed our pitstop in practice, don't search for opponent stop times
                 if (currentGameState.SessionData.JustGoneGreen)
                 {
@@ -708,6 +720,14 @@ namespace CrewChiefV4.Events
                 {
                     fragments.Add(MessageFragment.Text(folderWeShouldEmergeInPosition));
                     fragments.Add(MessageFragment.Integer(postPitData.expectedRacePosition));
+                }
+                if (postPitData.opponentClosestAheadAfterStop != null && !postPitData.opponentClosestAheadAfterStop.opponentData.InPits)
+                {
+                    Strategy.opponentFrontToWatchForPitting = postPitData.opponentClosestAheadAfterStop.opponentData.DriverRawName;
+                }
+                if (postPitData.opponentClosestBehindAfterStop != null && !postPitData.opponentClosestBehindAfterStop.opponentData.InPits)
+                {
+                    Strategy.opponentBehindToWatchForPitting = postPitData.opponentClosestBehindAfterStop.opponentData.DriverRawName;
                 }
                 // figure out what to read here
                 if (postPitData.opponentClosestAheadAfterStop != null)

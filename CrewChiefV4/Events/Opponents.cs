@@ -401,11 +401,13 @@ namespace CrewChiefV4.Events
                 }
 
                 // TODO: should probably keep the leader-pitting message under FCY, not sure about the others
+                HashSet<String> announcedPitters = new HashSet<string>();
                 if (currentGameState.PitData.LeaderIsPitting &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
                 {
                     audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
                         folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this));
+                    announcedPitters.Add(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName);
                 }
 
                 if (currentGameState.PitData.CarInFrontIsPitting && currentGameState.SessionData.TimeDeltaFront > 3 &&
@@ -413,6 +415,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
                         folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this));
+                    announcedPitters.Add(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName);
                 }
 
                 if (currentGameState.PitData.CarBehindIsPitting && currentGameState.SessionData.TimeDeltaBehind > 3 &&
@@ -420,6 +423,39 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
                         folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this));
+                    announcedPitters.Add(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName);
+                }
+                if (Strategy.opponentFrontToWatchForPitting != null && !announcedPitters.Contains(Strategy.opponentFrontToWatchForPitting))
+                {
+                    foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
+                    {
+                        if (entry.Value.DriverRawName == Strategy.opponentFrontToWatchForPitting)
+                        {
+                            if (entry.Value.InPits)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this));
+                                Strategy.opponentFrontToWatchForPitting = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (Strategy.opponentBehindToWatchForPitting != null && !announcedPitters.Contains(Strategy.opponentBehindToWatchForPitting))
+                {
+                    foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
+                    {
+                        if (entry.Value.DriverRawName == Strategy.opponentBehindToWatchForPitting)
+                        {
+                            if (entry.Value.InPits)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this));
+                                Strategy.opponentBehindToWatchForPitting = null;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
