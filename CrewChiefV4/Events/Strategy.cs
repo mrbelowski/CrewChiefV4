@@ -522,13 +522,6 @@ namespace CrewChiefV4.Events
                         }
                     }
 
-                    if (derivedRacePositionFromOpponent != null)
-                    {
-                        Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
-                            opponent.DriverRawName + " who's in P" + opponent.ClassPosition + ". Completed laps player " + lapsCompleted + " opponent " + 
-                            opponent.CompletedLaps + " track position player = "+ currentDistanceRoundTrack + " opponent = " + opponent.DistanceRoundTrack);
-                    }
-
                     // want to know how far the opponent is from this closestDeltapointPosition right now
                     // fuck me this is a retarded way to do this, but it's late and my brain has given up
                     float opponentPositionDelta = opponent.DistanceRoundTrack - closestDeltapointPosition;
@@ -553,6 +546,13 @@ namespace CrewChiefV4.Events
                         // he'll be behind (TODO: work out which way the delta-points lag will bias this)
                         opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, isPlayerClass, opponentCarClassId, opponent));
                     }                    
+                }
+
+                if (derivedRacePositionFromOpponent != null)
+                {
+                    Console.WriteLine("Derived expected race position P" + expectedPlayerRacePosition + " from opponent " +
+                        opponent.DriverRawName + " who's in P" + opponent.ClassPosition + ". Completed laps player " + lapsCompleted + " opponent " +
+                        opponent.CompletedLaps + " track position player = " + currentDistanceRoundTrack + " opponent = " + opponent.DistanceRoundTrack);
                 }
                 // sort each of these by the delta, smallest first
                 opponentsAhead.Sort(delegate(OpponentPositionAtPlayerPitExit d1, OpponentPositionAtPlayerPitExit d2)
