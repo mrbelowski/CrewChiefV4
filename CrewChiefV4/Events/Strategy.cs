@@ -531,8 +531,8 @@ namespace CrewChiefV4.Events
 
                 // this will be scaled
                 float baseDstanceCorrectionForPittingOpponents = (((trackLength * lapsCompleted) + currentDistanceRoundTrack) - positionAndTotalDistanceForTimeLoss.Item2);
-                // bit of a guesss...
-                float secondsLostOnExit = playerTimeSpentInPitLane == -1 ? 2 : (expectedPlayerTimeLoss - playerTimeSpentInPitLane) / 2;
+                // assume time lost on exit and entry are the same
+                float secondsLostOnExit = (expectedPlayerTimeLoss - playerTimeSpentInPitLane) / 2;
 
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
