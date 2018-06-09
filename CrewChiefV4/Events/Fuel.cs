@@ -241,7 +241,7 @@ namespace CrewChiefV4.Events
                 if (!initialised ||
                     // fuel has increased by at least 1 litre - we only check against the time window here
                     (fuelLevelWindowByTime.Count() > 0 && fuelLevelWindowByTime[0] > 0 && currentGameState.FuelData.FuelLeft > fuelLevelWindowByTime[0] + 1) ||
-                    (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))
+                    (currentGameState.SessionData.SessionType != SessionType.Race && previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))
                 {
                     // first time in, fuel has increased, or pit exit so initialise our internal state. Note we don't blat the average use data - 
                     // this will be replaced when we get our first data point but it's still valid until we do.
@@ -352,7 +352,8 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
+                    if (!currentGameState.PitData.InPitlane
+                        && currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
                     {
                         // it's x minutes since the last fuel window check
                         gameTimeAtLastFuelWindowUpdate = currentGameState.SessionData.SessionRunningTime;
