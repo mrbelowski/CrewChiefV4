@@ -51,12 +51,14 @@ namespace CrewChiefV4.Events
 
         // may be timed during practice.
         // Need to be careful here to ensure this is applicable to the session we've actually entered
-        private static float playerTimeLostForStop = -1;
-        private static CarData.CarClass carClassForLastPitstopTiming;
-        private static String trackNameForLastPitstopTiming;
-        private static Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
+        private float playerTimeLostForStop = -1;
+        private float gameTimeOnPitEntry = -1;
+        private float playerTimeSpentInPitLane = -1;
+        private CarData.CarClass carClassForLastPitstopTiming;
+        private String trackNameForLastPitstopTiming;
+        private Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
 
-        public static Boolean isTimingPracticeStop = false;
+        public Boolean isTimingPracticeStop = false;
         private Boolean hasPittedDuringPracticeStopProcess = false;
         private float gameTimeWhenEnteringLastSectorInPractice = -1;
         private float lastAndFirstSectorTimesOnStop = -1;
@@ -64,9 +66,9 @@ namespace CrewChiefV4.Events
         // this is set by the box-this-lap macro (eeewwww), and primes this event to play the position
         // estimates when we hit the final sector
         public static Boolean playPitPositionEstimates = false;
-        private static Boolean pitPositionEstimatesRequested = false;
+        private Boolean pitPositionEstimatesRequested = false;
 
-        public static Boolean playedPitPositionEstimatesForThisLap = false;
+        public Boolean playedPitPositionEstimatesForThisLap = false;
 
         // for timing opponent stops
         private Boolean timeOpponentStops = true;
@@ -78,8 +80,8 @@ namespace CrewChiefV4.Events
         // just used to track when an opponent transitions from to final sector
         private HashSet<String> opponentsInPenultimateSector = new HashSet<string>();
         // these are static because the opponents event needs to check them:
-        public static HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
-        public static HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
+        public HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
+        public HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
 
         // this is disabled for now - it's unfinished and will probably spam messages
         private Boolean warnAboutOpponentsExitingCloseToPlayer = false;
@@ -90,6 +92,8 @@ namespace CrewChiefV4.Events
         public static String opponentBehindToWatchForPitting = null;
 
         private Boolean printS1Positions = false;
+
+        private Dictionary<String, float> opponentsInPitLane = new Dictionary<String, float>();
 
         public override List<SessionPhase> applicableSessionPhases
         {
@@ -104,23 +108,24 @@ namespace CrewChiefV4.Events
         public override void clearState()
         {
             // don't wipe the time-lost-on-stop that may have been derived in a previous session
-            Strategy.opponentsTimeLostForStop.Clear();
+            opponentsTimeLostForStop.Clear();
             isTimingPracticeStop = false;
             gameTimeWhenEnteringLastSectorInPractice = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
             nextOpponentFinalSectorTimingCheckDue = DateTime.MinValue;
             opponentsInPitCycle.Clear();
             Strategy.playPitPositionEstimates = false;
-            Strategy.playedPitPositionEstimatesForThisLap = false;
+            playedPitPositionEstimatesForThisLap = false;
             timeOpponentStops = true;
             opponentsInPenultimateSector.Clear();
-            Strategy.opponentsWhoWillExitCloseBehind.Clear();
+            opponentsWhoWillExitCloseBehind.Clear();
             hasPittedDuringPracticeStopProcess = false;
-            Strategy.opponentsWhoWillExitCloseInFront.Clear();
-            Strategy.pitPositionEstimatesRequested = false;
+            opponentsWhoWillExitCloseInFront.Clear();
+            pitPositionEstimatesRequested = false;
             Strategy.opponentFrontToWatchForPitting = null;
             Strategy.opponentBehindToWatchForPitting = null;
             printS1Positions = false;
+            opponentsInPitLane.Clear();
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -152,6 +157,8 @@ namespace CrewChiefV4.Events
                 {
                     if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
+                        gameTimeOnPitEntry = currentGameState.SessionData.SessionRunningTime;
+                        playerTimeSpentInPitLane = -1;
                         // sanity check
                         if (currentGameState.PositionAndMotionData.CarSpeed > 1)
                         {
@@ -166,6 +173,11 @@ namespace CrewChiefV4.Events
                             hasPittedDuringPracticeStopProcess = false;
                         }
                     }
+                    else if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && gameTimeOnPitEntry != -1)
+                    {
+                        playerTimeSpentInPitLane = currentGameState.SessionData.SessionRunningTime - gameTimeOnPitEntry;
+                        gameTimeOnPitEntry = -1;
+                    }
                     else if (currentGameState.SessionData.SectorNumber == 2 && previousGameState.SessionData.SectorNumber == 1 &&
                         hasPittedDuringPracticeStopProcess && gameTimeWhenEnteringLastSectorInPractice != -1)
                     {
@@ -173,22 +185,22 @@ namespace CrewChiefV4.Events
 
                         if (sectorCount == 2)
                         {
-                            Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                            playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
                         }
                         else
                         {
-                            Strategy.playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+                            playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
                         }
                         gameTimeWhenEnteringLastSectorInPractice = -1;
                         isTimingPracticeStop = false;
                         hasPittedDuringPracticeStopProcess = false;
-                        Strategy.carClassForLastPitstopTiming = currentGameState.carClass;
-                        Strategy.trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
+                        carClassForLastPitstopTiming = currentGameState.carClass;
+                        trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
-                        Console.WriteLine("Practice pitstop has cost us " + Strategy.playerTimeLostForStop + " seconds");
+                        Console.WriteLine("Practice pitstop has cost us " + playerTimeLostForStop + " seconds");
                         audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
                             MessageContents(folderPitStopCostsUsAbout,
-                            TimeSpanWrapper.FromSeconds(Strategy.playerTimeLostForStop, Precision.SECONDS)),
+                            TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
                             0, this));
                     }
                 }
@@ -196,6 +208,22 @@ namespace CrewChiefV4.Events
             }
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
+                // record the time each opponent entered the pitlane
+                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                {
+                    if (opponent.InPits)
+                    {
+                        if (!opponentsInPitLane.ContainsKey(opponent.DriverRawName))
+                        {
+                            opponentsInPitLane.Add(opponent.DriverRawName, currentGameState.SessionData.SessionRunningTime);
+                        }
+                    }
+                    else
+                    {
+                        opponentsInPitLane.Remove(opponent.DriverRawName);
+                    }
+                }
+
                 if (printS1Positions && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                 {
                     printS1Positions = false;
@@ -204,8 +232,8 @@ namespace CrewChiefV4.Events
                 if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
                 {
                     // just left the pits, clear our hack
-                    opponentBehindToWatchForPitting = null;
-                    opponentFrontToWatchForPitting = null;
+                    Strategy.opponentBehindToWatchForPitting = null;
+                    Strategy.opponentFrontToWatchForPitting = null;
                 }
 
                 // if we've timed our pitstop in practice, don't search for opponent stop times
@@ -215,27 +243,28 @@ namespace CrewChiefV4.Events
                 }
                 if (currentGameState.SessionData.IsNewLap)
                 {
-                    Strategy.playedPitPositionEstimatesForThisLap = false;
+                    playedPitPositionEstimatesForThisLap = false;
                 }
                 // if we've just requested a pit stop (and the game has this data), trigger the strategy data when we next hit the final sector
                 else if (playPitPositionEstimates &&
                     !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
                 {
-                    Strategy.playPitPositionEstimates = true;
-                    Strategy.pitPositionEstimatesRequested = false;
+                    playPitPositionEstimates = true;
+                    pitPositionEstimatesRequested = false;
                 }
                 // if we've just entered the pitlane and the pit countdown is disabled, and we don't have a penalty, trigger
                 // the strategy stuff
                 else if (!pitBoxPositionCountdown && !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo &&
-                    !Strategy.playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                    !playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
-                    Strategy.playPitPositionEstimates = true;
-                    Strategy.pitPositionEstimatesRequested = false;
+                    playPitPositionEstimates = true;
+                    pitPositionEstimatesRequested = false;
                 }
                 if (Strategy.playPitPositionEstimates &&
-                    (Strategy.pitPositionEstimatesRequested || (inFinalSector(currentGameState) && !Strategy.playedPitPositionEstimatesForThisLap)))
+                    (pitPositionEstimatesRequested || (inFinalSector(currentGameState) && !playedPitPositionEstimatesForThisLap)))
                 {
                     Strategy.playPitPositionEstimates = false;
+                    pitPositionEstimatesRequested = false;
                     // we requested a stop and we're in the final sector, or we requested data, so gather up the data we'll need and report it
                     //
                     // Note that we need to derive the position estimates here before we start slowing for pit entry
@@ -251,7 +280,7 @@ namespace CrewChiefV4.Events
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition, currentGameState.SessionData.CompletedLaps,
                             currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now,
                             currentGameState.SessionData.TrackDefinition.name, currentGameState.SessionData.TrackDefinition.trackLength,
-                            currentGameState.PositionAndMotionData.DistanceRoundTrack, bestLapTime);
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack, bestLapTime, currentGameState.SessionData.SessionRunningTime);
                     reportPostPitData(postRacePositions);
                     playedPitPositionEstimatesForThisLap = true;
                 }
@@ -383,7 +412,7 @@ namespace CrewChiefV4.Events
                                     // if this opponent has lost less than 5 seconds due to pitting, something has gone wrong in the calculations
                                     if (timeLost > 5)
                                     {
-                                        Strategy.opponentsTimeLostForStop[entry.Key] = timeLost;
+                                        opponentsTimeLostForStop[entry.Key] = timeLost;
                                     }
                                 }
                                 opponentsInPitCycle.Remove(entry.Key);
@@ -400,9 +429,9 @@ namespace CrewChiefV4.Events
         
         private float getExpectedPlayerTimeLoss(CarData.CarClass carClass, String trackName)
         {
-            if (CarData.IsCarClassEqual(carClass, Strategy.carClassForLastPitstopTiming) && trackName == Strategy.trackNameForLastPitstopTiming)
+            if (CarData.IsCarClassEqual(carClass, carClassForLastPitstopTiming) && trackName == trackNameForLastPitstopTiming)
             {
-                return Strategy.playerTimeLostForStop;
+                return playerTimeLostForStop;
             }
             return -1;
         }
@@ -412,17 +441,19 @@ namespace CrewChiefV4.Events
             float timeLossEstimate = getExpectedPlayerTimeLoss(carClass, trackName);
             if (timeLossEstimate == -1)
             {
-                if (Strategy.opponentsTimeLostForStop.Count != 0)
+                if (opponentsTimeLostForStop.Count != 0)
                 {                    
                     int pittedOpponentPositionDiff = int.MaxValue;
                     // select the best opponent to compare with
-                    foreach (KeyValuePair<String, float> entry in Strategy.opponentsTimeLostForStop)
+                    foreach (KeyValuePair<String, float> entry in opponentsTimeLostForStop)
                     {
                         int positionDiff = Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition);
                         if (positionDiff < pittedOpponentPositionDiff)
                         {
                             timeLossEstimate = entry.Value;
                             pittedOpponentPositionDiff = positionDiff;
+                            // guess how long this opponent might have been in the pitlane - assume 1 second time loss either side
+                            playerTimeSpentInPitLane = timeLossEstimate - 2;
                         }
                     }
                     Console.WriteLine("Got pitstop time loss estimate from opponent stop times - expect to lose " + timeLossEstimate + " seconds");
@@ -477,7 +508,7 @@ namespace CrewChiefV4.Events
         // all the nasty logic is in this method - refactor?
         private Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
             CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
-            String trackName, float trackLength, float currentDistanceRoundTrack, float bestLapTime)
+            String trackName, float trackLength, float currentDistanceRoundTrack, float bestLapTime, float sessionRunningTime)
         {
             float halfTrackLength = trackLength / 2;
             // check we have deltapoints first
@@ -498,7 +529,10 @@ namespace CrewChiefV4.Events
 
                 float closestDeltapointPosition = positionAndTotalDistanceForTimeLoss.Item1;
 
-                float distanceCorrectionForPittingOpponents = (((trackLength * lapsCompleted) + currentDistanceRoundTrack) - positionAndTotalDistanceForTimeLoss.Item2) / 2;
+                // this will be scaled
+                float baseDstanceCorrectionForPittingOpponents = (((trackLength * lapsCompleted) + currentDistanceRoundTrack) - positionAndTotalDistanceForTimeLoss.Item2);
+                // bit of a guesss...
+                float secondsLostOnExit = playerTimeSpentInPitLane == -1 ? 2 : (expectedPlayerTimeLoss - playerTimeSpentInPitLane) / 2;
 
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
@@ -513,16 +547,26 @@ namespace CrewChiefV4.Events
                     if (opponent.InPits)
                     {
                         // this makes things awkward. He'll be some distance behind where we predicted him to be.
-                        // The best we can do here is move him back half the distance we'd expect to lose by pitting
-                        correction = distanceCorrectionForPittingOpponents;
+                        // The best we can do here is move him back some proportion of the distance we'd expect to lose by pitting.
+                        // The exact amount is based on how far we think his is through his pit stop process.
+                        float timeOpponentEnterPitlane;
+                        if (opponentsInPitLane.TryGetValue(opponent.DriverRawName, out timeOpponentEnterPitlane))
+                        {
+                            // proportion of stop completed is the proportion of the amount of in-pitlane time this guy has already spent, minus a small correction for pit exit time loss
+                            float proportionOfPitstopCompleted = ((sessionRunningTime - timeOpponentEnterPitlane) / playerTimeSpentInPitLane) - (secondsLostOnExit / expectedPlayerTimeLoss);
+                            correction = baseDstanceCorrectionForPittingOpponents * (1 - proportionOfPitstopCompleted);
+                        }
+                        else
+                        {
+                            correction = baseDstanceCorrectionForPittingOpponents * 0.5f;
+                        }
                     }
 
                     if (isPlayerClass)
                     {
                         // get this guy's predicted total distance travelled.
                         //
-                        // If this car is in the pits, he will be further back due to this stop. We don't know where he is in the 
-                        // pit stop cycle, so the best we can do here is move him back 1/2 the distance we'd expect to lose
+                        // If this car is in the pits, he will be further back due to this stop. Move him back by distance we'd expect him to lose
                         float opponentTotalRaceDistance = ((opponent.CompletedLaps) * trackLength) + opponent.DistanceRoundTrack - correction;
                         totalRaceDistances.Add(new Tuple<OpponentData, float>(opponent, opponentTotalRaceDistance));                        
                     }
@@ -904,7 +948,7 @@ namespace CrewChiefV4.Events
             }
             if (fragments.Count > 0)
             {
-                if (Strategy.pitPositionEstimatesRequested)
+                if (pitPositionEstimatesRequested)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", fragments, 0, null));
                 }
@@ -913,7 +957,7 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", fragments, 0, this));
                 }
             }
-            else if (Strategy.pitPositionEstimatesRequested)
+            else if (pitPositionEstimatesRequested)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
@@ -967,7 +1011,7 @@ namespace CrewChiefV4.Events
             else
             {
                 Strategy.playPitPositionEstimates = true;
-                Strategy.pitPositionEstimatesRequested = true;
+                pitPositionEstimatesRequested = true;
             }
         }
 
