@@ -531,8 +531,6 @@ namespace CrewChiefV4.Events
 
                 // this will be scaled
                 float baseDstanceCorrectionForPittingOpponents = (((trackLength * lapsCompleted) + currentDistanceRoundTrack) - positionAndTotalDistanceForTimeLoss.Item2);
-                // assume time lost on exit and entry are the same
-                float secondsLostOnExit = (expectedPlayerTimeLoss - playerTimeSpentInPitLane) / 2;
 
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
@@ -552,9 +550,12 @@ namespace CrewChiefV4.Events
                         float timeOpponentEnterPitlane;
                         if (opponentsInPitLane.TryGetValue(opponent.DriverRawName, out timeOpponentEnterPitlane))
                         {
-                            // proportion of stop completed is the proportion of the amount of in-pitlane time this guy has already spent, minus a small correction for pit exit time loss
-                            float proportionOfPitstopCompleted = ((sessionRunningTime - timeOpponentEnterPitlane) / playerTimeSpentInPitLane) - (secondsLostOnExit / expectedPlayerTimeLoss);
-                            correction = baseDstanceCorrectionForPittingOpponents * (1 - proportionOfPitstopCompleted);
+                            // proportion of stop completed is the proportion of the amount of in-pitlane time this guy has already spent, minus a small correction for the time 
+                            // he'll lose on exit (the part of the pit process he's not completed yet), plus a small correction for the time he's already spent on entry (the part
+                            // of the pit process he *as* completed). Because these two corrections are the same (we assume entry loss and exit loss are identical),
+                            // these will cancel each other out, so we're only interested in the proportion of in-pitlane time he's spent
+                            float proportionOfPitstopCompleted = (sessionRunningTime - timeOpponentEnterPitlane) / playerTimeSpentInPitLane;
+                            correction = baseDstanceCorrectionForPittingOpponents * (1 - (Math.Min(0, proportionOfPitstopCompleted)));
                         }
                         else
                         {
