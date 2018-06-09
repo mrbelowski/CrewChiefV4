@@ -220,7 +220,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.3.2: Improved pit stop exit prediction when opponents are in the pitlane.
+Version 4.9.3.2: Improved pit stop exit prediction when opponents are in the pitlane; Don't reset the fuel data when leaving the pits during a race, unless we've added fuel.
 
 Version 4.9.3.1: Hotfix for pitstop prediction additions (see previous release notes). This fixes the wildly inaccurate pit stop time loss estimates reported by the pitstop benchmark process if you make the benchmark request too late in the lap (after you've entered the final sector)
 
