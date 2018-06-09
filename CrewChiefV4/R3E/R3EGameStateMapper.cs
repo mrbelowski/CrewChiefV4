@@ -768,11 +768,13 @@ namespace CrewChiefV4.RaceRoom
                     continue;
                 }
                 DriverData participantStruct = shared.DriverData[i];
+                /*
+                // don't discard opponents with duplicate positions
                 if (positionsFilledForThisTick.Contains(participantStruct.Place))
                 {
                     // discard this participant element because the race position is already occupied
                     continue;
-                }
+                }*/
                 String driverName = driverNames[i];
                 if (driverName.Length == 0 || driverName == currentGameState.SessionData.DriverRawName || opponentDriverNamesProcessedForThisTick.Contains(driverName) ||
                     participantStruct.Place < 1 || participantStruct.FinishStatus == (int)CrewChiefV4.RaceRoom.RaceRoomConstant.FinishStatus.R3E_FINISH_STATUS_DNS)

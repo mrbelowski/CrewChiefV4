@@ -1404,6 +1404,10 @@ namespace CrewChiefV4.PCars
                 opponentData.setInLap();
             }
             opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
+            if (opponentData.JustEnteredPits)
+            {
+                opponentData.NumPitStops++;
+            }
             opponentData.InPits = isInPits;
             opponentData.CompletedLaps = completedLaps;
         }
