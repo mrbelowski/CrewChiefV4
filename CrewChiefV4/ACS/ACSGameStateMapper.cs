@@ -2014,6 +2014,10 @@ namespace CrewChiefV4.assetto
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
             opponentData.JustEnteredPits = !opponentData.InPits && isInPits;
+            if (opponentData.JustEnteredPits)
+            {
+                opponentData.NumPitStops++;
+            }
             opponentData.InPits = isInPits;
 
             bool hasCrossedSFline = opponentData.CurrentSectorNumber == ACSGameStateMapper.numberOfSectorsOnTrack && sector == 1;

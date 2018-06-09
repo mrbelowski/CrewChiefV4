@@ -280,7 +280,8 @@ namespace CrewChiefV4.Events
                     Strategy.PostPitRacePosition postRacePositions = getPostPitPositionData(false, currentGameState.SessionData.ClassPosition, currentGameState.SessionData.CompletedLaps,
                             currentGameState.carClass, currentGameState.OpponentData, currentGameState.SessionData.DeltaTime, currentGameState.Now,
                             currentGameState.SessionData.TrackDefinition.name, currentGameState.SessionData.TrackDefinition.trackLength,
-                            currentGameState.PositionAndMotionData.DistanceRoundTrack, bestLapTime, currentGameState.SessionData.SessionRunningTime);
+                            currentGameState.PositionAndMotionData.DistanceRoundTrack, bestLapTime, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.PitData.HasMandatoryPitStop, currentGameState.PitData.PitWindowEnd, currentGameState.SessionData.SessionHasFixedTime);
                     reportPostPitData(postRacePositions);
                     playedPitPositionEstimatesForThisLap = true;
                 }
@@ -508,7 +509,8 @@ namespace CrewChiefV4.Events
         // all the nasty logic is in this method - refactor?
         private Strategy.PostPitRacePosition getPostPitPositionData(Boolean fromVoiceCommand, int currentRacePosition, int lapsCompleted,
             CarData.CarClass playerClass, Dictionary<String, OpponentData> opponents, DeltaTime playerDeltaTime, DateTime now,
-            String trackName, float trackLength, float currentDistanceRoundTrack, float bestLapTime, float sessionRunningTime)
+            String trackName, float trackLength, float currentDistanceRoundTrack, float bestLapTime, float sessionRunningTime,
+            Boolean hasMandatoryPitStop, int pitWindowEnd, Boolean fixedTimeSession)
         {
             float halfTrackLength = trackLength / 2;
             // check we have deltapoints first
@@ -535,14 +537,21 @@ namespace CrewChiefV4.Events
                 List<OpponentPositionAtPlayerPitExit> opponentsAhead = new List<OpponentPositionAtPlayerPitExit>();
                 List<OpponentPositionAtPlayerPitExit> opponentsBehind = new List<OpponentPositionAtPlayerPitExit>();
                 List<Tuple<OpponentData, float>> totalRaceDistances = new List<Tuple<OpponentData, float>>();
-                
+
+                // for fixed time races, see if we'd woudl expect this guy to stop on this lap:
+                Boolean expectMandatoryStopRaceTime = hasMandatoryPitStop && fixedTimeSession && pitWindowEnd > 1 && pitWindowEnd * 60 < sessionRunningTime + bestLapTime;
+
                 foreach (OpponentData opponent in opponents.Values)
                 {
                     String opponentCarClassId = opponent.CarClass.getClassIdentifier();
                     Boolean isPlayerClass = CarData.IsCarClassEqual(opponent.CarClass, playerClass);
 
                     float correction = 0;
-                    if (opponent.InPits)
+
+                    Boolean willNeedToStop = opponent.NumPitStops == 0 &&
+                        (expectMandatoryStopRaceTime || (!fixedTimeSession && hasMandatoryPitStop && pitWindowEnd > 1 && opponent.CompletedLaps == pitWindowEnd - 1));
+
+                    if (opponent.InPits || willNeedToStop)
                     {
                         // this makes things awkward. He'll be some distance behind where we predicted him to be.
                         // The best we can do here is move him back some proportion of the distance we'd expect to lose by pitting.
@@ -557,8 +566,14 @@ namespace CrewChiefV4.Events
                             float proportionOfPitstopCompleted = (sessionRunningTime - timeOpponentEnteredPitlane) / playerTimeSpentInPitLane;
                             correction = baseDistanceCorrectionForPittingOpponents * (1 - (Math.Min(1, Math.Max(0, proportionOfPitstopCompleted))));
                         }
+                        else if (willNeedToStop)
+                        {
+                            // he's not in the pits but probably will be
+                            correction = baseDistanceCorrectionForPittingOpponents;
+                        }
                         else
                         {
+                            // errr...
                             correction = baseDistanceCorrectionForPittingOpponents * 0.5f;
                         }
                     }
