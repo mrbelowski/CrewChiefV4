@@ -129,9 +129,9 @@ namespace CrewChiefV4
             ROAD_E, ROAD_F, ROAD_G, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
             VINTAGE_F1_C, VINTAGE_STOCK_CAR,
-            F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
+            F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
-            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER
+            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM
         }
 
         // use different thresholds for R3E car classes - there are a few different tyre models in the game with different heating characteristics:
@@ -141,7 +141,7 @@ namespace CrewChiefV4
             CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.TRACKDAY_A, CarClassEnum.R3E_SILHOUETTE, CarClassEnum.BMW_235I};
 
         public static CarClassEnum[] r3e2017TyreModelClasses = new CarClassEnum[] {
-            CarClassEnum.GT3, CarClassEnum.GT4, CarClassEnum.CARRERA_CUP};
+            CarClassEnum.GT1, CarClassEnum.GT3, CarClassEnum.GT4, CarClassEnum.CARRERA_CUP, CarClassEnum.TCR, CarClassEnum.GT1X, CarClassEnum.CAYMAN_CLUBSPORT};
 
         private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
@@ -665,7 +665,7 @@ namespace CrewChiefV4
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error pasing " + filename + ": " + e.Message);
+                    Console.WriteLine("Error parsing " + filename + ": " + e.Message);
                 }
             }
             return new CarClasses();
