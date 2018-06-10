@@ -220,6 +220,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.3.3: Take mandatory pitstop status into account when deriving expected post-pit opponent positions (assume opponents who still haven't pitted will pit this lap if we're at the end of the pit window); Added and corrected a few car classes (pCars2 and R3E)
+
 Version 4.9.3.2: Improved pit stop exit prediction when opponents are in the pitlane; Don't reset the fuel data when leaving the pits during a race, unless we've added fuel.
 
 Version 4.9.3.1: Hotfix for pitstop prediction additions (see previous release notes). This fixes the wildly inaccurate pit stop time loss estimates reported by the pitstop benchmark process if you make the benchmark request too late in the lap (after you've entered the final sector)
