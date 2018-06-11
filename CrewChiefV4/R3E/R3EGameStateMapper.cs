@@ -898,10 +898,16 @@ namespace CrewChiefV4.RaceRoom
 
                         float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
 
+                        // lap invalidation: at the start of the lap the laptime will be 0, so only check if the time is zero if
+                        // we've actually start this lap. For this we use LapDistance > 1 metre. Bit of an abitrary choice but
+                        // that's we roll at the CCMC
+                        Boolean lapInvalidated = participantStruct.CurrentLapValid != 1 || participantStruct.LapTimeCurrentSelf == -1 ||
+                            (participantStruct.LapDistance > 1 && participantStruct.LapTimeCurrentSelf == 0);
+
                         upateOpponentData(currentOpponentData, currentOpponentRacePosition,
                                 participantStruct.Place, currentOpponentLapsCompleted,
                                 currentOpponentSector, sectorTime, participantStruct.SectorTimePreviousSelf.Sector3,
-                                participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1 && participantStruct.LapTimeCurrentSelf != -1,
+                                participantStruct.InPitlane == 1, !lapInvalidated,
                                 currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                 new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                 participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
