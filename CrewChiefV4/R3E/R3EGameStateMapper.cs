@@ -898,10 +898,16 @@ namespace CrewChiefV4.RaceRoom
 
                         float secondsSinceLastUpdate = (float)new TimeSpan(currentGameState.Ticks - previousGameState.Ticks).TotalSeconds;
 
+                        // lap invalidation: if we're in sector1, the laptime will start at 0 so we can't use laptime == 0 to 
+                        // detect an invalid lap
+                        Boolean lapInvalidated = participantStruct.CurrentLapValid != 1 ||
+                            (currentOpponentSector == 1 && participantStruct.LapTimeCurrentSelf == -1) ||
+                            (currentOpponentSector > 1 && participantStruct.LapTimeCurrentSelf == 0);
+
                         upateOpponentData(currentOpponentData, currentOpponentRacePosition,
                                 participantStruct.Place, currentOpponentLapsCompleted,
                                 currentOpponentSector, sectorTime, participantStruct.SectorTimePreviousSelf.Sector3,
-                                participantStruct.InPitlane == 1, participantStruct.CurrentLapValid == 1 && participantStruct.LapTimeCurrentSelf != -1,
+                                participantStruct.InPitlane == 1, !lapInvalidated,
                                 currentGameState.SessionData.SessionRunningTime, secondsSinceLastUpdate,
                                 new float[] { participantStruct.Position.X, participantStruct.Position.Z }, previousOpponentWorldPosition,
                                 participantStruct.LapDistance, participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
