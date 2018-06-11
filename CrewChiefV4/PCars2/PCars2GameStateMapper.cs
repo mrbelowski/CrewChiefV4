@@ -86,7 +86,7 @@ namespace CrewChiefV4.PCars2
         private float lastCollisionMagnitude = 0;
         private Boolean collisionOnThisLap = false;
         // TODO: what to use for this value
-        private float collisionMagnitudeThreshold = 0.05f;
+        private float collisionMagnitudeThreshold = 0.02f;
 
         // next track conditions sample due after:
         private DateTime nextConditionsSampleDue = DateTime.MinValue;
