@@ -103,6 +103,9 @@ namespace CrewChiefV4
 
         public static MainWindow instance = null;
 
+        // True, while we are in a constructor.
+        private bool constructingWindow = false;
+
         public void killChief()
         {
             crewChief.stop();
@@ -378,6 +381,9 @@ namespace CrewChiefV4
                 else
                     this.WindowState = FormWindowState.Minimized;
             }
+
+            //var form = new PropertiesForm(this);
+            //form.ShowDialog(this);
         }
 
         private void HideToTray()
@@ -698,8 +704,11 @@ namespace CrewChiefV4
         public MainWindow()
         {
             MainWindow.instance = this;
+            this.constructingWindow = true;
 
             InitializeComponent();
+            this.SuspendLayout();
+
             SetupNotificationTrayIcon();
 
             if (CrewChief.Debugging)
@@ -945,6 +954,8 @@ namespace CrewChiefV4
             this.assignButtonToAction.Enabled = false;
             this.deleteAssigmentButton.Enabled = false;
 
+            this.ResumeLayout();
+
             if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
@@ -954,6 +965,8 @@ namespace CrewChiefV4
             this.Resize += MainWindow_Resize;
             this.KeyPreview = true;
             this.KeyDown += MainWindow_KeyDown;
+
+            this.constructingWindow = false;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -1636,8 +1649,14 @@ namespace CrewChiefV4
                 runListenForChannelOpenThread = false;
                 runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
                 voiceOption = VoiceOptionEnum.DISABLED;
-                UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
-                UserSettings.GetUserSettings().saveUserSettings();
+
+                // Turns out saving prefs takes 5% of main thread time on startup, so don't do it
+                // as we just read this from prefs.
+                if (!this.constructingWindow)
+                {
+                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                    UserSettings.GetUserSettings().saveUserSettings();
+                }
             }
         }
         private void holdButton_CheckedChanged(object sender, EventArgs e)

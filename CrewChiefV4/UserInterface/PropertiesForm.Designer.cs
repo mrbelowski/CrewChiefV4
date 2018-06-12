@@ -33,45 +33,75 @@ namespace CrewChiefV4
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.button1 = new System.Windows.Forms.Button();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.saveButton = new System.Windows.Forms.Button();
+            this.propertiesFlowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.searchTextBox = new System.Windows.Forms.TextBox();
+            this.mainTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.exitButton = new System.Windows.Forms.Button();
+            this.restoreButton = new System.Windows.Forms.Button();
+            this.headerTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.searchBoxTooltip = new System.Windows.Forms.ToolTip(this.components);
-            this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.gameFilterLabel = new System.Windows.Forms.Label();
+            this.filterBox = new System.Windows.Forms.ComboBox();
+            this.showCommonCheckbox = new System.Windows.Forms.CheckBox();
+            this.mainTableLayoutPanel.SuspendLayout();
+            this.buttonsTableLayoutPanel.SuspendLayout();
+            this.headerTableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             this.MinimizeBox = false;
             this.MaximizeBox = false;
             // 
-            // button1
+            // saveButton
             // 
-            this.button1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button1.Location = new System.Drawing.Point(3, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(159, 40);
-            this.button1.TabIndex = 1;
-            this.button1.Text = Configuration.getUIString("save_and_restart");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.saveButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.saveButton.Location = new System.Drawing.Point(3, 3);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(159, 40);
+            this.saveButton.Text = Configuration.getUIString("save_and_restart");
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            this.saveButton.TabIndex = 1;
             // 
-            // flowLayoutPanel1
+            // preferencesFlowLayoutPanel
             // 
-            this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.AutoSize = true;
-            this.flowLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 31);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(969, 612);
-            this.flowLayoutPanel1.TabIndex = 9;
+            this.propertiesFlowLayoutPanel.AutoScroll = true;
+            this.propertiesFlowLayoutPanel.AutoSize = true;
+            this.propertiesFlowLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.propertiesFlowLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertiesFlowLayoutPanel.Location = new System.Drawing.Point(3, 31);
+            this.propertiesFlowLayoutPanel.Name = "preferencesFlowLayoutPanel";
+            this.propertiesFlowLayoutPanel.Size = new System.Drawing.Size(969, 612);
+            this.propertiesFlowLayoutPanel.TabIndex = 0;
+            this.propertiesFlowLayoutPanel.TabStop = true;
+            //
+            // gameFilterLablel
+            //
+            this.gameFilterLabel.Name = "gameFilterLabel";
+            this.gameFilterLabel.Text = Configuration.getUIString("game_filter_label");
+            this.gameFilterLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.gameFilterLabel.TabIndex = 9;
+            //
+            // filterBox
+            //
+            this.filterBox.Name = "filterBox";
+            this.filterBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.filterBox.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.filterBox.MinimumSize = new System.Drawing.Size(203, -1);
+            this.filterBox.MaximumSize = new System.Drawing.Size(203, -1);
+            this.filterBox.SelectedValueChanged += FilterBox_SelectedValueChanged;
+            this.filterBox.TabIndex = 10;
+            //
+            // showCommonCheckbox
+            //
+            this.showCommonCheckbox.Name = "showCommonCheckbox";
+            this.showCommonCheckbox.Text = Configuration.getUIString("show_common_props_label");
+            this.showCommonCheckbox.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.showCommonCheckbox.Margin = new System.Windows.Forms.Padding(10, 5, 3, 3);
+            this.showCommonCheckbox.Checked = true;
+            this.showCommonCheckbox.CheckedChanged += ShowCommonCheckbox_CheckedChanged;
             // 
-            // textBox1
+            // searchTextBox
             // 
             var tooltip = Configuration.getUIString("search_box_tooltip_line1") + Environment.NewLine
                 + Configuration.getUIString("search_box_tooltip_line2") + Environment.NewLine
@@ -80,85 +110,90 @@ namespace CrewChiefV4
                 + Configuration.getUIString("search_box_tooltip_line6") + Environment.NewLine
                 + Configuration.getUIString("search_box_tooltip_line7") + Environment.NewLine
                 + Configuration.getUIString("search_box_tooltip_line8") + Environment.NewLine;
-            this.textBox1.Location = new System.Drawing.Point(780, 3);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(189, 20);
-            this.textBox1.TabIndex = 11;
-            this.searchBoxTooltip.SetToolTip(this.textBox1, tooltip);
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.searchTextBox.Location = new System.Drawing.Point(780, 3);
+            this.searchTextBox.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.searchTextBox.Name = "searchTextBox";
+            this.searchTextBox.Size = new System.Drawing.Size(189, 20);
+            this.searchTextBox.TabIndex = 12;
+            this.searchBoxTooltip.SetToolTip(this.searchTextBox, tooltip);
+            this.searchTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
-            // tableLayoutPanel1
+            // mainTableLayoutPanel
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 88F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(975, 703);
-            this.tableLayoutPanel1.TabIndex = 0;
+            this.mainTableLayoutPanel.ColumnCount = 1;
+            this.mainTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.mainTableLayoutPanel.Controls.Add(this.headerTableLayoutPanel, 0, 0);
+            this.mainTableLayoutPanel.Controls.Add(this.propertiesFlowLayoutPanel, 0, 1);
+            this.mainTableLayoutPanel.Controls.Add(this.buttonsTableLayoutPanel, 0, 2);
+            this.mainTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.mainTableLayoutPanel.Name = "mainTableLayoutPanel";
+            this.mainTableLayoutPanel.RowCount = 3;
+            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4F));
+            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 88F));
+            this.mainTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8F));
+            this.mainTableLayoutPanel.Size = new System.Drawing.Size(975, 703);
             // 
-            // tableLayoutPanel3
+            // buttonsTableLayoutPanel
             // 
-            this.tableLayoutPanel3.ColumnCount = 4;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
-            this.tableLayoutPanel3.Controls.Add(this.button1, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button2, 1, 0);
-            this.tableLayoutPanel3.Controls.Add(this.button3, 3, 0);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 646);
-            this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 1;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(975, 57);
-            this.tableLayoutPanel3.TabIndex = 0;
+            this.buttonsTableLayoutPanel.ColumnCount = 4;
+            this.buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
+            this.buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
+            this.buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49F));
+            this.buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17F));
+            this.buttonsTableLayoutPanel.Controls.Add(this.saveButton, 0, 0);
+            this.buttonsTableLayoutPanel.Controls.Add(this.exitButton, 1, 0);
+            this.buttonsTableLayoutPanel.Controls.Add(this.restoreButton, 3, 0);
+            this.buttonsTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.buttonsTableLayoutPanel.Location = new System.Drawing.Point(0, 646);
+            this.buttonsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonsTableLayoutPanel.Name = "buttonsTableLayoutPanel";
+            this.buttonsTableLayoutPanel.RowCount = 1;
+            this.buttonsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.buttonsTableLayoutPanel.Size = new System.Drawing.Size(975, 57);
+            this.buttonsTableLayoutPanel.TabIndex = 0;
             // 
-            // button2
+            // exitButton
             // 
-            this.button2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button2.Location = new System.Drawing.Point(168, 3);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(159, 40);
-            this.button2.TabIndex = 2;
-            this.button2.Text = Configuration.getUIString("exit_without_saving");
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.exitButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.exitButton.Location = new System.Drawing.Point(168, 3);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(159, 40);
+            this.exitButton.Text = Configuration.getUIString("exit_without_saving");
+            this.exitButton.UseVisualStyleBackColor = true;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
+            this.exitButton.TabIndex = 0;
             // 
-            // button3
+            // restoreButton
             // 
-            this.button3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.button3.Location = new System.Drawing.Point(810, 3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(162, 40);
-            this.button3.TabIndex = 3;
-            this.button3.Text = Configuration.getUIString("restore_default_settings");
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.restoreButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.restoreButton.Location = new System.Drawing.Point(810, 3);
+            this.restoreButton.Name = "restoreButton";
+            this.restoreButton.Size = new System.Drawing.Size(162, 40);
+            this.restoreButton.Text = Configuration.getUIString("restore_default_settings");
+            this.restoreButton.UseVisualStyleBackColor = true;
+            this.restoreButton.Click += new System.EventHandler(this.restoreButton_Click);
+            this.restoreButton.TabIndex = 2;
             // 
-            // tableLayoutPanel2
+            // headerTableLayoutPanel
             // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 80F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.Controls.Add(this.textBox1, 1, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(975, 28);
-            this.tableLayoutPanel2.TabIndex = 0;
+            this.headerTableLayoutPanel.ColumnCount = 5;
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.headerTableLayoutPanel.Controls.Add(this.gameFilterLabel, 0, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.filterBox, 1, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.showCommonCheckbox, 2, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.searchTextBox, 4, 0);
+            this.headerTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.headerTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.headerTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.headerTableLayoutPanel.Name = "headerTableLayoutPanel";
+            this.headerTableLayoutPanel.RowCount = 1;
+            this.headerTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.headerTableLayoutPanel.Size = new System.Drawing.Size(975, 28);
+            this.headerTableLayoutPanel.TabIndex = 0;
             // 
             // searchBoxTooltip
             // 
@@ -173,29 +208,31 @@ namespace CrewChiefV4
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(975, 703);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.mainTableLayoutPanel);
             this.Name = "PropertiesForm";
             this.Text = Configuration.getUIString("properties_form");
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.properties_FormClosing);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
+            this.mainTableLayoutPanel.ResumeLayout(false);
+            this.mainTableLayoutPanel.PerformLayout();
+            this.buttonsTableLayoutPanel.ResumeLayout(false);
+            this.headerTableLayoutPanel.ResumeLayout(false);
+            this.headerTableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.FlowLayoutPanel propertiesFlowLayoutPanel;
+        private System.Windows.Forms.TextBox searchTextBox;
+        private System.Windows.Forms.TableLayoutPanel mainTableLayoutPanel;
+        private System.Windows.Forms.TableLayoutPanel headerTableLayoutPanel;
+        private System.Windows.Forms.TableLayoutPanel buttonsTableLayoutPanel;
         private System.Windows.Forms.ToolTip searchBoxTooltip;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button exitButton;
+        private System.Windows.Forms.Button restoreButton;
+        private System.Windows.Forms.Label gameFilterLabel;
+        private System.Windows.Forms.ComboBox filterBox;
+        private System.Windows.Forms.CheckBox showCommonCheckbox;
     }
 }

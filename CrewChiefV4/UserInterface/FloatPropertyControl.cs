@@ -15,9 +15,12 @@ namespace CrewChiefV4
         public float originalValue;
         public float defaultValue;
         public String label;
-        public FloatPropertyControl (String propertyId, String label, float value, float defaultValue, String helpText)
+        internal PropertyFilter filter = null;
+        public FloatPropertyControl (String propertyId, String label, float value, float defaultValue, String helpText, String filterText)
         {
             InitializeComponent();
+
+            this.SuspendLayout();
             this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
@@ -26,6 +29,9 @@ namespace CrewChiefV4
             this.defaultValue = defaultValue;
             this.toolTip1.SetToolTip(this.textBox1, helpText);
             this.toolTip1.SetToolTip(this.label1, helpText);
+            this.ResumeLayout(false);
+
+            this.filter = new PropertyFilter(filterText, propertyId, this.label);
         }
 
         public float getValue()
