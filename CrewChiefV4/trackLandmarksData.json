@@ -2781,7 +2781,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "the_chicane",
+					"landmarkName": "hislops",
 					"distanceRoundLapStart": 2473,
 					"distanceRoundLapEnd": 2630,
 					"isCommonOvertakingSpot": false
@@ -2904,6 +2904,12 @@
 					"distanceRoundLapStart": 1209,
 					"distanceRoundLapEnd": 1320,
 					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "hislops",
+					"distanceRoundLapStart": 1765,
+					"distanceRoundLapEnd": 1900,
+					"isCommonOvertakingSpot": false
 				},
 				{
 					"landmarkName": "knickerbrook",
