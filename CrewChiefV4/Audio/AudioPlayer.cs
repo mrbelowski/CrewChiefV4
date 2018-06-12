@@ -108,18 +108,14 @@ namespace CrewChiefV4.Audio
         public Boolean initialised = false;
 
         public static float soundPackVersion = -1;
-        // this is the last version number used by the update sound pack - all subsequent updates will use the update2 sound pack
-        //public static float lastUpdateSoundPackVersion = 121;
         
-        // if sound pack version <= 121, use update. If sound pack version <= 145, use update2, and so on
+        // if sound pack version ==-1 use base, if version <= 121, use update, if version <= 145, use update2, else use update3
         public static float[] updateSoundPackVersions = {121, 145};  
 
-        // this is the last version number used by the personalisations sound pack - all subsequent updates will use the update2 personalisations pack
-        //public static float lastUpdatePersonalisationsVersion = 120;
-
-        // if personalisation pack version <= 121, use update. If personalisation pack version <= 128, use update2, and so on
+        // if personalisation pack version == -1 use base, if version <= 121, use update, if version <= 128 use update2, else use update3
         public static float[] updatePersonalisationPackVersions = { 120, 128 };
 
+        // if drivernames pack version == -1 use base, if version <= 129, use update, else use update2
         public static float[] updateDrivernamesPackVersions = { 129 };
 
         public static float driverNamesVersion = -1;
