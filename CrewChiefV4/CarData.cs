@@ -354,6 +354,10 @@ namespace CrewChiefV4
 
         private static Dictionary<string, CarClass> nameToCarClass;
         private static Dictionary<int, CarClass> intToCarClass;
+
+        private static Dictionary<int, CarClass> iracingCarIdToCarClass;
+        private static Dictionary<int, CarClass> iracingCarClassIdToCarClass;
+
         private static List<String> userCarClassIds = new List<string>();
         public static int RACEROOM_CLASS_ID = -1;
         public static int IRACING_CLASS_ID = -1;
@@ -618,6 +622,8 @@ namespace CrewChiefV4
             // reset session scoped cache of class name / ID to CarClass Dictionary.
             nameToCarClass = new Dictionary<string, CarClass>();
             intToCarClass = new Dictionary<int, CarClass>();
+            iracingCarIdToCarClass = new Dictionary<int, CarClass>();
+            iracingCarClassIdToCarClass = new Dictionary<int, CarClass>();
         }
 
         private static void mergeCarClassData(CarClasses defaultCarClassData, CarClasses userCarClassData)
@@ -767,15 +773,16 @@ namespace CrewChiefV4
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }
+
         public static CarClass getCarClassForIRacingId(int carClassId, int carId)
         {
-            // first check if it's in the cache
+            // first check if it's in the one of the caches
             CarClass carClassCached = null;
-            if (intToCarClass.TryGetValue(carClassId, out carClassCached))
+            if (iracingCarIdToCarClass.TryGetValue(carId, out carClassCached))
             {
                 return carClassCached;
             }
-            if (intToCarClass.TryGetValue(carId, out carClassCached))
+            if (iracingCarClassIdToCarClass.TryGetValue(carClassId, out carClassCached))
             {
                 return carClassCached;
             }
@@ -783,14 +790,14 @@ namespace CrewChiefV4
             {
                 if (carClass.iracingCarIds.Contains(carId))
                 {
-                    intToCarClass.Add(carId, carClass);
+                    iracingCarIdToCarClass.Add(carId, carClass);
                     return carClass;
                 }
             }
 
             // create one if it doesn't exist
             CarClass newCarClass = new CarClass();
-            intToCarClass.Add(carClassId, newCarClass);
+            iracingCarClassIdToCarClass.Add(carClassId, newCarClass);
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }
