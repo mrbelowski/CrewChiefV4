@@ -33,22 +33,23 @@ namespace CrewChiefV4
 
         private String baseDriverNamesDownloadLocation;
         private String updateDriverNamesDownloadLocation;
+        private String update2DriverNamesDownloadLocation;
         private String driverNamesTempFileName = "temp_driver_names.zip";
-        private Boolean getBaseDriverNames = false;
+        private String drivernamesToDownload;
 
         private String baseSoundPackDownloadLocation;
         private String updateSoundPackDownloadLocation;
         private String update2SoundPackDownloadLocation;
+        private String update3SoundPackDownloadLocation;
         private String soundPackTempFileName = "temp_sound_pack.zip";
-        private Boolean getBaseSoundPack = false;
-        private Boolean getFirstUpdateSoundPack = false;
+        private String soundPackToDownload;
 
         private String basePersonalisationsDownloadLocation;
         private String updatePersonalisationsDownloadLocation;
         private String update2PersonalisationsDownloadLocation;
+        private String update3PersonalisationsDownloadLocation;
         private String personalisationsTempFileName = "temp_personalisations.zip";
-        private Boolean getBasePersonalisations = false;
-        private Boolean getFirstUpdatePersonalisations = false;
+        private String personalisationsToDownload;
 
 
         private Boolean isDownloadingDriverNames = false;
@@ -122,7 +123,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging || 
+            if (!CrewChief.Debugging || true ||
                 AudioPlayer.soundPackVersion <= 0 || AudioPlayer.personalisationsVersion <= 0 || AudioPlayer.driverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -209,11 +210,18 @@ namespace CrewChiefV4
                                         baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
                                         baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
                                         basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
+                                        
                                         updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
-                                        update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
                                         updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
                                         updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
+                                        
+                                        update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
                                         update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
+
+                                        // these ones don't (yet) exist
+                                        update2DriverNamesDownloadLocation = element.Descendants("update2drivernamesurl").First().Value;                                        
+                                        update3SoundPackDownloadLocation = element.Descendants("update3soundpackurl").First().Value;
+                                        update3PersonalisationsDownloadLocation = doc.Descendants("update3personalisationsurl").First().Value;
                                         gotLanguageSpecificUpdateInfo = true;
                                         break;
                                     }
@@ -226,11 +234,18 @@ namespace CrewChiefV4
                                     baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
                                     baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
                                     basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
+
                                     updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                                    update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
                                     updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
                                     updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
+                                    
+                                    update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
                                     update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
+
+                                    // these ones don't (yet) exist
+                                    update2DriverNamesDownloadLocation = doc.Descendants("update2drivernamesurl").First().Value;                                    
+                                    update3SoundPackDownloadLocation = doc.Descendants("update3soundpackurl").First().Value;
+                                    update3PersonalisationsDownloadLocation = doc.Descendants("update3personalisationsurl").First().Value;
                                 }
                             }
                             catch (Exception e2)
@@ -244,6 +259,7 @@ namespace CrewChiefV4
                                 downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");
                                 downloadSoundPackButton.Enabled = false;
                                 downloadSoundPackButton.BackColor = Color.LightGray;
+                                soundPackToDownload = baseSoundPackDownloadLocation;
                             }
                             else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
                             {
@@ -252,12 +268,21 @@ namespace CrewChiefV4
                                 if (AudioPlayer.soundPackVersion == -1)
                                 {
                                     downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
-                                    getBaseSoundPack = true;
+                                    soundPackToDownload = baseSoundPackDownloadLocation;
+                                }
+                                else if (AudioPlayer.soundPackVersion <= AudioPlayer.updateSoundPackVersions[0])
+                                {
+                                    soundPackToDownload = updateSoundPackDownloadLocation;
+                                    downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
+                                }
+                                else if (AudioPlayer.soundPackVersion <= AudioPlayer.updateSoundPackVersions[1])
+                                {
+                                    soundPackToDownload = update2SoundPackDownloadLocation;
+                                    downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
                                 }
                                 else
                                 {
-                                    // if we're on an old update sound pack, get the first (large) update
-                                    getFirstUpdateSoundPack = AudioPlayer.soundPackVersion < AudioPlayer.lastUpdateSoundPackVersion;
+                                    soundPackToDownload = update3SoundPackDownloadLocation;
                                     downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
                                 }
                                 newSoundPackAvailable = true;
@@ -268,11 +293,13 @@ namespace CrewChiefV4
                                 downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
                                 downloadSoundPackButton.BackColor = Color.LightGray;
                             }
+
                             if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1)
                             {
                                 downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
                                 downloadDriverNamesButton.Enabled = false;
                                 downloadDriverNamesButton.BackColor = Color.LightGray;
+                                drivernamesToDownload = baseDriverNamesDownloadLocation;
                             }
                             else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
                             {
@@ -281,11 +308,17 @@ namespace CrewChiefV4
                                 if (AudioPlayer.driverNamesVersion == -1)
                                 {
                                     downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
-                                    getBaseDriverNames = true;
+                                    drivernamesToDownload = baseDriverNamesDownloadLocation;
                                 }
-                                else
+                                else if (AudioPlayer.driverNamesVersion <= AudioPlayer.updateDrivernamesPackVersions[0])
                                 {
                                     downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+                                    drivernamesToDownload = updateDriverNamesDownloadLocation;
+                                }
+                                else if (AudioPlayer.driverNamesVersion <= AudioPlayer.updateDrivernamesPackVersions[1])
+                                {
+                                    downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
+                                    drivernamesToDownload = update2DriverNamesDownloadLocation;
                                 }
                                 newDriverNamesAvailable = true;
                             }
@@ -300,6 +333,7 @@ namespace CrewChiefV4
                                 downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");
                                 downloadPersonalisationsButton.Enabled = false;
                                 downloadPersonalisationsButton.BackColor = Color.LightGray;
+                                personalisationsToDownload = basePersonalisationsDownloadLocation;
                             }
                             else if (latestPersonalisationsVersion > AudioPlayer.personalisationsVersion)
                             {
@@ -308,12 +342,22 @@ namespace CrewChiefV4
                                 if (AudioPlayer.personalisationsVersion == -1)
                                 {
                                     downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
-                                    getBasePersonalisations = true;
+                                    personalisationsToDownload = basePersonalisationsDownloadLocation;
+                                }
+                                else if (AudioPlayer.personalisationsVersion <= AudioPlayer.updatePersonalisationPackVersions[0])
+                                {
+                                    downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                                    personalisationsToDownload = updatePersonalisationsDownloadLocation;
+                                }
+                                else if (AudioPlayer.personalisationsVersion <= AudioPlayer.updatePersonalisationPackVersions[1])
+                                {
+                                    downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                                    personalisationsToDownload = update2PersonalisationsDownloadLocation;
                                 }
                                 else
                                 {
-                                    getFirstUpdatePersonalisations = AudioPlayer.personalisationsVersion < AudioPlayer.lastUpdatePersonalisationsVersion;
                                     downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
+                                    personalisationsToDownload = update3PersonalisationsDownloadLocation;
                                 }
                                 newPersonalisationsAvailable = true;
                             }
@@ -1830,18 +1874,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                     }
                     catch (Exception) { }
-                    if (getBaseSoundPack)
-                    {
-                        wc.DownloadFileAsync(new Uri(baseSoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
-                    }
-                    else if (getFirstUpdateSoundPack)
-                    {
-                        wc.DownloadFileAsync(new Uri(updateSoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
-                    }
-                    else
-                    {
-                        wc.DownloadFileAsync(new Uri(update2SoundPackDownloadLocation), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
-                    }
+                    wc.DownloadFileAsync(new Uri(soundPackToDownload), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                 }
                 else if (downloadType == DownloadType.DRIVER_NAMES)
                 {
@@ -1853,14 +1886,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
                     }
                     catch (Exception) { }
-                    if (getBaseDriverNames)
-                    {
-                        wc.DownloadFileAsync(new Uri(baseDriverNamesDownloadLocation), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
-                    }
-                    else
-                    {
-                        wc.DownloadFileAsync(new Uri(updateDriverNamesDownloadLocation), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
-                    }
+                    wc.DownloadFileAsync(new Uri(drivernamesToDownload), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
                 }
                 else if (downloadType == DownloadType.PERSONALISATIONS)
                 {
@@ -1872,18 +1898,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    if (getBasePersonalisations)
-                    {
-                        wc.DownloadFileAsync(new Uri(basePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
-                    }
-                    else if (getFirstUpdatePersonalisations)
-                    {
-                        wc.DownloadFileAsync(new Uri(updatePersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
-                    }
-                    else
-                    {
-                        wc.DownloadFileAsync(new Uri(update2PersonalisationsDownloadLocation), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
-                    }
+                    wc.DownloadFileAsync(new Uri(personalisationsToDownload), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);                    
                 }
             }
         }
