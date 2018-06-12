@@ -123,7 +123,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging || true ||
+            if (!CrewChief.Debugging ||
                 AudioPlayer.soundPackVersion <= 0 || AudioPlayer.personalisationsVersion <= 0 || AudioPlayer.driverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -207,21 +207,22 @@ namespace CrewChiefV4
                                         float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
                                         float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
                                         float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-                                        baseSoundPackDownloadLocation = element.Descendants("basesoundpackurl").First().Value;
-                                        baseDriverNamesDownloadLocation = element.Descendants("basedrivernamesurl").First().Value;
-                                        basePersonalisationsDownloadLocation = element.Descendants("basepersonalisationsurl").First().Value;
-                                        
-                                        updateSoundPackDownloadLocation = element.Descendants("updatesoundpackurl").First().Value;
-                                        updateDriverNamesDownloadLocation = element.Descendants("updatedrivernamesurl").First().Value;
-                                        updatePersonalisationsDownloadLocation = element.Descendants("updatepersonalisationsurl").First().Value;
-                                        
-                                        update2SoundPackDownloadLocation = element.Descendants("update2soundpackurl").First().Value;
-                                        update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
+
+                                        baseSoundPackDownloadLocation = MainWindow.getElementDescendantValue(element, "basesoundpackurl");
+                                        baseDriverNamesDownloadLocation = MainWindow.getElementDescendantValue(element, "basedrivernamesurl");
+                                        basePersonalisationsDownloadLocation = MainWindow.getElementDescendantValue(element, "basepersonalisationsurl");
+
+                                        updateSoundPackDownloadLocation = MainWindow.getElementDescendantValue(element, "updatesoundpackurl");
+                                        updateDriverNamesDownloadLocation = MainWindow.getElementDescendantValue(element, "updatedrivernamesurl");
+                                        updatePersonalisationsDownloadLocation = MainWindow.getElementDescendantValue(element, "updatepersonalisationsurl");
+
+                                        update2SoundPackDownloadLocation = MainWindow.getElementDescendantValue(element, "update2soundpackurl");
+                                        update2PersonalisationsDownloadLocation = MainWindow.getElementDescendantValue(element, "update2personalisationsurl");
 
                                         // these ones don't (yet) exist
-                                        update2DriverNamesDownloadLocation = element.Descendants("update2drivernamesurl").First().Value;                                        
-                                        update3SoundPackDownloadLocation = element.Descendants("update3soundpackurl").First().Value;
-                                        update3PersonalisationsDownloadLocation = doc.Descendants("update3personalisationsurl").First().Value;
+                                        update2DriverNamesDownloadLocation = MainWindow.getElementDescendantValue(element, "update2drivernamesurl");
+                                        update3SoundPackDownloadLocation = MainWindow.getElementDescendantValue(element, "update3soundpackurl");
+                                        update3PersonalisationsDownloadLocation = MainWindow.getElementDescendantValue(element, "update3personalisationsurl");
                                         gotLanguageSpecificUpdateInfo = true;
                                         break;
                                     }
@@ -231,21 +232,23 @@ namespace CrewChiefV4
                                     float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
                                     float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
                                     float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-                                    baseSoundPackDownloadLocation = doc.Descendants("basesoundpackurl").First().Value;
-                                    baseDriverNamesDownloadLocation = doc.Descendants("basedrivernamesurl").First().Value;
-                                    basePersonalisationsDownloadLocation = doc.Descendants("basepersonalisationsurl").First().Value;
 
-                                    updateSoundPackDownloadLocation = doc.Descendants("updatesoundpackurl").First().Value;
-                                    updateDriverNamesDownloadLocation = doc.Descendants("updatedrivernamesurl").First().Value;
-                                    updatePersonalisationsDownloadLocation = doc.Descendants("updatepersonalisationsurl").First().Value;
-                                    
-                                    update2SoundPackDownloadLocation = doc.Descendants("update2soundpackurl").First().Value;
-                                    update2PersonalisationsDownloadLocation = doc.Descendants("update2personalisationsurl").First().Value;
+
+                                    baseSoundPackDownloadLocation = MainWindow.getDocDescendantValue(doc, "basesoundpackurl");
+                                    baseDriverNamesDownloadLocation = MainWindow.getDocDescendantValue(doc, "basedrivernamesurl");
+                                    basePersonalisationsDownloadLocation = MainWindow.getDocDescendantValue(doc, "basepersonalisationsurl");
+
+                                    updateSoundPackDownloadLocation = MainWindow.getDocDescendantValue(doc, "updatesoundpackurl");
+                                    updateDriverNamesDownloadLocation = MainWindow.getDocDescendantValue(doc, "updatedrivernamesurl");
+                                    updatePersonalisationsDownloadLocation = MainWindow.getDocDescendantValue(doc, "updatepersonalisationsurl");
+
+                                    update2SoundPackDownloadLocation = MainWindow.getDocDescendantValue(doc, "update2soundpackurl");
+                                    update2PersonalisationsDownloadLocation = MainWindow.getDocDescendantValue(doc, "update2personalisationsurl");
 
                                     // these ones don't (yet) exist
-                                    update2DriverNamesDownloadLocation = doc.Descendants("update2drivernamesurl").First().Value;                                    
-                                    update3SoundPackDownloadLocation = doc.Descendants("update3soundpackurl").First().Value;
-                                    update3PersonalisationsDownloadLocation = doc.Descendants("update3personalisationsurl").First().Value;
+                                    update2DriverNamesDownloadLocation = MainWindow.getDocDescendantValue(doc, "update2drivernamesurl");
+                                    update3SoundPackDownloadLocation = MainWindow.getDocDescendantValue(doc, "update3soundpackurl");
+                                    update3PersonalisationsDownloadLocation = MainWindow.getDocDescendantValue(doc, "update3personalisationsurl");
                                 }
                             }
                             catch (Exception e2)
@@ -2357,6 +2360,32 @@ namespace CrewChiefV4
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
+        }
+
+        // get the first decendant or null if we can't
+        public static String getElementDescendantValue(XElement parent, String elementName)
+        {
+            try
+            {
+                return parent.Descendants(elementName).First().Value;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        // get the first decendant or null if we can't
+        public static String getDocDescendantValue(XDocument parent, String elementName)
+        {
+            try
+            {
+                return parent.Descendants(elementName).First().Value;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 
