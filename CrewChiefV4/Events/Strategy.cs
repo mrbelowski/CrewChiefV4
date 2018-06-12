@@ -52,7 +52,7 @@ namespace CrewChiefV4.Events
         public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";
         public static String folderHeWillComeOutJustInFront = "strategy/he_will_come_out_just_in_front";
         // RECORD ME:
-        public static String folderHeWillComeOutJustBehind = "strategy/he_will_come_out_just_in_behind";
+        public static String folderHeWillComeOutJustBehind = "strategy/he_will_come_out_just_behind";
 
 
         // may be timed during practice.
@@ -236,7 +236,7 @@ namespace CrewChiefV4.Events
                                     // this guy has just entered the pit and we predict he'll exit just in front of us
                                     Console.WriteLine("Opponent " + entry.Key + " will exit the pit close in front of us");
                                     audioPlayer.playMessage(new QueuedMessage("opponent_exiting_in_front", MessageContents(entry.Value,
-                                        entry.Value.ClassPosition, folderHeWillComeOutJustInFront), 0, this));
+                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustInFront), 0, this));
 
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
@@ -248,7 +248,7 @@ namespace CrewChiefV4.Events
                                     // this guy has just entered the pit and we predict he'll exit just behind us
                                     Console.WriteLine("Opponent " + entry.Key + " will exit the pit close behind us");
                                     audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(entry.Value,
-                                        entry.Value.ClassPosition, folderHeWillComeOutJustBehind), 0, this));
+                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustBehind), 0, this));
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
                                     nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
