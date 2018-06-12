@@ -11,6 +11,7 @@ namespace CrewChiefV4.Events
     class Strategy : AbstractEvent
     {
         private Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
+        private Boolean warnAboutOpponentsExitingCloseToPlayer = UserSettings.GetUserSettings().getBoolean("enable_opponent_pit_exit_estimates");
 
         // if this is enabled, don't play the pit position estimates on pit entry. This is only a fallback in case
         // we haven't made a pit request
@@ -87,9 +88,6 @@ namespace CrewChiefV4.Events
         // these are static because the opponents event needs to check them:
         public static HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
         public static HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
-
-        // this is disabled for now - it's unfinished and will probably spam messages
-        public static Boolean warnAboutOpponentsExitingCloseToPlayer = true;
 
         private int sectorCount = 3;
 
@@ -326,8 +324,8 @@ namespace CrewChiefV4.Events
 
 
 
-                //-------------------------------
-                // this block is currently unused
+                //--------------------------------------
+                // opponent pit exit position estimation
                 if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentFinalSectorTimingCheckDue)
                 {
                     float expectedPlayerTimeLoss = -1;
@@ -399,8 +397,6 @@ namespace CrewChiefV4.Events
                     }
                 }
                 //------------------------------
-
-
 
 
                 if (timeOpponentStops && currentGameState.Now > nextPitTimingCheckDue)
