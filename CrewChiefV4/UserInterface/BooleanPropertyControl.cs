@@ -20,7 +20,6 @@ namespace CrewChiefV4
         {
             InitializeComponent();
 
-            this.SuspendLayout();
             this.label = label;
             this.propertyId = propertyId;
             this.originalValue = value;
@@ -28,7 +27,6 @@ namespace CrewChiefV4
             this.checkBox1.Checked = value;
             this.defaultValue = defaultValue;
             this.toolTip1.SetToolTip(this.checkBox1, helpText);
-            this.ResumeLayout(false);
 
             this.filter = new PropertyFilter(filterText, propertyId, this.label);
         }
