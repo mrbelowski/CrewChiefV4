@@ -51,7 +51,6 @@ namespace CrewChiefV4.Events
         
         public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";
         public static String folderHeWillComeOutJustInFront = "strategy/he_will_come_out_just_in_front";
-        // RECORD ME:
         public static String folderHeWillComeOutJustBehind = "strategy/he_will_come_out_just_behind";
 
 
