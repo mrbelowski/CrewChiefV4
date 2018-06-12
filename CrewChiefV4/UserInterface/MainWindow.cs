@@ -30,26 +30,14 @@ namespace CrewChiefV4
         private Boolean usingRetryAddressForDriverNames = false;
         private Boolean usingRetryAddressForPersonalisations = false;
 
-
-        private String baseDriverNamesDownloadLocation;
-        private String updateDriverNamesDownloadLocation;
-        private String update2DriverNamesDownloadLocation;
         private String driverNamesTempFileName = "temp_driver_names.zip";
-        private String drivernamesToDownload;
+        private String drivernamesDownloadURL;
 
-        private String baseSoundPackDownloadLocation;
-        private String updateSoundPackDownloadLocation;
-        private String update2SoundPackDownloadLocation;
-        private String update3SoundPackDownloadLocation;
         private String soundPackTempFileName = "temp_sound_pack.zip";
-        private String soundPackToDownload;
+        private String soundPackDownloadURL;
 
-        private String basePersonalisationsDownloadLocation;
-        private String updatePersonalisationsDownloadLocation;
-        private String update2PersonalisationsDownloadLocation;
-        private String update3PersonalisationsDownloadLocation;
         private String personalisationsTempFileName = "temp_personalisations.zip";
-        private String personalisationsToDownload;
+        private String personalisationsDownloadURL;
 
 
         private Boolean isDownloadingDriverNames = false;
@@ -264,8 +252,8 @@ namespace CrewChiefV4
                                 {
                                     if (AudioPlayer.soundPackVersion >= soundPack.upgradeFromVersion)
                                     {
-                                        soundPackToDownload = soundPack.downloadLocation;
-                                        if (soundPackToDownload != null)
+                                        soundPackDownloadURL = soundPack.downloadLocation;
+                                        if (soundPackDownloadURL != null)
                                         {
                                             downloadSoundPackButton.Text = Configuration.getUIString(latestSoundPackVersion == -1 ?
                                                 "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
@@ -291,8 +279,8 @@ namespace CrewChiefV4
                                 {
                                     if (AudioPlayer.personalisationsVersion >= personalisationPack.upgradeFromVersion)
                                     {
-                                        personalisationsToDownload = personalisationPack.downloadLocation;
-                                        if (personalisationsToDownload != null)
+                                        personalisationsDownloadURL = personalisationPack.downloadLocation;
+                                        if (personalisationsDownloadURL != null)
                                         {
                                             downloadPersonalisationsButton.Text = Configuration.getUIString(latestPersonalisationsVersion == -1 ?
                                                 "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
@@ -318,8 +306,8 @@ namespace CrewChiefV4
                                 {
                                     if (AudioPlayer.driverNamesVersion >= drivernamesPack.upgradeFromVersion)
                                     {
-                                        drivernamesToDownload = drivernamesPack.downloadLocation;
-                                        if (drivernamesToDownload != null)
+                                        drivernamesDownloadURL = drivernamesPack.downloadLocation;
+                                        if (drivernamesDownloadURL != null)
                                         {
                                             downloadDriverNamesButton.Text = Configuration.getUIString(latestDriverNamesVersion == -1 ?
                                                 "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
@@ -1838,7 +1826,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(soundPackToDownload), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    wc.DownloadFileAsync(new Uri(soundPackDownloadURL), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
                 }
                 else if (downloadType == DownloadType.DRIVER_NAMES)
                 {
@@ -1850,7 +1838,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(drivernamesToDownload), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                    wc.DownloadFileAsync(new Uri(drivernamesDownloadURL), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
                 }
                 else if (downloadType == DownloadType.PERSONALISATIONS)
                 {
@@ -1862,7 +1850,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(personalisationsToDownload), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);                    
+                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);                    
                 }
             }
         }
@@ -2120,8 +2108,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to get driver names from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForDriverNames = true;
-                baseDriverNamesDownloadLocation = baseDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
-                updateDriverNamesDownloadLocation = updateDriverNamesDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                drivernamesDownloadURL = drivernamesDownloadURL.Replace(retryReplace, retryReplaceWith);
                 startDownload(DownloadType.DRIVER_NAMES);
             }
             else
@@ -2150,9 +2137,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to get sound pack from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForSoundPack = true;
-                baseSoundPackDownloadLocation = baseSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
-                updateSoundPackDownloadLocation = updateSoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
-                update2SoundPackDownloadLocation = update2SoundPackDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                soundPackDownloadURL = soundPackDownloadURL.Replace(retryReplace, retryReplaceWith);
                 startDownload(DownloadType.SOUND_PACK);
             }
             else
@@ -2181,9 +2166,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to get personalisations from " + retryReplace + " will try from " + retryReplaceWith);
                 usingRetryAddressForPersonalisations = true;
-                basePersonalisationsDownloadLocation = basePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
-                updatePersonalisationsDownloadLocation = updatePersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
-                update2PersonalisationsDownloadLocation = update2PersonalisationsDownloadLocation.Replace(retryReplace, retryReplaceWith);
+                personalisationsDownloadURL = personalisationsDownloadURL.Replace(retryReplace, retryReplaceWith);
                 startDownload(DownloadType.PERSONALISATIONS);
             }
             else
