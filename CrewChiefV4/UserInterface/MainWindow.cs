@@ -381,9 +381,6 @@ namespace CrewChiefV4
                 else
                     this.WindowState = FormWindowState.Minimized;
             }
-
-            //var form = new PropertiesForm(this);
-            //form.ShowDialog(this);
         }
 
         private void HideToTray()
@@ -954,13 +951,13 @@ namespace CrewChiefV4
             this.assignButtonToAction.Enabled = false;
             this.deleteAssigmentButton.Enabled = false;
 
-            this.ResumeLayout();
-
             if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
                 doStartAppStuff();
             }
+
+            this.ResumeLayout();
 
             this.Resize += MainWindow_Resize;
             this.KeyPreview = true;
