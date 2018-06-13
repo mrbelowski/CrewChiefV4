@@ -115,6 +115,7 @@ namespace CrewChiefV4.Events
         {
             // don't wipe the time-lost-on-stop that may have been derived in a previous session
             opponentsTimeLostForStop.Clear();
+            opponentsTimeSpentInPitlane.Clear();
             isTimingPracticeStop = false;
             gameTimeWhenEnteringLastSectorInPractice = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
@@ -177,6 +178,7 @@ namespace CrewChiefV4.Events
                             gameTimeWhenEnteringLastSectorInPractice = -1;
                             isTimingPracticeStop = false;
                             hasPittedDuringPracticeStopProcess = false;
+                            gameTimeOnPitEntry = -1;
                         }
                     }
                     else if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && gameTimeOnPitEntry != -1)
