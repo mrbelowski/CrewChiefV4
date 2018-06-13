@@ -63,6 +63,7 @@ namespace CrewChiefV4.Events
         private CarData.CarClass carClassForLastPitstopTiming;
         private String trackNameForLastPitstopTiming;
         private Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
+        private Dictionary<String, float> opponentsTimeSpentInPitlane = new Dictionary<string, float>();
 
         public Boolean isTimingPracticeStop = false;
         private Boolean hasPittedDuringPracticeStopProcess = false;
@@ -256,6 +257,11 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
+                        if (opponentsInPitLane.ContainsKey(entry.Key))
+                        {
+                            // he's just left the pit lane
+                            opponentsTimeSpentInPitlane[entry.Key] = currentGameState.SessionData.SessionRunningTime - opponentsInPitLane[entry.Key];
+                        }
                         opponentsInPitLane.Remove(entry.Value.DriverRawName);
                     }
                 }
@@ -474,8 +480,11 @@ namespace CrewChiefV4.Events
                         {
                             timeLossEstimate = entry.Value;
                             pittedOpponentPositionDiff = positionDiff;
-                            // guess how long this opponent might have been in the pitlane - assume 1 second time loss either side
-                            playerTimeSpentInPitLane = timeLossEstimate - 2;
+                            float opponentTimeSpentInPitlane;
+                            if (opponentsTimeSpentInPitlane.TryGetValue(entry.Key, out opponentTimeSpentInPitlane))
+                            {
+                                playerTimeSpentInPitLane = opponentTimeSpentInPitlane;
+                            }
                         }
                     }
                 }
