@@ -75,10 +75,6 @@ namespace CrewChiefV4
         private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         public static Boolean forceMinWindowSize = UserSettings.GetUserSettings().getBoolean("force_min_window_size");
 
-        private float latestSoundPackVersion = -1;
-        private float latestDriverNamesVersion = -1;
-        private float latestPersonalisationsVersion = -1;
-
         private ControlWriter cw = null;
 
         private float currentVolume = -1;
@@ -109,7 +105,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging || 
+            if (!CrewChief.Debugging || true ||
                 SoundPackVersionsHelper.soundPackVersion <= 0 || SoundPackVersionsHelper.personalisationsVersion <= 0 || SoundPackVersionsHelper.driverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -166,7 +162,7 @@ namespace CrewChiefV4
                                     soundPackDownloadURL = soundPack.downloadLocation;
                                     if (soundPackDownloadURL != null)
                                     {
-                                        downloadSoundPackButton.Text = Configuration.getUIString(latestSoundPackVersion == -1 ?
+                                        downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
                                             "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
                                         downloadSoundPackButton.Enabled = true;
                                         downloadSoundPackButton.BackColor = Color.LightGreen;
@@ -193,7 +189,7 @@ namespace CrewChiefV4
                                     personalisationsDownloadURL = personalisationPack.downloadLocation;
                                     if (personalisationsDownloadURL != null)
                                     {
-                                        downloadPersonalisationsButton.Text = Configuration.getUIString(latestPersonalisationsVersion == -1 ?
+                                        downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
                                             "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
                                         downloadPersonalisationsButton.Enabled = true;
                                         downloadPersonalisationsButton.BackColor = Color.LightGreen;
@@ -220,7 +216,7 @@ namespace CrewChiefV4
                                     drivernamesDownloadURL = drivernamesPack.downloadLocation;
                                     if (drivernamesDownloadURL != null)
                                     {
-                                        downloadDriverNamesButton.Text = Configuration.getUIString(latestDriverNamesVersion == -1 ?
+                                        downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
                                             "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
                                         downloadDriverNamesButton.Enabled = true;
                                         downloadDriverNamesButton.BackColor = Color.LightGreen;
