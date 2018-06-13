@@ -18,13 +18,30 @@ namespace CrewChiefV4
     internal class PropertyFilter
     {
         internal List<GameEnum> filterList = null;
+        internal PropertiesForm.PropertyCategory category = PropertiesForm.PropertyCategory.UNKNOWN;
         internal bool includeFilter = true;
         internal string propertyLabelUpper = null;
 
-        internal PropertyFilter(string filter, string propertyId, string propertyLabel)
+        internal PropertyFilter(string filter, string category, string propertyId, string propertyLabel)
         {
             this.propertyLabelUpper = propertyLabel.ToUpperInvariant();
 
+            // Process category filter.
+            if (string.IsNullOrWhiteSpace(category))
+                this.category = PropertiesForm.PropertyCategory.MISC;
+            else
+            {
+                PropertiesForm.PropertyCategory catEnum = PropertiesForm.PropertyCategory.UNKNOWN;
+                if (Enum.TryParse(category, out catEnum))
+                    this.category = catEnum;
+                else
+                {
+                    Console.WriteLine("Failed to parse category: \"" + category + "\"  property: \"" + propertyId + "\"");
+                    this.category = PropertiesForm.PropertyCategory.MISC;
+                }
+            }
+
+            // Process game filter.
             if (string.IsNullOrWhiteSpace(filter))
                 return;
 
@@ -53,8 +70,12 @@ namespace CrewChiefV4
             }
         }
 
-        internal bool Applies(string textFilterUpper, GameEnum gameFilter, PropertiesForm.SpecialFilter specialFilter, bool includeCommon)
+        internal bool Applies(string textFilterUpper, GameEnum gameFilter, PropertiesForm.SpecialFilter specialFilter, bool includeCommon, PropertiesForm.PropertyCategory categoryFilter)
         {
+            if (categoryFilter != PropertiesForm.PropertyCategory.ALL
+                && this.category != categoryFilter)
+                return false;
+
             if (specialFilter != PropertiesForm.SpecialFilter.UNKNOWN)
             {
                 if (specialFilter == PropertiesForm.SpecialFilter.COMMON_PREFERENCES

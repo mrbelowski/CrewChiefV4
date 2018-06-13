@@ -150,15 +150,22 @@ unknown_personalisations_language_title = No Sound Pack language defined
 acs_install_path = ACS install path
 acs_install_path_help = ACS installation path for plugin installation and updating
 acs_install_path_filter = ASSETTO_64BIT;ASSETTO_32BIT
+acs_install_path_category = UI_STARTUP_AND_PATHS
+
 ams_install_path = AMS install path
 ams_install_path_help = AMS installation path for plugin installation and updating
 ams_install_path_filter = RF1
+ams_install_path_category = UI_STARTUP_AND_PATHS
+
 rf1_install_path = rF1 install path
 rf1_install_path_help = rF1 installation path for plugin installation and updating
 rf1_install_path_filter = RF1
+rf1_install_path_category = UI_STARTUP_AND_PATHS
+
 rf2_install_path = rF2 install path
 rf2_install_path_help = rF2 installation path for plugin installation and updating
 rf2_install_path_filter = RF2_64BIT
+rf2_install_path_category = UI_STARTUP_AND_PATHS
 
 override_default_sound_pack_location = Override default Sound Pack location
 override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
