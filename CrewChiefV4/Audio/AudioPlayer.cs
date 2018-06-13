@@ -21,7 +21,6 @@ namespace CrewChiefV4.Audio
 
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
         public Boolean mute = false;
-        public static float minimumSoundPackVersion = 105f;
 
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
         // prefer to drop messages or use generic terms instead of TTS names
@@ -106,10 +105,6 @@ namespace CrewChiefV4.Audio
         DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
 
         public Boolean initialised = false;
-
-        public static float soundPackVersion = -1; 
-        public static float driverNamesVersion = -1;
-        public static float personalisationsVersion = -1;
 
         public static String soundPackLanguage = null;
 
@@ -206,10 +201,10 @@ namespace CrewChiefV4.Audio
             }
             if (soundDirectory.Exists) 
             {
-                soundPackVersion = getSoundPackVersion(soundDirectory);
-                driverNamesVersion = getDriverNamesVersion(soundDirectory);
+                SoundPackVersionsHelper.soundPackVersion = getSoundPackVersion(soundDirectory);
+                SoundPackVersionsHelper.driverNamesVersion = getDriverNamesVersion(soundDirectory);
                 soundPackLanguage = getSoundPackLanguage(soundDirectory);
-                personalisationsVersion = getPersonalisationsVersion(soundDirectory);
+                SoundPackVersionsHelper.personalisationsVersion = getPersonalisationsVersion(soundDirectory);
             }
             else
             {
@@ -255,22 +250,15 @@ namespace CrewChiefV4.Audio
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
                 return;
             }
-            if (soundPackVersion == -1)
+            if (SoundPackVersionsHelper.soundPackVersion == -1)
             {
                 Console.WriteLine("Unable to get sound pack version");
             }
-            else if (soundPackVersion < minimumSoundPackVersion)
-            {
-                Console.WriteLine("The sound pack version in use is " + soundPackVersion + " but this version of the app requires version "
-                    + minimumSoundPackVersion + " or greater.");
-                Console.WriteLine("You must update your sound pack to run this application");
-                return;
-            }
             else
             {
-                Console.WriteLine("Minimum sound pack version = " + minimumSoundPackVersion +
-                    " using sound pack version " + soundPackVersion + ", driver names version " + driverNamesVersion + 
-                    " and personalisations version " + personalisationsVersion);
+                Console.WriteLine("Using sound pack version " + SoundPackVersionsHelper.soundPackVersion +
+                    ", driver names version " + SoundPackVersionsHelper.driverNamesVersion +
+                    " and personalisations version " + SoundPackVersionsHelper.personalisationsVersion);
             }
             if (this.soundCache == null)
             {

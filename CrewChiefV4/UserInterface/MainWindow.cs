@@ -112,7 +112,7 @@ namespace CrewChiefV4
 
             // do the auto updating stuff in a separate Thread
             if (!CrewChief.Debugging || 
-                AudioPlayer.soundPackVersion <= 0 || AudioPlayer.personalisationsVersion <= 0 || AudioPlayer.driverNamesVersion <=0)
+                SoundPackVersionsHelper.soundPackVersion <= 0 || SoundPackVersionsHelper.personalisationsVersion <= 0 || SoundPackVersionsHelper.driverNamesVersion <=0)
             {
                 new Thread(() =>
                 {
@@ -196,15 +196,15 @@ namespace CrewChiefV4
                                         float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
                                         float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
 
-                                        foreach (Utilities.SoundPackData soundPackData in Utilities.soundPacks)
+                                        foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
                                         {
                                             soundPackData.setDownloadLocation(element);
                                         }
-                                        foreach (Utilities.SoundPackData personalisationsPackData in Utilities.personalisationPacks)
+                                        foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
                                         {
                                             personalisationsPackData.setDownloadLocation(element);
                                         }
-                                        foreach (Utilities.SoundPackData drivernamePackData in Utilities.drivernamesPacks)
+                                        foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
                                         {
                                             drivernamePackData.setDownloadLocation(element);
                                         }
@@ -218,15 +218,15 @@ namespace CrewChiefV4
                                     float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
                                     float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
 
-                                    foreach (Utilities.SoundPackData soundPackData in Utilities.soundPacks)
+                                    foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
                                     {
                                         soundPackData.setDownloadLocation(doc);
                                     }
-                                    foreach (Utilities.SoundPackData personalisationsPackData in Utilities.personalisationPacks)
+                                    foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
                                     {
                                         personalisationsPackData.setDownloadLocation(doc);
                                     }
-                                    foreach (Utilities.SoundPackData drivernamePackData in Utilities.drivernamesPacks)
+                                    foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
                                     {
                                         drivernamePackData.setDownloadLocation(doc);
                                     }
@@ -242,15 +242,15 @@ namespace CrewChiefV4
                             downloadSoundPackButton.Enabled = false;
                             downloadSoundPackButton.BackColor = Color.LightGray;
                             downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
-                            if (latestSoundPackVersion == -1 && AudioPlayer.soundPackVersion == -1)
+                            if (latestSoundPackVersion == -1 && SoundPackVersionsHelper.soundPackVersion == -1)
                             {
                                 downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");                                
                             }
-                            else if (latestSoundPackVersion > AudioPlayer.soundPackVersion)
+                            else if (latestSoundPackVersion > SoundPackVersionsHelper.soundPackVersion)
                             {
-                                foreach (Utilities.SoundPackData soundPack in Utilities.soundPacks)
+                                foreach (SoundPackVersionsHelper.SoundPackData soundPack in SoundPackVersionsHelper.soundPacks)
                                 {
-                                    if (AudioPlayer.soundPackVersion >= soundPack.upgradeFromVersion)
+                                    if (SoundPackVersionsHelper.soundPackVersion >= soundPack.upgradeFromVersion)
                                     {
                                         soundPackDownloadURL = soundPack.downloadLocation;
                                         if (soundPackDownloadURL != null)
@@ -269,15 +269,15 @@ namespace CrewChiefV4
                             downloadPersonalisationsButton.Enabled = false;
                             downloadPersonalisationsButton.BackColor = Color.LightGray;
                             downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
-                            if (latestPersonalisationsVersion == -1 && AudioPlayer.personalisationsVersion == -1)
+                            if (latestPersonalisationsVersion == -1 && SoundPackVersionsHelper.personalisationsVersion == -1)
                             {
                                 downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");                                
                             }
-                            else if (latestPersonalisationsVersion > AudioPlayer.personalisationsVersion)
+                            else if (latestPersonalisationsVersion > SoundPackVersionsHelper.personalisationsVersion)
                             {
-                                foreach (Utilities.SoundPackData personalisationPack in Utilities.personalisationPacks)
+                                foreach (SoundPackVersionsHelper.SoundPackData personalisationPack in SoundPackVersionsHelper.personalisationPacks)
                                 {
-                                    if (AudioPlayer.personalisationsVersion >= personalisationPack.upgradeFromVersion)
+                                    if (SoundPackVersionsHelper.personalisationsVersion >= personalisationPack.upgradeFromVersion)
                                     {
                                         personalisationsDownloadURL = personalisationPack.downloadLocation;
                                         if (personalisationsDownloadURL != null)
@@ -296,15 +296,15 @@ namespace CrewChiefV4
                             downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
                             downloadDriverNamesButton.Enabled = false;
                             downloadDriverNamesButton.BackColor = Color.LightGray;
-                            if (latestDriverNamesVersion == -1 && AudioPlayer.driverNamesVersion == -1)
+                            if (latestDriverNamesVersion == -1 && SoundPackVersionsHelper.driverNamesVersion == -1)
                             {
                                 downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
                             }
-                            else if (latestDriverNamesVersion > AudioPlayer.driverNamesVersion)
+                            else if (latestDriverNamesVersion > SoundPackVersionsHelper.driverNamesVersion)
                             {
-                                foreach (Utilities.SoundPackData drivernamesPack in Utilities.drivernamesPacks)
+                                foreach (SoundPackVersionsHelper.SoundPackData drivernamesPack in SoundPackVersionsHelper.drivernamesPacks)
                                 {
-                                    if (AudioPlayer.driverNamesVersion >= drivernamesPack.upgradeFromVersion)
+                                    if (SoundPackVersionsHelper.driverNamesVersion >= drivernamesPack.upgradeFromVersion)
                                     {
                                         drivernamesDownloadURL = drivernamesPack.downloadLocation;
                                         if (drivernamesDownloadURL != null)
@@ -2114,7 +2114,7 @@ namespace CrewChiefV4
             else
             {
                 startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingPersonalisations;
-                if (AudioPlayer.driverNamesVersion == -1)
+                if (SoundPackVersionsHelper.driverNamesVersion == -1)
                 {
                     downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_press_to_download");
                 }
@@ -2143,7 +2143,7 @@ namespace CrewChiefV4
             else
             {
                 startApplicationButton.Enabled = !isDownloadingDriverNames && !isDownloadingPersonalisations;
-                if (AudioPlayer.soundPackVersion == -1)
+                if (SoundPackVersionsHelper.soundPackVersion == -1)
                 {
                     downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_press_to_download");
                 }
@@ -2172,7 +2172,7 @@ namespace CrewChiefV4
             else
             {
                 startApplicationButton.Enabled = !isDownloadingSoundPack && !isDownloadingDriverNames;
-                if (AudioPlayer.personalisationsVersion == -1)
+                if (SoundPackVersionsHelper.personalisationsVersion == -1)
                 {
                     downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_press_to_download");
                 }
