@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace CrewChiefV4
 {
@@ -45,6 +46,8 @@ namespace CrewChiefV4
             this.gameFilterLabel = new System.Windows.Forms.Label();
             this.filterBox = new System.Windows.Forms.ComboBox();
             this.showCommonCheckbox = new System.Windows.Forms.CheckBox();
+            this.categoriesLabel = new System.Windows.Forms.Label();
+            this.categoriesBox = new System.Windows.Forms.ComboBox();
             this.mainTableLayoutPanel.SuspendLayout();
             this.buttonsTableLayoutPanel.SuspendLayout();
             this.headerTableLayoutPanel.SuspendLayout();
@@ -100,6 +103,25 @@ namespace CrewChiefV4
             this.showCommonCheckbox.Margin = new System.Windows.Forms.Padding(10, 5, 3, 3);
             this.showCommonCheckbox.Checked = true;
             this.showCommonCheckbox.CheckedChanged += ShowCommonCheckbox_CheckedChanged;
+            //
+            // categoriesLablel
+            //
+            this.categoriesLabel.Name = "categoriesLabel";
+            //this.categoriesLabel.Text = Configuration.getUIString("game_filter_label");
+            this.categoriesLabel.Text = "Ca&tegory filter:";
+            this.categoriesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.categoriesLabel.TabIndex = 12;
+            //
+            // categoriesBox
+            //
+            this.filterBox.Name = "categoriesBox";
+            this.categoriesBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.categoriesBox.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.categoriesBox.MinimumSize = new System.Drawing.Size(203, -1);
+            this.categoriesBox.MaximumSize = new System.Drawing.Size(203, -1);
+            //this.categoriesBox.SelectedValueChanged += categoriesBox_SelectedValueChanged;
+            this.categoriesBox.TabIndex = 13;
+
             // 
             // searchTextBox
             // 
@@ -114,7 +136,7 @@ namespace CrewChiefV4
             this.searchTextBox.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.searchTextBox.Name = "searchTextBox";
             this.searchTextBox.Size = new System.Drawing.Size(189, 20);
-            this.searchTextBox.TabIndex = 12;
+            this.searchTextBox.TabIndex = 15;
             this.searchBoxTooltip.SetToolTip(this.searchTextBox, tooltip);
             this.searchTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
@@ -176,16 +198,20 @@ namespace CrewChiefV4
             // 
             // headerTableLayoutPanel
             // 
-            this.headerTableLayoutPanel.ColumnCount = 5;
+            this.headerTableLayoutPanel.ColumnCount = 7;
             this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 7F));
-            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24F));
-            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9F)); // spacer
             this.headerTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.headerTableLayoutPanel.Controls.Add(this.gameFilterLabel, 0, 0);
             this.headerTableLayoutPanel.Controls.Add(this.filterBox, 1, 0);
             this.headerTableLayoutPanel.Controls.Add(this.showCommonCheckbox, 2, 0);
-            this.headerTableLayoutPanel.Controls.Add(this.searchTextBox, 4, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.categoriesLabel, 3, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.categoriesBox, 4, 0);
+            this.headerTableLayoutPanel.Controls.Add(this.searchTextBox, 6, 0);
             this.headerTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.headerTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.headerTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -234,5 +260,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label gameFilterLabel;
         private System.Windows.Forms.ComboBox filterBox;
         private System.Windows.Forms.CheckBox showCommonCheckbox;
+        private System.Windows.Forms.Label categoriesLabel;
+        private System.Windows.Forms.ComboBox categoriesBox;
     }
 }

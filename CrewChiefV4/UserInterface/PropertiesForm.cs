@@ -34,6 +34,31 @@ namespace CrewChiefV4
         private SpecialFilter specialFilterPrev = SpecialFilter.UNKNOWN;
         private bool includeCommonPreferencesPrev = true;
 
+        /*UI, Startup & Paths
+Audio, Voice & Controllers
+Spotter
+Flags
+Message Frequencies
+Temperatures, Damages & Timings
+Miscellaneous*/
+
+        internal enum PropertyCategory
+        {
+            ALL,
+            UI_STARTUP_AND_PATHS,
+            AUDIO_VOICE_AND_CONTROLLERS,
+            SPOTTER,
+            FLAGS_AND_RULES,
+            MESSAGE_FREQUENCES,
+            FUEL, // Possibly join 4 or some of those.
+            TEMPS,
+            DAMAGES,
+            TIMINGS,
+            MISC,
+            UNKNOWN
+        }
+        private PropertyCategory categoryFilterPrev = PropertyCategory.UNKNOWN;
+
         public class ComboBoxItem<T>
         {
             public string Label { get; set; }
@@ -71,7 +96,8 @@ namespace CrewChiefV4
             {
                 this.propertiesFlowLayoutPanel.Controls.Add(new StringPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
                    UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
-                   Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter")));
+                   Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter"),
+                   Configuration.getUIStringStrict(strProp.Name + "_category")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -82,7 +108,8 @@ namespace CrewChiefV4
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
                 this.propertiesFlowLayoutPanel.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    Configuration.getUIString(boolProp.Name + "_help"), Configuration.getUIStringStrict(boolProp.Name + "_filter")));
+                    Configuration.getUIString(boolProp.Name + "_help"), Configuration.getUIStringStrict(boolProp.Name + "_filter"),
+                    Configuration.getUIStringStrict(boolProp.Name + "_category")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -93,7 +120,8 @@ namespace CrewChiefV4
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
                 this.propertiesFlowLayoutPanel.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    Configuration.getUIString(intProp.Name + "_help"), Configuration.getUIStringStrict(intProp.Name + "_filter")));
+                    Configuration.getUIString(intProp.Name + "_help"), Configuration.getUIStringStrict(intProp.Name + "_filter"),
+                    Configuration.getUIStringStrict(intProp.Name + "_category")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -104,7 +132,8 @@ namespace CrewChiefV4
                 Boolean.TryParse((String)boolProp.DefaultValue, out defaultValue);
                 this.propertiesFlowLayoutPanel.Controls.Add(new BooleanPropertyControl(boolProp.Name, Configuration.getUIString(boolProp.Name) + " " + Configuration.getUIString("boolean_prop_type"),
                     UserSettings.GetUserSettings().getBoolean(boolProp.Name), defaultValue,
-                    Configuration.getUIString(boolProp.Name + "_help"), Configuration.getUIStringStrict(boolProp.Name + "_filter"))); 
+                    Configuration.getUIString(boolProp.Name + "_help"), Configuration.getUIStringStrict(boolProp.Name + "_filter"),
+                    Configuration.getUIStringStrict(boolProp.Name + "_category"))); 
                 widgetCount++;
             }
             pad(widgetCount);
@@ -115,7 +144,8 @@ namespace CrewChiefV4
                 int.TryParse((String)intProp.DefaultValue, out defaultValue);
                 this.propertiesFlowLayoutPanel.Controls.Add(new IntPropertyControl(intProp.Name, Configuration.getUIString(intProp.Name) + " " + Configuration.getUIString("integer_prop_type"),
                     UserSettings.GetUserSettings().getInt(intProp.Name), defaultValue,
-                    Configuration.getUIString(intProp.Name + "_help"), Configuration.getUIStringStrict(intProp.Name + "_filter")));
+                    Configuration.getUIString(intProp.Name + "_help"), Configuration.getUIStringStrict(intProp.Name + "_filter"),
+                    Configuration.getUIStringStrict(intProp.Name + "_category")));
                 widgetCount++;
             }
             pad(widgetCount);
@@ -126,7 +156,8 @@ namespace CrewChiefV4
                 float.TryParse((String)floatProp.DefaultValue, out defaultValue);
                 this.propertiesFlowLayoutPanel.Controls.Add(new FloatPropertyControl(floatProp.Name, Configuration.getUIString(floatProp.Name) + " " + Configuration.getUIString("real_number_prop_type"),
                     UserSettings.GetUserSettings().getFloat(floatProp.Name), defaultValue,
-                    Configuration.getUIString(floatProp.Name + "_help"), Configuration.getUIStringStrict(floatProp.Name + "_filter"))); 
+                    Configuration.getUIString(floatProp.Name + "_help"), Configuration.getUIStringStrict(floatProp.Name + "_filter"),
+                    Configuration.getUIStringStrict(floatProp.Name + "_category"))); 
                 widgetCount++;
             }
             pad(widgetCount);
@@ -135,6 +166,7 @@ namespace CrewChiefV4
             this.searchTextPrev = DEFAULT_SEARCH_TEXT;
             this.gameFilterPrev = GameEnum.UNKNOWN;
             this.specialFilterPrev = SpecialFilter.UNKNOWN;
+            this.categoryFilterPrev = PropertyCategory.ALL;  // Initialize this here, so that initial game filtering works.
             this.includeCommonPreferencesPrev = true;
 
             this.searchTextBox.Text = DEFAULT_SEARCH_TEXT;
@@ -184,6 +216,89 @@ namespace CrewChiefV4
                 // No need to filter.
                 this.specialFilterPrev = SpecialFilter.ALL_PREFERENCES;
             }
+
+            // Category filter:
+            this.categoriesBox.Items.Clear();
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "All Categories",
+                Value = PropertyCategory.ALL
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "UI, Startup & Paths",
+                Value = PropertyCategory.UI_STARTUP_AND_PATHS
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Audio, Voice & Controllers",
+                Value = PropertyCategory.AUDIO_VOICE_AND_CONTROLLERS
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Spotter",
+                Value = PropertyCategory.SPOTTER
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Flags & Rules",
+                Value = PropertyCategory.FLAGS_AND_RULES
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Message Frequences",
+                Value = PropertyCategory.MESSAGE_FREQUENCES
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Fuel",
+                Value = PropertyCategory.FUEL
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Temperatures",
+                Value = PropertyCategory.TEMPS
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Damages",
+                Value = PropertyCategory.DAMAGES
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Timings",
+                Value = PropertyCategory.TIMINGS
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Miscellaneous",
+                Value = PropertyCategory.MISC
+            });
+
+            this.categoriesBox.SelectedIndex = 0;
+
+            this.categoriesBox.SelectedValueChanged += this.CategoriesBox_SelectedValueChanged;
 
             this.propertiesFlowLayoutPanel.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -318,10 +433,10 @@ namespace CrewChiefV4
             {
                 // This is the case of clearing previously non-empty search
                 if (string.IsNullOrWhiteSpace(text))
-                    this.PopulatePrefsFiltered("", this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev);  // Clear filter out.
+                    this.PopulatePrefsFiltered("", this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev, this.categoryFilterPrev);  // Clear filter out.
                 // General case, new filter.
                 else if (!string.IsNullOrWhiteSpace(text))
-                    this.PopulatePrefsFiltered(text, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev);  // Apply new filter.
+                    this.PopulatePrefsFiltered(text, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev, this.categoryFilterPrev);  // Apply new filter.
 
                 this.searchTextPrev = text;
             }
@@ -347,7 +462,7 @@ namespace CrewChiefV4
             if ((gameFilter != GameEnum.UNKNOWN && gameFilter != this.gameFilterPrev)
                 || (specialFilter != SpecialFilter.UNKNOWN && specialFilter != this.specialFilterPrev))
             {
-                this.PopulatePrefsFiltered(this.searchTextPrev == this.DEFAULT_SEARCH_TEXT ? "" : this.searchTextPrev, gameFilter, specialFilter, this.includeCommonPreferencesPrev);
+                this.PopulatePrefsFiltered(this.searchTextPrev == this.DEFAULT_SEARCH_TEXT ? "" : this.searchTextPrev, gameFilter, specialFilter, this.includeCommonPreferencesPrev, this.categoryFilterPrev);
 
                 // Save filter values but keep gameFilter and specialFilter mutually exclusive.
                 if (gameFilter != GameEnum.UNKNOWN)
@@ -364,12 +479,25 @@ namespace CrewChiefV4
             }
         }
 
+        private void CategoriesBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            var categoryFilter = (this.categoriesBox.SelectedItem as ComboBoxItem<PropertyCategory>).Value;
+            if (categoryFilter != this.categoryFilterPrev)
+            {
+                this.PopulatePrefsFiltered(this.searchTextPrev == this.DEFAULT_SEARCH_TEXT ? "" : this.searchTextPrev, this.gameFilterPrev,
+                    this.specialFilterPrev, this.includeCommonPreferencesPrev, categoryFilter);
+
+                this.categoryFilterPrev = categoryFilter;
+            }
+
+        }
+
         private void ShowCommonCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             var showCommon = this.showCommonCheckbox.Checked;
             if (showCommon != this.includeCommonPreferencesPrev)
             {
-                this.PopulatePrefsFiltered(this.searchTextPrev == this.DEFAULT_SEARCH_TEXT ? "" : this.searchTextPrev, this.gameFilterPrev, this.specialFilterPrev, showCommon);
+                this.PopulatePrefsFiltered(this.searchTextPrev == this.DEFAULT_SEARCH_TEXT ? "" : this.searchTextPrev, this.gameFilterPrev, this.specialFilterPrev, showCommon, this.categoryFilterPrev);
                 this.includeCommonPreferencesPrev = showCommon;
             }
         }
@@ -405,12 +533,12 @@ namespace CrewChiefV4
                 this.exitButton.Select();
 
                 if (!string.IsNullOrWhiteSpace(this.searchTextPrev) && this.searchTextPrev != DEFAULT_SEARCH_TEXT) 
-                    this.PopulatePrefsFiltered(null, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev);
+                    this.PopulatePrefsFiltered(null, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev, this.categoryFilterPrev);
             }
             else if (e.KeyCode == Keys.Enter)
             {
                 this.searchTextPrev = this.searchTextBox.Text;
-                this.PopulatePrefsFiltered(this.searchTextPrev, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev);
+                this.PopulatePrefsFiltered(this.searchTextPrev, this.gameFilterPrev, this.specialFilterPrev, this.includeCommonPreferencesPrev, this.categoryFilterPrev);
             }
         }
 
@@ -429,7 +557,7 @@ namespace CrewChiefV4
             }
         }
 
-        private void PopulatePrefsFiltered(string filter, GameEnum gameFilter, SpecialFilter specialFilter, bool includeCommon)
+        private void PopulatePrefsFiltered(string filter, GameEnum gameFilter, SpecialFilter specialFilter, bool includeCommon, PropertyCategory categoryFilter)
         {
             this.SuspendLayout();
             this.propertiesFlowLayoutPanel.SuspendLayout();
@@ -441,7 +569,7 @@ namespace CrewChiefV4
                 if (ctrl is StringPropertyControl)
                 {
                     var spc = ctrl as StringPropertyControl;
-                    if (spc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon))
+                    if (spc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon, categoryFilter))
                     {
                         spc.Visible = true;
                         anyHits = true;
@@ -452,7 +580,7 @@ namespace CrewChiefV4
                 else if (ctrl is BooleanPropertyControl)
                 {
                     var bpc = ctrl as BooleanPropertyControl;
-                    if (bpc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon))
+                    if (bpc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon, categoryFilter))
                     {
                         bpc.Visible = true;
                         anyHits = true;
@@ -463,7 +591,7 @@ namespace CrewChiefV4
                 else if (ctrl is IntPropertyControl)
                 {
                     var ipc = ctrl as IntPropertyControl;
-                    if (ipc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon))
+                    if (ipc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon, categoryFilter))
                     {
                         ipc.Visible = true;
                         anyHits = true;
@@ -474,7 +602,7 @@ namespace CrewChiefV4
                 else if (ctrl is FloatPropertyControl)
                 {
                     var fpc = ctrl as FloatPropertyControl;
-                    if (fpc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon))
+                    if (fpc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon, categoryFilter))
                     {
                         fpc.Visible = true;
                         anyHits = true;
