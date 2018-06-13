@@ -13,6 +13,13 @@ namespace CrewChiefV4.Audio
         public static float driverNamesVersion = -1;
         public static float personalisationsVersion = -1;
 
+        public static float latestSoundPackVersion = -1;
+        public static float latestDriverNamesVersion = -1;
+        public static float latestPersonalisationsVersion = -1;
+
+        public static String retryReplace;
+        public static String retryReplaceWith;
+
         // if sound pack version >= 146 use update3, >= 122 use update2, >= 0 use update, else use base
         // To add a new pack, add to the front of the appropriate list
         //
@@ -34,6 +41,78 @@ namespace CrewChiefV4.Audio
                                                            new SoundPackData(0, "updatedrivernamesurl"),
                                                            new SoundPackData(-1, "basedrivernamesurl")
                                                          };
+        public static Boolean parseUpdateData(String updateXML)
+        {
+            try
+            {
+                XDocument doc = XDocument.Parse(updateXML);
+                if (doc.Descendants("soundpack").Count() > 0)
+                {
+                    String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
+                    Boolean gotLanguageSpecificUpdateInfo = false;
+                    try
+                    {
+                        retryReplace = doc.Descendants("retry_replace").First().Value;
+                        retryReplaceWith = doc.Descendants("retry_replace_with").First().Value;
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("No retry download location available");
+                    }
+                    foreach (XElement element in doc.Descendants("soundpack"))
+                    {
+                        XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
+                        if (languageAttribute.Value == languageToCheck)
+                        {
+                            // this is the update set for this language
+                            float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                            float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                            float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+
+                            foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
+                            {
+                                soundPackData.setDownloadLocation(element);
+                            }
+                            foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
+                            {
+                                personalisationsPackData.setDownloadLocation(element);
+                            }
+                            foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
+                            {
+                                drivernamePackData.setDownloadLocation(element);
+                            }
+                            gotLanguageSpecificUpdateInfo = true;
+                            break;
+                        }
+                    }
+                    if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
+                    {
+                        float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
+                        float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
+                        float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
+
+                        foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
+                        {
+                            soundPackData.setDownloadLocation(doc);
+                        }
+                        foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
+                        {
+                            personalisationsPackData.setDownloadLocation(doc);
+                        }
+                        foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
+                        {
+                            drivernamePackData.setDownloadLocation(doc);
+                        }
+                    }
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Error parsing autoupdate data");
+            }
+            return false;
+        }
 
         public class SoundPackData
         {
