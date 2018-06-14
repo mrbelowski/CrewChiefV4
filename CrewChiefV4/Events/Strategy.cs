@@ -219,6 +219,11 @@ namespace CrewChiefV4.Events
                 // record the time each opponent entered the pitlane
                 foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                 {
+                    // if this guy hasn't completed a lap, ignore him
+                    if (entry.Value.CompletedLaps < 1)
+                    {
+                        continue;
+                    }
                     if (entry.Value.IsNewLap)
                     {
                         Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Key);
@@ -342,6 +347,10 @@ namespace CrewChiefV4.Events
                     nextOpponentFinalSectorTimingCheckDue = currentGameState.Now.AddSeconds(5);
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        if (entry.Value.CompletedLaps < 1)
+                        {
+                            continue;
+                        }
                         if (((sectorCount == 3 && entry.Value.CurrentSectorNumber == 2) || (sectorCount == 2 && entry.Value.CurrentSectorNumber == 1)) &&
                             !opponentsInPenultimateSector.Contains(entry.Key))
                         {
@@ -414,6 +423,10 @@ namespace CrewChiefV4.Events
                     // update opponent time lost
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        if (entry.Value.CompletedLaps < 1)
+                        {
+                            continue;
+                        }
                         // only interested in opponent pit times for our class
                         if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass) && entry.Value.CompletedLaps > 2)
                         {
