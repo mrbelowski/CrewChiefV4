@@ -615,7 +615,8 @@ Miscellaneous*/
                     var s = ctrl as Spacer;
                     if (!string.IsNullOrWhiteSpace(filterUpper)
                         || gameFilter != GameEnum.UNKNOWN
-                        || specialFilter != SpecialFilter.ALL_PREFERENCES)
+                        || specialFilter != SpecialFilter.ALL_PREFERENCES
+                        || categoryFilter != PropertyCategory.ALL)
                         s.Visible = false;  // If any filtering is applied, hide splitters.
                     else
                         s.Visible = true;
