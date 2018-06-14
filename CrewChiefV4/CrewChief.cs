@@ -979,7 +979,15 @@ namespace CrewChiefV4
             {
                 if (gameDataReader.dumpToFile)
                 {
-                    gameDataReader.DumpRawGameData();
+                    try
+                    {
+                        gameDataReader.DumpRawGameData();
+                    }
+                    finally
+                    {
+                        // Restore start/stop buton.
+                        MainWindow.instance.startApplicationButton.Enabled = true;
+                    }
                 }
                 try
                 {
