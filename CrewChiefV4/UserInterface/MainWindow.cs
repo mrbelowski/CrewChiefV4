@@ -105,7 +105,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging ||
+            if (!CrewChief.Debugging || true ||
                 SoundPackVersionsHelper.soundPackVersion <= 0 || SoundPackVersionsHelper.personalisationsVersion <= 0 || SoundPackVersionsHelper.driverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -2200,43 +2200,9 @@ namespace CrewChiefV4
             }
         }
 
-        private void personalisationBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void spotterNameBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
-        }
-
-        // get the first decendant or null if we can't
-        public static String getElementDescendantValue(XElement parent, String elementName)
-        {
-            try
-            {
-                return parent.Descendants(elementName).First().Value;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        // get the first decendant or null if we can't
-        public static String getDocDescendantValue(XDocument parent, String elementName)
-        {
-            try
-            {
-                return parent.Descendants(elementName).First().Value;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 
