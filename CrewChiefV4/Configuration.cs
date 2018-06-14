@@ -27,6 +27,16 @@ namespace CrewChiefV4
             return key;
         }
 
+        public static String getUIStringStrict(String key)
+        {
+            string uiString = null;
+            if (UIStrings.TryGetValue(key, out uiString))
+            {
+                return uiString;
+            }
+            return null;
+        }
+
         public static String getSoundConfigOption(String key)
         {
             string soundConfig = null;

@@ -95,10 +95,6 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to write raw game data: " + ex.Message);
                 Console.WriteLine("Stack trace: " + ex.StackTrace);
             }
-            finally
-            {
-                MainWindow.instance.startApplicationButton.Enabled = true;
-            }
         }
 
         protected T DeSerializeObject<T>(string fileName)
