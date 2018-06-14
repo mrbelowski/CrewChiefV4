@@ -15,9 +15,11 @@ namespace CrewChiefV4
         public int originalValue;
         public int defaultValue;
         public String label;
-        public IntPropertyControl(String propertyId, String label, int value, int defaultValue, String helpText)
+        internal PropertyFilter filter = null;
+        public IntPropertyControl(String propertyId, String label, int value, int defaultValue, String helpText, String filterText)
         {
             InitializeComponent();
+
             this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
@@ -26,6 +28,8 @@ namespace CrewChiefV4
             this.defaultValue = defaultValue;
             this.toolTip1.SetToolTip(this.textBox1, helpText);
             this.toolTip1.SetToolTip(this.label1, helpText);
+
+            this.filter = new PropertyFilter(filterText, propertyId, this.label);
         }
 
         public int getValue()
