@@ -102,6 +102,7 @@
     <Compile Include="Audio\MediaPlayerBackgroundPlayer.cs" />
     <Compile Include="Audio\NAudioBackgroundPlayer.cs" />
     <Compile Include="Audio\PlaybackModerator.cs" />
+    <Compile Include="Audio\SoundPackVersionsHelper.cs" />
     <Compile Include="Audio\Sounds.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="commands\KeyPresser.cs" />
