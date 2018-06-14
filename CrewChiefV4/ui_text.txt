@@ -5,6 +5,20 @@
 # [user]/AppData/local/CrewChiefV4/
 #
 # Any text set in that file will replace the corresponding default here
+#
+# ---- Property filtering ----
+# Properties form is capable of filtering properties per game.
+#
+# In order to specify property filter, add entry [property_name]_filter = [filter].
+# If property has no filter attached, it is considered to be common property.
+# Filter can consist of semicolon separated GameEnum values.  Filter can be inclusive or exclusive.  Exclusive filter starts with '!'. 
+#
+# Examples:
+# To specify that property applies to rF2 and R3E (include filter):
+#	my_prop_filter = RF2_64BIT;RACE_ROOM  
+#
+# To specify that property applies to all games but rF1 and AC (exclude filter):
+#	my_prop_filter = !RF1;ASSETTO_64BIT;ASSETTO_32BIT
 
 checking_sound_pack_version = Checking Sound Pack version...
 checking_driver_names_version = Checking driver names version...
@@ -114,6 +128,10 @@ real_number_prop_type = (real number)
 save_prop_changes_warning = You have unsaved changes. Click 'Yes' to save these changes and restart the application. Click 'No' to discard these changes
 save_changes = &Save changes
 save_and_restart = S&ave and restart
+game_filter_label = &Game filter:
+show_common_props_label = Show &common properties
+all_preferences_label = All Properties
+common_preferences_label = Common Properties
 
 unknown_sound_pack_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will apply the default English Sound Pack update files and set the language to English). Click "No" to cancel.
 unknown_sound_pack_language_title = No Sound Pack language defined
@@ -131,48 +149,96 @@ unknown_personalisations_language_title = No Sound Pack language defined
 
 acs_install_path = ACS install path
 acs_install_path_help = ACS installation path for plugin installation and updating
+acs_install_path_filter = ASSETTO_64BIT;ASSETTO_32BIT
 ams_install_path = AMS install path
 ams_install_path_help = AMS installation path for plugin installation and updating
+ams_install_path_filter = RF1
 rf1_install_path = rF1 install path
 rf1_install_path_help = rF1 installation path for plugin installation and updating
+rf1_install_path_filter = RF1
 rf2_install_path = rF2 install path
 rf2_install_path_help = rF2 installation path for plugin installation and updating
+rf2_install_path_filter = RF2_64BIT
+
 override_default_sound_pack_location = Override default Sound Pack location
 override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
 
 enable_brake_damage_messages = Enable brake damage messages
+enable_brake_damage_messages_filter = !IRACING
+
 enable_acs_log_sectors_for_unknown_tracks = Enable ACS log sectors for unknown tracks
+enable_acs_log_sectors_for_unknown_tracks_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 enable_brake_lock_warnings = Enable brake lock warnings
+enable_brake_lock_warnings_filter = !IRACING
+
 enable_brake_temp_warnings = Enable brake temp warnings
+enable_brake_temp_warnings_filter = !IRACING
+
 enable_damage_messages = Enable damage messages
+enable_damage_messages_filter = !IRACING
+
 enable_driver_names = Enable driver names
+
 enable_drs_messages = Enable DRS messages
+enable_drs_messages_filter = !IRACING
+
 enable_fuel_messages = Enable fuel messages
+
 enable_battery_messages = Enable battery messages
+enable_battery_messages_filter = RF2_64BIT
+
 enable_gap_messages = Enable gap messages
 enable_green_light_messages = Enable green light messages
 enable_pearls_of_wisdom	= Enable pearls of wisdom
+
 enable_pit_exit_brake_temp_warning = Enable pit exit brake temp warning
+enable_pit_exit_brake_temp_warning_filter = !IRACING
+
 enable_pit_exit_tyre_temp_warning = Enable pit exit tyre temp warning
+enable_pit_exit_tyre_temp_warning_filter = !IRACING
+
 enable_position_messages = Enable position messages
+
 enable_push_to_pass_messages = Enable push to pass messages
+enable_push_to_pass_messages_filter = !IRACING
+
 enable_race_start_messages = Enable race start messages
 enable_session_end_messages = Enable session end messages
 enable_spotter_in_timetrial = Enable Spotter in timetrial
+
 enable_suspension_damage_messages = Enable suspension damage messages
+enable_suspension_damage_messages_filter = !IRACING
+
 enable_track_and_air_temp_reports = Enable track and air temp reports
+
 enable_tyre_temp_warnings = Enable tyre temp warnings
+enable_tyre_temp_warnings_filter = !IRACING
+
 enable_tyre_wear_warnings = Enable tyre wear warnings
+enable_tyre_wear_warnings_filter = !IRACING
+
 enable_wheel_spin_warnings = Enable wheelspin warnings
+enable_wheel_spin_warnings_filter = !IRACING
+
 attempt_pcars_opponent_pit_detection = Attempt pCARS opponent pit detection
 attempt_pcars_opponent_pit_detection_help = Monitor opponent world positions and try to guess when they're entering and leaving the pit lane
+attempt_pcars_opponent_pit_detection_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 cache_sounds = Cache sounds
 cache_sounds_help = Cache sounds in memory
+
 disable_acs_yellow_flag_warnings = Disable ACS yellow flag warnings
 disable_acs_yellow_flag_warnings_help = Prevents yellow flag message spamming in messy online races
+disable_acs_yellow_flag_warnings_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 disable_pcars_prac_and_qual_pole_deltas = Disable pCARS prac and qual pole deltas
 disable_pcars_prac_and_qual_pole_deltas_help = Disable pCARS practice and qual pole deltas - these are unreliable
+disable_pcars_prac_and_qual_pole_deltas_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 launch_acs = Launch ACS
+launch_acs_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 play_cut_track_warnings = Play cut track warnings
 spotter_enable_three_wide_left_and_right = Spotter enable three wide left and right
 spotter_enable_three_wide_left_and_right_help = Use "three wide, you're on the left / right" mmessages (can be confusing)
@@ -181,7 +247,10 @@ use_alternate_beeps_help = Use a different radio sound (just the click)
 use_fahrenheit = Use Fahrenheit for temps
 use_listen_beep = Use listen beep
 use_listen_beep_help = Play a beep when you press the 'talk to Crew Chief' button
+
 acs_practice_time_minuts = ACS practice time minutes
+acs_practice_time_minuts_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 min_time_between_personalised_messages = Min time between personalised messages
 minimum_time_between_pearls_of_wisdom = Min time between pearls of wisdom
 spotter_hold_repeat_frequency = Spotter hold repeat frequency
@@ -189,13 +258,25 @@ spotter_hold_repeat_frequency_help = Time between the Spotter repeating "hold yo
 spotter_update_interval = Spotter update interval
 udp_data_port = pCARS UDP port
 udp_data_port_help = pCARS network data UDP port (should usually be 5606)
+udp_data_port_filter = PCARS_NETWORK
 
 acs_spotter_car_length = ACS Spotter default car length
+acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 ams_spotter_car_length = AMS Spotter default car length
+ams_spotter_car_length_filter = RF1
 pcars_spotter_car_length = pCARS Spotter default car length
+pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 r3e_spotter_car_length = R3E Spotter default car length
+r3e_spotter_car_length_filter = RACE_ROOM
+
 rf1_spotter_car_length = rF1 Spotter default car length
+rf1_spotter_car_length_filter = RF1
+
 rf2_spotter_car_length = rF2 Spotter default car length
+rf2_spotter_car_length_filter = RF2_64BIT
+
 spotter_gap_for_clear = Spotter gap for clear
 
 messages_volume = &Messages volume
@@ -227,82 +308,157 @@ disable_immediate_messages = Disable immediate messages
 disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
 max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
 max_safe_water_temp_over_baseline_help = Baseline water temp is taken after a few minutes. If the water temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high water temp' warning more sensitive
+
 launch_raceroom = Launch R3E
 launch_raceroom_help = If this is true the application will attempt to launch RaceRoom Racing Experience when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_raceroom_filter = RACE_ROOM
+
 r3e_launch_params = R3E launch params
 r3e_launch_params_help = This is used to tell Steam what app to run - R3E's Steam app ID is 211500. If you specified a path RRRE.exe you can leave this blank
+r3e_launch_params_filter = RACE_ROOM
+
 pcars32_launch_params = pCARS 32bit launch params
 pcars32_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars32.exe you can leave this blank
+pcars32_launch_params_filter = PCARS_32BIT
+
 pcars64_launch_params = pCARS 64bit launch params
 pcars64_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars64.exe you can leave this blank
+pcars64_launch_params_filter = PCARS_64BIT
+
 rf1_launch_params = rF1 launch params
 rf1_launch_params_help = This is used to tell Steam what app to run - rFactor's Steam app ID is 339790. If you specified a path rFactor.exe you can leave this blank
+rf1_launch_params_filter = RF1
+
 rf2_launch_params = rF2 launch params
 rf2_launch_params_help = This is used to tell Steam what app to run - rFactor2's Steam app ID is 365960. If you specified a path rFactor2.exe you can leave this blank
+rf2_launch_params_filter = RF2_64BIT
+
 gsc_launch_params = GSC launch params
 gsc_launch_params_help = This is used to tell Steam what app to run - Stock Car Extreme's Steam app ID is 273840. If you specified a path GSC.exe you can leave this blank
+gsc_launch_params_filter = RF1
+
 ams_launch_params = AMS launch params
 ams_launch_params_help = This is used to tell Steam what app to run - Automobilista's Steam app ID is 431600. If you specified a path AMS.exe you can leave this blank
+ams_launch_params_filter = RF1
+
 acs_launch_params = ACS launch params
 acs_launch_params_help = This is used to tell Steam what app to run - Assetto Corsa's Steam app ID is 244210. If you specified a path ACS.exe you can leave this blank
+acs_launch_params_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 marcas_launch_params = Marcas launch params
 marcas_launch_params_help = This is used to tell Steam what app to run - Copa Petrobras de Marcas Steam app ID is 359800. If you specified a path marcas.exe you can leave this blank
+marcas_launch_params_filter = RF1
+
 ftruck_launch_params = FTruck launch params
 ftruck_launch_params_help = This is used to tell Steam what app to run - Formula Truck's Steam app ID is 273750. If you specified a path FTruck.exe you can leave this blank
+ftruck_launch_params_filter = RF1
+
 r3e_launch_exe = R3E launch exe
 r3e_launch_exe_help = This is the location of Steam.exe or the direct path to RRRE.exe. Use forward slashes to separate paths.
+r3e_launch_exe_filter = RACE_ROOM
+
 rf1_launch_exe = rF1 launch exe
 rf1_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor.exe. Use forward slashes to separate paths.
+rf1_launch_exe_filter = RF1
+
 rf2_launch_exe = rF2 launch exe
 rf2_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor2.exe. Use forward slashes to separate paths.
+rf2_launch_exe_filter = RF2_64BIT
+
 gsc_launch_exe = GSC launch exe
 gsc_launch_exe_help = This is the location of Steam.exe or the direct path to GSC.exe. Use forward slashes to separate paths.
+gsc_launch_exe_filter = RF1
+
 ams_launch_exe = AMS launch exe
 ams_launch_exe_help = This is the location of Steam.exe or the direct path to AMS.exe. Use forward slashes to separate paths.
+ams_launch_exe_filter = RF1
+
 acs_launch_exe = ACS launch exe
 acs_launch_exe_help = This is the location of Steam.exe or the direct path to ACS.exe. Use forward slashes to separate paths.
+acs_launch_exe_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
 marcas_launch_exe = Marcas launch exe
 marcas_launch_exe_help = This is the location of Steam.exe or the direct path to marcas.exe. Use forward slashes to separate paths.
+marcas_launch_exe_filter = RF1
+
 ftruck_launch_exe = FTruck launch exe
 ftruck_launch_exe_help = This is the location of Steam.exe or the direct path to FTruck.exe. Use forward slashes to separate paths.
+ftruck_launch_exe_filter = RF1
+
 pcars32_launch_exe = pCARS 32bit launch exe
 pcars32_launch_exe_help = This is the location of Steam.exe or the direct path to pcars32.exe. Use forward slashes to separate paths.
+pcars32_launch_exe_filter = PCARS_32BIT
+
 pcars64_launch_exe = pCARS 64bit launch exe
 pcars64_launch_exe_help = This is the location of Steam.exe or the direct path to pcars64.exe. Use forward slashes to separate paths.
+pcars64_launch_exe_filter = PCARS_64BIT
+
 launch_rfactor1 = Launch rFactor 1
 launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_rfactor1_filter = RF1
+
 launch_rfactor2 = Launch rFactor 2
 launch_rfactor2_help = If this is true the application will attempt to launch rFactor 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_rfactor2_filter = RF2_64BIT
+
 launch_gsc = Launch GSC
 launch_gsc_help = If this is true the application will attempt to launch Stock Car Extreme when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_gsc_filter = RF1
+
 launch_ams = Launch AMS
 launch_ams_help = If this is true the application will attempt to launch Automobilista when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_ams_filter = RF1
+
 launch_marcas = Launch Marcas
 launch_marcas_help = If this is true the application will attempt to launch Copa Petrobras de Marcas when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_marcas_filter = RF1
+
 launch_ftruck = Launch FTruck
 launch_ftruck_help = If this is true the application will attempt to launch Formula Truck when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_ftruck_filter = RF1
+
 launch_pcars = Launch pCARS
 launch_pcars_help = If this is true the application will attempt to launch pCARS when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_pcars_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 pcars2_launch_exe = pCARS 2 launch exe
 pcars2_launch_exe_help = This is the location of Steam.exe or the direct path to pCARS2AVX.exe. Use forward slashes to separate paths.
+pcars2_launch_exe_filter = PCARS2
+
 pcars2_launch_params = pCARS 2 launch params
 pcars2_launch_params_help = This is used to tell Steam what app to run - pCARS 2's Steam app ID is 378860. If you specified a path pCARS2AVX.exe you can leave this blank
+pcars2_launch_params_filter = PCARS2
+
 launch_pcars2 = Launch pCARS 2
 launch_pcars2_help = If this is true the application will attempt to launch pCARS 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_pcars2_filter = PCARS2
+
 iracing_launch_exe = iRacing launch exe
 iracing_launch_exe_help = This is the path to iRacingSim64DX11.exe. Use forward slashes to separate paths.
+iracing_launch_exe_filter = IRACING
+
 iracing_launch_params = iRacing launch params
+iracing_launch_params_filter = IRACING
+
 launch_iracing = Launch iRacing
 launch_iracing_help = If this is true the application will attempt to launch iRacing when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_iracing_filter = IRACING
 
 run_immediately = Run immediately
 run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set
+
 pcars_steam_id = pCARS Steam ID
 pcars_steam_id_help = pCARS sometimes sends the participant data in the wrong order. If this value is set, the app will use it to try and work around this issue, preventing the app 'seeing' the wrong data for the player
+pcars_steam_id_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 cumulative_lap_lockup_warning_threshold = Cumulative lap lockup warning threshold
 cumulative_lap_lockup_warning_threshold_help = If the player has locked wheels for more than this many seconds over the course of a lap, play a warning
+cumulative_lap_lockup_warning_threshold_filter = !IRACING
+
 cumulative_lap_wheelspin_warning_threshold = Cumulative lap wheelspin warning threshold
 cumulative_lap_wheelspin_warning_threshold_help = If the player has wheelspin for more than this many seconds over the course of a lap, play a warning
+cumulative_lap_wheelspin_warning_threshold_filter = !IRACING
+
 minimum_name_voice_recognition_confidence = Minimum name voice recognition confidence
 minimum_name_voice_recognition_confidence_help = When processing voice commands asking about opponent drivers, the speech recognition engine must be at least this confident it understood before the app responds (0.0 - 1.0, default 0.4)
 minimum_voice_recognition_confidence = Minimum voice recognition confidence
@@ -363,10 +519,15 @@ pause_between_messages = Pause between messages
 pause_between_messages_help = Time pause between messages (in seconds) when reading multiple messages together in a single group.
 load_sound_files_on_startup = Load sound files on startup
 load_sound_files_on_startup_help = Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.
+
 pcars_character_encoding = pCARS character encoding
 pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
+pcars_character_encoding_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 enable_pcars_pit_window_messages = Enable pCARS pit window messages
 enable_pcars_pit_window_messages_help = Play pit window messages in pCARS. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host
+enable_pcars_pit_window_messages_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
 use_tts_for_missing_names = Use TTS for missing names
 use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
 report_yellows_in_all_sectors = Report yellows in all sectors
@@ -383,6 +544,7 @@ log_tyre_stats_help = Show tyre temps and wear at the start of each sector
 
 r3e_blue_flag_detection_distance = R3E blue flag detection distance
 r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
+r3e_blue_flag_detection_distance_filter = RACE_ROOM
 
 play_pre_lights_messages_until_cancelled = Play pre-lights messages until cancelled
 play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
@@ -391,6 +553,7 @@ time_between_caution_period_status_reminders_help = Time between caution period 
 
 enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
 enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
+enable_ams_pit_schedule_messages_filter = RF1
 
 personalisations_are_up_to_date = Personalisations are up to date
 personalisation_label = M&y name (requires restart)
@@ -404,9 +567,11 @@ install_plugin_popup_enable_title = Enable Plugin
 
 report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
 report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
+report_allowed_overtakes_under_yellow_filter = RACE_ROOM
 
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
+enable_rf2_pit_stop_prediction_filter = RF2_64BIT
 
 enable_simple_incident_detection = Enable simple incident detection
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
@@ -470,16 +635,22 @@ reject_message_when_talking_help = Don't play any messages while you have the 't
 
 enable_rf2_frozen_order_messages = Enable rF2 frozen order messages
 enable_rf2_frozen_order_messages_help = Announce order information during Full Course Yellow, Rolling and Formation/Standing starts.
+enable_rf2_frozen_order_messages_filter = RF2_64BIT
+
 enable_rf2_cut_track_heuristics = Enable rF2 cut track heuristic detection
 enable_rf2_cut_track_heuristics_help = If enabled, CC will try to detect if user cut track.  If disabled, cut track will only be reported if game reported that lap got invalidated.
+enable_rf2_cut_track_heuristics_filter = RF2_64BIT
+
 enable_rf2_pit_lane_approach_heuristics = Enable rF2 pit lane approach detection
 enable_rf2_pit_lane_approach_heuristics_help = Experimental: If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.
+enable_rf2_pit_lane_approach_heuristics_filter = RF2_64BIT
 
 enable_command_macros = Enable command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc
 
 pcars_enable_rain_prediction = Enable PCars rain prediction using CloudBrightness
 pcars_enable_rain_prediction_help = Use CloudBrightness to guess when it might rain - can be quite inaccurate
+pcars_enable_rain_prediction_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 
 get_status = Report car, damage and session status
 get_car_status = Report car status and damage
@@ -515,6 +686,7 @@ use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip op
 
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
+iracing_pit_tyre_pressure_in_psi_filter = IRACING
 
 spotter_volume_boost = Spotter volume boost (scale)
 spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAudio only)
@@ -530,6 +702,7 @@ save_list_of_unvocalized_names_help = Write unvocalized driver names to file
 
 enable_ams_blue_on_slower = Enable AMS / rF1 blue on slower
 enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
+enable_ams_blue_on_slower_filter = RF1
 
 enable_rants = Enable rants
 enable_rants_help = Allow the Chief to occasionally express his disappointment in colourful and forceful terms
@@ -544,9 +717,11 @@ speech_recognition_device_label = Sp&eech input device
 
 enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
 enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
+enable_rf2_pit_state_during_fcy_filter = RF2_64BIT
 
 enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
 enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
+enable_ams_pit_state_during_fcy_filter = RF1
 
 bring_game_window_to_front_for_macros = Ensure game is on top for command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
@@ -556,6 +731,7 @@ report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap/lone
 
 enable_crash_messages = Enable crash messages
 enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily
+enable_crash_messages_filter = !IRACING
 
 force_single_class = Force single car class
 force_single_class_help = Don't allow participants to be grouped by their car classes
@@ -563,8 +739,9 @@ force_single_class_help = Don't allow participants to be grouped by their car cl
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 
-pit_box_position_countdown = Pit box countdown (R3E, rF2 and iRacing only)
-pit_box_position_countdown_help = Play distance in metres to box as you approach.  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
+pit_box_position_countdown = Pit box countdown
+pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
+pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
@@ -579,12 +756,15 @@ target_warning_time_for_faster_class_car_help = Try and warn this many seconds i
 
 max_unknown_car_classes_for_assetto = Max unknown car models in ACS multi-class races
 max_unknown_car_classes_for_assetto_help = Assume single-class race if there are more than this many unknown car models in Assetto Corsa
+max_unknown_car_classes_for_assetto_filter = ASSETTO_64BIT;ASSETTO_32BIT
 
 iracing_fast_parsing = iRacing faster parser
 iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)
+iracing_fast_parsing_filter = IRACING
 
 enable_iracing_pit_stop_commands = Enable iRacing pit stop voice commands
 enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop commands, you may disable this.  If disabled, CC will exclude iRacing pit stop commands from the command set - may improve recognition accuracy
+enable_iracing_pit_stop_commands_filter = IRACING
 
 enable_tight_fuel_calc = Enable tight fuel calculations
 enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
@@ -594,9 +774,11 @@ add_additional_fuel_help = The amount of extra fuel (liters or gallons) you want
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
 iracing_invalidate_cut_track_laps_help = Disable this if you don't want the app to invalidate laps where you cut the track.
+iracing_invalidate_cut_track_laps_filter = IRACING
 
 force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
 force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.
+force_rf2_rolling_start_filter = RF2_64BIT
 
 enable_pit_exit_position_estimates = Enable pit exit position estimates
 enable_pit_exit_position_estimates_help = Play pit exit position estimates
