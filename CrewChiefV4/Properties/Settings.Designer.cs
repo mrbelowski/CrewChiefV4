@@ -3274,5 +3274,17 @@ namespace CrewChiefV4.Properties {
                 this["PIT_PREDICTION_device_type"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_opponent_pit_exit_estimates {
+            get {
+                return ((bool)(this["enable_opponent_pit_exit_estimates"]));
+            }
+            set {
+                this["enable_opponent_pit_exit_estimates"] = value;
+            }
+        }
     }
 }

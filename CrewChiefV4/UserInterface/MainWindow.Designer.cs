@@ -486,7 +486,6 @@ namespace CrewChiefV4
             this.spotterNameBox.Name = "spotterNameBox";
             this.spotterNameBox.Size = new System.Drawing.Size(142, 400);
             this.spotterNameBox.TabIndex = 100;
-            this.spotterNameBox.SelectedIndexChanged += new System.EventHandler(this.spotterNameBox_SelectedIndexChanged);
 
             this.donateLink.Location = new System.Drawing.Point(35, 650);
             this.donateLink.Size = new System.Drawing.Size(250, 15);
@@ -494,10 +493,6 @@ namespace CrewChiefV4
             this.donateLink.Click += new System.EventHandler(this.internetPanHandler);
             this.donateLink.TabIndex = 270;
             
-            // Associate the event-handling method with the 
-            // SelectedIndexChanged event.
-            this.personalisationBox.SelectedIndexChanged += new System.EventHandler(this.personalisationBox_SelectedIndexChanged);
-
             this.speechRecognitionDeviceLabel.AutoSize = true;
             this.speechRecognitionDeviceLabel.Location = new System.Drawing.Point(115, 70);
             this.speechRecognitionDeviceLabel.Name = "speechRecognitionDeviceLabel";
@@ -622,6 +617,7 @@ namespace CrewChiefV4
 
         public System.Windows.Forms.TextBox consoleTextBox;
         public System.Windows.Forms.Button startApplicationButton;
+        public System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.Button saveConsoleOutputButton;
         private System.Windows.Forms.ListBox buttonActionSelect;
@@ -652,7 +648,6 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label personalisationLabel;
         private System.Windows.Forms.TextBox filenameTextbox;
         private System.Windows.Forms.Label filenameLabel;
-        private System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.TextBox playbackInterval;
         private System.Windows.Forms.Label app_version;
         private System.Windows.Forms.ProgressBar soundPackProgressBar;
