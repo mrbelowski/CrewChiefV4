@@ -75,7 +75,7 @@ namespace CrewChiefV4
         private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         public static Boolean forceMinWindowSize = UserSettings.GetUserSettings().getBoolean("force_min_window_size");
 
-        private ControlWriter cw = null;
+        public ControlWriter consoleWriter = null;
 
         private float currentVolume = -1;
         private NotifyIcon notificationTrayIcon;
@@ -506,10 +506,10 @@ namespace CrewChiefV4
         {
             base.OnFormClosing(e);
             MacroManager.stop();
-            lock (cw)
+            lock (consoleWriter)
             {
-                cw.textbox = null;
-                cw.Dispose();
+                consoleWriter.textbox = null;
+                consoleWriter.Dispose();
             }
         }
 
@@ -612,9 +612,9 @@ namespace CrewChiefV4
             }
 
             CheckForIllegalCrossThreadCalls = false;
-            cw = new ControlWriter(consoleTextBox);
+            consoleWriter = new ControlWriter(consoleTextBox);
             consoleTextBox.KeyDown += TextBoxConsole_KeyDown;
-            Console.SetOut(cw);
+            Console.SetOut(consoleWriter);
 
             // if we can't init the UserSettings the app will basically be fucked. So try to nuke the Britton_IT_Ltd directory from
             // orbit (it's the only way to be sure) then restart the app. This shit is comically flakey but what else can we do here?
@@ -679,7 +679,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Console logging has been disabled ('enable_console_logging' property)");
             }
-            cw.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
+            consoleWriter.enable = UserSettings.GetUserSettings().getBoolean("enable_console_logging");
 
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
@@ -1691,6 +1691,7 @@ namespace CrewChiefV4
                     lock (this)
                     {
                         consoleTextBox.Text = "";
+                        consoleWriter.builder.Clear();
                     }
                 }
                 catch (Exception)
@@ -2210,6 +2211,7 @@ namespace CrewChiefV4
     {
         public TextBox textbox = null;
         public Boolean enable = true;
+        public StringBuilder builder = new StringBuilder();
         public ControlWriter(TextBox textbox)
         {
             this.textbox = textbox;
@@ -2217,7 +2219,7 @@ namespace CrewChiefV4
 
         public override void WriteLine(string value)
         {
-            if (enable)
+            if (enable || MainWindow.instance.recordSession.Checked)
             {
                 Boolean gotDateStamp = false;
                 StringBuilder sb = new StringBuilder();
@@ -2238,18 +2240,28 @@ namespace CrewChiefV4
                     sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
                 }
                 sb.Append(" : ").Append(value).AppendLine();
-                if (textbox != null && !textbox.IsDisposed)
+                if (enable)
                 {
-                    try
+                    if (textbox != null && !textbox.IsDisposed)
                     {
-                        lock (this)
+                        try
                         {
-                            textbox.AppendText(sb.ToString());
+                            lock (this)
+                            {
+                                textbox.AppendText(sb.ToString());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // swallow - nothing to log it to
                         }
                     }
-                    catch (Exception)
+                }
+                else
+                {
+                    lock (this)
                     {
-                        // swallow - nothing to log it to
+                        builder.Append(sb.ToString());
                     }
                 }
             }

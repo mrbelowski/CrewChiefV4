@@ -617,6 +617,7 @@ namespace CrewChiefV4
 
         public System.Windows.Forms.TextBox consoleTextBox;
         public System.Windows.Forms.Button startApplicationButton;
+        public System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.Button forceVersionCheckButton;
         private System.Windows.Forms.Button saveConsoleOutputButton;
         private System.Windows.Forms.ListBox buttonActionSelect;
@@ -647,7 +648,6 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label personalisationLabel;
         private System.Windows.Forms.TextBox filenameTextbox;
         private System.Windows.Forms.Label filenameLabel;
-        private System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.TextBox playbackInterval;
         private System.Windows.Forms.Label app_version;
         private System.Windows.Forms.ProgressBar soundPackProgressBar;
