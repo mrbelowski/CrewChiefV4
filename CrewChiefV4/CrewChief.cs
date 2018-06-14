@@ -111,6 +111,7 @@ namespace CrewChiefV4
             eventsList.Add("PitStops", new PitStops(audioPlayer));
             eventsList.Add("Fuel", new Fuel(audioPlayer));
             eventsList.Add("Battery", new Battery(audioPlayer));
+            eventsList.Add("Strategy", new Strategy(audioPlayer));
             eventsList.Add("Opponents", new Opponents(audioPlayer));
             eventsList.Add("RaceTime", new RaceTime(audioPlayer));
             eventsList.Add("TyreMonitor", new TyreMonitor(audioPlayer));
@@ -123,7 +124,6 @@ namespace CrewChiefV4
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
             eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));
-            eventsList.Add("Strategy", new Strategy(audioPlayer));
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
