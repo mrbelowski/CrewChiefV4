@@ -11,6 +11,7 @@ namespace CrewChiefV4.Events
     class Strategy : AbstractEvent
     {
         private Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
+        private Boolean warnAboutOpponentsExitingCloseToPlayer = UserSettings.GetUserSettings().getBoolean("enable_opponent_pit_exit_estimates");
 
         // if this is enabled, don't play the pit position estimates on pit entry. This is only a fallback in case
         // we haven't made a pit request
@@ -48,6 +49,11 @@ namespace CrewChiefV4.Events
         // used when we request a benchmark pitstop timing in practice, but we have no best lap data
         public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
 
+        
+        public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";
+        public static String folderHeWillComeOutJustInFront = "strategy/he_will_come_out_just_in_front";
+        public static String folderHeWillComeOutJustBehind = "strategy/he_will_come_out_just_behind";
+
 
         // may be timed during practice.
         // Need to be careful here to ensure this is applicable to the session we've actually entered
@@ -57,6 +63,7 @@ namespace CrewChiefV4.Events
         private CarData.CarClass carClassForLastPitstopTiming;
         private String trackNameForLastPitstopTiming;
         private Dictionary<String, float> opponentsTimeLostForStop = new Dictionary<string, float>();
+        private Dictionary<String, float> opponentsTimeSpentInPitlane = new Dictionary<string, float>();
 
         public Boolean isTimingPracticeStop = false;
         private Boolean hasPittedDuringPracticeStopProcess = false;
@@ -80,16 +87,15 @@ namespace CrewChiefV4.Events
         // just used to track when an opponent transitions from to final sector
         private HashSet<String> opponentsInPenultimateSector = new HashSet<string>();
         // these are static because the opponents event needs to check them:
-        public HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
-        public HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
-
-        // this is disabled for now - it's unfinished and will probably spam messages
-        private Boolean warnAboutOpponentsExitingCloseToPlayer = false;
+        public static HashSet<String> opponentsWhoWillExitCloseInFront = new HashSet<string>();
+        public static HashSet<String> opponentsWhoWillExitCloseBehind = new HashSet<string>();
 
         private int sectorCount = 3;
 
         public static String opponentFrontToWatchForPitting = null;
         public static String opponentBehindToWatchForPitting = null;
+
+        private DateTime nextOpponentPitExitWarningDue = DateTime.MinValue;
 
         private Boolean printS1Positions = false;
 
@@ -109,6 +115,7 @@ namespace CrewChiefV4.Events
         {
             // don't wipe the time-lost-on-stop that may have been derived in a previous session
             opponentsTimeLostForStop.Clear();
+            opponentsTimeSpentInPitlane.Clear();
             isTimingPracticeStop = false;
             gameTimeWhenEnteringLastSectorInPractice = -1;
             nextPitTimingCheckDue = DateTime.MinValue;
@@ -118,9 +125,9 @@ namespace CrewChiefV4.Events
             playedPitPositionEstimatesForThisLap = false;
             timeOpponentStops = true;
             opponentsInPenultimateSector.Clear();
-            opponentsWhoWillExitCloseBehind.Clear();
+            Strategy.opponentsWhoWillExitCloseBehind.Clear();
             hasPittedDuringPracticeStopProcess = false;
-            opponentsWhoWillExitCloseInFront.Clear();
+            Strategy.opponentsWhoWillExitCloseInFront.Clear();
             pitPositionEstimatesRequested = false;
             Strategy.opponentFrontToWatchForPitting = null;
             Strategy.opponentBehindToWatchForPitting = null;
@@ -171,6 +178,7 @@ namespace CrewChiefV4.Events
                             gameTimeWhenEnteringLastSectorInPractice = -1;
                             isTimingPracticeStop = false;
                             hasPittedDuringPracticeStopProcess = false;
+                            gameTimeOnPitEntry = -1;
                         }
                     }
                     else if (previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane && gameTimeOnPitEntry != -1)
@@ -209,18 +217,54 @@ namespace CrewChiefV4.Events
             else if (currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 // record the time each opponent entered the pitlane
-                foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                 {
-                    if (opponent.InPits)
+                    if (entry.Value.IsNewLap)
                     {
-                        if (!opponentsInPitLane.ContainsKey(opponent.DriverRawName))
+                        Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Key);
+                        Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                    }
+                    if (entry.Value.InPits)
+                    {
+                        if (!opponentsInPitLane.ContainsKey(entry.Value.DriverRawName))
                         {
-                            opponentsInPitLane.Add(opponent.DriverRawName, currentGameState.SessionData.SessionRunningTime);
+                            opponentsInPitLane.Add(entry.Value.DriverRawName, currentGameState.SessionData.SessionRunningTime);
+                            if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentPitExitWarningDue)
+                            {                                
+                                if (Strategy.opponentsWhoWillExitCloseInFront.Contains(entry.Key))
+                                {
+                                    // this guy has just entered the pit and we predict he'll exit just in front of us
+                                    Console.WriteLine("Opponent " + entry.Key + " will exit the pit close in front of us");
+                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_in_front", MessageContents(entry.Value,
+                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustInFront), 0, this));
+
+                                    // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
+                                    // removed from this set anyway
+                                    nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
+                                    Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                                }
+                                else if (Strategy.opponentsWhoWillExitCloseBehind.Contains(entry.Key))
+                                {
+                                    // this guy has just entered the pit and we predict he'll exit just behind us
+                                    Console.WriteLine("Opponent " + entry.Key + " will exit the pit close behind us");
+                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(entry.Value,
+                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustBehind), 0, this));
+                                    // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
+                                    // removed from this set anyway
+                                    nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
+                                    Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Key);
+                                }                                
+                            }
                         }
                     }
                     else
                     {
-                        opponentsInPitLane.Remove(opponent.DriverRawName);
+                        if (opponentsInPitLane.ContainsKey(entry.Key))
+                        {
+                            // he's just left the pit lane
+                            opponentsTimeSpentInPitlane[entry.Key] = currentGameState.SessionData.SessionRunningTime - opponentsInPitLane[entry.Key];
+                        }
+                        opponentsInPitLane.Remove(entry.Value.DriverRawName);
                     }
                 }
 
@@ -288,8 +332,8 @@ namespace CrewChiefV4.Events
 
 
 
-                //-------------------------------
-                // this block is currently unused
+                //--------------------------------------
+                // opponent pit exit position estimation
                 if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentFinalSectorTimingCheckDue)
                 {
                     float expectedPlayerTimeLoss = -1;
@@ -298,26 +342,6 @@ namespace CrewChiefV4.Events
                     nextOpponentFinalSectorTimingCheckDue = currentGameState.Now.AddSeconds(5);
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
-                        if (entry.Value.IsNewLap)
-                        {
-                            opponentsWhoWillExitCloseBehind.Remove(entry.Key);
-                            opponentsWhoWillExitCloseInFront.Remove(entry.Key);
-                        }
-                        else if (entry.Value.JustEnteredPits)
-                        {
-                            if (opponentsWhoWillExitCloseInFront.Contains(entry.Key))
-                            {
-                                // this guy has just entered the pit and we predict he'll exit just in front of us
-                                // TODO: report this, ensure we don't report more than 1 in a short time
-                            }
-                            opponentsWhoWillExitCloseInFront.Remove(entry.Key);
-                            if (opponentsWhoWillExitCloseBehind.Contains(entry.Key))
-                            {
-                                // this guy has just entered the pit and we predict he'll exit just behind us
-                                // TODO: report this, ensure we don't report more than 1 in a short time
-                            }
-                            opponentsWhoWillExitCloseBehind.Remove(entry.Key);
-                        }
                         if (((sectorCount == 3 && entry.Value.CurrentSectorNumber == 2) || (sectorCount == 2 && entry.Value.CurrentSectorNumber == 1)) &&
                             !opponentsInPenultimateSector.Contains(entry.Key))
                         {
@@ -328,6 +352,7 @@ namespace CrewChiefV4.Events
                             if (opponentsInPenultimateSector.Contains(entry.Key) && 
                                 ((sectorCount == 3 && entry.Value.CurrentSectorNumber == 3) || (sectorCount == 2 && entry.Value.CurrentSectorNumber == 2)))
                             {
+                                opponentsInPenultimateSector.Remove(entry.Key);
                                 // this guy has just hit final sector, so do the count-back
 
                                 // lazily obtain the expected time loss
@@ -335,15 +360,21 @@ namespace CrewChiefV4.Events
                                 {
                                     expectedPlayerTimeLoss = getTimeLossEstimate(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name,
                                         currentGameState.OpponentData, currentGameState.SessionData.ClassPosition);
-                                    nowMinusExpectedLoss = currentGameState.Now.AddSeconds(expectedPlayerTimeLoss * -1);
+
+                                    if (expectedPlayerTimeLoss == -1)
+                                    {
+                                        // no loss data, can't continue
+                                        break;
+                                    }
+                                    // get his track distanceRoundTrack at this point in history
+                                    int fullLapsLost = (int)(expectedPlayerTimeLoss / currentGameState.SessionData.PlayerLapTimeSessionBest);
+
+                                    // need to allow for losing 1 or more complete laps. This adjustment is required because the DeltaTimes stuff only
+                                    // holds the last lap's worth of data
+                                    nowMinusExpectedLoss = currentGameState.Now.AddSeconds((fullLapsLost * currentGameState.SessionData.PlayerLapTimeSessionBest) - expectedPlayerTimeLoss);
                                     doneTimeLossCalc = true;
-                                }
-                                if (expectedPlayerTimeLoss == -1)
-                                {
-                                    // no loss data, can't continue
-                                    break;
-                                }
-                                // get his track distanceRoundTrack at this point in history
+                                }                                
+                                
                                 TimeSpan closestDeltapointTimeDelta = TimeSpan.MaxValue;
                                 float closestDeltapointPosition = -1;
                                 foreach (KeyValuePair<float, DateTime> deltaPointEntry in entry.Value.DeltaTime.deltaPoints)
@@ -358,24 +389,22 @@ namespace CrewChiefV4.Events
                                 // this is the gap we expect to this guy when he leaves the pits. Negative gap means he'll be in front
                                 float expectedDistanceToPlayerOnPitExit = currentGameState.PositionAndMotionData.DistanceRoundTrack - closestDeltapointPosition;
                                 float absGap = Math.Abs(expectedDistanceToPlayerOnPitExit);
-                                if (expectedDistanceToPlayerOnPitExit > 0 && absGap < distanceAheadToBeConsideredVeryClose)
+
+                                if (expectedDistanceToPlayerOnPitExit < 0 && absGap < minDistanceAheadToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Key))
                                 {
-                                    // he'll come out of the pits right in front of us
-                                    opponentsWhoWillExitCloseInFront.Add(entry.Key);
+                                    // he'll come out of the pits right in front of us if he pits
+                                    Strategy.opponentsWhoWillExitCloseInFront.Add(entry.Key);
                                 }
-                                else if (expectedDistanceToPlayerOnPitExit < 0 && absGap < distanceBehindToBeConsideredVeryClose)
+                                else if (expectedDistanceToPlayerOnPitExit > 0 && absGap < minDistanceBehindToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Key))
                                 {
-                                    // he'll come out right behind us
-                                    opponentsWhoWillExitCloseBehind.Add(entry.Key);
+                                    // he'll come out right behind us if he pits
+                                    Strategy.opponentsWhoWillExitCloseBehind.Add(entry.Key);
                                 }
                             }
-                            opponentsInPenultimateSector.Remove(entry.Key);
                         }
                     }
                 }
                 //------------------------------
-
-
 
 
                 if (timeOpponentStops && currentGameState.Now > nextPitTimingCheckDue)
@@ -453,16 +482,14 @@ namespace CrewChiefV4.Events
                         {
                             timeLossEstimate = entry.Value;
                             pittedOpponentPositionDiff = positionDiff;
-                            // guess how long this opponent might have been in the pitlane - assume 1 second time loss either side
-                            playerTimeSpentInPitLane = timeLossEstimate - 2;
+                            float opponentTimeSpentInPitlane;
+                            if (opponentsTimeSpentInPitlane.TryGetValue(entry.Key, out opponentTimeSpentInPitlane))
+                            {
+                                playerTimeSpentInPitLane = opponentTimeSpentInPitlane;
+                            }
                         }
                     }
-                    Console.WriteLine("Got pitstop time loss estimate from opponent stop times - expect to lose " + timeLossEstimate + " seconds");
                 }
-            }
-            else
-            {
-                Console.WriteLine("Got pitstop time loss estimate from practice stop - expect to lose " + timeLossEstimate + " seconds");
             }
             return timeLossEstimate;
         }

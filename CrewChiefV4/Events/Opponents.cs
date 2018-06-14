@@ -403,7 +403,8 @@ namespace CrewChiefV4.Events
                 // TODO: should probably keep the leader-pitting message under FCY, not sure about the others
                 HashSet<String> announcedPitters = new HashSet<string>();
                 if (currentGameState.PitData.LeaderIsPitting &&
-                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
+                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
+                    !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
                         folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this));
@@ -411,7 +412,8 @@ namespace CrewChiefV4.Events
                 }
 
                 if (currentGameState.PitData.CarInFrontIsPitting && currentGameState.SessionData.TimeDeltaFront > 3 &&
-                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
+                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
+                    !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
                         folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this));
@@ -419,7 +421,8 @@ namespace CrewChiefV4.Events
                 }
 
                 if (currentGameState.PitData.CarBehindIsPitting && currentGameState.SessionData.TimeDeltaBehind > 3 &&
-                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation)
+                    currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
+                    !Strategy.opponentsWhoWillExitCloseBehind.Contains(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
                         folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this));

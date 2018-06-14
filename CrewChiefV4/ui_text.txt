@@ -600,3 +600,6 @@ force_rf2_rolling_start_help = Due to game limitations, CC can only guess what t
 
 enable_pit_exit_position_estimates = Enable pit exit position estimates
 enable_pit_exit_position_estimates_help = Play pit exit position estimates
+
+enable_opponent_pit_exit_estimates = Enable opponent pit exit estimates
+enable_opponent_pit_exit_estimates_help = Play pit exit position estimates for opponent cars

@@ -134,6 +134,12 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
             */
 
+            /*
+            List<String> rawDriverNames = new List<string>();
+            audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(makeTempDriver("bakus", rawDriverNames),
+                                        Strategy.folderIsPittingFromPosition, 12, Strategy.folderHeWillComeOutJustBehind), 0, this));
+            */
+
             DirectoryInfo soundDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath);
             FileInfo[] filesInSoundDirectory = soundDirectory.GetFiles();
             foreach (FileInfo fileInSoundDirectory in filesInSoundDirectory)
