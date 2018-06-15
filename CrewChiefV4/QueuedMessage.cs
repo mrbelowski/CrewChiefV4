@@ -230,6 +230,18 @@ namespace CrewChiefV4
         public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent) :
             this(messageName, delayedMessageEvent, secondsDelay, abstractEvent, null)
         { }
+
+        public override string ToString()
+        {
+            if (messageFolders != null)
+            {
+                return "(" + String.Join(", ", messageFolders) + ")";
+            }
+            else
+            {
+                return "";
+            }
+        }
         
         public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData)
         {

@@ -219,10 +219,15 @@ namespace CrewChiefV4.Events
                 // record the time each opponent entered the pitlane
                 foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                 {
+                    // if this guy hasn't completed a lap, ignore him
+                    if (entry.Value.CompletedLaps < 1)
+                    {
+                        continue;
+                    }
                     if (entry.Value.IsNewLap)
                     {
-                        Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Key);
-                        Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                        Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Value.DriverRawName);
+                        Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Value.DriverRawName);
                     }
                     if (entry.Value.InPits)
                     {
@@ -230,29 +235,29 @@ namespace CrewChiefV4.Events
                         {
                             opponentsInPitLane.Add(entry.Value.DriverRawName, currentGameState.SessionData.SessionRunningTime);
                             if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentPitExitWarningDue)
-                            {                                
-                                if (Strategy.opponentsWhoWillExitCloseInFront.Contains(entry.Key))
+                            {
+                                if (Strategy.opponentsWhoWillExitCloseInFront.Contains(entry.Value.DriverRawName))
                                 {
                                     // this guy has just entered the pit and we predict he'll exit just in front of us
-                                    Console.WriteLine("Opponent " + entry.Key + " will exit the pit close in front of us");
+                                    Console.WriteLine("Opponent " + entry.Value.DriverRawName + " will exit the pit close in front of us");
                                     audioPlayer.playMessage(new QueuedMessage("opponent_exiting_in_front", MessageContents(entry.Value,
                                         folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustInFront), 0, this));
 
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
                                     nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
-                                    Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Key);
+                                    Strategy.opponentsWhoWillExitCloseInFront.Remove(entry.Value.DriverRawName);
                                 }
-                                else if (Strategy.opponentsWhoWillExitCloseBehind.Contains(entry.Key))
+                                else if (Strategy.opponentsWhoWillExitCloseBehind.Contains(entry.Value.DriverRawName))
                                 {
                                     // this guy has just entered the pit and we predict he'll exit just behind us
-                                    Console.WriteLine("Opponent " + entry.Key + " will exit the pit close behind us");
+                                    Console.WriteLine("Opponent " + entry.Value.DriverRawName + " will exit the pit close behind us");
                                     audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(entry.Value,
                                         folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustBehind), 0, this));
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
                                     nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
-                                    Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Key);
+                                    Strategy.opponentsWhoWillExitCloseBehind.Remove(entry.Value.DriverRawName);
                                 }                                
                             }
                         }
@@ -342,6 +347,10 @@ namespace CrewChiefV4.Events
                     nextOpponentFinalSectorTimingCheckDue = currentGameState.Now.AddSeconds(5);
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        if (entry.Value.CompletedLaps < 1)
+                        {
+                            continue;
+                        }
                         if (((sectorCount == 3 && entry.Value.CurrentSectorNumber == 2) || (sectorCount == 2 && entry.Value.CurrentSectorNumber == 1)) &&
                             !opponentsInPenultimateSector.Contains(entry.Key))
                         {
@@ -390,15 +399,15 @@ namespace CrewChiefV4.Events
                                 float expectedDistanceToPlayerOnPitExit = currentGameState.PositionAndMotionData.DistanceRoundTrack - closestDeltapointPosition;
                                 float absGap = Math.Abs(expectedDistanceToPlayerOnPitExit);
 
-                                if (expectedDistanceToPlayerOnPitExit < 0 && absGap < minDistanceAheadToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Key))
+                                if (expectedDistanceToPlayerOnPitExit < 0 && absGap < minDistanceAheadToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Value.DriverRawName))
                                 {
                                     // he'll come out of the pits right in front of us if he pits
-                                    Strategy.opponentsWhoWillExitCloseInFront.Add(entry.Key);
+                                    Strategy.opponentsWhoWillExitCloseInFront.Add(entry.Value.DriverRawName);
                                 }
-                                else if (expectedDistanceToPlayerOnPitExit > 0 && absGap < minDistanceBehindToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Key))
+                                else if (expectedDistanceToPlayerOnPitExit > 0 && absGap < minDistanceBehindToBeConsideredAFewSeconds && AudioPlayer.canReadName(entry.Value.DriverRawName))
                                 {
                                     // he'll come out right behind us if he pits
-                                    Strategy.opponentsWhoWillExitCloseBehind.Add(entry.Key);
+                                    Strategy.opponentsWhoWillExitCloseBehind.Add(entry.Value.DriverRawName);
                                 }
                             }
                         }
@@ -414,6 +423,10 @@ namespace CrewChiefV4.Events
                     // update opponent time lost
                     foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        if (entry.Value.CompletedLaps < 1)
+                        {
+                            continue;
+                        }
                         // only interested in opponent pit times for our class
                         if (CarData.IsCarClassEqual(entry.Value.CarClass, currentGameState.carClass) && entry.Value.CompletedLaps > 2)
                         {
