@@ -50,9 +50,7 @@ Miscellaneous*/
             SPOTTER,
             FLAGS_AND_RULES,
             MESSAGE_FREQUENCES,
-            FUEL, // Possibly join 4 or some of those.
-            TEMPS,
-            DAMAGES,
+            FUEL_TEMPS_BRAKES_AND_DAMAGES,
             TIMINGS,
             MISC,
             UNKNOWN
@@ -264,11 +262,11 @@ Miscellaneous*/
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
                 //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Fuel",
-                Value = PropertyCategory.FUEL
+                Label = "Fuel, Brakes, Temperatures and Damage",
+                Value = PropertyCategory.FUEL_TEMPS_BRAKES_AND_DAMAGES
             });
 
-            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            /*this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
                 //Label = Configuration.getUIString("all_preferences_label"),
                 Label = "Temperatures",
@@ -280,7 +278,7 @@ Miscellaneous*/
                 //Label = Configuration.getUIString("all_preferences_label"),
                 Label = "Damages",
                 Value = PropertyCategory.DAMAGES
-            });
+            });*/
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
