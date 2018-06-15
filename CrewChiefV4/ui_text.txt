@@ -696,11 +696,11 @@ always_report_time_in_hundredths_help = Always report laptimes and gaps to hundr
 
 insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
 insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
-insert_beep_in_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS
+insert_beep_in_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
 
 insert_beep_out_between_spotter_and_chief = Insert beep-out between Spotter and Chief
 insert_beep_out_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert close channel beep sound on switching messages.
-insert_beep_out_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS
+insert_beep_out_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
 
 minimize_to_tray = Minimize to tray
 minimize_to_tray_help = Minimize Crew Chief to the system notification area instead of taskbar.
