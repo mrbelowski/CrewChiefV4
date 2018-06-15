@@ -18,7 +18,7 @@ namespace CrewChiefV4
     internal class PropertyFilter
     {
         internal List<GameEnum> filterList = null;
-        internal PropertiesForm.PropertyCategory category = PropertiesForm.PropertyCategory.UNKNOWN;
+        internal List<PropertiesForm.PropertyCategory> categoryList = null;
         internal bool includeFilter = true;
         internal string propertyLabelUpper = null;
 
@@ -27,17 +27,21 @@ namespace CrewChiefV4
             this.propertyLabelUpper = propertyLabel.ToUpperInvariant();
 
             // Process category filter.
-            if (string.IsNullOrWhiteSpace(category))
-                this.category = PropertiesForm.PropertyCategory.MISC;
-            else
+            if (!string.IsNullOrWhiteSpace(category))
             {
-                PropertiesForm.PropertyCategory catEnum = PropertiesForm.PropertyCategory.UNKNOWN;
-                if (Enum.TryParse(category, out catEnum))
-                    this.category = catEnum;
-                else
+                var categoryNames = category.Split(';');
+
+                this.categoryList = new List<PropertiesForm.PropertyCategory>();
+                foreach (var cat in categoryNames)
                 {
-                    Console.WriteLine("Failed to parse category: \"" + category + "\"  property: \"" + propertyId + "\"");
-                    this.category = PropertiesForm.PropertyCategory.MISC;
+                    var catEnum = PropertiesForm.PropertyCategory.UNKNOWN;
+                    if (Enum.TryParse(cat, out catEnum))
+                        this.categoryList.Add(catEnum);
+                    else
+                    {
+                        Console.WriteLine("Failed to parse category: \"" + cat + "\"  property: \"" + propertyId + "\"");
+                        this.categoryList = null;
+                    }
                 }
             }
 
@@ -72,9 +76,17 @@ namespace CrewChiefV4
 
         internal bool Applies(string textFilterUpper, GameEnum gameFilter, PropertiesForm.SpecialFilter specialFilter, bool includeCommon, PropertiesForm.PropertyCategory categoryFilter)
         {
-            if (categoryFilter != PropertiesForm.PropertyCategory.ALL
-                && this.category != categoryFilter)
-                return false;
+            if (categoryFilter != PropertiesForm.PropertyCategory.ALL)
+            {
+                if (this.categoryList == null)
+                {
+                    // By default, properties go to MISC.
+                    if (categoryFilter != PropertiesForm.PropertyCategory.MISC)
+                        return false;
+                }
+                else if (!this.categoryList.Contains(categoryFilter))
+                    return false;
+            }
 
             if (specialFilter != PropertiesForm.SpecialFilter.UNKNOWN)
             {
