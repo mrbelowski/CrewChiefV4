@@ -467,7 +467,9 @@ namespace CrewChiefV4.Events
             }
             else if (this.isLast)
             {
-                if (this.numberOfLapsInLastPlace > 3)
+                if (this.numberOfLapsInLastPlace > 3 &&
+                    CrewChief.currentGameState.SessionData.LapTimePrevious > CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest &&
+                    CrewChief.currentGameState.SessionData.ClassPosition > 3)
                 {
                     return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderConsistentlyLast), null);
                 }
