@@ -771,6 +771,11 @@ namespace CrewChiefV4.Audio
                                 lastMessagePlayed = thisMessage;
                             }
                             lastMessagePlayed = thisMessage;
+                            String messageStringContent = thisMessage.ToString();
+                            if (messageStringContent != "")
+                            {
+                                Console.WriteLine(messageStringContent);
+                            }
                             if (!mute)
                             {
                                 if (thisMessage.delayMessageResolution)
