@@ -186,6 +186,8 @@ timings_category_label = Timings
 pit_stops_and_multiclass_category_label = Pit Stops & Multiclass
 misc_category_label = Miscellaneous
 
+category_filter_label = Ca&tegory filter:
+
 ###################################### Preferences ######################################################
 # to change the name of the property title in the properties screen, just use the property name like this:
 # enable_spotter = Enable spotter
@@ -1043,7 +1045,7 @@ iracing_fast_parsing_filter = IRACING
 enable_iracing_pit_stop_commands = Enable iRacing pit stop voice commands
 enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop commands, you may disable this.  If disabled, CC will exclude iRacing pit stop commands from the command set - may improve recognition accuracy
 enable_iracing_pit_stop_commands_filter = IRACING
-enable_iracing_pit_stop_commands_category = AUDIO_VOICE_AND_CONTROLLERS
+enable_iracing_pit_stop_commands_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
 enable_tight_fuel_calc = Enable tight fuel calculations
 enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
