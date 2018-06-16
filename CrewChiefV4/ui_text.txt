@@ -249,7 +249,7 @@ enable_brake_damage_messages_category = FUEL_TEMPS_AND_DAMAGES
 
 enable_acs_log_sectors_for_unknown_tracks = Enable ACS log sectors for unknown tracks
 enable_acs_log_sectors_for_unknown_tracks_filter = ASSETTO_64BIT;ASSETTO_32BIT
-enable_acs_log_sectors_for_unknown_tracks_category = TIMINGS
+enable_acs_log_sectors_for_unknown_tracks_category = TIMINGS;UI_STARTUP_AND_PATHS
 
 enable_brake_lock_warnings = Enable brake lock warnings
 enable_brake_lock_warnings_filter = !IRACING
@@ -668,7 +668,7 @@ minimum_voice_recognition_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
 
 display_session_lap_times = Display session lap times
 display_session_lap_times_help = Write all the lap times from the completed session to the console (separated by ;)
-display_session_lap_times_category = TIMINGS
+display_session_lap_times_category = TIMINGS;UI_STARTUP_AND_PATHS
 
 enable_opponent_laptime_reporting_in_race = Enable opponent laptime reporting in race
 enable_opponent_laptime_reporting_in_race_help = Call out opponent lap times in the race (car front, behind & leader) if the lap time is their best lap.
@@ -805,10 +805,11 @@ enable_delayed_responses_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_console_logging = Enable console logging
 enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
+enable_console_logging_category = UI_STARTUP_AND_PATHS
 
 log_tyre_stats = Log tyre stats
 log_tyre_stats_help = Show tyre temps and wear at the start of each sector
-log_tyre_stats_category = FUEL_TEMPS_AND_DAMAGES
+log_tyre_stats_category = FUEL_TEMPS_AND_DAMAGES;UI_STARTUP_AND_PATHS
 
 r3e_blue_flag_detection_distance = R3E blue flag detection distance
 r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
