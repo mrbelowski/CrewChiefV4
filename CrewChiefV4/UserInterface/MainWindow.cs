@@ -866,9 +866,6 @@ namespace CrewChiefV4
             this.KeyDown += MainWindow_KeyDown;
 
             this.constructingWindow = false;
-
-            var form = new PropertiesForm(this);
-            form.ShowDialog();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
