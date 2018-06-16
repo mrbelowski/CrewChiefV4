@@ -169,7 +169,7 @@ namespace CrewChiefV4
                                     soundPackDownloadURL = soundPack.downloadLocation;
                                     if (soundPackDownloadURL != null)
                                     {
-                                        Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date");
+                                        Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date, next update is " + soundPack.downloadLocation);
                                         willNeedAnotherSoundPackDownload = soundPack.willRequireAnotherUpdate;
                                         downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
                                             "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
@@ -198,7 +198,7 @@ namespace CrewChiefV4
                                     personalisationsDownloadURL = personalisationPack.downloadLocation;
                                     if (personalisationsDownloadURL != null)
                                     {
-                                        Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date");
+                                        Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date, next update is " + personalisationPack.downloadLocation);
                                         willNeedAnotherPersonalisationsDownload = personalisationPack.willRequireAnotherUpdate;
                                         downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
                                             "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
@@ -227,7 +227,7 @@ namespace CrewChiefV4
                                     drivernamesDownloadURL = drivernamesPack.downloadLocation;
                                     if (drivernamesDownloadURL != null)
                                     {
-                                        Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date");
+                                        Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date, next update is " + drivernamesPack.downloadLocation);
                                         willNeedAnotherDrivernamesDownload = drivernamesPack.willRequireAnotherUpdate;
                                         downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
                                             "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
