@@ -751,6 +751,11 @@ namespace CrewChiefV4.Audio
                             else
                             {
                                 timeLastPearlOfWisdomPlayed = GameStateData.CurrentTime;
+                                String messageStringContent = thisMessage.ToString();
+                                if (messageStringContent != "")
+                                {
+                                    Console.WriteLine(messageStringContent);
+                                }
                                 if (!mute)
                                 {
                                     soundCache.Play(eventName);
