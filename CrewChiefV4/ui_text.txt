@@ -96,6 +96,7 @@ extracting_personalisations = Extracting personalisations
 error_downloading_driver_names = Error downloading driver names, check the readme file for instructions on how to manually download and install this.
 unable_to_download_driver_names = Unable to download driver names
 the_application_must_be_restarted_to_load_the_new_sounds = The application must be restarted to load the new sounds. Click OK to restart the application.
+the_application_must_be_restarted_to_load_the_new_sounds_need_another_restart = The application must be restarted to load the new sounds. An additional download will be required. Click OK to restart the application.
 
 load_new_sounds=Load new sounds
 
