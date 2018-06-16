@@ -16,7 +16,7 @@ namespace CrewChiefV4
         public Boolean defaultValue;
         public Boolean originalValue;
         internal PropertyFilter filter = null;
-        public BooleanPropertyControl(String propertyId, String label, Boolean value, Boolean defaultValue, String helpText, String filterText)
+        public BooleanPropertyControl(String propertyId, String label, Boolean value, Boolean defaultValue, String helpText, String filterText, String categoryText)
         {
             InitializeComponent();
 
@@ -28,7 +28,7 @@ namespace CrewChiefV4
             this.defaultValue = defaultValue;
             this.toolTip1.SetToolTip(this.checkBox1, helpText);
 
-            this.filter = new PropertyFilter(filterText, propertyId, this.label);
+            this.filter = new PropertyFilter(filterText, categoryText, propertyId, this.label);
         }
         public Boolean getValue()
         {

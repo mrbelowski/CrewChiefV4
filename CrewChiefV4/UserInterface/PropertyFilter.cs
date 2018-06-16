@@ -18,13 +18,34 @@ namespace CrewChiefV4
     internal class PropertyFilter
     {
         internal List<GameEnum> filterList = null;
+        internal List<PropertiesForm.PropertyCategory> categoryList = null;
         internal bool includeFilter = true;
         internal string propertyLabelUpper = null;
 
-        internal PropertyFilter(string filter, string propertyId, string propertyLabel)
+        internal PropertyFilter(string filter, string category, string propertyId, string propertyLabel)
         {
             this.propertyLabelUpper = propertyLabel.ToUpperInvariant();
 
+            // Process category filter.
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                var categoryNames = category.Split(';');
+
+                this.categoryList = new List<PropertiesForm.PropertyCategory>();
+                foreach (var cat in categoryNames)
+                {
+                    var catEnum = PropertiesForm.PropertyCategory.UNKNOWN;
+                    if (Enum.TryParse(cat, out catEnum))
+                        this.categoryList.Add(catEnum);
+                    else
+                    {
+                        Console.WriteLine("Failed to parse category: \"" + cat + "\"  property: \"" + propertyId + "\"");
+                        this.categoryList = null;
+                    }
+                }
+            }
+
+            // Process game filter.
             if (string.IsNullOrWhiteSpace(filter))
                 return;
 
@@ -53,8 +74,20 @@ namespace CrewChiefV4
             }
         }
 
-        internal bool Applies(string textFilterUpper, GameEnum gameFilter, PropertiesForm.SpecialFilter specialFilter, bool includeCommon)
+        internal bool Applies(string textFilterUpper, GameEnum gameFilter, PropertiesForm.SpecialFilter specialFilter, bool includeCommon, PropertiesForm.PropertyCategory categoryFilter)
         {
+            if (categoryFilter != PropertiesForm.PropertyCategory.ALL)
+            {
+                if (this.categoryList == null)
+                {
+                    // By default, properties go to MISC.
+                    if (categoryFilter != PropertiesForm.PropertyCategory.MISC)
+                        return false;
+                }
+                else if (!this.categoryList.Contains(categoryFilter))
+                    return false;
+            }
+
             if (specialFilter != PropertiesForm.SpecialFilter.UNKNOWN)
             {
                 if (specialFilter == PropertiesForm.SpecialFilter.COMMON_PREFERENCES
