@@ -32,15 +32,26 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
+
+	<!-- TODO: changeme to 147 when the release is done -->
 	<soundpackversion>146</soundpackversion>
+	
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<!-- sound pack update from version 121 upwards will use this update pack -->
 	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
+	<update3soundpackurl>http://thecrewchief.org/downloads/update_3_sound_pack.zip</update3soundpackurl>
+	
+	
+	<!-- TODO: changeme to 131 -->
 	<drivernamesversion>130</drivernamesversion>
+	
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
+	<update2drivernamesurl>http://thecrewchief.org/downloads/update_2_driver_names.zip</update2drivernamesurl>
+	
+	
 	<personalisationsversion>129</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
