@@ -32,10 +32,9 @@ namespace CrewChiefV4.Audio
         public static SoundPackData[] soundPacks = { new SoundPackData(-1, "basesoundpackurl", false),
                                                      // any sound packs after base will require an additional download if they're not the last in the list
                                                      //
-                                                     // TODO: change these additional download flags to true when we publish the next update sound pack
-                                                     // (the first non-cumulative pack). This will update from version 146
-                                                     new SoundPackData(0, "updatesoundpackurl", false),
-                                                     new SoundPackData(122, "update2soundpackurl", false)
+                                                     new SoundPackData(0, "updatesoundpackurl", true),
+                                                     new SoundPackData(122, "update2soundpackurl", true),
+                                                     new SoundPackData(146, "update3soundpackurl", false)
                                                    };
 
         public static SoundPackData[] personalisationPacks = { new SoundPackData(-1, "basepersonalisationsurl", false),
@@ -50,9 +49,8 @@ namespace CrewChiefV4.Audio
         public static SoundPackData[] drivernamesPacks = { new SoundPackData(-1, "basedrivernamesurl", false),
                                                            // any name packs after base will require an additional download if they're not the last in the list
                                                            //
-                                                           // TODO: change these additional download flags to true when we publish the next update names pack
-                                                           // (the first non-cumulative pack). This will update from version 130
-                                                           new SoundPackData(0, "updatedrivernamesurl", false)
+                                                           new SoundPackData(0, "updatedrivernamesurl", true),
+                                                           new SoundPackData(130, "update2drivernamesurl", false),
                                                          };
 
         public static Boolean parseUpdateData(String updateXML)

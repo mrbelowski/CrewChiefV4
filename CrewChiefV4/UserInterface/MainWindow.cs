@@ -112,7 +112,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging ||
+            if (!CrewChief.Debugging ||true||
                 SoundPackVersionsHelper.currentSoundPackVersion <= 0 || SoundPackVersionsHelper.currentPersonalisationsVersion <= 0 || SoundPackVersionsHelper.currentDriverNamesVersion <=0)
             {
                 new Thread(() =>
