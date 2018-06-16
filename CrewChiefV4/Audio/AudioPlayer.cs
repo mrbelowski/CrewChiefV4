@@ -201,10 +201,10 @@ namespace CrewChiefV4.Audio
             }
             if (soundDirectory.Exists) 
             {
-                SoundPackVersionsHelper.soundPackVersion = getSoundPackVersion(soundDirectory);
-                SoundPackVersionsHelper.driverNamesVersion = getDriverNamesVersion(soundDirectory);
+                SoundPackVersionsHelper.currentSoundPackVersion = getSoundPackVersion(soundDirectory);
+                SoundPackVersionsHelper.currentDriverNamesVersion = getDriverNamesVersion(soundDirectory);
                 soundPackLanguage = getSoundPackLanguage(soundDirectory);
-                SoundPackVersionsHelper.personalisationsVersion = getPersonalisationsVersion(soundDirectory);
+                SoundPackVersionsHelper.currentPersonalisationsVersion = getPersonalisationsVersion(soundDirectory);
             }
             else
             {
@@ -250,15 +250,15 @@ namespace CrewChiefV4.Audio
                 Console.WriteLine("Unable to find sound directory " + soundDirectory.FullName);
                 return;
             }
-            if (SoundPackVersionsHelper.soundPackVersion == -1)
+            if (SoundPackVersionsHelper.currentSoundPackVersion == -1)
             {
                 Console.WriteLine("Unable to get sound pack version");
             }
             else
             {
-                Console.WriteLine("Using sound pack version " + SoundPackVersionsHelper.soundPackVersion +
-                    ", driver names version " + SoundPackVersionsHelper.driverNamesVersion +
-                    " and personalisations version " + SoundPackVersionsHelper.personalisationsVersion);
+                Console.WriteLine("Using sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion +
+                    ", driver names version " + SoundPackVersionsHelper.currentDriverNamesVersion +
+                    " and personalisations version " + SoundPackVersionsHelper.currentPersonalisationsVersion);
             }
             if (this.soundCache == null)
             {
