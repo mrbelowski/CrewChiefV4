@@ -238,6 +238,7 @@ enable_damage_messages_filter = !IRACING
 enable_damage_messages_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 
 enable_driver_names = Enable driver names
+enable_driver_names_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_drs_messages = Enable DRS messages
 enable_drs_messages_filter = !IRACING
@@ -257,11 +258,11 @@ enable_pearls_of_wisdom	= Enable pearls of wisdom
 
 enable_pit_exit_brake_temp_warning = Enable pit exit brake temp warning
 enable_pit_exit_brake_temp_warning_filter = !IRACING
-enable_pit_exit_brake_temp_warning_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
+enable_pit_exit_brake_temp_warning_category = FUEL_TEMPS_BRAKES_AND_DAMAGES;PIT_STOPS_AND_MULTICLASS
 
 enable_pit_exit_tyre_temp_warning = Enable pit exit tyre temp warning
 enable_pit_exit_tyre_temp_warning_filter = !IRACING
-enable_pit_exit_tyre_temp_warning_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
+enable_pit_exit_tyre_temp_warning_category = FUEL_TEMPS_BRAKES_AND_DAMAGES;PIT_STOPS_AND_MULTICLASS
 
 enable_position_messages = Enable position messages
 
@@ -297,6 +298,7 @@ enable_wheel_spin_warnings_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 attempt_pcars_opponent_pit_detection = Attempt pCARS opponent pit detection
 attempt_pcars_opponent_pit_detection_help = Monitor opponent world positions and try to guess when they're entering and leaving the pit lane
 attempt_pcars_opponent_pit_detection_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+attempt_pcars_opponent_pit_detection_category = PIT_STOPS_AND_MULTICLASS
 
 cache_sounds = Cache sounds
 cache_sounds_help = Cache sounds in memory
@@ -755,6 +757,7 @@ pcars_character_encoding_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 enable_pcars_pit_window_messages = Enable pCARS pit window messages
 enable_pcars_pit_window_messages_help = Play pit window messages in pCARS. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host
 enable_pcars_pit_window_messages_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+enable_pcars_pit_window_messages_category = PIT_STOPS_AND_MULTICLASS
 
 use_tts_for_missing_names = Use TTS for missing names
 use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
@@ -794,6 +797,7 @@ time_between_caution_period_status_reminders_category = MESSAGE_FREQUENCES;FLAGS
 enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
 enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
 enable_ams_pit_schedule_messages_filter = RF1
+enable_ams_pit_schedule_messages_category = PIT_STOPS_AND_MULTICLASS
 
 report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
 report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
@@ -803,9 +807,12 @@ report_allowed_overtakes_under_yellow_category = FLAGS_AND_RULES
 enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
 enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
 enable_rf2_pit_stop_prediction_filter = RF2_64BIT
+enable_rf2_pit_stop_prediction_category = PIT_STOPS_AND_MULTICLASS
 
 enable_simple_incident_detection = Enable simple incident detection
 enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
+enable_simple_incident_detection_filter = ASSETTO_64BIT;ASSETTO_32BIT;PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+enable_simple_incident_detection_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 
 enable_yellow_flag_messages = Enable yellow flag messages
 enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridden during a session with voice command or button assignment)
@@ -813,6 +820,7 @@ enable_yellow_flag_messages_category = FLAGS_AND_RULES
 
 enable_opponent_crash_messages = Enable opponent crash messages
 enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
+enable_opponent_crash_messages_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 
 prefer_alternative_download_site = Prefer alternative download site
 prefer_alternative_download_site_help = Use the secondary download location for updates
@@ -825,6 +833,7 @@ realistic_mode = Realistic mode
 realistic_mode_help = Experimental: Restrict available message types based on the car and track in use
 always_report_time_in_hundredths = Always report time in hundredths
 always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
+always_report_time_in_hundredths_category = TIMINGS
 
 insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
 insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
@@ -847,6 +856,7 @@ read_corner_names_for_lap = Read corner names for current lap
 
 manual_formation_go_with_leader = Manual formation 'go' when leader crosses line
 manual_formation_go_with_leader_help = Cars are allowed to overtake on a manual formation lap as soon as the leader crosses the line
+manual_formation_go_with_leader_category = FLAGS_AND_RULES
 
 reject_message_when_talking = Block messages when talking to the Chief
 reject_message_when_talking_help = Don't play any messages while you have the 'talk to chief' radio channel open
@@ -865,10 +875,11 @@ enable_rf2_cut_track_heuristics_category = FLAGS_AND_RULES
 enable_rf2_pit_lane_approach_heuristics = Enable rF2 pit lane approach detection
 enable_rf2_pit_lane_approach_heuristics_help = Experimental: If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.
 enable_rf2_pit_lane_approach_heuristics_filter = RF2_64BIT
+enable_rf2_pit_lane_approach_heuristics_category = PIT_STOPS_AND_MULTICLASS
 
 enable_command_macros = Enable voice command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc
-enable_command_macros_category = AUDIO_VOICE_AND_CONTROLLERS
+enable_command_macros_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
 pcars_enable_rain_prediction = Enable PCars rain prediction using CloudBrightness
 pcars_enable_rain_prediction_help = Use CloudBrightness to guess when it might rain - can be quite inaccurate
@@ -911,6 +922,7 @@ use_tts_only_when_necessary_category = AUDIO_VOICE_AND_CONTROLLERS
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
 iracing_pit_tyre_pressure_in_psi_filter = IRACING
+iracing_pit_tyre_pressure_in_psi_category = PIT_STOPS_AND_MULTICLASS
 
 spotter_volume_boost = Spotter volume boost (scale)
 spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAudio only)
@@ -922,14 +934,16 @@ report_fuel_in_gallons_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 
 manual_formation_double_file = Manual formation lap double-file start
 manual_formation_double_file_help = Assume manual formation lap starts use 2 lines of cars
+manual_formation_double_file_category = FLAGS_AND_RULES
 
 save_list_of_unvocalized_names = Save driver names with no sound
 save_list_of_unvocalized_names_help = Write unvocalized driver names to file
+save_list_of_unvocalized_names_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_ams_blue_on_slower = Enable AMS / rF1 blue on slower
 enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
 enable_ams_blue_on_slower_filter = RF1
-enable_ams_blue_on_slower_category = FLAGS_AND_RULES
+enable_ams_blue_on_slower_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
 enable_rants = Enable rants
 enable_rants_help = Allow the Chief to occasionally express his disappointment in colourful and forceful terms
@@ -945,12 +959,12 @@ use_naudio_for_speech_recognition_category = AUDIO_VOICE_AND_CONTROLLERS
 enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
 enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
 enable_rf2_pit_state_during_fcy_filter = RF2_64BIT
-enable_rf2_pit_state_during_fcy_category = FLAGS_AND_RULES
+enable_rf2_pit_state_during_fcy_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
 enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
 enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
 enable_ams_pit_state_during_fcy_filter = RF1
-enable_ams_pit_state_during_fcy_category = FLAGS_AND_RULES
+enable_ams_pit_state_during_fcy_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
 bring_game_window_to_front_for_macros = Ensure game is on top for voice command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
@@ -967,6 +981,7 @@ enable_crash_messages_category = FUEL_TEMPS_BRAKES_AND_DAMAGES
 
 force_single_class = Force single car class
 force_single_class_help = Don't allow participants to be grouped by their car classes
+force_single_class_category = PIT_STOPS_AND_MULTICLASS
 
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
@@ -975,21 +990,28 @@ force_min_window_size_category = UI_STARTUP_AND_PATHS
 pit_box_position_countdown = Pit box countdown
 pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_position_countdown_category = PIT_STOPS_AND_MULTICLASS
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
+enable_multiclass_messages_category = PIT_STOPS_AND_MULTICLASS
 
 allow_macros_to_trigger_automatically = Allow automatic macro triggering
 allow_macros_to_trigger_automatically_help = Enable some macros to execute automatically (e.g. R3E pit auto-confirm)
+allow_macros_to_trigger_automatically_category = PIT_STOPS_AND_MULTICLASS
 
 target_warning_time_for_slower_class_car = Multi-class slower car warning time
 target_warning_time_for_slower_class_car_help = Try and warn this many seconds in advance when passing slower class cars
+target_warning_time_for_slower_class_car_category = PIT_STOPS_AND_MULTICLASS
+
 target_warning_time_for_faster_class_car = Multi-class faster car warning time
 target_warning_time_for_faster_class_car_help = Try and warn this many seconds in advance when being passed by faster class cars
+target_warning_time_for_faster_class_car_category = PIT_STOPS_AND_MULTICLASS
 
 max_unknown_car_classes_for_assetto = Max unknown car models in ACS multi-class races
 max_unknown_car_classes_for_assetto_help = Assume single-class race if there are more than this many unknown car models in Assetto Corsa
 max_unknown_car_classes_for_assetto_filter = ASSETTO_64BIT;ASSETTO_32BIT
+max_unknown_car_classes_for_assetto_category = PIT_STOPS_AND_MULTICLASS
 
 iracing_fast_parsing = iRacing faster parser
 iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)
@@ -1016,9 +1038,12 @@ iracing_invalidate_cut_track_laps_category = FLAGS_AND_RULES
 force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
 force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.
 force_rf2_rolling_start_filter = RF2_64BIT
+force_rf2_rolling_start_category = FLAGS_AND_RULES
 
 enable_pit_exit_position_estimates = Enable pit exit position estimates
 enable_pit_exit_position_estimates_help = Play pit exit position estimates
+enable_pit_exit_position_estimates_category = PIT_STOPS_AND_MULTICLASS
 
 enable_opponent_pit_exit_estimates = Enable opponent pit exit estimates
 enable_opponent_pit_exit_estimates_help = Play pit exit position estimates for opponent cars
+enable_opponent_pit_exit_estimates_category = PIT_STOPS_AND_MULTICLASS

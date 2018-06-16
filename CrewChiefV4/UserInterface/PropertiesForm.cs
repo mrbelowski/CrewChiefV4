@@ -52,6 +52,7 @@ Miscellaneous*/
             MESSAGE_FREQUENCES,
             FUEL_TEMPS_BRAKES_AND_DAMAGES,
             TIMINGS,
+            PIT_STOPS_AND_MULTICLASS,
             MISC,
             UNKNOWN
         }
@@ -272,19 +273,19 @@ Miscellaneous*/
                 Label = "Temperatures",
                 Value = PropertyCategory.TEMPS
             });
-
-            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
-            {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Damages",
-                Value = PropertyCategory.DAMAGES
-            });*/
-
+            */
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
                 //Label = Configuration.getUIString("all_preferences_label"),
                 Label = "Timings",
                 Value = PropertyCategory.TIMINGS
+            });
+
+            this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
+            {
+                //Label = Configuration.getUIString("all_preferences_label"),
+                Label = "Pit Stops & Multiclass",
+                Value = PropertyCategory.PIT_STOPS_AND_MULTICLASS
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
