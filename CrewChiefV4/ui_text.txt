@@ -6,20 +6,7 @@
 #
 # Any text set in that file will replace the corresponding default here
 #
-# ---- Property filtering ----
-# Properties form is capable of filtering properties per game.
-#
-# In order to specify property filter, add entry [property_name]_filter = [filter].
-# If property has no filter attached, it is considered to be common property.
-# Filter can consist of semicolon separated GameEnum values.  Filter can be inclusive or exclusive.  Exclusive filter starts with '!'. 
-#
-# Examples:
-# To specify that property applies to rF2 and R3E (include filter):
-#	my_prop_filter = RF2_64BIT;RACE_ROOM  
-#
-# To specify that property applies to all games but rF1 and AC (exclude filter):
-#	my_prop_filter = !RF1;ASSETTO_64BIT;ASSETTO_32BIT
-
+###################################### UI ######################################################
 checking_sound_pack_version = Checking Sound Pack version...
 checking_driver_names_version = Checking driver names version...
 checking_personalisations_version = Checking personalisations version...
@@ -98,6 +85,8 @@ unable_to_download_driver_names = Unable to download driver names
 the_application_must_be_restarted_to_load_the_new_sounds = The application must be restarted to load the new sounds. Click OK to restart the application.
 the_application_must_be_restarted_to_load_the_new_sounds_need_another_restart = The application must be restarted to load the new sounds. An additional download may be required. Click OK to restart the application.
 
+speech_recognition_device_label = Sp&eech input device
+
 load_new_sounds=Load new sounds
 
 downloading_sound_pack = Downloading Sound Pack...
@@ -115,6 +104,11 @@ volume_down = Decrease messages volume
 print_track_data = Print track and position info
 toggle_yellow_flag_messages = Toggle yellow flag messages
 activate_pit_prediction = Pitstop prediction
+get_fuel_status = Report fuel/battery status
+get_status = Report car, damage and session status
+get_car_status = Report car status and damage
+get_session_status = Report session status
+get_damage_report = Report car damage
 
 custom_device = custom device
 assigned_to = assigned to
@@ -143,419 +137,6 @@ unknown_driver_names_language_title = No Sound Pack language defined
 unknown_personalisations_language_text = The current Sound Pack has no language specified. Click "Yes" to proceed with the update (which will download the default English personalisations). Click "No" to cancel.
 unknown_personalisations_language_title = No Sound Pack language defined
 
-# to change the name of the property title in the properties screen, just use the property name like this:
-# enable_spotter = Enable spotter
-# If you uncomment this line, the property text for enable_spotter will display "Enable spotter"
-# Note that I've not (yet...) done this - I'm just using the property ID
-
-acs_install_path = ACS install path
-acs_install_path_help = ACS installation path for plugin installation and updating
-acs_install_path_filter = ASSETTO_64BIT;ASSETTO_32BIT
-ams_install_path = AMS install path
-ams_install_path_help = AMS installation path for plugin installation and updating
-ams_install_path_filter = RF1
-rf1_install_path = rF1 install path
-rf1_install_path_help = rF1 installation path for plugin installation and updating
-rf1_install_path_filter = RF1
-rf2_install_path = rF2 install path
-rf2_install_path_help = rF2 installation path for plugin installation and updating
-rf2_install_path_filter = RF2_64BIT
-
-override_default_sound_pack_location = Override default Sound Pack location
-override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
-
-enable_brake_damage_messages = Enable brake damage messages
-enable_brake_damage_messages_filter = !IRACING
-
-enable_acs_log_sectors_for_unknown_tracks = Enable ACS log sectors for unknown tracks
-enable_acs_log_sectors_for_unknown_tracks_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-enable_brake_lock_warnings = Enable brake lock warnings
-enable_brake_lock_warnings_filter = !IRACING
-
-enable_brake_temp_warnings = Enable brake temp warnings
-enable_brake_temp_warnings_filter = !IRACING
-
-enable_damage_messages = Enable damage messages
-enable_damage_messages_filter = !IRACING
-
-enable_driver_names = Enable driver names
-
-enable_drs_messages = Enable DRS messages
-enable_drs_messages_filter = !IRACING
-
-enable_fuel_messages = Enable fuel messages
-
-enable_battery_messages = Enable battery messages
-enable_battery_messages_filter = RF2_64BIT
-
-enable_gap_messages = Enable gap messages
-enable_green_light_messages = Enable green light messages
-enable_pearls_of_wisdom	= Enable pearls of wisdom
-
-enable_pit_exit_brake_temp_warning = Enable pit exit brake temp warning
-enable_pit_exit_brake_temp_warning_filter = !IRACING
-
-enable_pit_exit_tyre_temp_warning = Enable pit exit tyre temp warning
-enable_pit_exit_tyre_temp_warning_filter = !IRACING
-
-enable_position_messages = Enable position messages
-
-enable_push_to_pass_messages = Enable push to pass messages
-enable_push_to_pass_messages_filter = !IRACING
-
-enable_race_start_messages = Enable race start messages
-enable_session_end_messages = Enable session end messages
-enable_spotter_in_timetrial = Enable Spotter in timetrial
-
-enable_suspension_damage_messages = Enable suspension damage messages
-enable_suspension_damage_messages_filter = !IRACING
-
-enable_track_and_air_temp_reports = Enable track and air temp reports
-
-enable_tyre_temp_warnings = Enable tyre temp warnings
-enable_tyre_temp_warnings_filter = !IRACING
-
-enable_tyre_wear_warnings = Enable tyre wear warnings
-enable_tyre_wear_warnings_filter = !IRACING
-
-enable_wheel_spin_warnings = Enable wheelspin warnings
-enable_wheel_spin_warnings_filter = !IRACING
-
-attempt_pcars_opponent_pit_detection = Attempt pCARS opponent pit detection
-attempt_pcars_opponent_pit_detection_help = Monitor opponent world positions and try to guess when they're entering and leaving the pit lane
-attempt_pcars_opponent_pit_detection_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-cache_sounds = Cache sounds
-cache_sounds_help = Cache sounds in memory
-
-disable_acs_yellow_flag_warnings = Disable ACS yellow flag warnings
-disable_acs_yellow_flag_warnings_help = Prevents yellow flag message spamming in messy online races
-disable_acs_yellow_flag_warnings_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-disable_pcars_prac_and_qual_pole_deltas = Disable pCARS prac and qual pole deltas
-disable_pcars_prac_and_qual_pole_deltas_help = Disable pCARS practice and qual pole deltas - these are unreliable
-disable_pcars_prac_and_qual_pole_deltas_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-launch_acs = Launch ACS
-launch_acs_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-play_cut_track_warnings = Play cut track warnings
-spotter_enable_three_wide_left_and_right = Spotter enable three wide left and right
-spotter_enable_three_wide_left_and_right_help = Use "three wide, you're on the left / right" mmessages (can be confusing)
-use_alternate_beeps = Use alternate beeps
-use_alternate_beeps_help = Use a different radio sound (just the click)
-use_fahrenheit = Use Fahrenheit for temps
-use_listen_beep = Use listen beep
-use_listen_beep_help = Play a beep when you press the 'talk to Crew Chief' button
-
-acs_practice_time_minuts = ACS practice time minutes
-acs_practice_time_minuts_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-min_time_between_personalised_messages = Min time between personalised messages
-minimum_time_between_pearls_of_wisdom = Min time between pearls of wisdom
-spotter_hold_repeat_frequency = Spotter hold repeat frequency
-spotter_hold_repeat_frequency_help = Time between the Spotter repeating "hold your line" when along side a car
-spotter_update_interval = Spotter update interval
-udp_data_port = pCARS UDP port
-udp_data_port_help = pCARS network data UDP port (should usually be 5606)
-udp_data_port_filter = PCARS_NETWORK
-
-acs_spotter_car_length = ACS Spotter default car length
-acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-ams_spotter_car_length = AMS Spotter default car length
-ams_spotter_car_length_filter = RF1
-pcars_spotter_car_length = pCARS Spotter default car length
-pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-r3e_spotter_car_length = R3E Spotter default car length
-r3e_spotter_car_length_filter = RACE_ROOM
-
-rf1_spotter_car_length = rF1 Spotter default car length
-rf1_spotter_car_length_filter = RF1
-
-rf2_spotter_car_length = rF2 Spotter default car length
-rf2_spotter_car_length_filter = RF2_64BIT
-
-spotter_gap_for_clear = Spotter gap for clear
-
-messages_volume = &Messages volume
-background_volume = &Background volume
-background_volume_help = The volume of the background sounds (0 - 1)
-update_interval = Update interval
-update_interval_help = The time (milliseconds) between app updates
-use_sweary_messages = Use sweary messages
-use_sweary_messages_help = A few messages contain swearing - then enables / disables these
-enable_spotter = Enable Spotter
-enable_spotter_help = The Spotter can be enabled and disabled with a button. This setting sets it initial state
-speech_recognition_location = Speech recognition locale
-speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be en-[something].
-spotter_car_length = Spotter car length
-spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the Spotter calls 'hold your line' when you're not overlapping. Increase it if the Spotter doesn't call 'hold your line' when you clearly are overlapping.
-time_after_race_start_for_spotter = Time after race start for spotter
-time_after_race_start_for_spotter_help = Wait this many seconds after race start before enabling the spotter
-min_speed_for_spotter = Min speed for spotter
-min_speed_for_spotter_help = Don't use the Spotter if your speed is less than this
-max_closing_speed_for_spotter = Max closing speed for spotter
-max_closing_speed_for_spotter_help = Don't call 'hold your line' if the closing speed between you and the other car is greater than this
-spotter_clear_delay = Spotter clear delay
-spotter_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear'
-spotter_overlap_delay = Spotter overlap delay
-spotter_overlap_delay_help = You need to be overlapping for this many milliseconds before the Spotter calls 'hold your line'
-custom_device_guid = Custom device GUID
-custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list
-disable_immediate_messages = Disable immediate messages
-disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
-max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
-max_safe_water_temp_over_baseline_help = Baseline water temp is taken after a few minutes. If the water temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high water temp' warning more sensitive
-
-launch_raceroom = Launch R3E
-launch_raceroom_help = If this is true the application will attempt to launch RaceRoom Racing Experience when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_raceroom_filter = RACE_ROOM
-
-r3e_launch_params = R3E launch params
-r3e_launch_params_help = This is used to tell Steam what app to run - R3E's Steam app ID is 211500. If you specified a path RRRE.exe you can leave this blank
-r3e_launch_params_filter = RACE_ROOM
-
-pcars32_launch_params = pCARS 32bit launch params
-pcars32_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars32.exe you can leave this blank
-pcars32_launch_params_filter = PCARS_32BIT
-
-pcars64_launch_params = pCARS 64bit launch params
-pcars64_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars64.exe you can leave this blank
-pcars64_launch_params_filter = PCARS_64BIT
-
-rf1_launch_params = rF1 launch params
-rf1_launch_params_help = This is used to tell Steam what app to run - rFactor's Steam app ID is 339790. If you specified a path rFactor.exe you can leave this blank
-rf1_launch_params_filter = RF1
-
-rf2_launch_params = rF2 launch params
-rf2_launch_params_help = This is used to tell Steam what app to run - rFactor2's Steam app ID is 365960. If you specified a path rFactor2.exe you can leave this blank
-rf2_launch_params_filter = RF2_64BIT
-
-gsc_launch_params = GSC launch params
-gsc_launch_params_help = This is used to tell Steam what app to run - Stock Car Extreme's Steam app ID is 273840. If you specified a path GSC.exe you can leave this blank
-gsc_launch_params_filter = RF1
-
-ams_launch_params = AMS launch params
-ams_launch_params_help = This is used to tell Steam what app to run - Automobilista's Steam app ID is 431600. If you specified a path AMS.exe you can leave this blank
-ams_launch_params_filter = RF1
-
-acs_launch_params = ACS launch params
-acs_launch_params_help = This is used to tell Steam what app to run - Assetto Corsa's Steam app ID is 244210. If you specified a path ACS.exe you can leave this blank
-acs_launch_params_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-marcas_launch_params = Marcas launch params
-marcas_launch_params_help = This is used to tell Steam what app to run - Copa Petrobras de Marcas Steam app ID is 359800. If you specified a path marcas.exe you can leave this blank
-marcas_launch_params_filter = RF1
-
-ftruck_launch_params = FTruck launch params
-ftruck_launch_params_help = This is used to tell Steam what app to run - Formula Truck's Steam app ID is 273750. If you specified a path FTruck.exe you can leave this blank
-ftruck_launch_params_filter = RF1
-
-r3e_launch_exe = R3E launch exe
-r3e_launch_exe_help = This is the location of Steam.exe or the direct path to RRRE.exe. Use forward slashes to separate paths.
-r3e_launch_exe_filter = RACE_ROOM
-
-rf1_launch_exe = rF1 launch exe
-rf1_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor.exe. Use forward slashes to separate paths.
-rf1_launch_exe_filter = RF1
-
-rf2_launch_exe = rF2 launch exe
-rf2_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor2.exe. Use forward slashes to separate paths.
-rf2_launch_exe_filter = RF2_64BIT
-
-gsc_launch_exe = GSC launch exe
-gsc_launch_exe_help = This is the location of Steam.exe or the direct path to GSC.exe. Use forward slashes to separate paths.
-gsc_launch_exe_filter = RF1
-
-ams_launch_exe = AMS launch exe
-ams_launch_exe_help = This is the location of Steam.exe or the direct path to AMS.exe. Use forward slashes to separate paths.
-ams_launch_exe_filter = RF1
-
-acs_launch_exe = ACS launch exe
-acs_launch_exe_help = This is the location of Steam.exe or the direct path to ACS.exe. Use forward slashes to separate paths.
-acs_launch_exe_filter = ASSETTO_64BIT;ASSETTO_32BIT
-
-marcas_launch_exe = Marcas launch exe
-marcas_launch_exe_help = This is the location of Steam.exe or the direct path to marcas.exe. Use forward slashes to separate paths.
-marcas_launch_exe_filter = RF1
-
-ftruck_launch_exe = FTruck launch exe
-ftruck_launch_exe_help = This is the location of Steam.exe or the direct path to FTruck.exe. Use forward slashes to separate paths.
-ftruck_launch_exe_filter = RF1
-
-pcars32_launch_exe = pCARS 32bit launch exe
-pcars32_launch_exe_help = This is the location of Steam.exe or the direct path to pcars32.exe. Use forward slashes to separate paths.
-pcars32_launch_exe_filter = PCARS_32BIT
-
-pcars64_launch_exe = pCARS 64bit launch exe
-pcars64_launch_exe_help = This is the location of Steam.exe or the direct path to pcars64.exe. Use forward slashes to separate paths.
-pcars64_launch_exe_filter = PCARS_64BIT
-
-launch_rfactor1 = Launch rFactor 1
-launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_rfactor1_filter = RF1
-
-launch_rfactor2 = Launch rFactor 2
-launch_rfactor2_help = If this is true the application will attempt to launch rFactor 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_rfactor2_filter = RF2_64BIT
-
-launch_gsc = Launch GSC
-launch_gsc_help = If this is true the application will attempt to launch Stock Car Extreme when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_gsc_filter = RF1
-
-launch_ams = Launch AMS
-launch_ams_help = If this is true the application will attempt to launch Automobilista when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_ams_filter = RF1
-
-launch_marcas = Launch Marcas
-launch_marcas_help = If this is true the application will attempt to launch Copa Petrobras de Marcas when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_marcas_filter = RF1
-
-launch_ftruck = Launch FTruck
-launch_ftruck_help = If this is true the application will attempt to launch Formula Truck when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_ftruck_filter = RF1
-
-launch_pcars = Launch pCARS
-launch_pcars_help = If this is true the application will attempt to launch pCARS when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_pcars_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-pcars2_launch_exe = pCARS 2 launch exe
-pcars2_launch_exe_help = This is the location of Steam.exe or the direct path to pCARS2AVX.exe. Use forward slashes to separate paths.
-pcars2_launch_exe_filter = PCARS2
-
-pcars2_launch_params = pCARS 2 launch params
-pcars2_launch_params_help = This is used to tell Steam what app to run - pCARS 2's Steam app ID is 378860. If you specified a path pCARS2AVX.exe you can leave this blank
-pcars2_launch_params_filter = PCARS2
-
-launch_pcars2 = Launch pCARS 2
-launch_pcars2_help = If this is true the application will attempt to launch pCARS 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_pcars2_filter = PCARS2
-
-iracing_launch_exe = iRacing launch exe
-iracing_launch_exe_help = This is the path to iRacingSim64DX11.exe. Use forward slashes to separate paths.
-iracing_launch_exe_filter = IRACING
-
-iracing_launch_params = iRacing launch params
-iracing_launch_params_filter = IRACING
-
-launch_iracing = Launch iRacing
-launch_iracing_help = If this is true the application will attempt to launch iRacing when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
-launch_iracing_filter = IRACING
-
-run_immediately = Run immediately
-run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set
-
-pcars_steam_id = pCARS Steam ID
-pcars_steam_id_help = pCARS sometimes sends the participant data in the wrong order. If this value is set, the app will use it to try and work around this issue, preventing the app 'seeing' the wrong data for the player
-pcars_steam_id_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-cumulative_lap_lockup_warning_threshold = Cumulative lap lockup warning threshold
-cumulative_lap_lockup_warning_threshold_help = If the player has locked wheels for more than this many seconds over the course of a lap, play a warning
-cumulative_lap_lockup_warning_threshold_filter = !IRACING
-
-cumulative_lap_wheelspin_warning_threshold = Cumulative lap wheelspin warning threshold
-cumulative_lap_wheelspin_warning_threshold_help = If the player has wheelspin for more than this many seconds over the course of a lap, play a warning
-cumulative_lap_wheelspin_warning_threshold_filter = !IRACING
-
-minimum_name_voice_recognition_confidence = Minimum name voice recognition confidence
-minimum_name_voice_recognition_confidence_help = When processing voice commands asking about opponent drivers, the speech recognition engine must be at least this confident it understood before the app responds (0.0 - 1.0, default 0.4)
-minimum_voice_recognition_confidence = Minimum voice recognition confidence
-minimum_voice_recognition_confidence_help = When processing voice commands, the speech recognition engine must be at least this confident it understood before the app responds (0.0 - 1.0, default 0.5)
-display_session_lap_times = Display session lap times
-display_session_lap_times_help = Write all the lap times from the completed session to the console (separated by ;)
-enable_opponent_laptime_reporting_in_race = Enable opponent laptime reporting in race
-enable_opponent_laptime_reporting_in_race_help = Call out opponent lap times in the race (car front, behind & leader) if the lap time is their best lap.
-report_sector_deltas_race = Report race sector deltas
-report_sector_deltas_race_help = Give sector delta information during a race.
-report_sector_deltas_race_likelihood = Report race sector deltas likelihood
-report_sector_deltas_race_likelihood_help = Probability of giving a sectors report after each race lap (0 = disabled, 1 = every lap, default 0.3 - 30% chance of sector information on each lap)
-report_sector_deltas_practice_and_qual = Report practice and qual sector deltas
-report_sector_deltas_practice_and_qual_help = Give sector delta information during practice and qualifying.
-frequency_of_overtaking_messages = Frequency of overtaking messages
-frequency_of_overtaking_messages_help = How often to congratulate the player when he makes a clean overtake. 0 (never) to 10 (as often as possible)
-frequency_of_being_overtaken_messages = Frequency of being overtaken messages
-frequency_of_being_overtaken_messages_help = How often to berate the player when he gets overtaken. 0 (never) to 10 (as often as possible)
-frequency_of_car_close_ahead_reports = Frequency of car close ahead reports
-frequency_of_car_close_ahead_reports_help = How often to report a car close behind (being pressured). 0 (never) to 10 (as often as possible)
-frequency_of_car_close_behind_reports = Frequency of car close behind reports
-frequency_of_car_close_behind_reports_help = How often to report a car close in front (pressuring an opponent). 0 (never) to 10 (as often as possible)
-frequency_of_gap_ahead_reports = Frequency of gap ahead reports
-frequency_of_gap_ahead_reports_help = How often to report a the gap to the car in front. 0 (never) to 10 (as often as possible)
-frequency_of_gap_behind_reports = Frequency of gap behind reports
-frequency_of_gap_behind_reports_help = How often to report a the gap to the car behind. 0 (never) to 10 (as often as possible)
-frequency_of_opponent_race_lap_times = Frequency of opponent race lap times
-frequency_of_opponent_race_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
-frequency_of_opponent_practice_and_qual_lap_times = Frequency of opponent practice and quali lap times
-frequency_of_opponent_practice_and_qual_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
-frequency_of_pearls_of_wisdom = Frequency of pearls of wisdom
-frequency_of_pearls_of_wisdom_help = How often to play general encouragement messages. 0 (never) to 10 (as often as possible)
-frequency_of_player_race_lap_time_reports = Frequency of player race lap time reports
-frequency_of_player_race_lap_time_reports_help = How often to report player lap times in the race. 0 (never) to 10 (as often as possible)
-frequency_of_player_prac_and_qual_lap_time_reports = Freq of player prac and qual lap time reports
-frequency_of_player_prac_and_qual_lap_time_reports_help = How often to report player lap times in the practice and qualifying. 0 (never) to 10 (as often as possible)
-frequency_of_prac_and_qual_sector_delta_reports = Frequency of player prac and qual sector delta reports
-frequency_of_prac_and_qual_sector_delta_reports_help = How often to report player sector deltas in practice and qualifying. 0 (never) to 10 (as often as possible)
-frequency_of_race_sector_delta_reports = Frequency of race sector delta reports
-frequency_of_race_sector_delta_reports_help = How often to report a player sector deltas in race. 0 (never) to 10 (as often as possible)
-race_sector_reports_at_each_sector = Race sector reports at each sector
-race_sector_reports_at_each_sector_help = Play race sector delta reports as you complete each sector
-race_sector_reports_at_lap_end = Race sector reports at lap end
-race_sector_reports_at_lap_end_help = Play sector delta reports for whole lap when you complete the lap
-practice_and_qual_sector_reports_at_each_sector = Prac and qual sector reports at each sector
-practice_and_qual_sector_reports_at_each_sector_help = Play practice and qual sector delta reports as you complete each sector
-practice_and_qual_sector_reports_at_lap_end = Prac and qual sector reports at lap end
-practice_and_qual_sector_reports_at_lap_end_help = Play practice and qual sector delta reports for whole lap when you complete the lap
-ambient_temp_check_interval_seconds = Ambient temp check interval seconds
-ambient_temp_check_interval_seconds_help = How often to check for changes in ambient (air) temperature, in seconds
-track_temp_check_interval_seconds = Track temp check interval seconds
-track_temp_check_interval_seconds_help = How often to check for changes in track temperature, in seconds
-report_ambient_temp_changes_greater_than = Report ambient temp changes greater than
-report_ambient_temp_changes_greater_than_help = Report ambient (air) temperature if it's changed by more than this amount (in celsius)
-report_track_temp_changes_greater_than = Report track temp changes greater than
-report_track_temp_changes_greater_than_help = Report track temperature if it's changed by more than this amount (in celsius)
-pause_between_messages = Pause between messages
-pause_between_messages_help = Time pause between messages (in seconds) when reading multiple messages together in a single group.
-load_sound_files_on_startup = Load sound files on startup
-load_sound_files_on_startup_help = Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.
-
-pcars_character_encoding = pCARS character encoding
-pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
-pcars_character_encoding_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-enable_pcars_pit_window_messages = Enable pCARS pit window messages
-enable_pcars_pit_window_messages_help = Play pit window messages in pCARS. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host
-enable_pcars_pit_window_messages_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
-
-use_tts_for_missing_names = Use TTS for missing names
-use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
-report_yellows_in_all_sectors = Report yellows in all sectors
-report_yellows_in_all_sectors_help = If this is disabled the app will report yellow flags only in the current and next sector
-max_distance_moved_for_yellow_announcement = Max distance moved for yellow announcement
-max_distance_moved_for_yellow_announcement_help = Cars which have moved less than this many metres in 3 seconds may be reported as having crashed
-
-enable_delayed_responses = Enable delayed responses
-enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
-enable_console_logging = Enable console logging
-enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
-log_tyre_stats = Log tyre stats
-log_tyre_stats_help = Show tyre temps and wear at the start of each sector
-
-r3e_blue_flag_detection_distance = R3E blue flag detection distance
-r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
-r3e_blue_flag_detection_distance_filter = RACE_ROOM
-
-play_pre_lights_messages_until_cancelled = Play pre-lights messages until cancelled
-play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
-time_between_caution_period_status_reminders = Time between caution period status reminders
-time_between_caution_period_status_reminders_help = Time between caution period status reminders (seconds)
-
-enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
-enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
-enable_ams_pit_schedule_messages_filter = RF1
-
 personalisations_are_up_to_date = Personalisations are up to date
 personalisation_label = M&y name (requires restart)
 
@@ -565,44 +146,6 @@ install_plugin_select_directory_start = Please select
 install_plugin_select_directory_end = installation directory
 install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancle to Return
 install_plugin_popup_enable_title = Enable Plugin
-
-report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
-report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
-report_allowed_overtakes_under_yellow_filter = RACE_ROOM
-
-enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
-enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
-enable_rf2_pit_stop_prediction_filter = RF2_64BIT
-
-enable_simple_incident_detection = Enable simple incident detection
-enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
-enable_yellow_flag_messages = Enable yellow flag messages
-enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridden during a session with voice command or button assignment)
-enable_opponent_crash_messages = Enable opponent crash messages
-enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
-
-prefer_alternative_download_site = Prefer alternative download site
-prefer_alternative_download_site_help = Use the secondary download location for updates
-
-version = Version
-the_application_must_be_restarted_to_check_for_updates = The application must be restarted to check for updates. Click OK to restart the application.
-check_for_updates = &Force update check
-donate_link_text = Donate to Support Crew Chief development
-
-use_american_terms = Use American terms
-use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
-realistic_mode = Realistic mode
-realistic_mode_help = Experimental: Restrict available message types based on the car and track in use
-always_report_time_in_hundredths = Always report time in hundredths
-always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
-insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
-insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
-insert_beep_out_between_spotter_and_chief = Insert beep-out between Spotter and Chief
-insert_beep_out_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert close channel beep sound on switching messages.
-minimize_to_tray = Minimize to tray
-minimize_to_tray_help = Minimize Crew Chief to the system notification area instead of taskbar.
-minimize_on_startup = Minimize on startup
-minimize_to_tray_help = Starts Crew Chief minimized to task bar or system tray.
 
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = E&xit without Saving
@@ -623,141 +166,879 @@ reset_warning_text = This will reset all the Crew Chief settings to their defaul
 reset_warning_title = Reset All Settings to Default Values
 
 spotter_name_label = Spotter &voice (requires restart)
-get_fuel_status = Report fuel/battery status
+messages_audio_device_label = Messages playbac&k device
+background_audio_device_label = Background playback &device
 
+version = Version
+the_application_must_be_restarted_to_check_for_updates = The application must be restarted to check for updates. Click OK to restart the application.
+check_for_updates = &Force update check
+donate_link_text = Donate to Support Crew Chief development
 toggle_manual_formation_lap = Toggle manual formation lap mode
 read_corner_names_for_lap = Read corner names for current lap
 
+all_categories_label = All Categories
+ui_startup_and_paths_category_label = UI, Startup & Paths
+audio_voice_and_controllers_category_label = Audio, Voice & Controllers
+spotter_category_label = Spotter
+flags_and_rules_category_label = Flags & Rules
+message_frequences_category_label = Message Frequences
+fuel_temps_and_damages_category_label = Fuel, Temperatures & Damage
+timings_category_label = Timings
+pit_stops_and_multiclass_category_label = Pit Stops & Multiclass
+misc_category_label = Miscellaneous
+
+category_filter_label = Ca&tegory filter:
+
+###################################### Preferences ######################################################
+# to change the name of the property title in the properties screen, just use the property name like this:
+# enable_spotter = Enable spotter
+# If you uncomment this line, the property text for enable_spotter will display "Enable spotter"
+# Note that I've not (yet...) done this - I'm just using the property ID
+#
+# ---- Property filtering ----
+# Properties form is capable of filtering properties per game.
+#
+# In order to specify property filter, add entry [property_name]_filter = [filter].
+# If property has no filter attached, it is considered to be common property.
+# Filter can consist of semicolon separated GameEnum values.  Filter can be inclusive or exclusive.  Exclusive filter starts with '!'. 
+#
+# Examples:
+# To specify that property applies to rF2 and R3E (include filter):
+#	my_prop_filter = RF2_64BIT;RACE_ROOM  
+#
+# To specify that property applies to all games but rF1 and AC (exclude filter):
+#	my_prop_filter = !RF1;ASSETTO_64BIT;ASSETTO_32BIT
+#
+# ---- Property Categories ----
+# Properties can also be assigned one or multiple categories.  The intent is to help  users discover features and options.
+# The reason multiple categories are allowed is because it makes sense for some properties, and again increases discoverability.
+# If no category is assigned, property gets MISC (Miscellaneous) category.
+#
+# Category is specified by:
+#	my_prop_category = CATEGORY_NAME
+#
+# Where CATEGORY_NAME is one of the values in PropertiesForm.PropertyCategory enumeration.
+#
+
+acs_install_path = ACS install path
+acs_install_path_help = ACS installation path for plugin installation and updating
+acs_install_path_filter = ASSETTO_64BIT;ASSETTO_32BIT
+acs_install_path_category = UI_STARTUP_AND_PATHS
+
+ams_install_path = AMS install path
+ams_install_path_help = AMS installation path for plugin installation and updating
+ams_install_path_filter = RF1
+ams_install_path_category = UI_STARTUP_AND_PATHS
+
+rf1_install_path = rF1 install path
+rf1_install_path_help = rF1 installation path for plugin installation and updating
+rf1_install_path_filter = RF1
+rf1_install_path_category = UI_STARTUP_AND_PATHS
+
+rf2_install_path = rF2 install path
+rf2_install_path_help = rF2 installation path for plugin installation and updating
+rf2_install_path_filter = RF2_64BIT
+rf2_install_path_category = UI_STARTUP_AND_PATHS
+
+override_default_sound_pack_location = Override default Sound Pack location
+override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
+override_default_sound_pack_location_category = AUDIO_VOICE_AND_CONTROLLERS
+
+enable_brake_damage_messages = Enable brake damage messages
+enable_brake_damage_messages_filter = !IRACING;RF2_64BIT
+enable_brake_damage_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_acs_log_sectors_for_unknown_tracks = Enable ACS log sectors for unknown tracks
+enable_acs_log_sectors_for_unknown_tracks_filter = ASSETTO_64BIT;ASSETTO_32BIT
+enable_acs_log_sectors_for_unknown_tracks_category = TIMINGS;UI_STARTUP_AND_PATHS
+
+enable_brake_lock_warnings = Enable brake lock warnings
+enable_brake_lock_warnings_filter = !IRACING
+enable_brake_lock_warnings_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_brake_temp_warnings = Enable brake temp warnings
+enable_brake_temp_warnings_filter = !IRACING
+enable_brake_temp_warnings_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_damage_messages = Enable damage messages
+enable_damage_messages_filter = !IRACING
+enable_damage_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_driver_names = Enable driver names
+enable_driver_names_category = AUDIO_VOICE_AND_CONTROLLERS
+
+enable_drs_messages = Enable DRS messages
+enable_drs_messages_filter = !IRACING
+enable_drs_messages_category = FLAGS_AND_RULES
+
+enable_fuel_messages = Enable fuel messages
+enable_fuel_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_battery_messages = Enable battery messages
+enable_battery_messages_filter = RF2_64BIT
+enable_battery_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_gap_messages = Enable gap messages
+enable_gap_messages_category = TIMINGS
+enable_green_light_messages = Enable green light messages
+enable_pearls_of_wisdom	= Enable pearls of wisdom
+
+enable_pit_exit_brake_temp_warning = Enable pit exit brake temp warning
+enable_pit_exit_brake_temp_warning_filter = !IRACING
+enable_pit_exit_brake_temp_warning_category = FUEL_TEMPS_AND_DAMAGES;PIT_STOPS_AND_MULTICLASS
+
+enable_pit_exit_tyre_temp_warning = Enable pit exit tyre temp warning
+enable_pit_exit_tyre_temp_warning_filter = !IRACING
+enable_pit_exit_tyre_temp_warning_category = FUEL_TEMPS_AND_DAMAGES;PIT_STOPS_AND_MULTICLASS
+
+enable_position_messages = Enable position messages
+
+enable_push_to_pass_messages = Enable push to pass messages
+enable_push_to_pass_messages_filter = !IRACING
+enable_push_to_pass_messages_category = FLAGS_AND_RULES
+
+enable_race_start_messages = Enable race start messages
+enable_session_end_messages = Enable session end messages
+
+enable_spotter_in_timetrial = Enable Spotter in timetrial
+enable_spotter_in_timetrial_category = SPOTTER
+
+enable_suspension_damage_messages = Enable suspension damage messages
+enable_suspension_damage_messages_filter = !IRACING
+enable_suspension_damage_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_track_and_air_temp_reports = Enable track and air temp reports
+enable_track_and_air_temp_reports_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_tyre_temp_warnings = Enable tyre temp warnings
+enable_tyre_temp_warnings_filter = !IRACING
+enable_tyre_temp_warnings_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_tyre_wear_warnings = Enable tyre wear warnings
+enable_tyre_wear_warnings_filter = !IRACING
+enable_tyre_wear_warnings_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_wheel_spin_warnings = Enable wheelspin warnings
+enable_wheel_spin_warnings_filter = !IRACING
+enable_wheel_spin_warnings_category = FUEL_TEMPS_AND_DAMAGES
+
+attempt_pcars_opponent_pit_detection = Attempt pCARS opponent pit detection
+attempt_pcars_opponent_pit_detection_help = Monitor opponent world positions and try to guess when they're entering and leaving the pit lane
+attempt_pcars_opponent_pit_detection_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+attempt_pcars_opponent_pit_detection_category = PIT_STOPS_AND_MULTICLASS
+
+cache_sounds = Cache sounds
+cache_sounds_help = Cache sounds in memory
+cache_sounds_category = AUDIO_VOICE_AND_CONTROLLERS
+
+disable_acs_yellow_flag_warnings = Disable ACS yellow flag warnings
+disable_acs_yellow_flag_warnings_help = Prevents yellow flag message spamming in messy online races
+disable_acs_yellow_flag_warnings_filter = ASSETTO_64BIT;ASSETTO_32BIT
+disable_acs_yellow_flag_warnings_category = FLAGS_AND_RULES
+
+disable_pcars_prac_and_qual_pole_deltas = Disable pCARS prac and qual pole deltas
+disable_pcars_prac_and_qual_pole_deltas_help = Disable pCARS practice and qual pole deltas - these are unreliable
+disable_pcars_prac_and_qual_pole_deltas_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+disable_pcars_prac_and_qual_pole_deltas_category = TIMINGS
+
+launch_acs = Launch ACS
+launch_acs_filter = ASSETTO_64BIT;ASSETTO_32BIT
+launch_acs_category = UI_STARTUP_AND_PATHS
+
+play_cut_track_warnings = Play cut track warnings
+play_cut_track_warnings_category = FLAGS_AND_RULES
+
+spotter_enable_three_wide_left_and_right = Spotter enable three wide left and right
+spotter_enable_three_wide_left_and_right_help = Use "three wide, you're on the left / right" mmessages (can be confusing)
+spotter_enable_three_wide_left_and_right_category = SPOTTER
+
+use_alternate_beeps = Use alternate beeps
+use_alternate_beeps_help = Use a different radio sound (just the click)
+use_alternate_beeps_category = AUDIO_VOICE_AND_CONTROLLERS
+
+use_fahrenheit = Use Fahrenheit for temps
+use_fahrenheit_category = FUEL_TEMPS_AND_DAMAGES
+
+use_listen_beep = Use listen beep
+use_listen_beep_help = Play a beep when you press the 'talk to Crew Chief' button
+use_listen_beep_category = AUDIO_VOICE_AND_CONTROLLERS
+
+acs_practice_time_minuts = ACS practice time minutes
+acs_practice_time_minuts_filter = ASSETTO_64BIT;ASSETTO_32BIT
+
+min_time_between_personalised_messages = Min time between personalised messages
+min_time_between_personalised_messages_category = MESSAGE_FREQUENCES
+
+minimum_time_between_pearls_of_wisdom = Min time between pearls of wisdom
+minimum_time_between_pearls_of_wisdom_category = MESSAGE_FREQUENCES
+
+spotter_hold_repeat_frequency = Spotter hold repeat frequency
+spotter_hold_repeat_frequency_help = Time between the Spotter repeating "hold your line" when along side a car
+spotter_hold_repeat_frequency_category = SPOTTER;MESSAGE_FREQUENCES
+
+spotter_update_interval = Spotter update interval
+spotter_update_interval_category = SPOTTER
+
+udp_data_port = pCARS UDP port
+udp_data_port_help = pCARS network data UDP port (should usually be 5606)
+udp_data_port_filter = PCARS_NETWORK
+udp_data_port_category = UI_STARTUP_AND_PATHS
+
+acs_spotter_car_length = ACS Spotter default car length
+acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
+acs_spotter_car_length_category = SPOTTER
+
+ams_spotter_car_length = AMS Spotter default car length
+ams_spotter_car_length_filter = RF1
+ams_spotter_car_length_category = SPOTTER
+
+pcars_spotter_car_length = pCARS Spotter default car length
+pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+pcars_spotter_car_length_category = SPOTTER
+
+r3e_spotter_car_length = R3E Spotter default car length
+r3e_spotter_car_length_filter = RACE_ROOM
+r3e_spotter_car_length_category = SPOTTER
+
+rf1_spotter_car_length = rF1 Spotter default car length
+rf1_spotter_car_length_filter = RF1
+rf1_spotter_car_length_category = SPOTTER
+
+rf2_spotter_car_length = rF2 Spotter default car length
+rf2_spotter_car_length_filter = RF2_64BIT
+rf2_spotter_car_length_category = SPOTTER
+
+spotter_gap_for_clear = Spotter gap for clear
+spotter_gap_for_clear_category = SPOTTER;MESSAGE_FREQUENCES
+
+messages_volume = &Messages volume
+messages_volume_category = AUDIO_VOICE_AND_CONTROLLERS
+
+background_volume = &Background volume
+background_volume_help = The volume of the background sounds (0 - 1)
+background_volume_category = AUDIO_VOICE_AND_CONTROLLERS
+
+update_interval = Update interval
+update_interval_help = The time (milliseconds) between app updates
+update_interval_category = MESSAGE_FREQUENCES
+
+use_sweary_messages = Use sweary messages
+use_sweary_messages_help = A few messages contain swearing - then enables / disables these
+
+enable_spotter = Enable Spotter
+enable_spotter_help = The Spotter can be enabled and disabled with a button. This setting sets it initial state
+enable_spotter_category = SPOTTER
+
+speech_recognition_location = Speech recognition locale
+speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be en-[something].
+speech_recognition_location_category = AUDIO_VOICE_AND_CONTROLLERS
+
+spotter_car_length = Spotter car length
+spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the Spotter calls 'hold your line' when you're not overlapping. Increase it if the Spotter doesn't call 'hold your line' when you clearly are overlapping.
+spotter_car_length_category = SPOTTER
+
+time_after_race_start_for_spotter = Time after race start for spotter
+time_after_race_start_for_spotter_help = Wait this many seconds after race start before enabling the spotter
+time_after_race_start_for_spotter_category = SPOTTER
+
+min_speed_for_spotter = Min speed for spotter
+min_speed_for_spotter_help = Don't use the Spotter if your speed is less than this
+min_speed_for_spotter_category = SPOTTER
+
+max_closing_speed_for_spotter = Max closing speed for spotter
+max_closing_speed_for_spotter_help = Don't call 'hold your line' if the closing speed between you and the other car is greater than this
+max_closing_speed_for_spotter_category = SPOTTER
+
+spotter_clear_delay = Spotter clear delay
+spotter_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear'
+spotter_clear_delay_category = SPOTTER
+
+spotter_overlap_delay = Spotter overlap delay
+spotter_overlap_delay_help = You need to be overlapping for this many milliseconds before the Spotter calls 'hold your line'
+spotter_overlap_delay_category = SPOTTER
+
+custom_device_guid = Custom device GUID
+custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list
+custom_device_guid_category = AUDIO_VOICE_AND_CONTROLLERS
+
+disable_immediate_messages = Disable immediate messages
+disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
+disable_immediate_messages_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
+
+max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
+max_safe_oil_temp_over_baseline_category = FUEL_TEMPS_AND_DAMAGES
+
+max_safe_water_temp_over_baseline_help = Baseline water temp is taken after a few minutes. If the water temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high water temp' warning more sensitive
+max_safe_water_temp_over_baseline_category = FUEL_TEMPS_AND_DAMAGES
+
+launch_raceroom = Launch R3E
+launch_raceroom_help = If this is true the application will attempt to launch RaceRoom Racing Experience when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_raceroom_filter = RACE_ROOM
+launch_raceroom_category = UI_STARTUP_AND_PATHS
+
+r3e_launch_params = R3E launch params
+r3e_launch_params_help = This is used to tell Steam what app to run - R3E's Steam app ID is 211500. If you specified a path RRRE.exe you can leave this blank
+r3e_launch_params_filter = RACE_ROOM
+r3e_launch_params_category = UI_STARTUP_AND_PATHS
+
+pcars32_launch_params = pCARS 32bit launch params
+pcars32_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars32.exe you can leave this blank
+pcars32_launch_params_filter = PCARS_32BIT
+pcars32_launch_params_category = UI_STARTUP_AND_PATHS
+
+pcars64_launch_params = pCARS 64bit launch params
+pcars64_launch_params_help = This is used to tell Steam what app to run - pCARS' Steam app ID is 234630. If you specified a path pcars64.exe you can leave this blank
+pcars64_launch_params_filter = PCARS_64BIT
+pcars64_launch_params_category = UI_STARTUP_AND_PATHS
+
+rf1_launch_params = rF1 launch params
+rf1_launch_params_help = This is used to tell Steam what app to run - rFactor's Steam app ID is 339790. If you specified a path rFactor.exe you can leave this blank
+rf1_launch_params_filter = RF1
+rf1_launch_params_category = UI_STARTUP_AND_PATHS
+
+rf2_launch_params = rF2 launch params
+rf2_launch_params_help = This is used to tell Steam what app to run - rFactor2's Steam app ID is 365960. If you specified a path rFactor2.exe you can leave this blank
+rf2_launch_params_filter = RF2_64BIT
+rf2_launch_params_category = UI_STARTUP_AND_PATHS
+
+gsc_launch_params = GSC launch params
+gsc_launch_params_help = This is used to tell Steam what app to run - Stock Car Extreme's Steam app ID is 273840. If you specified a path GSC.exe you can leave this blank
+gsc_launch_params_filter = RF1
+gsc_launch_params_category = UI_STARTUP_AND_PATHS
+
+ams_launch_params = AMS launch params
+ams_launch_params_help = This is used to tell Steam what app to run - Automobilista's Steam app ID is 431600. If you specified a path AMS.exe you can leave this blank
+ams_launch_params_filter = RF1
+ams_launch_params_category = UI_STARTUP_AND_PATHS
+
+acs_launch_params = ACS launch params
+acs_launch_params_help = This is used to tell Steam what app to run - Assetto Corsa's Steam app ID is 244210. If you specified a path ACS.exe you can leave this blank
+acs_launch_params_filter = ASSETTO_64BIT;ASSETTO_32BIT
+acs_launch_params_category = UI_STARTUP_AND_PATHS
+
+marcas_launch_params = Marcas launch params
+marcas_launch_params_help = This is used to tell Steam what app to run - Copa Petrobras de Marcas Steam app ID is 359800. If you specified a path marcas.exe you can leave this blank
+marcas_launch_params_filter = RF1
+marcas_launch_params_category = UI_STARTUP_AND_PATHS
+
+ftruck_launch_params = FTruck launch params
+ftruck_launch_params_help = This is used to tell Steam what app to run - Formula Truck's Steam app ID is 273750. If you specified a path FTruck.exe you can leave this blank
+ftruck_launch_params_filter = RF1
+ftruck_launch_params_category = UI_STARTUP_AND_PATHS
+
+r3e_launch_exe = R3E launch exe
+r3e_launch_exe_help = This is the location of Steam.exe or the direct path to RRRE.exe. Use forward slashes to separate paths.
+r3e_launch_exe_filter = RACE_ROOM
+r3e_launch_exe_category = UI_STARTUP_AND_PATHS
+
+rf1_launch_exe = rF1 launch exe
+rf1_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor.exe. Use forward slashes to separate paths.
+rf1_launch_exe_filter = RF1
+rf1_launch_exe_category = UI_STARTUP_AND_PATHS
+
+rf2_launch_exe = rF2 launch exe
+rf2_launch_exe_help = This is the location of Steam.exe or the direct path to rFactor2.exe. Use forward slashes to separate paths.
+rf2_launch_exe_filter = RF2_64BIT
+rf2_launch_exe_category = UI_STARTUP_AND_PATHS
+
+gsc_launch_exe = GSC launch exe
+gsc_launch_exe_help = This is the location of Steam.exe or the direct path to GSC.exe. Use forward slashes to separate paths.
+gsc_launch_exe_filter = RF1
+gsc_launch_exe_category = UI_STARTUP_AND_PATHS
+
+ams_launch_exe = AMS launch exe
+ams_launch_exe_help = This is the location of Steam.exe or the direct path to AMS.exe. Use forward slashes to separate paths.
+ams_launch_exe_filter = RF1
+ams_launch_exe_category = UI_STARTUP_AND_PATHS
+
+acs_launch_exe = ACS launch exe
+acs_launch_exe_help = This is the location of Steam.exe or the direct path to ACS.exe. Use forward slashes to separate paths.
+acs_launch_exe_filter = ASSETTO_64BIT;ASSETTO_32BIT
+acs_launch_exe_category = UI_STARTUP_AND_PATHS
+
+marcas_launch_exe = Marcas launch exe
+marcas_launch_exe_help = This is the location of Steam.exe or the direct path to marcas.exe. Use forward slashes to separate paths.
+marcas_launch_exe_filter = RF1
+marcas_launch_exe_category = UI_STARTUP_AND_PATHS
+
+ftruck_launch_exe = FTruck launch exe
+ftruck_launch_exe_help = This is the location of Steam.exe or the direct path to FTruck.exe. Use forward slashes to separate paths.
+ftruck_launch_exe_filter = RF1
+ftruck_launch_exe_category = UI_STARTUP_AND_PATHS
+
+pcars32_launch_exe = pCARS 32bit launch exe
+pcars32_launch_exe_help = This is the location of Steam.exe or the direct path to pcars32.exe. Use forward slashes to separate paths.
+pcars32_launch_exe_filter = PCARS_32BIT
+pcars32_launch_exe_category = UI_STARTUP_AND_PATHS
+
+pcars64_launch_exe = pCARS 64bit launch exe
+pcars64_launch_exe_help = This is the location of Steam.exe or the direct path to pcars64.exe. Use forward slashes to separate paths.
+pcars64_launch_exe_filter = PCARS_64BIT
+pcars64_launch_exe_category = UI_STARTUP_AND_PATHS
+
+launch_rfactor1 = Launch rFactor 1
+launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_rfactor1_filter = RF1
+launch_rfactor1_category = UI_STARTUP_AND_PATHS
+
+launch_rfactor2 = Launch rFactor 2
+launch_rfactor2_help = If this is true the application will attempt to launch rFactor 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_rfactor2_filter = RF2_64BIT
+launch_rfactor2_category = UI_STARTUP_AND_PATHS
+
+launch_gsc = Launch GSC
+launch_gsc_help = If this is true the application will attempt to launch Stock Car Extreme when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_gsc_filter = RF1
+launch_gsc_category = UI_STARTUP_AND_PATHS
+
+launch_ams = Launch AMS
+launch_ams_help = If this is true the application will attempt to launch Automobilista when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_ams_filter = RF1
+launch_ams_category = UI_STARTUP_AND_PATHS
+
+launch_marcas = Launch Marcas
+launch_marcas_help = If this is true the application will attempt to launch Copa Petrobras de Marcas when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_marcas_filter = RF1
+launch_marcas_category = UI_STARTUP_AND_PATHS
+
+launch_ftruck = Launch FTruck
+launch_ftruck_help = If this is true the application will attempt to launch Formula Truck when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_ftruck_filter = RF1
+launch_ftruck_category = UI_STARTUP_AND_PATHS
+
+launch_pcars = Launch pCARS
+launch_pcars_help = If this is true the application will attempt to launch pCARS when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_pcars_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+launch_pcars_category = UI_STARTUP_AND_PATHS
+
+pcars2_launch_exe = pCARS 2 launch exe
+pcars2_launch_exe_help = This is the location of Steam.exe or the direct path to pCARS2AVX.exe. Use forward slashes to separate paths.
+pcars2_launch_exe_filter = PCARS2
+pcars2_launch_exe_category = UI_STARTUP_AND_PATHS
+
+pcars2_launch_params = pCARS 2 launch params
+pcars2_launch_params_help = This is used to tell Steam what app to run - pCARS 2's Steam app ID is 378860. If you specified a path pCARS2AVX.exe you can leave this blank
+pcars2_launch_params_filter = PCARS2
+pcars2_launch_params_category = UI_STARTUP_AND_PATHS
+
+launch_pcars2 = Launch pCARS 2
+launch_pcars2_help = If this is true the application will attempt to launch pCARS 2 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_pcars2_filter = PCARS2
+launch_pcars2_category = UI_STARTUP_AND_PATHS
+
+iracing_launch_exe = iRacing launch exe
+iracing_launch_exe_help = This is the path to iRacingSim64DX11.exe. Use forward slashes to separate paths.
+iracing_launch_exe_filter = IRACING
+iracing_launch_exe_category = UI_STARTUP_AND_PATHS
+
+iracing_launch_params = iRacing launch params
+iracing_launch_params_filter = IRACING
+iracing_launch_params_category = UI_STARTUP_AND_PATHS
+
+launch_iracing = Launch iRacing
+launch_iracing_help = If this is true the application will attempt to launch iRacing when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_iracing_filter = IRACING
+launch_iracing_category = UI_STARTUP_AND_PATHS
+
+run_immediately = Run immediately
+run_immediately_help = If this is true the application will start running CrewChief as soon as you start it up, using whatever options you previously set
+run_immediately_category = UI_STARTUP_AND_PATHS
+
+pcars_steam_id = pCARS Steam ID
+pcars_steam_id_help = pCARS sometimes sends the participant data in the wrong order. If this value is set, the app will use it to try and work around this issue, preventing the app 'seeing' the wrong data for the player
+pcars_steam_id_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+pcars_steam_id_category = UI_STARTUP_AND_PATHS
+
+cumulative_lap_lockup_warning_threshold = Cumulative lap lockup warning threshold
+cumulative_lap_lockup_warning_threshold_help = If the player has locked wheels for more than this many seconds over the course of a lap, play a warning
+cumulative_lap_lockup_warning_threshold_filter = !IRACING
+cumulative_lap_lockup_warning_threshold_category = FUEL_TEMPS_AND_DAMAGES;MESSAGE_FREQUENCES
+
+cumulative_lap_wheelspin_warning_threshold = Cumulative lap wheelspin warning threshold
+cumulative_lap_wheelspin_warning_threshold_help = If the player has wheelspin for more than this many seconds over the course of a lap, play a warning
+cumulative_lap_wheelspin_warning_threshold_filter = !IRACING
+cumulative_lap_wheelspin_warning_threshold_category = FUEL_TEMPS_AND_DAMAGES;MESSAGE_FREQUENCES
+
+minimum_name_voice_recognition_confidence = Minimum name voice recognition confidence
+minimum_name_voice_recognition_confidence_help = When processing voice commands asking about opponent drivers, the speech recognition engine must be at least this confident it understood before the app responds (0.0 - 1.0, default 0.4)
+minimum_name_voice_recognition_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
+
+minimum_voice_recognition_confidence = Minimum voice recognition confidence
+minimum_voice_recognition_confidence_help = When processing voice commands, the speech recognition engine must be at least this confident it understood before the app responds (0.0 - 1.0, default 0.5)
+minimum_voice_recognition_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
+
+display_session_lap_times = Display session lap times
+display_session_lap_times_help = Write all the lap times from the completed session to the console (separated by ;)
+display_session_lap_times_category = TIMINGS;UI_STARTUP_AND_PATHS
+
+enable_opponent_laptime_reporting_in_race = Enable opponent laptime reporting in race
+enable_opponent_laptime_reporting_in_race_help = Call out opponent lap times in the race (car front, behind & leader) if the lap time is their best lap.
+enable_opponent_laptime_reporting_in_race_category = TIMINGS
+
+report_sector_deltas_race = Report race sector deltas
+report_sector_deltas_race_help = Give sector delta information during a race.
+report_sector_deltas_race_category = TIMINGS
+
+report_sector_deltas_race_likelihood = Report race sector deltas likelihood
+report_sector_deltas_race_likelihood_help = Probability of giving a sectors report after each race lap (0 = disabled, 1 = every lap, default 0.3 - 30% chance of sector information on each lap)
+report_sector_deltas_race_likelihood_category = TIMINGS;MESSAGE_FREQUENCES
+
+report_sector_deltas_practice_and_qual = Report practice and qual sector deltas
+report_sector_deltas_practice_and_qual_help = Give sector delta information during practice and qualifying.
+report_sector_deltas_practice_and_qual_category = TIMINGS
+
+frequency_of_overtaking_messages = Frequency of overtaking messages
+frequency_of_overtaking_messages_help = How often to congratulate the player when he makes a clean overtake. 0 (never) to 10 (as often as possible)
+frequency_of_overtaking_messages_category = MESSAGE_FREQUENCES
+
+frequency_of_being_overtaken_messages = Frequency of being overtaken messages
+frequency_of_being_overtaken_messages_help = How often to berate the player when he gets overtaken. 0 (never) to 10 (as often as possible)
+frequency_of_being_overtaken_messages_category = MESSAGE_FREQUENCES
+
+frequency_of_car_close_ahead_reports = Frequency of car close ahead reports
+frequency_of_car_close_ahead_reports_help = How often to report a car close behind (being pressured). 0 (never) to 10 (as often as possible)
+frequency_of_car_close_ahead_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_car_close_behind_reports = Frequency of car close behind reports
+frequency_of_car_close_behind_reports_help = How often to report a car close in front (pressuring an opponent). 0 (never) to 10 (as often as possible)
+frequency_of_car_close_behind_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_gap_ahead_reports = Frequency of gap ahead reports
+frequency_of_gap_ahead_reports_help = How often to report a the gap to the car in front. 0 (never) to 10 (as often as possible)
+frequency_of_gap_ahead_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_gap_behind_reports = Frequency of gap behind reports
+frequency_of_gap_behind_reports_help = How often to report a the gap to the car behind. 0 (never) to 10 (as often as possible)
+frequency_of_gap_behind_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_opponent_race_lap_times = Frequency of opponent race lap times
+frequency_of_opponent_race_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
+frequency_of_opponent_race_lap_times_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_opponent_practice_and_qual_lap_times = Frequency of opponent practice and quali lap times
+frequency_of_opponent_practice_and_qual_lap_times_help = How often to report fast laps times for race leader and car in front and behind. 0 (never) to 10 (as often as possible). If this is 1, times are only reported if they're the session best. This criteria becomes less strict up to 10 where the time just needs to be a few tenths off session best.
+frequency_of_opponent_practice_and_qual_lap_times_category = MESSAGE_FREQUENCES
+
+frequency_of_pearls_of_wisdom = Frequency of pearls of wisdom
+frequency_of_pearls_of_wisdom_help = How often to play general encouragement messages. 0 (never) to 10 (as often as possible)
+frequency_of_pearls_of_wisdom_category = MESSAGE_FREQUENCES
+
+frequency_of_player_race_lap_time_reports = Frequency of player race lap time reports
+frequency_of_player_race_lap_time_reports_help = How often to report player lap times in the race. 0 (never) to 10 (as often as possible)
+frequency_of_player_race_lap_time_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_player_prac_and_qual_lap_time_reports = Freq of player prac and qual lap time reports
+frequency_of_player_prac_and_qual_lap_time_reports_help = How often to report player lap times in the practice and qualifying. 0 (never) to 10 (as often as possible)
+frequency_of_player_prac_and_qual_lap_time_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_prac_and_qual_sector_delta_reports = Frequency of player prac and qual sector delta reports
+frequency_of_prac_and_qual_sector_delta_reports_help = How often to report player sector deltas in practice and qualifying. 0 (never) to 10 (as often as possible)
+frequency_of_prac_and_qual_sector_delta_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+frequency_of_race_sector_delta_reports = Frequency of race sector delta reports
+frequency_of_race_sector_delta_reports_help = How often to report a player sector deltas in race. 0 (never) to 10 (as often as possible)
+frequency_of_race_sector_delta_reports_category = MESSAGE_FREQUENCES;TIMINGS
+
+race_sector_reports_at_each_sector = Race sector reports at each sector
+race_sector_reports_at_each_sector_help = Play race sector delta reports as you complete each sector
+race_sector_reports_at_each_sector_category = TIMINGS
+
+race_sector_reports_at_lap_end = Race sector reports at lap end
+race_sector_reports_at_lap_end_help = Play sector delta reports for whole lap when you complete the lap
+race_sector_reports_at_lap_end_category = TIMINGS
+
+practice_and_qual_sector_reports_at_each_sector = Prac and qual sector reports at each sector
+practice_and_qual_sector_reports_at_each_sector_help = Play practice and qual sector delta reports as you complete each sector
+practice_and_qual_sector_reports_at_each_sector_category = TIMINGS
+
+practice_and_qual_sector_reports_at_lap_end = Prac and qual sector reports at lap end
+practice_and_qual_sector_reports_at_lap_end_help = Play practice and qual sector delta reports for whole lap when you complete the lap
+practice_and_qual_sector_reports_at_lap_end_category = TIMINGS
+
+ambient_temp_check_interval_seconds = Ambient temp check interval seconds
+ambient_temp_check_interval_seconds_help = How often to check for changes in ambient (air) temperature, in seconds
+ambient_temp_check_interval_seconds_category = FUEL_TEMPS_AND_DAMAGES
+
+track_temp_check_interval_seconds = Track temp check interval seconds
+track_temp_check_interval_seconds_help = How often to check for changes in track temperature, in seconds
+track_temp_check_interval_seconds_category = FUEL_TEMPS_AND_DAMAGES
+
+report_ambient_temp_changes_greater_than = Report ambient temp changes greater than
+report_ambient_temp_changes_greater_than_help = Report ambient (air) temperature if it's changed by more than this amount (in celsius)
+report_ambient_temp_changes_greater_than_category = FUEL_TEMPS_AND_DAMAGES
+
+report_track_temp_changes_greater_than = Report track temp changes greater than
+report_track_temp_changes_greater_than_help = Report track temperature if it's changed by more than this amount (in celsius)
+report_track_temp_changes_greater_than_category = FUEL_TEMPS_AND_DAMAGES
+
+pause_between_messages = Pause between messages
+pause_between_messages_help = Time pause between messages (in seconds) when reading multiple messages together in a single group.
+pause_between_messages_category = MESSAGE_FREQUENCES
+
+load_sound_files_on_startup = Load sound files on startup
+load_sound_files_on_startup_help = Load all the sounds when the app starts up. This may make app start times quite long, but prevents the app having to load stuff while you're racing.
+load_sound_files_on_startup_category = UI_STARTUP_AND_PATHS
+
+pcars_character_encoding = pCARS character encoding
+pcars_character_encoding_help = For PS4 always use UTF-8. For PC and XBox this will usually be windows-1252 (Windows Western European).
+pcars_character_encoding_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+
+enable_pcars_pit_window_messages = Enable pCARS pit window messages
+enable_pcars_pit_window_messages_help = Play pit window messages in pCARS. Don't use this in online racing - the game always sends an enforced pit stop lap even if this isn't enabled by the host
+enable_pcars_pit_window_messages_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+enable_pcars_pit_window_messages_category = PIT_STOPS_AND_MULTICLASS
+
+use_tts_for_missing_names = Use TTS for missing names
+use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
+use_tts_for_missing_names_category = AUDIO_VOICE_AND_CONTROLLERS
+
+report_yellows_in_all_sectors = Report yellows in all sectors
+report_yellows_in_all_sectors_help = If this is disabled the app will report yellow flags only in the current and next sector
+report_yellows_in_all_sectors_category = FLAGS_AND_RULES
+
+max_distance_moved_for_yellow_announcement = Max distance moved for yellow announcement
+max_distance_moved_for_yellow_announcement_help = Cars which have moved less than this many metres in 3 seconds may be reported as having crashed
+max_distance_moved_for_yellow_announcement_category = FLAGS_AND_RULES
+
+enable_delayed_responses = Enable delayed voice command responses
+enable_delayed_responses_help = Some voice commands will trigger a "stand by" response, followed some time later by the requested into
+enable_delayed_responses_category = AUDIO_VOICE_AND_CONTROLLERS
+
+enable_console_logging = Enable console logging
+enable_console_logging_help = Uncheck this to prevent console window messages being shown. Reduces the CPU load of the app
+enable_console_logging_category = UI_STARTUP_AND_PATHS
+
+log_tyre_stats = Log tyre stats
+log_tyre_stats_help = Show tyre temps and wear at the start of each sector
+log_tyre_stats_category = FUEL_TEMPS_AND_DAMAGES;UI_STARTUP_AND_PATHS
+
+r3e_blue_flag_detection_distance = R3E blue flag detection distance
+r3e_blue_flag_detection_distance_help = Max distance (metres) for R3E blue flag trigger
+r3e_blue_flag_detection_distance_filter = RACE_ROOM
+r3e_blue_flag_detection_distance_category = FLAGS_AND_RULES
+
+play_pre_lights_messages_until_cancelled = Play pre-lights messages until cancelled
+play_pre_lights_messages_until_cancelled_help = Play pre-race info messages until a control input is detected
+
+time_between_caution_period_status_reminders = Time between caution period status reminders
+time_between_caution_period_status_reminders_help = Time between caution period status reminders (seconds)
+time_between_caution_period_status_reminders_category = MESSAGE_FREQUENCES;FLAGS_AND_RULES
+
+enable_ams_pit_schedule_messages = Enable AMS pit schedule messages
+enable_ams_pit_schedule_messages_help = Play 'box now' messages when using offline scheduled pit stops
+enable_ams_pit_schedule_messages_filter = RF1
+enable_ams_pit_schedule_messages_category = PIT_STOPS_AND_MULTICLASS
+
+report_allowed_overtakes_under_yellow = Report allowed overtakes under yellow
+report_allowed_overtakes_under_yellow_help = Play can-overtake and no-overtaking messages during yellow flags (R3E only)
+report_allowed_overtakes_under_yellow_filter = RACE_ROOM
+report_allowed_overtakes_under_yellow_category = FLAGS_AND_RULES
+
+enable_rf2_pit_stop_prediction = Enable rF2 pit stop prediction
+enable_rf2_pit_stop_prediction_help = Play 'box now' messages when using offline scheduled pit stops
+enable_rf2_pit_stop_prediction_filter = RF2_64BIT
+enable_rf2_pit_stop_prediction_category = PIT_STOPS_AND_MULTICLASS
+
+enable_simple_incident_detection = Enable simple incident detection
+enable_simple_incident_detection_help = Watch for and report very slow cars as incidents (pCARS and AC only)
+enable_simple_incident_detection_filter = ASSETTO_64BIT;ASSETTO_32BIT;PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
+enable_simple_incident_detection_category = FUEL_TEMPS_AND_DAMAGES
+
+enable_yellow_flag_messages = Enable yellow flag messages
+enable_yellow_flag_messages_help = Enable yellow flag messages (can be overridden during a session with voice command or button assignment)
+enable_yellow_flag_messages_category = FLAGS_AND_RULES
+
+enable_opponent_crash_messages = Enable opponent crash messages
+enable_opponent_crash_messages_help = Report the names of opponent cars involved in incidents where possible
+enable_opponent_crash_messages_category = FUEL_TEMPS_AND_DAMAGES
+
+prefer_alternative_download_site = Prefer alternative download site
+prefer_alternative_download_site_help = Use the secondary download location for updates
+
+use_american_terms = Use American terms
+use_american_terms_help = Assume unknown cars use American phrasing ("pace car", "white flag" for last lap etc)
+use_american_terms_category = FLAGS_AND_RULES
+
+realistic_mode = Realistic mode
+realistic_mode_help = Experimental: Restrict available message types based on the car and track in use
+always_report_time_in_hundredths = Always report time in hundredths
+always_report_time_in_hundredths_help = Always report laptimes and gaps to hundredths of a second
+always_report_time_in_hundredths_category = TIMINGS
+
+insert_beep_in_between_spotter_and_chief = Insert beep-in between Spotter and Chief
+insert_beep_in_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert open channel beep sound on switching messages.
+insert_beep_in_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
+
+insert_beep_out_between_spotter_and_chief = Insert beep-out between Spotter and Chief
+insert_beep_out_between_spotter_and_chief_help = If Spotter and Chief are different people (spotter voices other than Jim), insert close channel beep sound on switching messages.
+insert_beep_out_between_spotter_and_chief_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
+
+minimize_to_tray = Minimize to tray
+minimize_to_tray_help = Minimize Crew Chief to the system notification area instead of taskbar.
+minimize_to_tray_category = UI_STARTUP_AND_PATHS
+
+minimize_on_startup = Minimize on startup
+minimize_on_startup_help = Starts Crew Chief minimized to task bar or system tray.
+minimize_on_startup_category = UI_STARTUP_AND_PATHS
+
 manual_formation_go_with_leader = Manual formation 'go' when leader crosses line
 manual_formation_go_with_leader_help = Cars are allowed to overtake on a manual formation lap as soon as the leader crosses the line
+manual_formation_go_with_leader_category = FLAGS_AND_RULES
 
 reject_message_when_talking = Block messages when talking to the Chief
 reject_message_when_talking_help = Don't play any messages while you have the 'talk to chief' radio channel open
+reject_message_when_talking_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_rf2_frozen_order_messages = Enable rF2 frozen order messages
 enable_rf2_frozen_order_messages_help = Announce order information during Full Course Yellow, Rolling and Formation/Standing starts.
 enable_rf2_frozen_order_messages_filter = RF2_64BIT
+enable_rf2_frozen_order_messages_category = FLAGS_AND_RULES
 
 enable_rf2_cut_track_heuristics = Enable rF2 cut track heuristic detection
 enable_rf2_cut_track_heuristics_help = If enabled, CC will try to detect if user cut track.  If disabled, cut track will only be reported if game reported that lap got invalidated.
 enable_rf2_cut_track_heuristics_filter = RF2_64BIT
+enable_rf2_cut_track_heuristics_category = FLAGS_AND_RULES
 
 enable_rf2_pit_lane_approach_heuristics = Enable rF2 pit lane approach detection
 enable_rf2_pit_lane_approach_heuristics_help = Experimental: If enabled, CC will try to detect if user approaches the pit lane entry and remind him to respect speed limit.  Might not work correctly for all tracks.
 enable_rf2_pit_lane_approach_heuristics_filter = RF2_64BIT
+enable_rf2_pit_lane_approach_heuristics_category = PIT_STOPS_AND_MULTICLASS
 
-enable_command_macros = Enable command macros
+enable_command_macros = Enable voice command macros
 enable_command_macros_help = Enable voice-triggered command macros for pit actions etc
+enable_command_macros_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
 pcars_enable_rain_prediction = Enable PCars rain prediction using CloudBrightness
 pcars_enable_rain_prediction_help = Use CloudBrightness to guess when it might rain - can be quite inaccurate
 pcars_enable_rain_prediction_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 
-get_status = Report car, damage and session status
-get_car_status = Report car status and damage
-get_session_status = Report session status
-get_damage_report = Report car damage
-
 disable_alternative_voice_commands = Disable alternative voice commands
 disable_alternative_voice_commands_help = Experimental: If enabled, CC will only use the first item from each voice command set - may improve recognition accuracy
+disable_alternative_voice_commands_category = AUDIO_VOICE_AND_CONTROLLERS
 
 use_verbose_responses = Use verbose command responses
 use_verbose_responses_help = If enabled, will automatically request more info for the previously issued voice or button command
+use_verbose_responses_category = AUDIO_VOICE_AND_CONTROLLERS
 
 toggle_pace_notes_recording = Start / stop recording pace notes
 toggle_pace_notes_playback = Start / stop playing pace notes
 
-messages_audio_device_label = Messages playbac&k device
-background_audio_device_label = Background playback &device
 use_naudio = Use nAudio for playback
 use_naudio_help = nAudio playback library allows playback device selection and higher volumes
+use_naudio_category = AUDIO_VOICE_AND_CONTROLLERS
 
 toggle_track_landmarks_recording = Start / stop track landmarks recording
 add_track_landmark = Add Start / end track landmark
 
 tts_volume_boost = TTS volume boost (scale)
 tts_volume_boost_help = Scale (multiply) text-to-speech volume by this amount
+tts_volume_boost_category = AUDIO_VOICE_AND_CONTROLLERS
+
 tts_trim_start_milliseconds = Trim start of TTS sounds (milliseconds)
-tts_trim_end_milliseconds = Trim end of TTS sounds (milliseconds)
 tts_trim_start_milliseconds_help = Trim this many milliseconds off the start of TTS sounds to remove pauses before they play
+tts_trim_start_milliseconds_category = AUDIO_VOICE_AND_CONTROLLERS
+
+tts_trim_end_milliseconds = Trim end of TTS sounds (milliseconds)
 tts_trim_end_milliseconds_help = Trim this many milliseconds off the end of TTS sounds to remove pauses after they play
+tts_trim_end_milliseconds_category = AUDIO_VOICE_AND_CONTROLLERS
 
 use_tts_only_when_necessary = Only use TTS when there is no alternative
 use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip optional messages instead of using TTS names
+use_tts_only_when_necessary_category = AUDIO_VOICE_AND_CONTROLLERS
 
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
 iracing_pit_tyre_pressure_in_psi_filter = IRACING
+iracing_pit_tyre_pressure_in_psi_category = PIT_STOPS_AND_MULTICLASS
 
 spotter_volume_boost = Spotter volume boost (scale)
 spotter_volume_boost_help = Scale (multiply) spotter volume by this amount (nAudio only)
+spotter_volume_boost_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
 
 report_fuel_in_gallons = Fuel reports in gallons
 report_fuel_in_gallons_help = Reports fuel consumption in gallons instead of liters
+report_fuel_in_gallons_category = FUEL_TEMPS_AND_DAMAGES
 
 manual_formation_double_file = Manual formation lap double-file start
 manual_formation_double_file_help = Assume manual formation lap starts use 2 lines of cars
+manual_formation_double_file_category = FLAGS_AND_RULES
 
 save_list_of_unvocalized_names = Save driver names with no sound
 save_list_of_unvocalized_names_help = Write unvocalized driver names to file
+save_list_of_unvocalized_names_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_ams_blue_on_slower = Enable AMS / rF1 blue on slower
 enable_ams_blue_on_slower_help = Play 'Blue Flag' messages if car behind seems to be faster.  Useful in multi-class races
 enable_ams_blue_on_slower_filter = RF1
+enable_ams_blue_on_slower_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
 enable_rants = Enable rants
 enable_rants_help = Allow the Chief to occasionally express his disappointment in colourful and forceful terms
 
 spotter_oval_clear_delay = Spotter oval clear delay
 spotter_oval_clear_delay_help = You need to be clear for this many milliseconds before the Spotter calls 'clear' on ovals
+spotter_oval_clear_delay_category = SPOTTER
 
 use_naudio_for_speech_recognition = Use nAudio for speech recognition
 use_naudio_for_speech_recognition_help = nAudio allows speech recognition device selection
-
-speech_recognition_device_label = Sp&eech input device
+use_naudio_for_speech_recognition_category = AUDIO_VOICE_AND_CONTROLLERS
 
 enable_rf2_pit_state_during_fcy = Enable rF2 FCY pit state messages
 enable_rf2_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
 enable_rf2_pit_state_during_fcy_filter = RF2_64BIT
+enable_rf2_pit_state_during_fcy_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
 enable_ams_pit_state_during_fcy = Enable AMS / rF1 FCY pit state messages
 enable_ams_pit_state_during_fcy_help = Announce pit state during Safety Car/Pace Car phase
 enable_ams_pit_state_during_fcy_filter = RF1
+enable_ams_pit_state_during_fcy_category = FLAGS_AND_RULES;PIT_STOPS_AND_MULTICLASS
 
-bring_game_window_to_front_for_macros = Ensure game is on top for command macros
+bring_game_window_to_front_for_macros = Ensure game is on top for voice command macros
 bring_game_window_to_front_for_macros_help = Bring the game window to the front (on top) before running command macros
+bring_game_window_to_front_for_macros_category = AUDIO_VOICE_AND_CONTROLLERS
 
 report_all_laps_in_hotlap_mode = Report all laps when hotlapping/lone practice
 report_all_laps_in_hotlap_mode_help = Announce all lap times when in hotlap/lone practice mode or when we have no opponents in the session
+report_all_laps_in_hotlap_mode_category = MESSAGE_FREQUENCES;TIMINGS
 
 enable_crash_messages = Enable crash messages
 enable_crash_messages_help = Play 'are you OK?' messages when you crash very heavily
 enable_crash_messages_filter = !IRACING
+enable_crash_messages_category = FUEL_TEMPS_AND_DAMAGES
 
 force_single_class = Force single car class
 force_single_class_help = Don't allow participants to be grouped by their car classes
+force_single_class_category = PIT_STOPS_AND_MULTICLASS
 
 force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
+force_min_window_size_category = UI_STARTUP_AND_PATHS
 
 pit_box_position_countdown = Pit box countdown
 pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_position_countdown_category = PIT_STOPS_AND_MULTICLASS
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
+enable_multiclass_messages_category = PIT_STOPS_AND_MULTICLASS
 
 allow_macros_to_trigger_automatically = Allow automatic macro triggering
 allow_macros_to_trigger_automatically_help = Enable some macros to execute automatically (e.g. R3E pit auto-confirm)
+allow_macros_to_trigger_automatically_category = PIT_STOPS_AND_MULTICLASS
 
 target_warning_time_for_slower_class_car = Multi-class slower car warning time
 target_warning_time_for_slower_class_car_help = Try and warn this many seconds in advance when passing slower class cars
+target_warning_time_for_slower_class_car_category = PIT_STOPS_AND_MULTICLASS
+
 target_warning_time_for_faster_class_car = Multi-class faster car warning time
 target_warning_time_for_faster_class_car_help = Try and warn this many seconds in advance when being passed by faster class cars
+target_warning_time_for_faster_class_car_category = PIT_STOPS_AND_MULTICLASS
 
 max_unknown_car_classes_for_assetto = Max unknown car models in ACS multi-class races
 max_unknown_car_classes_for_assetto_help = Assume single-class race if there are more than this many unknown car models in Assetto Corsa
 max_unknown_car_classes_for_assetto_filter = ASSETTO_64BIT;ASSETTO_32BIT
+max_unknown_car_classes_for_assetto_category = PIT_STOPS_AND_MULTICLASS
 
 iracing_fast_parsing = iRacing faster parser
 iracing_fast_parsing_help = Use fast parser for iRacing session info. Disable only if you experience crashes (and please tell us)
@@ -766,23 +1047,30 @@ iracing_fast_parsing_filter = IRACING
 enable_iracing_pit_stop_commands = Enable iRacing pit stop voice commands
 enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop commands, you may disable this.  If disabled, CC will exclude iRacing pit stop commands from the command set - may improve recognition accuracy
 enable_iracing_pit_stop_commands_filter = IRACING
+enable_iracing_pit_stop_commands_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
 enable_tight_fuel_calc = Enable tight fuel calculations
 enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
+enable_tight_fuel_calc_category = FUEL_TEMPS_AND_DAMAGES
 
 add_additional_fuel = Additional fuel to add to finish the race
 add_additional_fuel_help = The amount of extra fuel (liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
+add_additional_fuel_category = FUEL_TEMPS_AND_DAMAGES
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
 iracing_invalidate_cut_track_laps_help = Disable this if you don't want the app to invalidate laps where you cut the track.
 iracing_invalidate_cut_track_laps_filter = IRACING
+iracing_invalidate_cut_track_laps_category = FLAGS_AND_RULES
 
 force_rf2_rolling_start = Force rF2 'Rolling Start' as a race start type
 force_rf2_rolling_start_help = Due to game limitations, CC can only guess what type of start race has.  Sometimes, 'Rolling' is detected as 'Formation/Standing', mostly on some Kart tracks.  You can force 'Rolling' start by enabling this option.
 force_rf2_rolling_start_filter = RF2_64BIT
+force_rf2_rolling_start_category = FLAGS_AND_RULES
 
 enable_pit_exit_position_estimates = Enable pit exit position estimates
 enable_pit_exit_position_estimates_help = Play pit exit position estimates
+enable_pit_exit_position_estimates_category = PIT_STOPS_AND_MULTICLASS
 
 enable_opponent_pit_exit_estimates = Enable opponent pit exit estimates
 enable_opponent_pit_exit_estimates_help = Play pit exit position estimates for opponent cars
+enable_opponent_pit_exit_estimates_category = PIT_STOPS_AND_MULTICLASS
