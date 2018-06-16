@@ -33,27 +33,19 @@ namespace CrewChiefV4
         }
         private SpecialFilter specialFilterPrev = SpecialFilter.UNKNOWN;
         private bool includeCommonPreferencesPrev = true;
-
-        /*UI, Startup & Paths
-Audio, Voice & Controllers
-Spotter
-Flags
-Message Frequencies
-Temperatures, Damages & Timings
-Miscellaneous*/
-
+        
         internal enum PropertyCategory
         {
-            ALL,
+            ALL,  // Don't assign this to properties, this means no filtering applied.
             UI_STARTUP_AND_PATHS,
             AUDIO_VOICE_AND_CONTROLLERS,
             SPOTTER,
             FLAGS_AND_RULES,
             MESSAGE_FREQUENCES,
-            FUEL_TEMPS_BRAKES_AND_DAMAGES,
+            FUEL_TEMPS_AND_DAMAGES,
             TIMINGS,
             PIT_STOPS_AND_MULTICLASS,
-            MISC,
+            MISC,  // Implied by default.
             UNKNOWN
         }
         private PropertyCategory categoryFilterPrev = PropertyCategory.UNKNOWN;
@@ -215,83 +207,66 @@ Miscellaneous*/
                 // No need to filter.
                 this.specialFilterPrev = SpecialFilter.ALL_PREFERENCES;
             }
-
+            
             // Category filter:
             this.categoriesBox.Items.Clear();
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "All Categories",
+                Label = Configuration.getUIString("all_categories_label"),
                 Value = PropertyCategory.ALL
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "UI, Startup & Paths",
+                Label = Configuration.getUIString("ui_startup_and_paths_category_label"),
                 Value = PropertyCategory.UI_STARTUP_AND_PATHS
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Audio, Voice & Controllers",
+                Label = Configuration.getUIString("audio_voice_and_controllers_category_label"),
                 Value = PropertyCategory.AUDIO_VOICE_AND_CONTROLLERS
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Spotter",
+                Label = Configuration.getUIString("spotter_category_label"),
                 Value = PropertyCategory.SPOTTER
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Flags & Rules",
+                Label = Configuration.getUIString("flags_and_rules_category_label"),
                 Value = PropertyCategory.FLAGS_AND_RULES
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Message Frequences",
+                Label = Configuration.getUIString("message_frequences_category_label"),
                 Value = PropertyCategory.MESSAGE_FREQUENCES
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Fuel, Brakes, Temperatures and Damage",
-                Value = PropertyCategory.FUEL_TEMPS_BRAKES_AND_DAMAGES
+                Label = Configuration.getUIString("fuel_temps_and_damages_category_label"),
+                Value = PropertyCategory.FUEL_TEMPS_AND_DAMAGES
             });
 
-            /*this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
-            {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Temperatures",
-                Value = PropertyCategory.TEMPS
-            });
-            */
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Timings",
+                Label = Configuration.getUIString("timings_category_label"),
                 Value = PropertyCategory.TIMINGS
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Pit Stops & Multiclass",
+                Label = Configuration.getUIString("pit_stops_and_multiclass_category_label"),
                 Value = PropertyCategory.PIT_STOPS_AND_MULTICLASS
             });
 
             this.categoriesBox.Items.Add(new ComboBoxItem<PropertyCategory>()
             {
-                //Label = Configuration.getUIString("all_preferences_label"),
-                Label = "Miscellaneous",
+                Label = Configuration.getUIString("misc_category_label"),
                 Value = PropertyCategory.MISC
             });
 
