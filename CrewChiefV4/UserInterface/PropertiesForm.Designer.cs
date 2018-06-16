@@ -83,6 +83,7 @@ namespace CrewChiefV4
             this.gameFilterLabel.Name = "gameFilterLabel";
             this.gameFilterLabel.Text = Configuration.getUIString("game_filter_label");
             this.gameFilterLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.gameFilterLabel.Padding = new Padding(0, 2, 0, 0);
             this.gameFilterLabel.TabIndex = 9;
             //
             // filterBox
@@ -107,9 +108,9 @@ namespace CrewChiefV4
             // categoriesLablel
             //
             this.categoriesLabel.Name = "categoriesLabel";
-            //this.categoriesLabel.Text = Configuration.getUIString("game_filter_label");
-            this.categoriesLabel.Text = "Ca&tegory filter:";
+            this.categoriesLabel.Text = Configuration.getUIString("category_filter_label");
             this.categoriesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.categoriesLabel.Padding = new Padding(0, 2, 0, 0);
             this.categoriesLabel.TabIndex = 12;
             //
             // categoriesBox
