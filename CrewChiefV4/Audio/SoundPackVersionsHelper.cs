@@ -30,23 +30,29 @@ namespace CrewChiefV4.Audio
         //
         // The base sound pack will always have everything
         public static SoundPackData[] soundPacks = { new SoundPackData(-1, "basesoundpackurl", false),
+                                                     // any sound packs after base will require an additional download if they're not the last in the list
+                                                     //
+                                                     // TODO: change these additional download flags to true when we publish the next update sound pack
+                                                     // (the first non-cumulative pack). This will update from version 146
                                                      new SoundPackData(0, "updatesoundpackurl", false),
-                                                     new SoundPackData(122, "update2soundpackurl", false),
-                                                     // any sound packs after update2soundpack will require an additional download if they're not the last in the list
-                                                     new SoundPackData(146, "update3soundpackurl", false),
+                                                     new SoundPackData(122, "update2soundpackurl", false)
                                                    };
 
         public static SoundPackData[] personalisationPacks = { new SoundPackData(-1, "basepersonalisationsurl", false),
+                                                               // any personalisations after base will require an additional download if they're not the last in the list
+                                                               //
+                                                               // TODO: change these additional download flags to true when we publish the next update personalisations pack
+                                                               // (the first non-cumulative pack). This will update from version 129
                                                                new SoundPackData(0, "updatepersonalisationsurl", false),
-                                                               new SoundPackData(121, "update2personalisationsurl", false),
-                                                               // any personalisations after update2personalisations will require an additional download if they're not the last in the list
-                                                               new SoundPackData(129, "update3personalisationsurl", false)
+                                                               new SoundPackData(121, "update2personalisationsurl", false)
                                                              };
 
         public static SoundPackData[] drivernamesPacks = { new SoundPackData(-1, "basedrivernamesurl", false),
-                                                           new SoundPackData(0, "updatedrivernamesurl", false),
-                                                           // any name packs after updatedrivernames will require an additional download if they're not the last in the list
-                                                           new SoundPackData(130, "update2drivernamesurl", false)
+                                                           // any name packs after base will require an additional download if they're not the last in the list
+                                                           //
+                                                           // TODO: change these additional download flags to true when we publish the next update names pack
+                                                           // (the first non-cumulative pack). This will update from version 130
+                                                           new SoundPackData(0, "updatedrivernamesurl", false)
                                                          };
 
         public static Boolean parseUpdateData(String updateXML)
