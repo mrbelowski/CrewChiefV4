@@ -305,6 +305,8 @@ namespace CrewChiefV4.iRacing
                     currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
                     currentGameState.PitData.NumPitStops = previousGameState.PitData.NumPitStops;
                     currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
+                    currentGameState.PitData.IsTeamRacing = previousGameState.PitData.IsTeamRacing;
+
                     currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
                     currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
                     currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
@@ -512,6 +514,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
             currentGameState.PitData.IsApproachingPitlane = playerCar.Live.TrackSurface == TrackSurfaces.AproachingPits && !shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] && currentSector == 3;
             Boolean jumpToPits = previousGameState != null && !previousGameState.PitData.IsApproachingPitlane && shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx];
+            currentGameState.PitData.IsTeamRacing = shared.SessionData.IsTeamRacing;
 
             currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector && currentSector != 1 || currentGameState.SessionData.IsNewLap;

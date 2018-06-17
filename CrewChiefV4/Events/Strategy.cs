@@ -214,7 +214,7 @@ namespace CrewChiefV4.Events
                 }
                 // nothing else to do unless we're in race mode
             }
-            else if (currentGameState.SessionData.SessionType == SessionType.Race)
+            else if (currentGameState.SessionData.SessionType == SessionType.Race && !currentGameState.PitData.IsTeamRacing)
             {
                 // record the time each opponent entered the pitlane
                 foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
