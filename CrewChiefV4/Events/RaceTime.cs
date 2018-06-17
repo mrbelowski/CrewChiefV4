@@ -121,6 +121,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 5 &&
                         !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
+                        currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest &&
                         // yuk... AC SessionStartPosition is suspect so don't allow "you're shit" messages based on it.
                         CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                     {
