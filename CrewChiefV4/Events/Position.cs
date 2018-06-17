@@ -418,7 +418,8 @@ namespace CrewChiefV4.Events
                             }
                             else if (!isLast && previousPosition < currentGameState.SessionData.ClassPosition &&
                                 currentGameState.SessionData.ClassPosition > 5 && !previousGameState.PitData.OnOutLap &&
-                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
+                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane && 
+                                currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
                             {
                                 // don't play bad-pearl if the lap just completed was an out lap or are in the pit
 
