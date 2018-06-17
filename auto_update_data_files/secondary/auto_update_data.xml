@@ -3,8 +3,8 @@
 Note that the filename has to remain 'auto_update_data.xml' so legacy installs (which have no concept of the primary / 
 secondary update sources) can still be updated. All downloads from this source will be pulled from the isnais ftp server. -->
 <item>
-<title>Crew Chief 4.9.3.3, updated 12 June 2018</title>
-<version>4.9.3.3</version>
+<title>Crew Chief 4.9.3.4, updated 18 June 2018</title>
+<version>4.9.3.4</version>
 <url>http://crewchief.isnais.de/CrewChiefV4.msi</url>
 <changelog>http://crewchief.isnais.de/change_log_for_auto_updated.html</changelog>
 
@@ -15,7 +15,7 @@ secondary update sources) can still be updated. All downloads from this source w
 <retry_replace_with>http://crewchief.isnais.de/</retry_replace_with>
 
 
-<!--legacy sound pack stuff for 4.1.2.2 and earlier-->
+<!--legacy sound pack stuff for 4.1.2.2 and earlier. I've given up updating this, it will be forever at 146 now. -->
 <soundpackversion>146</soundpackversion>
 <basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 <!-- sound pack update from base to version 121 will use this update pack -->
@@ -32,10 +32,7 @@ secondary update sources) can still be updated. All downloads from this source w
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-
-	<!-- TODO: changeme to 147 when the release is done -->
-	<soundpackversion>146</soundpackversion>
-	
+	<soundpackversion>147</soundpackversion>	
 	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://thecrewchief.org/downloads/update_sound_pack.zip</updatesoundpackurl>
@@ -43,15 +40,11 @@ secondary update sources) can still be updated. All downloads from this source w
 	<update2soundpackurl>http://thecrewchief.org/downloads/update_2_sound_pack.zip</update2soundpackurl>
 	<update3soundpackurl>http://thecrewchief.org/downloads/update_3_sound_pack.zip</update3soundpackurl>
 	
-	
-	<!-- TODO: changeme to 131 -->
-	<drivernamesversion>130</drivernamesversion>
-	
+	<drivernamesversion>131</drivernamesversion>	
 	<basedrivernamesurl>http://thecrewchief.org/downloads/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://thecrewchief.org/downloads/update_driver_names.zip</updatedrivernamesurl>
 	<update2drivernamesurl>http://thecrewchief.org/downloads/update_2_driver_names.zip</update2drivernamesurl>
-	
-	
+		
 	<personalisationsversion>129</personalisationsversion>
 	<basepersonalisationsurl>http://thecrewchief.org/downloads/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>

@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.3.3 updated 12 June 2018</title>
-<version>4.9.3.3</version>
+<title>Crew Chief 4.9.3.4 updated 18 June 2018</title>
+<version>4.9.3.4</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
@@ -15,7 +15,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 <retry_replace_with>http://thecrewchief.org/downloads/</retry_replace_with>
 
 
-<!--legacy sound pack stuff for 4.1.2.2 and earlier-->
+<!--legacy sound pack stuff for 4.1.2.2 and earlier. I've given up updating this, it will be forever at 146 now.-->
 <soundpackversion>146</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 <!-- sound pack update from base to version 121 will use this update pack -->
@@ -32,10 +32,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-
-	<!-- TODO: changeme to 147 when the release is done -->
-	<soundpackversion>146</soundpackversion>
-	
+	<soundpackversion>147</soundpackversion>	
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
@@ -43,14 +40,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
 	<update3soundpackurl>http://thecrewchief.org/downloads/update_3_sound_pack.zip</update3soundpackurl>
 	
-	
-	<!-- TODO: changeme to 131 -->
-	<drivernamesversion>130</drivernamesversion>
-	
+	<drivernamesversion>131</drivernamesversion>	
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
-	<update2drivernamesurl>http://thecrewchief.org/downloads/update_2_driver_names.zip</update2drivernamesurl>
-	
+	<update2drivernamesurl>http://thecrewchief.org/downloads/update_2_driver_names.zip</update2drivernamesurl>	
 	
 	<personalisationsversion>129</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
