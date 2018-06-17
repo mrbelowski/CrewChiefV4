@@ -341,9 +341,8 @@ namespace CrewChiefV4.Events
 
 
                 //--------------------------------------
-                // opponent pit exit position estimation - disable this for iRacing
-                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING &&
-                    warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentFinalSectorTimingCheckDue)
+                // opponent pit exit position estimation
+                if (warnAboutOpponentsExitingCloseToPlayer && currentGameState.Now > nextOpponentFinalSectorTimingCheckDue)
                 {
                     float expectedPlayerTimeLoss = -1;
                     DateTime nowMinusExpectedLoss = DateTime.MinValue;
