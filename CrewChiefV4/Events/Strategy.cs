@@ -288,7 +288,10 @@ namespace CrewChiefV4.Events
                 // if we've timed our pitstop in practice, don't search for opponent stop times
                 if (currentGameState.SessionData.JustGoneGreen)
                 {
-                    timeOpponentStops = getExpectedPlayerTimeLoss(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name) == -1;
+                    // don't time opponent stops for iracing because they are so variable - only make estimates for the player,
+                    // and when he's done a benchmark stop.
+                    timeOpponentStops = CrewChief.gameDefinition.gameEnum != GameEnum.IRACING &&
+                        getExpectedPlayerTimeLoss(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name) == -1;
                 }
                 if (currentGameState.SessionData.IsNewLap)
                 {
