@@ -886,6 +886,7 @@ namespace CrewChiefV4
         {
             var clrFore = Color.FromArgb(192, 186, 182);
             var clrBack = Color.FromArgb(54, 57, 62);
+            var clrInactive = Color.FromArgb(192 / 2, 186 / 2, 182 / 2);
 
             foreach (Control c in parent.Controls)
             {
@@ -896,13 +897,31 @@ namespace CrewChiefV4
                     var btn = c as Button;
                     btn.FlatStyle = FlatStyle.Flat;
                     btn.FlatAppearance.BorderSize = 1;
-                    btn.FlatAppearance.BorderColor = Color.FromArgb(192 / 2, 186 / 2, 182 / 2);
+                    btn.FlatAppearance.BorderColor = clrInactive;
                     //  Debug.Assert(false);
                 }
                 else if (c is TextBox)
                 {
                     var tb = c as TextBox;
                     tb.BorderStyle = BorderStyle.FixedSingle;
+                }
+                else if (c is ListBox)
+                {
+                    var lb = c as ListBox;
+                    lb.BorderStyle = BorderStyle.FixedSingle;
+                    //tb.BorderStyle = BorderStyle.FixedSingle;
+                }
+                else if (c is GroupBox)
+                {
+                    var gb = c as GroupBox;
+                    gb.FlatStyle = FlatStyle.Flat;// = BorderStyle.FixedSingle;
+
+                    // this? https://www.codeproject.com/Articles/14801/How-to-skin-scrollbars-for-Panels-in-C
+                    //gb.Bor   // TODO: this will need to be custom drawn.
+                    //                    gb.FlatFlatAppearance.BorderSize = 1;
+                    //                  gb.FlatAppearance.BorderColor = clrInactive;
+
+                    //tb.BorderStyle = BorderStyle.FixedSingle;
                 }
 
                 if (c.HasChildren)
