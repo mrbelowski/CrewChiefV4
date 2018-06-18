@@ -79,6 +79,8 @@ namespace CrewChiefV4
         private Boolean rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         public static Boolean forceMinWindowSize = UserSettings.GetUserSettings().getBoolean("force_min_window_size");
 
+        public static Boolean useDarkTheme = true;
+
         public ControlWriter consoleWriter = null;
 
         private float currentVolume = -1;
@@ -869,6 +871,8 @@ namespace CrewChiefV4
                 doStartAppStuff();
             }
 
+            this.applyDarkTheme();
+
             this.ResumeLayout();
 
             this.Resize += MainWindow_Resize;
@@ -876,6 +880,56 @@ namespace CrewChiefV4
             this.KeyDown += MainWindow_KeyDown;
 
             this.constructingWindow = false;
+        }
+
+        private void applyDarkThemeChildren(Control parent)
+        {
+            var clrFore = Color.FromArgb(192, 186, 182);
+            var clrBack = Color.FromArgb(54, 57, 62);
+
+            foreach (Control c in parent.Controls)
+            {
+                c.BackColor = clrBack;
+                c.ForeColor = clrFore;
+                if (c is Button)
+                {
+                    var btn = c as Button;
+                    btn.FlatStyle = FlatStyle.Flat;
+                    btn.FlatAppearance.BorderSize = 1;
+                    btn.FlatAppearance.BorderColor = Color.FromArgb(192 / 2, 186 / 2, 182 / 2);
+                    //  Debug.Assert(false);
+                }
+                else if (c is TextBox)
+                {
+                    var tb = c as TextBox;
+                    tb.BorderStyle = BorderStyle.FixedSingle;
+                }
+
+                if (c.HasChildren)
+                     this.applyDarkThemeChildren(c);
+            }
+
+        }
+
+        private void applyDarkTheme()
+        {
+            var clrFore = Color.FromArgb(192, 186, 182);
+            var clrBack = Color.FromArgb(54, 57, 62);
+            // might help
+            // https://social.msdn.microsoft.com/Forums/windows/en-US/73391533-6966-40b1-b27d-89c6280cdafc/set-winform-application-theme?forum=winforms
+            this.BackColor = clrBack;
+            this.ForeColor = clrFore;
+
+            if (this.HasChildren)
+                this.applyDarkThemeChildren(this);
+
+            // Spotter/Personalize boxes
+            this.spotterNameBox.FlatStyle = FlatStyle.Flat;
+            this.personalisationBox.FlatStyle = FlatStyle.Flat;
+            //this.spotterNameBox.ForeColor = clrFore;
+            //this.spotterNameBox.BackColor = clrBack;
+
+            //this.assignButtonToAction.ForeColor = clrFore;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)

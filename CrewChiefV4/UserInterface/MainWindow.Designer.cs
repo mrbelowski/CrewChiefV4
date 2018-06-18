@@ -140,7 +140,7 @@ namespace CrewChiefV4
             this.assignButtonToAction.Size = new System.Drawing.Size(130, 39);
             this.assignButtonToAction.TabIndex = 240;
             this.assignButtonToAction.Text = Configuration.getUIString("assign_control");
-            this.assignButtonToAction.UseVisualStyleBackColor = true;
+            //this.assignButtonToAction.UseVisualStyleBackColor = true;
             this.assignButtonToAction.Click += new System.EventHandler(this.assignButtonToActionClick);
             // 
             // deleteAssigmentButton
