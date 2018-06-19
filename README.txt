@@ -220,6 +220,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.3.5: Fixed sound pack version check
+
 Version 4.9.3.4: Changed how sound pack downloads are handled - should significantly reduce the size of sound pack updates; added property categories to make finding stuff easier; added opponent pit exit prediction warning - if the app thinks an opponent car will probably come out of the pits close to you (and it can read his driver name), you'll be warned about him; further opponent pit exit estimation improvements; some internal bug fixes
 
 Version 4.9.3.3: Fixed opponent pit time calculation in pit strategy - app was incorrectly guessing the time an opponent car was in the pitlane; take mandatory pitstop status into account when deriving expected post-pit opponent positions (assume opponents who still haven't pitted will pit this lap if we're at the end of the pit window); Added and corrected a few car classes (pCars2, iRacing and R3E); iRacing - fixed some car class allocation issues
