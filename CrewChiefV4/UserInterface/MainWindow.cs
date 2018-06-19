@@ -162,23 +162,28 @@ namespace CrewChiefV4
                         }
                         else if (SoundPackVersionsHelper.latestSoundPackVersion > SoundPackVersionsHelper.currentSoundPackVersion)
                         {
+                            SoundPackVersionsHelper.SoundPackData soundPackUpdateData = SoundPackVersionsHelper.soundPacks[0];
                             foreach (SoundPackVersionsHelper.SoundPackData soundPack in SoundPackVersionsHelper.soundPacks)
                             {
-                                if (SoundPackVersionsHelper.currentSoundPackVersion <= soundPack.upgradeFromVersion)
+                                if (SoundPackVersionsHelper.currentSoundPackVersion < soundPack.upgradeFromVersion)
                                 {
-                                    soundPackDownloadURL = soundPack.downloadLocation;
-                                    if (soundPackDownloadURL != null)
-                                    {
-                                        Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date, next update is " + soundPack.downloadLocation);
-                                        willNeedAnotherSoundPackDownload = soundPack.willRequireAnotherUpdate;
-                                        downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
-                                            "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
-                                        downloadSoundPackButton.Enabled = true;
-                                        downloadSoundPackButton.BackColor = Color.LightGreen;
-                                        newSoundPackAvailable = true;
-                                    }
                                     break;
                                 }
+                                else
+                                {
+                                    soundPackUpdateData = soundPack;
+                                }
+                            }
+                            soundPackDownloadURL = soundPackUpdateData.downloadLocation;
+                            if (soundPackDownloadURL != null)
+                            {
+                                Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date, next update is " + soundPackUpdateData.downloadLocation);
+                                willNeedAnotherSoundPackDownload = soundPackUpdateData.willRequireAnotherUpdate;
+                                downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
+                                    "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
+                                downloadSoundPackButton.Enabled = true;
+                                downloadSoundPackButton.BackColor = Color.LightGreen;
+                                newSoundPackAvailable = true;
                             }
                         }
 
@@ -191,23 +196,28 @@ namespace CrewChiefV4
                         }
                         else if (SoundPackVersionsHelper.latestPersonalisationsVersion > SoundPackVersionsHelper.currentPersonalisationsVersion)
                         {
+                            SoundPackVersionsHelper.SoundPackData personalisationPackUpdateData = SoundPackVersionsHelper.personalisationPacks[0];
                             foreach (SoundPackVersionsHelper.SoundPackData personalisationPack in SoundPackVersionsHelper.personalisationPacks)
                             {
-                                if (SoundPackVersionsHelper.currentPersonalisationsVersion <= personalisationPack.upgradeFromVersion)
+                                if (SoundPackVersionsHelper.currentPersonalisationsVersion < personalisationPack.upgradeFromVersion)
                                 {
-                                    personalisationsDownloadURL = personalisationPack.downloadLocation;
-                                    if (personalisationsDownloadURL != null)
-                                    {
-                                        Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date, next update is " + personalisationPack.downloadLocation);
-                                        willNeedAnotherPersonalisationsDownload = personalisationPack.willRequireAnotherUpdate;
-                                        downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
-                                            "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
-                                        downloadPersonalisationsButton.Enabled = true;
-                                        downloadPersonalisationsButton.BackColor = Color.LightGreen;
-                                        newPersonalisationsAvailable = true;
-                                    }
                                     break;
                                 }
+                                else
+                                {
+                                    personalisationPackUpdateData = personalisationPack;
+                                }
+                            }
+                            personalisationsDownloadURL = personalisationPackUpdateData.downloadLocation;
+                            if (personalisationsDownloadURL != null)
+                            {
+                                Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date, next update is " + personalisationPackUpdateData.downloadLocation);
+                                willNeedAnotherPersonalisationsDownload = personalisationPackUpdateData.willRequireAnotherUpdate;
+                                downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
+                                    "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
+                                downloadPersonalisationsButton.Enabled = true;
+                                downloadPersonalisationsButton.BackColor = Color.LightGreen;
+                                newPersonalisationsAvailable = true;
                             }
                         }
 
@@ -220,23 +230,28 @@ namespace CrewChiefV4
                         }
                         else if (SoundPackVersionsHelper.latestDriverNamesVersion > SoundPackVersionsHelper.currentDriverNamesVersion)
                         {
+                            SoundPackVersionsHelper.SoundPackData drivernamesPackUpdateData = SoundPackVersionsHelper.drivernamesPacks[0];
                             foreach (SoundPackVersionsHelper.SoundPackData drivernamesPack in SoundPackVersionsHelper.drivernamesPacks)
                             {
-                                if (SoundPackVersionsHelper.currentDriverNamesVersion <= drivernamesPack.upgradeFromVersion)
+                                if (SoundPackVersionsHelper.currentDriverNamesVersion < drivernamesPack.upgradeFromVersion)
                                 {
-                                    drivernamesDownloadURL = drivernamesPack.downloadLocation;
-                                    if (drivernamesDownloadURL != null)
-                                    {
-                                        Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date, next update is " + drivernamesPack.downloadLocation);
-                                        willNeedAnotherDrivernamesDownload = drivernamesPack.willRequireAnotherUpdate;
-                                        downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
-                                            "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
-                                        downloadDriverNamesButton.Enabled = true;
-                                        downloadDriverNamesButton.BackColor = Color.LightGreen;
-                                        newDriverNamesAvailable = true;
-                                    }
                                     break;
                                 }
+                                else
+                                {
+                                    drivernamesPackUpdateData = drivernamesPack;
+                                }
+                            }
+                            drivernamesDownloadURL = drivernamesPackUpdateData.downloadLocation;
+                            if (drivernamesDownloadURL != null)
+                            {
+                                Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date, next update is " + drivernamesPackUpdateData.downloadLocation);
+                                willNeedAnotherDrivernamesDownload = drivernamesPackUpdateData.willRequireAnotherUpdate;
+                                downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
+                                    "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
+                                downloadDriverNamesButton.Enabled = true;
+                                downloadDriverNamesButton.BackColor = Color.LightGreen;
+                                newDriverNamesAvailable = true;
                             }
                         }
 
