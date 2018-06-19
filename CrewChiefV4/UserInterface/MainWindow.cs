@@ -80,6 +80,10 @@ namespace CrewChiefV4
         public static Boolean forceMinWindowSize = UserSettings.GetUserSettings().getBoolean("force_min_window_size");
 
         public static Boolean useDarkTheme = true;
+        public static Color colorForeground = Color.FromArgb(192, 186, 182);
+        public static Color colorBackround = Color.FromArgb(54, 57, 62);
+        public static Color colorInactive = Color.FromArgb(192 / 2, 186 / 2, 182 / 2);
+        public static Color colorActiveButton = Color.FromArgb((int)(54 * 1.2), (int)(57 * 1.2), (int)(62 * 1.2));
 
         public ControlWriter consoleWriter = null;
 
@@ -899,20 +903,23 @@ namespace CrewChiefV4
 
         private void applyDarkThemeChildren(Control parent)
         {
-            var clrFore = Color.FromArgb(192, 186, 182);
-            var clrBack = Color.FromArgb(54, 57, 62);
-            var clrInactive = Color.FromArgb(192 / 2, 186 / 2, 182 / 2);
-
             foreach (Control c in parent.Controls)
             {
-                c.BackColor = clrBack;
-                c.ForeColor = clrFore;
+                c.BackColor = colorBackround;
+                c.ForeColor = colorForeground;
                 if (c is Button)
                 {
                     var btn = c as Button;
+
+                    // Custom paint our buttons.
+                    btn.Paint += this.CustomButton_Paint;
+                    btn.EnabledChanged += this.CustomButton_EnabledChanged;
+
                     btn.FlatStyle = FlatStyle.Flat;
                     btn.FlatAppearance.BorderSize = 1;
-                    btn.FlatAppearance.BorderColor = clrInactive;
+                    btn.FlatAppearance.BorderColor = colorInactive;
+                    btn.BackColor = btn.Enabled ? MainWindow.colorActiveButton : colorBackround;
+                    
                     //  Debug.Assert(false);
                 }
                 else if (c is TextBox)
@@ -945,14 +952,21 @@ namespace CrewChiefV4
 
         }
 
+        private void CustomButton_EnabledChanged(object sender, EventArgs e)
+        {
+            if (!MainWindow.useDarkTheme)
+                return;
+
+            var btn = sender as Button;
+            btn.BackColor = btn.Enabled ? MainWindow.colorActiveButton : MainWindow.colorBackround;
+        }
+
         private void applyDarkTheme()
         {
-            var clrFore = Color.FromArgb(192, 186, 182);
-            var clrBack = Color.FromArgb(54, 57, 62);
-            // might help
+           // might help
             // https://social.msdn.microsoft.com/Forums/windows/en-US/73391533-6966-40b1-b27d-89c6280cdafc/set-winform-application-theme?forum=winforms
-            this.BackColor = clrBack;
-            this.ForeColor = clrFore;
+            this.BackColor = MainWindow.colorBackround;
+            this.ForeColor = MainWindow.colorForeground;
 
             if (this.HasChildren)
                 this.applyDarkThemeChildren(this);
@@ -962,8 +976,43 @@ namespace CrewChiefV4
             this.personalisationBox.FlatStyle = FlatStyle.Flat;
             //this.spotterNameBox.ForeColor = clrFore;
             //this.spotterNameBox.BackColor = clrBack;
+            
+        }
 
-            //this.assignButtonToAction.ForeColor = clrFore;
+        private void CustomButton_Paint(object sender, PaintEventArgs e)
+        {
+            if (!MainWindow.useDarkTheme)
+                return;
+
+            var btn = sender as Button;
+            if (btn.Enabled)
+                return;  // Nothing to do.
+
+            //btn.BackColor = MainWindow.colorBackround;
+            // make sure Text is not also written on button
+            ///var reuqestedText = btn.Text;
+            //btn.Text = string.Empty;
+
+            //e.Graphics.Clear(btn.BackColor);
+
+            // Set flags to center text on button
+            TextFormatFlags flags = TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak;   // center the text
+        
+            // Render the text onto the button
+            TextRenderer.DrawText(e.Graphics, btn.Text, btn.Font, btn.ClientRectangle, MainWindow.colorInactive, flags);
+
+            /*e.Graphics.Clear(btn.BackColor);
+            using (var drawBrush = new SolidBrush(btn.ForeColor))
+            using (var sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            })
+            {
+                e.Graphics.DrawString(btn.Text, btn.Font, drawBrush, btn.ClientRectangle, sf);
+            }*/
+            //btn.OnPaint()
+            //throw new NotImplementedException();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
