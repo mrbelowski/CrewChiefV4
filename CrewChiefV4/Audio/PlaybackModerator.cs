@@ -151,6 +151,12 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
+         */
         public static bool ShouldPlaySound(SingleSound sound, Boolean canInterrupt)
         {
             if (rejectMessagesWhenTalking 

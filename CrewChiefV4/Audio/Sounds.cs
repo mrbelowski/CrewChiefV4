@@ -325,6 +325,12 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
         public void Play(List<String> soundNames, Boolean canInterrupt)
         {           
             SoundSet prefix = null;
@@ -426,6 +432,12 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
         public void Play(String soundName, Boolean canInterrupt)
         {
             List<String> l = new List<String>();
@@ -1152,6 +1164,12 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
         public void Play(Boolean canInterrupt)
         {
             if (!PlaybackModerator.ShouldPlaySound(this, canInterrupt))
