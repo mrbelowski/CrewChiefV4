@@ -28,6 +28,7 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
+        private static bool immediateMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -160,16 +161,12 @@ namespace CrewChiefV4.Audio
                 return false;
             }
 
-            if (canInterrupt)
+            if (immediateMessagesBlockOtherMessages && canInterrupt)
             {
                 if (audioPlayer.hasMessageInImmediateQueue())
                 {
-                    Console.WriteLine("blocking queued messasge " + sound.fullPath + " because an immediate message is waiting");
+                    PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because an immediate message is waiting", sound.fullPath));
                     return false;
-                }
-                else
-                {
-                    Console.WriteLine("queued messasge " + sound.fullPath + " can play");
                 }
             }
 
