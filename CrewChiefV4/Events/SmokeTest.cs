@@ -111,21 +111,18 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
-            /*
             audioPlayer.playMessage(new QueuedMessage(SMOKE_TEST, MessageContents(folderTest), 0, this));
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null)
             {
                 Thread.Sleep(800);
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
-            */
-
             //PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
             // pit exit strategy debug stuff to see how it sounds
             
-            List<String> rawDriverNames = new List<string>();
+            /*List<String> rawDriverNames = new List<string>();
             List<MessageFragment> fragments = new List<MessageFragment>();
             fragments.Add(MessageFragment.Text(Strategy.folderClearTrackOnPitExit));
             fragments.Add(MessageFragment.Text(Strategy.folderWeShouldEmergeInPosition));
@@ -135,8 +132,7 @@ namespace CrewChiefV4.Events
             fragments.Add(MessageFragment.Text(Strategy.folderAnd));
             fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
             audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
-            Thread.Sleep(4000);
-            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderDisableSpotter, 0, null));
+            */
 
             /*
             List<String> rawDriverNames = new List<string>();
