@@ -150,13 +150,18 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        public static bool ShouldPlaySound(SingleSound sound)
+        public static bool ShouldPlaySound(SingleSound sound, Boolean canInterrupt)
         {
             if (rejectMessagesWhenTalking 
                 && SpeechRecogniser.waitingForSpeech 
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
+                return false;
+            }
+
+            if (canInterrupt && audioPlayer.hasMessageInImmediateQueue())
+            {
                 return false;
             }
 
@@ -207,11 +212,11 @@ namespace CrewChiefV4.Audio
 
                 // insert bleep out/in
                 if (PlaybackModerator.insertBeepOutBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut, false);
 
                 // would be nice to have some slight random silence here
                 if (PlaybackModerator.insertBeepInBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn, false);
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;

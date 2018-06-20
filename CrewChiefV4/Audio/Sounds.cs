@@ -325,7 +325,7 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void Play(List<String> soundNames)
+        public void Play(List<String> soundNames, Boolean canInterrupt)
         {           
             SoundSet prefix = null;
             SoundSet suffix = null;
@@ -420,17 +420,17 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        singleSound.Play();
+                        singleSound.Play(canInterrupt);
                     }
                 }
             }
         }
 
-        public void Play(String soundName)
+        public void Play(String soundName, Boolean canInterrupt)
         {
             List<String> l = new List<String>();
             l.Add(soundName);
-            Play(l);
+            Play(l, canInterrupt);
         }
 
         public void ExpireCachedSounds()
@@ -1152,9 +1152,9 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void Play()
+        public void Play(Boolean canInterrupt)
         {
-            if (!PlaybackModerator.ShouldPlaySound(this))
+            if (!PlaybackModerator.ShouldPlaySound(this, canInterrupt))
                 return;
 
             PlaybackModerator.PreProcessSound(this);
