@@ -984,7 +984,10 @@ namespace CrewChiefV4.Audio
 
         public Boolean hasMessageInImmediateQueue()
         {
-            return immediateClips.Count > 0;
+            lock (immediateClips)
+            {
+                return immediateClips.Count > 0;
+            }
         }
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
