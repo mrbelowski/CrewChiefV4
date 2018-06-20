@@ -160,9 +160,14 @@ namespace CrewChiefV4.Audio
                 return false;
             }
 
-            if (canInterrupt && audioPlayer.hasMessageInImmediateQueue())
+            if (canInterrupt)
             {
-                return false;
+                Console.WriteLine("can interrupt sound " + sound.fullPath);
+                if (audioPlayer.hasMessageInImmediateQueue())
+                {
+                    Console.WriteLine("blocking queued messasge because an immediate message is waiting");
+                    return false;
+                }
             }
 
             return true;
