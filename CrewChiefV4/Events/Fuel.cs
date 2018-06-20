@@ -72,7 +72,14 @@ namespace CrewChiefV4.Events
         public static String folderGallonsToGetToTheEnd = "fuel/gallons_to_get_to_the_end";
 
         // no 1 litres equivalent
-        public static String folderWillNeedToAddOneGallonToGetToTheEnd = "fuel/need_to_add_one_gallon_to_get_to_the_end"; 
+        public static String folderWillNeedToAddOneGallonToGetToTheEnd = "fuel/need_to_add_one_gallon_to_get_to_the_end";
+
+        public static String folderFuelWillBeTight = "fuel/fuel_will_be_tight";
+
+
+
+
+
         
         private float averageUsagePerLap;
 
@@ -944,7 +951,12 @@ namespace CrewChiefV4.Events
             Boolean reportedLitresNeeded = false;
             int litresToEnd = getLitresToEndOfRace();
             int litresRemaining = (int) Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
-            if (litresToEnd != -1 && litresToEnd > litresRemaining + 1) // todo: allow for proper reserve here
+            if (litresToEnd > 0 && litresToEnd < 3)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderFuelWillBeTight, 0, null));
+                reportedLitresNeeded = true;
+            }
+            else if (litresToEnd != -1 && litresToEnd > litresRemaining + 3) // todo: allow for proper reserve here
             {
                 int litresNeeded = litresToEnd - litresRemaining;
                 QueuedMessage fuelMessage;
