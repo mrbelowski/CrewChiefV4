@@ -950,40 +950,47 @@ namespace CrewChiefV4.Events
             Boolean reportedConsumption = reportFuelConsumption();
             Boolean reportedLitresNeeded = false;
             int litresToEnd = getLitresToEndOfRace();
-            int litresRemaining = (int) Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
-            if (litresToEnd > 0 && litresToEnd < 3)
+            if (litresToEnd > 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderFuelWillBeTight, 0, null));
-                reportedLitresNeeded = true;
-            }
-            else if (litresToEnd != -1 && litresToEnd > litresRemaining + 3) // todo: allow for proper reserve here
-            {
+                int litresRemaining = (int)Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
                 int litresNeeded = litresToEnd - litresRemaining;
-                QueuedMessage fuelMessage;
-                if (fuelReportsInGallon)
+                // -2 means we expect to have 2 litres left at the end of the race
+                if (litresNeeded >= -2)
                 {
-                    // for gallons we want both whole and fractional part cause its a stupid unit.
-                    float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
-                    Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
-                    if (wholeandfractional.Item2 > 0)
+                    QueuedMessage fuelMessage;
+                    if (litresNeeded < 3)
                     {
-                        fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
-                            wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsToGetToTheEnd), 0, null);
+                        // between 2 litres short, and 2 litres excess fuel
+                        fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
                     }
                     else
                     {
-                        int wholeGallons = Convert.ToInt32(wholeandfractional.Item1);
-                        fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeGallons, wholeGallons == 1 ? 
-                            folderWillNeedToAddOneGallonToGetToTheEnd : folderWillNeedToAdd, wholeGallons, folderGallonsToGetToTheEnd), 0, null);
+                        if (fuelReportsInGallon)
+                        {
+                            // for gallons we want both whole and fractional part cause its a stupid unit.
+                            float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                            Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
+                            if (wholeandfractional.Item2 > 0)
+                            {
+                                fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                    wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsToGetToTheEnd), 0, null);
+                            }
+                            else
+                            {
+                                int wholeGallons = Convert.ToInt32(wholeandfractional.Item1);
+                                fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeGallons, wholeGallons == 1 ?
+                                    folderWillNeedToAddOneGallonToGetToTheEnd : folderWillNeedToAdd, wholeGallons, folderGallonsToGetToTheEnd), 0, null);
+                            }
+                        }
+                        else
+                        {
+                            fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                litresNeeded, folderLitresToGetToTheEnd), 0, null);
+                        }
                     }
+                    audioPlayer.playMessageImmediately(fuelMessage);
+                    reportedLitresNeeded = true;
                 }
-                else
-                {
-                    fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd, 
-                        litresNeeded, folderLitresToGetToTheEnd), 0, null);
-                }
-                audioPlayer.playMessageImmediately(fuelMessage);
-                reportedLitresNeeded = true;
             }
             if (!reportedConsumption && !reportedRemaining && !reportedLitresNeeded && allowNoDataMessage)
             {
