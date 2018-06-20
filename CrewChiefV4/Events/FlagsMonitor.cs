@@ -360,7 +360,8 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
+            // In iRacing White flag is set on last lap if "useAmericanTerms" is enabled, this causes white flag to be announched every 40 sec on last lap.
+            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !(GlobalBehaviourSettings.useAmericanTerms && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING))
             {
                 if (currentGameState.Now > disableWhiteFlagUntil)
                 {
