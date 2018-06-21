@@ -373,7 +373,7 @@ namespace CrewChiefV4.Events
                                     expectedPlayerTimeLoss = getTimeLossEstimate(currentGameState.carClass, currentGameState.SessionData.TrackDefinition.name,
                                         currentGameState.OpponentData, currentGameState.SessionData.ClassPosition);
 
-                                    if (expectedPlayerTimeLoss == -1)
+                                    if (expectedPlayerTimeLoss < 5) // 5 is a number i pulled out my arse, less than 5 seconds lost for a stop means something's wrong
                                     {
                                         // no loss data, can't continue
                                         break;
@@ -564,7 +564,7 @@ namespace CrewChiefV4.Events
             }
 
             float expectedPlayerTimeLoss = getTimeLossEstimate(playerClass, trackName, opponents, currentRacePosition);
-            if (expectedPlayerTimeLoss != -1)
+            if (expectedPlayerTimeLoss >= 5) // 5 is a number i pulled out my arse - less than 5 and surely something's gone wrong in the calculations
             {
                 // now we have a sensible value for the time lost due to the stop, estimate where we'll emerge
                 // in order to do this we need to know the total race distance at the point where we'd have been
