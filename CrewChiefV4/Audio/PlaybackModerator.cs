@@ -28,6 +28,7 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
+        private static bool immediateMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -150,7 +151,13 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        public static bool ShouldPlaySound(SingleSound sound)
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
+         */
+        public static bool ShouldPlaySound(SingleSound sound, Boolean canInterrupt)
         {
             if (rejectMessagesWhenTalking 
                 && SpeechRecogniser.waitingForSpeech 
@@ -158,6 +165,15 @@ namespace CrewChiefV4.Audio
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
                 return false;
+            }
+
+            if (immediateMessagesBlockOtherMessages && canInterrupt)
+            {
+                if (audioPlayer.hasMessageInImmediateQueue())
+                {
+                    PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because an immediate message is waiting", sound.fullPath));
+                    return false;
+                }
             }
 
             return true;
@@ -207,11 +223,11 @@ namespace CrewChiefV4.Audio
 
                 // insert bleep out/in
                 if (PlaybackModerator.insertBeepOutBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut, false);
 
                 // would be nice to have some slight random silence here
                 if (PlaybackModerator.insertBeepInBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn, false);
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;

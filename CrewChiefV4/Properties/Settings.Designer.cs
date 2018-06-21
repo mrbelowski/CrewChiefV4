@@ -3286,5 +3286,17 @@ namespace CrewChiefV4.Properties {
                 this["enable_opponent_pit_exit_estimates"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool immediate_messages_block_other_messages {
+            get {
+                return ((bool)(this["immediate_messages_block_other_messages"]));
+            }
+            set {
+                this["immediate_messages_block_other_messages"] = value;
+            }
+        }
     }
 }
