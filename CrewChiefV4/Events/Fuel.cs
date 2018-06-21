@@ -63,8 +63,6 @@ namespace CrewChiefV4.Events
 
         public static String folderWillNeedToStopAgain = "fuel/will_need_to_stop_again";
 
-
-        // TODO: RECORD ME
         public static String folderWillNeedToAdd = "fuel/we_will_need_to_add";
 
         public static String folderLitresToGetToTheEnd = "fuel/litres_to_get_to_the_end";
@@ -76,11 +74,6 @@ namespace CrewChiefV4.Events
 
         public static String folderFuelWillBeTight = "fuel/fuel_will_be_tight";
 
-
-
-
-
-        
         private float averageUsagePerLap;
 
         private float averageUsagePerMinute;
