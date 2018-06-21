@@ -758,7 +758,7 @@ namespace CrewChiefV4.Audio
                                 }
                                 if (!mute)
                                 {
-                                    soundCache.Play(eventName);
+                                    soundCache.Play(eventName, !isImmediateMessages);
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
                                 else
@@ -787,7 +787,7 @@ namespace CrewChiefV4.Audio
                                 {
                                     thisMessage.resolveDelayedContents();
                                 }
-                                soundCache.Play(thisMessage.messageFolders);
+                                soundCache.Play(thisMessage.messageFolders, !isImmediateMessages);
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -868,7 +868,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, false);
             }
         }
 
@@ -878,7 +878,7 @@ namespace CrewChiefV4.Audio
             {
                 if (!mute)
                 {
-                    soundCache.Play("listen_start_sound");
+                    soundCache.Play("listen_start_sound", false);
                 }
             }
         }
@@ -888,7 +888,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, false);
             }
         }
 
@@ -897,7 +897,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, false);
             }
         }
 
@@ -980,6 +980,14 @@ namespace CrewChiefV4.Audio
                 Thread.Sleep(queuedMessage.secondsDelay * 1000);
                 playMessageImmediately(queuedMessage);
             }).Start();            
+        }
+
+        public Boolean hasMessageInImmediateQueue()
+        {
+            lock (immediateClips)
+            {
+                return immediateClips.Count > 0;
+            }
         }
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
