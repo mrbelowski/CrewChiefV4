@@ -2086,9 +2086,11 @@ namespace CrewChiefV4.GameState
     public class HardPartsOnTrackData
     {
         public List<Tuple<float, float>> hardParts = new List<Tuple<float, float>>();
+        
         public Boolean isAllreadyBreaking = false;
         public float hardPartStart = -1;
         public bool hardPartsMapped = false;
+        public static bool sorted = false;
         public void mapHardPartsOnTrack(float breakPedal, float loudPedal, bool lapWasValid, bool isNewLap, float distanceRoundTrack)
         {
             if (hardPartsMapped)
@@ -2102,6 +2104,7 @@ namespace CrewChiefV4.GameState
             if (isNewLap && lapWasValid)
             {
                 hardPartsMapped = true;
+                SortHardParts();
                 Console.WriteLine("HardPart Has Been Mapped");
                 return;
             }
@@ -2109,14 +2112,46 @@ namespace CrewChiefV4.GameState
             {
                 isAllreadyBreaking = true;
                 hardPartStart = distanceRoundTrack;
-                hardParts.Add(new Tuple<float, float>(distanceRoundTrack, -1));
             }
-            if (loudPedal > 0.9 && isAllreadyBreaking)
+            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 25)
             {
                 hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
                 isAllreadyBreaking = false;
-                Console.WriteLine("HardPart On Track Start At " + hardPartStart + "And Ends At " + distanceRoundTrack);
+                Console.WriteLine("HardPart On Track Start At " + hardPartStart + " And Ends At " + distanceRoundTrack);
+            }        
+        }
+        private void SortHardParts()
+        {
+            List<Tuple<float, float>> sortedHardParts = new List<Tuple<float, float>>();
+            for (int index = 0; index < hardParts.Count; index++ )
+            {
+                Tuple<float, float> part = hardParts[index];
+                float nextPartStart = 0;
+                float nextPartEnd = 0;
+
+                if (index == hardParts.Count - 1)
+                {
+                    nextPartStart = hardParts[0].Item1;
+                    nextPartEnd = hardParts[0].Item2;
+                    sorted = true;
+                }
+                else
+                {
+                    nextPartStart = hardParts[index+1].Item1;
+                    nextPartEnd = hardParts[index+1].Item2;
+                }
+                if (Math.Abs(part.Item2 - nextPartStart) < 200)                
+                {
+                    Console.WriteLine("combining parts");
+                    sortedHardParts.Add(new Tuple<float, float>(part.Item1, nextPartEnd));
+                }
+                else
+                {
+                    sortedHardParts.Add(hardParts[index]);
+                }                
             }
+            hardParts = sortedHardParts;
+            Console.WriteLine("HardParts Count " + hardParts.Count);
         }
         public Boolean isInHardPart(float distanceRoundTrack)
         {
@@ -2126,10 +2161,10 @@ namespace CrewChiefV4.GameState
                 {
                     if (distanceRoundTrack >= part.Item1 && distanceRoundTrack <= part.Item2)
                     {
-                        //Console.WriteLine("HardPart On Track");
                         return true;
                     }
                 }
+
             }
             return false;
         }
@@ -2204,6 +2239,9 @@ namespace CrewChiefV4.GameState
         private Boolean WaitingForNewLapData = false;
 
         public HardPartsOnTrackData hardPartsOnTrackData = new HardPartsOnTrackData();
+
+        public Boolean IsInHardPartOfTrack = false;
+        
         // special case for pcars2 CloudBrightness and rain because we want to track this in real-time
         public float CloudBrightness = -1;
         public float RainDensity = -1;

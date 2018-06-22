@@ -1016,7 +1016,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
             }
-
+            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack);
             return currentGameState;
         }
 
