@@ -490,6 +490,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.ControlData.ThrottlePedal = shared.ThrottlePedal;
             currentGameState.ControlData.ClutchPedal = shared.ClutchPedal;
             currentGameState.ControlData.BrakePedal = shared.BrakePedal;
+            currentGameState.ControlData.BrakeBias = shared.BrakeBias;
             currentGameState.TransmissionData.Gear = shared.Gear;
 
             //------------------------ Session data -----------------------

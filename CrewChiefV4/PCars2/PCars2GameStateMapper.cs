@@ -1265,6 +1265,11 @@ namespace CrewChiefV4.PCars2
                 currentGameState.EngineData.EngineStalledWarning = true;
                 lastTimeEngineWasRunning = DateTime.MaxValue;
             }
+
+            currentGameState.ControlData.BrakePedal = shared.mBrake;
+            currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
+            currentGameState.ControlData.ClutchPedal = shared.mClutch;
+
             return currentGameState;
         }
 
