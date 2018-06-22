@@ -538,7 +538,7 @@ namespace CrewChiefV4.Events
                                     }
                                 }
                             }
-                            else if (currentGameState.SessionData.SessionType == SessionType.Race)
+                            else if (currentGameState.SessionData.SessionType == SessionType.Race && !currentGameState.PitData.InPitlane)
                             {
                                 Boolean playedLapMessage = false;
                                 if (frequencyOfPlayerRaceLapTimeReports > Utilities.random.NextDouble() * 10)
