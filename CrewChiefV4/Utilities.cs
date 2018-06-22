@@ -67,14 +67,15 @@ namespace CrewChiefV4
 
         /*
          * For tyre life estimates we want to know how long the tyres will last, so we're asking for a time prediction
-         * given a wear amount (100% wear). So y_data is the y-axis which may be time points (seconds since some point?) or
-         * number of sectors since some point (0 = new tyre, perhaps, incrementing +1 for each sector).
-         * x_data is the tyre wear at that y point (we'd expect this to be a percentage).
+         * given a wear amount (100% wear). So y_data is the y-axis which may be time points (session running time) or
+         * number of sectors since session start incrementing +1 for each sector. When we change tyres we clear these
+         * data sets but the y-axis time / sector counts will start at however long into the session (time or total 
+         * sectors) we are.
+         * x_data is the tyre wear at that y point (a percentage).
          * the x_point is the point you want to predict the life - wear amount. So we pass 100% in here to give us
-         * a time estimate.
+         * a time / sector count estimate.
          * order is the polynomial fit order - 1 for linear, 2 for quadratic etc. > 3 does not give a suitable
-         * curve and will produce nonsense. Use 2 or 3 for tyre wear. 2 tends to give a higher result (predicts
-         * greater wear).
+         * curve and will produce nonsense. Use 2 for tyre wear.
          */
         public static double getYEstimate(double[] x_data, double[] y_data, double x_point, int order)
         {
