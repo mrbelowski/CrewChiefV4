@@ -762,7 +762,10 @@ namespace CrewChiefV4.Events
                      currentGameState.TyreData.RearRightPercentWear < previousGameState.TyreData.RearRightPercentWear ||
                      currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear)))
                 {
-                    reportedEstimatedTimeLeft = true;
+                    reportedEstimatedTimeLeft = false;
+
+                    // TODO: before we clear, should we grab estimates from the previous data?
+
                     tyreLifeYPointsTime.Clear();
                     tyreLifeYPointsSectors.Clear();
                     tyreLifeXPointsLFWearBySector.Clear();
@@ -1223,6 +1226,10 @@ namespace CrewChiefV4.Events
                         {
                             playEstimatedTyreLifeMinutes(remaining, true);
                         }
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                 }
             }
