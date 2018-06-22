@@ -1,4 +1,5 @@
 ﻿using CrewChiefV4.GameState;
+using MathNet.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,6 +63,42 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Exception starting game: " + e.Message);
             }
+        }
+
+        /*
+         * For tyre life estimates we want to know how long the tyres will last, so we're asking for a time prediction
+         * given a wear amount (100% wear). So y_data is the y-axis which may be time points (seconds since some point?) or
+         * number of sectors since some point (0 = new tyre, perhaps, incrementing +1 for each sector).
+         * x_data is the tyre wear at that y point (we'd expect this to be a percentage).
+         * the x_point is the point you want to predict the life - wear amount. So we pass 100% in here to give us
+         * a time estimate.
+         * order is the polynomial fit order - 1 for linear, 2 for quadratic etc. > 3 does not give a suitable
+         * curve and will produce nonsense. Use 2 or 3 for tyre wear. 2 tends to give a higher result (predicts
+         * greater wear).
+         */
+        public static double getYEstimate(double[] x_data, double[] y_data, double x_point, int order)
+        {
+            // get the polynomial from the Numerics library:
+            double[] curveParams = Fit.Polynomial(x_data, y_data, order);
+
+            // solve for x_point:
+            double y_point = 0;
+            for (int power = 0; power < curveParams.Length; power++)
+            {
+                if (power == 0)
+                {
+                    y_point = y_point + curveParams[power];
+                }
+                else if (power == 1)
+                {
+                    y_point = y_point + curveParams[power] * x_point;
+                }
+                else
+                {
+                    y_point = y_point + curveParams[power] * Math.Pow(x_point, power);
+                }
+            }
+            return y_point;
         }
 
         public static void TraceEventClass(GameStateData gsd)
