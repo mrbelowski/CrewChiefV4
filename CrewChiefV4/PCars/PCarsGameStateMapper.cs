@@ -1241,6 +1241,10 @@ namespace CrewChiefV4.PCars
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
 
+            currentGameState.ControlData.BrakePedal = shared.mBrake;
+            currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
+            currentGameState.ControlData.ClutchPedal = shared.mClutch;
+
             return currentGameState;
         }
 
