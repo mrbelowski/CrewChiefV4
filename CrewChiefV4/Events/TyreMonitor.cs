@@ -757,11 +757,13 @@ namespace CrewChiefV4.Events
                 {
                     if (!reportedEstimatedTimeLeftOneThirdWear)
                     {
-                        reportedEstimatedTimeLeftOneThirdWear = reportEstimatedTyreLife(33, currentGameState.SessionData.SessionRunningTime);
+                        reportedEstimatedTimeLeftOneThirdWear = reportEstimatedTyreLife(33, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.SessionNumberOfLaps);
                     }
                     else if (!reportedEstimatedTimeLeftTwoThirdsWear)
                     {
-                        reportedEstimatedTimeLeftTwoThirdsWear = reportEstimatedTyreLife(66, currentGameState.SessionData.SessionRunningTime);
+                        reportedEstimatedTimeLeftTwoThirdsWear = reportEstimatedTyreLife(66, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.SessionNumberOfLaps);
                         if (reportedEstimatedTimeLeftTwoThirdsWear)
                         {
                             reportedEstimatedTimeLeftOneThirdWear = true;
@@ -1065,7 +1067,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private Boolean reportEstimatedTyreLife(float maxWearThreshold, float sessionRunningTime)
+        private Boolean reportEstimatedTyreLife(float maxWearThreshold, float sessionRunningTime, float sessionTotalRunTime, int sessionLaps)
         {
             Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
             if (maxWearPercent.Item2 >= maxWearThreshold)
@@ -1075,11 +1077,20 @@ namespace CrewChiefV4.Events
                 {
                     if (lapsInSession > 0 || timeInSession == 0)
                     {
-                        playEstimatedTypeLifeLaps(remaining, false);
+                        // only announce this if the estimate is close to or smaller than race distance
+                        if (remaining - lapsInSession < 2)
+                        {
+                            playEstimatedTypeLifeLaps(remaining, false);
+                        }
                     }
                     else
                     {
-                        playEstimatedTyreLifeMinutes(remaining, false);
+                        float sessionTotalMinutes = sessionTotalRunTime / 60;
+                        // only announce this if the estimate is close to or smaller than race distance
+                        if (remaining - sessionTotalRunTime < 2)
+                        {
+                            playEstimatedTyreLifeMinutes(remaining, false);
+                        }
                     }
                 }
                 return true;
