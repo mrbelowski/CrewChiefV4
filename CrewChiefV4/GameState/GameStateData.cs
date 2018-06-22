@@ -2111,7 +2111,16 @@ namespace CrewChiefV4.GameState
             if (!isAllreadyBreaking && breakPedal > 0.1)
             {
                 isAllreadyBreaking = true;
-                hardPartStart = distanceRoundTrack;
+                if (distanceRoundTrack > 25)
+                {
+                    hardPartStart = distanceRoundTrack - 25;
+                }
+                else
+                {
+                    // MR - should we pass track lenght here in case our first part is within 25m of the starting line or just ignore ?
+                    hardPartStart = distanceRoundTrack;
+                }
+                
             }
             if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 25)
             {
