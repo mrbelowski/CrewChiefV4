@@ -2083,6 +2083,57 @@ namespace CrewChiefV4.GameState
         }
     }
 
+    public class HardPartsOnTrackData
+    {
+        public List<Tuple<float, float>> hardParts = new List<Tuple<float, float>>();
+        public Boolean isAllreadyBreaking = false;
+        public float hardPartStart = -1;
+        public bool hardPartsMapped = false;
+        public void mapHardPartsOnTrack(float breakPedal, float loudPedal, bool lapWasValid, bool isNewLap, float distanceRoundTrack)
+        {
+            if (hardPartsMapped)
+            {
+                return;
+            }
+            if (!lapWasValid && isNewLap)
+            {
+                hardParts.Clear();
+            }
+            if (isNewLap && lapWasValid)
+            {
+                hardPartsMapped = true;
+                Console.WriteLine("HardPart Has Been Mapped");
+                return;
+            }
+            if (!isAllreadyBreaking && breakPedal > 0.1)
+            {
+                isAllreadyBreaking = true;
+                hardPartStart = distanceRoundTrack;
+                hardParts.Add(new Tuple<float, float>(distanceRoundTrack, -1));
+            }
+            if (loudPedal > 0.9 && isAllreadyBreaking)
+            {
+                hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
+                isAllreadyBreaking = false;
+                Console.WriteLine("HardPart On Track Start At " + hardPartStart + "And Ends At " + distanceRoundTrack);
+            }
+        }
+        public Boolean isInHardPart(float distanceRoundTrack)
+        {
+            if (hardPartsMapped)
+            {
+                foreach (Tuple<float, float> part in hardParts)
+                {
+                    if (distanceRoundTrack >= part.Item1 && distanceRoundTrack <= part.Item2)
+                    {
+                        //Console.WriteLine("HardPart On Track");
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
 
     public class GameStateData
     {
@@ -2151,7 +2202,8 @@ namespace CrewChiefV4.GameState
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
 
         private Boolean WaitingForNewLapData = false;
-        
+
+        public HardPartsOnTrackData hardPartsOnTrackData = new HardPartsOnTrackData();
         // special case for pcars2 CloudBrightness and rain because we want to track this in real-time
         public float CloudBrightness = -1;
         public float RainDensity = -1;
