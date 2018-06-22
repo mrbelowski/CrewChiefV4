@@ -67,6 +67,9 @@ namespace CrewChiefV4.Events
         private String folderMetres = "mandatory_pit_stops/metres";
         private String folderBoxPositionIntro = "mandatory_pit_stops/box_in";
 
+        // TODO:
+        // record separate sounds for "100 metres" and "50 metres" for a nicer pit countdown
+
         private int pitWindowOpenLap;
 
         private int pitWindowClosedLap;
