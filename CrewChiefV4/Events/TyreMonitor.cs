@@ -784,7 +784,16 @@ namespace CrewChiefV4.Events
                         // add some data if we're in a new sector
                         if (tyreLifeYPointsSectors.Count == 0)
                         {
-                            tyreLifeYPointsSectors.Add(0d);
+                            // as we might have changed tyres, use the number of laps complete here to scale this
+                            if (currentGameState.SessionData.SectorNumber == 2)
+                            {
+                                // special case here - our first measurement is for the sector1 end
+                                tyreLifeYPointsSectors.Add(1 + (currentGameState.SessionData.CompletedLaps * 3));
+                            }
+                            else
+                            {
+                                tyreLifeYPointsSectors.Add(currentGameState.SessionData.CompletedLaps * 3);
+                            }
                         }
                         else
                         {
@@ -986,10 +995,9 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private int getRemainingTyreLife(float sessionRunningTime)
+        private int getRemainingTyreLife(float sessionRunningTime, Tuple<CornerData.Corners, float> maxWearPercent)
         {
-            Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
-            
+            // TODO: if the maxWear is quite low (<20%) the quadratic estimate is quite inaccurate - use linear in this case?
             if (lapsInSession > 0 || timeInSession == 0)
             {
                 double[] x_data;
@@ -1050,7 +1058,7 @@ namespace CrewChiefV4.Events
             {
                 // 1/3 through the tyre's life
                 reportedEstimatedTimeLeft = true;
-                int remaining = getRemainingTyreLife(sessionRunningTime);
+                int remaining = getRemainingTyreLife(sessionRunningTime, maxWearPercent);
                 if (remaining != -1)
                 {
                     if (lapsInSession > 0 || timeInSession == 0)
@@ -1200,22 +1208,22 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
-                float maxWearPercent = getMaxWearPercent().Item2;
+                Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-                else if (maxWearPercent < 1)
+                else if (maxWearPercent.Item2 < 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                 }
-                else if (maxWearPercent < 5) 
+                else if (maxWearPercent.Item2 < 5) 
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
                 else 
                 {
-                    int remaining = getRemainingTyreLife(CrewChief.currentGameState.SessionData.SessionRunningTime);
+                    int remaining = getRemainingTyreLife(CrewChief.currentGameState.SessionData.SessionRunningTime, maxWearPercent);
                     if (remaining != -1)
                     {
                         if (lapsInSession > 0 || timeInSession == 0)
