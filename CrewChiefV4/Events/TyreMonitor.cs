@@ -1030,7 +1030,7 @@ namespace CrewChiefV4.Events
                             x_data = tyreLifeXPointsRRWearByTime.ToArray();
                             break;
                     }
-                    double secondsToFullWear = (int)Utilities.getYEstimate(x_data, tyreLifeYPointsSectors.ToArray(), 100, 3);
+                    double secondsToFullWear = (int)Utilities.getYEstimate(x_data, tyreLifeYPointsTime.ToArray(), 100, 3);
                     int minutesRemainingOnTheseTyres = (int)Math.Floor(secondsToFullWear / 60);
                     playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
                 }
