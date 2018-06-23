@@ -3298,5 +3298,17 @@ namespace CrewChiefV4.Properties {
                 this["immediate_messages_block_other_messages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_delayd_messages_on_hardparts {
+            get {
+                return ((bool)(this["enable_delayd_messages_on_hardparts"]));
+            }
+            set {
+                this["enable_delayd_messages_on_hardparts"] = value;
+            }
+        }
     }
 }

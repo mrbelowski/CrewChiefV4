@@ -538,7 +538,19 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                            currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                            currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                        }
+                    }
+                }
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
 
                 lastActiveTimeForOpponents.Clear();
@@ -574,7 +586,19 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                                }
+                            }
+                        }
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
@@ -673,6 +697,11 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
 
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
+
+                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                 }                
             }
 
@@ -1240,6 +1269,14 @@ namespace CrewChiefV4.PCars
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+            
+            if (previousGameState != null && !currentGameState.PitData.OnOutLap)
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
+            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
+
 
             currentGameState.ControlData.BrakePedal = shared.mBrake;
             currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
