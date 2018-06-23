@@ -174,8 +174,10 @@ namespace CrewChiefV4.Events
             {
                 lastOffTrackSessionTime = currentGameState.SessionData.SessionRunningTime;
             }
-            if (currentGameState.FlagData.isLocalYellow 
-                || currentGameState.FlagData.sectorFlags[currentGameState.SessionData.SectorNumber - 1] == FlagEnum.YELLOW)
+
+            Boolean currentSectorIsYellow = currentGameState.SessionData.SectorNumber > 0 && currentGameState.SessionData.SectorNumber < 4 &&
+                currentGameState.FlagData.sectorFlags[currentGameState.SessionData.SectorNumber - 1] == FlagEnum.YELLOW;
+            if (currentGameState.FlagData.isLocalYellow || currentSectorIsYellow)
             {
                 lastYellowFlagTime = currentGameState.SessionData.SessionRunningTime;
             }
