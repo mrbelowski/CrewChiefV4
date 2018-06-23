@@ -67,8 +67,9 @@ namespace CrewChiefV4.Events
         private String folderMetres = "mandatory_pit_stops/metres";
         private String folderBoxPositionIntro = "mandatory_pit_stops/box_in";
 
-        // TODO:
-        // record separate sounds for "100 metres" and "50 metres" for a nicer pit countdown
+        // separate sounds for "100 metres" and "50 metres" for a nicer pit countdown
+        private String folderOneHundredMetreWarning = "mandatory_pit_stops/one_hundred_metres";
+        private String folderFiftyMetreWarning = "mandatory_pit_stops/fifty_metres";
 
         private int pitWindowOpenLap;
 
@@ -282,21 +283,14 @@ namespace CrewChiefV4.Events
                 {
                     if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
                     {
-                        List<MessageFragment> messageContents = new List<MessageFragment>();
-                        messageContents.Add(MessageFragment.Integer(100, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
-                        if (!playedMoreThan150MetreWarning)
-                        {
-                            // Skip "meters" once if there was a message before.
-                            messageContents.Add(MessageFragment.Text(folderMetres));
-                        }
-                        audioPlayer.playMessageImmediately(new QueuedMessage("100_metre_warning", messageContents, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneHundredMetreWarning, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
                     }
                     // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("50_metre_warning", MessageContents(50, folderMetres), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFiftyMetreWarning, 0, null));
                         previousDistanceToBox = distanceToBox;
                         played50MetreWarning = true;
                     }
