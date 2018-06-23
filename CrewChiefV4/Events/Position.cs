@@ -172,7 +172,8 @@ namespace CrewChiefV4.Events
                 lastOffTrackSessionTime = currentGameState.SessionData.SessionRunningTime;
             }
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
-                currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
+                currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0 &&
+                !currentGameState.FlagData.isLocalYellow)
             {                
                 if (currentGameState.Now > lastPassCheck.Add(passCheckInterval))
                 {
