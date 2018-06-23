@@ -58,7 +58,7 @@ namespace CrewChiefV4.Audio
         private QueuedMessage lastMessagePlayed = null;
 
         private Boolean allowPearlsOnNextPlay = true;
-
+        private int lastDelayedQueueSize = -1;
         private Dictionary<String, int> playedMessagesCount = new Dictionary<String, int>();
 
         private Boolean monitorRunning = false;
@@ -456,10 +456,22 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0  &&  !(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && delayMessagesInHardParts))
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
-                            playQueueContents(queuedClips, false);
-                            allowPearlsOnNextPlay = true;
+                            if (!(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && delayMessagesInHardParts))
+                            {
+                                playQueueContents(queuedClips, false);
+                                allowPearlsOnNextPlay = true;
+                                lastDelayedQueueSize = -1;
+                            }
+                            else
+                            {
+                                if (queuedClips.Count != lastDelayedQueueSize)
+                                {
+                                    lastDelayedQueueSize = queuedClips.Count;
+                                    Console.WriteLine("Delaying message playback because we're in a hard part of a track.  Queue size: " + lastDelayedQueueSize);
+                                }
+                            }
                         }
                     }
                     catch (Exception e)

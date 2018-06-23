@@ -175,7 +175,7 @@ namespace CrewChiefV4.Audio
             {
                 if (audioPlayer.hasMessageInImmediateQueue())
                 {
-                    PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because an immediate message is waiting", sound.fullPath));
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because an immediate message is waiting", sound.fullPath));
                     return false;
                 }
             }
