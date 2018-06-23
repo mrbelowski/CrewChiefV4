@@ -220,6 +220,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.3.6: Reduce size of 'personalisations' update pack (install this update before updating your personalisations); Much more accurate tyre life prediction using a non-linear curve fit of tyre wear data recorded for the current tyre set (assumes a tyre is worn out when it has 5% life left); added more info to the fuel status message - now includes fuel-to-end; allow spotter sounds to cancel other queued messages (disabled by default, enable with 'Spotter and responses block other messages' property - note this can sound strange when only the start or end sounds of a message play); a few minor tweaks; iRacing - fix white-flag message spam
+
 Version 4.9.3.5: Fixed sound pack version check
 
 Version 4.9.3.4: Changed how sound pack downloads are handled - should significantly reduce the size of sound pack updates; added property categories to make finding stuff easier; added opponent pit exit prediction warning - if the app thinks an opponent car will probably come out of the pits close to you (and it can read his driver name), you'll be warned about him; further opponent pit exit estimation improvements; some internal bug fixes

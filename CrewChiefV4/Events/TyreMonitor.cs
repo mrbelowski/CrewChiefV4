@@ -166,7 +166,8 @@ namespace CrewChiefV4.Events
 
         private Boolean reportedTyreWearForCurrentPitEntry;
 
-        private Boolean reportedEstimatedTimeLeft;
+        private Boolean reportedEstimatedTimeLeftOneThirdWear;
+        private Boolean reportedEstimatedTimeLeftTwoThirdsWear;
         
         private float leftFrontWearPercent;
         private float rightFrontWearPercent;
@@ -257,6 +258,18 @@ namespace CrewChiefV4.Events
         private int thisLapTyreConditionReportSector = 2;
         private int thisLapTyreTempReportSector = 3;
 
+        private List<double> tyreLifeYPointsTime = new List<double>();
+        private List<double> tyreLifeYPointsSectors = new List<double>();
+        private List<double> tyreLifeXPointsLFWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsLFWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsRFWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsRFWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsLRWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsLRWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsRRWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsRRWearByTime = new List<double>();
+        private float lastTyreLifeYPointTime = -1;
+
         // don't warn about cold brakes for these car classes. This is in addition to the 'oval' check - some car classes
         // (older stuff, road cars) will have brakes that never really get hot, resulting in lots of annoying messages.
         private CarData.CarClassEnum[] ignoreColdBrakesForClasses = new CarData.CarClassEnum[] {
@@ -307,7 +320,8 @@ namespace CrewChiefV4.Events
         public override void clearState()
         {
             reportedTyreWearForCurrentPitEntry = false;
-            reportedEstimatedTimeLeft = false;
+            reportedEstimatedTimeLeftOneThirdWear = false;
+            reportedEstimatedTimeLeftTwoThirdsWear = false;
             leftFrontWearPercent = 0;
             leftRearWearPercent = 0;
             rightFrontWearPercent = 0;
@@ -371,6 +385,18 @@ namespace CrewChiefV4.Events
             playerClassSessionBestLapTimeByTyre = null;
 
             lastBrakeTempCheckSessionTime = -1.0f;
+
+            tyreLifeYPointsTime.Clear();
+            tyreLifeYPointsSectors.Clear();
+            tyreLifeXPointsLFWearBySector.Clear();
+            tyreLifeXPointsRFWearBySector.Clear();
+            tyreLifeXPointsLRWearBySector.Clear();
+            tyreLifeXPointsRRWearBySector.Clear();
+            tyreLifeXPointsLFWearByTime.Clear();
+            tyreLifeXPointsRFWearByTime.Clear();
+            tyreLifeXPointsLRWearByTime.Clear();
+            tyreLifeXPointsRRWearByTime.Clear();
+            lastTyreLifeYPointTime = -1;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -726,18 +752,98 @@ namespace CrewChiefV4.Events
                 {
                     reportCurrentTyreConditionStatus(false, false, delayResponses, false);
                 }
-                if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
+                if (!currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                     currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    reportEstimatedTyreLife(33, false);
+                    if (!reportedEstimatedTimeLeftOneThirdWear)
+                    {
+                        reportedEstimatedTimeLeftOneThirdWear = reportEstimatedTyreLife(33, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.CompletedLaps,
+                            currentGameState.SessionData.SessionNumberOfLaps);
+                    }
+                    else if (!reportedEstimatedTimeLeftTwoThirdsWear)
+                    {
+                        reportedEstimatedTimeLeftTwoThirdsWear = reportEstimatedTyreLife(66, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.CompletedLaps,
+                            currentGameState.SessionData.SessionNumberOfLaps);
+                        if (reportedEstimatedTimeLeftTwoThirdsWear)
+                        {
+                            reportedEstimatedTimeLeftOneThirdWear = true;
+                        }
+                    }
                 }
                 // if the tyre wear has actually decreased, reset the 'reportdEstimatedTyreWear flag - assume this means the tyres have been changed
-                if (previousGameState != null && (currentGameState.TyreData.FrontLeftPercentWear < previousGameState.TyreData.FrontLeftPercentWear ||
-                    currentGameState.TyreData.FrontRightPercentWear < previousGameState.TyreData.FrontRightPercentWear ||
-                    currentGameState.TyreData.RearRightPercentWear < previousGameState.TyreData.RearRightPercentWear ||
-                    currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear))
+                if (currentGameState.SessionData.JustGoneGreen ||
+                    (previousGameState != null && (currentGameState.TyreData.FrontLeftPercentWear < previousGameState.TyreData.FrontLeftPercentWear ||
+                     currentGameState.TyreData.FrontRightPercentWear < previousGameState.TyreData.FrontRightPercentWear ||
+                     currentGameState.TyreData.RearRightPercentWear < previousGameState.TyreData.RearRightPercentWear ||
+                     currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear)))
                 {
-                    reportedEstimatedTimeLeft = true;
+                    reportedEstimatedTimeLeftOneThirdWear = false;
+                    reportedEstimatedTimeLeftTwoThirdsWear = false;
+
+                    // TODO: before we clear, should we grab estimates from the previous data?
+
+                    tyreLifeYPointsTime.Clear();
+                    tyreLifeYPointsSectors.Clear();
+                    tyreLifeXPointsLFWearBySector.Clear();
+                    tyreLifeXPointsRFWearBySector.Clear();
+                    tyreLifeXPointsLRWearBySector.Clear();
+                    tyreLifeXPointsRRWearBySector.Clear();
+                    tyreLifeXPointsLFWearByTime.Clear();
+                    tyreLifeXPointsRFWearByTime.Clear();
+                    tyreLifeXPointsLRWearByTime.Clear();
+                    tyreLifeXPointsRRWearByTime.Clear();
+                }
+                else if (currentGameState.PositionAndMotionData.CarSpeed > 1 )
+                {
+                    if (currentGameState.SessionData.IsNewSector)
+                    {
+                        // add some data if we're in a new sector
+                        if (tyreLifeYPointsSectors.Count == 0)
+                        {
+                            // as we might have changed tyres, use the number of laps complete here to scale this
+                            if (currentGameState.SessionData.SectorNumber == 2)
+                            {
+                                // special case here - our first measurement is for the sector1 end
+                                tyreLifeYPointsSectors.Add(1 + (currentGameState.SessionData.CompletedLaps * 3));
+                            }
+                            else
+                            {
+                                tyreLifeYPointsSectors.Add(currentGameState.SessionData.CompletedLaps * 3);
+                            }
+                        }
+                        else
+                        {
+                            tyreLifeYPointsSectors.Add((double)tyreLifeYPointsSectors[tyreLifeYPointsSectors.Count - 1] + 1);
+                        }
+                        tyreLifeXPointsLFWearBySector.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                        tyreLifeXPointsRFWearBySector.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                        tyreLifeXPointsLRWearBySector.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                        tyreLifeXPointsRRWearBySector.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                    }
+                    if (lastTyreLifeYPointTime == -1)
+                    {
+                        tyreLifeYPointsTime.Add((double)currentGameState.SessionData.SessionRunningTime);
+                        lastTyreLifeYPointTime = currentGameState.SessionData.SessionRunningTime;
+                        tyreLifeXPointsLFWearByTime.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                        tyreLifeXPointsRFWearByTime.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                        tyreLifeXPointsLRWearByTime.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                        tyreLifeXPointsRRWearByTime.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                    }
+                    else
+                    {
+                        float timeDiff = currentGameState.SessionData.SessionRunningTime - lastTyreLifeYPointTime;
+                        if (timeDiff > 20)
+                        {
+                            tyreLifeYPointsTime.Add((double)currentGameState.SessionData.SessionRunningTime);
+                            lastTyreLifeYPointTime = currentGameState.SessionData.SessionRunningTime;
+                            tyreLifeXPointsLFWearByTime.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                            tyreLifeXPointsRFWearByTime.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                            tyreLifeXPointsLRWearByTime.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                            tyreLifeXPointsRRWearByTime.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                        }
+                    }
                 }
             }
         }
@@ -907,30 +1013,127 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
+        private int getRemainingTyreLife(float sessionRunningTime, Tuple<CornerData.Corners, float> maxWearPercent)
         {
-            float maxWearPercent = getMaxWearPercent();
-            if (maxWearPercent >= maxWearThreshold)
+            // TODO: if the maxWear is quite low (<20%) the quadratic estimate is quite inaccurate - use linear in this case?
+            if (lapsInSession > 0 || timeInSession == 0)
             {
-                // 1/3 through the tyre's life
-                reportedEstimatedTimeLeft = true;
-                if (lapsInSession > 0 || timeInSession == 0)
+                double[] x_data;
+                switch (maxWearPercent.Item1)
                 {
-                    int lapsRemainingOnTheseTyres = (int)(completedLaps / (maxWearPercent / 100)) - completedLaps - 1;
-                    playEstimatedTypeLifeLaps(lapsRemainingOnTheseTyres, immediate);
+                    case CornerData.Corners.FRONT_LEFT:
+                        x_data = tyreLifeXPointsLFWearBySector.ToArray();
+                        break;
+                    case CornerData.Corners.FRONT_RIGHT:
+                        x_data = tyreLifeXPointsRFWearBySector.ToArray();
+                        break;
+                    case CornerData.Corners.REAR_LEFT:
+                        x_data = tyreLifeXPointsLRWearBySector.ToArray();
+                        break;
+                    default:
+                        x_data = tyreLifeXPointsRRWearBySector.ToArray();
+                        break;
                 }
-                else
+                if (x_data.Length < 5 || tyreLifeYPointsSectors.Count != x_data.Length)
                 {
-                    int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
-                    playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
+                    return -1;
                 }
+                int sectorCountAtFullWear = (int)Utilities.getYEstimate(x_data, tyreLifeYPointsSectors.ToArray(), 95, 2);
+                // we know how many more sectors we expect to complete, so just divide it by 3
+                return (sectorCountAtFullWear / 3) - completedLaps;
+            }
+            else
+            {
+                double[] x_data;
+                switch (maxWearPercent.Item1)
+                {
+                    case CornerData.Corners.FRONT_LEFT:
+                        x_data = tyreLifeXPointsLFWearByTime.ToArray();
+                        break;
+                    case CornerData.Corners.FRONT_RIGHT:
+                        x_data = tyreLifeXPointsRFWearByTime.ToArray();
+                        break;
+                    case CornerData.Corners.REAR_LEFT:
+                        x_data = tyreLifeXPointsLRWearByTime.ToArray();
+                        break;
+                    default:
+                        x_data = tyreLifeXPointsRRWearByTime.ToArray();
+                        break;
+                }
+                if (x_data.Length < 5 || tyreLifeYPointsTime.Count != x_data.Length)
+                {
+                    return -1;
+                }
+                double expectedSessionTimeAtFullWear = Utilities.getYEstimate(x_data, tyreLifeYPointsTime.ToArray(), 95, 2);
+                return (int)Math.Floor((expectedSessionTimeAtFullWear - sessionRunningTime) / 60);
             }
         }
 
-        private float getMaxWearPercent()
+        private Boolean reportEstimatedTyreLife(float maxWearThreshold, float sessionRunningTime, float sessionTotalRunTime,
+            int lapsCompleted, int sessionTotalLaps)
         {
-            return GlobalBehaviourSettings.useOvalLogic ? Math.Max(rightFrontWearPercent, rightRearWearPercent)
-                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
+            Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
+            if (maxWearPercent.Item2 >= maxWearThreshold)
+            {
+                int tyreLifeRemaining = getRemainingTyreLife(sessionRunningTime, maxWearPercent);
+                if (tyreLifeRemaining != -1)
+                {
+                    if (lapsInSession > 0 || timeInSession == 0)
+                    {
+                        // only announce this if the estimate is close to or smaller than race distance
+                        int sessionLapsRemaining = sessionTotalLaps - lapsCompleted;
+                        if (tyreLifeRemaining - sessionLapsRemaining < 2)
+                        {
+                            playEstimatedTypeLifeLaps(tyreLifeRemaining, false);
+                        }
+                    }
+                    else
+                    {
+                        float sessionTimeRemaining = (sessionTotalRunTime - sessionRunningTime) / 60;
+                        // only announce this if the estimate is close to or smaller than race distance
+                        if (tyreLifeRemaining - sessionTimeRemaining < 2)
+                        {
+                            playEstimatedTyreLifeMinutes(tyreLifeRemaining, false);
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private Tuple<CornerData.Corners, float> getMaxWearPercent()
+        {
+            if (GlobalBehaviourSettings.useOvalLogic)
+            {
+                if (rightFrontWearPercent > rightRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_RIGHT, rightFrontWearPercent);
+                }
+                else
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_RIGHT, rightRearWearPercent);
+                }
+            }
+            else
+            {
+                if (rightFrontWearPercent > rightRearWearPercent && rightFrontWearPercent > leftFrontWearPercent && rightFrontWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_RIGHT, rightFrontWearPercent);
+                }
+                else if (rightRearWearPercent > rightFrontWearPercent && rightRearWearPercent > leftFrontWearPercent && rightRearWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_RIGHT, rightRearWearPercent);
+                }
+                else if (leftFrontWearPercent > rightRearWearPercent && leftFrontWearPercent > rightFrontWearPercent && leftFrontWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_LEFT, leftFrontWearPercent);
+                }
+                else
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_LEFT, leftRearWearPercent);
+                }
+            }
         }
 
         private void reportCurrentTyreTemps()
@@ -1034,26 +1237,36 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
-                float maxWearPercent = getMaxWearPercent();
+                Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-                else if (maxWearPercent < 1)
+                else if (maxWearPercent.Item2 < 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                 }
+                else if (maxWearPercent.Item2 < 5) 
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
                 else 
                 {
-                    if (lapsInSession > 0 || timeInSession == 0)
+                    int remaining = getRemainingTyreLife(CrewChief.currentGameState.SessionData.SessionRunningTime, maxWearPercent);
+                    if (remaining != -1)
                     {
-                        int lapsRemainingOnTheseTyres = (int)(completedLaps / (maxWearPercent / 100)) - completedLaps - 1;
-                        playEstimatedTypeLifeLaps(lapsRemainingOnTheseTyres, true);
+                        if (lapsInSession > 0 || timeInSession == 0)
+                        {
+                            playEstimatedTypeLifeLaps(remaining, true);
+                        }
+                        else
+                        {
+                            playEstimatedTyreLifeMinutes(remaining, true);
+                        }
                     }
                     else
                     {
-                        int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
-                        playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, true);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                 }
             }
