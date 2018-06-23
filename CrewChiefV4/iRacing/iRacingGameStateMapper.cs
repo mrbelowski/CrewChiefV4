@@ -1037,7 +1037,7 @@ namespace CrewChiefV4.iRacing
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
-            if(previousGameState != null)
+            if(previousGameState != null && !currentGameState.PitData.OnOutLap)
             {
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);

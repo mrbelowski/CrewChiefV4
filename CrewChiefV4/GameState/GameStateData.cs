@@ -2101,7 +2101,7 @@ namespace CrewChiefV4.GameState
             {
                 hardParts.Clear();
             }
-            if (isNewLap && lapWasValid)
+            if (isNewLap && lapWasValid && hardParts.Count > 0)
             {
                 hardPartsMapped = true;
                 SortHardParts();
@@ -2113,7 +2113,7 @@ namespace CrewChiefV4.GameState
                 isAllreadyBreaking = true;
                 if (distanceRoundTrack > 25)
                 {
-                    hardPartStart = distanceRoundTrack - 25;
+                    hardPartStart = distanceRoundTrack - 150;
                 }
                 else
                 {
@@ -2122,7 +2122,7 @@ namespace CrewChiefV4.GameState
                 }
                 
             }
-            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 50)
+            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 175)
             {
                 hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
                 isAllreadyBreaking = false;

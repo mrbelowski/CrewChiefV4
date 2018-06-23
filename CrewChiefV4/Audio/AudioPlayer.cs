@@ -454,7 +454,7 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0 && !(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack))
                         {
                             playQueueContents(queuedClips, false);
                             allowPearlsOnNextPlay = true;
