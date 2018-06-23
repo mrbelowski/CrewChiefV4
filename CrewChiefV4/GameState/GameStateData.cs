@@ -2122,7 +2122,7 @@ namespace CrewChiefV4.GameState
                 }
                 
             }
-            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 25)
+            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 50)
             {
                 hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
                 isAllreadyBreaking = false;

@@ -166,7 +166,11 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
                 return false;
             }
-
+            if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt)
+            {
+                PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
+                return false;
+            }
             if (immediateMessagesBlockOtherMessages && canInterrupt)
             {
                 if (audioPlayer.hasMessageInImmediateQueue())
