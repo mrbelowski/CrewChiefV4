@@ -295,14 +295,12 @@ namespace CrewChiefV4.rFactor1
                     if (this.lastSessionHardPartsOnTrackData != null
                         && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
                         currentGameState.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
-                    else
-                        this.lastSessionHardPartsOnTrackData = null;
                 }
                 else
                 {
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
                     this.lastSessionTrackDataContainer = tdc;
-                    this.lastSessionHardPartsOnTrackData = currentGameState.hardPartsOnTrackData;
+                    this.lastSessionHardPartsOnTrackData = null;
 
                     this.lastSessionTrackName = currentGameState.SessionData.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.lapDist;
@@ -1168,6 +1166,7 @@ namespace CrewChiefV4.rFactor1
             }
 
             currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
+            this.lastSessionHardPartsOnTrackData = currentGameState.hardPartsOnTrackData;
 
             return currentGameState;
         }

@@ -2126,8 +2126,8 @@ namespace CrewChiefV4.GameState
             {
                 hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
                 isAlreadyBraking = false;
-                Console.WriteLine("HardPart On Track Start At " + hardPartStart + " And Ends At " + distanceRoundTrack);
-            }        
+                Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " + distanceRoundTrack.ToString("0.000"));
+            }
         }
         private void SortHardParts()
         {

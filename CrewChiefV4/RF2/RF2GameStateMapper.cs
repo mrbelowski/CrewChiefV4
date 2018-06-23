@@ -569,8 +569,6 @@ namespace CrewChiefV4.rFactor2
                     if (this.lastSessionHardPartsOnTrackData != null
                         && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
                         cgs.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
-                    else
-                        this.lastSessionHardPartsOnTrackData = null;
 
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
@@ -585,7 +583,7 @@ namespace CrewChiefV4.rFactor2
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
 
                     this.lastSessionTrackDataContainer = tdc;
-                    this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
+                    this.lastSessionHardPartsOnTrackData = null;
                     this.lastSessionTrackName = csd.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.scoring.mScoringInfo.mLapDist;
                 }
@@ -1779,6 +1777,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal, psd.CurrentLapIsValid, cgs.SessionData.IsNewLap, cgs.PositionAndMotionData.DistanceRoundTrack);
 
             cgs.IsInHardPartOfTrack = cgs.hardPartsOnTrackData.isInHardPart(cgs.PositionAndMotionData.DistanceRoundTrack) && cgs.PositionAndMotionData.CarSpeed > 5;
+            this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
 
             return cgs;
         }
