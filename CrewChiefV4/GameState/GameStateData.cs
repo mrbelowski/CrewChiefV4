@@ -2087,7 +2087,7 @@ namespace CrewChiefV4.GameState
     {
         public List<Tuple<float, float>> hardParts = new List<Tuple<float, float>>();
         
-        public Boolean isAllreadyBreaking = false;
+        public Boolean isAlreadyBraking = false;
         public float hardPartStart = -1;
         public bool hardPartsMapped = false;
         public static bool sorted = false;
@@ -2108,9 +2108,9 @@ namespace CrewChiefV4.GameState
                 Console.WriteLine("HardPart Has Been Mapped");
                 return;
             }
-            if (!isAllreadyBreaking && breakPedal > 0.1)
+            if (!isAlreadyBraking && breakPedal > 0.1)
             {
-                isAllreadyBreaking = true;
+                isAlreadyBraking = true;
                 if (distanceRoundTrack > 25)
                 {
                     hardPartStart = distanceRoundTrack - 150;
@@ -2122,10 +2122,10 @@ namespace CrewChiefV4.GameState
                 }
                 
             }
-            if (loudPedal > 0.9 && isAllreadyBreaking && distanceRoundTrack > hardPartStart + 175)
+            if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
             {
                 hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
-                isAllreadyBreaking = false;
+                isAlreadyBraking = false;
                 Console.WriteLine("HardPart On Track Start At " + hardPartStart + " And Ends At " + distanceRoundTrack);
             }        
         }

@@ -152,7 +152,7 @@ namespace CrewChiefV4.iRacing
                         if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                         {
                             currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                            currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                             currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                             currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                         }
@@ -252,7 +252,7 @@ namespace CrewChiefV4.iRacing
                                 if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                                 {
                                     currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                                    currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                                     currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                                     currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                                 }
@@ -375,7 +375,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                     currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                    currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                     currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                     currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
 

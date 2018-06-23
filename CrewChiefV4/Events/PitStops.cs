@@ -320,7 +320,7 @@ namespace CrewChiefV4.Events
                     // in S1 but have exited pits, and we're expecting the limit to have been turned off
                     timeOfDisengageCheck = DateTime.MaxValue;
                     timeOfLastLimiterWarning = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderDisengageLimiter, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDisengageLimiter, 0, this));
                 }
                 else if (previousGameState != null)
                 {

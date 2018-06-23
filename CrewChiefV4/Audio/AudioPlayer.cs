@@ -86,6 +86,8 @@ namespace CrewChiefV4.Audio
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
+        public Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayd_messages_on_hardparts");
+
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
         private OrderedDictionary immediateClips = new OrderedDictionary();
@@ -454,7 +456,7 @@ namespace CrewChiefV4.Audio
                     nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0 && !(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack))
+                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0  &&  !(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && delayMessagesInHardParts))
                         {
                             playQueueContents(queuedClips, false);
                             allowPearlsOnNextPlay = true;

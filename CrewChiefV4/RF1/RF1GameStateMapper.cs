@@ -239,7 +239,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
                 currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                 currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                 currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
             }

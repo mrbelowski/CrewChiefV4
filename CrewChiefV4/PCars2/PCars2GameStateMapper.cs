@@ -409,7 +409,7 @@ namespace CrewChiefV4.PCars2
                         if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                         {
                             currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                            currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                             currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                             currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                         }
@@ -458,7 +458,7 @@ namespace CrewChiefV4.PCars2
                                 if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                                 {
                                     currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                                    currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                                     currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                                     currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                                 }
@@ -572,7 +572,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
 
                     currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                    currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                     currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                     currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                 }                

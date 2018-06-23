@@ -633,7 +633,7 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
 
                 cgs.hardPartsOnTrackData.hardParts = pgs.hardPartsOnTrackData.hardParts;
-                cgs.hardPartsOnTrackData.isAllreadyBreaking = pgs.hardPartsOnTrackData.isAllreadyBreaking;
+                cgs.hardPartsOnTrackData.isAlreadyBraking = pgs.hardPartsOnTrackData.isAlreadyBraking;
                 cgs.hardPartsOnTrackData.hardPartStart = pgs.hardPartsOnTrackData.hardPartStart;
                 cgs.hardPartsOnTrackData.hardPartsMapped = pgs.hardPartsOnTrackData.hardPartsMapped;
             }
