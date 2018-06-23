@@ -81,7 +81,9 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenWeWerePassed;
 
         private const int secondsToCheckForDamageOrOfftrackOnPass = 10;
+        private const int secondsToCheckForYellowOnPass = 3;
         private float lastOffTrackSessionTime = -1.0f;
+        private float lastYellowFlagTime = -1.0f;
         private bool lastOvertakeWasClean = true;
 
         private string opponentAheadKey = null;
@@ -90,7 +92,7 @@ namespace CrewChiefV4.Events
         private string opponentKeyForCarWeJustPassed;
 
         private string opponentKeyForCarThatJustPassedUs;
-                
+
         public Position(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -136,6 +138,7 @@ namespace CrewChiefV4.Events
             timeWhenWeMadeAPass = DateTime.MinValue;
             lastOvertakeMessageTime = DateTime.MinValue;
             lastOffTrackSessionTime = -1.0f;
+            lastYellowFlagTime = -1.0f;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -170,6 +173,11 @@ namespace CrewChiefV4.Events
             if (currentGameState.PenaltiesData.IsOffRacingSurface)
             {
                 lastOffTrackSessionTime = currentGameState.SessionData.SessionRunningTime;
+            }
+            if (currentGameState.FlagData.isLocalYellow 
+                || currentGameState.FlagData.sectorFlags[currentGameState.SessionData.SectorNumber - 1] == FlagEnum.YELLOW)
+            {
+                lastYellowFlagTime = currentGameState.SessionData.SessionRunningTime;
             }
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                 currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
@@ -210,6 +218,11 @@ namespace CrewChiefV4.Events
                                 {
                                     lastOvertakeWasClean = false;
                                     Console.WriteLine("Overtake considered not clean due to vehicle off track.");
+                                }
+                                else if (lastYellowFlagTime > 0.0f && (currentGameState.SessionData.SessionRunningTime - lastYellowFlagTime) < secondsToCheckForYellowOnPass)
+                                {
+                                    lastOvertakeWasClean = false;
+                                    Console.WriteLine("Overtake considered not clean due to yellow flag.");
                                 }
                             }
                         }
