@@ -1065,6 +1065,19 @@ namespace CrewChiefV4.assetto
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                            currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                            currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                        }
+                    }
+                }
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, distanceRoundTrack, currentGameState.Now);
             }
             else
@@ -1102,7 +1115,19 @@ namespace CrewChiefV4.assetto
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;                        
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                                }
+                            }
+                        }
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, distanceRoundTrack, currentGameState.Now);
 
                         currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);                        
@@ -1207,6 +1232,10 @@ namespace CrewChiefV4.assetto
                     currentGameState.TyreData.TyreTypeName = previousGameState.TyreData.TyreTypeName;
 
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
+                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
                 }
                 //------------------- Variable session data ---------------------------
 
@@ -1892,6 +1921,14 @@ namespace CrewChiefV4.assetto
             currentGameState.PositionAndMotionData.Orientation.Pitch = shared.acsPhysics.pitch;
             currentGameState.PositionAndMotionData.Orientation.Roll = shared.acsPhysics.roll;
             currentGameState.PositionAndMotionData.Orientation.Yaw = shared.acsPhysics.heading;
+
+            if (previousGameState != null && !currentGameState.PitData.OnOutLap)
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
+            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
+
             return currentGameState;
         }
 
