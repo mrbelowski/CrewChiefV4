@@ -90,6 +90,7 @@ namespace CrewChiefV4.rFactor2
         // Track landmarks cache.
         private string lastSessionTrackName = null;
         private TrackDataContainer lastSessionTrackDataContainer = null;
+        private HardPartsOnTrackData lastSessionHardPartsOnTrackData = null;
         private double lastSessionTrackLength = -1.0;
 
         private double lastPitBoxPositionEstimate = -1.0;
@@ -565,6 +566,12 @@ namespace CrewChiefV4.rFactor2
                 {
                     tdc = this.lastSessionTrackDataContainer;
 
+                    if (this.lastSessionHardPartsOnTrackData != null
+                        && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
+                        cgs.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
+                    else
+                        this.lastSessionHardPartsOnTrackData = null;
+
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
 
@@ -578,6 +585,7 @@ namespace CrewChiefV4.rFactor2
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
 
                     this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
                     this.lastSessionTrackName = csd.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.scoring.mScoringInfo.mLapDist;
                 }
@@ -623,6 +631,11 @@ namespace CrewChiefV4.rFactor2
                 cgs.Conditions.samples = pgs.Conditions.samples;
 
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
+
+                cgs.hardPartsOnTrackData.hardParts = pgs.hardPartsOnTrackData.hardParts;
+                cgs.hardPartsOnTrackData.isAllreadyBreaking = pgs.hardPartsOnTrackData.isAllreadyBreaking;
+                cgs.hardPartsOnTrackData.hardPartStart = pgs.hardPartsOnTrackData.hardPartStart;
+                cgs.hardPartsOnTrackData.hardPartsMapped = pgs.hardPartsOnTrackData.hardPartsMapped;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -1760,6 +1773,12 @@ namespace CrewChiefV4.rFactor2
                 && (pgs.SessionData.SessionPhase == SessionPhase.Formation
                     || pgs.SessionData.SessionPhase == SessionPhase.Countdown))
                 csd.JustGoneGreen = true;
+
+            // Map difficult track parts.
+            if (pgs != null && !cgs.PitData.OnOutLap)
+                cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal, psd.CurrentLapIsValid, cgs.SessionData.IsNewLap, cgs.PositionAndMotionData.DistanceRoundTrack);
+
+            cgs.IsInHardPartOfTrack = cgs.hardPartsOnTrackData.isInHardPart(cgs.PositionAndMotionData.DistanceRoundTrack) && cgs.PositionAndMotionData.CarSpeed > 5;
 
             return cgs;
         }

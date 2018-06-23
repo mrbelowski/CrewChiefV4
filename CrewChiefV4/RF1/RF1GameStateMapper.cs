@@ -48,6 +48,7 @@ namespace CrewChiefV4.rFactor1
         // Track landmarks cache.
         private string lastSessionTrackName = null;
         private TrackDataContainer lastSessionTrackDataContainer = null;
+        private HardPartsOnTrackData lastSessionHardPartsOnTrackData = null;
         private float lastSessionTrackLength = -1.0f;
 
         // next track conditions sample due after:
@@ -237,6 +238,10 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                 currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
+                currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
+                currentGameState.hardPartsOnTrackData.isAllreadyBreaking = previousGameState.hardPartsOnTrackData.isAllreadyBreaking;
+                currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
             }
             if (currentGameState.FlagData.isFullCourseYellow)
             {
@@ -286,11 +291,19 @@ namespace CrewChiefV4.rFactor1
                     tdc = this.lastSessionTrackDataContainer;
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+
+                    if (this.lastSessionHardPartsOnTrackData != null
+                        && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
+                        currentGameState.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
+                    else
+                        this.lastSessionHardPartsOnTrackData = null;
                 }
                 else
                 {
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
                     this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionHardPartsOnTrackData = currentGameState.hardPartsOnTrackData;
+
                     this.lastSessionTrackName = currentGameState.SessionData.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.lapDist;
                 }
@@ -1147,6 +1160,14 @@ namespace CrewChiefV4.rFactor1
                     (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                      previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
                 currentGameState.SessionData.JustGoneGreen = true;
+
+            if (previousGameState != null && !currentGameState.PitData.OnOutLap)
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
+
+            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
 
             return currentGameState;
         }
