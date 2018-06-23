@@ -1297,7 +1297,7 @@ namespace CrewChiefV4.PCars2
             
             currentGameState.ControlData.BrakePedal = shared.mBrake;
             currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
-            currentGameState.ControlData.ClutchPedal = shared.mClutch
+            currentGameState.ControlData.ClutchPedal = shared.mClutch;
 
             if (previousGameState != null && !currentGameState.PitData.OnOutLap)
             {
