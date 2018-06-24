@@ -630,10 +630,7 @@ namespace CrewChiefV4.rFactor2
 
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
 
-                cgs.hardPartsOnTrackData.hardParts = pgs.hardPartsOnTrackData.hardParts;
-                cgs.hardPartsOnTrackData.isAlreadyBraking = pgs.hardPartsOnTrackData.isAlreadyBraking;
-                cgs.hardPartsOnTrackData.hardPartStart = pgs.hardPartsOnTrackData.hardPartStart;
-                cgs.hardPartsOnTrackData.hardPartsMapped = pgs.hardPartsOnTrackData.hardPartsMapped;
+                cgs.hardPartsOnTrackData = pgs.hardPartsOnTrackData;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -1775,6 +1772,12 @@ namespace CrewChiefV4.rFactor2
             // Map difficult track parts.
             if (pgs != null && !cgs.PitData.OnOutLap)
                 cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal, psd.CurrentLapIsValid, cgs.SessionData.IsNewLap, cgs.PositionAndMotionData.DistanceRoundTrack);
+            
+            if (cgs.hardPartsOnTrackData.hardPartsMapped && !cgs.hardPartsOnTrackData.gapsAdjusted)
+            {
+                cgs.SessionData.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.hardParts);
+                cgs.hardPartsOnTrackData.gapsAdjusted = true;
+            }
 
             cgs.IsInHardPartOfTrack = cgs.hardPartsOnTrackData.isInHardPart(cgs.PositionAndMotionData.DistanceRoundTrack) && cgs.PositionAndMotionData.CarSpeed > 5;
             this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
