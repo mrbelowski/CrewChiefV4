@@ -2107,13 +2107,13 @@ namespace CrewChiefV4.GameState
                 lapTimeForHardPartsData = lapTime;
                 SortHardParts();
                 hardPartsForBestLap = hardPartsForThisLap;
-                hardPartsForThisLap = new List<Tuple<float, float>>();
                 hardPartsMapped = true;
                 useNewData = true;
             }
             currentLapValid = true;
             totalDistanceCoveredByHardPointsForThisLap = 0;
             exceededMaxHardParts = false;
+            hardPartsForThisLap = new List<Tuple<float, float>>();
             return useNewData;
         }
 
