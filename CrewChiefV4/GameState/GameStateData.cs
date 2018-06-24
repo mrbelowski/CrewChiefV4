@@ -2095,7 +2095,6 @@ namespace CrewChiefV4.GameState
         private Boolean currentLapValid = true;
         private float trackLength;
         private float totalDistanceCoveredByHardPointsForThisLap = 0;
-        private float totalDistanceCoveredByHardPointsForBestLap = 0;
         private Boolean exceededMaxHardParts = false;
 
         // called when we complete a lap. If it's our best lap we use this data
@@ -2111,7 +2110,6 @@ namespace CrewChiefV4.GameState
                 hardPartsForThisLap = new List<Tuple<float, float>>();
                 hardPartsMapped = true;
                 useNewData = true;
-                totalDistanceCoveredByHardPointsForBestLap = totalDistanceCoveredByHardPointsForThisLap;
             }
             currentLapValid = true;
             totalDistanceCoveredByHardPointsForThisLap = 0;
