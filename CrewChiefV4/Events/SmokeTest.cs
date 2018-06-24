@@ -133,8 +133,9 @@ namespace CrewChiefV4.Events
             fragments.Add(MessageFragment.Text(Strategy.folderAnd));
             fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
             audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            Thread.Sleep(2000);
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
             */
-
             /*
             List<String> rawDriverNames = new List<string>();
             audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(makeTempDriver("bakus", rawDriverNames),
