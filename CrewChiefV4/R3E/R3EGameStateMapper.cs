@@ -1386,6 +1386,7 @@ namespace CrewChiefV4.RaceRoom
             if (currentGameState.hardPartsOnTrackData.hardPartsMapped && !currentGameState.hardPartsOnTrackData.gapsAdjusted)
             {
                 currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardParts);
+                currentGameState.hardPartsOnTrackData.gapsAdjusted = true;
             }
             currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
             
