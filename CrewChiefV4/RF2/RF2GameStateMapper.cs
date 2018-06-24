@@ -1770,15 +1770,18 @@ namespace CrewChiefV4.rFactor2
                 csd.JustGoneGreen = true;
 
             // Map difficult track parts.
-            if (pgs != null && !cgs.PitData.OnOutLap)
-                cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal, psd.CurrentLapIsValid, cgs.SessionData.IsNewLap, cgs.PositionAndMotionData.DistanceRoundTrack);
-            
-            if (cgs.hardPartsOnTrackData.hardPartsMapped && !cgs.hardPartsOnTrackData.gapsAdjusted)
+            if (csd.IsNewLap)
             {
-                cgs.SessionData.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.hardParts);
-                cgs.hardPartsOnTrackData.gapsAdjusted = true;
+                if (cgs.hardPartsOnTrackData.updateHardPartsForNewLap(csd.LapTimePrevious))
+                {
+                    csd.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.hardPartsForBestLap);
+                }
             }
-
+            else if (!cgs.PitData.OnOutLap)
+            {
+                cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal,
+                    cgs.PositionAndMotionData.DistanceRoundTrack, csd.CurrentLapIsValid);
+            }
             cgs.IsInHardPartOfTrack = cgs.hardPartsOnTrackData.isInHardPart(cgs.PositionAndMotionData.DistanceRoundTrack) && cgs.PositionAndMotionData.CarSpeed > 5;
             this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
 
