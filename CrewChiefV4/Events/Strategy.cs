@@ -296,12 +296,13 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.IsNewLap)
                 {
                     playedPitPositionEstimatesForThisLap = false;
+                    pitPositionEstimatesRequested = false;
+                    Strategy.playPitPositionEstimates = false;
                 }
                 // if we've just requested a pit stop (and the game has this data), trigger the strategy data when we next hit the final sector
-                else if (playPitPositionEstimates &&
-                    !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop)
+                else if (!previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop && !playedPitPositionEstimatesForThisLap)
                 {
-                    playPitPositionEstimates = true;
+                    Strategy.playPitPositionEstimates = true;
                     pitPositionEstimatesRequested = false;
                 }
                 // if we've just entered the pitlane and the pit countdown is disabled, and we don't have a penalty, trigger
@@ -309,14 +310,12 @@ namespace CrewChiefV4.Events
                 else if (!pitBoxPositionCountdown && !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo &&
                     !playedPitPositionEstimatesForThisLap && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
-                    playPitPositionEstimates = true;
+                    Strategy.playPitPositionEstimates = true;
                     pitPositionEstimatesRequested = false;
                 }
                 if (Strategy.playPitPositionEstimates &&
                     (pitPositionEstimatesRequested || (inFinalSector(currentGameState) && !playedPitPositionEstimatesForThisLap)))
                 {
-                    Strategy.playPitPositionEstimates = false;
-                    pitPositionEstimatesRequested = false;
                     // we requested a stop and we're in the final sector, or we requested data, so gather up the data we'll need and report it
                     //
                     // Note that we need to derive the position estimates here before we start slowing for pit entry
@@ -336,6 +335,8 @@ namespace CrewChiefV4.Events
                             currentGameState.PitData.HasMandatoryPitStop, currentGameState.PitData.PitWindowEnd, currentGameState.SessionData.SessionHasFixedTime);
                     reportPostPitData(postRacePositions);
                     playedPitPositionEstimatesForThisLap = true;
+                    pitPositionEstimatesRequested = false;
+                    Strategy.playPitPositionEstimates = false;
                 }
 
 
