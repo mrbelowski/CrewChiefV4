@@ -466,10 +466,17 @@ namespace CrewChiefV4.Audio
                             }
                             else
                             {
+                                // if there are no messages in the immediate queue, ensure the radio channel is closed here
+                                Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
+                                if (shouldCloseChannel)
+                                {
+                                    closeRadioInternalChannel();
+                                }
                                 if (queuedClips.Count != lastDelayedQueueSize)
                                 {
                                     lastDelayedQueueSize = queuedClips.Count;
-                                    Console.WriteLine("Delaying message playback because we're in a hard part of a track.  Queue size: " + lastDelayedQueueSize);
+                                    Console.WriteLine("Delaying message playback because we're in a hard part of a track.  Queue size: " +
+                                        lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
                                 }
                             }
                         }

@@ -2085,31 +2085,42 @@ namespace CrewChiefV4.GameState
 
     public class HardPartsOnTrackData
     {
-
-        public List<Tuple<float, float>> hardParts = new List<Tuple<float, float>>();
+        public List<Tuple<float, float>> hardPartsForThisLap = new List<Tuple<float, float>>();
+        public List<Tuple<float, float>> hardPartsForBestLap = new List<Tuple<float, float>>();
         public Boolean isAlreadyBraking = false;        
         public Boolean hardPartsMapped = false;
         public Boolean gapsAdjusted = false;
         public float hardPartStart = -1;
+        private float lapTimeForHardPartsData = -1;
+        private Boolean currentLapValid = true;
 
-        public void mapHardPartsOnTrack(float breakPedal, float loudPedal, bool lapWasValid, bool isNewLap, float distanceRoundTrack)
+        // called when we complete a lap. If it's our best lap we use this data
+        public Boolean updateHardPartsForNewLap(float lapTime)
         {
-            if (hardPartsMapped)
+            Boolean useNewData = false;
+            if (currentLapValid && lapTime > 0 && (lapTimeForHardPartsData == -1 || lapTimeForHardPartsData > lapTime) && hardPartsForThisLap.Count > 0)
             {
-                return;
-            }
-            if (!lapWasValid && isNewLap)
-            {
-                hardParts.Clear();
-            }
-            if (isNewLap && lapWasValid && hardParts.Count > 0)
-            {
-                hardPartsMapped = true;
+                // started a new lap, previous was valid and we have data so see if we want to use the data
+                lapTimeForHardPartsData = lapTime;
                 SortHardParts();
-                Console.WriteLine("HardParts has been mapped");
+                hardPartsForBestLap = hardPartsForThisLap;
+                hardPartsForThisLap = new List<Tuple<float, float>>();
+                hardPartsMapped = true;
+                useNewData = true;
+            }
+            currentLapValid = true;
+            return useNewData;
+        }
+
+        // called on every tick
+        public void mapHardPartsOnTrack(float brakePedal, float loudPedal, float distanceRoundTrack, Boolean lapIsValid)
+        {
+            if (!lapIsValid || !currentLapValid)
+            {
+                currentLapValid = false;
                 return;
             }
-            if (!isAlreadyBraking && breakPedal > 0.1)
+            if (!isAlreadyBraking && brakePedal > 0.1)
             {
                 isAlreadyBraking = true;
                 if (distanceRoundTrack > 150)
@@ -2124,29 +2135,30 @@ namespace CrewChiefV4.GameState
             }
             if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
             {
-                hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack + 25));
+                hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack + 25));
                 isAlreadyBraking = false;
                 Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
             }
         }
+
         private void SortHardParts()
         {
             List<Tuple<float, float>> sortedHardParts = new List<Tuple<float, float>>();
-            for (int index = 0; index < hardParts.Count; index++ )
+            for (int index = 0; index < hardPartsForThisLap.Count; index++ )
             {
-                Tuple<float, float> part = hardParts[index];
+                Tuple<float, float> part = hardPartsForThisLap[index];
                 float nextPartStart = 0;
                 float nextPartEnd = 0;
 
-                if (index == hardParts.Count - 1)
+                if (index == hardPartsForThisLap.Count - 1)
                 {
-                    nextPartStart = hardParts[0].Item1;
-                    nextPartEnd = hardParts[0].Item2;
+                    nextPartStart = hardPartsForThisLap[0].Item1;
+                    nextPartEnd = hardPartsForThisLap[0].Item2;
                 }
                 else
                 {
-                    nextPartStart = hardParts[index+1].Item1;
-                    nextPartEnd = hardParts[index+1].Item2;
+                    nextPartStart = hardPartsForThisLap[index + 1].Item1;
+                    nextPartEnd = hardPartsForThisLap[index + 1].Item2;
                 }
                 if (Math.Abs(part.Item2 - nextPartStart) < 200)                
                 {
@@ -2155,18 +2167,18 @@ namespace CrewChiefV4.GameState
                 }
                 else
                 {
-                    sortedHardParts.Add(hardParts[index]);
+                    sortedHardParts.Add(hardPartsForThisLap[index]);
                 }                
             }
-            hardParts = sortedHardParts;
-            Console.WriteLine("HardParts count " + hardParts.Count);
-
+            hardPartsForThisLap = sortedHardParts;
+            Console.WriteLine("HardParts count " + hardPartsForThisLap.Count);
         }
+
         public Boolean isInHardPart(float distanceRoundTrack)
         {
             if (hardPartsMapped)
             {
-                foreach (Tuple<float, float> part in hardParts)
+                foreach (Tuple<float, float> part in hardPartsForBestLap)
                 {
                     if (distanceRoundTrack >= part.Item1 && distanceRoundTrack <= part.Item2)
                     {
