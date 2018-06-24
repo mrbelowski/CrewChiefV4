@@ -1780,7 +1780,7 @@ namespace CrewChiefV4.rFactor2
             else if (!cgs.PitData.OnOutLap)
             {
                 cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal,
-                    cgs.PositionAndMotionData.DistanceRoundTrack, csd.CurrentLapIsValid);
+                    cgs.PositionAndMotionData.DistanceRoundTrack, csd.CurrentLapIsValid, csd.TrackDefinition.trackLength);
             }
             cgs.IsInHardPartOfTrack = cgs.hardPartsOnTrackData.isInHardPart(cgs.PositionAndMotionData.DistanceRoundTrack) && cgs.PositionAndMotionData.CarSpeed > 5;
             this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;

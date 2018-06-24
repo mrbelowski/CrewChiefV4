@@ -2093,6 +2093,9 @@ namespace CrewChiefV4.GameState
         public float hardPartStart = -1;
         private float lapTimeForHardPartsData = -1;
         private Boolean currentLapValid = true;
+        private float trackLength;
+        private float totalDistanceCoveredByHardPointsForThisLap = 0;
+        private float totalDistanceCoveredByHardPointsForBestLap = 0;
 
         // called when we complete a lap. If it's our best lap we use this data
         public Boolean updateHardPartsForNewLap(float lapTime)
@@ -2107,14 +2110,17 @@ namespace CrewChiefV4.GameState
                 hardPartsForThisLap = new List<Tuple<float, float>>();
                 hardPartsMapped = true;
                 useNewData = true;
+                totalDistanceCoveredByHardPointsForBestLap = totalDistanceCoveredByHardPointsForThisLap;
             }
             currentLapValid = true;
+            totalDistanceCoveredByHardPointsForThisLap = 0;
             return useNewData;
         }
 
         // called on every tick
-        public void mapHardPartsOnTrack(float brakePedal, float loudPedal, float distanceRoundTrack, Boolean lapIsValid)
+        public void mapHardPartsOnTrack(float brakePedal, float loudPedal, float distanceRoundTrack, Boolean lapIsValid, float trackLength)
         {
+            this.trackLength = trackLength;
             if (!lapIsValid || !currentLapValid)
             {
                 currentLapValid = false;
@@ -2135,7 +2141,9 @@ namespace CrewChiefV4.GameState
             }
             if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
             {
-                hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack + 25));
+                float endPoint = distanceRoundTrack + 25;
+                totalDistanceCoveredByHardPointsForThisLap += endPoint - hardPartStart;
+                hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, endPoint));
                 isAlreadyBraking = false;
                 Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
             }
