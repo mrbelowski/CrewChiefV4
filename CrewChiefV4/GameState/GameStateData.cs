@@ -2096,6 +2096,7 @@ namespace CrewChiefV4.GameState
         private float trackLength;
         private float totalDistanceCoveredByHardPointsForThisLap = 0;
         private float totalDistanceCoveredByHardPointsForBestLap = 0;
+        private Boolean exceededMaxHardParts = false;
 
         // called when we complete a lap. If it's our best lap we use this data
         public Boolean updateHardPartsForNewLap(float lapTime)
@@ -2114,6 +2115,7 @@ namespace CrewChiefV4.GameState
             }
             currentLapValid = true;
             totalDistanceCoveredByHardPointsForThisLap = 0;
+            exceededMaxHardParts = false;
             return useNewData;
         }
 
@@ -2124,6 +2126,10 @@ namespace CrewChiefV4.GameState
             if (!lapIsValid || !currentLapValid)
             {
                 currentLapValid = false;
+                return;
+            }
+            if (exceededMaxHardParts)
+            {
                 return;
             }
             if (!isAlreadyBraking && brakePedal > 0.1)
@@ -2146,6 +2152,10 @@ namespace CrewChiefV4.GameState
                 hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, endPoint));
                 isAlreadyBraking = false;
                 Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
+                if (totalDistanceCoveredByHardPointsForThisLap > trackLength / 2)
+                {
+                    exceededMaxHardParts = true;
+                }
             }
         }
 
