@@ -118,7 +118,7 @@ namespace CrewChiefV4.Events
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
             // TODO: remove.
-            //PlaybackModerator.SetTracing(true /*enabled*/);
+            PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
             // pit exit strategy debug stuff to see how it sounds

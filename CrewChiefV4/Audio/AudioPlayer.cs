@@ -470,12 +470,14 @@ namespace CrewChiefV4.Audio
                                 Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
                                 if (shouldCloseChannel)
                                 {
+                                    // TODO: remove.
+                                    Console.WriteLine("Hard parts: closing radio cahnnel on delay.");
                                     closeRadioInternalChannel();
                                 }
                                 if (queuedClips.Count != lastDelayedQueueSize)
                                 {
                                     lastDelayedQueueSize = queuedClips.Count;
-                                    Console.WriteLine("Delaying message playback because we're in a hard part of a track.  Queue size: " +
+                                    Console.WriteLine("Hard parts:  Delaying message playback because we're in a hard part of a track.  Queue size: " +
                                         lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
                                 }
                             }
