@@ -374,11 +374,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
-                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
-                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
-                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
-
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 }
             }
 
@@ -1037,10 +1033,15 @@ namespace CrewChiefV4.iRacing
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
-            if(previousGameState != null && !currentGameState.PitData.OnOutLap)
+            if(previousGameState != null/* && !currentGameState.PitData.OnOutLap*/)
             {
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
+            if (currentGameState.hardPartsOnTrackData.hardPartsMapped && !currentGameState.hardPartsOnTrackData.gapsAdjusted)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardParts);
+                currentGameState.hardPartsOnTrackData.gapsAdjusted = true;
             }
             currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
             return currentGameState;

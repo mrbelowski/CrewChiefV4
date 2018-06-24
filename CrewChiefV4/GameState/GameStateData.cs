@@ -2085,12 +2085,13 @@ namespace CrewChiefV4.GameState
 
     public class HardPartsOnTrackData
     {
+
         public List<Tuple<float, float>> hardParts = new List<Tuple<float, float>>();
-        
-        public Boolean isAlreadyBraking = false;
+        public Boolean isAlreadyBraking = false;        
+        public Boolean hardPartsMapped = false;
+        public Boolean gapsAdjusted = false;
         public float hardPartStart = -1;
-        public bool hardPartsMapped = false;
-        public static bool sorted = false;
+
         public void mapHardPartsOnTrack(float breakPedal, float loudPedal, bool lapWasValid, bool isNewLap, float distanceRoundTrack)
         {
             if (hardPartsMapped)
@@ -2105,28 +2106,27 @@ namespace CrewChiefV4.GameState
             {
                 hardPartsMapped = true;
                 SortHardParts();
-                Console.WriteLine("HardPart Has Been Mapped");
+                Console.WriteLine("HardParts has been mapped");
                 return;
             }
             if (!isAlreadyBraking && breakPedal > 0.1)
             {
                 isAlreadyBraking = true;
-                if (distanceRoundTrack > 25)
+                if (distanceRoundTrack > 150)
                 {
                     hardPartStart = distanceRoundTrack - 150;
                 }
                 else
                 {
-                    // MR - should we pass track lenght here in case our first part is within 25m of the starting line or just ignore ?
                     hardPartStart = distanceRoundTrack;
                 }
                 
             }
             if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
             {
-                hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack));
+                hardParts.Add(new Tuple<float, float>(hardPartStart, distanceRoundTrack + 25));
                 isAlreadyBraking = false;
-                Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " + distanceRoundTrack.ToString("0.000"));
+                Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
             }
         }
         private void SortHardParts()
@@ -2142,7 +2142,6 @@ namespace CrewChiefV4.GameState
                 {
                     nextPartStart = hardParts[0].Item1;
                     nextPartEnd = hardParts[0].Item2;
-                    sorted = true;
                 }
                 else
                 {
@@ -2151,7 +2150,7 @@ namespace CrewChiefV4.GameState
                 }
                 if (Math.Abs(part.Item2 - nextPartStart) < 200)                
                 {
-                    Console.WriteLine("combining parts");
+                    Console.WriteLine("Combining hard parts");
                     sortedHardParts.Add(new Tuple<float, float>(part.Item1, nextPartEnd));
                 }
                 else
@@ -2160,7 +2159,8 @@ namespace CrewChiefV4.GameState
                 }                
             }
             hardParts = sortedHardParts;
-            Console.WriteLine("HardParts Count " + hardParts.Count);
+            Console.WriteLine("HardParts count " + hardParts.Count);
+
         }
         public Boolean isInHardPart(float distanceRoundTrack)
         {

@@ -1071,10 +1071,7 @@ namespace CrewChiefV4.assetto
                     {
                         if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                         {
-                            currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
-                            currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
-                            currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                            currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                         }
                     }
                 }
@@ -1121,10 +1118,7 @@ namespace CrewChiefV4.assetto
                             {
                                 if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                                 {
-                                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
-                                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
-                                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                                 }
                             }
                         }
@@ -1232,10 +1226,7 @@ namespace CrewChiefV4.assetto
                     currentGameState.TyreData.TyreTypeName = previousGameState.TyreData.TyreTypeName;
 
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
-                    currentGameState.hardPartsOnTrackData.hardParts = previousGameState.hardPartsOnTrackData.hardParts;
-                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
-                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
-                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 }
                 //------------------- Variable session data ---------------------------
 
@@ -1926,6 +1917,11 @@ namespace CrewChiefV4.assetto
             {
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     previousGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.IsNewLap, currentGameState.PositionAndMotionData.DistanceRoundTrack);
+            }
+            if (currentGameState.hardPartsOnTrackData.hardPartsMapped && !currentGameState.hardPartsOnTrackData.gapsAdjusted)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardParts);
+                currentGameState.hardPartsOnTrackData.gapsAdjusted = true;
             }
             currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
 
