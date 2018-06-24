@@ -2100,6 +2100,10 @@ namespace CrewChiefV4.GameState
         // called when we complete a lap. If it's our best lap we use this data
         public Boolean updateHardPartsForNewLap(float lapTime)
         {
+            if (!CrewChiefV4.Audio.AudioPlayer.delayMessagesInHardParts)
+            {
+                return false;
+            }
             Boolean useNewData = false;
             if (currentLapValid && lapTime > 0 && (lapTimeForHardPartsData == -1 || lapTimeForHardPartsData > lapTime) && hardPartsForThisLap.Count > 0)
             {
@@ -2120,6 +2124,10 @@ namespace CrewChiefV4.GameState
         // called on every tick
         public void mapHardPartsOnTrack(float brakePedal, float loudPedal, float distanceRoundTrack, Boolean lapIsValid, float trackLength)
         {
+            if (!CrewChiefV4.Audio.AudioPlayer.delayMessagesInHardParts)
+            {
+                return;
+            }
             this.trackLength = trackLength;
             if (!lapIsValid || !currentLapValid)
             {

@@ -25,7 +25,9 @@ namespace CrewChiefV4.Audio
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
         // prefer to drop messages or use generic terms instead of TTS names
         public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
-        
+
+        public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayd_messages_on_hardparts");
+
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
         public static Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
@@ -85,8 +87,6 @@ namespace CrewChiefV4.Audio
 
         // if this is true, no 'green green green', 'get ready', or spotter messages are played
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
-
-        public Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayd_messages_on_hardparts");
 
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
