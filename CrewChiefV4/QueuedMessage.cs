@@ -130,6 +130,9 @@ namespace CrewChiefV4
         private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         private static readonly String compoundMessageIdentifier = "COMPOUND_";
+
+        public SoundMetadata metadata = null;  // null => a generic 'regular message' meta data object will be created automatically
+                                                // for regular queue messages, and a 'high importance' metadata object create for immediate-queue messages
         
         public int maxPermittedQueueLengthForMessage = 0;         // 0 => don't check queue length
         public long dueTime;

@@ -124,6 +124,8 @@ namespace CrewChiefV4.Audio
 
         private SynchronizationContext mainThreadContext = null;
 
+        private int messageId = 0;
+
         static AudioPlayer()
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
@@ -781,7 +783,7 @@ namespace CrewChiefV4.Audio
                                 }
                                 if (!mute)
                                 {
-                                    soundCache.Play(eventName, !isImmediateMessages);
+                                    soundCache.Play(eventName, createSoundMetadata(thisMessage.metadata, !isImmediateMessages));
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
                                 else
@@ -810,7 +812,7 @@ namespace CrewChiefV4.Audio
                                 {
                                     thisMessage.resolveDelayedContents();
                                 }
-                                soundCache.Play(thisMessage.messageFolders, !isImmediateMessages);
+                                soundCache.Play(thisMessage.messageFolders, createSoundMetadata(thisMessage.metadata, !isImmediateMessages));
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -891,7 +893,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
-                soundCache.Play(soundToPlay, false);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -901,7 +903,7 @@ namespace CrewChiefV4.Audio
             {
                 if (!mute)
                 {
-                    soundCache.Play("listen_start_sound", false);
+                    soundCache.Play("listen_start_sound", SoundMetadata.beep);
                 }
             }
         }
@@ -911,7 +913,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
-                soundCache.Play(soundToPlay, false);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -920,7 +922,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
-                soundCache.Play(soundToPlay, false);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -1219,6 +1221,22 @@ namespace CrewChiefV4.Audio
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
                 ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+        }
+
+        private SoundMetadata createSoundMetadata(SoundMetadata providedMetadata, Boolean fromRegularMessageQueue)
+        {
+            if (providedMetadata == null)
+            {
+                providedMetadata = new SoundMetadata(fromRegularMessageQueue ? SoundType.REGULAR_MESSAGE : SoundType.IMPORTANT_MESSAGE);
+            }
+            int messageIdToUse;
+            lock (this)
+            {
+                this.messageId++;
+                messageIdToUse = this.messageId;
+            }
+            providedMetadata.messageId = messageIdToUse;
+            return providedMetadata;
         }
     }
 }

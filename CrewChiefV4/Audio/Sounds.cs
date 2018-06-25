@@ -331,7 +331,7 @@ namespace CrewChiefV4.Audio
          * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
          * can make the app skip playing this sound.
          */
-        public void Play(List<String> soundNames, Boolean canInterrupt)
+        public void Play(List<String> soundNames, SoundMetadata soundMetadata)
         {           
             SoundSet prefix = null;
             SoundSet suffix = null;
@@ -426,7 +426,7 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        singleSound.Play(canInterrupt);
+                        singleSound.Play(soundMetadata);
                     }
                 }
             }
@@ -438,11 +438,11 @@ namespace CrewChiefV4.Audio
          * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
          * can make the app skip playing this sound.
          */
-        public void Play(String soundName, Boolean canInterrupt)
+        public void Play(String soundName, SoundMetadata soundMetadata)
         {
             List<String> l = new List<String>();
             l.Add(soundName);
-            Play(l, canInterrupt);
+            Play(l, soundMetadata);
         }
 
         public void ExpireCachedSounds()
@@ -1170,9 +1170,9 @@ namespace CrewChiefV4.Audio
          * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
          * can make the app skip playing this sound.
          */
-        public void Play(Boolean canInterrupt)
+        public void Play(SoundMetadata soundMetadata)
         {
-            if (!PlaybackModerator.ShouldPlaySound(this, canInterrupt))
+            if (!PlaybackModerator.ShouldPlaySound(this, soundMetadata))
                 return;
 
             PlaybackModerator.PreProcessSound(this);
