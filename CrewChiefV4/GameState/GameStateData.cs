@@ -2113,6 +2113,10 @@ namespace CrewChiefV4.GameState
                 hardPartsForBestLap = hardPartsForThisLap;
                 hardPartsMapped = true;
                 useNewData = true;
+                foreach (Tuple<float, float> hardPart in hardPartsForBestLap)
+                {
+                    Console.WriteLine("Sorted best lap Hard parts.  Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
+                }   
             }
             currentLapValid = true;
             totalDistanceCoveredByHardPointsForThisLap = 0;
@@ -2167,9 +2171,11 @@ namespace CrewChiefV4.GameState
 
         private void SortHardParts()
         {
-            List<Tuple<float, float>> sortedHardParts = new List<Tuple<float, float>>();
+            List<Tuple<float, float>> sortedHardParts = new List<Tuple<float, float>>();                        
             for (int index = 0; index < hardPartsForThisLap.Count; index++ )
             {
+                Boolean addPart = true;
+                Tuple<float, float> partToAdd = null;
                 Tuple<float, float> part = hardPartsForThisLap[index];
                 float nextPartStart = 0;
                 float nextPartEnd = 0;
@@ -2184,17 +2190,30 @@ namespace CrewChiefV4.GameState
                     nextPartStart = hardPartsForThisLap[index + 1].Item1;
                     nextPartEnd = hardPartsForThisLap[index + 1].Item2;
                 }
-                if (Math.Abs(part.Item2 - nextPartStart) < 200)                
+                if (Math.Abs(part.Item2 - nextPartStart) < 100)                
                 {
-                    Console.WriteLine("Combining hard parts");
-                    sortedHardParts.Add(new Tuple<float, float>(part.Item1, nextPartEnd));
+                    partToAdd = new Tuple<float, float>(part.Item1, nextPartEnd);                    
                 }
                 else
                 {
-                    sortedHardParts.Add(hardPartsForThisLap[index]);
-                }                
+                    partToAdd = hardPartsForThisLap[index];                                                         
+                }
+                foreach (Tuple<float, float> sortedPart in sortedHardParts)
+                {
+                    if (partToAdd.Item1 >= sortedPart.Item1 && partToAdd.Item2 <= sortedPart.Item2)
+                    {
+                        Console.WriteLine("Overlapping hardpart detected skipping");
+                        addPart = false;
+                    }
+                }
+                if (addPart && partToAdd != null)
+                {
+                    Console.WriteLine("Combining hard parts");
+                    sortedHardParts.Add(partToAdd);
+                }
             }
             hardPartsForThisLap = sortedHardParts;
+         
             Console.WriteLine("HardParts count " + hardPartsForThisLap.Count);
         }
 
