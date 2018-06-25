@@ -2190,13 +2190,14 @@ namespace CrewChiefV4.GameState
                     nextPartStart = hardPartsForThisLap[index + 1].Item1;
                     nextPartEnd = hardPartsForThisLap[index + 1].Item2;
                 }
-                if (Math.Abs(part.Item2 - nextPartStart) < 100)                
+                if (Math.Abs(part.Item2 - nextPartStart) < 150)                
                 {
+                    Console.WriteLine("Combining hard parts");
                     partToAdd = new Tuple<float, float>(part.Item1, nextPartEnd);                    
                 }
                 else
                 {
-                    partToAdd = hardPartsForThisLap[index];                                                         
+                    partToAdd = part;                                                         
                 }
                 foreach (Tuple<float, float> sortedPart in sortedHardParts)
                 {
@@ -2207,8 +2208,7 @@ namespace CrewChiefV4.GameState
                     }
                 }
                 if (addPart && partToAdd != null)
-                {
-                    Console.WriteLine("Combining hard parts");
+                {                    
                     sortedHardParts.Add(partToAdd);
                 }
             }
