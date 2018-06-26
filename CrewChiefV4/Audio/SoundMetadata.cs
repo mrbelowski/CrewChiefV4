@@ -6,17 +6,6 @@ using System.Threading.Tasks;
 
 namespace CrewChiefV4.Audio
 {
-    public class SoundWrapper
-    {
-        public SingleSound singleSound;
-        public SoundMetadata soundMetadata;
-        public SoundWrapper(SingleSound singleSound, SoundMetadata soundMetadata)
-        {
-            this.singleSound = singleSound;
-            this.soundMetadata = soundMetadata;
-        }
-    }
-
     public enum SoundType {
         BEEP,
         SPOTTER,

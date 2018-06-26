@@ -109,7 +109,7 @@
     <Compile Include="Audio\PlaybackModerator.cs" />
     <Compile Include="Audio\SoundPackVersionsHelper.cs" />
     <Compile Include="Audio\Sounds.cs" />
-    <Compile Include="Audio\SoundWrapper.cs" />
+    <Compile Include="Audio\SoundMetadata.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="commands\KeyPresser.cs" />
     <Compile Include="commands\CommandMacro.cs" />
