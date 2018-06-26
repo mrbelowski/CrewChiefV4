@@ -218,6 +218,11 @@ namespace CrewChiefV4
             {
                 AudioPlayer.delayMessagesInHardParts = true;
             }
+            // switch the gap points to use the adjusted ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
+            }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
         }
 
@@ -226,6 +231,11 @@ namespace CrewChiefV4
             if (AudioPlayer.delayMessagesInHardParts)
             {
                 AudioPlayer.delayMessagesInHardParts = false;
+            }
+            // switch the gap points back to use the regular ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
         }
