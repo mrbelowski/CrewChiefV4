@@ -1036,7 +1036,8 @@ namespace CrewChiefV4.Audio
                         lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
                         this.holdChannelOpen = false;
-                        populateSoundMetadata(queuedMessage, SoundType.IMPORTANT_MESSAGE, 50);
+                        // default is for priority 5, which puts unknown immediate messages lower than spotter
+                        populateSoundMetadata(queuedMessage, SoundType.IMPORTANT_MESSAGE, 5);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
@@ -1062,7 +1063,8 @@ namespace CrewChiefV4.Audio
                     {
                         this.useShortBeepWhenOpeningChannel = true;
                         this.holdChannelOpen = keepChannelOpen;
-                        populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 100);
+                        // default spotter priority is 10, which should be highest
+                        populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
@@ -1100,6 +1102,7 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
+                        // default 'regular' message priority is 0, which is lowest
                         populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
                         int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
 

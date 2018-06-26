@@ -357,7 +357,8 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableBlueFlagUntil)
                 {
                     disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenBlueFlagMessages);
-                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
+                    // immediate to prevent it being delayed by the hard-parts logic
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBlueFlag, 0, this));
                 }
             }
             // In iRacing White flag is set on last lap if "useAmericanTerms" is enabled, this causes white flag to be announched every 40 sec on last lap.
@@ -726,7 +727,8 @@ namespace CrewChiefV4.Events
                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && !hasReportedIsUnderLocalYellow)
                         {
                             //Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
+                            // immediate to prevent it being delayed by the hard-parts logic
+                            audioPlayer.playMessageImmediately(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
                         }
                     }
                     else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
@@ -849,14 +851,16 @@ namespace CrewChiefV4.Events
                                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                         {
                                             //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                            audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
+                                            // immediate to prevent it being delayed by the hard-parts logic
+                                            audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
                                                 folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData));
                                         }
                                     }
                                     else if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                     {
                                         //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                        audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
+                                        // immediate to prevent it being delayed by the hard-parts logic
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
                                             folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData));
                                     }
                                 }
@@ -1301,7 +1305,8 @@ namespace CrewChiefV4.Events
             }
             if (messageContents.Count > 0 && CrewChief.yellowFlagMessagesEnabled)
             {
-                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+                // immediate to prevent it being delayed by the hard-parts logic
+                audioPlayer.playMessageImmediately(new QueuedMessage("incident_drivers", messageContents, 0, this));
             }
         }
 
@@ -1334,7 +1339,8 @@ namespace CrewChiefV4.Events
                         // report the pileup
                         if (CrewChief.yellowFlagMessagesEnabled)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" + crashedInLandmarkKey), 0, this));
+                            // immediate to prevent it being delayed by the hard-parts logic
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" + crashedInLandmarkKey), 0, this));
                         }
                         return true;
                     }

@@ -1040,7 +1040,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
                 }
             }
-            else// if(!currentGameState.PitData.OnOutLap*/)
+            else if (!currentGameState.SessionData.TrackDefinition.isOval)// if(!currentGameState.PitData.OnOutLap*/)
             {
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
