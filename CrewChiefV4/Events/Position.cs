@@ -89,6 +89,8 @@ namespace CrewChiefV4.Events
         private string opponentAheadKey = null;
         private string opponentBehindKey = null;
 
+        private int expireOvertakeMessagesAfter = 5000;
+
         private string opponentKeyForCarWeJustPassed;
 
         private string opponentKeyForCarThatJustPassedUs;
@@ -274,7 +276,9 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'good'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
-                            audioPlayer.playMessage(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
+                            QueuedMessage overtakingMessage = new QueuedMessage(folderOvertaking, 0, this, validationData);
+                            overtakingMessage.expiryTime = (currentGameState.Now.Ticks / TimeSpan.TicksPerMillisecond) + expireOvertakeMessagesAfter;
+                            audioPlayer.playMessage(overtakingMessage, PearlsOfWisdom.PearlType.GOOD, 0);
                             reported = true;
                         }
                     }
@@ -315,6 +319,8 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'bad'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
+                            QueuedMessage beingOvertakenMessage = new QueuedMessage(folderBeingOvertaken, 0, this, validationData);
+                            beingOvertakenMessage.expiryTime = (currentGameState.Now.Ticks / TimeSpan.TicksPerMillisecond) + expireOvertakeMessagesAfter;
                             audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
                             reported = true;
                         }
