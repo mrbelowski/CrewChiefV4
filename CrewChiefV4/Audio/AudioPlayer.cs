@@ -477,8 +477,6 @@ namespace CrewChiefV4.Audio
                                 Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
                                 if (shouldCloseChannel)
                                 {
-                                    // TODO: remove.
-                                    Console.WriteLine("Hard parts: closing radio cahnnel on delay.");
                                     closeRadioInternalChannel();
                                 }
                                 if (queuedClips.Count != lastDelayedQueueSize)
@@ -849,15 +847,6 @@ namespace CrewChiefV4.Audio
                     break;
                 }
             }
-            if (soundsProcessed.Count == 0)
-            {
-                Console.WriteLine("Processed no messages in this queue");
-            }
-            else
-            {
-                Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
-            }
-            
             return soundsProcessed;
         }
 
@@ -1098,7 +1087,6 @@ namespace CrewChiefV4.Audio
                 }
                 index++;
             }
-            Console.WriteLine("Message queue has " + queue.Count + " elements, inserting this element at point " + index);
             return index;
         }
 
