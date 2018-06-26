@@ -48,6 +48,7 @@ namespace CrewChiefV4.Events
         public static String folderTimePitstopAcknowledge = "strategy/acknowledge_time_pitstop";
         // used when we request a benchmark pitstop timing in practice, but we have no best lap data
         public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
+        public static String folderNeedFlyingLap = "strategy/will_calculate_time_loss_from_next_lap";
 
         
         public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";
@@ -101,6 +102,8 @@ namespace CrewChiefV4.Events
 
         private Dictionary<String, float> opponentsInPitLane = new Dictionary<String, float>();
 
+        private Boolean waitingForValidDataForBenchmark = false;
+
         public override List<SessionPhase> applicableSessionPhases
         {
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.FullCourseYellow }; }
@@ -133,6 +136,25 @@ namespace CrewChiefV4.Events
             Strategy.opponentBehindToWatchForPitting = null;
             printS1Positions = false;
             opponentsInPitLane.Clear();
+            waitingForValidDataForBenchmark = false;
+        }
+
+        private void setTimeLossFromBenchmark(GameStateData currentGameState)
+        {
+            if (sectorCount == 2)
+            {
+                playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+            }
+            else
+            {
+                playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+            }
+        }
+
+        private Boolean hasValidComparisonForBenchmark(GameStateData currentGameState)
+        {
+            return (sectorCount == 2 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector2Time > 0) ||
+                (sectorCount == 3 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector3Time > 0);
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -154,6 +176,16 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
+                if (waitingForValidDataForBenchmark && hasValidComparisonForBenchmark(currentGameState))
+                {
+                    waitingForValidDataForBenchmark = false;
+                    setTimeLossFromBenchmark(currentGameState);
+                    Console.WriteLine("Practice pitstop has cost us " + playerTimeLostForStop + " seconds");
+                    audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
+                        MessageContents(folderPitStopCostsUsAbout,
+                        TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
+                        0, this));
+                }
                 // always log the game time at start of final sector, in case we make a late decision to time a stop
                 if (enteredLastSector(previousGameState, currentGameState))
                 {
@@ -190,26 +222,26 @@ namespace CrewChiefV4.Events
                         hasPittedDuringPracticeStopProcess && gameTimeWhenEnteringLastSectorInPractice != -1)
                     {
                         lastAndFirstSectorTimesOnStop = currentGameState.SessionData.SessionRunningTime - gameTimeWhenEnteringLastSectorInPractice;
-
-                        if (sectorCount == 2)
-                        {
-                            playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector2Time + currentGameState.SessionData.PlayerBestLapSector1Time);
-                        }
-                        else
-                        {
-                            playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
-                        }
                         gameTimeWhenEnteringLastSectorInPractice = -1;
                         isTimingPracticeStop = false;
                         hasPittedDuringPracticeStopProcess = false;
                         carClassForLastPitstopTiming = currentGameState.carClass;
                         trackNameForLastPitstopTiming = currentGameState.SessionData.TrackDefinition.name;
 
-                        Console.WriteLine("Practice pitstop has cost us " + playerTimeLostForStop + " seconds");
-                        audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
-                            MessageContents(folderPitStopCostsUsAbout,
-                            TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
-                            0, this));
+                        if (hasValidComparisonForBenchmark(currentGameState))
+                        {
+                            waitingForValidDataForBenchmark = false;
+                            setTimeLossFromBenchmark(currentGameState);
+                            Console.WriteLine("Practice pitstop has cost us " + playerTimeLostForStop + " seconds");
+                            audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
+                                MessageContents(folderPitStopCostsUsAbout,
+                                TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
+                                0, this));
+                        }
+                        else
+                        {
+                            waitingForValidDataForBenchmark = true;
+                        }
                     }
                 }
                 // nothing else to do unless we're in race mode
@@ -1049,16 +1081,8 @@ namespace CrewChiefV4.Events
 
         public void respondPracticeStop()
         {
-            if (CrewChief.currentGameState.SessionData.PlayerBestLapSector1Time > 0 && CrewChief.currentGameState.SessionData.PlayerBestLapSector3Time > 0)
-            {
-                isTimingPracticeStop = true;
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
-            }
-            else
-            {
-                // can't get a benchmark as we have no best lap data in the session
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderNeedMoreLapData, 0, null));
-            }
+            isTimingPracticeStop = true;
+            audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
         }
 
         public void respondRace()

@@ -73,6 +73,8 @@ DISABLE_YELLOW_FLAG_MESSAGES = no more yellows:stop incident updates:don't give 
 ENABLE_MANUAL_FORMATION_LAP = this is the formation lap:formation lap:rolling start
 DISABLE_MANUAL_FORMATION_LAP = standing start:no formation lap
 WHATS_THE_TIME = what's the time:what time is it
+TALK_TO_ME_ANYWHERE = talk to me anywhere:messages at any point
+DONT_TALK_IN_THE_CORNERS = don't talk in the corners:no messages in the corners:don't talk in the braking zones:no messages in the braking zones
 
 WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind

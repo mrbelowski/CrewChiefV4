@@ -1057,6 +1057,12 @@ namespace CrewChiefV4
                         crewChief.toggleEnableYellowFlagsMode();
                         nextPollWait = 1000;
                     }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS))
+                    {
+                        Console.WriteLine("Toggling delay-messages-in-hard-parts");
+                        crewChief.toggleDelayMessagesInHardParts();
+                        nextPollWait = 1000;
+                    }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_FUEL_STATUS))
                     {
                         Console.WriteLine("Getting fuel/battery status");

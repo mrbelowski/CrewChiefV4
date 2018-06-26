@@ -1273,7 +1273,6 @@ namespace CrewChiefV4.PCars
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
             }
-            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
 
             currentGameState.ControlData.BrakePedal = shared.mBrake;
             currentGameState.ControlData.ThrottlePedal = shared.mThrottle;

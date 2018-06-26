@@ -1297,13 +1297,11 @@ namespace CrewChiefV4.PCars2
                     currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
                 }
             }
-            else if (!currentGameState.PitData.OnOutLap)
+            else if (!currentGameState.PitData.OnOutLap && !currentGameState.SessionData.TrackDefinition.isOval)
             {
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
             }
-            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
-
 
             return currentGameState;
         }

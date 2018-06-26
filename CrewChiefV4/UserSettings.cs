@@ -48,7 +48,7 @@ namespace CrewChiefV4
             ControllerConfiguration.ControllerData.PROPERTY_CONTAINER, "PERSONALISATION_NAME", "app_version", "PRINT_TRACK_DATA", "spotter_name",
             "update_notify_attempted", "last_trace_file_name", "READ_CORNER_NAMES_FOR_LAP", "GET_CAR_STATUS", "GET_SESSION_STATUS", "GET_DAMAGE_REPORT", "GET_STATUS",
             "TOGGLE_PACE_NOTES_", "NAUDIO_DEVICE_GUID", "NAUDIO_RECORDING_DEVICE_GUID", "TOGGLE_TRACK_LANDMARKS_RECORDING", "ADD_TRACK_LANDMARK",
-            "PIT_PREDICTION"};
+            "PIT_PREDICTION", "TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS"};
 
         private UserSettings()
         {

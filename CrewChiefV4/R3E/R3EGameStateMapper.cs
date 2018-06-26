@@ -1390,7 +1390,6 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
             }
-            currentGameState.IsInHardPartOfTrack = currentGameState.hardPartsOnTrackData.isInHardPart(currentGameState.PositionAndMotionData.DistanceRoundTrack) && currentGameState.PositionAndMotionData.CarSpeed > 5;
             
             return currentGameState;
         }

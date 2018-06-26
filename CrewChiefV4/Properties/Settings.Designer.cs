@@ -3302,12 +3302,48 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_delayd_messages_on_hardparts {
+        public bool enable_delayed_messages_on_hardparts {
             get {
-                return ((bool)(this["enable_delayd_messages_on_hardparts"]));
+                return ((bool)(this["enable_delayed_messages_on_hardparts"]));
             }
             set {
-                this["enable_delayd_messages_on_hardparts"] = value;
+                this["enable_delayed_messages_on_hardparts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid {
+            get {
+                return ((string)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type {
+            get {
+                return ((string)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index {
+            get {
+                return ((int)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"] = value;
             }
         }
     }
