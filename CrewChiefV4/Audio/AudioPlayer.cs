@@ -795,7 +795,7 @@ namespace CrewChiefV4.Audio
                         else
                         {
                             if (thisMessage.messageName != AudioPlayer.folderDidntUnderstand &&
-                                thisMessage.messageName != AudioPlayer.folderStandBy)
+                                thisMessage.messageName != AudioPlayer.folderStandBy && thisMessage.metadata.type != SoundType.SPOTTER)
                             {
                                 // only cache the last message for repeat if it's an actual message
                                 lastMessagePlayed = thisMessage;
@@ -1227,6 +1227,9 @@ namespace CrewChiefV4.Audio
         {
             if (lastMessagePlayed != null)
             {
+                lastMessagePlayed.metadata.messageId = getMessageId();
+                lastMessagePlayed.metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
+                lastMessagePlayed.metadata.priority = 5;
                 playMessageImmediately(lastMessagePlayed);
             }
         }
@@ -1270,13 +1273,16 @@ namespace CrewChiefV4.Audio
             {
                 queuedMessage.metadata = new SoundMetadata(defaultSoundType, defaultPriority);
             }
-            int messageIdToUse;
+            queuedMessage.metadata.messageId = getMessageId();
+        }
+
+        private int getMessageId()
+        {
             lock (this)
             {
                 this.messageId++;
-                messageIdToUse = this.messageId;
+                return this.messageId;
             }
-            queuedMessage.metadata.messageId = messageIdToUse;
         }
     }
 }
