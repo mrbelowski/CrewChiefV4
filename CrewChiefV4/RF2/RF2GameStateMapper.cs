@@ -1775,7 +1775,8 @@ namespace CrewChiefV4.rFactor2
                 if (cgs.hardPartsOnTrackData.updateHardPartsForNewLap(csd.LapTimePrevious))
                     csd.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.hardPartsForBestLap);
             }
-            else if (!cgs.PitData.OnOutLap && !csd.TrackDefinition.isOval)
+            else if (!cgs.PitData.OnOutLap && !csd.TrackDefinition.isOval &&
+                !(csd.SessionType == SessionType.Race && (csd.CompletedLaps < 1 || (GameStateData.useManualFormationLap && csd.CompletedLaps < 2))))
                 cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal,
                     cgs.PositionAndMotionData.DistanceRoundTrack, csd.CurrentLapIsValid, csd.TrackDefinition.trackLength);
 
