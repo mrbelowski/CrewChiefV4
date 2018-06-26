@@ -200,6 +200,46 @@ namespace CrewChiefV4
             }
         }
 
+        public void toggleDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                disableDelayMessagesInHardParts();
+            }
+            else
+            {
+                enableDelayMessagesInHardParts();
+            }
+        }
+
+        public void enableDelayMessagesInHardParts()
+        {
+            if (!AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = true;
+            }
+            // switch the gap points to use the adjusted ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
+        }
+
+        public void disableDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = false;
+            }
+            // switch the gap points back to use the regular ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
+        }
+
         public void toggleReadOpponentDeltasMode()
         {
             if (readOpponentDeltasForEveryLap)
@@ -839,6 +879,7 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
+                                PlaybackModerator.clearBlockedMessages();
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;

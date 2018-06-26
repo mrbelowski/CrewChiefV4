@@ -48,6 +48,8 @@ namespace CrewChiefV4
 
         public static String PIT_PREDICTION = Configuration.getUIString("activate_pit_prediction");
 
+        public static String TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS = Configuration.getUIString("toggle_delay_messages_in_hard_parts");
+
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
         // yuk...
@@ -82,6 +84,7 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_RACE_UPDATES_FUNCTION);
             addButtonAssignment(TOGGLE_SPOTTER_FUNCTION);
             addButtonAssignment(TOGGLE_READ_OPPONENT_DELTAS);
+            addButtonAssignment(TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS);
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
             addButtonAssignment(VOLUME_UP);
             addButtonAssignment(VOLUME_DOWN);
@@ -122,6 +125,7 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_RACE_UPDATES_FUNCTION]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_SPOTTER_FUNCTION]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_READ_OPPONENT_DELTAS]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[REPEAT_LAST_MESSAGE_BUTTON]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_UP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
@@ -248,6 +252,10 @@ namespace CrewChiefV4
                 {
                     actionId = "TOGGLE_READ_OPPONENT_DELTAS";
                 }
+                else if (buttonAssignment.action == TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS)
+                {
+                    actionId = "TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS";
+                }
                 else if (buttonAssignment.action == REPEAT_LAST_MESSAGE_BUTTON)
                 {
                     actionId = "REPEAT_LAST_MESSAGE_BUTTON";
@@ -358,6 +366,13 @@ namespace CrewChiefV4
             if (toggleReadOpponentDeltasButtonIndex != -1 && toggleReadOpponentDeltasDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, TOGGLE_READ_OPPONENT_DELTAS, toggleReadOpponentDeltasButtonIndex, toggleReadOpponentDeltasDeviceGuid);
+            }
+
+            int toggleBlockMessagesInHardPartsButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index");
+            String toggleBlockMessagesInHardPartsDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid");
+            if (toggleBlockMessagesInHardPartsButtonIndex != -1 && toggleBlockMessagesInHardPartsDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS, toggleBlockMessagesInHardPartsButtonIndex, toggleBlockMessagesInHardPartsDeviceGuid);
             }
 
             int repeatLastMessageButtonIndex = UserSettings.GetUserSettings().getInt("REPEAT_LAST_MESSAGE_BUTTON_button_index");

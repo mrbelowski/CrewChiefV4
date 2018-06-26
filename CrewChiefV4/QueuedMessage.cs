@@ -130,6 +130,9 @@ namespace CrewChiefV4
         private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         private static readonly String compoundMessageIdentifier = "COMPOUND_";
+
+        public SoundMetadata metadata = null;  // null => a generic 'regular message' meta data object will be created automatically
+                                               // for regular queue messages, and a 'high importance' metadata object create for immediate-queue messages
         
         public int maxPermittedQueueLengthForMessage = 0;         // 0 => don't check queue length
         public long dueTime;
@@ -164,7 +167,15 @@ namespace CrewChiefV4
         }
 
         public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
-            Dictionary<String, Object> validationData) : this(messageName, messageFragments, secondsDelay, abstractEvent)
+            Dictionary<String, Object> validationData, SoundMetadata metadata)
+            : this(messageName, messageFragments, secondsDelay, abstractEvent, validationData)
+        {
+            this.metadata = metadata;
+        }
+
+        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
+            Dictionary<String, Object> validationData)
+            : this(messageName, messageFragments, secondsDelay, abstractEvent)
         {
             this.validationData = validationData;
         }

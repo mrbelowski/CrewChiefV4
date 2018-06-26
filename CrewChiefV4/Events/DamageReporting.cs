@@ -125,15 +125,15 @@ namespace CrewChiefV4.Events
             driverIsOKRequestCount = 0;
             if (responseType == DriverOKResponseType.CLEARLY_OK)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
             else if (responseType == DriverOKResponseType.NOT_UNDERSTOOD)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
             else if (responseType == DriverOKResponseType.NO_SPEECH)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
         }
         
@@ -244,13 +244,13 @@ namespace CrewChiefV4.Events
                     timeWhenAskedIfDriverIsOK = currentGameState.Now;
                     if (driverIsOKRequestCount == 1)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                         driverIsOKRequestCount = 2;
                     }
                     else if (driverIsOKRequestCount == 2)
                     {
                         // no response after 3 requests, he's dead, jim.
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                         cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
                     }
                 }
@@ -940,7 +940,7 @@ namespace CrewChiefV4.Events
                 now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.purgeQueues();
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                 // only kick off the 'waiting for response' stuff sometimes
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
                 {

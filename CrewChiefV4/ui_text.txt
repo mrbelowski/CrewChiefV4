@@ -1076,9 +1076,11 @@ enable_opponent_pit_exit_estimates_help = Play pit exit position estimates for o
 enable_opponent_pit_exit_estimates_category = PIT_STOPS_AND_MULTICLASS
 
 immediate_messages_block_other_messages = Spotter and responses block other messages
-immediate_messages_block_other_messages_help = The spotter and command responses block other messages
+immediate_messages_block_other_messages_help = The spotter and command responses block other messages (initial state)
 immediate_messages_block_other_messages_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
 
-enable_delayd_messages_on_hardparts = Delay messages on hard parts
-enable_delayd_messages_on_hardparts_help = Delays non immediate messages when approaching a corner.
-enable_delayd_messages_on_hardparts_category = AUDIO_VOICE_AND_CONTROLLERS  
+enable_delayed_messages_on_hardparts = Delay messages on hard parts
+enable_delayed_messages_on_hardparts_help = Delays non immediate messages when approaching a corner.
+enable_delayed_messages_on_hardparts_category = AUDIO_VOICE_AND_CONTROLLERS
+
+toggle_delay_messages_in_hard_parts = Toggle delay messages on hard parts
