@@ -32,28 +32,14 @@ namespace CrewChiefV4.Audio
         public SoundType type;
         public int priority = 5;  // 0 = lowest, 5 = default, 10 = spotter
 
-        // these have no messageId or priority because they're only ever single sounds
-        public static SoundMetadata beep()
-        {
-            return new SoundMetadata(SoundType.BEEP);
-        }
-
-        public SoundMetadata()
-        {
-            this.messageId = -1;
-            this.type = SoundType.REGULAR_MESSAGE;
-        }
-
-        public SoundMetadata(int messageId, SoundType type)
-        {
-            this.type = type;
-            this.messageId = messageId;
-        }
-
+        // this has no messageId or priority because they're only ever single sounds
+        public static SoundMetadata beep = new SoundMetadata(SoundType.BEEP);
+        
         public SoundMetadata(SoundType type)
         {
             this.type = type;
         }
+
         public SoundMetadata(SoundType type, int priority)
         {
             this.type = type;

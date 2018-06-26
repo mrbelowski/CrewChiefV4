@@ -893,7 +893,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
-                soundCache.Play(soundToPlay, SoundMetadata.beep());
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -903,7 +903,7 @@ namespace CrewChiefV4.Audio
             {
                 if (!mute)
                 {
-                    soundCache.Play("listen_start_sound", SoundMetadata.beep());
+                    soundCache.Play("listen_start_sound", SoundMetadata.beep);
                 }
             }
         }
@@ -913,7 +913,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
-                soundCache.Play(soundToPlay, SoundMetadata.beep());
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -922,7 +922,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
-                soundCache.Play(soundToPlay, SoundMetadata.beep());
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
