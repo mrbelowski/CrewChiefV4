@@ -935,7 +935,7 @@ namespace CrewChiefV4.Events
                         if (poleSitter != null && !playedManualStartLeaderHasCrossedLine && poleSitter.CompletedLaps == 1)
                         {
                             playedManualStartLeaderHasCrossedLine = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                 }

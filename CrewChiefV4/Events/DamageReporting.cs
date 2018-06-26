@@ -125,15 +125,15 @@ namespace CrewChiefV4.Events
             driverIsOKRequestCount = 0;
             if (responseType == DriverOKResponseType.CLEARLY_OK)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
             else if (responseType == DriverOKResponseType.NOT_UNDERSTOOD)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
             else if (responseType == DriverOKResponseType.NO_SPEECH)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
         }
         

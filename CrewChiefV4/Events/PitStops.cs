@@ -273,7 +273,8 @@ namespace CrewChiefV4.Events
                         messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                         messageContents.Add(MessageFragment.Text(folderMetres));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0,
+                            null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
 
                         playedMoreThan150MetreWarning = true;
                     }
@@ -283,14 +284,14 @@ namespace CrewChiefV4.Events
                 {
                     if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneHundredMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneHundredMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         previousDistanceToBox = distanceToBox;
                         played100MetreWarning = true;
                     }
                     // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
                     else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFiftyMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFiftyMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         previousDistanceToBox = distanceToBox;
                         played50MetreWarning = true;
                     }
@@ -317,7 +318,7 @@ namespace CrewChiefV4.Events
                     // in S1 but have exited pits, and we're expecting the limit to have been turned off
                     timeOfDisengageCheck = DateTime.MaxValue;
                     timeOfLastLimiterWarning = currentGameState.Now;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDisengageLimiter, 0, this) { metadata = new SoundMetadata(SoundType.REGULAR_MESSAGE, 0) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDisengageLimiter, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                 }
                 else if (previousGameState != null)
                 {

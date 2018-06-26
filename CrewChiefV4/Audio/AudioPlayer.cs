@@ -1040,6 +1040,13 @@ namespace CrewChiefV4.Audio
                         // here we assume the message is a voice command response, which is the most common use case 
                         // for non-spotter immediate messages
                         populateSoundMetadata(queuedMessage, SoundType.VOICE_COMMAND_RESPONSE, 5);
+                        // sanity check...
+                        if (queuedMessage.metadata.type == SoundType.REGULAR_MESSAGE)
+                        {
+                            // a regular message will not play from the immediate queue
+                            Console.WriteLine("Message " + queuedMessage.messageName + " is in the immediate queue but is type 'regular' - this will not play. Setting the type to 'important'");
+                            queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
+                        }
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
