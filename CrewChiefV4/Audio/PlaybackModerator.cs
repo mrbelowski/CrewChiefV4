@@ -36,14 +36,16 @@ namespace CrewChiefV4.Audio
         private static string prevLastKey = "";
         private static SingleSound lastSoundPreProcessed = null;
 
-        public static void PreProcessSound(SingleSound sound)
+        private static HashSet<int> blockedMessageIds = new HashSet<int>();
+
+        public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
         {
             if (PlaybackModerator.audioPlayer == null)
                 return;
 
             //PlaybackModerator.Trace($"Pre-Processing sound: {sound.fullPath}  isSpotter: {sound.isSpotter}  isBleep: {sound.isBleep} ");
 
-            PlaybackModerator.InjectBeepOutIn(sound);
+            PlaybackModerator.InjectBeepOutIn(sound, soundMetadata);
 
             PlaybackModerator.lastSoundPreProcessed = sound;
         }
@@ -148,7 +150,11 @@ namespace CrewChiefV4.Audio
             Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
 
-        // TODO
+        public static void clearBlockedMessages()
+        {
+            blockedMessageIds.Clear();
+        }
+
         private static Boolean canInterrupt(SoundMetadata metadata)
         {
             return metadata.type == SoundType.REGULAR_MESSAGE;
@@ -165,11 +171,21 @@ namespace CrewChiefV4.Audio
          */
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
+            int messageId = soundMetadata == null ? -1 : soundMetadata.messageId;
+            if (blockedMessageIds.Contains(messageId))
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
+                return false;
+            }
             if (rejectMessagesWhenTalking 
                 && SpeechRecogniser.waitingForSpeech 
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
+                if (messageId != -1)
+                {
+                    blockedMessageIds.Add(messageId);
+                }
                 return false;
             }
             /*if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt && audioPlayer.delayMessagesInHardParts)
@@ -182,6 +198,10 @@ namespace CrewChiefV4.Audio
                 if (audioPlayer.hasMessageInImmediateQueue())
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because an immediate message is waiting", singleSound.fullPath));
+                    if (messageId != -1)
+                    {
+                        blockedMessageIds.Add(messageId);
+                    }
                     return false;
                 }
             }
@@ -189,7 +209,7 @@ namespace CrewChiefV4.Audio
             return true;
         }
 
-        private static void InjectBeepOutIn(SingleSound sound)
+        private static void InjectBeepOutIn(SingleSound sound, SoundMetadata soundMetadata)
         {
             Debug.Assert(PlaybackModerator.audioPlayer != null, "audioPlayer is not set.");
 
@@ -233,11 +253,11 @@ namespace CrewChiefV4.Audio
 
                 // insert bleep out/in
                 if (PlaybackModerator.insertBeepOutBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut, SoundMetadata.beep);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut, soundMetadata);
 
                 // would be nice to have some slight random silence here
                 if (PlaybackModerator.insertBeepInBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn, SoundMetadata.beep);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn, soundMetadata);
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;

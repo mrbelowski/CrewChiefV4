@@ -783,7 +783,7 @@ namespace CrewChiefV4.Audio
                                 }
                                 if (!mute)
                                 {
-                                    soundCache.Play(eventName, createSoundMetadata(thisMessage.metadata, !isImmediateMessages));
+                                    soundCache.Play(eventName, thisMessage.metadata);
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
                                 else
@@ -812,7 +812,7 @@ namespace CrewChiefV4.Audio
                                 {
                                     thisMessage.resolveDelayedContents();
                                 }
-                                soundCache.Play(thisMessage.messageFolders, createSoundMetadata(thisMessage.metadata, !isImmediateMessages));
+                                soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -893,7 +893,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
-                soundCache.Play(soundToPlay, SoundMetadata.beep);
+                soundCache.Play(soundToPlay, SoundMetadata.beep());
             }
         }
 
@@ -903,7 +903,7 @@ namespace CrewChiefV4.Audio
             {
                 if (!mute)
                 {
-                    soundCache.Play("listen_start_sound", SoundMetadata.beep);
+                    soundCache.Play("listen_start_sound", SoundMetadata.beep());
                 }
             }
         }
@@ -913,7 +913,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
-                soundCache.Play(soundToPlay, SoundMetadata.beep);
+                soundCache.Play(soundToPlay, SoundMetadata.beep());
             }
         }
 
@@ -922,7 +922,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
-                soundCache.Play(soundToPlay, SoundMetadata.beep);
+                soundCache.Play(soundToPlay, SoundMetadata.beep());
             }
         }
 
@@ -1036,7 +1036,8 @@ namespace CrewChiefV4.Audio
                         lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
                         this.holdChannelOpen = false;
-                        immediateClips.Add(queuedMessage.messageName, queuedMessage);
+                        populateSoundMetadata(queuedMessage, SoundType.IMPORTANT_MESSAGE, 50);
+                        immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
             }
@@ -1061,11 +1062,30 @@ namespace CrewChiefV4.Audio
                     {
                         this.useShortBeepWhenOpeningChannel = true;
                         this.holdChannelOpen = keepChannelOpen;
-                        immediateClips.Add(queuedMessage.messageName, queuedMessage);
+                        populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 100);
+                        immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
             }
         }
+
+        private int getInsertionIndex(OrderedDictionary queue, QueuedMessage queuedMessage)
+        {
+            int index = 0;
+            foreach (Object value in queue.Values)
+            {
+                int existingMessagePriority = ((QueuedMessage)value).metadata.priority;
+                if (queuedMessage.metadata.priority > existingMessagePriority)
+                {
+                    // the existing message is lower priorty than the one we're adding so we've found the index we want                 
+                    break;
+                }
+                index++;
+            }
+            Console.WriteLine("Message queue has " + queue.Count + " elements, inserting this element at point " + index);
+            return index;
+        }
+
 
         public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
         {
@@ -1080,6 +1100,9 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
+                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
+                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
+
                         PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
                         if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
                         {
@@ -1088,15 +1111,19 @@ namespace CrewChiefV4.Audio
                         if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
                         {
                             QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                            pearlQueuedMessage.metadata = queuedMessage.metadata;
                             pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Add(PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            insertionIndex++;
                         }
-                        queuedClips.Add(queuedMessage.messageName, queuedMessage);
+                        queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
                         if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
                         {
                             QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
                             pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Add(PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            pearlQueuedMessage.metadata = queuedMessage.metadata;
+                            insertionIndex++;
+                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
                         }
                     }
                 }
@@ -1223,11 +1250,13 @@ namespace CrewChiefV4.Audio
                 ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
         }
 
-        private SoundMetadata createSoundMetadata(SoundMetadata providedMetadata, Boolean fromRegularMessageQueue)
+        // defaultSoundType is only used if we've not already added metadata
+        // defaultPriority is only used if we've not already added metadata
+        private void populateSoundMetadata(QueuedMessage queuedMessage, SoundType defaultSoundType, int defaultPriority)
         {
-            if (providedMetadata == null)
+            if (queuedMessage.metadata == null)
             {
-                providedMetadata = new SoundMetadata(fromRegularMessageQueue ? SoundType.REGULAR_MESSAGE : SoundType.IMPORTANT_MESSAGE);
+                queuedMessage.metadata = new SoundMetadata(defaultSoundType, defaultPriority);
             }
             int messageIdToUse;
             lock (this)
@@ -1235,8 +1264,7 @@ namespace CrewChiefV4.Audio
                 this.messageId++;
                 messageIdToUse = this.messageId;
             }
-            providedMetadata.messageId = messageIdToUse;
-            return providedMetadata;
+            queuedMessage.metadata.messageId = messageIdToUse;
         }
     }
 }

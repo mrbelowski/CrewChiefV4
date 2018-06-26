@@ -1175,7 +1175,7 @@ namespace CrewChiefV4.Audio
             if (!PlaybackModerator.ShouldPlaySound(this, soundMetadata))
                 return;
 
-            PlaybackModerator.PreProcessSound(this);
+            PlaybackModerator.PreProcessSound(this, soundMetadata);
             if (AudioPlayer.playWithNAudio)
             {
                 PlayNAudio();

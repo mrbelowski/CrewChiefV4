@@ -17,29 +17,47 @@ namespace CrewChiefV4.Audio
         }
     }
 
-    public enum SoundType {BEEP, SPOTTER, VOICE_COMMAND_RESPONSE, REGULAR_MESSAGE, IMPORTANT_MESSAGE, CRITICAL_MESSAGE}
+    public enum SoundType {
+        BEEP,
+        SPOTTER,
+        VOICE_COMMAND_RESPONSE, 
+        CRITICAL_MESSAGE,
+        IMPORTANT_MESSAGE,
+        REGULAR_MESSAGE
+    }
 
     public class SoundMetadata
     {
-        public int messageId = -1;
+        public int messageId = -1;  // -1 => unset
         public SoundType type;
+        public int priority = 0;  // 0 => lowest priority
 
-        public static SoundMetadata beep = new SoundMetadata(SoundType.BEEP);
-        public static SoundMetadata spotter = new SoundMetadata(SoundType.SPOTTER);
+        // these have no messageId
+        public static SoundMetadata beep()
+        {
+            return new SoundMetadata(SoundType.BEEP, 100);
+        }
 
         public SoundMetadata()
         {
             this.messageId = -1;
             this.type = SoundType.REGULAR_MESSAGE;
         }
+
         public SoundMetadata(int messageId, SoundType type)
         {
             this.type = type;
             this.messageId = messageId;
         }
+
         public SoundMetadata(SoundType type)
         {
             this.type = type;
+        }
+        public SoundMetadata(SoundType type, int priority)
+        {
+            this.type = type;
+            this.priority = priority;
         }
     }
 }
