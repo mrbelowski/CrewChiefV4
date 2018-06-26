@@ -82,6 +82,8 @@ I've not finished implementing this but currently the app understands and respon
 "what class is the car behind" / "what class is the guy behind"- reports class name, or "faster" / "slower" if the app doesn't have the class name
 "time this stop" / "practice pitstop" / "time this pitstop" / "pitstop benchmark": time the next pitstop (sector 3 + sector 1 time) to work out home much tome overall a pitstop costs - practice session only
 "where will I be after a stop?" / "Estimate pit exit positions" / "What will happen if I pit?": play estimate of traffic and race positions on pit exit, if you were to pit on this lap
+"don't talk in the [corners / braking zones]" / "no messages in the [corners / braking zones]": delay non-critical messages if the player is in a challenging section of the track
+"talk to me anywhere" / "messages at any point": disable message delay in challenging parts of the track
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
@@ -220,6 +222,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.3.7: Added option to pause most messages in braking and cornering zones (sections of the track starting from heavy braking and ending with near-full throttle application) - this doesn't apply to spotter messages or other very high priority messages. It can be enabled and disabled with a button mapping ('Toggle delay messages on hard parts') or a voice command ('don't talk in the [corners/braking zones]' / 'no messages in the [corners/braking zones]', 'talk to me anywhere' / 'messages at any point'). The initial state is set with the 'Delay messages on hard parts' option. Note that this feature is disabled for ovals and later sections of very short tracks; added some basic message prioritisation - there's still more work to do here; prevent any further fragments of a message from playing if this message was interrupted; simplified pitstop benchmark process - you can now get a benchmark pitstop time without having to set a hot lap first (although you'll still need to set one after your stop to allow the app to work out the time loss); a few bug fixes
+
 Version 4.9.3.6: Reduce size of 'personalisations' update pack (install this update before updating your personalisations); Much more accurate tyre life prediction using a non-linear curve fit of tyre wear data recorded for the current tyre set (assumes a tyre is worn out when it has 5% life left); added more info to the fuel status message - now includes fuel-to-end; allow spotter sounds to cancel other queued messages (disabled by default, enable with 'Spotter and responses block other messages' property - note this can sound strange when only the start or end sounds of a message play); a few minor tweaks; iRacing - fix white-flag message spam
 
 Version 4.9.3.5: Fixed sound pack version check
