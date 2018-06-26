@@ -48,6 +48,7 @@ namespace CrewChiefV4.Events
         public static String folderTimePitstopAcknowledge = "strategy/acknowledge_time_pitstop";
         // used when we request a benchmark pitstop timing in practice, but we have no best lap data
         public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
+        public static String folderNeedFlyingLap = "strategy/will_calculate_time_loss_from_next_lap";
 
         
         public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";

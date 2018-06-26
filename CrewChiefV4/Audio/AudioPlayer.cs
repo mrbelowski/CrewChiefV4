@@ -48,7 +48,6 @@ namespace CrewChiefV4.Audio
         public static String folderStandBy = "acknowledge/stand_by";
         public static String folderFuelToEnd = "acknowledge/fuel_to_end";
 
-        // RECORD ME
         public static String folderAcknowledgeEnableDelayInHardParts = "acknowledge/keep_quiet_in_corners_enabled";
         public static String folderAcknowledgeDisableDelayInHardParts = "acknowledge/keep_quiet_in_corners_disabled";
 
