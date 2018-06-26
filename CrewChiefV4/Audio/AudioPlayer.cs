@@ -464,7 +464,8 @@ namespace CrewChiefV4.Audio
                     {
                         if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
-                            if (!(CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && delayMessagesInHardParts))
+                            if (!(CrewChief.currentGameState != null && delayMessagesInHardParts && 
+                                CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack)))
                             {
                                 playQueueContents(queuedClips, false);
                                 allowPearlsOnNextPlay = true;

@@ -2296,9 +2296,7 @@ namespace CrewChiefV4.GameState
         private Boolean WaitingForNewLapData = false;
 
         public HardPartsOnTrackData hardPartsOnTrackData = new HardPartsOnTrackData();
-
-        public Boolean IsInHardPartOfTrack = false;
-        
+                
         // special case for pcars2 CloudBrightness and rain because we want to track this in real-time
         public float CloudBrightness = -1;
         public float RainDensity = -1;
