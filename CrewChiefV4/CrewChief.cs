@@ -218,7 +218,7 @@ namespace CrewChiefV4
             {
                 AudioPlayer.delayMessagesInHardParts = true;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
         }
 
         public void disableDelayMessagesInHardParts()
@@ -227,7 +227,7 @@ namespace CrewChiefV4
             {
                 AudioPlayer.delayMessagesInHardParts = false;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
         }
 
         public void toggleReadOpponentDeltasMode()

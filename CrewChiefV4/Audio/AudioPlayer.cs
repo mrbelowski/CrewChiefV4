@@ -26,7 +26,7 @@ namespace CrewChiefV4.Audio
         // prefer to drop messages or use generic terms instead of TTS names
         public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
 
-        public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayd_messages_on_hardparts");
+        public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayed_messages_on_hardparts");
 
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
@@ -47,6 +47,10 @@ namespace CrewChiefV4.Audio
         public static String folderRadioCheckResponse = "acknowledge/radio_check";
         public static String folderStandBy = "acknowledge/stand_by";
         public static String folderFuelToEnd = "acknowledge/fuel_to_end";
+
+        // RECORD ME
+        public static String folderAcknowledgeEnableDelayInHardParts = "acknowledge/keep_quiet_in_corners_enabled";
+        public static String folderAcknowledgeDisableDelayInHardParts = "acknowledge/keep_quiet_in_corners_disabled";
 
         private String folderRants = "rants/general";
         private Boolean playedRantInThisSession = false;
