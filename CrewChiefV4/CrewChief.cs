@@ -200,6 +200,36 @@ namespace CrewChiefV4
             }
         }
 
+        public void toggleDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                disableDelayMessagesInHardParts();
+            }
+            else
+            {
+                enableDelayMessagesInHardParts();
+            }
+        }
+
+        public void enableDelayMessagesInHardParts()
+        {
+            if (!AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = true;
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+        }
+
+        public void disableDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = false;
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+        }
+
         public void toggleReadOpponentDeltasMode()
         {
             if (readOpponentDeltasForEveryLap)

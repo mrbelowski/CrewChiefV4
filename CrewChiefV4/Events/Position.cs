@@ -89,8 +89,6 @@ namespace CrewChiefV4.Events
         private string opponentAheadKey = null;
         private string opponentBehindKey = null;
 
-        private int expireOvertakeMessagesAfter = 5000;
-
         private string opponentKeyForCarWeJustPassed;
 
         private string opponentKeyForCarThatJustPassedUs;
@@ -277,7 +275,6 @@ namespace CrewChiefV4.Events
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             QueuedMessage overtakingMessage = new QueuedMessage(folderOvertaking, 0, this, validationData);
-                            overtakingMessage.expiryTime = (currentGameState.Now.Ticks / TimeSpan.TicksPerMillisecond) + expireOvertakeMessagesAfter;
                             audioPlayer.playMessage(overtakingMessage, PearlsOfWisdom.PearlType.GOOD, 0);
                             reported = true;
                         }
@@ -320,7 +317,6 @@ namespace CrewChiefV4.Events
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             QueuedMessage beingOvertakenMessage = new QueuedMessage(folderBeingOvertaken, 0, this, validationData);
-                            beingOvertakenMessage.expiryTime = (currentGameState.Now.Ticks / TimeSpan.TicksPerMillisecond) + expireOvertakeMessagesAfter;
                             audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
                             reported = true;
                         }

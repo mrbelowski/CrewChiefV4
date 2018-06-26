@@ -1,4 +1,5 @@
-﻿using CrewChiefV4.Events;
+﻿using CrewChiefV4.Audio;
+using CrewChiefV4.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -2100,10 +2101,6 @@ namespace CrewChiefV4.GameState
         // called when we complete a lap. If it's our best lap we use this data
         public Boolean updateHardPartsForNewLap(float lapTime)
         {
-            if (!CrewChiefV4.Audio.AudioPlayer.delayMessagesInHardParts)
-            {
-                return false;
-            }
             Boolean useNewData = false;
             if (currentLapValid && lapTime > 0 && (lapTimeForHardPartsData == -1 || lapTimeForHardPartsData > lapTime) && hardPartsForThisLap.Count > 0)
             {
@@ -2128,10 +2125,6 @@ namespace CrewChiefV4.GameState
         // called on every tick
         public void mapHardPartsOnTrack(float brakePedal, float loudPedal, float distanceRoundTrack, Boolean lapIsValid, float trackLength)
         {
-            if (!CrewChiefV4.Audio.AudioPlayer.delayMessagesInHardParts)
-            {
-                return;
-            }
             this.trackLength = trackLength;
             if (!lapIsValid || !currentLapValid)
             {
@@ -2161,7 +2154,7 @@ namespace CrewChiefV4.GameState
                 totalDistanceCoveredByHardPointsForThisLap += endPoint - hardPartStart;
                 hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, endPoint));
                 isAlreadyBraking = false;
-                Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
+                // Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
                 if (totalDistanceCoveredByHardPointsForThisLap > trackLength / 2)
                 {
                     exceededMaxHardParts = true;
@@ -2219,7 +2212,7 @@ namespace CrewChiefV4.GameState
 
         public Boolean isInHardPart(float distanceRoundTrack)
         {
-            if (hardPartsMapped)
+            if (AudioPlayer.delayMessagesInHardParts && hardPartsMapped)
             {
                 foreach (Tuple<float, float> part in hardPartsForBestLap)
                 {

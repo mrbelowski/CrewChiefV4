@@ -76,6 +76,8 @@ namespace CrewChiefV4
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
         public static String[] TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("TELL_ME_THE_GAPS");
         public static String[] DONT_TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("DONT_TELL_ME_THE_GAPS");
+        public static String[] TALK_TO_ME_ANYWHERE = Configuration.getSpeechRecognitionPhrases("TALK_TO_ME_ANYWHERE");
+        public static String[] DONT_TALK_IN_THE_CORNERS = Configuration.getSpeechRecognitionPhrases("DONT_TALK_IN_THE_CORNERS");
         public static String[] WHATS_THE_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TIME");
         public static String[] ENABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("ENABLE_YELLOW_FLAG_MESSAGES");
         public static String[] DISABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("DISABLE_YELLOW_FLAG_MESSAGES");
@@ -546,6 +548,8 @@ namespace CrewChiefV4
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
                 validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
+                validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
+                validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
                 validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
@@ -1112,6 +1116,14 @@ namespace CrewChiefV4
             else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
             {
                 crewChief.reportCurrentTime();
+            }
+            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE))
+            {
+                crewChief.disableDelayMessagesInHardParts();
+            }
+            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS))
+            {
+                crewChief.enableDelayMessagesInHardParts();
             }
             else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
                ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
