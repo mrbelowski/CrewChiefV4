@@ -129,8 +129,6 @@ namespace CrewChiefV4.Audio
 
         private int messageId = 0;
 
-        public int criticalMessagesInQueue = 0;
-
         static AudioPlayer()
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
@@ -821,10 +819,6 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
-                                if (thisMessage.metadata.type == SoundType.SPOTTER || thisMessage.metadata.type == SoundType.CRITICAL_MESSAGE)
-                                {
-                                    criticalMessagesInQueue--;
-                                }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -1010,17 +1004,26 @@ namespace CrewChiefV4.Audio
             }).Start();            
         }
 
-        public Boolean hasMessageInImmediateQueue()
+        public SoundType getMinTypeInImmediateQueue()
         {
+            // if there's nothing in this queue, return OTHER
+            SoundType minType = SoundType.OTHER;
             lock (immediateClips)
             {
-                int count = immediateClips.Count;
-                if (count == 0)
+                foreach (DictionaryEntry d in immediateClips)
                 {
-                    criticalMessagesInQueue = 0;
+                    SoundType type = ((QueuedMessage) d.Value).metadata.type;
+                    if (type < minType)
+                    {
+                        minType = type;
+                    }
+                    if (minType == SoundType.SPOTTER)
+                    {
+                        break;
+                    }
                 }
-                return count > 0;
             }
+            return minType;
         }
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
@@ -1056,10 +1059,6 @@ namespace CrewChiefV4.Audio
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
-                        if (queuedMessage.metadata.type == SoundType.CRITICAL_MESSAGE)
-                        {
-                            criticalMessagesInQueue++;
-                        }
                     }
                 }
             }
@@ -1087,7 +1086,6 @@ namespace CrewChiefV4.Audio
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
-                        criticalMessagesInQueue++;
                     }
                 }
             }
