@@ -2096,8 +2096,10 @@ namespace CrewChiefV4.GameState
         private Boolean currentLapValid = true;
         private float trackLength;
 
+        private float trackLengthForLastMinSectionLengthCheck = 0;
         private float sectionStartBuffer = 150;
         private float sectionEndBuffer = 25;
+        private float minSectionLength = 175;
         private float minDistanceBetweenSections = 150;
         private float startLineStartBuffer = 10;
         private float startLineEndBuffer = 30;
@@ -2150,7 +2152,8 @@ namespace CrewChiefV4.GameState
                 isAlreadyBraking = true;
                 hardPartStart = distanceRoundTrack;
             }
-            if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
+            setMinSectionLength();
+            if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + minSectionLength)
             {
                 float endPoint = distanceRoundTrack;
                 if (hardPartStart < endPoint)
@@ -2163,6 +2166,29 @@ namespace CrewChiefV4.GameState
             }
         }
 
+        private void setMinSectionLength()
+        {
+            if (trackLength != trackLengthForLastMinSectionLengthCheck)
+            {
+                trackLengthForLastMinSectionLengthCheck = trackLength;
+                if (trackLength < 1000)
+                {
+                    minSectionLength = 50;
+                }
+                else if (trackLength < 2000)
+                {
+                    minSectionLength = 100;
+                }
+                else if (trackLength < 3000)
+                {
+                    minSectionLength = 130;
+                }
+                else
+                {
+                    minSectionLength = 175;
+                }
+            }
+        }
         // using the proportion of track length spent in hard-parts (the raw unprocessed data), adjust
         // the parameters we're going to use to adjust and combine these raw hard parts sections
         private void updateSectionParameters(float totalDistanceCoveredByHardPoints)
@@ -2175,40 +2201,40 @@ namespace CrewChiefV4.GameState
                 sectionEndBuffer = 25;
                 minDistanceBetweenSections = 150;
                 startLineStartBuffer = 10;
-                startLineEndBuffer = 30;
+                startLineEndBuffer = 20;
             }
             else if (proportionOfTrack < 0.3)
             {
-                sectionStartBuffer = 100;
+                sectionStartBuffer = 110;
                 sectionEndBuffer = 15;
                 minDistanceBetweenSections = 120;
                 startLineStartBuffer = 10;
-                startLineEndBuffer = 40;
+                startLineEndBuffer = 30;
             }
             else if (proportionOfTrack < 0.4)
             {
-                sectionStartBuffer = 80;
-                sectionEndBuffer = 0;
+                sectionStartBuffer = 90;
+                sectionEndBuffer = 10;
                 minDistanceBetweenSections = 100;
                 startLineStartBuffer = 10;
-                startLineEndBuffer = 50;
+                startLineEndBuffer = 40;
             }
             else if (proportionOfTrack < 0.5)
             {
-                sectionStartBuffer = 50;
+                sectionStartBuffer = 70;
                 sectionEndBuffer = 0;
-                minDistanceBetweenSections = 50;
+                minDistanceBetweenSections = 70;
                 startLineStartBuffer = 10;
-                startLineEndBuffer = 60;
+                startLineEndBuffer = 50;
             }
             else
             {
                 // most of the track is 'hard', so extend the hard parts as little as we can
-                sectionStartBuffer = 30;
-                sectionEndBuffer = -20; // is this safe?
-                minDistanceBetweenSections = 40;
+                sectionStartBuffer = 50;
+                sectionEndBuffer = -10; // is this safe?
+                minDistanceBetweenSections = 50;
                 startLineStartBuffer = 10;
-                startLineEndBuffer = 80;
+                startLineEndBuffer = 60;
             }
         }
 
@@ -2244,9 +2270,9 @@ namespace CrewChiefV4.GameState
                         // increment the outer loop counter as we're not interested in this pair's start point
                         index++;
                     }
-                    else if (nextStart < thisEnd)
+                    else if (nextStart < thisEnd + minDistanceBetweenSections)
                     {
-                        // this start point overlaps, so we use its end point
+                        // this start point overlaps, or is close enough to be considered overlapping, so we use its end point
                         thisEnd = nextEnd;
                         // increment the outer loop counter as we're not interested in this pair's start point
                         index++;
