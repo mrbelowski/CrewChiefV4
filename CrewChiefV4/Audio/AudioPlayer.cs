@@ -129,6 +129,8 @@ namespace CrewChiefV4.Audio
 
         private int messageId = 0;
 
+        public int spotterMessagesInQueue = 0;
+
         static AudioPlayer()
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
@@ -819,6 +821,10 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
+                                if (thisMessage.metadata.type == SoundType.SPOTTER)
+                                {
+                                    spotterMessagesInQueue--;
+                                }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -1008,7 +1014,12 @@ namespace CrewChiefV4.Audio
         {
             lock (immediateClips)
             {
-                return immediateClips.Count > 0;
+                int count = immediateClips.Count;
+                if (count == 0)
+                {
+                    spotterMessagesInQueue = 0;
+                }
+                return count > 0;
             }
         }
 
@@ -1072,6 +1083,7 @@ namespace CrewChiefV4.Audio
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
+                        spotterMessagesInQueue++;
                     }
                 }
             }
