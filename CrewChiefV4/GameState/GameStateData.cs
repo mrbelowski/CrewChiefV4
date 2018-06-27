@@ -2233,7 +2233,7 @@ namespace CrewChiefV4.GameState
                 // the end point of this hard part, adjusted
                 float thisEnd = Math.Min(maxAllowedEndPoint, thisPart.Item2 + sectionEndBuffer);
 
-                // now see if any of the other unadjusted data points overlap
+                // now see if any of the other adjusted data points overlap
                 for (int remainingIndex = index + 1; remainingIndex < hardParts.Count; remainingIndex++)
                 {
                     float nextStart = Math.Max(startLineEndBuffer, hardParts[remainingIndex].Item1 - sectionStartBuffer);
