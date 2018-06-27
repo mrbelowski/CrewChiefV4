@@ -3350,12 +3350,12 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool spotter_messages_block_other_messages {
+        public bool critical_messages_block_other_messages {
             get {
-                return ((bool)(this["spotter_messages_block_other_messages"]));
+                return ((bool)(this["critical_messages_block_other_messages"]));
             }
             set {
-                this["spotter_messages_block_other_messages"] = value;
+                this["critical_messages_block_other_messages"] = value;
             }
         }
     }

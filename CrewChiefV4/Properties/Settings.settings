@@ -833,7 +833,7 @@
     <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
     </Setting>
-    <Setting Name="spotter_messages_block_other_messages" Type="System.Boolean" Scope="User">
+    <Setting Name="critical_messages_block_other_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
