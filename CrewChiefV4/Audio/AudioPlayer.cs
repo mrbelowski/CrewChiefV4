@@ -1109,13 +1109,13 @@ namespace CrewChiefV4.Audio
                     {
                         // default 'regular' message priority is 0, which is lowest
                         populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
-                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
-
                         PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
                         if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
                         {
                             pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
                         }
+
+                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
                         if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
                         {
                             QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
