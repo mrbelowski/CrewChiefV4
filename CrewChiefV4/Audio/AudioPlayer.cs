@@ -129,7 +129,7 @@ namespace CrewChiefV4.Audio
 
         private int messageId = 0;
 
-        public int spotterMessagesInQueue = 0;
+        public int criticalMessagesInQueue = 0;
 
         static AudioPlayer()
         {
@@ -821,9 +821,9 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
-                                if (thisMessage.metadata.type == SoundType.SPOTTER)
+                                if (thisMessage.metadata.type == SoundType.SPOTTER || thisMessage.metadata.type == SoundType.CRITICAL_MESSAGE)
                                 {
-                                    spotterMessagesInQueue--;
+                                    criticalMessagesInQueue--;
                                 }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
@@ -1017,7 +1017,7 @@ namespace CrewChiefV4.Audio
                 int count = immediateClips.Count;
                 if (count == 0)
                 {
-                    spotterMessagesInQueue = 0;
+                    criticalMessagesInQueue = 0;
                 }
                 return count > 0;
             }
@@ -1056,6 +1056,10 @@ namespace CrewChiefV4.Audio
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
+                        if (queuedMessage.metadata.type == SoundType.CRITICAL_MESSAGE)
+                        {
+                            criticalMessagesInQueue++;
+                        }
                     }
                 }
             }
@@ -1083,7 +1087,7 @@ namespace CrewChiefV4.Audio
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
-                        spotterMessagesInQueue++;
+                        criticalMessagesInQueue++;
                     }
                 }
             }
