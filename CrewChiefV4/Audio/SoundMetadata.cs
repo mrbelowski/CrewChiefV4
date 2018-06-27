@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace CrewChiefV4.Audio
 {
     // type of sound, in order of importance. OTHER is used for beeps. The ordering here
-    // determines whether the presents of a sound can (if it's in the immediate queue) prevent
+    // determines whether the presence of a sound can (if it's in the immediate queue) prevent
     // regular queued messages from playing.
     public enum SoundType {
-        SPOTTER = 0,
+        SPOTTER = 0,    // most important
         CRITICAL_MESSAGE,
         VOICE_COMMAND_RESPONSE, 
         IMPORTANT_MESSAGE,
         REGULAR_MESSAGE,
-        OTHER
+        OTHER           // used only for beeps (do we need this?)
     }
 
     public class SoundMetadata
