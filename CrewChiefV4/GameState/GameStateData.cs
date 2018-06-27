@@ -2118,17 +2118,24 @@ namespace CrewChiefV4.GameState
                     if (CrewChief.Debugging)
                     {
                         Console.WriteLine("raw lap Hard parts. Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
-                    }
+                    }                    
                     totalDistanceCoveredByHardPoints += (hardPart.Item2 - hardPart.Item1);
+                }
+                if (CrewChief.Debugging)
+                {
+                    Console.WriteLine("Proportion of track considered hard (raw data) = " + totalDistanceCoveredByHardPoints);
                 }
                 updateSectionParameters(totalDistanceCoveredByHardPoints);
                 processedHardPartsForBestLap = adjustAndCombineHardParts(rawHardPartsForThisLap);
+                float totalProcessed = 0;
                 if (CrewChief.Debugging)
                 {
                     foreach (Tuple<float, float> hardPart in processedHardPartsForBestLap)
                     {
                         Console.WriteLine("Processed lap Hard parts. Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
+                        totalProcessed += (hardPart.Item2 - hardPart.Item1);
                     }
+                    Console.WriteLine("Proportion of track considered hard (processed data) = " + totalProcessed);
                 }
                 hardPartsMapped = true;
                 useNewData = true;
@@ -2194,7 +2201,7 @@ namespace CrewChiefV4.GameState
         private void updateSectionParameters(float totalDistanceCoveredByHardPoints)
         {
             float proportionOfTrack = totalDistanceCoveredByHardPoints / trackLength;
-            if (proportionOfTrack < 0.2)
+             if (proportionOfTrack < 0.2)
             {
                 // few hard parts, use generous params
                 sectionStartBuffer = 150;
