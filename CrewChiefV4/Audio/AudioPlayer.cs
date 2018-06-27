@@ -463,9 +463,12 @@ namespace CrewChiefV4.Audio
                     {
                         if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
-                            if (!(CrewChief.currentGameState != null && delayMessagesInHardParts && 
-                                CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack)
-                                && CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green))
+                            Boolean doHardPartsCheck = delayMessagesInHardParts &&
+                                CrewChief.currentGameState != null &&
+                                (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
+                                !GameStateData.onManualFormationLap;
+                            if (!doHardPartsCheck ||
+                                !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
                             {
                                 playQueueContents(queuedClips, false);
                                 allowPearlsOnNextPlay = true;
@@ -1087,7 +1090,7 @@ namespace CrewChiefV4.Audio
                 }
                 index++;
             }
-            return index;
+            return Math.Min(index,  queue.Count);
         }
 
 
