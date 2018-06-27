@@ -322,8 +322,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (previousGameState != null)
                 {
-                    if (currentGameState.SessionData.SectorNumber == 3 &&
-                        !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
+                    if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
                         if (currentGameState.PitData.limiterStatus == 0)
                         {
