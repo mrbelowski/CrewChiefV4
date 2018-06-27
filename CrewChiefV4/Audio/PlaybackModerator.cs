@@ -195,17 +195,20 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
                 return false;
             }*/
-            if (canInterrupt(soundMetadata) &&
-                ((criticalMessagesBlockOtherMessages && audioPlayer.criticalMessagesInQueue > 0) ||
-                 (importantMessagesBlockOtherMessages && audioPlayer.hasMessageInImmediateQueue())))
+            if (canInterrupt(soundMetadata))
             {
-                PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because {1} message is waiting", singleSound.fullPath,
-                    (audioPlayer.criticalMessagesInQueue > 0 ? "a critical" : "an immediate")));
-                if (messageId != -1)
+                SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
+                if ((criticalMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE) ||
+                    (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
                 {
-                    blockedMessageIds.Add(messageId);
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because a {1} message is waiting", 
+                        singleSound.fullPath, mostImportantTypeInImmediateQueue));
+                    if (messageId != -1)
+                    {
+                        blockedMessageIds.Add(messageId);
+                    }
+                    return false;
                 }
-                return false;
             }
 
             return true;
