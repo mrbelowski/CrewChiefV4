@@ -346,7 +346,7 @@ namespace CrewChiefV4
             }
             else
             {
-                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true, (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
         }
 
