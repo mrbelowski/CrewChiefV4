@@ -242,6 +242,24 @@ namespace CrewChiefV4
             this(messageName, delayedMessageEvent, secondsDelay, abstractEvent, null)
         { }
 
+        // called when we repeat this message - clears all the validation and sets the type to voice-command
+        public void prepareToBeRepeated(int newMessageId)
+        {
+            if (metadata == null)
+            {
+                metadata = new SoundMetadata();
+            }
+            messageName = "REPEAT_" + messageName;
+            metadata.messageId = newMessageId;
+            metadata.priority = 5;
+            metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
+            dueTime = 0;
+            expiryTime = 0;
+            abstractEvent = null;
+            validationData = null;
+            secondsDelay = 0;
+        }
+
         public override string ToString()
         {
             if (messageFolders != null)

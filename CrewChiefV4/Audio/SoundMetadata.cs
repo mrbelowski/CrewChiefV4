@@ -23,7 +23,12 @@ namespace CrewChiefV4.Audio
 
         // this has no messageId or priority because they're only ever single sounds
         public static SoundMetadata beep = new SoundMetadata(SoundType.BEEP);
-        
+
+        public SoundMetadata()
+        {
+
+        }
+
         public SoundMetadata(SoundType type)
         {
             this.type = type;

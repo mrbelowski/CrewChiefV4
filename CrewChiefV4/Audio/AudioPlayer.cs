@@ -1223,9 +1223,8 @@ namespace CrewChiefV4.Audio
         {
             if (lastMessagePlayed != null)
             {
-                lastMessagePlayed.metadata.messageId = getMessageId();
-                lastMessagePlayed.metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
-                lastMessagePlayed.metadata.priority = 5;
+                // clear the validation, expiry and other data
+                lastMessagePlayed.prepareToBeRepeated(getMessageId());
                 playMessageImmediately(lastMessagePlayed);
             }
         }
