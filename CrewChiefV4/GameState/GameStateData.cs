@@ -2086,8 +2086,8 @@ namespace CrewChiefV4.GameState
 
     public class HardPartsOnTrackData
     {
-        public List<Tuple<float, float>> hardPartsForThisLap = new List<Tuple<float, float>>();
-        public List<Tuple<float, float>> hardPartsForBestLap = new List<Tuple<float, float>>();
+        public List<Tuple<float, float>> rawHardPartsForThisLap = new List<Tuple<float, float>>();
+        public List<Tuple<float, float>> processedHardPartsForBestLap = new List<Tuple<float, float>>();
         public Boolean isAlreadyBraking = false;        
         public Boolean hardPartsMapped = false;
         public Boolean gapsAdjusted = false;
@@ -2095,30 +2095,44 @@ namespace CrewChiefV4.GameState
         private float lapTimeForHardPartsData = -1;
         private Boolean currentLapValid = true;
         private float trackLength;
-        private float totalDistanceCoveredByHardPointsForThisLap = 0;
-        private Boolean exceededMaxHardParts = false;
+
+        private float sectionStartBuffer = 150;
+        private float sectionEndBuffer = 25;
+        private float minDistanceBetweenSections = 150;
+        private float startLineStartBuffer = 10;
+        private float startLineEndBuffer = 30;
 
         // called when we complete a lap. If it's our best lap we use this data
         public Boolean updateHardPartsForNewLap(float lapTime)
         {
             Boolean useNewData = false;
-            if (currentLapValid && lapTime > 0 && (lapTimeForHardPartsData == -1 || lapTimeForHardPartsData > lapTime) && hardPartsForThisLap.Count > 0)
+            // started a new lap, previous was valid and we have data so see if we want to use the data
+            if (currentLapValid && lapTime > 0 && (lapTimeForHardPartsData == -1 || lapTimeForHardPartsData > lapTime) && rawHardPartsForThisLap.Count > 0)
             {
-                // started a new lap, previous was valid and we have data so see if we want to use the data
                 lapTimeForHardPartsData = lapTime;
-                SortHardParts();
-                hardPartsForBestLap = hardPartsForThisLap;
+                float totalDistanceCoveredByHardPoints = 0;
+                foreach (Tuple<float, float> hardPart in rawHardPartsForThisLap)
+                {
+                    if (CrewChief.Debugging)
+                    {
+                        Console.WriteLine("raw lap Hard parts. Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
+                    }
+                    totalDistanceCoveredByHardPoints += (hardPart.Item2 - hardPart.Item1);
+                }
+                updateSectionParameters(totalDistanceCoveredByHardPoints);
+                processedHardPartsForBestLap = adjustAndCombineHardParts(rawHardPartsForThisLap);
+                if (CrewChief.Debugging)
+                {
+                    foreach (Tuple<float, float> hardPart in processedHardPartsForBestLap)
+                    {
+                        Console.WriteLine("Processed lap Hard parts. Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
+                    }
+                }
                 hardPartsMapped = true;
                 useNewData = true;
-                foreach (Tuple<float, float> hardPart in hardPartsForBestLap)
-                {
-                    Console.WriteLine("Sorted best lap Hard parts.  Starts at: " + hardPart.Item1.ToString("0.000") + "    Ends at: " + hardPart.Item2.ToString("0.000"));
-                }   
             }
             currentLapValid = true;
-            totalDistanceCoveredByHardPointsForThisLap = 0;
-            exceededMaxHardParts = false;
-            hardPartsForThisLap = new List<Tuple<float, float>>();
+            rawHardPartsForThisLap = new List<Tuple<float, float>>();
             return useNewData;
         }
 
@@ -2131,90 +2145,133 @@ namespace CrewChiefV4.GameState
                 currentLapValid = false;
                 return;
             }
-            if (exceededMaxHardParts)
-            {
-                return;
-            }
             if (!isAlreadyBraking && brakePedal > 0.1)
             {
                 isAlreadyBraking = true;
-                if (distanceRoundTrack > 150)
-                {
-                    hardPartStart = distanceRoundTrack - 150;
-                }
-                else
-                {
-                    hardPartStart = distanceRoundTrack;
-                }
-                
+                hardPartStart = distanceRoundTrack;
             }
             if (loudPedal > 0.9 && isAlreadyBraking && distanceRoundTrack > hardPartStart + 175)
             {
-                float endPoint = distanceRoundTrack + 25;
-                totalDistanceCoveredByHardPointsForThisLap += endPoint - hardPartStart;
-                hardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, endPoint));
-                isAlreadyBraking = false;
-                // Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
-                if (totalDistanceCoveredByHardPointsForThisLap > trackLength / 2)
+                float endPoint = distanceRoundTrack;
+                if (hardPartStart < endPoint)
                 {
-                    exceededMaxHardParts = true;
+                    // don't allow sections which cross the start line
+                    rawHardPartsForThisLap.Add(new Tuple<float, float>(hardPartStart, endPoint));
+                    // Console.WriteLine("Hard part on track mapped.  Starts at: " + hardPartStart.ToString("0.000") + "    Ends at: " +  (distanceRoundTrack + 25).ToString("0.000"));
                 }
+                isAlreadyBraking = false;
             }
         }
 
-        private void SortHardParts()
+        // using the proportion of track length spent in hard-parts (the raw unprocessed data), adjust
+        // the parameters we're going to use to adjust and combine these raw hard parts sections
+        private void updateSectionParameters(float totalDistanceCoveredByHardPoints)
         {
-            List<Tuple<float, float>> sortedHardParts = new List<Tuple<float, float>>();                        
-            for (int index = 0; index < hardPartsForThisLap.Count; index++ )
+            float proportionOfTrack = totalDistanceCoveredByHardPoints / trackLength;
+            if (proportionOfTrack < 0.2)
             {
-                Boolean addPart = true;
-                Tuple<float, float> partToAdd = null;
-                Tuple<float, float> part = hardPartsForThisLap[index];
-                float nextPartStart = 0;
-                float nextPartEnd = 0;
+                // few hard parts, use generous params
+                sectionStartBuffer = 150;
+                sectionEndBuffer = 25;
+                minDistanceBetweenSections = 150;
+                startLineStartBuffer = 10;
+                startLineEndBuffer = 30;
+            }
+            else if (proportionOfTrack < 0.3)
+            {
+                sectionStartBuffer = 100;
+                sectionEndBuffer = 15;
+                minDistanceBetweenSections = 120;
+                startLineStartBuffer = 10;
+                startLineEndBuffer = 40;
+            }
+            else if (proportionOfTrack < 0.4)
+            {
+                sectionStartBuffer = 80;
+                sectionEndBuffer = 0;
+                minDistanceBetweenSections = 100;
+                startLineStartBuffer = 10;
+                startLineEndBuffer = 50;
+            }
+            else if (proportionOfTrack < 0.5)
+            {
+                sectionStartBuffer = 50;
+                sectionEndBuffer = 0;
+                minDistanceBetweenSections = 50;
+                startLineStartBuffer = 10;
+                startLineEndBuffer = 60;
+            }
+            else
+            {
+                // most of the track is 'hard', so extend the hard parts as little as we can
+                sectionStartBuffer = 30;
+                sectionEndBuffer = -20; // is this safe?
+                minDistanceBetweenSections = 40;
+                startLineStartBuffer = 10;
+                startLineEndBuffer = 80;
+            }
+        }
 
-                if (index == hardPartsForThisLap.Count - 1)
+        private List<Tuple<float, float>> adjustAndCombineHardParts(List<Tuple<float, float>> hardParts)
+        {
+            List<Tuple<float, float>> adjustedHardParts = new List<Tuple<float, float>>();
+            // don't allow a hard part to end within startLineStartBuffer metres of the line:
+            float maxAllowedEndPoint = trackLength - startLineStartBuffer;
+            // the last end point we checked in the nested loop
+            float lastEndPoint = 0;
+
+            for (int index = 0; index < hardParts.Count; index++)
+            {
+                Tuple<float, float> thisPart = hardParts[index];
+                // the adjusted start point of this part, using the start buffer and ensuring it's not too close to the line:
+                float thisStart = Math.Max(startLineEndBuffer, thisPart.Item1 - sectionStartBuffer);
+                if (thisStart < lastEndPoint)
                 {
-                    nextPartStart = hardPartsForThisLap[0].Item1;
-                    nextPartEnd = hardPartsForThisLap[0].Item2;
+                    // after adjusting this start point, it's before the last end point so don't use it
+                    continue;
                 }
-                else
+                // the end point of this hard part, adjusted
+                float thisEnd = Math.Min(maxAllowedEndPoint, thisPart.Item2 + sectionEndBuffer);
+
+                // now see if any of the other unadjusted data points overlap
+                for (int remainingIndex = index + 1; remainingIndex < hardParts.Count; remainingIndex++)
                 {
-                    nextPartStart = hardPartsForThisLap[index + 1].Item1;
-                    nextPartEnd = hardPartsForThisLap[index + 1].Item2;
-                }
-                if (Math.Abs(part.Item2 - nextPartStart) < 150)                
-                {
-                    Console.WriteLine("Combining hard parts");
-                    partToAdd = new Tuple<float, float>(part.Item1, nextPartEnd);                    
-                }
-                else
-                {
-                    partToAdd = part;                                                         
-                }
-                foreach (Tuple<float, float> sortedPart in sortedHardParts)
-                {
-                    if (partToAdd.Item1 >= sortedPart.Item1 && partToAdd.Item2 <= sortedPart.Item2)
+                    float nextStart = Math.Max(startLineEndBuffer, hardParts[remainingIndex].Item1 - sectionStartBuffer);
+                    float nextEnd = Math.Min(maxAllowedEndPoint, hardParts[remainingIndex].Item2 + sectionEndBuffer);
+                    if (nextStart > nextEnd)
                     {
-                        Console.WriteLine("Overlapping hardpart detected skipping");
-                        addPart = false;
+                        // after adjusting this start and end points, its start is after its end so don't use it
+                        // increment the outer loop counter as we're not interested in this pair's start point
+                        index++;
+                    }
+                    else if (nextStart < thisEnd)
+                    {
+                        // this start point overlaps, so we use its end point
+                        thisEnd = nextEnd;
+                        // increment the outer loop counter as we're not interested in this pair's start point
+                        index++;
+                    }
+                    else
+                    {
+                        // the next start point doesn't overlap so we use whatever end point we hard on the previous iteration
+                        break;
                     }
                 }
-                if (addPart && partToAdd != null)
-                {                    
-                    sortedHardParts.Add(partToAdd);
+                // if we have a valid pair, add them
+                if (thisStart < thisEnd)
+                {
+                    adjustedHardParts.Add(new Tuple<float, float>(thisStart, thisEnd));
+                    lastEndPoint = thisEnd;
                 }
             }
-            hardPartsForThisLap = sortedHardParts;
-         
-            Console.WriteLine("HardParts count " + hardPartsForThisLap.Count);
+            return adjustedHardParts;
         }
 
         public Boolean isInHardPart(float distanceRoundTrack)
         {
             if (AudioPlayer.delayMessagesInHardParts && hardPartsMapped)
             {
-                foreach (Tuple<float, float> part in hardPartsForBestLap)
+                foreach (Tuple<float, float> part in processedHardPartsForBestLap)
                 {
                     if (distanceRoundTrack >= part.Item1 && distanceRoundTrack <= part.Item2)
                     {

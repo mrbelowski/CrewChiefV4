@@ -1087,7 +1087,7 @@ namespace CrewChiefV4.Audio
                 }
                 index++;
             }
-            return index;
+            return Math.Min(index,  queue.Count);
         }
 
 

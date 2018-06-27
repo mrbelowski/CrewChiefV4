@@ -1382,7 +1382,7 @@ namespace CrewChiefV4.RaceRoom
             {
                 if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
                 {
-                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
                 }
             }
              else if (!currentGameState.PitData.OnOutLap &&
