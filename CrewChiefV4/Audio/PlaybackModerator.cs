@@ -29,6 +29,7 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         private static bool immediateMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
+        private static bool spotterMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("spotter_messages_block_other_messages");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -193,11 +194,12 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
                 return false;
             }*/
-            if (immediateMessagesBlockOtherMessages && canInterrupt(soundMetadata))
+            if (canInterrupt(soundMetadata) && audioPlayer.hasMessageInImmediateQueue())
             {
-                if (audioPlayer.hasMessageInImmediateQueue())
+                if (audioPlayer.spotterMessagesInQueue > 0 || immediateMessagesBlockOtherMessages)
                 {
-                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because an immediate message is waiting", singleSound.fullPath));
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because {1} message is waiting", singleSound.fullPath,
+                        (audioPlayer.spotterMessagesInQueue > 0 ? "a spotter" : "an immediate")));
                     if (messageId != -1)
                     {
                         blockedMessageIds.Add(messageId);
