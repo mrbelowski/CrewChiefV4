@@ -1773,7 +1773,7 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewLap)
             {
                 if (cgs.hardPartsOnTrackData.updateHardPartsForNewLap(csd.LapTimePrevious))
-                    csd.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.hardPartsForBestLap);
+                    csd.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.processedHardPartsForBestLap);
             }
             else if (!cgs.PitData.OnOutLap && !csd.TrackDefinition.isOval &&
                 !(csd.SessionType == SessionType.Race && (csd.CompletedLaps < 1 || (GameStateData.useManualFormationLap && csd.CompletedLaps < 2))))

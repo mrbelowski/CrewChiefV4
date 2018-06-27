@@ -151,7 +151,7 @@ namespace CrewChiefV4.iRacing
                     {
                         if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                         {
-                            currentGameState.hardPartsOnTrackData.hardPartsForBestLap = previousGameState.hardPartsOnTrackData.hardPartsForBestLap;
+                            currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
                             currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                             currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                             currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
@@ -251,7 +251,7 @@ namespace CrewChiefV4.iRacing
                             {
                                 if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
                                 {
-                                    currentGameState.hardPartsOnTrackData.hardPartsForBestLap = previousGameState.hardPartsOnTrackData.hardPartsForBestLap;
+                                    currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
                                     currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
                                     currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
                                     currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
@@ -1037,7 +1037,7 @@ namespace CrewChiefV4.iRacing
             {
                 if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
                 {
-                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.hardPartsForBestLap);
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
                 }
             }
             else if (!currentGameState.SessionData.TrackDefinition.isOval &&
