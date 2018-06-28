@@ -29,7 +29,6 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         private static bool importantMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
-        private static bool criticalMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("critical_messages_block_other_messages");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -193,7 +192,7 @@ namespace CrewChiefV4.Audio
             if (canInterrupt(soundMetadata))
             {
                 SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
-                if ((criticalMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE) ||
+                if (mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||
                     (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because a {1} message is waiting", 

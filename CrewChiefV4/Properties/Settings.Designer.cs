@@ -3346,17 +3346,5 @@ namespace CrewChiefV4.Properties {
                 this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool critical_messages_block_other_messages {
-            get {
-                return ((bool)(this["critical_messages_block_other_messages"]));
-            }
-            set {
-                this["critical_messages_block_other_messages"] = value;
-            }
-        }
     }
 }
