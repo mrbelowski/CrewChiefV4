@@ -141,11 +141,6 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to read raw game data: " + ex.Message);
             }
-            finally
-            {
-                MainWindow.instance.startApplicationButton.Enabled = true;
-            }
-
             return objectOut;
         }
 

@@ -17,6 +17,8 @@ namespace CrewChiefV4.Audio
 {
     public class AudioPlayer
     {
+        private Dictionary<SoundType, int> soundTypesInImmediateQueue = new Dictionary<SoundType, int>();
+
         public static String PAUSE_ID = "insert_pause";
 
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
@@ -235,8 +237,18 @@ namespace CrewChiefV4.Audio
             {
                 selectedPersonalisation = savedPersonalisation;
             }
+            resetSoundTypesInImmediateQueue();
         }
-        
+
+        private void resetSoundTypesInImmediateQueue()
+        {
+            soundTypesInImmediateQueue[SoundType.SPOTTER] = 0;
+            soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] = 0;
+            soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] = 0;
+            soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] = 0;
+            soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] = 0;
+        }
+
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
@@ -819,6 +831,10 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
+                                if (isImmediateMessages)
+                                {
+                                    soundTypesInImmediateQueue[thisMessage.metadata.type] = soundTypesInImmediateQueue[thisMessage.metadata.type] - 1;
+                                }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -1006,24 +1022,27 @@ namespace CrewChiefV4.Audio
 
         public SoundType getMinTypeInImmediateQueue()
         {
-            // if there's nothing in this queue, return OTHER
-            SoundType minType = SoundType.OTHER;
-            lock (immediateClips)
+            if (soundTypesInImmediateQueue[SoundType.SPOTTER] > 0)
             {
-                foreach (DictionaryEntry d in immediateClips)
-                {
-                    SoundType type = ((QueuedMessage) d.Value).metadata.type;
-                    if (type < minType)
-                    {
-                        minType = type;
-                    }
-                    if (minType == SoundType.SPOTTER)
-                    {
-                        break;
-                    }
-                }
+                return SoundType.SPOTTER;
             }
-            return minType;
+            if (soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] > 0)
+            {
+                return SoundType.CRITICAL_MESSAGE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] > 0)
+            {
+                return SoundType.VOICE_COMMAND_RESPONSE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] > 0)
+            {
+                return SoundType.IMPORTANT_MESSAGE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] > 0)
+            {
+                return SoundType.REGULAR_MESSAGE;
+            }
+            return SoundType.OTHER;
         }
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
@@ -1058,6 +1077,11 @@ namespace CrewChiefV4.Audio
                             Console.WriteLine("Message " + queuedMessage.messageName + " is in the immediate queue but is type 'regular' - this will not play. Setting the type to 'important'");
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
+                        if (immediateClips.Count == 0)
+                        {
+                            resetSoundTypesInImmediateQueue();
+                        }
+                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
@@ -1085,6 +1109,11 @@ namespace CrewChiefV4.Audio
                         this.holdChannelOpen = keepChannelOpen;
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
+                        if (immediateClips.Count == 0)
+                        {
+                            resetSoundTypesInImmediateQueue();
+                        }
+                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
