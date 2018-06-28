@@ -4,7 +4,8 @@
 <h2>Version 4.9.3.7</h2>
 <ul>
 	<li>Added option to pause most messages in braking and cornering zones (sections of the track starting from heavy braking and ending with near-full throttle application) - this doesn't apply to spotter messages or other very high priority messages. It can be enabled and disabled with a button mapping ('Toggle delay messages on hard parts') or a voice command ('don't talk in the [corners/braking zones]' / 'no messages in the [corners/braking zones]', 'talk to me anywhere' / 'messages at any point'). The initial state is set with the 'Delay messages on hard parts' option and defaults to 'off'. Note that this feature is disabled for ovals and may produce odd results on very short tracks</b></li>
-	<li>Added some basic message prioritisation - there's still more work to do here</li>
+	<li>Added some basic message prioritisation - higher priority messages will be inserted into the queue in front of lower priority messages</li>
+	<li>Replaced the 'Spotter and responses block other messages' property with 2 new properties - 'Critical messages block other messages' (this allows spotter and some critical messages like the pit-limiter warning to block other messages) and 'Important messages block other messages' (this allows spotter, critical messages, voice command responses and important messages like yellow flags to block other messages)</li>
 	<li>Prevent any further fragments of a message from playing if this message was interrupted</li>
 	<li>Simplified pitstop benchmark process - you can now get a benchmark pitstop time without having to set a hot lap first (although you'll still need to set one after your stop to allow the app to work out the time loss)</li>
 	<li>A few bug fixes</li>
