@@ -17,6 +17,7 @@ namespace CrewChiefV4.Audio
 {
     public class AudioPlayer
     {
+        // keep track of the counts of each type of message in the immediate queue:
         private Dictionary<SoundType, int> soundTypesInImmediateQueue = new Dictionary<SoundType, int>();
 
         public static String PAUSE_ID = "insert_pause";
@@ -461,7 +462,7 @@ namespace CrewChiefV4.Audio
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception processing immediate clips: " + e.Message);
+                        Console.WriteLine("Exception processing immediate clips: " + e.Message + " stack " + e.StackTrace);
                         lock (immediateClips)
                         {
                             immediateClips.Clear();
