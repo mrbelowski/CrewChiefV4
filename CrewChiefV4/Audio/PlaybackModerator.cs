@@ -37,7 +37,7 @@ namespace CrewChiefV4.Audio
         private static string prevLastKey = "";
         private static SingleSound lastSoundPreProcessed = null;
 
-        private static HashSet<int> blockedMessageIds = new HashSet<int>();
+        public static int lastBlockedMessageId = -1;
 
         public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
         {
@@ -150,12 +150,7 @@ namespace CrewChiefV4.Audio
 
             Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
-
-        public static void clearBlockedMessages()
-        {
-            blockedMessageIds.Clear();
-        }
-
+        
         private static Boolean canInterrupt(SoundMetadata metadata)
         {
             // is this sufficient? Should the spotter be able to interrupt voice comm responses?
@@ -173,8 +168,8 @@ namespace CrewChiefV4.Audio
          */
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
-            int messageId = soundMetadata == null ? -1 : soundMetadata.messageId;
-            if (blockedMessageIds.Contains(messageId))
+            int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
+            if (lastBlockedMessageId == messageId)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
                 return false;
@@ -184,9 +179,9 @@ namespace CrewChiefV4.Audio
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
-                if (messageId != -1)
+                if (messageId != 0)
                 {
-                    blockedMessageIds.Add(messageId);
+                    lastBlockedMessageId = messageId;
                 }
                 return false;
             }
@@ -203,9 +198,9 @@ namespace CrewChiefV4.Audio
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because a {1} message is waiting", 
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
-                    if (messageId != -1)
+                    if (messageId != 0)
                     {
-                        blockedMessageIds.Add(messageId);
+                        lastBlockedMessageId = messageId;
                     }
                     return false;
                 }
@@ -231,7 +226,7 @@ namespace CrewChiefV4.Audio
             if (((!PlaybackModerator.lastSoundWasSpotter && isSpotterSound)  // If we are flipping from the Chief to Spotter
                 || (PlaybackModerator.lastSoundWasSpotter && !isSpotterSound))  // Or from the Spotter to Chief
                 && PlaybackModerator.audioPlayer.isChannelOpen()  // And, channel is still open
-                && !PlaybackModerator.lastSoundPreProcessed.isBleep)    // and the last sound wasn't also a beep (to stop the spotter kicking off with a double-beep)
+                && (PlaybackModerator.lastSoundPreProcessed == null || !PlaybackModerator.lastSoundPreProcessed.isBleep))   // and the last sound wasn't also a beep (to stop the spotter kicking off with a double-beep)
             {
                 // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
                 string keyBleepOut = null;

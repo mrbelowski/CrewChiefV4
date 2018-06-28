@@ -20,7 +20,7 @@ namespace CrewChiefV4.Audio
 
     public class SoundMetadata
     {
-        public int messageId = -1;  // -1 => unset
+        public int messageId = 0;  // 0 => unset
         public SoundType type;
 
         // this affects the queue insertion order. Higher priority items are inserted at the head of the queue
