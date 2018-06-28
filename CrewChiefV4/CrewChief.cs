@@ -769,6 +769,10 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Error reading game data: " + e.StackTrace);
                             }
+                            finally
+                            {
+                                MainWindow.instance.startApplicationButton.Enabled = true;
+                            }
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
