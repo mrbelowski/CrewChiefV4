@@ -22,6 +22,7 @@ namespace CrewChiefV4.iRacing
         public int IncidentLimit { get; set; }
         public bool IsTeamRacing { get; set; }
         public int NumCarClasses { get; set; }
+        public bool StandingStart { get; set; }
         const string sessionInfoYamlPath = "SessionInfo:Sessions:SessionNum:{{{0}}}{1}:";
         public void Update(string sessionString, int sessionNumber)
         {
@@ -35,7 +36,8 @@ namespace CrewChiefV4.iRacing
             this.RaceLaps = YamlParser.Parse(sessionString, string.Format(sessionInfoYamlPath, sessionNumber, "SessionLaps"));
             this.SessionTimeString = YamlParser.Parse(sessionString, string.Format(sessionInfoYamlPath, sessionNumber, "SessionTime"));
             this.RaceTime = Parser.ParseSec(SessionTimeString);            
-            this.IncidentLimitString = YamlParser.Parse(sessionString, "WeekendInfo:WeekendOptions:IncidentLimit:");;
+            this.IncidentLimitString = YamlParser.Parse(sessionString, "WeekendInfo:WeekendOptions:IncidentLimit:");
+            this.StandingStart = Parser.ParseInt(YamlParser.Parse(sessionString, "WeekendInfo:WeekendOptions:StandingStart:")) == 1;
 
             if(IsLimitedIncidents)
             {
