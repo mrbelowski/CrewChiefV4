@@ -195,8 +195,13 @@ namespace CrewChiefV4.Audio
                 if (mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||
                     (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
                 {
-                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because a {1} message is waiting", 
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
+                    if (PlaybackModerator.enableTracing)
+                    {
+                        PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(
+                            importantMessagesBlockOtherMessages ? SoundType.IMPORTANT_MESSAGE : SoundType.CRITICAL_MESSAGE));
+                    }
                     if (messageId != 0)
                     {
                         lastBlockedMessageId = messageId;

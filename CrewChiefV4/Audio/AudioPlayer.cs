@@ -250,6 +250,24 @@ namespace CrewChiefV4.Audio
             soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] = 0;
         }
 
+        // for debugging the moderator message block process
+        public String getMessagesBlocking(SoundType blockLevel)
+        {
+            List<String> blockingMessages = new List<string>();
+            lock (immediateClips)
+            {
+                foreach (Object entry in immediateClips.Values)
+                {
+                    QueuedMessage message = (QueuedMessage)entry;
+                    if (message.metadata.type <= blockLevel)
+                    {
+                        blockingMessages.Add(message.messageName + "(" + message.metadata.type + ")");
+                    }
+                }
+            }
+            return String.Join(", ", blockingMessages);
+        }
+
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
