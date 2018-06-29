@@ -300,7 +300,7 @@ namespace CrewChiefV4.Events
                     {
                         break;
                     }
-                    audioPlayer.playMessageImmediately(message);
+                    audioPlayer.playMessage(message);
                 }
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
@@ -500,8 +500,7 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.purgeQueues();
                         }
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderGetReady, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 15) });
-                        //audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
                         playedGetReady = true;
                     }
                 }
