@@ -538,7 +538,16 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                        }
+                    }
+                }
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
 
                 lastActiveTimeForOpponents.Clear();
@@ -574,7 +583,16 @@ namespace CrewChiefV4.PCars
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
                         currentGameState.SessionData.TrackDefinition.setGapPoints();
                         GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
-
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                                }
+                            }
+                        }
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
@@ -673,6 +691,8 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
 
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
+
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 }                
             }
 
@@ -1240,6 +1260,25 @@ namespace CrewChiefV4.PCars
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
+            
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
+                {
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+                }
+            }
+            else if (!currentGameState.PitData.OnOutLap &&
+                !(currentGameState.SessionData.SessionType == SessionType.Race &&
+                   (currentGameState.SessionData.CompletedLaps < 1 || (GameStateData.useManualFormationLap && currentGameState.SessionData.CompletedLaps < 2))))
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
+            }
+
+            currentGameState.ControlData.BrakePedal = shared.mBrake;
+            currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
+            currentGameState.ControlData.ClutchPedal = shared.mClutch;
 
             return currentGameState;
         }

@@ -512,7 +512,7 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
             }
@@ -591,7 +591,7 @@ namespace CrewChiefV4.Events
         {
             if (!playedManualStartPlayedGoGoGo)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
             }
             GameStateData.onManualFormationLap = false;
             // reset
@@ -935,7 +935,7 @@ namespace CrewChiefV4.Events
                         if (poleSitter != null && !playedManualStartLeaderHasCrossedLine && poleSitter.CompletedLaps == 1)
                         {
                             playedManualStartLeaderHasCrossedLine = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                 }

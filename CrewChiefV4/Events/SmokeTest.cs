@@ -117,7 +117,8 @@ namespace CrewChiefV4.Events
                 Thread.Sleep(800);
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
             }
-            //PlaybackModerator.SetTracing(true /*enabled*/);
+            // TODO: remove.
+            PlaybackModerator.SetTracing(true /*enabled*/);
             //this.BeepOutInTest();
 
             // pit exit strategy debug stuff to see how it sounds
@@ -132,8 +133,9 @@ namespace CrewChiefV4.Events
             fragments.Add(MessageFragment.Text(Strategy.folderAnd));
             fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
             audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            Thread.Sleep(2000);
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
             */
-
             /*
             List<String> rawDriverNames = new List<string>();
             audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(makeTempDriver("bakus", rawDriverNames),
@@ -208,7 +210,7 @@ namespace CrewChiefV4.Events
 
         }
 
-        private void BeepOutInTest()
+        private void beepOutInTest()
         {
             PlaybackModerator.SetTracing(true /*enabled*/);
 
@@ -268,6 +270,37 @@ namespace CrewChiefV4.Events
                                         MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
+        }
+
+        private void messageInterruptTest()
+        {
+            PlaybackModerator.SetTracing(true /*enabled*/);
+
+            List<String> rawDriverNames = new List<string>();
+            List<MessageFragment> fragments = new List<MessageFragment>();
+            fragments.Add(MessageFragment.Text(Strategy.folderClearTrackOnPitExit));
+            fragments.Add(MessageFragment.Text(Strategy.folderWeShouldEmergeInPosition));
+            fragments.Add(MessageFragment.Integer(12));
+            fragments.Add(MessageFragment.Text(Strategy.folderBetween));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("bakus", rawDriverNames)));
+            fragments.Add(MessageFragment.Text(Strategy.folderAnd));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
+            audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            fragments = new List<MessageFragment>();
+            fragments.Add(MessageFragment.Text(Strategy.folderClearTrackOnPitExit));
+            fragments.Add(MessageFragment.Text(Strategy.folderWeShouldEmergeInPosition));
+            fragments.Add(MessageFragment.Integer(12));
+            fragments.Add(MessageFragment.Text(Strategy.folderBetween));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("bakus", rawDriverNames)));
+            fragments.Add(MessageFragment.Text(Strategy.folderAnd));
+            fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
+            audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            Thread.Sleep(2500);
+            audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
+
+            QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+            //inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
         }
     }
 }

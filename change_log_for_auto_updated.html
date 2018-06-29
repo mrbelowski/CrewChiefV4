@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.3.7</h2>
+<ul>
+	<li>Added option to pause most messages in braking and cornering zones (sections of the track starting from heavy braking and ending with near-full throttle application) - this doesn't apply to spotter messages or other very high priority messages. It can be enabled and disabled with a button mapping ('Toggle delay messages on hard parts') or a voice command ('don't talk in the [corners/braking zones]' / 'no messages in the [corners/braking zones]', 'talk to me anywhere' / 'messages at any point'). The initial state is set with the 'Delay messages on hard parts' option and defaults to 'off'. Note that this feature is disabled for ovals and may produce odd results on very short tracks</b></li>
+	<li>Added some basic message prioritisation - higher priority messages will be inserted into the queue in front of lower priority messages</li>
+	<li>Replaced the 'Spotter and responses block other messages' property. The spotter (and one or two 'critical' messages) now interrupt and block other messages by default. Enable the 'Command responses and important messages block other messages' to allow other types of important message (such as voice command responsed and yellow flags) to also interrupt and block messages</li>
+	<li>Prevent any further fragments of a message from playing if this message was interrupted</li>
+	<li>Simplified pitstop benchmark process - you can now get a benchmark pitstop time without having to set a hot lap first (although you'll still need to set one after your stop to allow the app to work out the time loss)</li>
+	<li>A few bug fixes</li>
+</ul>
+<h2>Version 4.9.3.6</h2>
+<ul>
+	<li>Reduce size of 'personalisations' update pack <b>install this update before updating your personalisations</b></li>
+	<li>Much more accurate tyre life prediction using a non-linear curve fit of tyre wear data recorded for the current tyre set (assumes a tyre is worn out when it has 5% life left)</li>
+	<li>Added more info to the fuel status message - now includes fuel-to-end</li>
+	<li>Allow spotter sounds to cancel other queued messages (disabled by default, enable with 'Spotter and responses block other messages' property - note this can sound strange when only the start or end sounds of a message play)</li>
+	<li>A few minor tweaks</li>
+	<li>iRacing - fix white-flag message spam</li>
+</ul>
 <h2>Version 4.9.3.5</h2>
 <ul>
 	<li>Fixed sound pack version check</li>

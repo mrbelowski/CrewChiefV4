@@ -818,5 +818,20 @@
     <Setting Name="enable_opponent_pit_exit_estimates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="immediate_messages_block_other_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="enable_delayed_messages_on_hardparts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

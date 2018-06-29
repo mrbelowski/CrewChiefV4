@@ -200,6 +200,46 @@ namespace CrewChiefV4
             }
         }
 
+        public void toggleDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                disableDelayMessagesInHardParts();
+            }
+            else
+            {
+                enableDelayMessagesInHardParts();
+            }
+        }
+
+        public void enableDelayMessagesInHardParts()
+        {
+            if (!AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = true;
+            }
+            // switch the gap points to use the adjusted ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
+        }
+
+        public void disableDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = false;
+            }
+            // switch the gap points back to use the regular ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
+        }
+
         public void toggleReadOpponentDeltasMode()
         {
             if (readOpponentDeltasForEveryLap)
@@ -306,7 +346,7 @@ namespace CrewChiefV4
             }
             else
             {
-                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true, (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
         }
 
@@ -729,6 +769,10 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Error reading game data: " + e.StackTrace);
                             }
+                            finally
+                            {
+                                MainWindow.instance.startApplicationButton.Enabled = true;
+                            }
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
@@ -839,6 +883,7 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
+                                PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;

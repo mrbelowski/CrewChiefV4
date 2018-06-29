@@ -28,6 +28,7 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
+        private static bool importantMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -35,14 +36,16 @@ namespace CrewChiefV4.Audio
         private static string prevLastKey = "";
         private static SingleSound lastSoundPreProcessed = null;
 
-        public static void PreProcessSound(SingleSound sound)
+        public static int lastBlockedMessageId = -1;
+
+        public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
         {
             if (PlaybackModerator.audioPlayer == null)
                 return;
 
             //PlaybackModerator.Trace($"Pre-Processing sound: {sound.fullPath}  isSpotter: {sound.isSpotter}  isBleep: {sound.isBleep} ");
 
-            PlaybackModerator.InjectBeepOutIn(sound);
+            PlaybackModerator.InjectBeepOutIn(sound, soundMetadata);
 
             PlaybackModerator.lastSoundPreProcessed = sound;
         }
@@ -146,24 +149,66 @@ namespace CrewChiefV4.Audio
 
             Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
+        
+        private static Boolean canInterrupt(SoundMetadata metadata)
+        {
+            // is this sufficient? Should the spotter be able to interrupt voice comm responses?
+            return metadata.type == SoundType.REGULAR_MESSAGE;
+        }
 
         //public static void PostProcessSound()
         //{ }
 
-        public static bool ShouldPlaySound(SingleSound sound)
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
+         */
+        public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
+            int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
+            if (lastBlockedMessageId == messageId)
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
+                return false;
+            }
             if (rejectMessagesWhenTalking 
                 && SpeechRecogniser.waitingForSpeech 
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
-                PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", sound.fullPath));
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
+                if (messageId != 0)
+                {
+                    lastBlockedMessageId = messageId;
+                }
                 return false;
+            }
+            /*if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt && audioPlayer.delayMessagesInHardParts)
+            {
+                PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
+                return false;
+            }*/
+            if (canInterrupt(soundMetadata))
+            {
+                SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
+                if (mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||
+                    (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
+                {
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because a {1} message is waiting", 
+                        singleSound.fullPath, mostImportantTypeInImmediateQueue));
+                    if (messageId != 0)
+                    {
+                        lastBlockedMessageId = messageId;
+                    }
+                    return false;
+                }
             }
 
             return true;
         }
 
-        private static void InjectBeepOutIn(SingleSound sound)
+        private static void InjectBeepOutIn(SingleSound sound, SoundMetadata soundMetadata)
         {
             Debug.Assert(PlaybackModerator.audioPlayer != null, "audioPlayer is not set.");
 
@@ -180,7 +225,7 @@ namespace CrewChiefV4.Audio
             if (((!PlaybackModerator.lastSoundWasSpotter && isSpotterSound)  // If we are flipping from the Chief to Spotter
                 || (PlaybackModerator.lastSoundWasSpotter && !isSpotterSound))  // Or from the Spotter to Chief
                 && PlaybackModerator.audioPlayer.isChannelOpen()  // And, channel is still open
-                && !PlaybackModerator.lastSoundPreProcessed.isBleep)    // and the last sound wasn't also a beep (to stop the spotter kicking off with a double-beep)
+                && (PlaybackModerator.lastSoundPreProcessed == null || !PlaybackModerator.lastSoundPreProcessed.isBleep))   // and the last sound wasn't also a beep (to stop the spotter kicking off with a double-beep)
             {
                 // Ok, so idea here is that Chief and Spotter have different bleeps.  So we use opposing sets.
                 string keyBleepOut = null;
@@ -207,11 +252,11 @@ namespace CrewChiefV4.Audio
 
                 // insert bleep out/in
                 if (PlaybackModerator.insertBeepOutBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepOut, soundMetadata);
 
                 // would be nice to have some slight random silence here
                 if (PlaybackModerator.insertBeepInBetweenSpotterAndChief)
-                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn);
+                    PlaybackModerator.audioPlayer.getSoundCache().Play(keyBleepIn, soundMetadata);
             }
 
             PlaybackModerator.lastSoundWasSpotter = isSpotterSound;

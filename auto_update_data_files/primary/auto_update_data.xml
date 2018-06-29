@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.3.5 updated 19 June 2018</title>
-<version>4.9.3.5</version>
+<title>Crew Chief 4.9.3.6 updated 23 June 2018</title>
+<version>4.9.3.6</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
@@ -32,7 +32,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- language-aware sound pack stuff for later versions-->
 <soundpack language="en">
-	<soundpackversion>148</soundpackversion>	
+	<soundpackversion>149</soundpackversion>	
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
@@ -45,9 +45,10 @@ will be pulled from the thecrewchief.org ftp server. -->
 	<updatedrivernamesurl>http://crewchief.isnais.de/update_driver_names.zip</updatedrivernamesurl>
 	<update2drivernamesurl>http://thecrewchief.org/downloads/update_2_driver_names.zip</update2drivernamesurl>	
 	
-	<personalisationsversion>129</personalisationsversion>
+	<personalisationsversion>130</personalisationsversion>
 	<basepersonalisationsurl>http://crewchief.isnais.de/personalisations.zip</basepersonalisationsurl>
 	<updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 	<update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
+	<update3personalisationsurl>http://crewchief.isnais.de/update_3_personalisations.zip</update3personalisationsurl>
 </soundpack>
 </item>

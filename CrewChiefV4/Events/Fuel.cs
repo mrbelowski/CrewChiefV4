@@ -63,6 +63,17 @@ namespace CrewChiefV4.Events
 
         public static String folderWillNeedToStopAgain = "fuel/will_need_to_stop_again";
 
+        public static String folderWillNeedToAdd = "fuel/we_will_need_to_add";
+
+        public static String folderLitresToGetToTheEnd = "fuel/litres_to_get_to_the_end";
+
+        public static String folderGallonsToGetToTheEnd = "fuel/gallons_to_get_to_the_end";
+
+        // no 1 litres equivalent
+        public static String folderWillNeedToAddOneGallonToGetToTheEnd = "fuel/need_to_add_one_gallon_to_get_to_the_end";
+
+        public static String folderFuelWillBeTight = "fuel/fuel_will_be_tight";
+
         private float averageUsagePerLap;
 
         private float averageUsagePerMinute;
@@ -916,7 +927,7 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
-        public void reportFuelStatus(Boolean allowNoDataMessage)
+        public void reportFuelStatus(Boolean allowNoDataMessage, Boolean isRace)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
             {
@@ -930,7 +941,55 @@ namespace CrewChiefV4.Events
 
             Boolean reportedRemaining = reportFuelRemaining(allowNoDataMessage);
             Boolean reportedConsumption = reportFuelConsumption();
-            if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
+            Boolean reportedLitresNeeded = false;
+            if (isRace)
+            {
+                int litresToEnd = getLitresToEndOfRace();
+                // TODO: TEST ME
+                if (litresToEnd > 0)
+                {
+                    int litresRemaining = (int)Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
+                    int litresNeeded = litresToEnd - litresRemaining;
+                    // -2 means we expect to have 2 litres left at the end of the race
+                    if (litresNeeded >= -2)
+                    {
+                        QueuedMessage fuelMessage;
+                        if (litresNeeded < 3)
+                        {
+                            // between 2 litres short, and 2 litres excess fuel
+                            fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
+                        }
+                        else
+                        {
+                            if (fuelReportsInGallon)
+                            {
+                                // for gallons we want both whole and fractional part cause its a stupid unit.
+                                float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                                Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
+                                if (wholeandfractional.Item2 > 0)
+                                {
+                                    fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                        wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsToGetToTheEnd), 0, null);
+                                }
+                                else
+                                {
+                                    int wholeGallons = Convert.ToInt32(wholeandfractional.Item1);
+                                    fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeGallons, wholeGallons == 1 ?
+                                        folderWillNeedToAddOneGallonToGetToTheEnd : folderWillNeedToAdd, wholeGallons, folderGallonsToGetToTheEnd), 0, null);
+                                }
+                            }
+                            else
+                            {
+                                fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                    litresNeeded, folderLitresToGetToTheEnd), 0, null);
+                            }
+                        }
+                        audioPlayer.playMessageImmediately(fuelMessage);
+                        reportedLitresNeeded = true;
+                    }
+                }
+            }
+            if (!reportedConsumption && !reportedRemaining && !reportedLitresNeeded && allowNoDataMessage)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
@@ -972,7 +1031,8 @@ namespace CrewChiefV4.Events
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL));
+                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL),
+                    (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {

@@ -110,6 +110,7 @@ namespace CrewChiefV4
             {
                 this.MinimumSize = new System.Drawing.Size(1160, 730);
             }
+
             // Some update test code - uncomment this to allow the app to process an update .zip file in the root of the sound pack
             /*
             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
@@ -1176,6 +1177,12 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("Toggling yellow flag messages to: " + (CrewChief.yellowFlagMessagesEnabled ? "disabled" : "enabled"));
                         crewChief.toggleEnableYellowFlagsMode();
+                        nextPollWait = 1000;
+                    }
+                    else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS))
+                    {
+                        Console.WriteLine("Toggling delay-messages-in-hard-parts");
+                        crewChief.toggleDelayMessagesInHardParts();
                         nextPollWait = 1000;
                     }
                     else if (controllerConfiguration.hasOutstandingClick(ControllerConfiguration.GET_FUEL_STATUS))

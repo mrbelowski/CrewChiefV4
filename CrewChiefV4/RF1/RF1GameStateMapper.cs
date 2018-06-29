@@ -48,6 +48,7 @@ namespace CrewChiefV4.rFactor1
         // Track landmarks cache.
         private string lastSessionTrackName = null;
         private TrackDataContainer lastSessionTrackDataContainer = null;
+        private HardPartsOnTrackData lastSessionHardPartsOnTrackData = null;
         private float lastSessionTrackLength = -1.0f;
 
         // next track conditions sample due after:
@@ -237,6 +238,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                 currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
+                currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
             }
             if (currentGameState.FlagData.isFullCourseYellow)
             {
@@ -286,11 +288,17 @@ namespace CrewChiefV4.rFactor1
                     tdc = this.lastSessionTrackDataContainer;
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
+
+                    if (this.lastSessionHardPartsOnTrackData != null
+                        && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
+                        currentGameState.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
                 }
                 else
                 {
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(currentGameState.SessionData.TrackDefinition.name, shared.lapDist);
                     this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionHardPartsOnTrackData = null;
+
                     this.lastSessionTrackName = currentGameState.SessionData.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.lapDist;
                 }
@@ -1147,6 +1155,22 @@ namespace CrewChiefV4.rFactor1
                     (previousGameState.SessionData.SessionPhase == SessionPhase.Formation ||
                      previousGameState.SessionData.SessionPhase == SessionPhase.Countdown))
                 currentGameState.SessionData.JustGoneGreen = true;
+
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
+                {
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+                }
+            }
+            else if (!currentGameState.PitData.OnOutLap && !currentGameState.SessionData.TrackDefinition.isOval &&
+                !(currentGameState.SessionData.SessionType == SessionType.Race &&
+                   (currentGameState.SessionData.CompletedLaps < 1 || (GameStateData.useManualFormationLap && currentGameState.SessionData.CompletedLaps < 2))))
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
+            }
+            this.lastSessionHardPartsOnTrackData = currentGameState.hardPartsOnTrackData;
 
             return currentGameState;
         }

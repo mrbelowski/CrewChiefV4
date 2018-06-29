@@ -833,6 +833,40 @@ namespace CrewChiefV4
             }
         }
 
+        public void adjustGapPoints(List<Tuple<float,float>> hardParts)
+        {
+            if (trackLength > TrackData.gapPointsThreshold)
+            {
+                float totalGaps = 0;
+                List<float> gaps = new List<float>();
+                while (totalGaps < trackLength)
+                {
+                    totalGaps += TrackData.gapPointSpacing;
+                    if (totalGaps < trackLength - TrackData.gapPointSpacing)
+                    {
+                        foreach(Tuple<float,float> hardPart in hardParts)
+                        {
+                            if (totalGaps >= hardPart.Item1 && totalGaps <= hardPart.Item2)
+                            {
+                                totalGaps = hardPart.Item2;
+                            }
+                        }
+                        gaps.Add(totalGaps);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                // the gapPoints are used instead of the sector / start-finish line for opponent gaps.
+                // We need to ensure our 1st gap point is near, but not on, the start-finish line (so the lap
+                // distance between previous and current game states has increased). Yes. A hack.
+                // This final gap point is just before the start-finish line
+                gaps.Add(trackLength - 50);
+
+                gapPoints = gaps.ToArray();
+            }
+        }
         public void setSectorPointsForUnknownTracks()
         {
             if (sectorsOnTrack == 0)

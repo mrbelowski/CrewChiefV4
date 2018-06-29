@@ -17,6 +17,9 @@ namespace CrewChiefV4.Audio
 {
     public class AudioPlayer
     {
+        // keep track of the counts of each type of message in the immediate queue:
+        private Dictionary<SoundType, int> soundTypesInImmediateQueue = new Dictionary<SoundType, int>();
+
         public static String PAUSE_ID = "insert_pause";
 
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
@@ -25,7 +28,9 @@ namespace CrewChiefV4.Audio
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
         // prefer to drop messages or use generic terms instead of TTS names
         public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
-        
+
+        public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayed_messages_on_hardparts");
+
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
         public static Dictionary<string, Tuple<string, int>> playbackDevices = new Dictionary<string, Tuple<string, int>>();
@@ -46,6 +51,9 @@ namespace CrewChiefV4.Audio
         public static String folderStandBy = "acknowledge/stand_by";
         public static String folderFuelToEnd = "acknowledge/fuel_to_end";
 
+        public static String folderAcknowledgeEnableDelayInHardParts = "acknowledge/keep_quiet_in_corners_enabled";
+        public static String folderAcknowledgeDisableDelayInHardParts = "acknowledge/keep_quiet_in_corners_disabled";
+
         private String folderRants = "rants/general";
         private Boolean playedRantInThisSession = false;
         public static Boolean rantWaitingToPlay = false;
@@ -58,7 +66,7 @@ namespace CrewChiefV4.Audio
         private QueuedMessage lastMessagePlayed = null;
 
         private Boolean allowPearlsOnNextPlay = true;
-
+        private int lastDelayedQueueSize = -1;
         private Dictionary<String, int> playedMessagesCount = new Dictionary<String, int>();
 
         private Boolean monitorRunning = false;
@@ -121,6 +129,8 @@ namespace CrewChiefV4.Audio
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         private SynchronizationContext mainThreadContext = null;
+
+        private int messageId = 0;
 
         static AudioPlayer()
         {
@@ -228,8 +238,18 @@ namespace CrewChiefV4.Audio
             {
                 selectedPersonalisation = savedPersonalisation;
             }
+            resetSoundTypesInImmediateQueue();
         }
-        
+
+        private void resetSoundTypesInImmediateQueue()
+        {
+            soundTypesInImmediateQueue[SoundType.SPOTTER] = 0;
+            soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] = 0;
+            soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] = 0;
+            soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] = 0;
+            soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] = 0;
+        }
+
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
@@ -442,7 +462,7 @@ namespace CrewChiefV4.Audio
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception processing immediate clips: " + e.Message);
+                        Console.WriteLine("Exception processing immediate clips: " + e.Message + " stack " + e.StackTrace);
                         lock (immediateClips)
                         {
                             immediateClips.Clear();
@@ -456,8 +476,32 @@ namespace CrewChiefV4.Audio
                     {
                         if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                         {
-                            playQueueContents(queuedClips, false);
-                            allowPearlsOnNextPlay = true;
+                            Boolean doHardPartsCheck = delayMessagesInHardParts &&
+                                CrewChief.currentGameState != null &&
+                                (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
+                                !GameStateData.onManualFormationLap;
+                            if (!doHardPartsCheck ||
+                                !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
+                            {
+                                playQueueContents(queuedClips, false);
+                                allowPearlsOnNextPlay = true;
+                                lastDelayedQueueSize = -1;
+                            }
+                            else
+                            {
+                                // if there are no messages in the immediate queue, ensure the radio channel is closed here
+                                Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
+                                if (shouldCloseChannel)
+                                {
+                                    closeRadioInternalChannel();
+                                }
+                                if (queuedClips.Count != lastDelayedQueueSize)
+                                {
+                                    lastDelayedQueueSize = queuedClips.Count;
+                                    Console.WriteLine("Hard parts:  Delaying message playback because we're in a hard part of a track.  Queue size: " +
+                                        lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
+                                }
+                            }
                         }
                     }
                     catch (Exception e)
@@ -758,7 +802,7 @@ namespace CrewChiefV4.Audio
                                 }
                                 if (!mute)
                                 {
-                                    soundCache.Play(eventName);
+                                    soundCache.Play(eventName, thisMessage.metadata);
                                     timeOfLastMessageEnd = GameStateData.CurrentTime;
                                 }
                                 else
@@ -770,7 +814,7 @@ namespace CrewChiefV4.Audio
                         else
                         {
                             if (thisMessage.messageName != AudioPlayer.folderDidntUnderstand &&
-                                thisMessage.messageName != AudioPlayer.folderStandBy)
+                                thisMessage.messageName != AudioPlayer.folderStandBy && thisMessage.metadata.type != SoundType.SPOTTER)
                             {
                                 // only cache the last message for repeat if it's an actual message
                                 lastMessagePlayed = thisMessage;
@@ -787,7 +831,11 @@ namespace CrewChiefV4.Audio
                                 {
                                     thisMessage.resolveDelayedContents();
                                 }
-                                soundCache.Play(thisMessage.messageFolders);
+                                soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
+                                if (isImmediateMessages)
+                                {
+                                    soundTypesInImmediateQueue[thisMessage.metadata.type] = soundTypesInImmediateQueue[thisMessage.metadata.type] - 1;
+                                }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -819,15 +867,6 @@ namespace CrewChiefV4.Audio
                     break;
                 }
             }
-            if (soundsProcessed.Count == 0)
-            {
-                Console.WriteLine("Processed no messages in this queue");
-            }
-            else
-            {
-                Console.WriteLine("*** Processed " + String.Join(", ", soundsProcessed.ToArray()));
-            }
-            
             return soundsProcessed;
         }
 
@@ -868,7 +907,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepStart();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -878,7 +917,7 @@ namespace CrewChiefV4.Audio
             {
                 if (!mute)
                 {
-                    soundCache.Play("listen_start_sound");
+                    soundCache.Play("listen_start_sound", SoundMetadata.beep);
                 }
             }
         }
@@ -888,7 +927,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepShorStart();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -897,7 +936,7 @@ namespace CrewChiefV4.Audio
             if (!mute)
             {
                 var soundToPlay = PlaybackModerator.GetSuggestedBleepEnd();
-                soundCache.Play(soundToPlay);
+                soundCache.Play(soundToPlay, SoundMetadata.beep);
             }
         }
 
@@ -982,6 +1021,31 @@ namespace CrewChiefV4.Audio
             }).Start();            
         }
 
+        public SoundType getMinTypeInImmediateQueue()
+        {
+            if (soundTypesInImmediateQueue[SoundType.SPOTTER] > 0)
+            {
+                return SoundType.SPOTTER;
+            }
+            if (soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] > 0)
+            {
+                return SoundType.CRITICAL_MESSAGE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] > 0)
+            {
+                return SoundType.VOICE_COMMAND_RESPONSE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] > 0)
+            {
+                return SoundType.IMPORTANT_MESSAGE;
+            }
+            if (soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] > 0)
+            {
+                return SoundType.REGULAR_MESSAGE;
+            }
+            return SoundType.OTHER;
+        }
+
         public void playMessageImmediately(QueuedMessage queuedMessage)
         {
             if (disableImmediateMessages)
@@ -1003,7 +1067,23 @@ namespace CrewChiefV4.Audio
                         lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
                         this.holdChannelOpen = false;
-                        immediateClips.Add(queuedMessage.messageName, queuedMessage);
+
+                        // here we assume the message is a voice command response, which is the most common use case 
+                        // for non-spotter immediate messages
+                        populateSoundMetadata(queuedMessage, SoundType.VOICE_COMMAND_RESPONSE, 5);
+                        // sanity check...
+                        if (queuedMessage.metadata.type == SoundType.REGULAR_MESSAGE)
+                        {
+                            // a regular message will not play from the immediate queue
+                            Console.WriteLine("Message " + queuedMessage.messageName + " is in the immediate queue but is type 'regular' - this will not play. Setting the type to 'important'");
+                            queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
+                        }
+                        if (immediateClips.Count == 0)
+                        {
+                            resetSoundTypesInImmediateQueue();
+                        }
+                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
+                        immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
             }
@@ -1028,11 +1108,35 @@ namespace CrewChiefV4.Audio
                     {
                         this.useShortBeepWhenOpeningChannel = true;
                         this.holdChannelOpen = keepChannelOpen;
-                        immediateClips.Add(queuedMessage.messageName, queuedMessage);
+                        // default spotter priority is 10
+                        populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
+                        if (immediateClips.Count == 0)
+                        {
+                            resetSoundTypesInImmediateQueue();
+                        }
+                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
+                        immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
             }
         }
+
+        private int getInsertionIndex(OrderedDictionary queue, QueuedMessage queuedMessage)
+        {
+            int index = 0;
+            foreach (Object value in queue.Values)
+            {
+                int existingMessagePriority = ((QueuedMessage)value).metadata.priority;
+                if (queuedMessage.metadata.priority > existingMessagePriority)
+                {
+                    // the existing message is lower priorty than the one we're adding so we've found the index we want                 
+                    break;
+                }
+                index++;
+            }
+            return Math.Min(index,  queue.Count);
+        }
+
 
         public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
         {
@@ -1047,23 +1151,31 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
+                        // default 'regular' message priority is 0, which is lowest
+                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
                         PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
                         if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
                         {
                             pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
                         }
+
+                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
                         if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
                         {
                             QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                            pearlQueuedMessage.metadata = queuedMessage.metadata;
                             pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Add(PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            insertionIndex++;
                         }
-                        queuedClips.Add(queuedMessage.messageName, queuedMessage);
+                        queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
                         if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
                         {
                             QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
                             pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Add(PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            pearlQueuedMessage.metadata = queuedMessage.metadata;
+                            insertionIndex++;
+                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
                         }
                     }
                 }
@@ -1155,6 +1267,8 @@ namespace CrewChiefV4.Audio
         {
             if (lastMessagePlayed != null)
             {
+                // clear the validation, expiry and other data
+                lastMessagePlayed.prepareToBeRepeated(getMessageId());
                 playMessageImmediately(lastMessagePlayed);
             }
         }
@@ -1188,6 +1302,26 @@ namespace CrewChiefV4.Audio
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
                 ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+        }
+
+        // defaultSoundType is only used if we've not already added metadata
+        // defaultPriority is only used if we've not already added metadata
+        private void populateSoundMetadata(QueuedMessage queuedMessage, SoundType defaultSoundType, int defaultPriority)
+        {
+            if (queuedMessage.metadata == null)
+            {
+                queuedMessage.metadata = new SoundMetadata(defaultSoundType, defaultPriority);
+            }
+            queuedMessage.metadata.messageId = getMessageId();
+        }
+
+        private int getMessageId()
+        {
+            lock (this)
+            {
+                this.messageId++;
+                return this.messageId;
+            }
         }
     }
 }

@@ -145,12 +145,26 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
 
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.SessionData.Track.CodeName, 0, (float)shared.SessionData.Track.Length * 1000);
-
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                            currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                            currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                        }
+                    }
+                }
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(shared.SessionData.Track.CodeName, currentGameState.SessionData.TrackDefinition.trackLength);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                 currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval || shared.SessionData.Track.IsOval;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+
+
 
                 currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
@@ -231,7 +245,19 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.SessionNumberOfLaps = Parser.ParseInt(shared.SessionData.RaceLaps);
 
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(shared.SessionData.Track.CodeName, 0, (float)shared.SessionData.Track.Length * 1000);
-
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                                }
+                            }
+                        }
                         TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(shared.SessionData.Track.CodeName, currentGameState.SessionData.TrackDefinition.trackLength);
                         currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
                         currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval || shared.SessionData.Track.IsOval;
@@ -348,6 +374,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 }
             }
 
@@ -1006,7 +1033,20 @@ namespace CrewChiefV4.iRacing
             }
             CrewChief.distanceRoundTrack = currentGameState.PositionAndMotionData.DistanceRoundTrack;
             CrewChief.viewingReplay = false;
-
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
+                {
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+                }
+            }
+            else if (!currentGameState.SessionData.TrackDefinition.isOval &&
+                !(currentGameState.SessionData.SessionType == SessionType.Race &&
+                   (currentGameState.SessionData.CompletedLaps < 1 || (GameStateData.useManualFormationLap && currentGameState.SessionData.CompletedLaps < 2))))// if(!currentGameState.PitData.OnOutLap*/)
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
+            }
             return currentGameState;
         }
 

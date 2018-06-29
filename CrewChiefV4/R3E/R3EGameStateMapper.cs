@@ -267,6 +267,16 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance = tdc.raceroomRollingStartLapDistance;
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                        }
+                    }
+                }
                 currentGameState.PitData.IsRefuellingAllowed = true;
 
                 lastActiveTimeForOpponents.Clear();
@@ -420,6 +430,16 @@ namespace CrewChiefV4.RaceRoom
                         Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
                         Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
                         String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                                }
+                            }
+                        }
                         Console.WriteLine("TrackName " + trackName);                        
                     }
                 }
@@ -484,12 +504,15 @@ namespace CrewChiefV4.RaceRoom
 
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
+
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 }
             }
 
             currentGameState.ControlData.ThrottlePedal = shared.ThrottlePedal;
             currentGameState.ControlData.ClutchPedal = shared.ClutchPedal;
             currentGameState.ControlData.BrakePedal = shared.BrakePedal;
+            currentGameState.ControlData.BrakeBias = shared.BrakeBias;
             currentGameState.TransmissionData.Gear = shared.Gear;
 
             //------------------------ Session data -----------------------
@@ -1354,6 +1377,22 @@ namespace CrewChiefV4.RaceRoom
                     GlobalBehaviourSettings.UpdateFromCarClass(correctedCarClass);
                 }
             }
+
+             if (currentGameState.SessionData.IsNewLap)
+            {
+                if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
+                {
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+                }
+            }
+             else if (!currentGameState.PitData.OnOutLap &&
+                 !(currentGameState.SessionData.SessionType == SessionType.Race &&
+                   (currentGameState.SessionData.CompletedLaps < 1 || (GameStateData.useManualFormationLap && currentGameState.SessionData.CompletedLaps < 2))))
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
+            }
+            
             return currentGameState;
         }
 

@@ -40,10 +40,9 @@ namespace CrewChiefV4.Audio
         public static SoundPackData[] personalisationPacks = { new SoundPackData(-1, "basepersonalisationsurl", false),
                                                                // any personalisations after base will require an additional download if they're not the last in the list
                                                                //
-                                                               // TODO: change these additional download flags to true when we publish the next update personalisations pack
-                                                               // (the first non-cumulative pack). This will update from version 129
-                                                               new SoundPackData(0, "updatepersonalisationsurl", false),
-                                                               new SoundPackData(121, "update2personalisationsurl", false)
+                                                               new SoundPackData(0, "updatepersonalisationsurl", true),
+                                                               new SoundPackData(121, "update2personalisationsurl", true),
+                                                               new SoundPackData(129, "update3personalisationsurl", false)
                                                              };
 
         public static SoundPackData[] drivernamesPacks = { new SoundPackData(-1, "basedrivernamesurl", false),

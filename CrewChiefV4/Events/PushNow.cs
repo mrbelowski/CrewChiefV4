@@ -99,11 +99,11 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionRunningTime > 30 && isOpponentApproachingPitExit(currentGameState))
                 {
                     // we've exited into clean air
-                    audioPlayer.playMessage(new QueuedMessage(folderTrafficBehindExitingPits, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTrafficBehindExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                 }
                 else
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderPushExitingPits, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPushExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                 }
                 // now try and report the current brake and tyre temp status
                 try
@@ -127,15 +127,16 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionNumberOfLaps > 0)
                     {
                         // special case for iracing - AFAIK no other games have number-of-laps in qual sessions
-                        audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, 
-                            currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps), 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro,
+                            currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                     }
                     else if (currentGameState.SessionData.SessionHasFixedTime)
                     {
                         int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
                         if (minutesLeft > 1)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0,
+                                this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                 }
@@ -147,7 +148,7 @@ namespace CrewChiefV4.Events
                 isApproachingStartLine(currentGameState.SessionData.TrackDefinition, previousGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.DistanceRoundTrack) &&
                 isOpponentLeavingPits(currentGameState))
             {
-                audioPlayer.playMessage(new QueuedMessage(folderOpponentExitingPits, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderOpponentExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
         }
 
