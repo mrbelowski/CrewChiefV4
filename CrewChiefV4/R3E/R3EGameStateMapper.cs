@@ -301,7 +301,6 @@ namespace CrewChiefV4.RaceRoom
                     if (i == playerDriverDataIndex)
                     {
                         currentGameState.SessionData.IsNewSector = previousGameState == null || participantStruct.TrackSector != previousGameState.SessionData.SectorNumber;
-                        
                         currentGameState.SessionData.SectorNumber = participantStruct.TrackSector;
                         Validator.validate(driverName);
 
@@ -1392,7 +1391,6 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
                     currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
             }
-            
             return currentGameState;
         }
 
