@@ -885,6 +885,7 @@ namespace CrewChiefV4
                                 Console.WriteLine("New session");
                                 PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
+                                audioPlayer.resetSoundTypesInImmediateQueue();
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;
                                 if (!stateCleared)
