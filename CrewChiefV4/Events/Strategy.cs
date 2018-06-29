@@ -136,7 +136,6 @@ namespace CrewChiefV4.Events
             Strategy.opponentBehindToWatchForPitting = null;
             printS1Positions = false;
             opponentsInPitLane.Clear();
-            waitingForValidDataForBenchmark = false;
         }
 
         private void setTimeLossFromBenchmark(GameStateData currentGameState)
@@ -153,8 +152,20 @@ namespace CrewChiefV4.Events
 
         private Boolean hasValidComparisonForBenchmark(GameStateData currentGameState)
         {
-            return (sectorCount == 2 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector2Time > 0) ||
-                (sectorCount == 3 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector3Time > 0);
+            if (currentGameState.SessionData.SessionType == SessionType.Qualify)
+            {
+                return false;
+            }
+            if (currentGameState.SessionData.SessionType == SessionType.Practice)
+            {
+                return (sectorCount == 2 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector2Time > 0) ||
+                    (sectorCount == 3 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector3Time > 0);
+            }
+            if (currentGameState.SessionData.SessionType == SessionType.Race)
+            {
+                return currentGameState.SessionData.IsNewLap && currentGameState.SessionData.CompletedLaps > 1 && currentGameState.SessionData.PreviousLapWasValid;
+            }
+            return false;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState) 
@@ -175,10 +186,15 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (waitingForValidDataForBenchmark && hasValidComparisonForBenchmark(currentGameState) && currentGameState.SessionData.SessionType != SessionType.Qualify)
+            if (waitingForValidDataForBenchmark)
             {
-                if (currentGameState.SessionData.TrackDefinition.name == trackNameForLastPitstopTiming &&
-                    CarData.IsCarClassEqual(currentGameState.carClass, carClassForLastPitstopTiming))
+                if (currentGameState.SessionData.TrackDefinition.name != trackNameForLastPitstopTiming ||
+                    !CarData.IsCarClassEqual(currentGameState.carClass, carClassForLastPitstopTiming))
+                {
+                    // wrong car class or track, cancel waiting
+                    waitingForValidDataForBenchmark = false;
+                }
+                else if (hasValidComparisonForBenchmark(currentGameState))
                 {
                     setTimeLossFromBenchmark(currentGameState);
                     Console.WriteLine("Completing pit benchmark in " + currentGameState.SessionData.SessionType +
@@ -191,8 +207,8 @@ namespace CrewChiefV4.Events
                             TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
                             0, this));
                     }
+                    waitingForValidDataForBenchmark = false;
                 }
-                waitingForValidDataForBenchmark = false;
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
