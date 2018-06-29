@@ -241,7 +241,7 @@ namespace CrewChiefV4.Audio
             resetSoundTypesInImmediateQueue();
         }
 
-        private void resetSoundTypesInImmediateQueue()
+        public void resetSoundTypesInImmediateQueue()
         {
             soundTypesInImmediateQueue[SoundType.SPOTTER] = 0;
             soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] = 0;
@@ -695,6 +695,10 @@ namespace CrewChiefV4.Audio
                         {
                             queueToPlay.Remove(key);
                         }
+                    }
+                    if (isImmediateMessages && queueToPlay.Count == 0)
+                    {
+                        resetSoundTypesInImmediateQueue();
                     }
                 }
             }
