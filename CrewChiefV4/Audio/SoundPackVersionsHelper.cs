@@ -29,35 +29,47 @@ namespace CrewChiefV4.Audio
         // will install and prompt for a restart. He'll then be prompted to download another sound pack update, and so on.
         //
         // The base sound pack will always have everything
-        public static SoundPackData[] soundPacks = { new SoundPackData(-1, "basesoundpackurl", false),
-                                                     // any sound packs after base will require an additional download if they're not the last in the list
-                                                     //
-                                                     new SoundPackData(0, "updatesoundpackurl", true),
-                                                     new SoundPackData(122, "update2soundpackurl", true),
-                                                     new SoundPackData(146, "update3soundpackurl", false)
-                                                   };
+        public static List<SoundPackData> voiceMessageUpdatePacks = new List<SoundPackData>();
+        public static List<SoundPackData> personalisationUpdatePacks = new List<SoundPackData>();
+        public static List<SoundPackData> drivernamesUpdatePacks = new List<SoundPackData>();
 
-        public static SoundPackData[] personalisationPacks = { new SoundPackData(-1, "basepersonalisationsurl", false),
-                                                               // any personalisations after base will require an additional download if they're not the last in the list
-                                                               //
-                                                               new SoundPackData(0, "updatepersonalisationsurl", true),
-                                                               new SoundPackData(121, "update2personalisationsurl", true),
-                                                               new SoundPackData(129, "update3personalisationsurl", false)
-                                                             };
+        private static List<SoundPackData> createNewPackData(XElement element)
+        {
+            List<SoundPackData> packData = new List<SoundPackData>();
+            int finalVersion = 0;
+            foreach (XElement packUpdateElement in element.Descendants("update-pack"))
+            {
+                String url = packUpdateElement.Attribute(XName.Get("url", "")).Value;
+                int updatesFromVersion;
+                if (int.TryParse(packUpdateElement.Attribute(XName.Get("updates-from-version", "")).Value, out updatesFromVersion))
+                {
+                    // create the entry
+                    packData.Add(new SoundPackData(updatesFromVersion, url));
+                    if (updatesFromVersion > finalVersion) {
+                        finalVersion = updatesFromVersion;
+                    }
+                }
+            }
+            // now get the biggest version and tag the intermediate versions as requiring another download
+            foreach (SoundPackData data in packData)
+            {
+                if (data.upgradeFromVersion > -1 && data.upgradeFromVersion < finalVersion)
+                {
+                    data.willRequireAnotherUpdate = true;
+                }
+            }
 
-        public static SoundPackData[] drivernamesPacks = { new SoundPackData(-1, "basedrivernamesurl", false),
-                                                           // any name packs after base will require an additional download if they're not the last in the list
-                                                           //
-                                                           new SoundPackData(0, "updatedrivernamesurl", true),
-                                                           new SoundPackData(130, "update2drivernamesurl", false),
-                                                         };
+            // now sort the list, lowest first
+            packData.Sort((a, b) => a.upgradeFromVersion.CompareTo(b.upgradeFromVersion));
+            return packData;
+        }
 
         public static Boolean parseUpdateData(String updateXML)
         {
             try
             {
                 XDocument doc = XDocument.Parse(updateXML);
-                if (doc.Descendants("soundpack").Count() > 0)
+                if (doc.Descendants("sounds").Count() > 0)
                 {
                     String languageToCheck = AudioPlayer.soundPackLanguage == null ? "en" : AudioPlayer.soundPackLanguage;
                     Boolean gotLanguageSpecificUpdateInfo = false;
@@ -70,27 +82,26 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("No retry download location available");
                     }
-                    foreach (XElement element in doc.Descendants("soundpack"))
+                    foreach (XElement element in doc.Descendants("sounds"))
                     {
                         XAttribute languageAttribute = element.Attribute(XName.Get("language", ""));
                         if (languageAttribute.Value == languageToCheck)
                         {
                             // this is the update set for this language
-                            float.TryParse(element.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                            float.TryParse(element.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                            float.TryParse(element.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-
-                            foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
+                            XElement voiceMessagesElement = element.Descendants("voice-messages").First();
+                            if (float.TryParse(voiceMessagesElement.Attribute(XName.Get("latest-version", "")).Value, out latestSoundPackVersion)) 
                             {
-                                soundPackData.setDownloadLocation(element);
+                                voiceMessageUpdatePacks.AddRange(createNewPackData(voiceMessagesElement));
                             }
-                            foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
+                            XElement driverNamesElement = element.Descendants("driver-names").First();
+                            if (float.TryParse(driverNamesElement.Attribute(XName.Get("latest-version", "")).Value, out latestDriverNamesVersion))
                             {
-                                personalisationsPackData.setDownloadLocation(element);
+                                drivernamesUpdatePacks.AddRange(createNewPackData(driverNamesElement));
                             }
-                            foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
+                            XElement personalisationElement = element.Descendants("personalisations").First();
+                            if (float.TryParse(personalisationElement.Attribute(XName.Get("latest-version", "")).Value, out latestPersonalisationsVersion))
                             {
-                                drivernamePackData.setDownloadLocation(element);
+                                personalisationUpdatePacks.AddRange(createNewPackData(personalisationElement));
                             }
                             gotLanguageSpecificUpdateInfo = true;
                             break;
@@ -98,21 +109,22 @@ namespace CrewChiefV4.Audio
                     }
                     if (!gotLanguageSpecificUpdateInfo && AudioPlayer.soundPackLanguage == null)
                     {
-                        float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion);
-                        float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion);
-                        float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion);
-
-                        foreach (SoundPackVersionsHelper.SoundPackData soundPackData in SoundPackVersionsHelper.soundPacks)
+                        if (float.TryParse(doc.Descendants("soundpackversion").First().Value, out latestSoundPackVersion))
                         {
-                            soundPackData.setDownloadLocation(doc);
+                            voiceMessageUpdatePacks.Add(new SoundPackData(-1, doc.Descendants("basesoundpackurl").First().Value));
+                            voiceMessageUpdatePacks.Add(new SoundPackData(0, doc.Descendants("updatesoundpackurl").First().Value));
+                            voiceMessageUpdatePacks.Add(new SoundPackData(122, doc.Descendants("update2soundpackurl").First().Value));
                         }
-                        foreach (SoundPackVersionsHelper.SoundPackData personalisationsPackData in SoundPackVersionsHelper.personalisationPacks)
+                        if (float.TryParse(doc.Descendants("drivernamesversion").First().Value, out latestDriverNamesVersion))
                         {
-                            personalisationsPackData.setDownloadLocation(doc);
+                            drivernamesUpdatePacks.Add(new SoundPackData(-1, doc.Descendants("basedrivernamesurl").First().Value));
+                            drivernamesUpdatePacks.Add(new SoundPackData(0, doc.Descendants("updatedrivernamesurl").First().Value));
                         }
-                        foreach (SoundPackVersionsHelper.SoundPackData drivernamePackData in SoundPackVersionsHelper.drivernamesPacks)
+                        if (float.TryParse(doc.Descendants("personalisationsversion").First().Value, out latestPersonalisationsVersion))
                         {
-                            drivernamePackData.setDownloadLocation(doc);
+                            personalisationUpdatePacks.Add(new SoundPackData(-1, doc.Descendants("basepersonalisationsurl").First().Value));
+                            personalisationUpdatePacks.Add(new SoundPackData(-1, doc.Descendants("updatepersonalisationsurl").First().Value));
+                            personalisationUpdatePacks.Add(new SoundPackData(-1, doc.Descendants("update2personalisationsurl").First().Value));
                         }
                     }
                     return true;
@@ -128,43 +140,16 @@ namespace CrewChiefV4.Audio
         public class SoundPackData
         {
             public int upgradeFromVersion;
-            public String elementName;
-            public String downloadLocation = null;
+            public String url;
             // if this is true, after downloading this pack the user will have to download another. False for
             // the base pack and the old cumulative update packs (everything at the time of writing), true for others except the most recent.
             public Boolean willRequireAnotherUpdate = false;
 
-            public SoundPackData(int upgradeFromVersion, String elementName, Boolean willRequireAnotherUpdate)
+            public SoundPackData(int upgradeFromVersion, String url)
             {
                 this.upgradeFromVersion = upgradeFromVersion;
-                this.elementName = elementName;
-                this.willRequireAnotherUpdate = willRequireAnotherUpdate;
-            }
-
-            // use the first decendant or null if we can't get it
-            public void setDownloadLocation(System.Xml.Linq.XElement parent)
-            {
-                try
-                {
-                    this.downloadLocation = parent.Descendants(elementName).First().Value;
-                }
-                catch (Exception)
-                {
-                }
-            }
-
-            // use the first decendant or null if we can't get it
-            public void setDownloadLocation(System.Xml.Linq.XDocument parent)
-            {
-                try
-                {
-                    this.downloadLocation = parent.Descendants(elementName).First().Value;
-                }
-                catch (Exception)
-                {
-                }
+                this.url = url;
             }
         }
-
     }
 }
