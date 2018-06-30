@@ -15,6 +15,27 @@ will be pulled from the thecrewchief.org ftp server. -->
 <retry_replace_with>http://thecrewchief.org/downloads/</retry_replace_with>
 
 
+<sounds language="en">
+	<voice-messages latest-version="149">
+		<update-pack url="http://crewchief.isnais.de/base_sound_pack.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_sound_pack.zip" updates-from-version="0"/>
+		<update-pack url="http://crewchief.isnais.de/update_2_sound_pack.zip" updates-from-version="122"/>
+		<update-pack url="http://crewchief.isnais.de/update_3_sound_pack.zip" updates-from-version="146"/>
+	</voice-messages>
+	<driver-names latest-version="131">
+		<update-pack url="http://crewchief.isnais.de/base_driver_names.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_driver_names.zip" updates-from-version="0"/>
+		<update-pack url="http://thecrewchief.org/downloads/update_2_driver_names.zip" updates-from-version="130"/>
+	</driver-names>
+	<personalisations latest-version="130">
+		<update-pack url="http://crewchief.isnais.de/personalisations.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_personalisations.zip" updates-from-version="0"/>
+		<update-pack url="http://crewchief.isnais.de/update_2_personalisations.zip" updates-from-version="121"/>
+		<update-pack url="http://crewchief.isnais.de/update_3_personalisations.zip" updates-from-version="129"/>
+	</personalisations>
+</sounds>
+
+
 <!--legacy sound pack stuff for 4.1.2.2 and earlier. I've given up updating this, it will be forever at 146 now.-->
 <soundpackversion>146</soundpackversion>
 <basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
