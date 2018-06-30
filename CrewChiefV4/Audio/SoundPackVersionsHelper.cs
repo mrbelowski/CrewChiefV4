@@ -36,31 +36,29 @@ namespace CrewChiefV4.Audio
         private static List<SoundPackData> createNewPackData(XElement element)
         {
             List<SoundPackData> packData = new List<SoundPackData>();
-            if (float.TryParse(element.Attribute(XName.Get("latest-version", "")).Value, out latestSoundPackVersion))
+            int finalVersion = 0;
+            foreach (XElement packUpdateElement in element.Descendants("update-pack"))
             {
-                int finalVersion = 0;
-                foreach (XElement packUpdateElement in element.Descendants("update-pack"))
+                String url = packUpdateElement.Attribute(XName.Get("url", "")).Value;
+                int updatesFromVersion;
+                if (int.TryParse(packUpdateElement.Attribute(XName.Get("updates-from-version", "")).Value, out updatesFromVersion))
                 {
-                    String url = packUpdateElement.Attribute(XName.Get("url", "")).Value;
-                    int updatesFromVersion;
-                    if (int.TryParse(packUpdateElement.Attribute(XName.Get("updates-from-version", "")).Value, out updatesFromVersion))
-                    {
-                        // create the entry
-                        packData.Add(new SoundPackData(updatesFromVersion, url));
-                        if (updatesFromVersion > finalVersion) {
-                            finalVersion = updatesFromVersion;
-                        }
-                    }
-                }
-                // now get the biggest version and tag the intermediate versions as requiring another download
-                foreach (SoundPackData data in packData)
-                {
-                    if (data.upgradeFromVersion > -1 && data.upgradeFromVersion < finalVersion)
-                    {
-                        data.willRequireAnotherUpdate = true;
+                    // create the entry
+                    packData.Add(new SoundPackData(updatesFromVersion, url));
+                    if (updatesFromVersion > finalVersion) {
+                        finalVersion = updatesFromVersion;
                     }
                 }
             }
+            // now get the biggest version and tag the intermediate versions as requiring another download
+            foreach (SoundPackData data in packData)
+            {
+                if (data.upgradeFromVersion > -1 && data.upgradeFromVersion < finalVersion)
+                {
+                    data.willRequireAnotherUpdate = true;
+                }
+            }
+
             // now sort the list, lowest first
             packData.Sort((a, b) => a.upgradeFromVersion.CompareTo(b.upgradeFromVersion));
             return packData;
