@@ -98,12 +98,12 @@ namespace CrewChiefV4.Audio
                             XElement driverNamesElement = element.Descendants("driver-names").First();
                             if (float.TryParse(driverNamesElement.Attribute(XName.Get("latest-version", "")).Value, out latestDriverNamesVersion))
                             {
-                                personalisationUpdatePacks.AddRange(createNewPackData(driverNamesElement));
+                                drivernamesUpdatePacks.AddRange(createNewPackData(driverNamesElement));
                             }
                             XElement personalisationElement = element.Descendants("personalisations").First();
                             if (float.TryParse(personalisationElement.Attribute(XName.Get("latest-version", "")).Value, out latestPersonalisationsVersion))
                             {
-                                drivernamesUpdatePacks.AddRange(createNewPackData(personalisationElement));
+                                personalisationUpdatePacks.AddRange(createNewPackData(personalisationElement));
                             }
                             gotLanguageSpecificUpdateInfo = true;
                             break;
