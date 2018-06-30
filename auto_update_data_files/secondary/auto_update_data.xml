@@ -15,6 +15,7 @@ secondary update sources) can still be updated. All downloads from this source w
 <retry_replace_with>http://crewchief.isnais.de/</retry_replace_with>
 
 
+<!-- current implementation where all the sound pack update information is in this document -->
 <sounds language="en">
 	<voice-messages latest-version="149">
 		<update-pack url="http://thecrewchief.org/downloads/base_sound_pack.zip" updates-from-version="-1"/>
@@ -51,7 +52,8 @@ secondary update sources) can still be updated. All downloads from this source w
 <updatepersonalisationsurl>http://thecrewchief.org/downloads/update_personalisations.zip</updatepersonalisationsurl>
 <update2personalisationsurl>http://thecrewchief.org/downloads/update_2_personalisations.zip</update2personalisationsurl>
 
-<!-- language-aware sound pack stuff for later versions-->
+
+<!-- legacy sound pack stuff for 4.9.3.6 and earlier. Again, this will not be updated and will (eventually) be removed -->
 <soundpack language="en">
 	<soundpackversion>149</soundpackversion>	
 	<basesoundpackurl>http://thecrewchief.org/downloads/base_sound_pack.zip</basesoundpackurl>
