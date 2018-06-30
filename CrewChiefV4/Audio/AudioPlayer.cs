@@ -241,13 +241,31 @@ namespace CrewChiefV4.Audio
             resetSoundTypesInImmediateQueue();
         }
 
-        private void resetSoundTypesInImmediateQueue()
+        public void resetSoundTypesInImmediateQueue()
         {
             soundTypesInImmediateQueue[SoundType.SPOTTER] = 0;
             soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] = 0;
             soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] = 0;
             soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] = 0;
             soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] = 0;
+        }
+
+        // for debugging the moderator message block process
+        public String getMessagesBlocking(SoundType blockLevel)
+        {
+            List<String> blockingMessages = new List<string>();
+            lock (immediateClips)
+            {
+                foreach (Object entry in immediateClips.Values)
+                {
+                    QueuedMessage message = (QueuedMessage)entry;
+                    if (message.metadata.type <= blockLevel)
+                    {
+                        blockingMessages.Add(message.messageName + "(" + message.metadata.type + ")");
+                    }
+                }
+            }
+            return String.Join(", ", blockingMessages);
         }
 
         public void initialise()
@@ -695,6 +713,10 @@ namespace CrewChiefV4.Audio
                         {
                             queueToPlay.Remove(key);
                         }
+                    }
+                    if (isImmediateMessages && queueToPlay.Count == 0)
+                    {
+                        resetSoundTypesInImmediateQueue();
                     }
                 }
             }
