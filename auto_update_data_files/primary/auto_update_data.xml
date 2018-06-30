@@ -17,7 +17,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- current implementation where all the sound pack update information is in this document -->
 <sounds language="en">
-	<voice-messages latest-version="149">
+	<voice-messages latest-version="150">
 		<update-pack url="http://crewchief.isnais.de/base_sound_pack.zip" updates-from-version="-1"/>
 		<update-pack url="http://crewchief.isnais.de/update_sound_pack.zip" updates-from-version="0"/>
 		<update-pack url="http://crewchief.isnais.de/update_2_sound_pack.zip" updates-from-version="122"/>
@@ -56,7 +56,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- legacy sound pack stuff for 4.9.3.6 and earlier. Again, this will not be updated and will (eventually) be removed -->
 <soundpack language="en">
-	<soundpackversion>149</soundpackversion>	
+	<soundpackversion>150</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
