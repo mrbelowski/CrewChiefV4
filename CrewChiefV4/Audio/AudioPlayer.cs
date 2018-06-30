@@ -653,6 +653,10 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
+                            else
+                            {
+                                Console.WriteLine("Clip " + key + " will not be played");
+                            }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
@@ -969,6 +973,7 @@ namespace CrewChiefV4.Audio
 
         private int purgeQueue(OrderedDictionary queue)
         {
+            Console.WriteLine("Purging queue");
             int purged = 0;
             lock (queue)
             {
