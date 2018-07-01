@@ -905,11 +905,11 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.LastSector1Time > -1 && currentGameState.SessionData.LastSector2Time > -1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector1Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector1Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector1Time, Precision.AUTO_LAPTIMES)), 0, null));
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector2Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector2Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector2Time, Precision.AUTO_LAPTIMES)), 0, null));
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector3Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector3Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector3Time, Precision.AUTO_LAPTIMES)), 0, null));
                 }
                 else
                 {
@@ -922,17 +922,17 @@ namespace CrewChiefV4.Events
                 if (currentGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.LastSector3Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector3Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector3Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector3Time, Precision.AUTO_LAPTIMES)), 0, null));
                 }
                 else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 2 && currentGameState.SessionData.LastSector1Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector1Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector1Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector1Time, Precision.AUTO_LAPTIMES)), 0, null));
                 }
                 else if (currentGameState != null && currentGameState.SessionData.SectorNumber == 3 && currentGameState.SessionData.LastSector2Time > -1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sector2Time",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector2Time, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LastSector2Time, Precision.AUTO_LAPTIMES)), 0, null));
                 }
                 else
                 {
@@ -958,7 +958,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.PlayerClassSessionBestLapTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("sessionFastestLaptime",
-                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.PlayerClassSessionBestLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(TimeSpanWrapper.FromSeconds(currentGameState.SessionData.PlayerClassSessionBestLapTime, Precision.AUTO_LAPTIMES)), 0, null));
                 }
                 else
                 {
@@ -970,7 +970,7 @@ namespace CrewChiefV4.Events
                 if (lastLapTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
-                        MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                        MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, null));
                     
                 }
                 else
@@ -1081,7 +1081,7 @@ namespace CrewChiefV4.Events
                             if (lastLapTime > 0)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
-                                    MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                    MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, null));
                             }
 
                             switch (lastLapSelfRating)
@@ -1200,17 +1200,17 @@ namespace CrewChiefV4.Events
                         if (lastLapTime > 0)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
-                                MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(lastLapTime, Precision.AUTO_LAPTIMES)), 0, null));
 
                             // We also neeed to announce how good it is.
                             List<MessageFragment> messages = new List<MessageFragment>();
                             switch (lastLapSelfRating)
                             {
                                 case LastLapRating.PERSONAL_BEST:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, null));
                                     break;
                                 case LastLapRating.CLOSE_TO_PERSONAL_BEST:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPaceOK, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPaceOK, 0, null));
                                     break;
                                 case LastLapRating.MEH:
                                     messages.Add(MessageFragment.Text(folderPaceBad));

@@ -293,7 +293,7 @@ namespace CrewChiefV4.Events
                 else if (timeLeft < 60)
                 {
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this));                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, null));                    
                 }
             }
             else
