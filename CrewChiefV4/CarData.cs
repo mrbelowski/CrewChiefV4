@@ -17,12 +17,12 @@ namespace CrewChiefV4
     {
         // some temperatures - maybe externalise these
         // These are the peaks. If the tyre exceeds these temps even for one tick over a lap, we'll warn about it. This is why they look so high
-        private static float maxColdRoadTyreTempPeak = 50;
+        private static float maxColdRoadTyreTempPeak = 40;
         private static float maxWarmRoadTyreTempPeak = 90;
         private static float maxHotRoadTyreTempPeak = 110;
 
         // very wide range for unknown tyres
-        private static float maxColdUnknownRaceTyreTempPeak = 70;
+        private static float maxColdUnknownRaceTyreTempPeak = 60;
         private static float maxWarmUnknownRaceTyreTempPeak = 117;
         private static float maxHotUnknownRaceTyreTempPeak = 137;
 
@@ -46,7 +46,7 @@ namespace CrewChiefV4
         private static float maxWarmUltraSoftTyreTempPeak = 95;
         private static float maxHotUltraSoftTyreTempPeak = 107;
 
-        private static float maxColdWetTyreTempPeak = 50;
+        private static float maxColdWetTyreTempPeak = 40;
         private static float maxWarmWetTyreTempPeak = 80;
         private static float maxHotWetTyreTempPeak = 105;
 
@@ -55,7 +55,7 @@ namespace CrewChiefV4
         private static float maxHotIntermediateTyreTempPeak = 110;
 
         // no idea about these - use similar thresholds to inters?
-        private static float maxColdAllTerrainTyreTempPeak = 60;
+        private static float maxColdAllTerrainTyreTempPeak = 50;
         private static float maxWarmAllTerrainTyreTempPeak = 95;
         private static float maxHotAllTerrainTyreTempPeak = 110;
 
@@ -69,7 +69,7 @@ namespace CrewChiefV4
         private static float maxHotSnowTyreTempPeak = 300;
         //
 
-        private static float maxColdBiasPlyTyreTempPeak = 70;
+        private static float maxColdBiasPlyTyreTempPeak = 60;
         private static float maxWarmBiasPlyTyreTempPeak = 103;
         private static float maxHotBiasPlyTyreTempPeak = 123;
 

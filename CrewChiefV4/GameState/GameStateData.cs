@@ -2163,6 +2163,7 @@ namespace CrewChiefV4.GameState
             if (!lapIsValid || !currentLapValid)
             {
                 currentLapValid = false;
+                isAlreadyBraking = false;
                 return;
             }
             if (!isAlreadyBraking && brakePedal > 0.1)
