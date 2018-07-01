@@ -491,7 +491,8 @@ namespace CrewChiefV4.Events
                                     {
                                         TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
                                         // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
-                                        if ((!disablePCarspracAndQualPoleDeltaReports || 
+                                        if (frequencyOfPlayerQualAndPracLapTimeReports > Utilities.random.NextDouble() * 10 &&
+                                            (!disablePCarspracAndQualPoleDeltaReports || 
                                             CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum ||
                                             CrewChief.gameDefinition.gameEnum == GameDefinition.iracing.gameEnum ||
                                             CrewChief.gameDefinition.gameEnum == GameDefinition.assetto32Bit.gameEnum ||
@@ -514,7 +515,8 @@ namespace CrewChiefV4.Events
                                     }
                                     // don't read this message if the rounded time gap is 0.0 seconds or it's more than 59 seconds
                                     // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
-                                    if ((!disablePCarspracAndQualPoleDeltaReports || CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum || 
+                                    if (frequencyOfPlayerQualAndPracLapTimeReports > Utilities.random.NextDouble() * 10 &&
+                                        (!disablePCarspracAndQualPoleDeltaReports || CrewChief.gameDefinition.gameEnum == GameDefinition.raceRoom.gameEnum || 
                                         CrewChief.gameDefinition.gameEnum == GameDefinition.iracing.gameEnum ||
                                         CrewChief.gameDefinition.gameEnum == GameDefinition.assetto32Bit.gameEnum ||
                                         CrewChief.gameDefinition.gameEnum == GameDefinition.assetto64Bit.gameEnum) &&
