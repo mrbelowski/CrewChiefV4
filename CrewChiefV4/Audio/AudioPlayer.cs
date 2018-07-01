@@ -884,6 +884,10 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         Console.WriteLine("Event " + eventName + " is no longer in the queue");
+                        if (CrewChief.Debugging)
+                        {
+                            Console.WriteLine("The " + (isImmediateMessages ? "immediate" : "regular") + " queue contains " + String.Join(", ", thisQueue.Keys));
+                        }
                     }
                 }
                 else
