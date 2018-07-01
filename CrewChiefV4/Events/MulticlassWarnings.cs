@@ -435,7 +435,7 @@ namespace CrewChiefV4.Events
                 if (opponentKey != null)
                 {
                     gotResponse = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, null));
                 }
             }
             else if (SpeechRecogniser.WHAT_CLASS_IS_CAR_BEHIND.Contains(voiceMessage))
@@ -444,7 +444,7 @@ namespace CrewChiefV4.Events
                 if (opponentKey != null)
                 {
                     gotResponse = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, null));
                 }
             }
             else if (SpeechRecogniser.IS_CAR_AHEAD_MY_CLASS.Contains(voiceMessage))
@@ -456,11 +456,11 @@ namespace CrewChiefV4.Events
                     CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
                     if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, null));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
                     }
                 }
             }
@@ -473,17 +473,17 @@ namespace CrewChiefV4.Events
                     CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
                     if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, null));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
                     }
                 }
             }
             if (!gotResponse)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
         }
 
