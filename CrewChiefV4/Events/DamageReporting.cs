@@ -612,16 +612,16 @@ namespace CrewChiefV4.Events
                 switch (lastReportedPunctureCorner)
                 {
                     case CornerData.Corners.FRONT_LEFT:
-                        damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, this));
+                        damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, null));
                         break;
                     case CornerData.Corners.FRONT_RIGHT:
-                        damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, this));
+                        damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, null));
                         break;
                     case CornerData.Corners.REAR_LEFT:
-                        damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, this));
+                        damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, null));
                         break;
                     case CornerData.Corners.REAR_RIGHT:
-                        damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, this));
+                        damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, null));
                         break;
                 }
                 QueuedMessage aero = getDamageMessage(Component.AERO, false);
@@ -652,7 +652,7 @@ namespace CrewChiefV4.Events
                 if (damageMessages.Count == 0)
                 {
                     // no damage
-                    damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, this));
+                    damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, null));
                 }
                 foreach (QueuedMessage message in damageMessages)
                 {

@@ -831,7 +831,7 @@ namespace CrewChiefV4.Events
             {
                 haveData = true;
                 if (useImmediateQueue)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, null));
                 else
                     this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this));
             }
@@ -949,11 +949,11 @@ namespace CrewChiefV4.Events
             // Report usage trend:
             var bu = this.EvaluateBatteryUse();
             if (bu == BatteryUseTrend.Decreasing)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, null));
             else if (bu == BatteryUseTrend.Increasing)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, null));
             else if (bu == BatteryUseTrend.Stable)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseStable), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseStable), 0, null));
 
             var midRaceReached = false;
             var batteryAdvice = BatteryAdvice.Unknown;
@@ -1045,13 +1045,13 @@ namespace CrewChiefV4.Events
             }
 
             if (batteryAdvice == BatteryAdvice.BatteryUseSpotOn)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderShouldMakeEnd : Battery.folderShouldMakeHalfDistance), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderShouldMakeEnd : Battery.folderShouldMakeHalfDistance), 0, null));
             else if (batteryAdvice == BatteryAdvice.IncreaseBatteryUse)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderIncreaseUseEasilyMakeEnd : Battery.folderIncreaseUseEasilyMakeHalfDistance), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderIncreaseUseEasilyMakeEnd : Battery.folderIncreaseUseEasilyMakeHalfDistance), 0, null));
             else if (batteryAdvice == BatteryAdvice.ReduceBatteryUse)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderReduceUseToMakeEnd : Battery.folderReduceUseHalfDistance), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderReduceUseToMakeEnd : Battery.folderReduceUseHalfDistance), 0, null));
             else if (batteryAdvice == BatteryAdvice.WontMakeItWithoutPitting)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderWontMakeEndWoPit : Battery.folderWontMakeHalfDistanceWoPit), 0, this));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderWontMakeEndWoPit : Battery.folderWontMakeHalfDistanceWoPit), 0, null));
         }
     }
 }
