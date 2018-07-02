@@ -494,7 +494,7 @@ namespace CrewChiefV4.iRacing
             //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
 
-            currentGameState.SessionData.NumCarsOverall = shared.Drivers.Count;
+            currentGameState.SessionData.NumCarsOverall = shared.PaceCarPresent ? shared.Drivers.Count - 1 : shared.Drivers.Count;
             //use qual position in race session position until we green and first lap has been started. 
             if ((currentGameState.SessionData.SessionPhase == SessionPhase.Formation || currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown || playerCar.Live.Lap < 1) && currentGameState.SessionData.SessionType == SessionType.Race)
@@ -556,7 +556,7 @@ namespace CrewChiefV4.iRacing
             currentGameState.PitData.InPitlane = shared.Telemetry.CarIdxOnPitRoad[PlayerCarIdx] || playerCar.Live.TrackSurface == TrackSurfaces.InPitStall;
 
             currentGameState.PitData.JumpedToPits = previousGameState != null && !previousGameState.PitData.IsApproachingPitlane && !previousGameState.PitData.JumpedToPits && currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane;
-
+            
             if (previousGameState != null)
             {
                 if (previousGameState.SessionData.SectorNumber == 2 && currentSector == 3)
@@ -570,7 +570,9 @@ namespace CrewChiefV4.iRacing
             }
 
             currentGameState.PitData.IsApproachingPitlane = playerCar.Live.TrackSurface == TrackSurfaces.AproachingPits && !currentGameState.PitData.InPitlane && currentGameState.SessionData.HasCompletedSector2ThisLap;
-            
+
+            currentGameState.PitData.IsInGarage = shared.Telemetry.IsInGarage;
+
             currentGameState.PitData.IsTeamRacing = shared.SessionData.IsTeamRacing;
 
             currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap;

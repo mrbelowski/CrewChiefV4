@@ -1716,6 +1716,8 @@ namespace CrewChiefV4.GameState
         public Boolean IsTeamRacing = false;
 
         public Boolean JumpedToPits = false;
+
+        public Boolean IsInGarage = false;
     }
 
     public class PenatiesData
