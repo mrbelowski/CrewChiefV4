@@ -282,7 +282,7 @@ namespace CrewChiefV4.Events
                     if (!reported)
                     {
                         // check the pass is still valid
-                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() ||
+                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() || currentGameState.PitData.InPitlane ||
                                 currentGameState.PositionAndMotionData.CarSpeed - carWeJustPassed.Speed > maxSpeedDifferenceForReportablePass)
                         {
                             opponentKeyForCarWeJustPassed = null;

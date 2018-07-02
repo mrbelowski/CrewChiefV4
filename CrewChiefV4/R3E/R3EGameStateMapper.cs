@@ -736,7 +736,6 @@ namespace CrewChiefV4.RaceRoom
 
                     if (currentGameState.PitData.InPitlane)
                     {
-                        currentGameState.SessionData.CurrentLapIsValid = false;
                         // the track sector number is nonsense when we're on an out lap
                         if (previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
@@ -1741,7 +1740,7 @@ namespace CrewChiefV4.RaceRoom
                             completedLapTime = sessionRunningTime - currentLapData.GameTimeAtLapStart;
                         }
                         opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, currentLapData.IsValid ? completedLapTime : -1, 
-                            false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            isInPits, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;
