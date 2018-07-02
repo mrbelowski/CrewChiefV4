@@ -603,10 +603,19 @@ namespace CrewChiefV4.PCars2
                 }
             }
 
-            if (shared.mLapInvalidated)
+            ePitMode pitMode = (ePitMode)shared.mPitMode;
+            currentGameState.PitData.InPitlane =
+                pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
+                pitMode == ePitMode.PIT_MODE_IN_PIT ||
+                pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
+                pitMode == ePitMode.PIT_MODE_IN_GARAGE ||
+                pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
+
+            if (shared.mLapInvalidated || currentGameState.PitData.InPitlane)
             {
-                if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0)
+                if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0 && !currentGameState.PitData.InPitlane)
                 {
+                    // log lap invalidation if we're not in the pits
                     Console.WriteLine("Invalidating lap " + (currentGameState.SessionData.CompletedLaps + 1) + " in sector " + currentGameState.SessionData.SectorNumber +
                         " at distance " + playerData.mCurrentLapDistance + " lap time " + shared.mmfOnly_mCurrentTime + " collision on this lap = " + collisionOnThisLap);
                 }
@@ -623,13 +632,15 @@ namespace CrewChiefV4.PCars2
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
                     currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.OverallPosition, shared.mCurrentSector1Times[playerIndex],
-                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
+                        shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
                 if (currentGameState.SessionData.SectorNumber == 3)
                 {
                     currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
                     currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.OverallPosition, shared.mCurrentSector2Times[playerIndex] + shared.mCurrentSector1Times[playerIndex],
-                        currentGameState.SessionData.SessionRunningTime, !shared.mLapInvalidated, shared.mRainDensity > 0, shared.mTrackTemperature, shared.mAmbientTemperature);
+                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
+                        shared.mTrackTemperature, shared.mAmbientTemperature);
                 }
             }
 
@@ -646,11 +657,6 @@ namespace CrewChiefV4.PCars2
                 loggedTrackLimitViolationOnThisLap = false;
                 collisionOnThisLap = false;
             }
-            ePitMode pitMode = (ePitMode)shared.mPitMode;
-            currentGameState.PitData.InPitlane = pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS ||
-                pitMode == ePitMode.PIT_MODE_IN_PIT ||
-                pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
-                pitMode == ePitMode.PIT_MODE_IN_GARAGE;
 
             if (previousGameState != null)
             {
