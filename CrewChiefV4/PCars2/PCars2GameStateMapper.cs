@@ -922,17 +922,21 @@ namespace CrewChiefV4.PCars2
 
             if (currentGameState.PitData.InPitlane)
             {
-                // should we just use the sector number to check this?
-                if (pitMode == ePitMode.PIT_MODE_DRIVING_INTO_PITS)
+                if (!previousGameState.PitData.InPitlane)
                 {
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
-                else if (pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS || pitMode == ePitMode.PIT_MODE_IN_GARAGE || pitMode == ePitMode.PIT_MODE_IN_PIT)
+                else if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.PitData.OnInLap = false;
                     currentGameState.PitData.OnOutLap = true;
                 }
+            }
+            else if (previousGameState.PitData.InPitlane)
+            {
+                currentGameState.PitData.OnOutLap = true;
+                currentGameState.PitData.OnInLap = false;
             }
             else if (currentGameState.SessionData.IsNewLap)
             {
