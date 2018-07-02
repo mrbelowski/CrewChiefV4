@@ -1706,7 +1706,6 @@ namespace CrewChiefV4.assetto
                 }
                 else if (currentGameState.SessionData.SectorNumber == 1)
                 {
-
                     currentGameState.PitData.OnInLap = false;
                     currentGameState.PitData.OnOutLap = true;
                 }
@@ -2084,7 +2083,7 @@ namespace CrewChiefV4.assetto
                         }
                         else
                         {
-                            opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime,
+                            opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime, isInPits,
                                 false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, ACSGameStateMapper.numberOfSectorsOnTrack);
                         }
                     }

@@ -399,7 +399,7 @@ namespace CrewChiefV4.Events
                         {
                             conditionsWindow.Insert(0, conditionsSample);
                         }
-                        if (lapIsValid)
+                        if (lapIsValid && !currentGameState.PitData.InPitlane)
                         {
                             Boolean playedLapTime = false;
                             if (isHotLappingOrLonePractice && reportAllLaptimesInHotlapMode)

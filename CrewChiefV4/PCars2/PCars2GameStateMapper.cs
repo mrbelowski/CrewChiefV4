@@ -611,9 +611,9 @@ namespace CrewChiefV4.PCars2
                 pitMode == ePitMode.PIT_MODE_IN_GARAGE ||
                 pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
 
-            if (shared.mLapInvalidated || currentGameState.PitData.InPitlane)
+            if (shared.mLapInvalidated)
             {
-                if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0 && !currentGameState.PitData.InPitlane)
+                if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0)
                 {
                     // log lap invalidation if we're not in the pits
                     Console.WriteLine("Invalidating lap " + (currentGameState.SessionData.CompletedLaps + 1) + " in sector " + currentGameState.SessionData.SectorNumber +
@@ -896,7 +896,7 @@ namespace CrewChiefV4.PCars2
                 currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.mLastLapTime).ToString(@"mm\:ss\.fff"));
                 currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.OverallPosition;
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        shared.mLastLapTime, currentGameState.SessionData.PreviousLapWasValid, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
+                        shared.mLastLapTime, currentGameState.SessionData.PreviousLapWasValid, currentGameState.PitData.InPitlane, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime, false, 

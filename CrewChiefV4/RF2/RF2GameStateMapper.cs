@@ -1430,6 +1430,7 @@ namespace CrewChiefV4.rFactor2
                             csd.SessionRunningTime,
                             opponent.LastLapTime,
                             lapValid,  // TODO: revisit
+                            vehicleScoring.mInPits == 1,
                             shared.scoring.mScoringInfo.mRaining > minRainThreshold,
                             (float)shared.scoring.mScoringInfo.mTrackTemp,
                             (float)shared.scoring.mScoringInfo.mAmbientTemp,
@@ -1958,6 +1959,7 @@ namespace CrewChiefV4.rFactor2
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
                         csd.CurrentLapIsValid,
+                        playerScoring.mInPits == 1,
                         scoring.mScoringInfo.mRaining > minRainThreshold,
                         (float)scoring.mScoringInfo.mTrackTemp,
                         (float)scoring.mScoringInfo.mAmbientTemp,
