@@ -659,18 +659,20 @@ namespace CrewChiefV4.iRacing
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
-                if (currentGameState.SessionData.IsNewLap || currentGameState.PitData.JumpedToPits)
-                {
-                    currentGameState.PitData.OnInLap = false;
-                    currentGameState.PitData.OnOutLap = true;
-                }
             }
-            else if (currentGameState.SessionData.IsNewLap)
+            if ((previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane) ||
+                currentGameState.PitData.JumpedToPits || (currentGameState.PitData.InPitlane && currentGameState.SessionData.IsNewLap))
+            {
+                currentGameState.PitData.OnInLap = false;
+                currentGameState.PitData.OnOutLap = true;
+            }
+            if (currentGameState.SessionData.IsNewLap && playerCar.Live.TrackSurface != TrackSurfaces.AproachingPits)
             {
                 // starting a new lap while not in the pitlane so clear the in / out lap flags
                 currentGameState.PitData.OnInLap = false;
                 currentGameState.PitData.OnOutLap = false;
             }
+
             if (previousGameState != null && currentGameState.PitData.OnOutLap && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
             {
                 currentGameState.PitData.IsAtPitExit = true;
