@@ -219,8 +219,10 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
                 if (currentGameState.SessionData.IsNewLap && !currentGameState.PitData.InPitlane && 
+                    !currentGameState.PitData.OnInLap &&
                     !previousGameState.PitData.OnOutLap &&
-                    currentGameState.SessionData.CompletedLaps > 1 && currentGameState.SessionData.PreviousLapWasValid)
+                    currentGameState.SessionData.CompletedLaps > 1 && 
+                    currentGameState.SessionData.PreviousLapWasValid)
                 {
                     hasPracticeLapForComparison = true;
                 }
