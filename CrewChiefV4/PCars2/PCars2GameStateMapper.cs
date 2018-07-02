@@ -928,7 +928,7 @@ namespace CrewChiefV4.PCars2
 
             if (currentGameState.PitData.InPitlane)
             {
-                if (!previousGameState.PitData.InPitlane)
+                if (previousGameState != null && !previousGameState.PitData.InPitlane)
                 {
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
@@ -939,7 +939,7 @@ namespace CrewChiefV4.PCars2
                     currentGameState.PitData.OnOutLap = true;
                 }
             }
-            else if (previousGameState.PitData.InPitlane)
+            else if (previousGameState == null || previousGameState.PitData.InPitlane)
             {
                 currentGameState.PitData.OnOutLap = true;
                 currentGameState.PitData.OnInLap = false;
