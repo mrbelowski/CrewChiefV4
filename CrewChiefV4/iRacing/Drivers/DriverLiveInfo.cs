@@ -74,7 +74,7 @@ namespace CrewChiefV4.iRacing
         public void ParseTelemetry(iRacingData e)
         {   
             this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
-            insertDummyLap = this.Lap < e.CarIdxLap[this.Driver.Id] && e.CarIdxLap[this.Driver.Id] > 0 && dummyInserted == false;
+            insertDummyLap = this.Lap < e.CarIdxLap[this.Driver.Id] && e.CarIdxLap[this.Driver.Id] > 0 && dummyInserted == false && this.Driver.IsCurrentDriver;
             this.Lap = e.CarIdxLap[this.Driver.Id];
             
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
