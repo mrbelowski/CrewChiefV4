@@ -437,6 +437,7 @@ namespace CrewChiefV4.GameState
 
         public StartType StartType = StartType.None;
 
+        public Boolean HasCompletedSector2ThisLap = false;
 
         public SessionData()
         {
