@@ -599,10 +599,6 @@ namespace CrewChiefV4.iRacing
                 Boolean lapValid = validSpeed && playerCar.Live.PreviousLapWasValid && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits;
                 if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
                 {
-                    currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.OverallPosition;
-
-                    currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         playerCar.Live.LapTimePrevious, lapValid, currentGameState.PitData.InPitlane, false, shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp,
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
