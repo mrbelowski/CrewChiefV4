@@ -472,18 +472,18 @@ namespace CrewChiefV4.GameState
                 restoreTo.PlayerBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
-        public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart)
+        public void playerStartNewLap(int lapNumber, int overallPosition, Boolean inPits, float gameTimeAtStart)
         {
             LapData thisLapData = new LapData();
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
-            thisLapData.PositionAtStart = position;
+            thisLapData.PositionAtStart = overallPosition;
             thisLapData.LapNumber = lapNumber;
             CurrentLapIsValid = true;
             PlayerLapData.Add(thisLapData);
         }
 
-        public void playerCompleteLapWithProvidedLapTime(int classPosition, float gameTimeAtLapEnd, float providedLapTime,
+        public void playerCompleteLapWithProvidedLapTime(int overallPosition, float gameTimeAtLapEnd, float providedLapTime,
             Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime,
             float sessionTimeRemaining, int numberOfSectors)
         {
@@ -493,12 +493,12 @@ namespace CrewChiefV4.GameState
             }
             CurrentLapIsValid = true;
             formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(providedLapTime).ToString(@"mm\:ss\.fff"));
-            PositionAtStartOfCurrentLap = classPosition;
+            PositionAtStartOfCurrentLap = overallPosition;
             LapData lapData = lapData = PlayerLapData[PlayerLapData.Count - 1];
             
             LapTimePreviousEstimateForInvalidLap = SessionRunningTime - SessionTimesAtEndOfSectors[numberOfSectors - 1];
             LapTimePrevious = providedLapTime;
-            playerAddCumulativeSectorData(numberOfSectors, classPosition, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            playerAddCumulativeSectorData(numberOfSectors, overallPosition, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             lapData.LapTime = providedLapTime;
             lapData.InLap = inPitLane;
 
@@ -528,16 +528,16 @@ namespace CrewChiefV4.GameState
                 }
             }                
         }
-        
 
-        public void playerAddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime,
+
+        public void playerAddCumulativeSectorData(int sectorNumberJustCompleted, int overallPosition, float cumulativeSectorTime,
             float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
         {
             SessionTimesAtEndOfSectors[sectorNumberJustCompleted] = gameTimeAtSectorEnd;
             LapData lapData;
             if (PlayerLapData.Count == 0)
             {
-                playerStartNewLap(0, position, true, -1);
+                playerStartNewLap(0, overallPosition, true, -1);
                 lapData = PlayerLapData[0];
                 lapData.hasMissingSectors = true;
                 lapData.IsValid = false;
@@ -617,7 +617,7 @@ namespace CrewChiefV4.GameState
                 }
             }
             lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
-            lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+            lapData.SectorPositions[sectorNumberJustCompleted - 1] = overallPosition;
             lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
             lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
             if (lapData.IsValid && !lapIsValid)

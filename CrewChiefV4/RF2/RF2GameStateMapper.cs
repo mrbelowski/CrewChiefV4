@@ -127,6 +127,7 @@ namespace CrewChiefV4.rFactor2
         public static bool pluginVerified = false;
         public override void versionCheck(Object memoryMappedFileStruct)
         {
+            /*
             if (RF2GameStateMapper.pluginVerified)
                 return;
 
@@ -176,7 +177,7 @@ namespace CrewChiefV4.rFactor2
                 var msg = "rFactor 2 Shared Memory version: " + versionStr + " 64bit."
                     + (shared.extended.mHostedPluginVars.StockCarRules_IsHosted != 0 ? ("  Stock Car Rules plugin hosted. (DFT:" + shared.extended.mHostedPluginVars.StockCarRules_DoubleFileType + ")")  : "");
                 Console.WriteLine(msg);
-            }
+            }*/
         }
         
         // Abrupt session detection variables.
