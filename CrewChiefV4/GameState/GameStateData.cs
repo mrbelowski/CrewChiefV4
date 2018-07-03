@@ -2462,8 +2462,7 @@ namespace CrewChiefV4.GameState
                 }
                 // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
                 if (this.WaitingForNewLapData && 
-                    ((previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry) || 
-                        previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime))
+                    (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry))
                 {
                     // the timer has expired or we have new data
                     this.WaitingForNewLapData = false;
