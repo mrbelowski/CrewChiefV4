@@ -173,7 +173,8 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
                 return false;
             }
-            if (rejectMessagesWhenTalking 
+            if (rejectMessagesWhenTalking
+                && soundMetadata.type != SoundType.VOICE_COMMAND_RESPONSE
                 && SpeechRecogniser.waitingForSpeech 
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
