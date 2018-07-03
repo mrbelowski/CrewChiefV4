@@ -3346,5 +3346,17 @@ namespace CrewChiefV4.Properties {
                 this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool iracing_enable_auto_fuel_to_end_of_race {
+            get {
+                return ((bool)(this["iracing_enable_auto_fuel_to_end_of_race"]));
+            }
+            set {
+                this["iracing_enable_auto_fuel_to_end_of_race"] = value;
+            }
+        }
     }
 }

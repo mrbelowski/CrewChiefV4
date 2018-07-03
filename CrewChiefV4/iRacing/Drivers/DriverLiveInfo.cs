@@ -17,6 +17,8 @@ namespace CrewChiefV4.iRacing
             _prevSector = -1;
             LiveLapsCompleted = -1;
             LapsCompleted = -1;
+            insertDummyLap = false;
+            dummyInserted = false;
             this.Sectors = new[]
                     {
                         new Sector() {Number = 0, StartPercentage = 0f},
@@ -65,13 +67,16 @@ namespace CrewChiefV4.iRacing
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
-        private int _prevLap;
+        private int _prevLap = 0;
         private int _prevSector;
-
+        private Boolean insertDummyLap;
+        private Boolean dummyInserted;
         public void ParseTelemetry(iRacingData e)
         {   
             this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
+            insertDummyLap = this.Lap < e.CarIdxLap[this.Driver.Id] && e.CarIdxLap[this.Driver.Id] > 0 && dummyInserted == false && this.Driver.IsCurrentDriver;
             this.Lap = e.CarIdxLap[this.Driver.Id];
+            
             this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
             if (this._prevSector == 3 && (this.CurrentSector == 1) || 
                 (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
@@ -88,9 +93,12 @@ namespace CrewChiefV4.iRacing
             {
                 this._prevSector = this.CurrentSector;
             }
-            
-            if (_driver.CurrentResults.LapsComplete > this.LapsCompleted)
+            if (_driver.CurrentResults.LapsComplete > this.LapsCompleted || insertDummyLap)
             {
+                if(insertDummyLap)
+                {
+                    dummyInserted = true;
+                }
                 this.IsNewLap = true;
             }
             else
