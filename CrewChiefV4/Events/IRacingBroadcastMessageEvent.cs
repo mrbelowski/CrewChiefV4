@@ -90,6 +90,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+            {
+                return;
+            }
             lastColdFLPressure = (int)currentGameState.TyreData.FrontLeftPressure;
             lastColdFRPressure = (int)currentGameState.TyreData.FrontRightPressure;
             lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
@@ -102,7 +106,7 @@ namespace CrewChiefV4.Events
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
-            if(autoFuelToEnd && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
+            if(autoFuelToEnd)
             {
                 if(previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane
                     && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 15 
