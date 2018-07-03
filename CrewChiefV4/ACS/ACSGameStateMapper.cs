@@ -51,8 +51,6 @@ namespace CrewChiefV4.assetto
         private static string expectedVersion = "1.7";
         private static string expectedPluginVersion = "1.0.0";
 
-        public List<LapData> playerLapData = new List<LapData>();
-
         private int lapCountAtSector1End = -1;
 
         // next track conditions sample due after:
@@ -931,8 +929,6 @@ namespace CrewChiefV4.assetto
                         lastSessionTrack == null || lastSessionTrack.name != currentGameState.SessionData.TrackDefinition.name ||
                             (currentGameState.SessionData.SessionHasFixedTime && sessionTimeRemaining > lastSessionTimeRemaining + 1))))
             {
-
-                playerLapData.Clear();
                 Console.WriteLine("New session, trigger...");
                 if (sessionOfSameTypeRestarted)
                 {
