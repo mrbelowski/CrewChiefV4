@@ -621,41 +621,41 @@ namespace CrewChiefV4.PCars2
                 }
                 currentGameState.SessionData.CurrentLapIsValid = false;
             }
-            if (currentGameState.SessionData.IsNewSector)
-            {
-                if (currentGameState.SessionData.SectorNumber == 1)
-                {
-                    currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = currentGameState.SessionData.SessionRunningTime - currentGameState.SessionData.SessionTimesAtEndOfSectors[3];
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[3] = currentGameState.SessionData.SessionRunningTime;
-                }
-                else if (currentGameState.SessionData.SectorNumber == 2)
-                {
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[1] = currentGameState.SessionData.SessionRunningTime;
-                    currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.OverallPosition, shared.mCurrentSector1Times[playerIndex],
-                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
-                        shared.mTrackTemperature, shared.mAmbientTemperature);
-                }
-                if (currentGameState.SessionData.SectorNumber == 3)
-                {
-                    currentGameState.SessionData.SessionTimesAtEndOfSectors[2] = currentGameState.SessionData.SessionRunningTime;
-                    currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.OverallPosition, shared.mCurrentSector2Times[playerIndex] + shared.mCurrentSector1Times[playerIndex],
-                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
-                        shared.mTrackTemperature, shared.mAmbientTemperature);
-                }
-            }
 
             currentGameState.SessionData.Flag = mapToFlagEnum(shared.mHighestFlagColour);
             currentGameState.SessionData.NumCarsOverall = shared.mNumParticipants;
-            currentGameState.SessionData.IsNewLap = previousGameState == null || 
-                currentGameState.SessionData.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
-                (currentGameState.SessionData.SessionType == SessionType.Practice &&
-                    currentGameState.SessionData.SectorNumber == 1 && previousGameState.SessionData.SectorNumber == 3);
+            currentGameState.SessionData.IsNewLap = previousGameState != null &&
+                (currentGameState.SessionData.CompletedLaps == previousGameState.SessionData.CompletedLaps + 1 ||
+                  (currentGameState.SessionData.SessionType == SessionType.Practice &&
+                      currentGameState.SessionData.SectorNumber == 1 && previousGameState.SessionData.SectorNumber == 3));
+
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.readLandmarksForThisLap = false;
                 loggedPossibleTrackLimitViolationOnThisLap = false;
                 loggedTrackLimitViolationOnThisLap = false;
                 collisionOnThisLap = false;
+
+                currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
+                        shared.mLastLapTime, currentGameState.SessionData.CurrentLapIsValid, currentGameState.PitData.InPitlane, shared.mRainDensity > 0, 
+                        shared.mTrackTemperature, shared.mAmbientTemperature, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
+                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
+            }
+            else if (currentGameState.SessionData.IsNewSector)
+            {
+                if (currentGameState.SessionData.SectorNumber == 2)
+                {
+                    currentGameState.SessionData.playerAddCumulativeSectorData(1, currentGameState.SessionData.OverallPosition, shared.mCurrentSector1Times[playerIndex],
+                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
+                        shared.mTrackTemperature, shared.mAmbientTemperature);
+                }
+                else if (currentGameState.SessionData.SectorNumber == 3)
+                {
+                    currentGameState.SessionData.playerAddCumulativeSectorData(2, currentGameState.SessionData.OverallPosition, shared.mCurrentSector2Times[playerIndex] + shared.mCurrentSector1Times[playerIndex],
+                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid, shared.mRainDensity > 0,
+                        shared.mTrackTemperature, shared.mAmbientTemperature);
+                }
             }
 
             if (previousGameState != null)
@@ -887,44 +887,6 @@ namespace CrewChiefV4.PCars2
 
             currentGameState.sortClassPositions();
             currentGameState.setPracOrQualiDeltas();
-
-            currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
-            if (currentGameState.SessionData.IsNewLap)
-            {
-                currentGameState.SessionData.PreviousLapWasValid = previousGameState != null && previousGameState.SessionData.CurrentLapIsValid;
-                currentGameState.SessionData.CurrentLapIsValid = true;
-                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(shared.mLastLapTime).ToString(@"mm\:ss\.fff"));
-                currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.OverallPosition;
-                currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        shared.mLastLapTime, currentGameState.SessionData.PreviousLapWasValid, currentGameState.PitData.InPitlane, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
-                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
-                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
-                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime, false, 
-                    shared.mTrackTemperature, shared.mAmbientTemperature);
-            }
-            else if (previousGameState != null)
-            {
-                currentGameState.SessionData.PreviousLapWasValid = previousGameState.SessionData.PreviousLapWasValid;
-            }
-
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
-                currentGameState.SessionData.LapTimePrevious > 0)
-            {
-                if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
-                     currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
-                {
-                    if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
-                        currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.OverallSessionBestLapTime)
-                    {
-                        currentGameState.SessionData.OverallSessionBestLapTime = currentGameState.SessionData.LapTimePrevious;
-                    }
-                    if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
-                        currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerClassSessionBestLapTime)
-                    {
-                        currentGameState.SessionData.PlayerClassSessionBestLapTime = currentGameState.SessionData.LapTimePrevious;
-                    }
-                }
-            }
 
             if (currentGameState.PitData.InPitlane)
             {

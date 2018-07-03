@@ -360,7 +360,7 @@ namespace CrewChiefV4.GameState
         public int LapsDeltaBehind = -1;
 
         // 0 means we don't know what sector we're in. This is 1-indexed
-        public int SectorNumber = 0;
+        public int SectorNumber = 1;
 
         public Boolean IsNewSector = false;
 
@@ -472,130 +472,159 @@ namespace CrewChiefV4.GameState
                 restoreTo.PlayerBestLapTimeByTyre.Add(entry.Key, entry.Value);
         }
 
-        public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart, Boolean isRaining, float trackTemp, float airTemp)
+        public void playerStartNewLap(int lapNumber, int position, Boolean inPits, float gameTimeAtStart)
         {
             LapData thisLapData = new LapData();
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
             thisLapData.PositionAtStart = position;
             thisLapData.LapNumber = lapNumber;
+            CurrentLapIsValid = true;
             PlayerLapData.Add(thisLapData);
         }
 
-        public void playerCompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid, Boolean inPitLane, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+        public void playerCompleteLapWithProvidedLapTime(int classPosition, float gameTimeAtLapEnd, float providedLapTime,
+            Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime,
+            float sessionTimeRemaining, int numberOfSectors)
         {
-            if (PlayerLapData.Count > 0)
+            if (PlayerLapData.Count == 0)
             {
-                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
-                if (PlayerLapData.Count == 1 || !lapData.hasMissingSectors)
-                {
-                    playerAddCumulativeSectorData(numberOfSectors, position, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
-                    lapData.LapTime = providedLapTime;
-                    lapData.InLap = inPitLane;
-
-                    LapTimePrevious = providedLapTime;
-                    if (lapData.IsValid && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
-                    {
-                        PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
-                        PlayerLapTimeSessionBest = lapData.LapTime;
-
-                        PlayerBestLapSector1Time = lapData.SectorTimes[0];
-                        PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                        PlayerBestLapSector3Time = lapData.SectorTimes[2];
-                    }
-                }
-                else
-                {
-                    PlayerLapData.Remove(lapData);
-                }
-                PreviousLapWasValid = lapData.IsValid;
+                return;
             }
-        }
+            CurrentLapIsValid = true;
+            formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(providedLapTime).ToString(@"mm\:ss\.fff"));
+            PositionAtStartOfCurrentLap = classPosition;
+            LapData lapData = lapData = PlayerLapData[PlayerLapData.Count - 1];
+            
+            LapTimePreviousEstimateForInvalidLap = SessionRunningTime - SessionTimesAtEndOfSectors[numberOfSectors - 1];
+            LapTimePrevious = providedLapTime;
+            playerAddCumulativeSectorData(numberOfSectors, classPosition, providedLapTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
+            lapData.LapTime = providedLapTime;
+            lapData.InLap = inPitLane;
 
-        public void playerAddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, 
-            Boolean isRaining, float trackTemp, float airTemp)
-        {
-            if (PlayerLapData.Count > 0)
+            LapTimePrevious = providedLapTime;
+            if (lapData.IsValid && !lapData.OutLap && !lapData.InLap && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
             {
-                LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
+                PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                PlayerLapTimeSessionBest = lapData.LapTime;
 
-                if (cumulativeSectorTime <= 0)
+                PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                if (numberOfSectors > 2)
                 {
-                    cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
+                    PlayerBestLapSector3Time = lapData.SectorTimes[2];
                 }
-                float thisSectorTime;
-                if (sectorNumberJustCompleted == 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
+            }
+            PreviousLapWasValid = lapData.IsValid;
+            if (PreviousLapWasValid && LapTimePrevious > 0 && PlayerLapTimeSessionBest == -1 || LapTimePrevious == PlayerLapTimeSessionBest)
+            {
+                if (OverallSessionBestLapTime == -1 || LapTimePrevious < OverallSessionBestLapTime)
                 {
-                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0] - lapData.SectorTimes[1];
+                    OverallSessionBestLapTime = LapTimePrevious;
                 }
-                else if (sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] > 0)
+                if (PlayerClassSessionBestLapTime == -1 || LapTimePrevious < PlayerClassSessionBestLapTime)
                 {
-                    thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+                    PlayerClassSessionBestLapTime = LapTimePrevious;
                 }
-                else if (sectorNumberJustCompleted == 1)
+            }                
+        }
+        
+
+        public void playerAddCumulativeSectorData(int sectorNumberJustCompleted, int position, float cumulativeSectorTime,
+            float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        {
+            SessionTimesAtEndOfSectors[sectorNumberJustCompleted] = gameTimeAtSectorEnd;
+            LapData lapData;
+            if (PlayerLapData.Count == 0)
+            {
+                playerStartNewLap(0, position, true, -1);
+                lapData = PlayerLapData[0];
+                lapData.hasMissingSectors = true;
+                lapData.IsValid = false;
+                lapIsValid = false;
+            }
+            else
+            {
+                lapData = PlayerLapData[PlayerLapData.Count - 1];
+            }
+            if (cumulativeSectorTime <= 0 && gameTimeAtSectorEnd > 0 && lapData.GameTimeAtLapStart > 0)
+            {
+                cumulativeSectorTime = gameTimeAtSectorEnd - lapData.GameTimeAtLapStart;
+            }
+            float thisSectorTime;
+            if (cumulativeSectorTime > 0 && sectorNumberJustCompleted == 3 && lapData.SectorTimes[0] > 0 && lapData.SectorTimes[1] > 0)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0] - lapData.SectorTimes[1];
+            }
+            else if (cumulativeSectorTime > 0 && sectorNumberJustCompleted == 2 && lapData.SectorTimes[0] > 0)
+            {
+                thisSectorTime = cumulativeSectorTime - lapData.SectorTimes[0];
+            }
+            else if (cumulativeSectorTime > 0 && sectorNumberJustCompleted == 1)
+            {
+                thisSectorTime = cumulativeSectorTime;
+            }
+            else
+            {
+                // we don't have enough data to calculate this sector time - given that we always drop back to calculated cumulative sector
+                // times when the provided time <= 0, this should only happen if we've never actually completed a previous sector. So it's
+                // safe to assume any sector < 0 means missing data.
+                thisSectorTime = -1;
+                lapData.hasMissingSectors = true;
+                lapData.IsValid = false;
+                lapIsValid = false;
+            }
+            if (lapIsValid && thisSectorTime > 0)
+            {
+                if (sectorNumberJustCompleted == 1)
                 {
-                    thisSectorTime = cumulativeSectorTime;
-                }
-                else
-                {
-                    // we don't have enough data to calculate this sector time - given that we always drop back to calculated cumulative sector
-                    // times when the provided time <= 0, this should only happen if we've never actually completed a previous sector. So it's
-                    // safe to assume any sector < 0 means missing data.
-                    thisSectorTime = -1;
-                    lapData.hasMissingSectors = true;
-                }
-                if (lapIsValid && thisSectorTime > 0)
-                {
-                    if(sectorNumberJustCompleted == 1)
-                    {
-                        LastSector1Time = thisSectorTime;
-                    }
-                    if (sectorNumberJustCompleted == 2)
-                    {
-                        LastSector2Time = thisSectorTime;
-                    }
-                    if (sectorNumberJustCompleted == 3)
-                    {
-                        LastSector3Time = thisSectorTime;
-                    }
-                    if (sectorNumberJustCompleted == 1 && (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time))
+                    LastSector1Time = thisSectorTime;
+                    if (PlayerBestSector1Time == -1 || thisSectorTime < PlayerBestSector1Time)
                     {
                         PlayerBestSector1Time = thisSectorTime;
                     }
-                    if (sectorNumberJustCompleted == 2 && (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time))
+                }
+                else if (sectorNumberJustCompleted == 2)
+                {
+                    LastSector2Time = thisSectorTime;
+                    if (PlayerBestSector2Time == -1 || thisSectorTime < PlayerBestSector2Time)
                     {
                         PlayerBestSector2Time = thisSectorTime;
                     }
-                    if (sectorNumberJustCompleted == 3 && (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time))
+                }
+                else if (sectorNumberJustCompleted == 3)
+                {
+                    LastSector3Time = thisSectorTime;
+                    if (PlayerBestSector3Time == -1 || thisSectorTime < PlayerBestSector3Time)
                     {
                         PlayerBestSector3Time = thisSectorTime;
                     }
-                }
-                else
+                }                    
+            }
+            else
+            {
+                if (sectorNumberJustCompleted == 1)
                 {
-                    if (sectorNumberJustCompleted == 1)
-                    {
-                        LastSector1Time = -1;
-                    }
-                    if (sectorNumberJustCompleted == 2)
-                    {
-                        LastSector2Time = -1;
-                    }
-                    if (sectorNumberJustCompleted == 3)
-                    {
-                        LastSector3Time = -1;
-                    }
+                    LastSector1Time = -1;
                 }
-                lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
-                lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
-                lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
-                lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
-                if (lapData.IsValid && !lapIsValid)
+                else if (sectorNumberJustCompleted == 2)
                 {
-                    lapData.IsValid = false;
+                    LastSector2Time = -1;
+                }
+                else if (sectorNumberJustCompleted == 3)
+                {
+                    LastSector3Time = -1;
                 }
             }
+            lapData.SectorTimes[sectorNumberJustCompleted - 1] = thisSectorTime;
+            lapData.SectorPositions[sectorNumberJustCompleted - 1] = position;
+            lapData.GameTimeAtSectorEnd[sectorNumberJustCompleted - 1] = gameTimeAtSectorEnd;
+            lapData.Conditions[sectorNumberJustCompleted - 1] = new LapConditions(isRaining, trackTemp, airTemp);
+            if (lapData.IsValid && !lapIsValid)
+            {
+                lapData.IsValid = false;
+            }
+            
         }
 
         public float[] getPlayerTimeAndSectorsForBestLap(bool ignoreLast)
@@ -2432,7 +2461,9 @@ namespace CrewChiefV4.GameState
                     this.GameTimeWhenLastCrossedStartFinishLine = previousGameState.GameTimeWhenLastCrossedStartFinishLine;
                 }
                 // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
-                if (this.WaitingForNewLapData && (previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry) || previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime)
+                if (this.WaitingForNewLapData && 
+                    ((previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime || this.Now > this.NewLapDataTimerExpiry) || 
+                        previousGameState.SessionData.LapTimePrevious != gameProvidedLastLapTime))
                 {
                     // the timer has expired or we have new data
                     this.WaitingForNewLapData = false;

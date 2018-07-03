@@ -1006,8 +1006,7 @@ namespace CrewChiefV4.PCars
                         shared.mLastLapTime, currentGameState.SessionData.PreviousLapWasValid, currentGameState.PitData.InPitlane, false, shared.mTrackTemperature, shared.mAmbientTemperature, 
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
-                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime, false, 
-                    shared.mTrackTemperature, shared.mAmbientTemperature);
+                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
             }
             else if (previousGameState != null)
             {

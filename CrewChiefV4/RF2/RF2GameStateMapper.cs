@@ -1972,10 +1972,7 @@ namespace CrewChiefV4.rFactor2
                     csd.CompletedLaps + 1,
                     csd.OverallPosition,
                     playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
-                    csd.SessionRunningTime,
-                    scoring.mScoringInfo.mRaining > minRainThreshold,
-                    (float)scoring.mScoringInfo.mTrackTemp,
-                    (float)scoring.mScoringInfo.mAmbientTemp);
+                    csd.SessionRunningTime);
             }
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
