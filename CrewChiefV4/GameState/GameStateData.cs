@@ -494,7 +494,7 @@ namespace CrewChiefV4.GameState
             CurrentLapIsValid = true;
             formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(providedLapTime).ToString(@"mm\:ss\.fff"));
             PositionAtStartOfCurrentLap = overallPosition;
-            LapData lapData = lapData = PlayerLapData[PlayerLapData.Count - 1];
+            LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
             
             LapTimePreviousEstimateForInvalidLap = SessionRunningTime - SessionTimesAtEndOfSectors[numberOfSectors - 1];
             LapTimePrevious = providedLapTime;
