@@ -641,80 +641,91 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            if (previousGameState != null && currentGameState.SessionData.SessionType == SessionType.Race)
+            if (previousGameState != null)
             {
-                if ((!previousGameState.PitData.IsApproachingPitlane
-                    && currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING) 
-                    // Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
-                    || currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING 
-                    && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0)
+                if (currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    timeStartedAppoachingPitsCheck = DateTime.MaxValue;
-                    timeSpeedInPitsWarning = currentGameState.Now;
+                    if ((!previousGameState.PitData.IsApproachingPitlane
+                        && currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+                        // Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
+                        || currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING
+                        && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0)
+                    {
+                        timeStartedAppoachingPitsCheck = DateTime.MaxValue;
+                        timeSpeedInPitsWarning = currentGameState.Now;
 
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
-                }
-                if(!previousGameState.PitData.IsApproachingPitlane
-                    && currentGameState.PitData.IsApproachingPitlane && timeStartedAppoachingPitsCheck == DateTime.MaxValue)
-                {
-                    timeStartedAppoachingPitsCheck = currentGameState.Now + TimeSpan.FromSeconds(1);
-                }
-                // different logic for PCars2 pit-crew-ready checks
-                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
-                {
-                    if (!previousGameState.PitData.PitStallOccupied && currentGameState.PitData.PitStallOccupied)
-                    {
-                        audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
-                        warnedAboutOccupiedPitOnThisLap = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                     }
-                    if (currentGameState.SessionData.SectorNumber == 3 && 
-                        previousGameState.SessionData.SectorNumber == 2 &&
-                        currentGameState.PitData.HasRequestedPitStop)
+                    if (!previousGameState.PitData.IsApproachingPitlane
+                        && currentGameState.PitData.IsApproachingPitlane && timeStartedAppoachingPitsCheck == DateTime.MaxValue)
                     {
-                        if (currentGameState.PitData.PitStallOccupied)
+                        timeStartedAppoachingPitsCheck = currentGameState.Now + TimeSpan.FromSeconds(1);
+                    }
+                    // different logic for PCars2 pit-crew-ready checks
+                    if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                    {
+                        if (!previousGameState.PitData.PitStallOccupied && currentGameState.PitData.PitStallOccupied)
                         {
-                            if (!warnedAboutOccupiedPitOnThisLap)
+                            audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                            warnedAboutOccupiedPitOnThisLap = true;
+                        }
+                        if (currentGameState.SessionData.SectorNumber == 3 &&
+                            previousGameState.SessionData.SectorNumber == 2 &&
+                            currentGameState.PitData.HasRequestedPitStop)
+                        {
+                            if (currentGameState.PitData.PitStallOccupied)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
-                                warnedAboutOccupiedPitOnThisLap = true;
+                                if (!warnedAboutOccupiedPitOnThisLap)
+                                {
+                                    audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this));
+                                    warnedAboutOccupiedPitOnThisLap = true;
+                                }
+                            }
+                            else
+                            {
+                                audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
                             }
                         }
-                        else
-                        {
-                            audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
-                        }
+                    }
+                    else if (!previousGameState.PitData.IsPitCrewReady
+                        && currentGameState.PitData.IsPitCrewReady)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
+                    }
+                    if (!previousGameState.PitData.IsPitCrewDone
+                        && currentGameState.PitData.IsPitCrewDone)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                    }
+                    if (!previousGameState.PitData.HasRequestedPitStop
+                        && currentGameState.PitData.HasRequestedPitStop
+                        && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
+                    {
+                        timeOfPitRequestOrCancel = currentGameState.Now;
+                        // respond immediately to this request
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
+                    }
+                    // don't play pit request cancelled in pCars2 because the request often cancels itself for no reason at all (other than pcars2 being a mess)
+                    // - the pit crew may or may not be ready for you when this happens. It's just one of the many mysteries of pCars2.
+                    if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2_NETWORK
+                        && !currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
+                        && previousGameState.PitData.HasRequestedPitStop
+                        && !currentGameState.PitData.HasRequestedPitStop
+                        && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
+                    {
+                        timeOfPitRequestOrCancel = currentGameState.Now;
+                        audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this));
                     }
                 }
-                else if (!previousGameState.PitData.IsPitCrewReady
-                    && currentGameState.PitData.IsPitCrewReady)
-                {
-                    audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this));
-                }
-                if (!previousGameState.PitData.IsPitCrewDone
-                    && currentGameState.PitData.IsPitCrewDone)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
-                }
-                if (!previousGameState.PitData.HasRequestedPitStop
-                    && currentGameState.PitData.HasRequestedPitStop
-                    && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
+                else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
+                    !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop && 
+                      (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                 {
                     timeOfPitRequestOrCancel = currentGameState.Now;
                     // respond immediately to this request
-                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestReceived, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                 }
-                // don't play pit request cancelled in pCars2 because the request often cancels itself for no reason at all (other than pcars2 being a mess)
-                // - the pit crew may or may not be ready for you when this happens. It's just one of the many mysteries of pCars2.
-                if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2_NETWORK
-                    && !currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
-                    && previousGameState.PitData.HasRequestedPitStop
-                    && !currentGameState.PitData.HasRequestedPitStop
-                    && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
-                {
-                    timeOfPitRequestOrCancel = currentGameState.Now;
-                    audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this));
-                }
-            }
+            }            
         }
 
         public override void respond(String voiceMessage)

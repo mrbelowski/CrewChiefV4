@@ -897,9 +897,6 @@ namespace CrewChiefV4.rFactor2
                     csd.formattedPlayerLapTimes.Add(lt);
             }
 
-            if (csd.IsNewLap && csd.LapTimePrevious > 0)
-                csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
             csd.LeaderSectorNumber = leaderScoring.mSector == 0 ? 3 : leaderScoring.mSector;
             csd.TimeDeltaFront = (float)Math.Abs(playerScoring.mTimeBehindNext);
@@ -1972,10 +1969,7 @@ namespace CrewChiefV4.rFactor2
                     csd.CompletedLaps + 1,
                     csd.OverallPosition,
                     playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
-                    csd.SessionRunningTime,
-                    scoring.mScoringInfo.mRaining > minRainThreshold,
-                    (float)scoring.mScoringInfo.mTrackTemp,
-                    (float)scoring.mScoringInfo.mAmbientTemp);
+                    csd.SessionRunningTime);
             }
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {
