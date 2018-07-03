@@ -360,7 +360,7 @@ namespace CrewChiefV4.GameState
         public int LapsDeltaBehind = -1;
 
         // 0 means we don't know what sector we're in. This is 1-indexed
-        public int SectorNumber = 1;
+        public int SectorNumber = 0;
 
         public Boolean IsNewSector = false;
 
