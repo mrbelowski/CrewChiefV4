@@ -897,9 +897,6 @@ namespace CrewChiefV4.rFactor2
                     csd.formattedPlayerLapTimes.Add(lt);
             }
 
-            if (csd.IsNewLap && csd.LapTimePrevious > 0)
-                csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
             csd.LeaderSectorNumber = leaderScoring.mSector == 0 ? 3 : leaderScoring.mSector;
             csd.TimeDeltaFront = (float)Math.Abs(playerScoring.mTimeBehindNext);

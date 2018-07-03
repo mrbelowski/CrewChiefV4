@@ -423,10 +423,6 @@ namespace CrewChiefV4.rFactor1
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
                 }
             }
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
-            {
-                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-            }
             currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor1Constant.rfFinishStatus.finished;
             currentGameState.SessionData.LeaderSectorNumber = leader.sector == 0 ? 3 : leader.sector;
             currentGameState.SessionData.TimeDeltaFront = Math.Abs(player.timeBehindNext);
