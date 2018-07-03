@@ -192,7 +192,8 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (waitingForValidDataForBenchmark)
+            if (waitingForValidDataForBenchmark && (currentGameState.SessionData.IsNewLap ||
+                (currentGameState.SessionData.IsNewSector && previousGameState.SessionData.SectorNumber == 1)))
             {
                 if (currentGameState.SessionData.TrackDefinition.name != trackNameForLastPitstopTiming ||
                     !CarData.IsCarClassEqual(currentGameState.carClass, carClassForLastPitstopTiming))

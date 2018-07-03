@@ -637,7 +637,6 @@ namespace CrewChiefV4.RaceRoom
                             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         }
                     }
-
                     if (currentGameState.SessionData.CurrentLapIsValid && (participantStruct.CurrentLapValid != 1 || participantStruct.LapTimeCurrentSelf == -1))
                     {
                         currentGameState.SessionData.CurrentLapIsValid = false;
