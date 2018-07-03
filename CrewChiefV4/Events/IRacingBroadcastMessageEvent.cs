@@ -102,7 +102,7 @@ namespace CrewChiefV4.Events
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
-            if(autoFuelToEnd)
+            if(autoFuelToEnd && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
             {
                 if(previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane
                     && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 15 
