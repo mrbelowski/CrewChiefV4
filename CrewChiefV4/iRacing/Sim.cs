@@ -20,6 +20,7 @@ namespace CrewChiefV4.iRacing
             _raceSessionInProgress = false;
             _leaderFinished = null;
             _gameTimeWhenWhiteFlagTriggered = -1.0;
+            _paceCarPresent = false;
         }
 
         enum RaceEndState {NONE, WAITING_TO_CROSS_LINE, FINISHED}
@@ -50,6 +51,9 @@ namespace CrewChiefV4.iRacing
         private Driver _paceCar;
         public Driver PaceCar { get { return _paceCar; } }
 
+        private Boolean _paceCarPresent;
+        public Boolean PaceCarPresent { get { return _paceCarPresent; } }
+
         private readonly List<Driver> _drivers;
         public List<Driver> Drivers { get { return _drivers; } }
 
@@ -72,6 +76,8 @@ namespace CrewChiefV4.iRacing
                 Console.WriteLine("Reloading Drivers");
                 _drivers.Clear();
                 _driver = null;
+                _paceCar = null;
+                _paceCarPresent = false;
             }
 
             // Assume max 70 drivers
@@ -83,7 +89,7 @@ namespace CrewChiefV4.iRacing
                 {
                     driver = Driver.FromSessionInfo(sessionInfo, id, DriverId);
 
-                    if (driver == null || driver.IsPacecar)
+                    if (driver == null)
                     {
                         continue;
                     }
@@ -100,7 +106,12 @@ namespace CrewChiefV4.iRacing
                 {
                     _driver = driver;
                     _driver.IsCurrentDriver = true;
-                }                
+                }
+                if (driver.IsPaceCar)
+                {
+                    _paceCar = driver;
+                    _paceCarPresent = true;
+                }
             }
         }
 
@@ -131,7 +142,7 @@ namespace CrewChiefV4.iRacing
                 // Find driver and update results
                 int id = int.Parse(idValue);
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
-                if (driver != null)
+                if (driver != null && !driver.IsPaceCar)
                 {                   
                     driver.CurrentResults.QualifyingPosition = position + 1;
                 }
@@ -154,7 +165,7 @@ namespace CrewChiefV4.iRacing
                 int id = int.Parse(idValue);
 
                 var driver = _drivers.SingleOrDefault(d => d.Id == id);
-                if (driver != null)
+                if (driver != null && !driver.IsPaceCar)
                 {
                     driver.UpdateResultsInfo(sessionInfo, _currentSessionNumber.Value, position);
                 }
@@ -230,7 +241,7 @@ namespace CrewChiefV4.iRacing
                 // Correct the distances
                 foreach (var driver in _drivers)
                 {
-                    if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                    if (driver.IsSpectator || driver.IsPaceCar || driver.CurrentResults.IsOut)
                     {
                         continue;
                     }
@@ -247,12 +258,12 @@ namespace CrewChiefV4.iRacing
                     // See if leading driver crossed s/f line after race time expired.
                     foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                     {
-                        if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                        if (driver.IsSpectator || driver.IsPaceCar || driver.CurrentResults.IsOut)
                         {
                             continue;
                         }
 
-                        if (driver.Id == this._driver.Id)
+                        if (driver.IsCurrentDriver)
                         {
                             // It appears that player s/f crossing time is set before the actual s/f crossing.  So, for player "Finished" state 
                             // rely on logic that waits for new lap crossing.
@@ -275,7 +286,7 @@ namespace CrewChiefV4.iRacing
                     if (_leaderFinished != null 
                         && driver.Live.GameTimeWhenLastCrossedSFLine >= _leaderFinished.Live.GameTimeWhenLastCrossedSFLine)
                     {
-                        if (driver.Id == this._driver.Id)
+                        if (driver.IsCurrentDriver || driver.IsPaceCar)
                         {
                             // It appears that player s/f crossing time is set before the actual s/f crossing.  So, for player "Finished" state 
                             // rely on logic that waits for new lap crossing.
@@ -321,7 +332,7 @@ namespace CrewChiefV4.iRacing
                 int pos = 1;
                 foreach (var driver in _drivers.OrderByDescending(d => d.Live.TotalLapDistanceCorrected))
                 {
-                    if (driver.IsSpectator || driver.IsPacecar || driver.CurrentResults.IsOut)
+                    if (driver.IsSpectator || driver.IsPaceCar || driver.CurrentResults.IsOut)
                     {
                         driver.Live.Position = 1001;  // Make it obvious those guys are not tracked.
                         continue;
@@ -355,7 +366,7 @@ namespace CrewChiefV4.iRacing
                 // In P or Q, set live position from result position (== best lap according to iRacing)
                 foreach (var driver in _drivers)
                 {
-                    if (driver.IsSpectator || driver.IsPacecar)
+                    if (driver.IsSpectator || driver.IsPaceCar)
                     {
                         driver.Live.Position = 1001;  // Make it obvious those guys are not tracked.
                         continue;

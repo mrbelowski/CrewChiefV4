@@ -192,7 +192,6 @@ namespace CrewChiefV4.GameState
         public float LastImpactTime = -1.0f;
     }
 
-
     public enum FrozenOrderPhase
     {
         None,
@@ -236,6 +235,13 @@ namespace CrewChiefV4.GameState
 
         // Meters/s.  If -1, SC either left or not present.
         public float SafetyCarSpeed = -1.0f;
+    }
+
+    public enum StartType
+    {
+        None,
+        Standing,
+        Rolling
     }
 
     public class SessionData
@@ -428,6 +434,10 @@ namespace CrewChiefV4.GameState
         public int StrengthOfField = 0;
 
         public Boolean IsLastLap = false;
+
+        public StartType StartType = StartType.None;
+
+        public Boolean HasCompletedSector2ThisLap = false;
 
         public SessionData()
         {
@@ -1706,6 +1716,10 @@ namespace CrewChiefV4.GameState
         public float PitBoxPositionEstimate = -1.0f;
 
         public Boolean IsTeamRacing = false;
+
+        public Boolean JumpedToPits = false;
+
+        public Boolean IsInGarage = false;
     }
 
     public class PenatiesData

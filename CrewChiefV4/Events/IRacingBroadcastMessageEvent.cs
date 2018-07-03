@@ -22,6 +22,8 @@ namespace CrewChiefV4.Events
         private PressureUnit pressureUnit = UserSettings.GetUserSettings().getBoolean("iracing_pit_tyre_pressure_in_psi") ?
             PressureUnit.PSI : PressureUnit.KPA;
 
+        private Boolean autoFuelToEnd = UserSettings.GetUserSettings().getBoolean("iracing_enable_auto_fuel_to_end_of_race");
+
         public static String folderYouHave = "incidents/you_have";
 
         public static String folderincidents = "incidents/incidents";
@@ -100,6 +102,39 @@ namespace CrewChiefV4.Events
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
+            if(autoFuelToEnd)
+            {
+                if(previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane
+                    && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 15 
+                    && !previousGameState.PitData.IsInGarage && !currentGameState.PitData.JumpedToPits)
+                {
+                    Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
+                    int litresNeeded = fuelEvent.getLitresToEndOfRace();
+
+                    if (litresNeeded == -1)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    }
+                    else if (litresNeeded == 0)
+                    {
+                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
+                    }
+                    else if (litresNeeded > 0)
+                    {
+                        AddFuel(litresNeeded);
+                        Console.WriteLine("Auto refuel to the end of the race, adding " + litresNeeded + " liters of fuel");                        
+                        if (litresNeeded > (int)fuelCapacity)
+                        {
+                            // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
+                            audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
+                        }
+                        else
+                        {
+                            audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
+                        }
+                    }
+                }
+            }
 /*
             if (hasLimitedIncidents)
             {

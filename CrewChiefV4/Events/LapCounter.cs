@@ -406,6 +406,10 @@ namespace CrewChiefV4.Events
                 // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
                 GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
             }
+            /*else if (currentGameState.SessionData.StartType == StartType.Rolling)
+            {
+
+            }*/
             else
             {
                 // nasty... 2 separate code paths here - one for the existing pre-lights logic which is a ball of spaghetti I don't fancy unpicking, 
@@ -438,11 +442,13 @@ namespace CrewChiefV4.Events
                                 //      Allow messages for countdown phase for any game
                                 //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
                                 //      Allow messages for formation phase for Raceroom
+                                //      Allow messages for formation phase for iRacing
                                 //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
                                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
                                         currentGameState.SessionData.SectorNumber == 3)))
                                 {
@@ -471,7 +477,7 @@ namespace CrewChiefV4.Events
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
                         {
                             purgePreLightsMessages = true;
                         }
