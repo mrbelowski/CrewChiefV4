@@ -724,7 +724,6 @@ namespace CrewChiefV4.PCars2
                             currentGameState.OpponentData.Remove(participantName);
                             continue;
                         }
-                        CarData.CarClass opponentCarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
 
                         OpponentData currentOpponentData = null;
                         if (currentGameState.OpponentData.TryGetValue(participantName, out currentOpponentData))
@@ -796,7 +795,7 @@ namespace CrewChiefV4.PCars2
                                             new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] }, previousOpponentWorldPosition,
                                             shared.mSpeeds[i], shared.mWorldFastestLapTime, shared.mWorldFastestSector1Time, shared.mWorldFastestSector2Time, shared.mWorldFastestSector3Time, 
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
-                                            shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
+                                            shared.mAmbientTemperature, shared.mTrackTemperature,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                             lastSectorTime, shared.mLapsInvalidated[i] == 1, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
 
@@ -815,6 +814,7 @@ namespace CrewChiefV4.PCars2
                                     if (currentOpponentData.IsNewLap)
                                     {
                                         currentOpponentData.trackLandmarksTiming.cancelWaitingForLandmarkEnd();
+                                        currentOpponentData.CarClass = CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i));
                                     }
                                     if (currentOpponentData.IsNewLap && currentOpponentData.CurrentBestLapTime > 0)
                                     {
@@ -856,7 +856,7 @@ namespace CrewChiefV4.PCars2
                         {
                             if (participantStruct.mIsActive && participantName != null && participantName.Length > 0)
                             {
-                                addOpponentForName(participantName, createOpponentData(participantStruct, true, opponentCarClass,
+                                addOpponentForName(participantName, createOpponentData(participantStruct, true, CarData.getCarClassForClassName(StructHelper.getCarClassName(shared, i)),
                                     participantStruct.mName != null && participantStruct.mName[0] != 0, currentGameState.SessionData.TrackDefinition.trackLength), currentGameState);
                             }
                         }
@@ -1301,7 +1301,7 @@ namespace CrewChiefV4.PCars2
             Boolean isInPits, Boolean isLeavingPits,
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
-            float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
+            float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, 
             Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
@@ -1315,7 +1315,6 @@ namespace CrewChiefV4.PCars2
             }
             opponentData.WorldPosition = currentWorldPosition;
             opponentData.IsNewLap = false;
-            opponentData.CarClass = carClass;
             opponentData.JustEnteredPits = !opponentData.InPits && (isInPits || isEnteringPits);
             if (opponentData.JustEnteredPits)
             {
