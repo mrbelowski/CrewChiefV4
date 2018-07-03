@@ -71,7 +71,7 @@ namespace CrewChiefV4.Events
         private float lastAndFirstSectorTimesOnStop = -1;
 
         // an extra check for practice sessions. We only allow the pit benchmark calculation if we've completed
-        // a valid lap that's not our first la and is not a lap where we visited the pits. This prevents the app
+        // a valid lap that's not our first lap and is not a lap where we visited the pits. This prevents the app
         // using the line lap or outlap for its comparison data
         private Boolean hasPracticeLapForComparison = false;
 
@@ -192,7 +192,8 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (waitingForValidDataForBenchmark)
+            if (waitingForValidDataForBenchmark && (currentGameState.SessionData.IsNewLap ||
+                (currentGameState.SessionData.IsNewSector && previousGameState.SessionData.SectorNumber == 1)))
             {
                 if (currentGameState.SessionData.TrackDefinition.name != trackNameForLastPitstopTiming ||
                     !CarData.IsCarClassEqual(currentGameState.carClass, carClassForLastPitstopTiming))

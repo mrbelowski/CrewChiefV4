@@ -599,10 +599,6 @@ namespace CrewChiefV4.iRacing
                 Boolean lapValid = validSpeed && playerCar.Live.PreviousLapWasValid && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits;
                 if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
                 {
-                    currentGameState.SessionData.PositionAtStartOfCurrentLap = currentGameState.SessionData.OverallPosition;
-
-                    currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(playerCar.Live.LapTimePrevious).ToString(@"mm\:ss\.fff"));
-
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         playerCar.Live.LapTimePrevious, lapValid, currentGameState.PitData.InPitlane, false, shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp,
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
@@ -627,8 +623,7 @@ namespace CrewChiefV4.iRacing
             if (currentGameState.SessionData.PlayerLapData.Count == 0 || currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
-                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, playerCar.Live.GameTimeWhenLastCrossedSFLine, false,
-                    shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp);
+                    currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, playerCar.Live.GameTimeWhenLastCrossedSFLine);
             }
 
             currentGameState.PositionAndMotionData.DistanceRoundTrack = currentGameState.SessionData.TrackDefinition != null ? Math.Abs(currentGameState.SessionData.TrackDefinition.trackLength * playerCar.Live.CorrectedLapDistance) : -1.0f;
