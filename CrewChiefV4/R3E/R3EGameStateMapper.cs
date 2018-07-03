@@ -688,7 +688,6 @@ namespace CrewChiefV4.RaceRoom
 
                     if (currentGameState.PitData.InPitlane)
                     {
-                        // the track sector number is nonsense when we're on an out lap
                         if (previousGameState != null && !previousGameState.PitData.InPitlane)
                         {
                             if (currentGameState.SessionData.SessionRunningTime > 30 && currentGameState.SessionData.SessionType == SessionType.Race)
@@ -698,20 +697,23 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.PitData.OnInLap = true;
                             currentGameState.PitData.OnOutLap = false;
                         }
+                        else if (currentGameState.SessionData.IsNewLap)
+                        {
+                            currentGameState.PitData.OnInLap = false;
+                            currentGameState.PitData.OnOutLap = true;
+                        }
                     }
                     else if (previousGameState != null && previousGameState.PitData.InPitlane)
                     {
                         currentGameState.PitData.OnInLap = false;
                         currentGameState.PitData.OnOutLap = true;
-                        currentGameState.SessionData.PreviousLapWasValid = false;
-                        currentGameState.SessionData.CurrentLapIsValid = false;
                         currentGameState.PitData.IsAtPitExit = true;
                     }
                     else if (currentGameState.SessionData.IsNewLap)
                     {
                         // starting a new lap while not in the pitlane so clear the in / out lap flags
                         currentGameState.PitData.OnInLap = false;
-                        currentGameState.PitData.OnOutLap = false;                        
+                        currentGameState.PitData.OnOutLap = false;
                     }
                     break;
                 }

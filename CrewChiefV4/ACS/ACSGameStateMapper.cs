@@ -1568,16 +1568,26 @@ namespace CrewChiefV4.assetto
 
             if (currentGameState.PitData.InPitlane)
             {
-                if (currentGameState.SessionData.SectorNumber == ACSGameStateMapper.numberOfSectorsOnTrack)
+                if (previousGameState != null && !previousGameState.PitData.InPitlane)
                 {
+                    if (currentGameState.SessionData.SessionRunningTime > 30 && currentGameState.SessionData.SessionType == SessionType.Race)
+                    {
+                        currentGameState.PitData.NumPitStops++;
+                    }
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
-                else if (currentGameState.SessionData.SectorNumber == 1)
+                else if (currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.PitData.OnInLap = false;
                     currentGameState.PitData.OnOutLap = true;
                 }
+            }
+            else if (previousGameState != null && previousGameState.PitData.InPitlane)
+            {
+                currentGameState.PitData.OnInLap = false;
+                currentGameState.PitData.OnOutLap = true;
+                currentGameState.PitData.IsAtPitExit = true;
             }
             else if (currentGameState.SessionData.IsNewLap)
             {
@@ -1585,6 +1595,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.PitData.OnInLap = false;
                 currentGameState.PitData.OnOutLap = false;
             }
+
             if (previousGameState != null && currentGameState.PitData.OnOutLap && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
             {
                 currentGameState.PitData.IsAtPitExit = true;

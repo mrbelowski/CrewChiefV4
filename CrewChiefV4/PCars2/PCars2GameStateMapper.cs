@@ -892,6 +892,10 @@ namespace CrewChiefV4.PCars2
             {
                 if (previousGameState != null && !previousGameState.PitData.InPitlane)
                 {
+                    if (currentGameState.SessionData.SessionRunningTime > 30 && currentGameState.SessionData.SessionType == SessionType.Race)
+                    {
+                        currentGameState.PitData.NumPitStops++;
+                    }
                     currentGameState.PitData.OnInLap = true;
                     currentGameState.PitData.OnOutLap = false;
                 }
@@ -901,19 +905,18 @@ namespace CrewChiefV4.PCars2
                     currentGameState.PitData.OnOutLap = true;
                 }
             }
-            else if (previousGameState == null || previousGameState.PitData.InPitlane)
+            else if (previousGameState != null && previousGameState.PitData.InPitlane)
             {
-                currentGameState.PitData.OnOutLap = true;
                 currentGameState.PitData.OnInLap = false;
+                currentGameState.PitData.OnOutLap = true;
+                currentGameState.PitData.IsAtPitExit = true;
             }
             else if (currentGameState.SessionData.IsNewLap)
             {
+                // starting a new lap while not in the pitlane so clear the in / out lap flags
                 currentGameState.PitData.OnInLap = false;
                 currentGameState.PitData.OnOutLap = false;
             }
-
-            currentGameState.PitData.IsAtPitExit = previousGameState != null && currentGameState.PitData.OnOutLap && 
-                previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane;
 
             ePitSchedule pitShedule = (ePitSchedule)shared.mPitSchedule;
             if (pitShedule == ePitSchedule.PIT_SCHEDULE_NONE)
