@@ -610,7 +610,6 @@ namespace CrewChiefV4.PCars2
                 pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_PITS ||
                 pitMode == ePitMode.PIT_MODE_IN_GARAGE ||
                 pitMode == ePitMode.PIT_MODE_DRIVING_OUT_OF_GARAGE;
-
             if (shared.mLapInvalidated)
             {
                 if (currentGameState.SessionData.CurrentLapIsValid && currentGameState.SessionData.CompletedLaps > 0)
