@@ -1444,7 +1444,7 @@ namespace CrewChiefV4
             }
         }
 
-        private void initialiseSpeechEngine()
+        private bool initialiseSpeechEngine()
         {
             try
             {
@@ -1459,6 +1459,24 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to create speech engine, error message: " + e.Message);
                 runListenForChannelOpenThread = false;
             }
+            //make sure we disable everything that might have been enabled in case speech engine fails
+            if (!crewChief.speechRecogniser.initialised)
+            {
+                
+                voiceDisableButton.Checked = true;
+                runListenForChannelOpenThread = false;
+                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
+                voiceOption = VoiceOptionEnum.DISABLED;
+
+                // Turns out saving prefs takes 5% of main thread time on startup, so don't do it
+                // as we just read this from prefs.
+                if (!this.constructingWindow)
+                {
+                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                    UserSettings.GetUserSettings().saveUserSettings();
+                }
+            }
+            return crewChief.speechRecogniser.initialised;
         }
 
         private void assignButton()
@@ -1471,9 +1489,11 @@ namespace CrewChiefV4
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen() && voiceOption != VoiceOptionEnum.DISABLED;
                 if (runListenForChannelOpenThread)
                 {
-                    initialiseSpeechEngine();
-                }
-                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+                    if(initialiseSpeechEngine())
+                    {
+                        runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+                    }
+                }                
             }
             else
             {
@@ -1583,7 +1603,6 @@ namespace CrewChiefV4
                 runListenForChannelOpenThread = false;
                 runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
                 voiceOption = VoiceOptionEnum.DISABLED;
-
                 // Turns out saving prefs takes 5% of main thread time on startup, so don't do it
                 // as we just read this from prefs.
                 if (!this.constructingWindow)
@@ -1597,15 +1616,21 @@ namespace CrewChiefV4
         {
             if (((RadioButton)sender).Checked)
             {
-                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
                 try
                 {
-                    initialiseSpeechEngine();
-                    crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
-                    voiceOption = VoiceOptionEnum.HOLD;
-                    runListenForChannelOpenThread = true;
-                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
-                    UserSettings.GetUserSettings().saveUserSettings();
+                    if(initialiseSpeechEngine())
+                    {
+                        runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
+                        crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.HOLD;
+                        voiceOption = VoiceOptionEnum.HOLD;
+                        runListenForChannelOpenThread = true;
+                        UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                    else
+                    {
+                        ((RadioButton)sender).Checked = false;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1617,15 +1642,22 @@ namespace CrewChiefV4
         {
             if (((RadioButton)sender).Checked)
             {
-                runListenForButtonPressesThread = true;
-                runListenForChannelOpenThread = false;
                 try
                 {
-                    initialiseSpeechEngine();
-                    crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
-                    voiceOption = VoiceOptionEnum.TOGGLE;
-                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
-                    UserSettings.GetUserSettings().saveUserSettings();
+                    if(initialiseSpeechEngine())
+                    {
+                        runListenForButtonPressesThread = true;
+                        runListenForChannelOpenThread = false;
+                        crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TOGGLE;
+                        voiceOption = VoiceOptionEnum.TOGGLE;
+                        UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                    else
+                    {
+                        ((RadioButton)sender).Checked = false;
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -1637,15 +1669,22 @@ namespace CrewChiefV4
         {
             if (((RadioButton)sender).Checked)
             {
-                runListenForChannelOpenThread = false;
-                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
                 try
                 {
-                    initialiseSpeechEngine();
-                    crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
-                    voiceOption = VoiceOptionEnum.ALWAYS_ON;
-                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
-                    UserSettings.GetUserSettings().saveUserSettings();
+                    if(initialiseSpeechEngine())
+                    {
+                        runListenForChannelOpenThread = false;
+                        runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
+                        crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
+                        voiceOption = VoiceOptionEnum.ALWAYS_ON;
+                        UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                    else
+                    {
+                        ((RadioButton)sender).Checked = false;
+                    }
+
                 }
                 catch (Exception ex)
                 {
