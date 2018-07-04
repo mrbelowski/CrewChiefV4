@@ -684,6 +684,7 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
                     currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
                     currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
+                    currentGameState.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
                     currentGameState.Conditions.samples = previousGameState.Conditions.samples;
                     currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
@@ -745,7 +746,6 @@ namespace CrewChiefV4.PCars
                 }
             }
             currentGameState.SessionData.LapTimeCurrent = shared.mCurrentTime;
-            currentGameState.SessionData.LapTimePrevious = shared.mLastLapTime;
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
