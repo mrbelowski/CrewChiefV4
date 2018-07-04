@@ -8,6 +8,8 @@ using CrewChiefV4.Events;
 using System.Threading;
 using CrewChiefV4.Audio;
 using CrewChiefV4.commands;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace CrewChiefV4
 {
@@ -24,7 +26,7 @@ namespace CrewChiefV4
         private bool keepRecording = true;
         //
 
-        private String location = UserSettings.GetUserSettings().getString("speech_recognition_location");
+        private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
@@ -32,7 +34,7 @@ namespace CrewChiefV4
         private Boolean enable_iracing_pit_stop_commands = UserSettings.GetUserSettings().getBoolean("enable_iracing_pit_stop_commands");
         private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
-        private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
+        private static String localeSREConfigSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
@@ -396,10 +398,124 @@ namespace CrewChiefV4
             }
         }
 
-        private void initWithLocale(String locale)
+        private Tuple<String, String> parseLocalePropertyValue(String value)
         {
-            cultureInfo = new System.Globalization.CultureInfo(locale);
-            this.sre = new SpeechRecognitionEngine(cultureInfo);
+            if (value != null && value.Length > 1)
+            {
+                if (value.Length == 2)
+                {
+                    return new Tuple<String, String>(value.ToLowerInvariant(), null);
+                }
+                if (value.Length == 4)
+                {
+                    return new Tuple<String, String>(value.Substring(0, 2).ToLowerInvariant(), value.Substring(2).ToUpperInvariant());
+                }
+                if (value.Length == 5)
+                {
+                    return new Tuple<String, String>(value.Substring(0, 2).ToLowerInvariant(), value.Substring(3).ToUpperInvariant());
+                }
+            }
+            return new Tuple<String, String>(null, null);
+        }
+
+        private Boolean initWithLocale()
+        {
+            String overrideCountry = null;
+            if(localeCountryPropertySetting != null && localeCountryPropertySetting.Length == 2)
+            {
+                overrideCountry = localeCountryPropertySetting.ToUpper();
+            }
+            Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(localeSREConfigSetting);
+            String sreConfigLang = sreConfigLangAndCountry.Item1;
+            String sreConfigCountry = sreConfigLangAndCountry.Item2;
+            RecognizerInfo info = null;
+
+            String langToUse = sreConfigLang;
+            String countryToUse = overrideCountry != null ? overrideCountry : sreConfigCountry;            
+            String langAndCountryToUse = countryToUse != null ? langToUse + "-" + countryToUse : null;
+
+            if (langAndCountryToUse != null)
+            {
+                Console.WriteLine("Attempting to get recogniser for " + langAndCountryToUse);
+                foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
+                {
+                    if (ri.Culture.Name.Equals(langAndCountryToUse))
+                    {
+                        info = ri;
+                        cultureInfo = ri.Culture;
+                        break;
+                    }
+                }
+            }
+            if (info == null)
+            {
+                if (langAndCountryToUse != null)
+                {
+                    Console.WriteLine("Failed to get recogniser for " + langAndCountryToUse);
+                }
+                Console.WriteLine("Attempting to get recogniser for " + langToUse);
+                foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
+                {
+                    if (ri.Culture.TwoLetterISOLanguageName.Equals(langToUse))
+                    {
+                        info = ri;
+                        cultureInfo = ri.Culture;
+                        break;
+                    }
+                }
+            }
+
+            if (info != null)
+            {
+                Console.WriteLine(info.Culture.EnglishName + " - (" + info.Culture.Name + ")");
+                this.sre = new SpeechRecognitionEngine(info);
+                return this.sre != null;
+            }
+            if (countryToUse == null)
+            {
+                if (langToUse == "en")
+                {
+                    if (MessageBox.Show(Configuration.getUIString("install_any_speechlanguage_popup_text"), Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
+                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                    }
+                    Console.WriteLine("Unable to initialise speech engine with English voice recognition pack. " +
+                    "Check that at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " +
+                    "MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi are installed." +
+                    " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                } 
+                else
+                {
+                    if (MessageBox.Show(Configuration.getUIString("install_single_speechlanguage_popup_text_start") + langToUse +
+                    Configuration.getUIString("install_single_speechlanguage_popup_text_end"),
+                    Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
+                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                    }
+                    Console.WriteLine("Unable to initialise speech engine with '" + langToUse + "' voice recognition pack. " +
+                    "Check that and appropriate language pack is installed." +
+                    " They can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                }
+                
+                return false;
+            }
+            else
+            {
+                if (MessageBox.Show(Configuration.getUIString("install_single_speechlanguage_popup_text_start") + langAndCountryToUse +
+                    Configuration.getUIString("install_single_speechlanguage_popup_text_end"),
+                    Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                {
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                }
+                Console.WriteLine("Unable to initialise speech engine with voice recognition pack for location " + langAndCountryToUse +
+                    ". Check MSSpeech_SR_" + langAndCountryToUse + "_TELE.msi is installed." +
+                    " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                
+                return false;
+            }            
         }
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
@@ -432,45 +548,45 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
-            if (useNAudio) {
+            if (useNAudio)
+            {
                 buffer = new RingBufferStream.RingBufferStream(48000);
                 waveIn = new NAudio.Wave.WaveInEvent();
                 waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
+            //try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
+            //catch it and tell user to go download.
+            try
+            {                
+                new SpeechRecognitionEngine();                    
+            }
+            catch (Exception e)
+            {
+                if (MessageBox.Show(Configuration.getUIString("install_speechplatform_popup_text"), Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                {
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27225");
+                }
+                Console.WriteLine("Unable to initialise speech engine. Check that SpeechPlatformRuntime.msi is installed. It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27225");
+                Console.WriteLine("Exception message: " + e.Message);
+                return;
+            }
 
-            if (location != null && location.Length > 0)
+            //this is not likely to throw but we try to catch it anyways. 
+            try
             {
-                try
+                if (!initWithLocale())
                 {
-                    Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
-                    initWithLocale(location);
-                    Console.WriteLine("Success");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to initialise speech engine with voice recognition pack for location " + location +
-                        ". Check that SpeechPlatformRuntime.msi and MSSpeech_SR_" + location + "_TELE.msi are installed.");
-                    Console.WriteLine("Exception message: " + e.Message);
                     return;
                 }
+                Console.WriteLine("Success");
             }
-            else
+            catch (Exception e)
             {
-                try
-                {
-                    Console.WriteLine("Attempting to initialise speech recognition for any English locale");
-                    initWithLocale(defaultLocale);
-                    Console.WriteLine("Success");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to initialise speech engine with the OS's default English voice recognition pack (location name " + defaultLocale + "). " +
-                        "Check that SpeechPlatformRuntime.msi and at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " +
-                        "MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi are installed.");
-                    Console.WriteLine("Exception message: " + e.Message);
-                    return;
-                }
+                Console.WriteLine("Unable to initialise speech engine.");
+                Console.WriteLine("Exception message: " + e.Message);
             }
+           
             try
             {
                 if (useNAudio)

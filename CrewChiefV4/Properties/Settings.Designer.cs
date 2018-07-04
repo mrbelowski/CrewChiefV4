@@ -109,13 +109,13 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("en")]
-        public string speech_recognition_location {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string speech_recognition_country {
             get {
-                return ((string)(this["speech_recognition_location"]));
+                return ((string)(this["speech_recognition_country"]));
             }
             set {
-                this["speech_recognition_location"] = value;
+                this["speech_recognition_country"] = value;
             }
         }
         
