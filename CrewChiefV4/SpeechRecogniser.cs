@@ -403,7 +403,7 @@ namespace CrewChiefV4
             RecognizerInfo info = null;
             foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
             {
-                if (ri.Culture.TwoLetterISOLanguageName.Equals("en") && locale.Length == 2)
+                if (ri.Culture.TwoLetterISOLanguageName.Equals(defaultLocale) && locale.Length == 2)
                 {
                     info = ri;
                     cultureInfo = ri.Culture;
@@ -513,9 +513,9 @@ namespace CrewChiefV4
                 locationToUse = location;
                 Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
                 //fix possible user error in user defined locale
-                if (location.Length == 2 && !location.Equals("en"))
+                if (location.Length == 2 && !location.Equals(defaultLocale))
                 {
-                    locationToUse = "en-" + location;
+                    locationToUse = defaultLocale  + "-" + location;
                 }
             }
             else
