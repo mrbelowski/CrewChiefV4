@@ -483,6 +483,14 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
+            if (useNAudio)
+            {
+                buffer = new RingBufferStream.RingBufferStream(48000);
+                waveIn = new NAudio.Wave.WaveInEvent();
+                waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
+            }
+            //try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
+            //catch it and tell user to go download.
             try
             {                
                 new SpeechRecognitionEngine();                    
@@ -498,17 +506,13 @@ namespace CrewChiefV4
                 Console.WriteLine("Exception message: " + e.Message);
                 return;
             }
-            if (useNAudio) 
-            {
-                buffer = new RingBufferStream.RingBufferStream(48000);
-                waveIn = new NAudio.Wave.WaveInEvent();
-                waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
-            }
+
             String locationToUse = defaultLocale;
             if (location != null && location.Length > 0)
             {
                 locationToUse = location;
                 Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
+                //fix possible user error in user defined locale
                 if (location.Length == 2 && !location.Equals("en"))
                 {
                     locationToUse = "en-" + location;
@@ -518,6 +522,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Attempting to initialise speech recognition for any English locale");
             }
+            //this is not likely to throw but we try to catch it anyways. 
             try
             {
                 if (!initWithLocale(locationToUse))
