@@ -200,9 +200,6 @@ namespace CrewChiefV4
 
         public Boolean initialised = false;
 
-        //this is needed if the user for some odd reason have decided to uninstall SpeechPlatformRuntime.msi after having activated speech recognition, in this case the app trys to init twise.
-        public Boolean failedSpeechEngineOnce = false;
-
         public MainWindow.VoiceOptionEnum voiceOptionEnum;
 
         private List<String> driverNamesInUse = new List<string>();
@@ -486,10 +483,6 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
-            if (failedSpeechEngineOnce)
-            {
-                return;
-            }
             try
             {                
                 new SpeechRecognitionEngine();                    
@@ -501,9 +494,8 @@ namespace CrewChiefV4
                 {
                     Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27225");
                 }
-                Console.WriteLine("Unable to initialise speech engine. Check that SpeechPlatformRuntime.msi is installed.");
+                Console.WriteLine("Unable to initialise speech engine. Check that SpeechPlatformRuntime.msi is installed. It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27225");
                 Console.WriteLine("Exception message: " + e.Message);
-                //failedSpeechEngineOnce = true;
                 return;
             }
             if (useNAudio) 
