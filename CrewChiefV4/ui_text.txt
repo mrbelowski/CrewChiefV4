@@ -436,7 +436,7 @@ enable_spotter_help = The Spotter can be enabled and disabled with a button. Thi
 enable_spotter_category = SPOTTER
 
 speech_recognition_location = Speech recognition locale
-speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be en-[something].
+speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be ex. en-GB, en-US, it-IT, fr-FR etc.
 speech_recognition_location_category = AUDIO_VOICE_AND_CONTROLLERS
 
 spotter_car_length = Spotter car length
