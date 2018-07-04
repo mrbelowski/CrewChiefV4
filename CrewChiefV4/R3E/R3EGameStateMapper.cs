@@ -1006,21 +1006,6 @@ namespace CrewChiefV4.RaceRoom
                 {
                     currentGameState.SessionData.PlayerBestLapTimeByTyre[currentGameState.TyreData.FrontLeftTyreType] = currentGameState.SessionData.LapTimePrevious;
                 }
-                if ((currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
-                     currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerLapTimeSessionBest))
-                {
-                    currentGameState.SessionData.PlayerLapTimeSessionBest = currentGameState.SessionData.LapTimePrevious;
-                    if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
-                        currentGameState.SessionData.OverallSessionBestLapTime > currentGameState.SessionData.PlayerLapTimeSessionBest)
-                    {
-                        currentGameState.SessionData.OverallSessionBestLapTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                    }
-                    if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
-                        currentGameState.SessionData.PlayerClassSessionBestLapTime > currentGameState.SessionData.PlayerLapTimeSessionBest)
-                    {
-                        currentGameState.SessionData.PlayerClassSessionBestLapTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                    }
-                }
             }
 
             // TODO: lap time previous for invalid laps (is this still needed?)
