@@ -431,16 +431,7 @@ namespace CrewChiefV4
             RecognizerInfo info = null;
 
             String langToUse = sreConfigLang;
-            String countryToUse = overrideCountry != null ? overrideCountry : sreConfigCountry;
-            
-            /*if (langToUse != sreConfigLang)
-            {
-                Console.WriteLine("The language in the SRE config file (" + localeSREConfigSetting +
-                    ") does not match the language in the user properties (" + localeCountryPropertySetting + ")");
-                langToUse = sreConfigLang;
-                countryToUse = sreConfigCountry;
-            }*/
-
+            String countryToUse = overrideCountry != null ? overrideCountry : sreConfigCountry;            
             String langAndCountryToUse = countryToUse != null ? langToUse + "-" + countryToUse : null;
 
             if (langAndCountryToUse != null)
