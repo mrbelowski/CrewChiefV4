@@ -515,6 +515,7 @@ namespace CrewChiefV4
             String locationToUse = defaultLocale;
             if (location != null && location.Length > 0)
             {
+                locationToUse = location;
                 Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
                 if (location.Length == 2 && !location.Equals("en"))
                 {
