@@ -90,6 +90,10 @@ namespace CrewChiefV4.Events
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+            {
+                return;
+            }
             lastColdFLPressure = (int)currentGameState.TyreData.FrontLeftPressure;
             lastColdFRPressure = (int)currentGameState.TyreData.FrontRightPressure;
             lastColdRLPressure = (int)currentGameState.TyreData.RearLeftPressure;
