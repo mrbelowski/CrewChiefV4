@@ -1459,6 +1459,23 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to create speech engine, error message: " + e.Message);
                 runListenForChannelOpenThread = false;
             }
+            //make sure we disable everything that might have been enabled in case speech engine fails
+            if (!crewChief.speechRecogniser.initialised)
+            {
+                
+                voiceDisableButton.Checked = true;
+                runListenForChannelOpenThread = false;
+                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
+                voiceOption = VoiceOptionEnum.DISABLED;
+
+                // Turns out saving prefs takes 5% of main thread time on startup, so don't do it
+                // as we just read this from prefs.
+                if (!this.constructingWindow)
+                {
+                    UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                    UserSettings.GetUserSettings().saveUserSettings();
+                }
+            }
             return crewChief.speechRecogniser.initialised;
         }
 
@@ -1472,9 +1489,11 @@ namespace CrewChiefV4
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen() && voiceOption != VoiceOptionEnum.DISABLED;
                 if (runListenForChannelOpenThread)
                 {
-                    initialiseSpeechEngine();
-                }
-                runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+                    if(initialiseSpeechEngine())
+                    {
+                        runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+                    }
+                }                
             }
             else
             {
@@ -1611,7 +1630,6 @@ namespace CrewChiefV4
                     else
                     {
                         ((RadioButton)sender).Checked = false;
-                        voiceDisableButton.Checked = true;
                     }
                 }
                 catch (Exception ex)
@@ -1638,7 +1656,6 @@ namespace CrewChiefV4
                     else
                     {
                         ((RadioButton)sender).Checked = false;
-                        voiceDisableButton.Checked = true;
                     }
 
                 }
@@ -1666,7 +1683,6 @@ namespace CrewChiefV4
                     else
                     {
                         ((RadioButton)sender).Checked = false;
-                        voiceDisableButton.Checked = true;
                     }
 
                 }
