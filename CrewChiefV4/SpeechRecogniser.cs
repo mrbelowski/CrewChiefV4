@@ -512,37 +512,33 @@ namespace CrewChiefV4
                 waveIn = new NAudio.Wave.WaveInEvent();
                 waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
+            String locationToUse = defaultLocale;
             if (location != null && location.Length > 0)
             {
-                String locationToUse = location;
                 Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
                 if (location.Length == 2 && !location.Equals("en"))
                 {
                     locationToUse = "en-" + location;
-                    Console.WriteLine(locationToUse);
-                }
-                try
-                {
-                    if (!initWithLocale(locationToUse))
-                    {
-                        return;
-                    }                    
-                    Console.WriteLine("Success");
-                }
-                catch (Exception e)
-                {
-
                 }
             }
             else
             {
                 Console.WriteLine("Attempting to initialise speech recognition for any English locale");
-                if (!initWithLocale(defaultLocale))
+            }
+            try
+            {
+                if (!initWithLocale(locationToUse))
                 {
                     return;
                 }
                 Console.WriteLine("Success");
-            }            
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to initialise speech engine.");
+                Console.WriteLine("Exception message: " + e.Message);
+            }
+           
             try
             {
                 if (useNAudio)
