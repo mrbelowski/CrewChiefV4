@@ -435,9 +435,9 @@ enable_spotter = Enable Spotter
 enable_spotter_help = The Spotter can be enabled and disabled with a button. This setting sets it initial state
 enable_spotter_category = SPOTTER
 
-speech_recognition_location = Speech recognition locale
-speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be ex. en-GB, en-US, it-IT, fr-FR etc.
-speech_recognition_location_category = AUDIO_VOICE_AND_CONTROLLERS
+speech_recognition_country = Speech recognition country
+speech_recognition_country_help = Optional - the localisation country to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be a country specifics value ex. GB, US, IT, DA, LT.
+speech_recognition_country_category = AUDIO_VOICE_AND_CONTROLLERS
 
 spotter_car_length = Spotter car length
 spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the Spotter calls 'hold your line' when you're not overlapping. Increase it if the Spotter doesn't call 'hold your line' when you clearly are overlapping.

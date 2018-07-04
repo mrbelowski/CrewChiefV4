@@ -26,7 +26,7 @@ namespace CrewChiefV4
         private bool keepRecording = true;
         //
 
-        private String localePropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_location");
+        private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
@@ -420,23 +420,26 @@ namespace CrewChiefV4
 
         private Boolean initWithLocale()
         {
-            Tuple<String, String> propertyLangAndCountry = parseLocalePropertyValue(localePropertySetting);
-            String overrideLang = propertyLangAndCountry.Item1;
-            String overrideCountry = propertyLangAndCountry.Item2;
+            String overrideCountry = null;
+            if(localeCountryPropertySetting != null && localeCountryPropertySetting.Length == 2)
+            {
+                overrideCountry = localeCountryPropertySetting.ToUpper();
+            }
             Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(localeSREConfigSetting);
             String sreConfigLang = sreConfigLangAndCountry.Item1;
             String sreConfigCountry = sreConfigLangAndCountry.Item2;
             RecognizerInfo info = null;
 
-            String langToUse = overrideLang != null ? overrideLang : sreConfigCountry;
+            String langToUse = sreConfigLang;
             String countryToUse = overrideCountry != null ? overrideCountry : sreConfigCountry;
-            if (langToUse != sreConfigLang)
+            
+            /*if (langToUse != sreConfigLang)
             {
                 Console.WriteLine("The language in the SRE config file (" + localeSREConfigSetting +
-                    ") does not match the language in the user properties (" + localePropertySetting + ")");
+                    ") does not match the language in the user properties (" + localeCountryPropertySetting + ")");
                 langToUse = sreConfigLang;
                 countryToUse = sreConfigCountry;
-            }
+            }*/
 
             String langAndCountryToUse = countryToUse != null ? langToUse + "-" + countryToUse : null;
 

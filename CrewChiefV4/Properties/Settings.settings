@@ -23,8 +23,8 @@
     <Setting Name="log_tyre_stats" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="speech_recognition_location" Type="System.String" Scope="User">
-      <Value Profile="(Default)">en</Value>
+    <Setting Name="speech_recognition_country" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="r3e_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
