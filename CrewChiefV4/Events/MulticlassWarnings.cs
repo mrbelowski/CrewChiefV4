@@ -269,18 +269,18 @@ namespace CrewChiefV4.Events
                                     String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
                                     if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners",
-                                            MessageContents(folderYouAreBeingCaughtByThe, classWithRunnersSuffix), 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners",
+                                            MessageContents(folderYouAreBeingCaughtByThe, classWithRunnersSuffix), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("being_caught_by_known_car_class_runners",
-                                            MessageContents(folderYouAreBeingCaughtByThe, classWithoutRunnersSuffix, folderRunners), 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners",
+                                            MessageContents(folderYouAreBeingCaughtByThe, classWithoutRunnersSuffix, folderRunners), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderYouAreBeingCaughtByFasterCars, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreBeingCaughtByFasterCars, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                             }
                             else if (otherClassWarningData.numFasterCars > 1)
@@ -291,20 +291,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarsRacingForPosition)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else if (otherClassWarningData.fasterCarsRacingForPosition)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehindFighting, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarsBehind, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehind, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
                                 // cars in the group are racing the player for position. Do we need to fix this in the OtherCarClassWarningData data?
@@ -317,20 +317,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderFasterCarBehind, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehind, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                             }
                             if (otherClassWarningData.numSlowerCars > 1)
@@ -351,38 +351,38 @@ namespace CrewChiefV4.Events
                                         String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
                                         if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
-                                                MessageContents(folderYouAreCatchingThe, classWithRunnersSuffix), 0, this));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners",
+                                                MessageContents(folderYouAreCatchingThe, classWithRunnersSuffix), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("catching_known_car_class_runners",
-                                                MessageContents(folderYouAreCatchingThe, classWithoutRunnersSuffix, folderRunners), 0, this));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners",
+                                                MessageContents(folderYouAreCatchingThe, classWithoutRunnersSuffix, folderRunners), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         }                                        
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderYouAreCatchingSlowerCars, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreCatchingSlowerCars, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else if (otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.slowerCarsRacingForPosition)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else if (otherClassWarningData.slowerCarsRacingForPosition)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarsAhead, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 caughtSlowerClassInThisSession = true;
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
@@ -396,20 +396,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 else if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderSlowerCarAhead, 0, this));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
                                 caughtSlowerClassInThisSession = true;
                             }
@@ -435,7 +435,7 @@ namespace CrewChiefV4.Events
                 if (opponentKey != null)
                 {
                     gotResponse = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, null));
                 }
             }
             else if (SpeechRecogniser.WHAT_CLASS_IS_CAR_BEHIND.Contains(voiceMessage))
@@ -444,7 +444,7 @@ namespace CrewChiefV4.Events
                 if (opponentKey != null)
                 {
                     gotResponse = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(getClassSound(currentGameState.OpponentData[opponentKey]), 0, null));
                 }
             }
             else if (SpeechRecogniser.IS_CAR_AHEAD_MY_CLASS.Contains(voiceMessage))
@@ -456,11 +456,11 @@ namespace CrewChiefV4.Events
                     CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
                     if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, null));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
                     }
                 }
             }
@@ -473,17 +473,17 @@ namespace CrewChiefV4.Events
                     CarData.CarClass opponentClass = currentGameState.OpponentData[opponentKey].CarClass;
                     if (CarData.IsCarClassEqual(currentGameState.carClass, opponentClass))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYes, 0, null));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
                     }
                 }
             }
             if (!gotResponse)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
         }
 

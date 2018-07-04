@@ -388,8 +388,8 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
-                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.OverallPosition, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
+                        lastSectorTime, lastSectorTime > 0, player.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.OverallPosition, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime);
             }
             else if (currentGameState.SessionData.IsNewSector)
             {
@@ -422,10 +422,6 @@ namespace CrewChiefV4.rFactor1
                 {
                     currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
                 }
-            }
-            if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.LapTimePrevious > 0)
-            {
-                currentGameState.SessionData.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff"));
             }
             currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor1Constant.rfFinishStatus.finished;
             currentGameState.SessionData.LeaderSectorNumber = leader.sector == 0 ? 3 : leader.sector;
@@ -866,7 +862,7 @@ namespace CrewChiefV4.rFactor1
                 if (opponent.IsNewLap)
                 {
                     opponent.CompleteLapWithProvidedLapTime(opponent.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                            lastSectorTime, lastSectorTime > 0, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, 
+                            lastSectorTime, lastSectorTime > 0, vehicle.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, 
                             currentGameState.SessionData.SessionTimeRemaining, 3);
                     opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.OverallPosition, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
                 }

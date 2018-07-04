@@ -194,7 +194,7 @@ namespace CrewChiefV4.Events
             }
             if (!gotData && !fromStatusRequest)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, this));                
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                
             }
         }
 

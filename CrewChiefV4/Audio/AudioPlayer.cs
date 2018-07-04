@@ -653,6 +653,10 @@ namespace CrewChiefV4.Audio
                             {
                                 Console.WriteLine("Clip " + key + " has just been played in response to a voice command, skipping");
                             }
+                            else
+                            {
+                                Console.WriteLine("Clip " + key + " will not be played");
+                            }
                             soundsProcessed.Add(key);
                             willBePlayedCount--;
                         }
@@ -880,6 +884,10 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         Console.WriteLine("Event " + eventName + " is no longer in the queue");
+                        if (CrewChief.Debugging)
+                        {
+                            Console.WriteLine("The " + (isImmediateMessages ? "immediate" : "regular") + " queue contains " + String.Join(", ", thisQueue.Keys));
+                        }
                     }
                 }
                 else
@@ -969,6 +977,7 @@ namespace CrewChiefV4.Audio
 
         private int purgeQueue(OrderedDictionary queue)
         {
+            Console.WriteLine("Purging queue");
             int purged = 0;
             lock (queue)
             {
@@ -1156,7 +1165,7 @@ namespace CrewChiefV4.Audio
                 }
                 index++;
             }
-            return Math.Min(index,  queue.Count);
+            return index;
         }
 
 

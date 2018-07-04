@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.3.6 updated 23 June 2018</title>
-<version>4.9.3.6</version>
+<title>Crew Chief 4.9.3.7 updated 1 July 2018</title>
+<version>4.9.3.7</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
@@ -13,6 +13,28 @@ will be pulled from the thecrewchief.org ftp server. -->
 <retry_replace>http://crewchief.isnais.de/</retry_replace>
 <!-- with this: -->
 <retry_replace_with>http://thecrewchief.org/downloads/</retry_replace_with>
+
+
+<!-- current implementation where all the sound pack update information is in this document -->
+<sounds language="en">
+	<voice-messages latest-version="150">
+		<update-pack url="http://crewchief.isnais.de/base_sound_pack.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_sound_pack.zip" updates-from-version="0"/>
+		<update-pack url="http://crewchief.isnais.de/update_2_sound_pack.zip" updates-from-version="122"/>
+		<update-pack url="http://crewchief.isnais.de/update_3_sound_pack.zip" updates-from-version="146"/>
+	</voice-messages>
+	<driver-names latest-version="131">
+		<update-pack url="http://crewchief.isnais.de/base_driver_names.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_driver_names.zip" updates-from-version="0"/>
+		<update-pack url="http://crewchief.isnais.de/update_2_driver_names.zip" updates-from-version="130"/>
+	</driver-names>
+	<personalisations latest-version="130">
+		<update-pack url="http://crewchief.isnais.de/personalisations.zip" updates-from-version="-1"/>
+		<update-pack url="http://crewchief.isnais.de/update_personalisations.zip" updates-from-version="0"/>
+		<update-pack url="http://crewchief.isnais.de/update_2_personalisations.zip" updates-from-version="121"/>
+		<update-pack url="http://crewchief.isnais.de/update_3_personalisations.zip" updates-from-version="129"/>
+	</personalisations>
+</sounds>
 
 
 <!--legacy sound pack stuff for 4.1.2.2 and earlier. I've given up updating this, it will be forever at 146 now.-->
@@ -30,15 +52,17 @@ will be pulled from the thecrewchief.org ftp server. -->
 <updatepersonalisationsurl>http://crewchief.isnais.de/update_personalisations.zip</updatepersonalisationsurl>
 <update2personalisationsurl>http://crewchief.isnais.de/update_2_personalisations.zip</update2personalisationsurl>
 
-<!-- language-aware sound pack stuff for later versions-->
+
+
+<!-- legacy sound pack stuff for 4.9.3.6 and earlier. Again, this will not be updated and will (eventually) be removed -->
 <soundpack language="en">
-	<soundpackversion>149</soundpackversion>	
+	<soundpackversion>150</soundpackversion>
 	<basesoundpackurl>http://crewchief.isnais.de/base_sound_pack.zip</basesoundpackurl>
 	<!-- sound pack update from base to version 121 will use this update pack -->
 	<updatesoundpackurl>http://crewchief.isnais.de/update_sound_pack.zip</updatesoundpackurl>
 	<!-- sound pack update from version 121 upwards will use this update pack -->
 	<update2soundpackurl>http://crewchief.isnais.de/update_2_sound_pack.zip</update2soundpackurl>
-	<update3soundpackurl>http://thecrewchief.org/downloads/update_3_sound_pack.zip</update3soundpackurl>
+	<update3soundpackurl>http://crewchief.isnais.de/update_3_sound_pack.zip</update3soundpackurl>
 	
 	<drivernamesversion>131</drivernamesversion>	
 	<basedrivernamesurl>http://crewchief.isnais.de/base_driver_names.zip</basedrivernamesurl>

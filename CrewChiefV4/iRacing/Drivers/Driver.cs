@@ -23,7 +23,6 @@ namespace CrewChiefV4.iRacing
         /// If true, this is your driver on track.
         /// </summary>
         public bool IsCurrentDriver { get; set; }
-
         public int Id { get; set; }
         public int CustId { get; set; }
         public string Name { get; set; }
@@ -37,7 +36,7 @@ namespace CrewChiefV4.iRacing
         public Tuple<String, float> licensLevel { get; set; }
 
         public bool IsSpectator { get; set; }
-        public bool IsPacecar { get; set; }
+        public bool IsPaceCar { get; set; }
 
         public DriverCarInfo Car { get; set; }
         public DriverSessionResults CurrentResults { get; set; }
@@ -90,7 +89,7 @@ namespace CrewChiefV4.iRacing
                 this.Car.DriverPitTrkPct = Parser.ParseFloat(YamlParser.Parse(sessionInfo, "DriverInfo:DriverPitTrkPct:"), -1.0f);
             }
             bool isPaceCar = Parser.ParseInt(ParseDriverYaml(sessionInfo, "CarIsPaceCar")) == 1;
-            this.IsPacecar = this.CustId == -1 || isPaceCar;
+            this.IsPaceCar = this.CustId == -1 || isPaceCar;
         }
         public static Driver FromSessionInfo(string sessionInfo, int carIdx, int playerCarIdx)
         {            

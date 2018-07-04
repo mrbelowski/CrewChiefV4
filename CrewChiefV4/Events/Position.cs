@@ -282,7 +282,7 @@ namespace CrewChiefV4.Events
                     if (!reported)
                     {
                         // check the pass is still valid
-                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() ||
+                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() || currentGameState.PitData.InPitlane ||
                                 currentGameState.PositionAndMotionData.CarSpeed - carWeJustPassed.Speed > maxSpeedDifferenceForReportablePass)
                         {
                             opponentKeyForCarWeJustPassed = null;
@@ -510,17 +510,17 @@ namespace CrewChiefV4.Events
         {            
             if (isLast)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, null));
             }
             else if (currentPosition == 1)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this));                    
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, null));                    
             }
             else if (currentPosition > 0)
             {
                 if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, null));
                 }
                 else
                 {

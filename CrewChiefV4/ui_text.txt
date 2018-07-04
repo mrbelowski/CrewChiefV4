@@ -1084,3 +1084,8 @@ enable_delayed_messages_on_hardparts_help = Delays non immediate messages when a
 enable_delayed_messages_on_hardparts_category = AUDIO_VOICE_AND_CONTROLLERS
 
 toggle_delay_messages_in_hard_parts = Toggle delay messages on hard parts
+
+iracing_enable_auto_fuel_to_end_of_race = Enable iRacing auto refueling when entering pit in race
+iracing_enable_auto_fuel_to_end_of_race_help = Enables auto refueling in iRacing based on fuel calculations done by the app.
+iracing_enable_auto_fuel_to_end_of_race_category = PIT_STOPS_AND_MULTICLASS
+iracing_enable_auto_fuel_to_end_of_race_filter = IRACING

@@ -50,7 +50,6 @@ namespace CrewChiefV4.Events
         public static String folderNeedMoreLapData = "strategy/set_benchmark_laptime_first";
         public static String folderNeedFlyingLap = "strategy/will_calculate_time_loss_from_next_lap";
 
-        
         public static String folderIsPittingFromPosition = "strategy/is_pitting_from_position";
         public static String folderHeWillComeOutJustInFront = "strategy/he_will_come_out_just_in_front";
         public static String folderHeWillComeOutJustBehind = "strategy/he_will_come_out_just_behind";
@@ -70,6 +69,11 @@ namespace CrewChiefV4.Events
         private Boolean hasPittedDuringPracticeStopProcess = false;
         private float gameTimeWhenEnteringLastSectorInPractice = -1;
         private float lastAndFirstSectorTimesOnStop = -1;
+
+        // an extra check for practice sessions. We only allow the pit benchmark calculation if we've completed
+        // a valid lap that's not our first lap and is not a lap where we visited the pits. This prevents the app
+        // using the line lap or outlap for its comparison data
+        private Boolean hasPracticeLapForComparison = false;
 
         // this is set by the box-this-lap macro (eeewwww), and primes this event to play the position
         // estimates when we hit the final sector
@@ -136,6 +140,7 @@ namespace CrewChiefV4.Events
             Strategy.opponentBehindToWatchForPitting = null;
             printS1Positions = false;
             opponentsInPitLane.Clear();
+            hasPracticeLapForComparison = false;
         }
 
         private void setTimeLossFromBenchmark(GameStateData currentGameState)
@@ -158,7 +163,8 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
-                return (sectorCount == 2 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector2Time > 0) ||
+                return hasPracticeLapForComparison &&
+                    (sectorCount == 2 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector2Time > 0) ||
                     (sectorCount == 3 && currentGameState.SessionData.PlayerBestLapSector1Time > 0 && currentGameState.SessionData.PlayerBestLapSector3Time > 0);
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race)
@@ -186,7 +192,8 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            if (waitingForValidDataForBenchmark)
+            if (waitingForValidDataForBenchmark && (currentGameState.SessionData.IsNewLap ||
+                (currentGameState.SessionData.IsNewSector && previousGameState.SessionData.SectorNumber == 1)))
             {
                 if (currentGameState.SessionData.TrackDefinition.name != trackNameForLastPitstopTiming ||
                     !CarData.IsCarClassEqual(currentGameState.carClass, carClassForLastPitstopTiming))
@@ -212,6 +219,12 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
             {
+                if (currentGameState.SessionData.IsNewLap && !currentGameState.PitData.InPitlane && 
+                    !currentGameState.PitData.OnOutLap &&
+                    currentGameState.SessionData.PreviousLapWasValid)
+                {
+                    hasPracticeLapForComparison = true;
+                }
                 // always log the game time at start of final sector, in case we make a late decision to time a stop
                 if (enteredLastSector(previousGameState, currentGameState))
                 {
