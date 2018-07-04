@@ -1517,28 +1517,6 @@ namespace CrewChiefV4.assetto
 
                 currentGameState.sortClassPositions();
                 currentGameState.setPracOrQualiDeltas();
-                
-                if (currentGameState.SessionData.IsNewLap && currentGameState.SessionData.PreviousLapWasValid &&
-                     currentGameState.SessionData.LapTimePrevious > 0)
-                {
-
-                    if (currentGameState.SessionData.PlayerLapTimeSessionBest == -1 ||
-                         currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerLapTimeSessionBest)
-                    {
-                        currentGameState.SessionData.PlayerLapTimeSessionBest = currentGameState.SessionData.LapTimePrevious;
-                        if (currentGameState.SessionData.OverallSessionBestLapTime == -1 ||
-                            currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.OverallSessionBestLapTime)
-                        {
-                            currentGameState.SessionData.OverallSessionBestLapTime = currentGameState.SessionData.LapTimePrevious;
-                        }
-                        if (currentGameState.SessionData.PlayerClassSessionBestLapTime == -1 ||
-                            currentGameState.SessionData.LapTimePrevious < currentGameState.SessionData.PlayerClassSessionBestLapTime)
-                        {
-                            currentGameState.SessionData.PlayerClassSessionBestLapTime = currentGameState.SessionData.LapTimePrevious;
-                        }
-                    }
-                }
-
             }
 
             // engine/transmission data
