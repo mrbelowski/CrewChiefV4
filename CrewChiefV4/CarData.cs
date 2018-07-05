@@ -363,6 +363,11 @@ namespace CrewChiefV4
         public static int IRACING_CLASS_ID = -1;
         public static String CLASS_ID = "";
 
+        public static void clearCachedIRacingClassData() {
+            iracingCarClassIdToCarClass.Clear();
+            iracingCarIdToCarClass.Clear();
+        }
+
         public class TyreTypeData
         {
             public float maxColdTyreTemp { get; set; }
