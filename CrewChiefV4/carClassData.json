@@ -869,12 +869,18 @@
 			"spotterVehicleWidth": 1.75,
 			"limiterAvailable": false
 		},
-		{
-			"carClassEnum": "SPEC_MIATA",
-			"iracingCarIds": [67],
+        {
+            "carClassEnum": "SPEC_MIATA",
+            "iracingCarIds": [ 67 ],
+            "timesInHundredths": true,
+            "enabledMessageTypes": "FUEL",
+            "limiterAvailable": false
+        },
+        {
+			"carClassEnum": "FORMULA_RENAULT20",
+			"iracingCarIds": [74],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "FUEL",
-			"limiterAvailable": false
+			"enabledMessageTypes": "FUEL"
 		},
 
 	]
