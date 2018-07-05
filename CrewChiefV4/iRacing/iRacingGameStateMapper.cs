@@ -1147,10 +1147,10 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
-                    if (opponentData.CurrentSectorNumber == 1)
+                    if (opponentData.CurrentSectorNumber == 1 && opponentData.CarClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
                     {
                         // re-evaluate the car class
-                        opponentData.CarClass = CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId);
+                        opponentData.CarClass = CarData.getCarClassForIRacingId(carClassId, carId);
                     }
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, -1, sessionRunningTime, currentLapValid && validSpeed, false, trackTempreture, airTemperature);
                 }
