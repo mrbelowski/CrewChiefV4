@@ -218,7 +218,7 @@ namespace CrewChiefV4.iRacing
                     else
                     {
                         currentGameState.OpponentData.Add(driver.Id.ToString(), createOpponentData(driver, true,
-                            CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
                 // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
@@ -819,7 +819,8 @@ namespace CrewChiefV4.iRacing
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                         currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
                                         shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1.0f,
-                                        currentOpponentSpeed, driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap);
+                                        currentOpponentSpeed, driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap,
+                                        driver.Car.CarClassId, driver.Car.CarId);
 
                             if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
@@ -893,7 +894,7 @@ namespace CrewChiefV4.iRacing
                     if (!driver.CurrentResults.IsOut || !driver.IsPaceCar || !driver.IsSpectator)
                     {
                         currentGameState.OpponentData.Add(opponentDataKey, createOpponentData(driver,
-                            false, CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                            false, currentGameState.SessionData.TrackDefinition.trackLength));
                     }
                 }
 
@@ -1085,7 +1086,7 @@ namespace CrewChiefV4.iRacing
             Boolean previousLapWasValid, Boolean currentLapValid, float sessionRunningTime,
             float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             Boolean isRace, float airTemperature, float trackTempreture, float nearPitEntryPointDistance, float speed,
-            float GameTimeWhenLastCrossedStartFinishLine, bool isInWorld, bool isNewLap)
+            float GameTimeWhenLastCrossedStartFinishLine, bool isInWorld, bool isNewLap, int carClassId, int carId)
         {
             if (opponentData.CostId != CostId)
             {
@@ -1146,6 +1147,11 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.CurrentSectorNumber == 1 && sector == 2 || opponentData.CurrentSectorNumber == 2 && sector == 3)
                 {
+                    if (opponentData.CurrentSectorNumber == 1)
+                    {
+                        // re-evaluate the car class
+                        opponentData.CarClass = CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId);
+                    }
                     opponentData.AddCumulativeSectorData(opponentData.CurrentSectorNumber, racePosition, -1, sessionRunningTime, currentLapValid && validSpeed, false, trackTempreture, airTemperature);
                 }
                 opponentData.CurrentSectorNumber = sector;
@@ -1294,7 +1300,7 @@ namespace CrewChiefV4.iRacing
             return lastSessionPhase;
         }
 
-        private OpponentData createOpponentData(Driver driver, Boolean loadDriverName, CarData.CarClassEnum playerCarClass, float trackLength)
+        private OpponentData createOpponentData(Driver driver, Boolean loadDriverName, float trackLength)
         {
             String driverName = driver.Name.ToLower();
             if (loadDriverName && CrewChief.enableDriverNames)
