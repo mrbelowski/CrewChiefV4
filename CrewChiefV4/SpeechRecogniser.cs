@@ -34,7 +34,7 @@ namespace CrewChiefV4
         private Boolean enable_iracing_pit_stop_commands = UserSettings.GetUserSettings().getBoolean("enable_iracing_pit_stop_commands");
         private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
-        private static String localeSREConfigSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
+        private static String localeSREConfigSetting = Configuration.getSpeechRecognitionConfigOption("language");
 
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
