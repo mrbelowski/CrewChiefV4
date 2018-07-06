@@ -20,7 +20,7 @@
 language = en
 
 # the original name of this property was defaultLocale. It's still here just for backwards compatibility
-defaultLocale = en
+defaultLocale = 
 
 ######################################################
 # Static recognition phrases - these are recognised 'as-is' with no combining of phrases or sentences.
