@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.4.0</h2>
+<ul>
+	<li>Fixed regression in non-English speech recognition config files - the 'defaultLocale' property name for speech recognition language had been changed to 'language', so the app was ignoring this value in existing configurations. The app will now use the 'defaultLocale' property value if it doesn't find a 'language' property</li>
+</ul>
 <h2>Version 4.9.3.9</h2>
 <ul>
 	<li>Allow spotter messages to play if they have interrupted another message, even if they would otherwise have expired</li>
