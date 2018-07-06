@@ -35,6 +35,7 @@ namespace CrewChiefV4
         private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
         private static String sreConfigLanguageSetting = Configuration.getSpeechRecognitionConfigOption("language");
+        private static String sreConfigDefaultLocaleSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
@@ -425,7 +426,10 @@ namespace CrewChiefV4
             {
                 overrideCountry = localeCountryPropertySetting.ToUpper();
             }
-            Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(sreConfigLanguageSetting);
+            // for backwards compatibility
+            Boolean useDefaultLocaleInsteadOfLanguage = sreConfigLanguageSetting == null || sreConfigLanguageSetting == "";
+
+            Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(useDefaultLocaleInsteadOfLanguage ? sreConfigDefaultLocaleSetting : sreConfigLanguageSetting);
             String sreConfigLang = sreConfigLangAndCountry.Item1;
             String sreConfigCountry = sreConfigLangAndCountry.Item2;
             RecognizerInfo info = null;
