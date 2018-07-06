@@ -427,7 +427,7 @@ namespace CrewChiefV4
                 overrideCountry = localeCountryPropertySetting.ToUpper();
             }
             // for backwards compatibility
-            Boolean useDefaultLocaleInsteadOfLanguage = sreConfigLanguageSetting == null || sreConfigLanguageSetting == "";
+            Boolean useDefaultLocaleInsteadOfLanguage = sreConfigDefaultLocaleSetting != null && sreConfigDefaultLocaleSetting.Length > 0;
 
             Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(useDefaultLocaleInsteadOfLanguage ? sreConfigDefaultLocaleSetting : sreConfigLanguageSetting);
             String sreConfigLang = sreConfigLangAndCountry.Item1;
