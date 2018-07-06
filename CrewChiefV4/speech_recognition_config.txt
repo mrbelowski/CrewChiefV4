@@ -15,8 +15,12 @@
 
 # These phrases are all in English so can be loaded by any of the English speech recognition language packs. If this
 # file is translated to a different language, this setting must match the ISO language code of the phrases in this file - 
-# e.g. 'en' for English, 'fr' for French, 'de' for German, etc
+# e.g. 'en' for English, 'fr' for French, 'de' for German, etc. It *may* be possible to set a language code that doesn't
+# match the language of the phrases in this file but this doesn't usually work
 language = en
+
+# the original name of this property was defaultLocale. It's still here just for backwards compatibility
+defaultLocale = en
 
 ######################################################
 # Static recognition phrases - these are recognised 'as-is' with no combining of phrases or sentences.
