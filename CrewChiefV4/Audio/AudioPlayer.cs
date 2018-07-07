@@ -496,6 +496,7 @@ namespace CrewChiefV4.Audio
                         {
                             Boolean doHardPartsCheck = delayMessagesInHardParts &&
                                 CrewChief.currentGameState != null &&
+                                CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
                                 (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
                                 !GameStateData.onManualFormationLap;
                             if (!doHardPartsCheck ||
