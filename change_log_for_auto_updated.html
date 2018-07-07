@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.4.0</h2>
+<ul>
+	<li>Fixed regression in non-English speech recognition config files - the 'defaultLocale' property name for speech recognition language had been changed to 'language', so the app was ignoring this value in existing configurations. The app will now use the 'defaultLocale' property value if it doesn't find a 'language' property</li>
+</ul>
+<h2>Version 4.9.3.9</h2>
+<ul>
+	<li>Allow spotter messages to play if they have interrupted another message, even if they would otherwise have expired</li>
+	<li>iRacing - enable fuel tracking in lone practice sessions</li>
+	<li>iRacing - Added option to re fuel to end of race in a race session when entering the pitlane, this will not trigger if you get a tow back to pits it only works for regular preformed pitstop!</li>
+	<li>iRacing - some multiclass fixes</li>
+	<li>pCars2 - performance improvements</li>
+	<li>internal rework - consolidated lots of timings code to make behaviour more consistent across games</li>
+	<li>Speech recognition engine initialisation improvements - better handling of language / country options, better management of installed components and error reporting</li>
+	<li>Improvements to interrupting logic</li>
+	<li>Various bug fixes</li>
+</ul>
 <h2>Version 4.9.3.7</h2>
 <ul>
 	<li>Added option to pause most messages in braking and cornering zones (sections of the track starting from heavy braking and ending with near-full throttle application) - this doesn't apply to spotter messages or other very high priority messages. It can be enabled and disabled with a button mapping ('Toggle delay messages on hard parts') or a voice command ('don't talk in the [corners/braking zones]' / 'no messages in the [corners/braking zones]', 'talk to me anywhere' / 'messages at any point'). This feature is switched off by default - the initial state is set with the 'Delay messages on hard parts' option. Note that you need to drive at least one valid lap before the app can work out which sections of the track it needs to keep quiet in. This feature is disabled for ovals and may produce odd results on very short tracks</li>

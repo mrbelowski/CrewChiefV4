@@ -131,7 +131,7 @@ namespace CrewChiefV4
             VINTAGE_F1_C, VINTAGE_STOCK_CAR,
             F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
-            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM
+            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM, FORMULA_RENAULT20
         }
 
         // use different thresholds for R3E car classes - there are a few different tyre models in the game with different heating characteristics:
@@ -362,6 +362,11 @@ namespace CrewChiefV4
         public static int RACEROOM_CLASS_ID = -1;
         public static int IRACING_CLASS_ID = -1;
         public static String CLASS_ID = "";
+
+        public static void clearCachedIRacingClassData() {
+            iracingCarClassIdToCarClass.Clear();
+            iracingCarIdToCarClass.Clear();
+        }
 
         public class TyreTypeData
         {

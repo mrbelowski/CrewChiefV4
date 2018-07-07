@@ -207,6 +207,12 @@ namespace CrewChiefV4.Audio
                     {
                         lastBlockedMessageId = messageId;
                     }
+                    // ensure the blocking message won't expire
+                    QueuedMessage firstWaitingMessage = audioPlayer.getFirstWaitingImmediateMessage(mostImportantTypeInImmediateQueue);
+                    if (firstWaitingMessage != null && firstWaitingMessage.expiryTime > 0)
+                    {
+                        firstWaitingMessage.expiryTime = firstWaitingMessage.expiryTime + 2000;
+                    }
                     return false;
                 }
             }

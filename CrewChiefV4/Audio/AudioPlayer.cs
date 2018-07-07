@@ -1077,6 +1077,22 @@ namespace CrewChiefV4.Audio
             return SoundType.OTHER;
         }
 
+        public QueuedMessage getFirstWaitingImmediateMessage(SoundType minType)
+        {
+            lock (immediateClips)
+            {
+                foreach (Object value in immediateClips.Values)
+                {
+                    QueuedMessage message = (QueuedMessage)value;
+                    if (message.metadata.type <= minType)
+                    {
+                        return message;
+                    }
+                }
+            }
+            return null;
+        }
+
         public void playMessageImmediately(QueuedMessage queuedMessage)
         {
             if (disableImmediateMessages)

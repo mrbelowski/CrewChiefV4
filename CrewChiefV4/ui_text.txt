@@ -147,6 +147,12 @@ install_plugin_select_directory_end = installation directory
 install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancle to Return
 install_plugin_popup_enable_title = Enable Plugin
 
+install_speechplatform_popup_title = Missing dependency
+install_speechplatform_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Press OK to get redirected to the download location, Or Cancle to return
+install_any_speechlanguage_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Please download and install one of the following MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi,MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
+install_single_speechlanguage_popup_text_start = It appears that your system is missing a dependency for speech recogniser to work. Please download and install MSSpeech_SR_
+install_single_speechlanguage_popup_text_end = _TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
+
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = E&xit without Saving
 restore_default_settings = &Restore Default Settings
@@ -429,9 +435,9 @@ enable_spotter = Enable Spotter
 enable_spotter_help = The Spotter can be enabled and disabled with a button. This setting sets it initial state
 enable_spotter_category = SPOTTER
 
-speech_recognition_location = Speech recognition locale
-speech_recognition_location_help = Optional - the localisation to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be en-[something].
-speech_recognition_location_category = AUDIO_VOICE_AND_CONTROLLERS
+speech_recognition_country = Speech recognition country
+speech_recognition_country_help = Optional - the localisation country to use for speech recognition. If this isn't set, the app will use which ever English pack you've installed (or the first it finds if you have more than one). If you set it, the value must be a country specifics value ex. GB, US, IT, DA, LT.
+speech_recognition_country_category = AUDIO_VOICE_AND_CONTROLLERS
 
 spotter_car_length = Spotter car length
 spotter_car_length_help = The length of a car, used to check if there's an overlap. Decrease this if the Spotter calls 'hold your line' when you're not overlapping. Increase it if the Spotter doesn't call 'hold your line' when you clearly are overlapping.
