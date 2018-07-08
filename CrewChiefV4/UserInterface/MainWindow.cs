@@ -113,7 +113,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging || 
+            if (!CrewChief.Debugging ||
                 SoundPackVersionsHelper.currentSoundPackVersion <= 0 || SoundPackVersionsHelper.currentPersonalisationsVersion <= 0 || SoundPackVersionsHelper.currentDriverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -128,10 +128,27 @@ namespace CrewChiefV4
                     downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
                     downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
 
+                    String[] commandLineArgs = Environment.GetCommandLineArgs();
+                    Boolean skipUpdates = false;
+                    if (commandLineArgs != null)
+                    {
+                        foreach (String arg in commandLineArgs)
+                        {
+                            if ("SKIP_UPDATES".Equals(arg))
+                            {
+                                Console.WriteLine("Skipping application update check. To enable this check, run the app *without* the SKIP_UPDATES command line argument");
+                                skipUpdates = true;
+                                break;
+                            }
+                        }
+                    }
                     Boolean gotUpdateData = false;
                     try
                     {
-                        AutoUpdater.Start(firstUpdate);
+                        if (!skipUpdates)
+                        {
+                            AutoUpdater.Start(firstUpdate);
+                        }
                         string xml = new WebClient().DownloadString(firstUpdate);
                         gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                     }
@@ -145,7 +162,10 @@ namespace CrewChiefV4
                         Console.WriteLine("Unable to get update data with primary URL, trying secondary");
                         try
                         {
-                            AutoUpdater.Start(secondUpdate);
+                            if (!skipUpdates)
+                            {
+                                AutoUpdater.Start(secondUpdate);
+                            }
                             string xml = new WebClient().DownloadString(secondUpdate);
                             gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                         }
