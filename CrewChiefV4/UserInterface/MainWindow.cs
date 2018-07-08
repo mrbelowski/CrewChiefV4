@@ -1576,7 +1576,7 @@ namespace CrewChiefV4
             catch
             {
             }
-            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"));
+            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"), true);
         }
 
         private void saveConsoleOutputButtonClicked(object sender, EventArgs e)
@@ -2210,7 +2210,7 @@ namespace CrewChiefV4
             }
         }
         
-        private void doRestart(String warningMessage, String warningTitle)
+        private void doRestart(String warningMessage, String warningTitle, Boolean removeSkipUpdates = false)
         {
             if (CrewChief.Debugging)
             {
@@ -2227,11 +2227,20 @@ namespace CrewChiefV4
                 {
                     // have to add "multi" to the start args so the app can restart
                     List<String> startArgs = new List<string>();
-                    startArgs.AddRange(Environment.GetCommandLineArgs());
+                    foreach (String startArg in Environment.GetCommandLineArgs())
+                    {
+                        // if we're restarting because the 'force update check' was clicked, remove the SKIP_UPDATES arg
+                        if (removeSkipUpdates && "SKIP_UPDATES".Equals(startArg))
+                        {
+                            continue;
+                        }
+                        startArgs.Add(startArg);
+                    }
                     if (!startArgs.Contains("multi"))
                     {
                         startArgs.Add("multi");
                     }
+
                     System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", startArgs.ToArray())); // to start new instance of application
                     this.Close(); //to turn off current app
                 }
