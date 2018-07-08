@@ -567,15 +567,19 @@ namespace CrewChiefV4.Events
                     // select the best opponent to compare with
                     foreach (KeyValuePair<String, float> entry in opponentsTimeLostForStop)
                     {
-                        int positionDiff = Math.Abs(opponents[entry.Key].ClassPosition - currentRacePosition);
-                        if (positionDiff < pittedOpponentPositionDiff)
+                        OpponentData opponentData;
+                        if (opponents.TryGetValue(entry.Key, out opponentData))
                         {
-                            timeLossEstimate = entry.Value;
-                            pittedOpponentPositionDiff = positionDiff;
-                            float opponentTimeSpentInPitlane;
-                            if (opponentsTimeSpentInPitlane.TryGetValue(entry.Key, out opponentTimeSpentInPitlane))
+                            int positionDiff = Math.Abs(opponentData.ClassPosition - currentRacePosition);
+                            if (positionDiff < pittedOpponentPositionDiff)
                             {
-                                playerTimeSpentInPitLane = opponentTimeSpentInPitlane;
+                                timeLossEstimate = entry.Value;
+                                pittedOpponentPositionDiff = positionDiff;
+                                float opponentTimeSpentInPitlane;
+                                if (opponentsTimeSpentInPitlane.TryGetValue(entry.Key, out opponentTimeSpentInPitlane))
+                                {
+                                    playerTimeSpentInPitLane = opponentTimeSpentInPitlane;
+                                }
                             }
                         }
                     }
