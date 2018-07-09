@@ -1,4 +1,5 @@
-﻿/*
+﻿using CrewChiefV4.GameState;
+/*
  * The idea behind PlaybackModerator class is to allow us to adjust playback after all the high level logic is evaluated,
  * messages resolved, duplicates removed etc.  It is plugged into SingleSound play and couple of other low level places.
  * Currently, the only two things it does is injects fake beep-out/in between Spotter and Chief messages and decides which 
@@ -63,6 +64,25 @@ namespace CrewChiefV4.Audio
         public static void clearPlayedMessageCounteras()
         {
             queuedMessageCounters.Clear();
+        }
+
+        public static void UpdateAutoVerbosity(GameStateData currenGameState)
+        {
+            verbosity = Verbosity.FULL;
+            if (currenGameState.SessionData.SessionType == SessionType.Race && currenGameState.PositionAndMotionData.CarSpeed > 5)
+            {
+                // only interested if we're moving and it's a race session
+                 if ((currenGameState.SessionData.TimeDeltaFront < 2 && currenGameState.SessionData.TimeDeltaBehind < 2) ||
+                    (currenGameState.SessionData.TimeDeltaFront < 1 || currenGameState.SessionData.TimeDeltaBehind < 1))
+                {
+                    verbosity = Verbosity.LOW;
+                }
+                else if (currenGameState.SessionData.CompletedLaps == 0 || 
+                    currenGameState.SessionData.SessionNumberOfLaps == currenGameState.SessionData.CompletedLaps + 1)
+                {
+                    verbosity = Verbosity.MED;
+                }
+            }
         }
 
         public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
@@ -260,18 +280,20 @@ namespace CrewChiefV4.Audio
                 priority = queuedMessage.metadata.priority;
                 type = queuedMessage.metadata.type;
             }
-            Boolean canPlay = true;;
+            Boolean canPlay = true;
             if (verbosity == Verbosity.FULL)
             {
+                // waffle-mode, all messages can play
                 canPlay = true;
             }
             else if (verbosity == Verbosity.SILENT)
             {
+                // insolent-mode, no messages can play
                 canPlay = false;
             }
             else
             {
-                // now check against the verbosity
+                // check against the verbosity
                 if (verbosity == Verbosity.MED)
                 {
                     // TODO: externalise the thresholds?

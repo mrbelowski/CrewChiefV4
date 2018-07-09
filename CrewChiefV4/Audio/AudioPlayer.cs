@@ -1196,7 +1196,7 @@ namespace CrewChiefV4.Audio
                         Console.WriteLine("Clip for event " + queuedMessage.messageName + " is already queued, ignoring");
                         return;
                     }
-                    else
+                    else if (PlaybackModerator.MessageCanBeQueued(queuedMessage, queuedClips.Count, CrewChief.currentGameState.Now))
                     {
                         // default 'regular' message priority is 0, which is lowest
                         populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
