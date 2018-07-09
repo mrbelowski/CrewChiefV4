@@ -958,6 +958,9 @@ namespace CrewChiefV4
                                     }
                                     stateCleared = false;
                                 }
+                                // update the auto-verbosity
+                                PlaybackModerator.UpdateAutoVerbosity(currentGameState);
+
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {

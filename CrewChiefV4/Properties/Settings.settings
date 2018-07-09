@@ -836,5 +836,8 @@
     <Setting Name="iracing_enable_auto_fuel_to_end_of_race" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="priortise_messages_depending_on_situation" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

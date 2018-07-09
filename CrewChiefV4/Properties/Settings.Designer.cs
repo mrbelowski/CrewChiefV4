@@ -3358,5 +3358,17 @@ namespace CrewChiefV4.Properties {
                 this["iracing_enable_auto_fuel_to_end_of_race"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool priortise_messages_depending_on_situation {
+            get {
+                return ((bool)(this["priortise_messages_depending_on_situation"]));
+            }
+            set {
+                this["priortise_messages_depending_on_situation"] = value;
+            }
+        }
     }
 }

@@ -49,6 +49,7 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         private static bool importantMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
+        private static bool autoVerbosity = UserSettings.GetUserSettings().getBoolean("priortise_messages_depending_on_situation");
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -69,11 +70,15 @@ namespace CrewChiefV4.Audio
         public static void UpdateAutoVerbosity(GameStateData currenGameState)
         {
             verbosity = Verbosity.FULL;
+            if (!autoVerbosity)
+            {
+                return;
+            }
             if (currenGameState.SessionData.SessionType == SessionType.Race && currenGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 // only interested if we're moving and it's a race session
-                 if ((currenGameState.SessionData.TimeDeltaFront < 2 && currenGameState.SessionData.TimeDeltaBehind < 2) ||
-                    (currenGameState.SessionData.TimeDeltaFront < 1 || currenGameState.SessionData.TimeDeltaBehind < 1))
+                 if ((currenGameState.SessionData.TimeDeltaFront < 3 && currenGameState.SessionData.TimeDeltaBehind < 3) ||
+                    (currenGameState.SessionData.TimeDeltaFront < 2 || currenGameState.SessionData.TimeDeltaBehind < 2))
                 {
                     verbosity = Verbosity.LOW;
                 }
