@@ -20,11 +20,12 @@ namespace CrewChiefV4.Audio
 
     public class SoundMetadata
     {
+        public static int DEFAULT_PRIORITY = 5;
         public int messageId = 0;  // 0 => unset
         public SoundType type;
 
         // this affects the queue insertion order. Higher priority items are inserted at the head of the queue
-        public int priority = 5;  // 0 = lowest, 5 = default, 10 = spotter
+        public int priority = DEFAULT_PRIORITY;  // 0 = lowest, 5 = default, 10 = spotter
 
         // this has no messageId or priority because they're only ever single sounds
         public static SoundMetadata beep = new SoundMetadata(SoundType.OTHER);

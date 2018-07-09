@@ -15,6 +15,25 @@ using System.Linq;
 
 namespace CrewChiefV4.Audio
 {
+    public enum Verbosity
+    {
+        SILENT = 0,
+        LOW,
+        MED,
+        FULL
+    }
+
+    public class MessageQueueCounter
+    {
+        public DateTime timeQueued;
+        public int numberOfTimesQueued;
+        public MessageQueueCounter(DateTime timeQueued)
+        {
+            this.timeQueued = timeQueued;
+            this.numberOfTimesQueued = 1;
+        }
+    }
+
     public static class PlaybackModerator
     {
 #if DEBUG
@@ -37,6 +56,14 @@ namespace CrewChiefV4.Audio
         private static SingleSound lastSoundPreProcessed = null;
 
         public static int lastBlockedMessageId = -1;
+
+        public static Verbosity verbosity = Verbosity.FULL;
+        private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string,MessageQueueCounter>();
+
+        public static void clearPlayedMessageCounteras()
+        {
+            queuedMessageCounters.Clear();
+        }
 
         public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
         {
@@ -216,8 +243,59 @@ namespace CrewChiefV4.Audio
                     return false;
                 }
             }
-
             return true;
+        }
+
+        public static bool MessageCanBeQueued(QueuedMessage queuedMessage, int currentQueueDepth, DateTime now)
+        {
+            int priority;
+            SoundType type;
+            if (queuedMessage.metadata == null)
+            {
+                priority = SoundMetadata.DEFAULT_PRIORITY;
+                type = SoundType.REGULAR_MESSAGE;
+            }
+            else
+            {
+                priority = queuedMessage.metadata.priority;
+                type = queuedMessage.metadata.type;
+            }
+            Boolean canPlay = true;;
+            if (verbosity == Verbosity.FULL)
+            {
+                canPlay = true;
+            }
+            else if (verbosity == Verbosity.SILENT)
+            {
+                canPlay = false;
+            }
+            else
+            {
+                // now check against the verbosity
+                if (verbosity == Verbosity.MED)
+                {
+                    // TODO: externalise the thresholds?
+                    canPlay = priority > 3;
+                }
+                else if (verbosity == Verbosity.LOW)
+                {
+                    canPlay = priority > 5;
+                }
+            }
+            if (canPlay)
+            {
+                MessageQueueCounter counter;
+                if (queuedMessageCounters.TryGetValue(queuedMessage.messageName, out counter))
+                {
+                    counter.timeQueued = now;
+                    counter.numberOfTimesQueued = counter.numberOfTimesQueued + 1;
+                }
+                else
+                {
+                    queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
+                }
+            }
+            return canPlay;
         }
 
         private static void InjectBeepOutIn(SingleSound sound, SoundMetadata soundMetadata)

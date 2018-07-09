@@ -1185,7 +1185,6 @@ namespace CrewChiefV4.Audio
             return index;
         }
 
-
         public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
         {
             if (queuedMessage.canBePlayed)
