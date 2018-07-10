@@ -315,7 +315,7 @@ namespace CrewChiefV4.Audio
             }
             else
             {
-                PlaybackModerator.Trace(string.Format("Message {} hasn't been queued because its priority is {} and our verbosity is currently {}", queuedMessage.messageName, priority, verbosity));
+                PlaybackModerator.Trace(string.Format("Message {0} hasn't been queued because its priority is {1} and our verbosity is currently {2}", queuedMessage.messageName, priority, verbosity));
             }
             return canPlay;
         }
