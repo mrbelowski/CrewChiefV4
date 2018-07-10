@@ -1065,7 +1065,7 @@ namespace CrewChiefV4.Events
                     return -1;
                 }
                 double expectedSessionTimeAtFullWear = Utilities.getYEstimate(x_data, tyreLifeYPointsTime.ToArray(), 95, 2);
-                return (int)Math.Floor((expectedSessionTimeAtFullWear - sessionRunningTime) / 60);
+                return (int)Math.Ceiling((expectedSessionTimeAtFullWear - sessionRunningTime) / 60);
             }
         }
 

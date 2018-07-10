@@ -113,7 +113,7 @@ namespace CrewChiefV4
             */
 
             // do the auto updating stuff in a separate Thread
-            if (!CrewChief.Debugging || 
+            if (!CrewChief.Debugging ||
                 SoundPackVersionsHelper.currentSoundPackVersion <= 0 || SoundPackVersionsHelper.currentPersonalisationsVersion <= 0 || SoundPackVersionsHelper.currentDriverNamesVersion <=0)
             {
                 new Thread(() =>
@@ -128,10 +128,27 @@ namespace CrewChiefV4
                     downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
                     downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
 
+                    String[] commandLineArgs = Environment.GetCommandLineArgs();
+                    Boolean skipUpdates = false;
+                    if (commandLineArgs != null)
+                    {
+                        foreach (String arg in commandLineArgs)
+                        {
+                            if ("SKIP_UPDATES".Equals(arg))
+                            {
+                                Console.WriteLine("Skipping application update check. To enable this check, run the app *without* the SKIP_UPDATES command line argument");
+                                skipUpdates = true;
+                                break;
+                            }
+                        }
+                    }
                     Boolean gotUpdateData = false;
                     try
                     {
-                        AutoUpdater.Start(firstUpdate);
+                        if (!skipUpdates)
+                        {
+                            AutoUpdater.Start(firstUpdate);
+                        }
                         string xml = new WebClient().DownloadString(firstUpdate);
                         gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                     }
@@ -145,7 +162,10 @@ namespace CrewChiefV4
                         Console.WriteLine("Unable to get update data with primary URL, trying secondary");
                         try
                         {
-                            AutoUpdater.Start(secondUpdate);
+                            if (!skipUpdates)
+                            {
+                                AutoUpdater.Start(secondUpdate);
+                            }
                             string xml = new WebClient().DownloadString(secondUpdate);
                             gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                         }
@@ -1556,7 +1576,7 @@ namespace CrewChiefV4
             catch
             {
             }
-            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"));
+            doRestart(Configuration.getUIString("the_application_must_be_restarted_to_check_for_updates"), Configuration.getUIString("check_for_updates"), true);
         }
 
         private void saveConsoleOutputButtonClicked(object sender, EventArgs e)
@@ -2190,7 +2210,7 @@ namespace CrewChiefV4
             }
         }
         
-        private void doRestart(String warningMessage, String warningTitle)
+        private void doRestart(String warningMessage, String warningTitle, Boolean removeSkipUpdates = false)
         {
             if (CrewChief.Debugging)
             {
@@ -2207,11 +2227,20 @@ namespace CrewChiefV4
                 {
                     // have to add "multi" to the start args so the app can restart
                     List<String> startArgs = new List<string>();
-                    startArgs.AddRange(Environment.GetCommandLineArgs());
+                    foreach (String startArg in Environment.GetCommandLineArgs())
+                    {
+                        // if we're restarting because the 'force update check' was clicked, remove the SKIP_UPDATES arg
+                        if (removeSkipUpdates && "SKIP_UPDATES".Equals(startArg))
+                        {
+                            continue;
+                        }
+                        startArgs.Add(startArg);
+                    }
                     if (!startArgs.Contains("multi"))
                     {
                         startArgs.Add("multi");
                     }
+
                     System.Diagnostics.Process.Start(Application.ExecutablePath, String.Join(" ", startArgs.ToArray())); // to start new instance of application
                     this.Close(); //to turn off current app
                 }
