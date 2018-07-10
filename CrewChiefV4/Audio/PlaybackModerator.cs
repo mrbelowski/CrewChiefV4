@@ -94,8 +94,10 @@ namespace CrewChiefV4.Audio
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
-                        currentGameState.SessionData.TimeDeltaFront < 2 || currentGameState.SessionData.TimeDeltaBehind < 2)
+                    if ((currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3 && 
+                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
+                        (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2) ||
+                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2))
                     {
                         verbosity = Verbosity.LOW;
                     }
