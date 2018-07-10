@@ -167,13 +167,6 @@ namespace CrewChiefV4
         }
 
         public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
-            Dictionary<String, Object> validationData, SoundMetadata metadata)
-            : this(messageName, messageFragments, secondsDelay, abstractEvent, validationData)
-        {
-            this.metadata = metadata;
-        }
-
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
             Dictionary<String, Object> validationData)
             : this(messageName, messageFragments, secondsDelay, abstractEvent)
         {

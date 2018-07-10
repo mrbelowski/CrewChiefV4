@@ -20,7 +20,7 @@ namespace CrewChiefV4.Audio
 
     public class SoundMetadata
     {
-        public static int DEFAULT_PRIORITY = 5;
+        public const int DEFAULT_PRIORITY = 5;
         public int messageId = 0;  // 0 => unset
         public SoundType type;
 

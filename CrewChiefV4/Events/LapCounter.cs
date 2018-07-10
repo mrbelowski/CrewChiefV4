@@ -300,7 +300,7 @@ namespace CrewChiefV4.Events
                     {
                         break;
                     }
-                    audioPlayer.playMessage(message);
+                    audioPlayer.playMessage(message, 10);
                 }
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
@@ -378,7 +378,7 @@ namespace CrewChiefV4.Events
                          currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk))
                     {
                         playedPreLightsRollingStartWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage(FrozenOrderMonitor.folderRollingStartReminder, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(FrozenOrderMonitor.folderRollingStartReminder, 0, this), 10);
                     }
 
                     // when the lights change to green, give some info:
@@ -424,7 +424,7 @@ namespace CrewChiefV4.Events
                             // empty the queue and play 'get ready'
                             int purgedCount = audioPlayer.purgeQueues();
                             Console.WriteLine("Purging pre-lights messages, removed = " + purgedCount + " messages");
-                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
                             playedGetReady = true;
                         }
                         else
@@ -500,7 +500,7 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.purgeQueues();
                         }
-                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
                         playedGetReady = true;
                     }
                 }
@@ -544,15 +544,15 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), 10);
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this), 10);
                     }
                     else if (position > 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this), 10);
                     }
                     else
                     {
@@ -564,11 +564,11 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this), 10);
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this), 10);
                     }
                     else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5 &&
                         currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
@@ -577,12 +577,12 @@ namespace CrewChiefV4.Events
                         // might be invalid so perhaps they're really not being shit. At the moment.
                         if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5, 10);
                         }
                     }
                     else if (position >= 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5, 10);
                     }
                     else
                     {
@@ -614,7 +614,7 @@ namespace CrewChiefV4.Events
 
         private void playManualStartGetReady()
         {
-            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
             playedManualStartGetReady = true;
         }
 
@@ -731,11 +731,11 @@ namespace CrewChiefV4.Events
             }
             if (opponentToLineUpBehind == null)
             {
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsNoName, 0, this));
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsNoName, 0, this), 10);
             }
             else
             {
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this), 10);
             }
             playedManualStartInitialMessage = true;
         }
@@ -762,18 +762,18 @@ namespace CrewChiefV4.Events
                         if (gridSide == GridSide.LEFT)
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn), 0, this));
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn), 0, this), 10);
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn), 0, this));
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn), 0, this), 10);
                         }
                     }
                     else
                     {
                         audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow), 0, this));
+                                    newOpponentToFollow), 0, this), 10);
                     }
                 }
             }
@@ -782,7 +782,7 @@ namespace CrewChiefV4.Events
                 if (!playedRejoinAtBackMessage)
                 {
                     playedRejoinAtBackMessage = true;
-                    audioPlayer.playMessage(new QueuedMessage("rejoin_at_back", MessageContents(folderManualStartRejoinAtBack), 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("rejoin_at_back", MessageContents(folderManualStartRejoinAtBack), 0, this), 10);
                 }
                 setOpponentToFollowAndStartPosition(currentGameState, true, false);
             }
@@ -799,7 +799,7 @@ namespace CrewChiefV4.Events
 
                     audioPlayer.playMessage(new QueuedMessage("give_position_back",
                         MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, getOpponent(currentGameState, manualStartOpponentToFollow)),
-                        MessageContents(folderGivePositionBack), 5, this, validationData));                    
+                        MessageContents(folderGivePositionBack), 5, this, validationData), 10);                    
                 }
             }
         }
@@ -834,7 +834,7 @@ namespace CrewChiefV4.Events
                     if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 5)
                     {
                         Console.WriteLine("Looks like the leader has 'gone'");
-                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this), 10);
                         leaderHasGone = true;
                     }
                 }
@@ -881,11 +881,11 @@ namespace CrewChiefV4.Events
                 }
                 if (opponentToLineUpBehind == null)
                 {
-                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsNoName, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsNoName, 0, this), 10);
                 }
                 else
                 {
-                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this), 10);
                 }
             }
         }

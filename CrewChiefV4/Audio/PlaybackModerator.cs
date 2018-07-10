@@ -61,29 +61,43 @@ namespace CrewChiefV4.Audio
 
         public static Verbosity verbosity = Verbosity.FULL;
         private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string,MessageQueueCounter>();
+        private static DateTime nextVerbosityUpdate = DateTime.MinValue;
 
-        public static void clearPlayedMessageCounteras()
+        private static Dictionary<Verbosity, int> minPriorityForEachVerbosity = new Dictionary<Verbosity, int>() {
+            {Verbosity.FULL, 0},
+            {Verbosity.MED, 5},
+            {Verbosity.LOW, 10},
+            {Verbosity.SILENT, 20}
+        };
+
+        public static void clearPlayedMessageCounters()
         {
             queuedMessageCounters.Clear();
         }
 
-        public static void UpdateAutoVerbosity(GameStateData currenGameState)
+        public static void UpdateAutoVerbosity(GameStateData currentGameState)
         {
-            verbosity = Verbosity.FULL;
-            if (!autoVerbosity)
+            if (!autoVerbosity || currentGameState == null)
+            {
+                verbosity = Verbosity.FULL;
+                return;
+            }
+            if (currentGameState.Now < nextVerbosityUpdate)
             {
                 return;
             }
-            if (currenGameState.SessionData.SessionType == SessionType.Race && currenGameState.PositionAndMotionData.CarSpeed > 5)
+            nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
+            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 // only interested if we're moving and it's a race session
-                 if ((currenGameState.SessionData.TimeDeltaFront < 3 && currenGameState.SessionData.TimeDeltaBehind < 3) ||
-                    (currenGameState.SessionData.TimeDeltaFront < 2 || currenGameState.SessionData.TimeDeltaBehind < 2))
+                 if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
+                    currentGameState.SessionData.TimeDeltaFront < 2 || currentGameState.SessionData.TimeDeltaBehind < 2)
                 {
                     verbosity = Verbosity.LOW;
                 }
-                else if (currenGameState.SessionData.CompletedLaps == 0 || 
-                    currenGameState.SessionData.SessionNumberOfLaps == currenGameState.SessionData.CompletedLaps + 1)
+                else if (currentGameState.SessionData.CompletedLaps == 0 || 
+                    (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
+                    (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 2 >= currentGameState.SessionData.SessionTotalRunTime))
                 {
                     verbosity = Verbosity.MED;
                 }
@@ -285,30 +299,7 @@ namespace CrewChiefV4.Audio
                 priority = queuedMessage.metadata.priority;
                 type = queuedMessage.metadata.type;
             }
-            Boolean canPlay = true;
-            if (verbosity == Verbosity.FULL)
-            {
-                // waffle-mode, all messages can play
-                canPlay = true;
-            }
-            else if (verbosity == Verbosity.SILENT)
-            {
-                // insolent-mode, no messages can play
-                canPlay = false;
-            }
-            else
-            {
-                // check against the verbosity
-                if (verbosity == Verbosity.MED)
-                {
-                    // TODO: externalise the thresholds?
-                    canPlay = priority > 3;
-                }
-                else if (verbosity == Verbosity.LOW)
-                {
-                    canPlay = priority > 5;
-                }
-            }
+            Boolean canPlay = priority >= minPriorityForEachVerbosity[verbosity];            
             if (canPlay)
             {
                 MessageQueueCounter counter;
