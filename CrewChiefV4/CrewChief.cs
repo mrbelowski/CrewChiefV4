@@ -886,7 +886,7 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
-                                PlaybackModerator.clearVerbosityData();
+                                PlaybackModerator.ClearVerbosityData();
                                 PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 audioPlayer.resetSoundTypesInImmediateQueue();
@@ -1025,7 +1025,7 @@ namespace CrewChiefV4
             sessionFinished = false;
             faultingEvents.Clear();
             faultingEventsCount.Clear();
-            PlaybackModerator.clearVerbosityData();
+            PlaybackModerator.ClearVerbosityData();
             PlaybackModerator.lastBlockedMessageId = -1;
             audioPlayer.disablePearlsOfWisdom = false;
             audioPlayer.resetSoundTypesInImmediateQueue();

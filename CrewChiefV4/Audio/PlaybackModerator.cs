@@ -70,7 +70,7 @@ namespace CrewChiefV4.Audio
             {Verbosity.SILENT, 20}
         };
 
-        public static void clearVerbosityData()
+        public static void ClearVerbosityData()
         {
             queuedMessageCounters.Clear();
             verbosity = Verbosity.FULL;
@@ -81,15 +81,15 @@ namespace CrewChiefV4.Audio
         {
             if (!autoVerbosity || currentGameState == null)
             {
-                verbosity = Verbosity.FULL;
+                PlaybackModerator.verbosity = Verbosity.FULL;
                 return;
             }
             if (currentGameState.Now < nextVerbosityUpdate)
             {
                 return;
             }
-            nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
-            verbosity = Verbosity.FULL;
+            PlaybackModerator.nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
+            PlaybackModerator.verbosity = Verbosity.FULL;
             if (currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race)
@@ -106,22 +106,22 @@ namespace CrewChiefV4.Audio
 
                     if (inCloseTraffic || hasCarVeryClose)
                     {
-                        verbosity = Verbosity.LOW;
+                        PlaybackModerator.verbosity = Verbosity.LOW;
                     }
                     else if (inTraffic || hasCarClose)
                     {
-                        verbosity = Verbosity.MED;
+                        PlaybackModerator.verbosity = Verbosity.MED;
                     }
                     else if (currentGameState.SessionData.CompletedLaps == 0 ||
                         (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
                         (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
                     {
-                        verbosity = Verbosity.MED;
+                        PlaybackModerator.verbosity = Verbosity.MED;
                     }
                 }
                 else if (currentGameState.SessionData.SessionType == SessionType.Qualify && !currentGameState.PitData.OnOutLap && currentGameState.SessionData.CurrentLapIsValid)
                 {
-                    verbosity = Verbosity.MED;
+                    PlaybackModerator.verbosity = Verbosity.MED;
                 }
             }
         }
@@ -313,6 +313,7 @@ namespace CrewChiefV4.Audio
             SoundType type;
             if (queuedMessage.metadata == null)
             {
+                Console.WriteLine("Message " + queuedMessage.messageName + " has no metadata, setting priority and type to default");
                 priority = SoundMetadata.DEFAULT_PRIORITY;
                 type = SoundType.REGULAR_MESSAGE;
             }
@@ -321,18 +322,18 @@ namespace CrewChiefV4.Audio
                 priority = queuedMessage.metadata.priority;
                 type = queuedMessage.metadata.type;
             }
-            Boolean canPlay = priority >= minPriorityForEachVerbosity[verbosity];            
+            Boolean canPlay = priority >= PlaybackModerator.minPriorityForEachVerbosity[verbosity];            
             if (canPlay)
             {
                 MessageQueueCounter counter;
-                if (queuedMessageCounters.TryGetValue(queuedMessage.messageName, out counter))
+                if (PlaybackModerator.queuedMessageCounters.TryGetValue(queuedMessage.messageName, out counter))
                 {
                     counter.timeQueued = now;
                     counter.numberOfTimesQueued = counter.numberOfTimesQueued + 1;
                 }
                 else
                 {
-                    queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
+                    PlaybackModerator.queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
                 }
             }
             else
