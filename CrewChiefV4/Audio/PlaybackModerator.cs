@@ -103,7 +103,7 @@ namespace CrewChiefV4.Audio
                     }
                     else if (currentGameState.SessionData.CompletedLaps == 0 ||
                         (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
-                        (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 2 >= currentGameState.SessionData.SessionTotalRunTime))
+                        (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
                     {
                         verbosity = Verbosity.MED;
                     }
