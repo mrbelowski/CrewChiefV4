@@ -1097,5 +1097,5 @@ iracing_enable_auto_fuel_to_end_of_race_category = PIT_STOPS_AND_MULTICLASS
 iracing_enable_auto_fuel_to_end_of_race_filter = IRACING
 
 priortise_messages_depending_on_situation = Advanced message prioritisation
-priortise_messages_depending_on_situation_help = Write me
+priortise_messages_depending_on_situation_help = Disable less import messages when under pressure, on a qualy lap, etc
 priortise_messages_depending_on_situation_category = AUDIO_VOICE_AND_CONTROLLERS

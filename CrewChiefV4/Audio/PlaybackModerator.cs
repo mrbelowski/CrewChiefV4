@@ -67,7 +67,7 @@ namespace CrewChiefV4.Audio
             {Verbosity.FULL, 0},
             {Verbosity.MED, 5},
             {Verbosity.LOW, 10},
-            {Verbosity.SILENT, 20}
+            {Verbosity.SILENT, 20}  // this one isn't used. Remove it?
         };
 
         public static void clearVerbosityData()
