@@ -633,7 +633,7 @@ namespace CrewChiefV4.Events
                                     else if (consistency == ConsistencyResult.IMPROVING)
                                     {
                                         lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, Utilities.random.Next(0, 8), this), 3);
+                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, Utilities.random.Next(0, 8), this), 5);
                                     }
                                     else if (consistency == ConsistencyResult.WORSENING)
                                     {

@@ -567,7 +567,7 @@ namespace CrewChiefV4.Events
                         play2minOpenWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen2Min, 0, this), 2);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen2Min, 0, this), 10);
                         }
                     }
                     else if (pitWindowClosedTime > 0 && playClosedNow && currentGameState.SessionData.SessionTimeRemaining > 0 &&

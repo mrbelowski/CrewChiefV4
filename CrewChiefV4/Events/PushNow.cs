@@ -237,19 +237,19 @@ namespace CrewChiefV4.Events
                     // going flat out, we're going to catch the guy ahead us before the end
                     if (currentGameState.SessionData.ClassPosition == 2)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 0, this), 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 0, this), 5);
                     }
                     else if (currentGameState.SessionData.ClassPosition == 3)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 0, this), 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 0, this), 5);
                     }
                     else if (currentGameState.SessionData.ClassPosition == 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 0, this), 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 0, this), 5);
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToImprove, 0, this), 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToImprove, 0, this), 5);
                     }
                     return true;
                 }

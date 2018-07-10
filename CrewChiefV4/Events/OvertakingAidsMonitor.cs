@@ -87,7 +87,7 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, true /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", MessageContents(folderASecondOffDRSRange), 0, this), 5);
+                            audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", MessageContents(folderASecondOffDRSRange), 0, this), 10);
                             playedGetCloserForDRSOnThisLap = true;
                         }
                     }
@@ -96,7 +96,7 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, true /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("drs_a_few_tenths_out_of_range", MessageContents(folderAFewTenthsOffDRSRange), 0, this), 5);
+                            audioPlayer.playMessage(new QueuedMessage("drs_a_few_tenths_out_of_range", MessageContents(folderAFewTenthsOffDRSRange), 0, this), 10);
                             playedGetCloserForDRSOnThisLap = true;
                         }
                     }
@@ -111,7 +111,7 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, false /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this), 5);
+                            audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this), 10);
                         }
                     }
                 }

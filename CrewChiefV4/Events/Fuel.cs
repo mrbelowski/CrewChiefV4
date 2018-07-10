@@ -464,7 +464,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 3);
+                                    audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
                                 }
                             }
                             else if (raceLapsRemaining > 3 && estimatedFuelLapsLeft == 4)
@@ -569,7 +569,7 @@ namespace CrewChiefV4.Events
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 3);
+                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
                                     }
                                 }
                             }

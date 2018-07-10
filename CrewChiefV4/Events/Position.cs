@@ -381,20 +381,20 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 4)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this), 5);
                         }
                         else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 1)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this), 5);
                         }
                         else if (!isLast && (currentGameState.SessionData.ClassPosition == 1 || currentGameState.SessionData.ClassPosition < currentGameState.SessionData.SessionStartClassPosition - 1))
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this), 5);
                         }
                         else if (!isLast && Utilities.random.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
-                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this), 5);
                         }
                     }
                 }
