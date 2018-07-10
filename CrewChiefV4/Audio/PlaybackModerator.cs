@@ -87,17 +87,24 @@ namespace CrewChiefV4.Audio
                 return;
             }
             nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
-            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PositionAndMotionData.CarSpeed > 5)
+            verbosity = Verbosity.FULL;
+            if (currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
-                // only interested if we're moving and it's a race session
-                if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
-                    currentGameState.SessionData.TimeDeltaFront < 2 || currentGameState.SessionData.TimeDeltaBehind < 2)
+                if (currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    verbosity = Verbosity.LOW;
+                    if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
+                        currentGameState.SessionData.TimeDeltaFront < 2 || currentGameState.SessionData.TimeDeltaBehind < 2)
+                    {
+                        verbosity = Verbosity.LOW;
+                    }
+                    else if (currentGameState.SessionData.CompletedLaps == 0 ||
+                        (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
+                        (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 2 >= currentGameState.SessionData.SessionTotalRunTime))
+                    {
+                        verbosity = Verbosity.MED;
+                    }
                 }
-                else if (currentGameState.SessionData.CompletedLaps == 0 || 
-                    (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
-                    (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 2 >= currentGameState.SessionData.SessionTotalRunTime))
+                else if (currentGameState.SessionData.SessionType == SessionType.Qualify && !currentGameState.PitData.OnOutLap && currentGameState.SessionData.CurrentLapIsValid)
                 {
                     verbosity = Verbosity.MED;
                 }
