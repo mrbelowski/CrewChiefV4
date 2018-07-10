@@ -90,7 +90,7 @@ namespace CrewChiefV4.Audio
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 // only interested if we're moving and it's a race session
-                 if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
+                if ((currentGameState.SessionData.TimeDeltaFront < 3 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
                     currentGameState.SessionData.TimeDeltaFront < 2 || currentGameState.SessionData.TimeDeltaBehind < 2)
                 {
                     verbosity = Verbosity.LOW;
@@ -312,6 +312,10 @@ namespace CrewChiefV4.Audio
                 {
                     queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
                 }
+            }
+            else
+            {
+                PlaybackModerator.Trace(string.Format("Message {} hasn't been queued because its priority is {} and our verbosity is currently {}", queuedMessage.messageName, priority, verbosity));
             }
             return canPlay;
         }
