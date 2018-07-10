@@ -883,8 +883,7 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
-                                PlaybackModerator.clearPlayedMessageCounters();
-                                PlaybackModerator.verbosity = Verbosity.FULL;
+                                PlaybackModerator.clearVerbosityData();
                                 PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 audioPlayer.resetSoundTypesInImmediateQueue();

@@ -59,7 +59,7 @@ namespace CrewChiefV4.Audio
 
         public static int lastBlockedMessageId = -1;
 
-        public static Verbosity verbosity = Verbosity.FULL;
+        private static Verbosity verbosity = Verbosity.FULL;
         private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string,MessageQueueCounter>();
         private static DateTime nextVerbosityUpdate = DateTime.MinValue;
 
@@ -70,9 +70,11 @@ namespace CrewChiefV4.Audio
             {Verbosity.SILENT, 20}
         };
 
-        public static void clearPlayedMessageCounters()
+        public static void clearVerbosityData()
         {
             queuedMessageCounters.Clear();
+            verbosity = Verbosity.FULL;
+            nextVerbosityUpdate = DateTime.MinValue;
         }
 
         public static void UpdateAutoVerbosity(GameStateData currentGameState)
