@@ -66,8 +66,7 @@ namespace CrewChiefV4.Audio
         private static Dictionary<Verbosity, int> minPriorityForEachVerbosity = new Dictionary<Verbosity, int>() {
             {Verbosity.FULL, 0},
             {Verbosity.MED, 5},
-            {Verbosity.LOW, 10},
-            {Verbosity.SILENT, 20}  // this one isn't used. Remove it?
+            {Verbosity.LOW, 10}
         };
 
         public static void clearVerbosityData()
