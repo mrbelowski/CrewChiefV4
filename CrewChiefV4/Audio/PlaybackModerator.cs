@@ -93,12 +93,23 @@ namespace CrewChiefV4.Audio
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    if ((currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3 && 
-                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3) ||
-                        (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2) ||
-                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2))
+                    Boolean inCloseTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1.5 &&
+                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1.5;
+                    Boolean hasCarVeryClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1) ||
+                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1);
+                    
+                    Boolean inTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3 &&
+                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3;                   
+                    Boolean hasCarClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2) ||
+                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2);
+
+                    if (inCloseTraffic || hasCarVeryClose)
                     {
                         verbosity = Verbosity.LOW;
+                    }
+                    else if (inTraffic || hasCarClose)
+                    {
+                        verbosity = Verbosity.MED;
                     }
                     else if (currentGameState.SessionData.CompletedLaps == 0 ||
                         (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
