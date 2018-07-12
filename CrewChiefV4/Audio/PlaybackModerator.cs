@@ -322,9 +322,14 @@ namespace CrewChiefV4.Audio
                 priority = queuedMessage.metadata.priority;
                 type = queuedMessage.metadata.type;
             }
+
+           
             Boolean canPlay = priority >= PlaybackModerator.minPriorityForEachVerbosity[verbosity];            
             if (canPlay)
             {
+                // not using this Dictionary of played messages so no point in adding data to it. Will leave this code
+                // here for now in case i come up with a use-case
+                /*
                 MessageQueueCounter counter;
                 if (PlaybackModerator.queuedMessageCounters.TryGetValue(queuedMessage.messageName, out counter))
                 {
@@ -335,6 +340,7 @@ namespace CrewChiefV4.Audio
                 {
                     PlaybackModerator.queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
                 }
+                */
             }
             else
             {
