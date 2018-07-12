@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.4.2</h2>
+<ul>
+	<li>Prevent unimportant messages playing if the player is fighting with other cars in a race session or is on a flying lap in a qualifying session (disabled by default, enable this with the 'Advanced message prioritisation' option)</li>
+	<li>Allow app update check to be skipped - adding the start argument SKIP_UPDATES to your shortcut will prevent the app checking for updates (but it'll still check for sound pack updates)</li>
+	<li>Report yellow flag messages even if we're in a corner / braking zone</li>
+	<li>Various bug fixes and tweaks</li>
+</ul>
 <h2>Version 4.9.4.0</h2>
 <ul>
 	<li>Fixed regression in non-English speech recognition config files - the 'defaultLocale' property name for speech recognition language had been changed to 'language', so the app was ignoring this value in existing configurations. The app will now use the 'defaultLocale' property value if it doesn't find a 'language' property</li>
