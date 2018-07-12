@@ -1008,7 +1008,7 @@ namespace CrewChiefV4.Audio
             return channelOpen;
         }
 
-        public void playMessage(QueuedMessage queuedMessage)
+        public void playMessage(QueuedMessage queuedMessage, int priority = SoundMetadata.DEFAULT_PRIORITY)
         {
             if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.NONE))
             {
@@ -1016,7 +1016,7 @@ namespace CrewChiefV4.Audio
             } 
             else
             {
-                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
+                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0, priority);
             }
         }
 
@@ -1185,8 +1185,7 @@ namespace CrewChiefV4.Audio
             return index;
         }
 
-
-        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
+        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability, int priority = SoundMetadata.DEFAULT_PRIORITY)
         {
             if (queuedMessage.canBePlayed)
             {
@@ -1200,30 +1199,34 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         // default 'regular' message priority is 0, which is lowest
-                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
-                        PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
-                        if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
+                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, priority);
+                        DateTime now = CrewChief.currentGameState == null ? DateTime.Now : CrewChief.currentGameState.Now;
+                        if (PlaybackModerator.MessageCanBeQueued(queuedMessage, queuedClips.Count, now))
                         {
-                            pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
-                        }
+                            PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
+                            if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
+                            {
+                                pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
+                            }
 
-                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
-                        if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
-                        {
-                            QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
-                            pearlQueuedMessage.metadata = queuedMessage.metadata;
-                            pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
-                            insertionIndex++;
-                        }
-                        queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
-                        if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
-                        {
-                            QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
-                            pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            pearlQueuedMessage.metadata = queuedMessage.metadata;
-                            insertionIndex++;
-                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
+                            if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
+                            {
+                                QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                                pearlQueuedMessage.metadata = queuedMessage.metadata;
+                                pearlQueuedMessage.dueTime = queuedMessage.dueTime;
+                                queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                                insertionIndex++;
+                            }
+                            queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
+                            if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
+                            {
+                                QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                                pearlQueuedMessage.dueTime = queuedMessage.dueTime;
+                                pearlQueuedMessage.metadata = queuedMessage.metadata;
+                                insertionIndex++;
+                                queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            }
                         }
                     }
                 }

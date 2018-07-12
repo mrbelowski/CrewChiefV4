@@ -22,6 +22,7 @@ namespace CrewChiefV4
 
         readonly int timeBetweenProcConnectCheckMillis = 500;
         readonly int timeBetweenProcDisconnectCheckMillis = 2000;
+        readonly int maxEventFailuresBeforeDisabling = 10;
         DateTime nextProcessStateCheck = DateTime.MinValue;
         bool isGameProcessRunning = false;
 
@@ -64,6 +65,8 @@ namespace CrewChiefV4
         private Dictionary<String, String> faultingEvents = new Dictionary<String, String>();
         
         private Dictionary<String, int> faultingEventsCount = new Dictionary<String, int>();
+
+        private Boolean sessionHasFailingEvent = false;
 
         private Spotter spotter;
 
@@ -883,6 +886,7 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
+                                PlaybackModerator.ClearVerbosityData();
                                 PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
                                 audioPlayer.resetSoundTypesInImmediateQueue();
@@ -903,6 +907,7 @@ namespace CrewChiefV4
                                     }
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
+                                    sessionHasFailingEvent = false;
                                     stateCleared = true;
                                     PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
                                     PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
@@ -957,6 +962,9 @@ namespace CrewChiefV4
                                     }
                                     stateCleared = false;
                                 }
+                                // update the auto-verbosity
+                                PlaybackModerator.UpdateAutoVerbosity(currentGameState);
+
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {
@@ -1015,6 +1023,13 @@ namespace CrewChiefV4
             currentGameState = null;
             previousGameState = null;
             sessionFinished = false;
+            faultingEvents.Clear();
+            faultingEventsCount.Clear();
+            PlaybackModerator.ClearVerbosityData();
+            PlaybackModerator.lastBlockedMessageId = -1;
+            audioPlayer.disablePearlsOfWisdom = false;
+            audioPlayer.resetSoundTypesInImmediateQueue();
+            sessionHasFailingEvent = false;
             Console.WriteLine("Stopping queue monitor");
             if (audioPlayer != null)
             {
@@ -1058,7 +1073,11 @@ namespace CrewChiefV4
         {
             try
             {
-                abstractEvent.trigger(previousGameState, currentGameState);
+                int failureCount;
+                if (!sessionHasFailingEvent || !faultingEventsCount.TryGetValue(eventName, out failureCount) || failureCount < maxEventFailuresBeforeDisabling)
+                {
+                    abstractEvent.trigger(previousGameState, currentGameState);
+                }
             }
             catch (Exception e)
             {
@@ -1066,10 +1085,11 @@ namespace CrewChiefV4
                 if (faultingEventsCount.TryGetValue(eventName, out failureCount))
                 {
                     faultingEventsCount[eventName] = ++failureCount;
-                    if (failureCount > 5)
+                    if (failureCount >= maxEventFailuresBeforeDisabling)
                     {
+                        sessionHasFailingEvent = true;
                         Console.WriteLine("Event " + eventName +
-                            " has failed > 5 times in this session");
+                            " has failed " + maxEventFailuresBeforeDisabling + " times in this session and will be disabled");
                     }
                 }
                 if (!faultingEvents.ContainsKey(eventName))
