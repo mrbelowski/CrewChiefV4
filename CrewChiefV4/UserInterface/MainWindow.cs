@@ -697,9 +697,12 @@ namespace CrewChiefV4
             this.filenameLabel.Visible = CrewChief.Debugging;
             this.filenameTextbox.Visible = CrewChief.Debugging;
             this.playbackInterval.Visible = CrewChief.Debugging;
+            this.buttonSmokeTest.Visible = CrewChief.Debugging;
+            this.smokeTestTextBox.Visible = CrewChief.Debugging;
             if (CrewChief.Debugging)
             {
                 this.recordSession.Visible = true;
+                this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
             }
             else
             {
@@ -2326,6 +2329,15 @@ namespace CrewChiefV4
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
+        }
+
+        private void playSmokeTestSounds(object sender, EventArgs e)
+        {
+            if (crewChief.audioPlayer != null)
+            {
+                new SmokeTest(crewChief.audioPlayer).playFolders(this.smokeTestTextBox.Lines);
+            }
+            
         }
     }
 
