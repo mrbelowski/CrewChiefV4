@@ -213,6 +213,10 @@ namespace CrewChiefV4.Events
         {
             List<String> rawDriverNames = new List<string>();
             List<MessageFragment> fragments = new List<MessageFragment>();
+            if (foldersOrStuff.Length > 0 && File.Exists(foldersOrStuff[0]))
+            {
+                foldersOrStuff = File.ReadAllLines(foldersOrStuff[0]);
+            }
             foreach(String stuffToPlay in foldersOrStuff)
             {
                 int num;

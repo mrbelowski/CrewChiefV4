@@ -697,21 +697,39 @@ namespace CrewChiefV4
             this.filenameLabel.Visible = CrewChief.Debugging;
             this.filenameTextbox.Visible = CrewChief.Debugging;
             this.playbackInterval.Visible = CrewChief.Debugging;
-            this.buttonSmokeTest.Visible = CrewChief.Debugging;
-            this.smokeTestTextBox.Visible = CrewChief.Debugging;
+           
+            String[] commandLineArgs = Environment.GetCommandLineArgs();
+            if (commandLineArgs != null)
+            {
+                foreach (String arg in commandLineArgs)
+                {
+                    if (arg.Equals("SMOKE_TEST"))
+                    {
+                        Console.WriteLine("Smoke-test enabled");
+                        this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
+                        this.buttonSmokeTest.Visible = true;
+                        this.smokeTestTextBox.Visible = true;
+                    }
+                }
+            }
             if (CrewChief.Debugging)
             {
                 this.recordSession.Visible = true;
-                this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
             }
             else
             {
                 this.recordSession.Visible = false;
-                String[] commandLineArgs = Environment.GetCommandLineArgs();
                 if (commandLineArgs != null)
                 {
                     foreach (String arg in commandLineArgs)
                     {
+                        if(arg.Equals("SMOKE_TEST"))
+                        {
+                            Console.WriteLine("Smoke-test enabled");
+                            this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
+                            this.buttonSmokeTest.Visible = true;
+                            this.smokeTestTextBox.Visible = true;
+                        }
                         if (arg.Equals("DEBUG"))
                         {
                             Console.WriteLine("Dump-to-file enabled");
