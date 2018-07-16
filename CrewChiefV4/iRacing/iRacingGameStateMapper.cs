@@ -223,7 +223,7 @@ namespace CrewChiefV4.iRacing
                     }
                 }
                 // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
-                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0, true);
+                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, shared.Telemetry.AirTemp, shared.Telemetry.TrackTempCrew, 0, shared.Telemetry.WindVel, 0, 0, 0, true);
 
                 //need to call this after adding opponents else we have nothing to compare against 
                 Utilities.TraceEventClass(currentGameState);
@@ -603,7 +603,7 @@ namespace CrewChiefV4.iRacing
                 if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        playerCar.Live.LapTimePrevious, lapValid, currentGameState.PitData.InPitlane, false, shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp,
+                        playerCar.Live.LapTimePrevious, lapValid, currentGameState.PitData.InPitlane, false, shared.Telemetry.TrackTempCrew, shared.Telemetry.AirTemp,
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
 
                     if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
@@ -614,7 +614,7 @@ namespace CrewChiefV4.iRacing
                 else if ((currentSector == 2 || currentSector == 3) && playerCar.Live.Lap > 0)
                 {
                     currentGameState.SessionData.playerAddCumulativeSectorData(currentSector - 1, currentGameState.SessionData.OverallPosition, shared.Telemetry.LapCurrentLapTime,
-                        currentGameState.SessionData.SessionRunningTime, validSpeed && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits, false, shared.Telemetry.TrackTemp, shared.Telemetry.AirTemp);
+                        currentGameState.SessionData.SessionRunningTime, validSpeed && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits, false, shared.Telemetry.TrackTempCrew, shared.Telemetry.AirTemp);
                 }
             }
 
@@ -818,7 +818,7 @@ namespace CrewChiefV4.iRacing
                                         shared.Telemetry.CarIdxOnPitRoad[driver.Id] || driver.Live.TrackSurface == TrackSurfaces.InPitStall, previousIsApporchingPits,
                                         previousOpponentLapValid, currentOpponentLapValid, currentGameState.SessionData.SessionRunningTime, currentOpponentLapDistance,
                                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                        currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTemp,
+                                        currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTempCrew,
                                         shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1.0f,
                                         currentOpponentSpeed, driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap,
                                         driver.Car.CarClassId, driver.Car.CarId);
@@ -976,7 +976,7 @@ namespace CrewChiefV4.iRacing
             {
                 nextConditionsSampleDue = currentGameState.Now.Add(ConditionsMonitor.ConditionsSampleFrequency);
                 currentGameState.Conditions.addSample(currentGameState.Now, currentGameState.SessionData.CompletedLaps, currentGameState.SessionData.SectorNumber,
-                    shared.Telemetry.AirTemp, shared.Telemetry.TrackTemp, 0, shared.Telemetry.WindVel, 0, 0, 0, currentGameState.SessionData.IsNewLap);
+                    shared.Telemetry.AirTemp, shared.Telemetry.TrackTempCrew, 0, shared.Telemetry.WindVel, 0, 0, 0, currentGameState.SessionData.IsNewLap);
             }
 
             currentGameState.PenaltiesData.IsOffRacingSurface = shared.Telemetry.PlayerTrackSurface == TrackSurfaces.OffTrack;
