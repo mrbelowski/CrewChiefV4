@@ -395,8 +395,10 @@ namespace CrewChiefV4.iRacing
         /// Temperature of track at start/finish line
         /// </summary>
         public System.Single 	TrackTemp;
-
+        
         /// <summary>
+        /// As of 2018 Season 3 patch this temperature is dynamic and gives a more accurate value.
+        /// and we are switching to use this this.
         /// Temperature of track measured by crew around track
         /// </summary>
         public System.Single TrackTempCrew;
