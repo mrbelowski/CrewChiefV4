@@ -2346,7 +2346,7 @@ namespace CrewChiefV4
         {
             if (crewChief.audioPlayer != null)
             {
-                new SmokeTest(crewChief.audioPlayer).playFolders(this.smokeTestTextBox.Lines);
+                new SmokeTest(crewChief.audioPlayer).soundTestPlay(this.smokeTestTextBox.Lines);
             }
             
         }

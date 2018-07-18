@@ -209,7 +209,7 @@ namespace CrewChiefV4.Events
                 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
 
         }
-        public bool playFolders(String[] foldersOrStuff, int messageNumber = 0)
+        public bool soundTestPlay(String[] foldersOrStuff, int messageNumber = 1)
         {
             List<String> rawDriverNames = new List<string>();
             List<MessageFragment> fragments = new List<MessageFragment>();
@@ -235,7 +235,7 @@ namespace CrewChiefV4.Events
                     Array.Copy(foldersOrStuff, iter, nextNessage, 0, foldersOrStuff.Length - iter);
                     audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                     messageNumber++;
-                    return playFolders(nextNessage, messageNumber);
+                    return soundTestPlay(nextNessage, messageNumber);
                 }
                 
                 if (isNumeric)
