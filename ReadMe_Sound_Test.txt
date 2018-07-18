@@ -23,6 +23,10 @@ name roslev
 timings/ahead_is_increasing
 time gap 3.23
 &
+name leonavicius
+timings/is_reeling_you_in
+time gap 1.23
+&
 #To insert a pause type "pause 100" followed by millisec. ex:
 pause 150
 # Time messages can be played with the following commands
