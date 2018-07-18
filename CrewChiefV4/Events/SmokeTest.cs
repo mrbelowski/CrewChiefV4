@@ -209,7 +209,7 @@ namespace CrewChiefV4.Events
                 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
 
         }
-        public void playFolders(String[] foldersOrStuff)
+        public bool playFolders(String[] foldersOrStuff, int messageNumber = 0)
         {
             List<String> rawDriverNames = new List<string>();
             List<MessageFragment> fragments = new List<MessageFragment>();
@@ -217,10 +217,27 @@ namespace CrewChiefV4.Events
             {
                 foldersOrStuff = File.ReadAllLines(foldersOrStuff[0]);
             }
-            foreach(String stuffToPlay in foldersOrStuff)
+            int iter = 0;
+            String messageName = "";
+            foreach(String stuffToPlay in foldersOrStuff)            
             {
+                messageName = "sound_test_message_" + messageNumber.ToString();
+                iter++;
                 int num;
                 bool isNumeric = int.TryParse(stuffToPlay, out num);
+                if(stuffToPlay.StartsWith("#") || stuffToPlay.Length < 1)
+                { 
+                    continue;
+                }
+                if (stuffToPlay.StartsWith("&"))
+                {                    
+                    String [] nextNessage = new String [foldersOrStuff.Length - iter];
+                    Array.Copy(foldersOrStuff, iter, nextNessage, 0, foldersOrStuff.Length - iter);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    messageNumber++;
+                    return playFolders(nextNessage, messageNumber);
+                }
+                
                 if (isNumeric)
                 {
                     fragments.Add(MessageFragment.Integer(num));
@@ -276,8 +293,9 @@ namespace CrewChiefV4.Events
                     fragments.Add(MessageFragment.Text(stuffToPlay));
                 }
 
-            }            
-            audioPlayer.playMessage(new QueuedMessage("sound_test_for_beginners", fragments, 0, this));
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+            return true;
         }
 
         private void beepOutInTest()
