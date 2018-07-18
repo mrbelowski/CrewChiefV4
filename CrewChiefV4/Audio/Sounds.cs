@@ -325,7 +325,13 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void Play(List<String> soundNames)
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
+        public void Play(List<String> soundNames, SoundMetadata soundMetadata)
         {           
             SoundSet prefix = null;
             SoundSet suffix = null;
@@ -420,17 +426,23 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        singleSound.Play();
+                        singleSound.Play(soundMetadata);
                     }
                 }
             }
         }
 
-        public void Play(String soundName)
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
+        public void Play(String soundName, SoundMetadata soundMetadata)
         {
             List<String> l = new List<String>();
             l.Add(soundName);
-            Play(l);
+            Play(l, soundMetadata);
         }
 
         public void ExpireCachedSounds()
@@ -1152,12 +1164,18 @@ namespace CrewChiefV4.Audio
             }
         }
 
-        public void Play()
+        /*
+         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * can make the app skip playing this sound.
+         */
+        public void Play(SoundMetadata soundMetadata)
         {
-            if (!PlaybackModerator.ShouldPlaySound(this))
+            if (!PlaybackModerator.ShouldPlaySound(this, soundMetadata))
                 return;
 
-            PlaybackModerator.PreProcessSound(this);
+            PlaybackModerator.PreProcessSound(this, soundMetadata);
             if (AudioPlayer.playWithNAudio)
             {
                 PlayNAudio();

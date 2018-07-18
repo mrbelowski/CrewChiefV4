@@ -12,7 +12,7 @@ namespace CrewChiefV4.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -109,13 +109,13 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("en")]
-        public string speech_recognition_location {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string speech_recognition_country {
             get {
-                return ((string)(this["speech_recognition_location"]));
+                return ((string)(this["speech_recognition_country"]));
             }
             set {
-                this["speech_recognition_location"] = value;
+                this["speech_recognition_country"] = value;
             }
         }
         
@@ -229,7 +229,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int frequency_of_pearls_of_wisdom {
             get {
                 return ((int)(this["frequency_of_pearls_of_wisdom"]));
@@ -841,7 +841,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_race_sector_delta_reports {
             get {
                 return ((int)(this["frequency_of_race_sector_delta_reports"]));
@@ -853,7 +853,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_opponent_race_lap_times {
             get {
                 return ((int)(this["frequency_of_opponent_race_lap_times"]));
@@ -865,7 +865,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int frequency_of_player_race_lap_time_reports {
             get {
                 return ((int)(this["frequency_of_player_race_lap_time_reports"]));
@@ -877,7 +877,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int frequency_of_prac_and_qual_sector_delta_reports {
             get {
                 return ((int)(this["frequency_of_prac_and_qual_sector_delta_reports"]));
@@ -985,7 +985,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int frequency_of_opponent_practice_and_qual_lap_times {
             get {
                 return ((int)(this["frequency_of_opponent_practice_and_qual_lap_times"]));
@@ -1129,7 +1129,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int frequency_of_player_prac_and_qual_lap_time_reports {
             get {
                 return ((int)(this["frequency_of_player_prac_and_qual_lap_time_reports"]));
@@ -3224,6 +3224,150 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["force_rf2_rolling_start"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_pit_exit_position_estimates {
+            get {
+                return ((bool)(this["enable_pit_exit_position_estimates"]));
+            }
+            set {
+                this["enable_pit_exit_position_estimates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int PIT_PREDICTION_button_index {
+            get {
+                return ((int)(this["PIT_PREDICTION_button_index"]));
+            }
+            set {
+                this["PIT_PREDICTION_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PIT_PREDICTION_device_guid {
+            get {
+                return ((string)(this["PIT_PREDICTION_device_guid"]));
+            }
+            set {
+                this["PIT_PREDICTION_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PIT_PREDICTION_device_type {
+            get {
+                return ((string)(this["PIT_PREDICTION_device_type"]));
+            }
+            set {
+                this["PIT_PREDICTION_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool enable_opponent_pit_exit_estimates {
+            get {
+                return ((bool)(this["enable_opponent_pit_exit_estimates"]));
+            }
+            set {
+                this["enable_opponent_pit_exit_estimates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool immediate_messages_block_other_messages {
+            get {
+                return ((bool)(this["immediate_messages_block_other_messages"]));
+            }
+            set {
+                this["immediate_messages_block_other_messages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_delayed_messages_on_hardparts {
+            get {
+                return ((bool)(this["enable_delayed_messages_on_hardparts"]));
+            }
+            set {
+                this["enable_delayed_messages_on_hardparts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid {
+            get {
+                return ((string)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type {
+            get {
+                return ((string)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index {
+            get {
+                return ((int)(this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"]));
+            }
+            set {
+                this["TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool iracing_enable_auto_fuel_to_end_of_race {
+            get {
+                return ((bool)(this["iracing_enable_auto_fuel_to_end_of_race"]));
+            }
+            set {
+                this["iracing_enable_auto_fuel_to_end_of_race"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool priortise_messages_depending_on_situation {
+            get {
+                return ((bool)(this["priortise_messages_depending_on_situation"]));
+            }
+            set {
+                this["priortise_messages_depending_on_situation"] = value;
             }
         }
     }

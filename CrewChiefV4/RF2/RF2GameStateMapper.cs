@@ -90,6 +90,7 @@ namespace CrewChiefV4.rFactor2
         // Track landmarks cache.
         private string lastSessionTrackName = null;
         private TrackDataContainer lastSessionTrackDataContainer = null;
+        private HardPartsOnTrackData lastSessionHardPartsOnTrackData = null;
         private double lastSessionTrackLength = -1.0;
 
         private double lastPitBoxPositionEstimate = -1.0;
@@ -565,6 +566,10 @@ namespace CrewChiefV4.rFactor2
                 {
                     tdc = this.lastSessionTrackDataContainer;
 
+                    if (this.lastSessionHardPartsOnTrackData != null
+                        && this.lastSessionHardPartsOnTrackData.hardPartsMapped)
+                        cgs.hardPartsOnTrackData = this.lastSessionHardPartsOnTrackData;
+
                     if (tdc.trackLandmarks.Count > 0)
                         Console.WriteLine(tdc.trackLandmarks.Count + " landmarks defined for this track");
 
@@ -578,6 +583,7 @@ namespace CrewChiefV4.rFactor2
                     tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(csd.TrackDefinition.name, (float)shared.scoring.mScoringInfo.mLapDist);
 
                     this.lastSessionTrackDataContainer = tdc;
+                    this.lastSessionHardPartsOnTrackData = null;
                     this.lastSessionTrackName = csd.TrackDefinition.name;
                     this.lastSessionTrackLength = shared.scoring.mScoringInfo.mLapDist;
                 }
@@ -623,6 +629,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.Conditions.samples = pgs.Conditions.samples;
 
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
+
+                cgs.hardPartsOnTrackData = pgs.hardPartsOnTrackData;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -888,9 +896,6 @@ namespace CrewChiefV4.rFactor2
                 foreach (var lt in psd.formattedPlayerLapTimes)
                     csd.formattedPlayerLapTimes.Add(lt);
             }
-
-            if (csd.IsNewLap && csd.LapTimePrevious > 0)
-                csd.formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(csd.LapTimePrevious).ToString(@"mm\:ss\.fff"));
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
             csd.LeaderSectorNumber = leaderScoring.mSector == 0 ? 3 : leaderScoring.mSector;
@@ -1422,6 +1427,7 @@ namespace CrewChiefV4.rFactor2
                             csd.SessionRunningTime,
                             opponent.LastLapTime,
                             lapValid,  // TODO: revisit
+                            vehicleScoring.mInPits == 1,
                             shared.scoring.mScoringInfo.mRaining > minRainThreshold,
                             (float)shared.scoring.mScoringInfo.mTrackTemp,
                             (float)shared.scoring.mScoringInfo.mAmbientTemp,
@@ -1761,6 +1767,19 @@ namespace CrewChiefV4.rFactor2
                     || pgs.SessionData.SessionPhase == SessionPhase.Countdown))
                 csd.JustGoneGreen = true;
 
+            // Map difficult track parts.
+            if (csd.IsNewLap)
+            {
+                if (cgs.hardPartsOnTrackData.updateHardPartsForNewLap(csd.LapTimePrevious))
+                    csd.TrackDefinition.adjustGapPoints(cgs.hardPartsOnTrackData.processedHardPartsForBestLap);
+            }
+            else if (!cgs.PitData.OnOutLap && !csd.TrackDefinition.isOval &&
+                !(csd.SessionType == SessionType.Race && (csd.CompletedLaps < 1 || (GameStateData.useManualFormationLap && csd.CompletedLaps < 2))))
+                cgs.hardPartsOnTrackData.mapHardPartsOnTrack(cgs.ControlData.BrakePedal, cgs.ControlData.ThrottlePedal,
+                    cgs.PositionAndMotionData.DistanceRoundTrack, csd.CurrentLapIsValid, csd.TrackDefinition.trackLength);
+
+            this.lastSessionHardPartsOnTrackData = cgs.hardPartsOnTrackData;
+
             return cgs;
         }
 
@@ -1937,6 +1956,7 @@ namespace CrewChiefV4.rFactor2
                         csd.SessionRunningTime,
                         csd.LapTimePrevious,
                         csd.CurrentLapIsValid,
+                        playerScoring.mInPits == 1,
                         scoring.mScoringInfo.mRaining > minRainThreshold,
                         (float)scoring.mScoringInfo.mTrackTemp,
                         (float)scoring.mScoringInfo.mAmbientTemp,
@@ -1949,10 +1969,7 @@ namespace CrewChiefV4.rFactor2
                     csd.CompletedLaps + 1,
                     csd.OverallPosition,
                     playerScoring.mInPits == 1 || currentGameState.PositionAndMotionData.DistanceRoundTrack < 0.0f,
-                    csd.SessionRunningTime,
-                    scoring.mScoringInfo.mRaining > minRainThreshold,
-                    (float)scoring.mScoringInfo.mTrackTemp,
-                    (float)scoring.mScoringInfo.mAmbientTemp);
+                    csd.SessionRunningTime);
             }
             else if (csd.IsNewSector && lastSectorTime > 0.0f)
             {

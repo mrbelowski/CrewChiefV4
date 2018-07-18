@@ -46,6 +46,10 @@ namespace CrewChiefV4
         public static String TOGGLE_TRACK_LANDMARKS_RECORDING = Configuration.getUIString("toggle_track_landmarks_recording");
         public static String ADD_TRACK_LANDMARK = Configuration.getUIString("add_track_landmark");
 
+        public static String PIT_PREDICTION = Configuration.getUIString("activate_pit_prediction");
+
+        public static String TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS = Configuration.getUIString("toggle_delay_messages_in_hard_parts");
+
         private ControllerData networkGamePad = new ControllerData(Configuration.getUIString("udp_network_data_buttons"), DeviceType.Gamepad, UDP_NETWORK_CONTROLLER_GUID);
         
         // yuk...
@@ -80,6 +84,7 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_RACE_UPDATES_FUNCTION);
             addButtonAssignment(TOGGLE_SPOTTER_FUNCTION);
             addButtonAssignment(TOGGLE_READ_OPPONENT_DELTAS);
+            addButtonAssignment(TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS);
             addButtonAssignment(REPEAT_LAST_MESSAGE_BUTTON);
             addButtonAssignment(VOLUME_UP);
             addButtonAssignment(VOLUME_DOWN);
@@ -96,6 +101,7 @@ namespace CrewChiefV4
             addButtonAssignment(TOGGLE_PACE_NOTES_RECORDING);
             addButtonAssignment(TOGGLE_TRACK_LANDMARKS_RECORDING);
             addButtonAssignment(ADD_TRACK_LANDMARK);
+            addButtonAssignment(PIT_PREDICTION);
             controllers = loadControllers();
         }
 
@@ -119,6 +125,7 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_RACE_UPDATES_FUNCTION]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_SPOTTER_FUNCTION]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_READ_OPPONENT_DELTAS]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[REPEAT_LAST_MESSAGE_BUTTON]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_UP]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[VOLUME_DOWN]]);
@@ -136,6 +143,7 @@ namespace CrewChiefV4
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_PACE_NOTES_RECORDING]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[TOGGLE_TRACK_LANDMARKS_RECORDING]]);
             pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[ADD_TRACK_LANDMARK]]);
+            pollForButtonClicks(buttonAssignments[buttonAssignmentIndexes[PIT_PREDICTION]]);
             
         }
 
@@ -244,6 +252,10 @@ namespace CrewChiefV4
                 {
                     actionId = "TOGGLE_READ_OPPONENT_DELTAS";
                 }
+                else if (buttonAssignment.action == TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS)
+                {
+                    actionId = "TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS";
+                }
                 else if (buttonAssignment.action == REPEAT_LAST_MESSAGE_BUTTON)
                 {
                     actionId = "REPEAT_LAST_MESSAGE_BUTTON";
@@ -308,6 +320,10 @@ namespace CrewChiefV4
                 {
                     actionId = "ADD_TRACK_LANDMARK";
                 }
+                else if (buttonAssignment.action == PIT_PREDICTION)
+                {
+                    actionId = "PIT_PREDICTION";
+                }
                 if (buttonAssignment.controller != null && (buttonAssignment.joystick != null || buttonAssignment.controller.guid == UDP_NETWORK_CONTROLLER_GUID) && buttonAssignment.buttonIndex != -1)
                 {
                     UserSettings.GetUserSettings().setProperty(actionId + "_button_index", buttonAssignment.buttonIndex);
@@ -350,6 +366,13 @@ namespace CrewChiefV4
             if (toggleReadOpponentDeltasButtonIndex != -1 && toggleReadOpponentDeltasDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, TOGGLE_READ_OPPONENT_DELTAS, toggleReadOpponentDeltasButtonIndex, toggleReadOpponentDeltasDeviceGuid);
+            }
+
+            int toggleBlockMessagesInHardPartsButtonIndex = UserSettings.GetUserSettings().getInt("TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index");
+            String toggleBlockMessagesInHardPartsDeviceGuid = UserSettings.GetUserSettings().getString("TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid");
+            if (toggleBlockMessagesInHardPartsButtonIndex != -1 && toggleBlockMessagesInHardPartsDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS, toggleBlockMessagesInHardPartsButtonIndex, toggleBlockMessagesInHardPartsDeviceGuid);
             }
 
             int repeatLastMessageButtonIndex = UserSettings.GetUserSettings().getInt("REPEAT_LAST_MESSAGE_BUTTON_button_index");
@@ -460,6 +483,13 @@ namespace CrewChiefV4
             if (addTracklandmarkButtonIndex != -1 && addTracklandmarkDeviceGuid.Length > 0)
             {
                 loadAssignment(parent, ADD_TRACK_LANDMARK, addTracklandmarkButtonIndex, addTracklandmarkDeviceGuid);
+            }
+
+            int pitPredictionButtonIndex = UserSettings.GetUserSettings().getInt("PIT_PREDICTION_button_index");
+            String pitPredictionDeviceGuid = UserSettings.GetUserSettings().getString("PIT_PREDICTION_device_guid");
+            if (pitPredictionButtonIndex != -1 && pitPredictionDeviceGuid.Length > 0)
+            {
+                loadAssignment(parent, PIT_PREDICTION, pitPredictionButtonIndex, pitPredictionDeviceGuid);
             }
         }
 

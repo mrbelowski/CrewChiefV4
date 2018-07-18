@@ -8,6 +8,8 @@ using CrewChiefV4.Events;
 using System.Threading;
 using CrewChiefV4.Audio;
 using CrewChiefV4.commands;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace CrewChiefV4
 {
@@ -24,7 +26,7 @@ namespace CrewChiefV4
         private bool keepRecording = true;
         //
 
-        private String location = UserSettings.GetUserSettings().getString("speech_recognition_location");
+        private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
@@ -32,7 +34,8 @@ namespace CrewChiefV4
         private Boolean enable_iracing_pit_stop_commands = UserSettings.GetUserSettings().getBoolean("enable_iracing_pit_stop_commands");
         private static Boolean use_verbose_responses = UserSettings.GetUserSettings().getBoolean("use_verbose_responses");
 
-        private static String defaultLocale = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
+        private static String sreConfigLanguageSetting = Configuration.getSpeechRecognitionConfigOption("language");
+        private static String sreConfigDefaultLocaleSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
@@ -76,6 +79,8 @@ namespace CrewChiefV4
         public static String[] KEEP_ME_INFORMED = Configuration.getSpeechRecognitionPhrases("KEEP_ME_INFORMED");
         public static String[] TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("TELL_ME_THE_GAPS");
         public static String[] DONT_TELL_ME_THE_GAPS = Configuration.getSpeechRecognitionPhrases("DONT_TELL_ME_THE_GAPS");
+        public static String[] TALK_TO_ME_ANYWHERE = Configuration.getSpeechRecognitionPhrases("TALK_TO_ME_ANYWHERE");
+        public static String[] DONT_TALK_IN_THE_CORNERS = Configuration.getSpeechRecognitionPhrases("DONT_TALK_IN_THE_CORNERS");
         public static String[] WHATS_THE_TIME = Configuration.getSpeechRecognitionPhrases("WHATS_THE_TIME");
         public static String[] ENABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("ENABLE_YELLOW_FLAG_MESSAGES");
         public static String[] DISABLE_YELLOW_FLAG_MESSAGES = Configuration.getSpeechRecognitionPhrases("DISABLE_YELLOW_FLAG_MESSAGES");
@@ -106,6 +111,8 @@ namespace CrewChiefV4
         public static String[] RADIO_CHECK = Configuration.getSpeechRecognitionPhrases("RADIO_CHECK");
 
         public static String[] IS_MY_PIT_BOX_OCCUPIED = Configuration.getSpeechRecognitionPhrases("IS_MY_PIT_BOX_OCCUPIED");
+        public static String[] PLAY_POST_PIT_POSITION_ESTIMATE = Configuration.getSpeechRecognitionPhrases("PLAY_POST_PIT_POSITION_ESTIMATE");
+        public static String[] PRACTICE_PIT_STOP = Configuration.getSpeechRecognitionPhrases("PRACTICE_PIT_STOP");
 
 
         public static String ON = Configuration.getSpeechRecognitionConfigOption("ON");
@@ -392,10 +399,127 @@ namespace CrewChiefV4
             }
         }
 
-        private void initWithLocale(String locale)
+        private Tuple<String, String> parseLocalePropertyValue(String value)
         {
-            cultureInfo = new System.Globalization.CultureInfo(locale);
-            this.sre = new SpeechRecognitionEngine(cultureInfo);
+            if (value != null && value.Length > 1)
+            {
+                if (value.Length == 2)
+                {
+                    return new Tuple<String, String>(value.ToLowerInvariant(), null);
+                }
+                if (value.Length == 4)
+                {
+                    return new Tuple<String, String>(value.Substring(0, 2).ToLowerInvariant(), value.Substring(2).ToUpperInvariant());
+                }
+                if (value.Length == 5)
+                {
+                    return new Tuple<String, String>(value.Substring(0, 2).ToLowerInvariant(), value.Substring(3).ToUpperInvariant());
+                }
+            }
+            return new Tuple<String, String>(null, null);
+        }
+
+        private Boolean initWithLocale()
+        {
+            String overrideCountry = null;
+            if(localeCountryPropertySetting != null && localeCountryPropertySetting.Length == 2)
+            {
+                overrideCountry = localeCountryPropertySetting.ToUpper();
+            }
+            // for backwards compatibility
+            Boolean useDefaultLocaleInsteadOfLanguage = sreConfigDefaultLocaleSetting != null && sreConfigDefaultLocaleSetting.Length > 0;
+
+            Tuple<String, String> sreConfigLangAndCountry = parseLocalePropertyValue(useDefaultLocaleInsteadOfLanguage ? sreConfigDefaultLocaleSetting : sreConfigLanguageSetting);
+            String sreConfigLang = sreConfigLangAndCountry.Item1;
+            String sreConfigCountry = sreConfigLangAndCountry.Item2;
+            RecognizerInfo info = null;
+
+            String langToUse = sreConfigLang;
+            String countryToUse = overrideCountry != null ? overrideCountry : sreConfigCountry;            
+            String langAndCountryToUse = countryToUse != null ? langToUse + "-" + countryToUse : null;
+
+            if (langAndCountryToUse != null)
+            {
+                Console.WriteLine("Attempting to get recogniser for " + langAndCountryToUse);
+                foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
+                {
+                    if (ri.Culture.Name.Equals(langAndCountryToUse))
+                    {
+                        info = ri;
+                        cultureInfo = ri.Culture;
+                        break;
+                    }
+                }
+            }
+            if (info == null)
+            {
+                if (langAndCountryToUse != null)
+                {
+                    Console.WriteLine("Failed to get recogniser for " + langAndCountryToUse);
+                }
+                Console.WriteLine("Attempting to get recogniser for " + langToUse);
+                foreach (RecognizerInfo ri in SpeechRecognitionEngine.InstalledRecognizers())
+                {
+                    if (ri.Culture.TwoLetterISOLanguageName.Equals(langToUse))
+                    {
+                        info = ri;
+                        cultureInfo = ri.Culture;
+                        break;
+                    }
+                }
+            }
+
+            if (info != null)
+            {
+                Console.WriteLine(info.Culture.EnglishName + " - (" + info.Culture.Name + ")");
+                this.sre = new SpeechRecognitionEngine(info);
+                return this.sre != null;
+            }
+            if (countryToUse == null)
+            {
+                if (langToUse == "en")
+                {
+                    if (MessageBox.Show(Configuration.getUIString("install_any_speechlanguage_popup_text"), Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
+                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                    }
+                    Console.WriteLine("Unable to initialise speech engine with English voice recognition pack. " +
+                    "Check that at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " +
+                    "MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi are installed." +
+                    " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                } 
+                else
+                {
+                    if (MessageBox.Show(Configuration.getUIString("install_single_speechlanguage_popup_text_start") + langToUse +
+                    Configuration.getUIString("install_single_speechlanguage_popup_text_end"),
+                    Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                    {
+                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                    }
+                    Console.WriteLine("Unable to initialise speech engine with '" + langToUse + "' voice recognition pack. " +
+                    "Check that and appropriate language pack is installed." +
+                    " They can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                }
+                
+                return false;
+            }
+            else
+            {
+                if (MessageBox.Show(Configuration.getUIString("install_single_speechlanguage_popup_text_start") + langAndCountryToUse +
+                    Configuration.getUIString("install_single_speechlanguage_popup_text_end"),
+                    Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                {
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                }
+                Console.WriteLine("Unable to initialise speech engine with voice recognition pack for location " + langAndCountryToUse +
+                    ". Check MSSpeech_SR_" + langAndCountryToUse + "_TELE.msi is installed." +
+                    " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
+                
+                return false;
+            }            
         }
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
@@ -428,45 +552,45 @@ namespace CrewChiefV4
         public void initialiseSpeechEngine()
         {
             initialised = false;
-            if (useNAudio) {
+            if (useNAudio)
+            {
                 buffer = new RingBufferStream.RingBufferStream(48000);
                 waveIn = new NAudio.Wave.WaveInEvent();
                 waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
+            //try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
+            //catch it and tell user to go download.
+            try
+            {                
+                new SpeechRecognitionEngine();                    
+            }
+            catch (Exception e)
+            {
+                if (MessageBox.Show(Configuration.getUIString("install_speechplatform_popup_text"), Configuration.getUIString("install_speechplatform_popup_title"),
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                {
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=27225");
+                }
+                Console.WriteLine("Unable to initialise speech engine. Check that SpeechPlatformRuntime.msi is installed. It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27225");
+                Console.WriteLine("Exception message: " + e.Message);
+                return;
+            }
 
-            if (location != null && location.Length > 0)
+            //this is not likely to throw but we try to catch it anyways. 
+            try
             {
-                try
+                if (!initWithLocale())
                 {
-                    Console.WriteLine("Attempting to initialise speech recognition for user specified location " + location);
-                    initWithLocale(location);
-                    Console.WriteLine("Success");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to initialise speech engine with voice recognition pack for location " + location +
-                        ". Check that SpeechPlatformRuntime.msi and MSSpeech_SR_" + location + "_TELE.msi are installed.");
-                    Console.WriteLine("Exception message: " + e.Message);
                     return;
                 }
+                Console.WriteLine("Success");
             }
-            else
+            catch (Exception e)
             {
-                try
-                {
-                    Console.WriteLine("Attempting to initialise speech recognition for any English locale");
-                    initWithLocale(defaultLocale);
-                    Console.WriteLine("Success");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to initialise speech engine with the OS's default English voice recognition pack (location name " + defaultLocale + "). " +
-                        "Check that SpeechPlatformRuntime.msi and at least one of MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi, " +
-                        "MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi are installed.");
-                    Console.WriteLine("Exception message: " + e.Message);
-                    return;
-                }
+                Console.WriteLine("Unable to initialise speech engine.");
+                Console.WriteLine("Exception message: " + e.Message);
             }
+           
             try
             {
                 if (useNAudio)
@@ -544,6 +668,8 @@ namespace CrewChiefV4
                 validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
                 validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
                 validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
+                validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
+                validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
                 validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
                 validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
@@ -562,6 +688,8 @@ namespace CrewChiefV4
                 validateAndAdd(DO_I_HAVE_A_PENALTY, staticSpeechChoices);
                 validateAndAdd(DO_I_STILL_HAVE_A_PENALTY, staticSpeechChoices);
                 validateAndAdd(IS_MY_PIT_BOX_OCCUPIED, staticSpeechChoices);
+                validateAndAdd(PLAY_POST_PIT_POSITION_ESTIMATE, staticSpeechChoices);
+                validateAndAdd(PRACTICE_PIT_STOP, staticSpeechChoices);
                 validateAndAdd(DO_I_HAVE_A_MANDATORY_PIT_STOP, staticSpeechChoices);
                 validateAndAdd(WHAT_ARE_MY_SECTOR_TIMES, staticSpeechChoices);
                 validateAndAdd(WHATS_MY_LAST_SECTOR_TIME, staticSpeechChoices);
@@ -1109,6 +1237,14 @@ namespace CrewChiefV4
             {
                 crewChief.reportCurrentTime();
             }
+            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE))
+            {
+                crewChief.disableDelayMessagesInHardParts();
+            }
+            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS))
+            {
+                crewChief.enableDelayMessagesInHardParts();
+            }
             else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
                ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
                ResultContains(recognisedSpeech, HOWS_MY_ENGINE) ||
@@ -1235,6 +1371,11 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND))
             {
                 return CrewChief.getEvent("MulticlassWarnings");
+            }
+            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP) ||
+                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
+            {
+                return CrewChief.getEvent("Strategy");
             }
             return null;
         }

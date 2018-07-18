@@ -23,8 +23,8 @@
     <Setting Name="log_tyre_stats" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="speech_recognition_location" Type="System.String" Scope="User">
-      <Value Profile="(Default)">en</Value>
+    <Setting Name="speech_recognition_country" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="r3e_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
@@ -54,7 +54,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_pearls_of_wisdom" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">7</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="play_cut_track_warnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -207,16 +207,16 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_race_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_race_lap_times" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_player_race_lap_time_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_prac_and_qual_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">6</Value>
     </Setting>
     <Setting Name="race_sector_reports_at_each_sector" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -243,7 +243,7 @@
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_practice_and_qual_lap_times" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">7</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="enable_track_and_air_temp_reports" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -279,7 +279,7 @@
       <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="frequency_of_player_prac_and_qual_lap_time_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">6</Value>
     </Setting>
     <Setting Name="use_alternate_beeps" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -801,6 +801,42 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="force_rf2_rolling_start" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="enable_pit_exit_position_estimates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PIT_PREDICTION_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="PIT_PREDICTION_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="PIT_PREDICTION_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="enable_opponent_pit_exit_estimates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="immediate_messages_block_other_messages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="enable_delayed_messages_on_hardparts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_guid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_device_type" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TOGGLE_BLOCK_MESSAGES_IN_HARD_PARTS_button_index" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="iracing_enable_auto_fuel_to_end_of_race" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="priortise_messages_depending_on_situation" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

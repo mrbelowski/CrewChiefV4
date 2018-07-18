@@ -22,6 +22,7 @@ namespace CrewChiefV4
 
         readonly int timeBetweenProcConnectCheckMillis = 500;
         readonly int timeBetweenProcDisconnectCheckMillis = 2000;
+        readonly int maxEventFailuresBeforeDisabling = 10;
         DateTime nextProcessStateCheck = DateTime.MinValue;
         bool isGameProcessRunning = false;
 
@@ -64,6 +65,8 @@ namespace CrewChiefV4
         private Dictionary<String, String> faultingEvents = new Dictionary<String, String>();
         
         private Dictionary<String, int> faultingEventsCount = new Dictionary<String, int>();
+
+        private Boolean sessionHasFailingEvent = false;
 
         private Spotter spotter;
 
@@ -111,6 +114,7 @@ namespace CrewChiefV4
             eventsList.Add("PitStops", new PitStops(audioPlayer));
             eventsList.Add("Fuel", new Fuel(audioPlayer));
             eventsList.Add("Battery", new Battery(audioPlayer));
+            eventsList.Add("Strategy", new Strategy(audioPlayer));
             eventsList.Add("Opponents", new Opponents(audioPlayer));
             eventsList.Add("RaceTime", new RaceTime(audioPlayer));
             eventsList.Add("TyreMonitor", new TyreMonitor(audioPlayer));
@@ -197,6 +201,46 @@ namespace CrewChiefV4
             {
                 enableKeepQuietMode();
             }
+        }
+
+        public void toggleDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                disableDelayMessagesInHardParts();
+            }
+            else
+            {
+                enableDelayMessagesInHardParts();
+            }
+        }
+
+        public void enableDelayMessagesInHardParts()
+        {
+            if (!AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = true;
+            }
+            // switch the gap points to use the adjusted ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
+        }
+
+        public void disableDelayMessagesInHardParts()
+        {
+            if (AudioPlayer.delayMessagesInHardParts)
+            {
+                AudioPlayer.delayMessagesInHardParts = false;
+            }
+            // switch the gap points back to use the regular ones
+            if (currentGameState != null && currentGameState.SessionData.TrackDefinition != null && currentGameState.hardPartsOnTrackData.hardPartsMapped)
+            {
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
         }
 
         public void toggleReadOpponentDeltasMode()
@@ -305,7 +349,7 @@ namespace CrewChiefV4
             }
             else
             {
-                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true);
+                ((Fuel)eventsList["Fuel"]).reportFuelStatus(true, (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
         }
 
@@ -728,6 +772,10 @@ namespace CrewChiefV4
                             {
                                 Console.WriteLine("Error reading game data: " + e.StackTrace);
                             }
+                            finally
+                            {
+                                MainWindow.instance.startApplicationButton.Enabled = true;
+                            }
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
@@ -838,7 +886,10 @@ namespace CrewChiefV4
                             if (currentGameState.SessionData.IsNewSession)
                             {
                                 Console.WriteLine("New session");
+                                PlaybackModerator.ClearVerbosityData();
+                                PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
+                                audioPlayer.resetSoundTypesInImmediateQueue();
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;
                                 if (!stateCleared)
@@ -856,6 +907,7 @@ namespace CrewChiefV4
                                     }
                                     faultingEvents.Clear();
                                     faultingEventsCount.Clear();
+                                    sessionHasFailingEvent = false;
                                     stateCleared = true;
                                     PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
                                     PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
@@ -910,6 +962,9 @@ namespace CrewChiefV4
                                     }
                                     stateCleared = false;
                                 }
+                                // update the auto-verbosity
+                                PlaybackModerator.UpdateAutoVerbosity(currentGameState);
+
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {
@@ -968,6 +1023,13 @@ namespace CrewChiefV4
             currentGameState = null;
             previousGameState = null;
             sessionFinished = false;
+            faultingEvents.Clear();
+            faultingEventsCount.Clear();
+            PlaybackModerator.ClearVerbosityData();
+            PlaybackModerator.lastBlockedMessageId = -1;
+            audioPlayer.disablePearlsOfWisdom = false;
+            audioPlayer.resetSoundTypesInImmediateQueue();
+            sessionHasFailingEvent = false;
             Console.WriteLine("Stopping queue monitor");
             if (audioPlayer != null)
             {
@@ -978,7 +1040,15 @@ namespace CrewChiefV4
             {
                 if (gameDataReader.dumpToFile)
                 {
-                    gameDataReader.DumpRawGameData();
+                    try
+                    {
+                        gameDataReader.DumpRawGameData();
+                    }
+                    finally
+                    {
+                        // Restore start/stop buton.
+                        MainWindow.instance.startApplicationButton.Enabled = true;
+                    }
                 }
                 try
                 {
@@ -1003,7 +1073,11 @@ namespace CrewChiefV4
         {
             try
             {
-                abstractEvent.trigger(previousGameState, currentGameState);
+                int failureCount;
+                if (!sessionHasFailingEvent || !faultingEventsCount.TryGetValue(eventName, out failureCount) || failureCount < maxEventFailuresBeforeDisabling)
+                {
+                    abstractEvent.trigger(previousGameState, currentGameState);
+                }
             }
             catch (Exception e)
             {
@@ -1011,10 +1085,11 @@ namespace CrewChiefV4
                 if (faultingEventsCount.TryGetValue(eventName, out failureCount))
                 {
                     faultingEventsCount[eventName] = ++failureCount;
-                    if (failureCount > 5)
+                    if (failureCount >= maxEventFailuresBeforeDisabling)
                     {
+                        sessionHasFailingEvent = true;
                         Console.WriteLine("Event " + eventName +
-                            " has failed > 5 times in this session");
+                            " has failed " + maxEventFailuresBeforeDisabling + " times in this session and will be disabled");
                     }
                 }
                 if (!faultingEvents.ContainsKey(eventName))

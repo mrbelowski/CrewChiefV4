@@ -1,6 +1,91 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.4.2</h2>
+<ul>
+	<li>Prevent unimportant messages playing if the player is fighting with other cars in a race session or is on a flying lap in a qualifying session (disabled by default, enable this with the 'Advanced message prioritisation' option)</li>
+	<li>Allow app update check to be skipped - adding the start argument SKIP_UPDATES to your shortcut will prevent the app checking for updates (but it'll still check for sound pack updates)</li>
+	<li>Report yellow flag messages even if we're in a corner / braking zone</li>
+	<li>Various bug fixes and tweaks</li>
+</ul>
+<h2>Version 4.9.4.0</h2>
+<ul>
+	<li>Fixed regression in non-English speech recognition config files - the 'defaultLocale' property name for speech recognition language had been changed to 'language', so the app was ignoring this value in existing configurations. The app will now use the 'defaultLocale' property value if it doesn't find a 'language' property</li>
+</ul>
+<h2>Version 4.9.3.9</h2>
+<ul>
+	<li>Allow spotter messages to play if they have interrupted another message, even if they would otherwise have expired</li>
+	<li>iRacing - enable fuel tracking in lone practice sessions</li>
+	<li>iRacing - Added option to re fuel to end of race in a race session when entering the pitlane, this will not trigger if you get a tow back to pits it only works for regular preformed pitstop!</li>
+	<li>iRacing - some multiclass fixes</li>
+	<li>pCars2 - performance improvements</li>
+	<li>internal rework - consolidated lots of timings code to make behaviour more consistent across games</li>
+	<li>Speech recognition engine initialisation improvements - better handling of language / country options, better management of installed components and error reporting</li>
+	<li>Improvements to interrupting logic</li>
+	<li>Various bug fixes</li>
+</ul>
+<h2>Version 4.9.3.7</h2>
+<ul>
+	<li>Added option to pause most messages in braking and cornering zones (sections of the track starting from heavy braking and ending with near-full throttle application) - this doesn't apply to spotter messages or other very high priority messages. It can be enabled and disabled with a button mapping ('Toggle delay messages on hard parts') or a voice command ('don't talk in the [corners/braking zones]' / 'no messages in the [corners/braking zones]', 'talk to me anywhere' / 'messages at any point'). This feature is switched off by default - the initial state is set with the 'Delay messages on hard parts' option. Note that you need to drive at least one valid lap before the app can work out which sections of the track it needs to keep quiet in. This feature is disabled for ovals and may produce odd results on very short tracks</li>
+	<li>Added some basic message prioritisation - higher priority messages will be inserted into the queue in front of lower priority messages</li>
+	<li>Replaced the 'Spotter and responses block other messages' property. The spotter (and some 'critical' messages) now interrupt and block regular messages (most things except voice command responses and some other important messages) by default. Enable the 'Command responses and important messages block other messages' to allow other types of important message (such as voice command responses and yellow flags) to also interrupt and block messages</li>
+	<li>Prevent any further fragments of a message from playing if this message was interrupted</li>
+	<li>Simplified pitstop benchmark process - you can now get a benchmark pitstop time without having to set a hot lap first (although you'll still need to set one after your stop to allow the app to work out the time loss)</li>
+	<li>A few bug fixes</li>
+</ul>
+<h2>Version 4.9.3.6</h2>
+<ul>
+	<li>Reduce size of 'personalisations' update pack <b>install this update before updating your personalisations</b></li>
+	<li>Much more accurate tyre life prediction using a non-linear curve fit of tyre wear data recorded for the current tyre set (assumes a tyre is worn out when it has 5% life left)</li>
+	<li>Added more info to the fuel status message - now includes fuel-to-end</li>
+	<li>Allow spotter sounds to cancel other queued messages (disabled by default, enable with 'Spotter and responses block other messages' property - note this can sound strange when only the start or end sounds of a message play)</li>
+	<li>A few minor tweaks</li>
+	<li>iRacing - fix white-flag message spam</li>
+</ul>
+<h2>Version 4.9.3.5</h2>
+<ul>
+	<li>Fixed sound pack version check</li>
+</ul>
+<h2>Version 4.9.3.4</h2>
+<ul>
+	<li>Changed how sound pack downloads are handled - should significantly reduce the size of sound pack updates</li>
+	<li>Added property categories to make finding stuff easier</li>
+	<li>Added opponent pit exit prediction warning - if the app thinks an opponent car will probably come out of the pits close to you (and it can read his driver name), you'll be warned about him</li>
+	<li>Further opponent pit exit estimation improvements</li>
+	<li>some internal bug fixes</li>
+</ul>
+<h2>Version 4.9.3.3</h2>
+<ul>
+	<li>Fixed opponent time in pitlane when timing opponent stops for pit strategy calls</li>
+	<li>Take mandatory pitstop status into account when deriving expected post-pit opponent positions (assume opponents who still haven't pitted will pit this lap if we're at the end of the pit window)</li>
+	<li>Added and corrected a few car classes (pCars2, iRacing and R3E)</li>
+	<li>iRacing - fixed some car class allocation issues</li>
+</ul>
+<h2>Version 4.9.3.2</h2>
+<ul>
+	<li>Improved pit stop exit prediction when opponents are in the pitlane</li>
+	<li>Don't reset the fuel data when leaving the pits during a race, unless we've added fuel</li>
+</ul>
+<h2>Version 4.9.3.1</h2>
+<ul>
+	<li>Hotfix for pitstop prediction additions (see previous release notes). This fixes the wildly inaccurate pit stop time loss estimates reported by the pitstop benchmark process if you make the benchmark request too late in the lap (after you've entered the final sector)</li>
+</ul>
+<h2>Version 4.9.3.0</h2>
+<ul>
+	<li>First cut of pit exit prediction - obtain a benchmark pit time in practice by making the 'time this stop' / 'practice pitstop' / 'time this pitstop' / 'pitstop benchmark' command, or by pressing the "Pitstop prediction" button before make your practice stop. The pit exit prediction will play automatically some time after requsting a stop, or if you make the 'Where will be be after a stop?' / 'Estimate pit exit positions' / 'What will happen if I pit?' command, or by pressing the "Pitstop prediction" button during a race (see 'Pit exit position prediction' section in the readme.txt)</li>
+	<li>Disable cold brakes warnings for some car classes</li>
+	<li>R3E - detect if this and next laps are invalidated due to cut track in quali/practice</li>
+	<li>R3E - disable pit stall position messages in post race</li>
+	<li>R3E - improve cut track detection</li>
+	<li>R3E -  fix best lap time not announced during leaderboard challenge</li>
+	<li>AC - fix crashes due to unexpected timings reported by the game</li>
+	<li>Suppress crashes when using Naudio Input - (but please send us log file if you get exceptions in log)</li>
+	<li>Fix issue where best lap time is lost if it is set after an invalid lap</li>
+	<li>Fix incorrect gaps announced if vehicles aren't within the same lap</li>
+	<li>Fix DRS messages announced incorrectly if opponent is pitting</li>
+	<li>Make 'half fuel' call play at exactly half fuel (was playing a bit too early)</li>
+	<li>App wide bug fixes</li>
+</ul>
 <h2>Version 4.9.2.9</h2>
 <ul>
 	<li>Allow pit countdown past session finish (for cooldown lap)</li>

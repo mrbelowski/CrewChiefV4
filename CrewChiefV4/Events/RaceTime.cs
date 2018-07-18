@@ -121,6 +121,7 @@ namespace CrewChiefV4.Events
                     }
                     else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 5 &&
                         !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
+                        currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest &&
                         // yuk... AC SessionStartPosition is suspect so don't allow "you're shit" messages based on it.
                         CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                     {
@@ -155,16 +156,16 @@ namespace CrewChiefV4.Events
                         if (currentGameState.SessionData.ClassPosition == 1)
                         {
                             // don't add a pearl here - the audio clip already contains encouragement
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0);
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), pearlType, 0, 5);
                         }
                         else if (currentGameState.SessionData.ClassPosition < 4)
                         {
                             // don't add a pearl here - the audio clip already contains encouragement
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0);
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLapPodium, 0, this), pearlType, 0, 5);
                         }
                         else
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderLastLap, 0, this), 5);
                         }
                     }
                 }
@@ -194,7 +195,7 @@ namespace CrewChiefV4.Events
                     {
                         // don't play the chequered flag message in race sessions
                         audioPlayer.playMessage(new QueuedMessage("session_complete",
-                            MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
+                            MessageContents(folder0mins, Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this), 10);
                     }
                 } 
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played2mins && timeLeft / 60 < 2 && timeLeft / 60 > 1.9)
@@ -206,7 +207,7 @@ namespace CrewChiefV4.Events
                     played20mins = true;
                     playedHalfWayHome = true;
                     audioPlayer.suspendPearlsOfWisdom();
-                    audioPlayer.playMessage(new QueuedMessage(folder2mins, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folder2mins, 0, this), 10);
                 } if (currentGameState.SessionData.SessionRunningTime > 60 && !played5mins && timeLeft / 60 < 5 && timeLeft / 60 > 4.9)
                 {
                     played5mins = true;
@@ -217,16 +218,16 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition == 1)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.playMessage(new QueuedMessage(folder5minsLeading, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folder5minsLeading, 0, this), pearlType, 0, 5);
                     }
                     else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition < 4)
                     {
                         // don't add a pearl here - the audio clip already contains encouragement
-                        audioPlayer.playMessage(new QueuedMessage(folder5minsPodium, 0, this), pearlType, 0);
+                        audioPlayer.playMessage(new QueuedMessage(folder5minsPodium, 0, this), pearlType, 0, 5);
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folder5mins, 0, this), pearlType, 0.7);
+                        audioPlayer.playMessage(new QueuedMessage(folder5mins, 0, this), pearlType, 0.7, 5);
                     }
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played10mins && timeLeft / 60 < 10 && timeLeft / 60 > 9.9)
@@ -234,25 +235,25 @@ namespace CrewChiefV4.Events
                     played10mins = true;
                     played15mins = true;
                     played20mins = true;
-                    audioPlayer.playMessage(new QueuedMessage(folder10mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder10mins, 0, this), pearlType, 0.7, 3);
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played15mins && timeLeft / 60 < 15 && timeLeft / 60 > 14.9)
                 {
                     played15mins = true;
                     played20mins = true;
-                    audioPlayer.playMessage(new QueuedMessage(folder15mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder15mins, 0, this), pearlType, 0.7, 3);
                 }
                 if (currentGameState.SessionData.SessionRunningTime > 60 && !played20mins && timeLeft / 60 < 20 && timeLeft / 60 > 19.9)
                 {
                     played20mins = true;
-                    audioPlayer.playMessage(new QueuedMessage(folder20mins, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folder20mins, 0, this), pearlType, 0.7, 3);
                 }
                 else if (currentGameState.SessionData.SessionType == SessionType.Race &&
                     currentGameState.SessionData.SessionRunningTime > 60 && !playedHalfWayHome && timeLeft > 0 && timeLeft < halfTime)
                 {
                     // this one sounds weird in practice and qual sessions, so skip it
                     playedHalfWayHome = true;
-                    audioPlayer.playMessage(new QueuedMessage(folderHalfWayHome, 0, this), pearlType, 0.7);
+                    audioPlayer.playMessage(new QueuedMessage(folderHalfWayHome, 0, this), pearlType, 0.7, 3);
                 }
             }
         }
@@ -292,7 +293,7 @@ namespace CrewChiefV4.Events
                 else if (timeLeft < 60)
                 {
                     Console.WriteLine("Playing less than a minute message, timeleft = " + timeLeft);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, this));                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanOneMinute, 0, null));                    
                 }
             }
             else

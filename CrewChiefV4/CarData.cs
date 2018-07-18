@@ -17,12 +17,12 @@ namespace CrewChiefV4
     {
         // some temperatures - maybe externalise these
         // These are the peaks. If the tyre exceeds these temps even for one tick over a lap, we'll warn about it. This is why they look so high
-        private static float maxColdRoadTyreTempPeak = 50;
+        private static float maxColdRoadTyreTempPeak = 40;
         private static float maxWarmRoadTyreTempPeak = 90;
         private static float maxHotRoadTyreTempPeak = 110;
 
         // very wide range for unknown tyres
-        private static float maxColdUnknownRaceTyreTempPeak = 70;
+        private static float maxColdUnknownRaceTyreTempPeak = 60;
         private static float maxWarmUnknownRaceTyreTempPeak = 117;
         private static float maxHotUnknownRaceTyreTempPeak = 137;
 
@@ -46,7 +46,7 @@ namespace CrewChiefV4
         private static float maxWarmUltraSoftTyreTempPeak = 95;
         private static float maxHotUltraSoftTyreTempPeak = 107;
 
-        private static float maxColdWetTyreTempPeak = 50;
+        private static float maxColdWetTyreTempPeak = 40;
         private static float maxWarmWetTyreTempPeak = 80;
         private static float maxHotWetTyreTempPeak = 105;
 
@@ -55,7 +55,7 @@ namespace CrewChiefV4
         private static float maxHotIntermediateTyreTempPeak = 110;
 
         // no idea about these - use similar thresholds to inters?
-        private static float maxColdAllTerrainTyreTempPeak = 60;
+        private static float maxColdAllTerrainTyreTempPeak = 50;
         private static float maxWarmAllTerrainTyreTempPeak = 95;
         private static float maxHotAllTerrainTyreTempPeak = 110;
 
@@ -69,7 +69,7 @@ namespace CrewChiefV4
         private static float maxHotSnowTyreTempPeak = 300;
         //
 
-        private static float maxColdBiasPlyTyreTempPeak = 70;
+        private static float maxColdBiasPlyTyreTempPeak = 60;
         private static float maxWarmBiasPlyTyreTempPeak = 103;
         private static float maxHotBiasPlyTyreTempPeak = 123;
 
@@ -129,9 +129,9 @@ namespace CrewChiefV4
             ROAD_E, ROAD_F, ROAD_G, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
             VINTAGE_F1_C, VINTAGE_STOCK_CAR,
-            F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
+            F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
-            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER
+            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM, FORMULA_RENAULT20
         }
 
         // use different thresholds for R3E car classes - there are a few different tyre models in the game with different heating characteristics:
@@ -141,7 +141,7 @@ namespace CrewChiefV4
             CarClassEnum.F3, CarClassEnum.AUDI_TT_VLN, CarClassEnum.KTM_RR, CarClassEnum.TRACKDAY_A, CarClassEnum.R3E_SILHOUETTE, CarClassEnum.BMW_235I};
 
         public static CarClassEnum[] r3e2017TyreModelClasses = new CarClassEnum[] {
-            CarClassEnum.GT3, CarClassEnum.GT4, CarClassEnum.CARRERA_CUP};
+            CarClassEnum.GT1, CarClassEnum.GT3, CarClassEnum.GT4, CarClassEnum.CARRERA_CUP, CarClassEnum.TCR, CarClassEnum.GT1X, CarClassEnum.CAYMAN_CLUBSPORT};
 
         private static Dictionary<TyreType, List<CornerData.EnumWithThresholds>> tyreTempThresholds = new Dictionary<TyreType, List<CornerData.EnumWithThresholds>>();
         private static Dictionary<BrakeType, List<CornerData.EnumWithThresholds>> brakeTempThresholds = new Dictionary<BrakeType, List<CornerData.EnumWithThresholds>>();
@@ -354,10 +354,19 @@ namespace CrewChiefV4
 
         private static Dictionary<string, CarClass> nameToCarClass;
         private static Dictionary<int, CarClass> intToCarClass;
+
+        private static Dictionary<int, CarClass> iracingCarIdToCarClass;
+        private static Dictionary<int, CarClass> iracingCarClassIdToCarClass;
+
         private static List<String> userCarClassIds = new List<string>();
         public static int RACEROOM_CLASS_ID = -1;
         public static int IRACING_CLASS_ID = -1;
         public static String CLASS_ID = "";
+
+        public static void clearCachedIRacingClassData() {
+            iracingCarClassIdToCarClass.Clear();
+            iracingCarIdToCarClass.Clear();
+        }
 
         public class TyreTypeData
         {
@@ -618,6 +627,8 @@ namespace CrewChiefV4
             // reset session scoped cache of class name / ID to CarClass Dictionary.
             nameToCarClass = new Dictionary<string, CarClass>();
             intToCarClass = new Dictionary<int, CarClass>();
+            iracingCarIdToCarClass = new Dictionary<int, CarClass>();
+            iracingCarClassIdToCarClass = new Dictionary<int, CarClass>();
         }
 
         private static void mergeCarClassData(CarClasses defaultCarClassData, CarClasses userCarClassData)
@@ -665,7 +676,7 @@ namespace CrewChiefV4
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error pasing " + filename + ": " + e.Message);
+                    Console.WriteLine("Error parsing " + filename + ": " + e.Message);
                 }
             }
             return new CarClasses();
@@ -767,15 +778,16 @@ namespace CrewChiefV4
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }
+
         public static CarClass getCarClassForIRacingId(int carClassId, int carId)
         {
-            // first check if it's in the cache
+            // first check if it's in the one of the caches
             CarClass carClassCached = null;
-            if (intToCarClass.TryGetValue(carClassId, out carClassCached))
+            if (iracingCarIdToCarClass.TryGetValue(carId, out carClassCached))
             {
                 return carClassCached;
             }
-            if (intToCarClass.TryGetValue(carId, out carClassCached))
+            if (iracingCarClassIdToCarClass.TryGetValue(carClassId, out carClassCached))
             {
                 return carClassCached;
             }
@@ -783,14 +795,14 @@ namespace CrewChiefV4
             {
                 if (carClass.iracingCarIds.Contains(carId))
                 {
-                    intToCarClass.Add(carId, carClass);
+                    iracingCarIdToCarClass.Add(carId, carClass);
                     return carClass;
                 }
             }
 
             // create one if it doesn't exist
             CarClass newCarClass = new CarClass();
-            intToCarClass.Add(carClassId, newCarClass);
+            iracingCarClassIdToCarClass.Add(carClassId, newCarClass);
             newCarClass.placeholderClassId = carClassId.ToString();
             return newCarClass;
         }

@@ -27,6 +27,16 @@ namespace CrewChiefV4
             return key;
         }
 
+        public static String getUIStringStrict(String key)
+        {
+            string uiString = null;
+            if (UIStrings.TryGetValue(key, out uiString))
+            {
+                return uiString;
+            }
+            return null;
+        }
+
         public static String getSoundConfigOption(String key)
         {
             string soundConfig = null;
@@ -54,12 +64,17 @@ namespace CrewChiefV4
             {
                 if (options.Contains(":"))
                 {
+                    List<String> phrasesList = new List<string>();
                     var phrases = options.Split(':');
                     for (int i = 0; i < phrases.Length; ++i)
                     {
-                        phrases[i] = phrases[i].Trim();
+                        String phrase = phrases[i].Trim();
+                        if (phrase.Length > 0)
+                        {
+                            phrasesList.Add(phrase);
+                        }
                     }
-                    return phrases;
+                    return phrasesList.ToArray();
                 }
                 else
                 {

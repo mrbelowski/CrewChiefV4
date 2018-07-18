@@ -60,6 +60,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\AutoUpdater.NET.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.4.5.1\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Speech, Version=11.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Microsoft SDKs\Speech\v11.0\Assembly\Microsoft.Speech.dll</HintPath>
@@ -82,6 +85,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Speech" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -102,7 +107,9 @@
     <Compile Include="Audio\MediaPlayerBackgroundPlayer.cs" />
     <Compile Include="Audio\NAudioBackgroundPlayer.cs" />
     <Compile Include="Audio\PlaybackModerator.cs" />
+    <Compile Include="Audio\SoundPackVersionsHelper.cs" />
     <Compile Include="Audio\Sounds.cs" />
+    <Compile Include="Audio\SoundMetadata.cs" />
     <Compile Include="CarData.cs" />
     <Compile Include="commands\KeyPresser.cs" />
     <Compile Include="commands\CommandMacro.cs" />
@@ -114,6 +121,7 @@
     <Compile Include="ControllerConfiguration.cs" />
     <Compile Include="Events\Battery.cs" />
     <Compile Include="Events\CommonDataContainers.cs" />
+    <Compile Include="Events\Strategy.cs" />
     <Compile Include="Events\FrozenOrderMonitor.cs" />
     <Compile Include="Events\MulticlassWarnings.cs" />
     <Compile Include="Events\OvertakingAidsMonitor.cs" />
@@ -152,6 +160,7 @@
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
+    <Compile Include="UserInterface\PropertyFilter.cs" />
     <Compile Include="Validator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />

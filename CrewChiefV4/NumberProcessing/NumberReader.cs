@@ -10,6 +10,7 @@ namespace CrewChiefV4
         public static String folderPoint = "numbers/point";
         public static String folderMinutes = "numbers/minutes";
         public static String folderMinute = "numbers/minute";
+        private static String folderSeconds = "numbers/seconds";
         public static String folderOh = "numbers/oh";
 
         /**
@@ -102,10 +103,10 @@ namespace CrewChiefV4
                 int hundredths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
-                Boolean useNewENMinutes = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                Boolean useNewENMinutes = SoundPackVersionsHelper.currentSoundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
                     timeSpanWrapper.timeSpan.Minutes > 0 && timeSpanWrapper.timeSpan.Minutes < 3 && timeSpanWrapper.timeSpan.Seconds > 0 && timeSpanWrapper.timeSpan.Seconds < 60;
 
-                Boolean useNewENSeconds = AudioPlayer.soundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                Boolean useNewENSeconds = SoundPackVersionsHelper.currentSoundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
                     timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
                     (precision == Precision.HUNDREDTHS && hundredths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 

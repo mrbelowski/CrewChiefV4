@@ -77,6 +77,16 @@ Personalisations
 The "My name" dropdown menu in the top right of the main UI allows you to select from a list of names which the app will use to address you, from time to time. These are incorporated into existing messages so for example, rather than just saying "box now" the app will say "box now, please Jim". There are lots of variations and they sound quite good, if you are lucky enough to have a first name that's in this list. How often you hear these personalised messages is controlled by the "Min time between personalised messages" property. The old default value (30s) is a bit low - 60s sounds better. The Personalisations come in the form of a mini-sound pack which is downloaded and managed by the app (they used to require lots of manual faffing) - if new personalisations are available the "Download personalisations" button will he highlighted in green. Swapping between personalisations requires an app restart.
 
 
+Pit exit position prediction
+----------------------------
+Version 4.9.3.0 adds rudamentary race and track position predictions for pit exit. This is based on a benchmark pitstop time which uses the time difference between your best lap's sector3 and sector1 times, and the corresponding times on your inlap & outlap.
+
+Benchmark pit times can be measured during a practice session with the 'time this stop' / 'practice pitstop' / 'time this pitstop' / 'pitstop benchmark' voice command, or by pressing the "Pitstop prediction" button before make your practice stop. Do some hot laps to get a baseline laptime, then issue this after your 'box this lap' command, and do a full race-simulation pitstop. Maintain race pace on your outlap until you finish sector1. The app will calculate how much time you lost and use this when you pit in the race. If you don't measure your own benchmark pit time the app will measure the time your opponents lose due to pitting and use this instead - note that this means pit exit prediction data won't be available until after at least one of your opponents have completed a pitstop.
+
+If the app has usable benchmark data and you request a pitstop *before you reach sector3*, it'll tell you where you should come out and what the traffic will be like when you hit sector3. You can also request this data at any time with the 'Where will be be after a stop?' / 'Estimate pit exit positions' / 'What will happen if I pit?', or by pressing the "Pitstop prediction" button during a race, even if you've not requested a pitstop (the app will derive its estimates on every lap regardless or whether you actually pit).
+
+At the time of writing there's more work to be done here and some more features that may be added.
+
 
 Voice Recognition
 -------------------------
@@ -155,7 +165,10 @@ The app understands lots of command including:
 "what's the sof" / "what is the strength of field" (iRacing only)
 "how many incidents do i have" / "what's my incident count" (iRacing only)
 "what's the incident limit" (iRacing only) 
-
+"time this stop" / "practice pitstop" / "time this pitstop" / "pitstop benchmark": time the next pitstop (sector 3 + sector 1 time) to work out home much tome overall a pitstop costs - practice session only
+"where will I be after a stop?" / "Estimate pit exit positions" / "What will happen if I pit?": play estimate of traffic and race positions on pit exit, if you were to pit on this lap
+"don't talk in the [corners / braking zones]" / "no messages in the [corners / braking zones]": delay non-critical messages if the player is in a challenging section of the track
+"talk to me anywhere" / "messages at any point": disable message delay in challenging parts of the track
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
@@ -325,3 +338,19 @@ You can request new names on the Crew Chief forum.
 Please share you recordings with the rest of the commmunity by uploading to the Crew Chief forum and we will include it in our next update.
 
 To load your newly added landmarks file you have to restart the app! 
+
+
+Manual formation lap
+--------------------
+Some online leagues run a manual formation at the start of the race. Lap 1 of the race is run in formation at a slower pace (even if the game doesn't know this), with the actual race starting when the lead car crosses the start line, or when player's car crosses the start line. Using Crew Chief in this situation would result in lots of annoying an unhelpful calls during the formation lap.
+
+To prevent this, and attempt to provide some useful information during this lap, the app has a manual formation lap mode. This is always disabled when you start the app, and can be enabled or disabled with a button press ('Toggle manual formation lap mode') or a voice command ("This is the formation lap / formation lap / rolling start" to enable, "Standing start / no formation lap" to disable). When it's enabled the app will assume that the opening lap is driven in formation and not under race conditions, and that the race starts at the start of lap 2. If you enable manual formation lap mode during the practice session or qualifying, it'll remain enabled for the race (and for subsequent race starts until you switch it off or restart the app).
+
+There are 2 additional options in the properties screen:
+'Manual formation 'go' when leader crosses line'. If this is enabled, the 'go go go' call will be made when the leader crosses the start line. If it's disabled the 'go go go' call will be made when the player crosses the start line.
+
+'Manual formation lap double-file start': if this is enabled, the app will assume that your rolling start is double file. It will expect you to start the race on the same side of the track as your grid position (regardless of who drops out in front of you). It will expect you to be behind the guy who was placed on the grid directly in front of you, on your side - the app does *not* check the position of cars which are not on your side of the grid (so the 2 pace lines don't have to be lined up properly with each other). If this is disabled, it will expect a single pace line starting the race in grid-order.
+
+If a car drops out of the pace lap or crashes, the app assumes that he'll rejoin at the back and start from the back. Things can get messy if there are formation lap incidents and the app can only do its best here :)
+
+Once the race starts at the end of the formation lap, the app will give its regular racing calls (so you don't need to switch this mode off during the race).

@@ -81,7 +81,9 @@ namespace CrewChiefV4.Events
         private DateTime timeWhenWeWerePassed;
 
         private const int secondsToCheckForDamageOrOfftrackOnPass = 10;
+        private const int secondsToCheckForYellowOnPass = 3;
         private float lastOffTrackSessionTime = -1.0f;
+        private float lastYellowFlagTime = -1.0f;
         private bool lastOvertakeWasClean = true;
 
         private string opponentAheadKey = null;
@@ -90,7 +92,7 @@ namespace CrewChiefV4.Events
         private string opponentKeyForCarWeJustPassed;
 
         private string opponentKeyForCarThatJustPassedUs;
-                
+
         public Position(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -136,6 +138,7 @@ namespace CrewChiefV4.Events
             timeWhenWeMadeAPass = DateTime.MinValue;
             lastOvertakeMessageTime = DateTime.MinValue;
             lastOffTrackSessionTime = -1.0f;
+            lastYellowFlagTime = -1.0f;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -170,6 +173,13 @@ namespace CrewChiefV4.Events
             if (currentGameState.PenaltiesData.IsOffRacingSurface)
             {
                 lastOffTrackSessionTime = currentGameState.SessionData.SessionRunningTime;
+            }
+
+            Boolean currentSectorIsYellow = currentGameState.SessionData.SectorNumber > 0 && currentGameState.SessionData.SectorNumber < 4 &&
+                currentGameState.FlagData.sectorFlags[currentGameState.SessionData.SectorNumber - 1] == FlagEnum.YELLOW;
+            if (currentGameState.FlagData.isLocalYellow || currentSectorIsYellow)
+            {
+                lastYellowFlagTime = currentGameState.SessionData.SessionRunningTime;
             }
             if (currentGameState.SessionData.SessionPhase == SessionPhase.Green &&
                 currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps > 0)
@@ -210,6 +220,11 @@ namespace CrewChiefV4.Events
                                 {
                                     lastOvertakeWasClean = false;
                                     Console.WriteLine("Overtake considered not clean due to vehicle off track.");
+                                }
+                                else if (lastYellowFlagTime > 0.0f && (currentGameState.SessionData.SessionRunningTime - lastYellowFlagTime) < secondsToCheckForYellowOnPass)
+                                {
+                                    lastOvertakeWasClean = false;
+                                    Console.WriteLine("Overtake considered not clean due to yellow flag.");
                                 }
                             }
                         }
@@ -259,14 +274,15 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'good'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
-                            audioPlayer.playMessage(new QueuedMessage(folderOvertaking, 0, this, validationData), PearlsOfWisdom.PearlType.GOOD, 0);
+                            QueuedMessage overtakingMessage = new QueuedMessage(folderOvertaking, 0, this, validationData);
+                            audioPlayer.playMessage(overtakingMessage, PearlsOfWisdom.PearlType.GOOD, 0, 10);
                             reported = true;
                         }
                     }
                     if (!reported)
                     {
                         // check the pass is still valid
-                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() ||
+                        if (!currentGameState.SessionData.CurrentLapIsValid || carWeJustPassed.isEnteringPits() || currentGameState.PitData.InPitlane ||
                                 currentGameState.PositionAndMotionData.CarSpeed - carWeJustPassed.Speed > maxSpeedDifferenceForReportablePass)
                         {
                             opponentKeyForCarWeJustPassed = null;
@@ -300,7 +316,8 @@ namespace CrewChiefV4.Events
                             // allow an existing queued pearl to be played if it's type is 'bad'
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
-                            audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
+                            QueuedMessage beingOvertakenMessage = new QueuedMessage(folderBeingOvertaken, 0, this, validationData);
+                            audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0, 10);
                             reported = true;
                         }
                     }
@@ -364,20 +381,20 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 4)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this), 5);
                         }
                         else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 1)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this), 5);
                         }
                         else if (!isLast && (currentGameState.SessionData.ClassPosition == 1 || currentGameState.SessionData.ClassPosition < currentGameState.SessionData.SessionStartClassPosition - 1))
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this), 5);
                         }
                         else if (!isLast && Utilities.random.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
-                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this), 5);
                         }
                     }
                 }
@@ -418,7 +435,8 @@ namespace CrewChiefV4.Events
                             }
                             else if (!isLast && previousPosition < currentGameState.SessionData.ClassPosition &&
                                 currentGameState.SessionData.ClassPosition > 5 && !previousGameState.PitData.OnOutLap &&
-                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane)
+                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane && 
+                                currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
                             {
                                 // don't play bad-pearl if the lap just completed was an out lap or are in the pit
 
@@ -442,7 +460,7 @@ namespace CrewChiefV4.Events
                             CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
                         DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
                             currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood);
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood, 10);
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }
@@ -467,7 +485,9 @@ namespace CrewChiefV4.Events
             }
             else if (this.isLast)
             {
-                if (this.numberOfLapsInLastPlace > 3)
+                if (this.numberOfLapsInLastPlace > 5 &&
+                    CrewChief.currentGameState.SessionData.LapTimePrevious > CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest &&
+                    CrewChief.currentGameState.SessionData.ClassPosition > 3)
                 {
                     return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderConsistentlyLast), null);
                 }
@@ -490,17 +510,17 @@ namespace CrewChiefV4.Events
         {            
             if (isLast)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, null));
             }
             else if (currentPosition == 1)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, this));                    
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, null));                    
             }
             else if (currentPosition > 0)
             {
                 if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("position", MessageContents(folderDriverPositionIntro, folderStub + currentPosition), 0, null));
                 }
                 else
                 {

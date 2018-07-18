@@ -84,7 +84,8 @@ namespace CrewChiefV4
                     }
                 }
 
-                File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleTextBox.Text);
+                File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleWriter.enable ?
+                    MainWindow.instance.consoleTextBox.Text : MainWindow.instance.consoleWriter.builder.ToString());
 
                 Console.WriteLine("Done writing session data log to: " + fileName);
                 Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");
@@ -93,10 +94,6 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to write raw game data: " + ex.Message);
                 Console.WriteLine("Stack trace: " + ex.StackTrace);
-            }
-            finally
-            {
-                MainWindow.instance.startApplicationButton.Enabled = true;
             }
         }
 
@@ -144,11 +141,6 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Unable to read raw game data: " + ex.Message);
             }
-            finally
-            {
-                MainWindow.instance.startApplicationButton.Enabled = true;
-            }
-
             return objectOut;
         }
 

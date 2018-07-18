@@ -166,7 +166,8 @@ namespace CrewChiefV4.Events
 
         private Boolean reportedTyreWearForCurrentPitEntry;
 
-        private Boolean reportedEstimatedTimeLeft;
+        private Boolean reportedEstimatedTimeLeftOneThirdWear;
+        private Boolean reportedEstimatedTimeLeftTwoThirdsWear;
         
         private float leftFrontWearPercent;
         private float rightFrontWearPercent;
@@ -257,6 +258,29 @@ namespace CrewChiefV4.Events
         private int thisLapTyreConditionReportSector = 2;
         private int thisLapTyreTempReportSector = 3;
 
+        private List<double> tyreLifeYPointsTime = new List<double>();
+        private List<double> tyreLifeYPointsSectors = new List<double>();
+        private List<double> tyreLifeXPointsLFWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsLFWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsRFWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsRFWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsLRWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsLRWearByTime = new List<double>();
+        private List<double> tyreLifeXPointsRRWearBySector = new List<double>();
+        private List<double> tyreLifeXPointsRRWearByTime = new List<double>();
+        private float lastTyreLifeYPointTime = -1;
+
+        // don't warn about cold brakes for these car classes. This is in addition to the 'oval' check - some car classes
+        // (older stuff, road cars) will have brakes that never really get hot, resulting in lots of annoying messages.
+        private CarData.CarClassEnum[] ignoreColdBrakesForClasses = new CarData.CarClassEnum[] {
+            CarData.CarClassEnum.FORMULA_E, CarData.CarClassEnum.HISTORIC_TOURING_1, CarData.CarClassEnum.HISTORIC_TOURING_2, 
+            CarData.CarClassEnum.Kart_1, CarData.CarClassEnum.Kart_2, CarData.CarClassEnum.KART_F1, 
+            CarData.CarClassEnum.KART_JUNIOR, CarData.CarClassEnum.KART_X30_RENTAL, CarData.CarClassEnum.KART_X30_SENIOR,
+            CarData.CarClassEnum.NSU_TT, CarData.CarClassEnum.ROAD_G, CarData.CarClassEnum.ROAD_F,
+            CarData.CarClassEnum.ROAD_E, CarData.CarClassEnum.VINTAGE_GT_C, CarData.CarClassEnum.VINTAGE_GT_D,
+            CarData.CarClassEnum.VINTAGE_INDY_65, CarData.CarClassEnum.VINTAGE_STOCK_CAR
+        };
+
         public TyreMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -296,7 +320,8 @@ namespace CrewChiefV4.Events
         public override void clearState()
         {
             reportedTyreWearForCurrentPitEntry = false;
-            reportedEstimatedTimeLeft = false;
+            reportedEstimatedTimeLeftOneThirdWear = false;
+            reportedEstimatedTimeLeftTwoThirdsWear = false;
             leftFrontWearPercent = 0;
             leftRearWearPercent = 0;
             rightFrontWearPercent = 0;
@@ -360,6 +385,18 @@ namespace CrewChiefV4.Events
             playerClassSessionBestLapTimeByTyre = null;
 
             lastBrakeTempCheckSessionTime = -1.0f;
+
+            tyreLifeYPointsTime.Clear();
+            tyreLifeYPointsSectors.Clear();
+            tyreLifeXPointsLFWearBySector.Clear();
+            tyreLifeXPointsRFWearBySector.Clear();
+            tyreLifeXPointsLRWearBySector.Clear();
+            tyreLifeXPointsRRWearBySector.Clear();
+            tyreLifeXPointsLFWearByTime.Clear();
+            tyreLifeXPointsRFWearByTime.Clear();
+            tyreLifeXPointsLRWearByTime.Clear();
+            tyreLifeXPointsRRWearByTime.Clear();
+            lastTyreLifeYPointTime = -1;
         }
 
         private Boolean isBrakeTempPeakForLap(float leftFront, float rightFront, float leftRear, float rightRear) 
@@ -547,19 +584,19 @@ namespace CrewChiefV4.Events
                                 {
                                     case WheelsLockedEnum.FRONTS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
+                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
                                         break;
                                     case WheelsLockedEnum.LEFT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
+                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
                                         break;
                                     case WheelsLockedEnum.RIGHT_FRONT:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
+                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
                                         break;
                                     case WheelsLockedEnum.REARS:
                                         audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this));
+                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
                                         break;
                                     default:
                                         break;
@@ -597,42 +634,42 @@ namespace CrewChiefV4.Events
                             {
                                 Console.WriteLine("Spinning fronts out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning rears out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this));
+                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                         }
@@ -715,18 +752,98 @@ namespace CrewChiefV4.Events
                 {
                     reportCurrentTyreConditionStatus(false, false, delayResponses, false);
                 }
-                if (!currentGameState.PitData.InPitlane && !reportedEstimatedTimeLeft && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
+                if (!currentGameState.PitData.InPitlane && enableTyreWearWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                     currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    reportEstimatedTyreLife(33, false);
+                    if (!reportedEstimatedTimeLeftOneThirdWear)
+                    {
+                        reportedEstimatedTimeLeftOneThirdWear = reportEstimatedTyreLife(33, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.CompletedLaps,
+                            currentGameState.SessionData.SessionNumberOfLaps);
+                    }
+                    else if (!reportedEstimatedTimeLeftTwoThirdsWear)
+                    {
+                        reportedEstimatedTimeLeftTwoThirdsWear = reportEstimatedTyreLife(66, currentGameState.SessionData.SessionRunningTime,
+                            currentGameState.SessionData.SessionTotalRunTime, currentGameState.SessionData.CompletedLaps,
+                            currentGameState.SessionData.SessionNumberOfLaps);
+                        if (reportedEstimatedTimeLeftTwoThirdsWear)
+                        {
+                            reportedEstimatedTimeLeftOneThirdWear = true;
+                        }
+                    }
                 }
                 // if the tyre wear has actually decreased, reset the 'reportdEstimatedTyreWear flag - assume this means the tyres have been changed
-                if (previousGameState != null && (currentGameState.TyreData.FrontLeftPercentWear < previousGameState.TyreData.FrontLeftPercentWear ||
-                    currentGameState.TyreData.FrontRightPercentWear < previousGameState.TyreData.FrontRightPercentWear ||
-                    currentGameState.TyreData.RearRightPercentWear < previousGameState.TyreData.RearRightPercentWear ||
-                    currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear))
+                if (currentGameState.SessionData.JustGoneGreen ||
+                    (previousGameState != null && (currentGameState.TyreData.FrontLeftPercentWear < previousGameState.TyreData.FrontLeftPercentWear ||
+                     currentGameState.TyreData.FrontRightPercentWear < previousGameState.TyreData.FrontRightPercentWear ||
+                     currentGameState.TyreData.RearRightPercentWear < previousGameState.TyreData.RearRightPercentWear ||
+                     currentGameState.TyreData.RearLeftPercentWear < previousGameState.TyreData.RearLeftPercentWear)))
                 {
-                    reportedEstimatedTimeLeft = true;
+                    reportedEstimatedTimeLeftOneThirdWear = false;
+                    reportedEstimatedTimeLeftTwoThirdsWear = false;
+
+                    // TODO: before we clear, should we grab estimates from the previous data?
+
+                    tyreLifeYPointsTime.Clear();
+                    tyreLifeYPointsSectors.Clear();
+                    tyreLifeXPointsLFWearBySector.Clear();
+                    tyreLifeXPointsRFWearBySector.Clear();
+                    tyreLifeXPointsLRWearBySector.Clear();
+                    tyreLifeXPointsRRWearBySector.Clear();
+                    tyreLifeXPointsLFWearByTime.Clear();
+                    tyreLifeXPointsRFWearByTime.Clear();
+                    tyreLifeXPointsLRWearByTime.Clear();
+                    tyreLifeXPointsRRWearByTime.Clear();
+                }
+                else if (currentGameState.PositionAndMotionData.CarSpeed > 1 )
+                {
+                    if (currentGameState.SessionData.IsNewSector)
+                    {
+                        // add some data if we're in a new sector
+                        if (tyreLifeYPointsSectors.Count == 0)
+                        {
+                            // as we might have changed tyres, use the number of laps complete here to scale this
+                            if (currentGameState.SessionData.SectorNumber == 2)
+                            {
+                                // special case here - our first measurement is for the sector1 end
+                                tyreLifeYPointsSectors.Add(1 + (currentGameState.SessionData.CompletedLaps * 3));
+                            }
+                            else
+                            {
+                                tyreLifeYPointsSectors.Add(currentGameState.SessionData.CompletedLaps * 3);
+                            }
+                        }
+                        else
+                        {
+                            tyreLifeYPointsSectors.Add((double)tyreLifeYPointsSectors[tyreLifeYPointsSectors.Count - 1] + 1);
+                        }
+                        tyreLifeXPointsLFWearBySector.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                        tyreLifeXPointsRFWearBySector.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                        tyreLifeXPointsLRWearBySector.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                        tyreLifeXPointsRRWearBySector.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                    }
+                    if (lastTyreLifeYPointTime == -1)
+                    {
+                        tyreLifeYPointsTime.Add((double)currentGameState.SessionData.SessionRunningTime);
+                        lastTyreLifeYPointTime = currentGameState.SessionData.SessionRunningTime;
+                        tyreLifeXPointsLFWearByTime.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                        tyreLifeXPointsRFWearByTime.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                        tyreLifeXPointsLRWearByTime.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                        tyreLifeXPointsRRWearByTime.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                    }
+                    else
+                    {
+                        float timeDiff = currentGameState.SessionData.SessionRunningTime - lastTyreLifeYPointTime;
+                        if (timeDiff > 20)
+                        {
+                            tyreLifeYPointsTime.Add((double)currentGameState.SessionData.SessionRunningTime);
+                            lastTyreLifeYPointTime = currentGameState.SessionData.SessionRunningTime;
+                            tyreLifeXPointsLFWearByTime.Add((double)currentGameState.TyreData.FrontLeftPercentWear);
+                            tyreLifeXPointsRFWearByTime.Add((double)currentGameState.TyreData.FrontRightPercentWear);
+                            tyreLifeXPointsLRWearByTime.Add((double)currentGameState.TyreData.RearLeftPercentWear);
+                            tyreLifeXPointsRRWearByTime.Add((double)currentGameState.TyreData.RearRightPercentWear);
+                        }
+                    }
                 }
             }
         }
@@ -759,7 +876,7 @@ namespace CrewChiefV4.Events
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
                     Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
-                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, Utilities.random.Next(0, 10), this));
+                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, Utilities.random.Next(0, 10), this), 5);
                 }
             }
             lastTyreTempMessage = messageContents;
@@ -767,24 +884,25 @@ namespace CrewChiefV4.Events
 
         public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
         {
+            CarData.CarClassEnum carClassEnum = CrewChief.currentGameState.carClass.carClassEnum;
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (peak)
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
                 }
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
             }
             else
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents);
+                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
                 }
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents);
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
             }
             if (messageContents.Count == 0)
             {
@@ -811,7 +929,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, Utilities.random.Next(0, 10), this));
+                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, Utilities.random.Next(0, 10), this), 5);
                 }
             }
             lastBrakeTempMessage = messageContents;
@@ -848,7 +966,7 @@ namespace CrewChiefV4.Events
             else if (playEvenIfUnchanged || 
                 (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents) && !wearIsGood))
             {
-                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Utilities.random.Next(0, 10), this));
+                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Utilities.random.Next(0, 10), this), 5);
             }
             lastTyreConditionMessage = messageContents;
         }
@@ -870,7 +988,7 @@ namespace CrewChiefV4.Events
             else if (minutesRemainingOnTheseTyres > 1 && minutesRemainingOnTheseTyres <= 4 + (timeInSession - timeElapsed) / 60)
             {
                  audioPlayer.playMessage(new QueuedMessage("minutes_on_current_tyres", MessageContents(folderMinutesOnCurrentTyresIntro, 
-                     minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, this));                
+                     minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, this), 5);                
             }
         }
 
@@ -891,34 +1009,131 @@ namespace CrewChiefV4.Events
             else if (lapsRemainingOnTheseTyres > 1 && lapsRemainingOnTheseTyres <= 2 + lapsInSession - completedLaps)
             {
                 audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(folderLapsOnCurrentTyresIntro, 
-                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, this));              
+                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, this), 5);              
             }
         }
 
-        private void reportEstimatedTyreLife(float maxWearThreshold, Boolean immediate)
+        private int getRemainingTyreLife(float sessionRunningTime, Tuple<CornerData.Corners, float> maxWearPercent)
         {
-            float maxWearPercent = getMaxWearPercent();
-            if (maxWearPercent >= maxWearThreshold)
+            // TODO: if the maxWear is quite low (<20%) the quadratic estimate is quite inaccurate - use linear in this case?
+            if (lapsInSession > 0 || timeInSession == 0)
             {
-                // 1/3 through the tyre's life
-                reportedEstimatedTimeLeft = true;
-                if (lapsInSession > 0 || timeInSession == 0)
+                double[] x_data;
+                switch (maxWearPercent.Item1)
                 {
-                    int lapsRemainingOnTheseTyres = (int)(completedLaps / (maxWearPercent / 100)) - completedLaps - 1;
-                    playEstimatedTypeLifeLaps(lapsRemainingOnTheseTyres, immediate);
+                    case CornerData.Corners.FRONT_LEFT:
+                        x_data = tyreLifeXPointsLFWearBySector.ToArray();
+                        break;
+                    case CornerData.Corners.FRONT_RIGHT:
+                        x_data = tyreLifeXPointsRFWearBySector.ToArray();
+                        break;
+                    case CornerData.Corners.REAR_LEFT:
+                        x_data = tyreLifeXPointsLRWearBySector.ToArray();
+                        break;
+                    default:
+                        x_data = tyreLifeXPointsRRWearBySector.ToArray();
+                        break;
+                }
+                if (x_data.Length < 5 || tyreLifeYPointsSectors.Count != x_data.Length)
+                {
+                    return -1;
+                }
+                int sectorCountAtFullWear = (int)Utilities.getYEstimate(x_data, tyreLifeYPointsSectors.ToArray(), 95, 2);
+                // we know how many more sectors we expect to complete, so just divide it by 3
+                return (sectorCountAtFullWear / 3) - completedLaps;
+            }
+            else
+            {
+                double[] x_data;
+                switch (maxWearPercent.Item1)
+                {
+                    case CornerData.Corners.FRONT_LEFT:
+                        x_data = tyreLifeXPointsLFWearByTime.ToArray();
+                        break;
+                    case CornerData.Corners.FRONT_RIGHT:
+                        x_data = tyreLifeXPointsRFWearByTime.ToArray();
+                        break;
+                    case CornerData.Corners.REAR_LEFT:
+                        x_data = tyreLifeXPointsLRWearByTime.ToArray();
+                        break;
+                    default:
+                        x_data = tyreLifeXPointsRRWearByTime.ToArray();
+                        break;
+                }
+                if (x_data.Length < 5 || tyreLifeYPointsTime.Count != x_data.Length)
+                {
+                    return -1;
+                }
+                double expectedSessionTimeAtFullWear = Utilities.getYEstimate(x_data, tyreLifeYPointsTime.ToArray(), 95, 2);
+                return (int)Math.Ceiling((expectedSessionTimeAtFullWear - sessionRunningTime) / 60);
+            }
+        }
+
+        private Boolean reportEstimatedTyreLife(float maxWearThreshold, float sessionRunningTime, float sessionTotalRunTime,
+            int lapsCompleted, int sessionTotalLaps)
+        {
+            Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
+            if (maxWearPercent.Item2 >= maxWearThreshold)
+            {
+                int tyreLifeRemaining = getRemainingTyreLife(sessionRunningTime, maxWearPercent);
+                if (tyreLifeRemaining != -1)
+                {
+                    if (lapsInSession > 0 || timeInSession == 0)
+                    {
+                        // only announce this if the estimate is close to or smaller than race distance
+                        int sessionLapsRemaining = sessionTotalLaps - lapsCompleted;
+                        if (tyreLifeRemaining - sessionLapsRemaining < 2)
+                        {
+                            playEstimatedTypeLifeLaps(tyreLifeRemaining, false);
+                        }
+                    }
+                    else
+                    {
+                        float sessionTimeRemaining = (sessionTotalRunTime - sessionRunningTime) / 60;
+                        // only announce this if the estimate is close to or smaller than race distance
+                        if (tyreLifeRemaining - sessionTimeRemaining < 2)
+                        {
+                            playEstimatedTyreLifeMinutes(tyreLifeRemaining, false);
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private Tuple<CornerData.Corners, float> getMaxWearPercent()
+        {
+            if (GlobalBehaviourSettings.useOvalLogic)
+            {
+                if (rightFrontWearPercent > rightRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_RIGHT, rightFrontWearPercent);
                 }
                 else
                 {
-                    int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
-                    playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, immediate);
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_RIGHT, rightRearWearPercent);
                 }
             }
-        }
-
-        private float getMaxWearPercent()
-        {
-            return GlobalBehaviourSettings.useOvalLogic ? Math.Max(rightFrontWearPercent, rightRearWearPercent)
-                : Math.Max(leftFrontWearPercent, Math.Max(rightFrontWearPercent, Math.Max(leftRearWearPercent, rightRearWearPercent)));
+            else
+            {
+                if (rightFrontWearPercent > rightRearWearPercent && rightFrontWearPercent > leftFrontWearPercent && rightFrontWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_RIGHT, rightFrontWearPercent);
+                }
+                else if (rightRearWearPercent > rightFrontWearPercent && rightRearWearPercent > leftFrontWearPercent && rightRearWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_RIGHT, rightRearWearPercent);
+                }
+                else if (leftFrontWearPercent > rightRearWearPercent && leftFrontWearPercent > rightFrontWearPercent && leftFrontWearPercent > leftRearWearPercent)
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.FRONT_LEFT, leftFrontWearPercent);
+                }
+                else
+                {
+                    return new Tuple<CornerData.Corners, float>(CornerData.Corners.REAR_LEFT, leftRearWearPercent);
+                }
+            }
         }
 
         private void reportCurrentTyreTemps()
@@ -930,7 +1145,7 @@ namespace CrewChiefV4.Events
             else
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
-                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, this));
+                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, null));
             }
             
         }
@@ -944,7 +1159,7 @@ namespace CrewChiefV4.Events
             else
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
-                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, this));
+                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, null));
             }
             
         }
@@ -1022,26 +1237,36 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_LONG_WILL_THESE_TYRES_LAST))
             {
-                float maxWearPercent = getMaxWearPercent();
+                Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-                else if (maxWearPercent < 1)
+                else if (maxWearPercent.Item2 < 1)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
                 }
+                else if (maxWearPercent.Item2 < 5) 
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                }
                 else 
                 {
-                    if (lapsInSession > 0 || timeInSession == 0)
+                    int remaining = getRemainingTyreLife(CrewChief.currentGameState.SessionData.SessionRunningTime, maxWearPercent);
+                    if (remaining != -1)
                     {
-                        int lapsRemainingOnTheseTyres = (int)(completedLaps / (maxWearPercent / 100)) - completedLaps - 1;
-                        playEstimatedTypeLifeLaps(lapsRemainingOnTheseTyres, true);
+                        if (lapsInSession > 0 || timeInSession == 0)
+                        {
+                            playEstimatedTypeLifeLaps(remaining, true);
+                        }
+                        else
+                        {
+                            playEstimatedTyreLifeMinutes(remaining, true);
+                        }
                     }
                     else
                     {
-                        int minutesRemainingOnTheseTyres = (int)Math.Floor(((timeElapsed / (maxWearPercent / 100)) - timeElapsed) / 60);
-                        playEstimatedTyreLifeMinutes(minutesRemainingOnTheseTyres, true);
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                 }
             }
@@ -1346,7 +1571,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents)
+        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, CarData.CarClassEnum carClassEnum)
         {
             switch (corners)
             {
@@ -1354,7 +1579,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotBrakesAllRound));
@@ -1370,7 +1598,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotFrontBrakes));
@@ -1386,7 +1617,10 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
+                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            {
+                                messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
+                            }
                             break;
                         case BrakeTemp.HOT:
                             messageContents.Add(MessageFragment.Text(folderHotRearBrakes));
@@ -1475,13 +1709,13 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left front locking, some right front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just left front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1491,13 +1725,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right front locking, some left front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just right front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1507,13 +1741,13 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left rear locking, some right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1523,13 +1757,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right rear locking, some left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1549,13 +1783,13 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left front spinning, some right front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just left front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1565,13 +1799,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right front spinning, some left front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just right front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1581,13 +1815,13 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left rear spinning, some right rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just left rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
@@ -1597,13 +1831,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right rear spinning, some left rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                     else
                     {
                         // just right rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }

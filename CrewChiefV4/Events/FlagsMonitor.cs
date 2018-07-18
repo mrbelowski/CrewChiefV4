@@ -349,7 +349,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableBlackFlagUntil)
                 {
                     disableBlackFlagUntil = currentGameState.Now.Add(timeBetweenBlackFlagMessages);
-                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderBlackFlag, 0, this), 10);
                 }
             }
             else if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.Flag == FlagEnum.BLUE)
@@ -357,15 +357,17 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableBlueFlagUntil)
                 {
                     disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenBlueFlagMessages);
-                    audioPlayer.playMessage(new QueuedMessage(folderBlueFlag, 0, this));
+                    // immediate to prevent it being delayed by the hard-parts logic
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBlueFlag, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                 }
             }
-            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE)
+            // In iRacing White flag is set on last lap if "useAmericanTerms" is enabled, this causes white flag to be announched every 40 sec on last lap.
+            else if (currentGameState.SessionData.Flag == FlagEnum.WHITE && !(GlobalBehaviourSettings.useAmericanTerms && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING))
             {
                 if (currentGameState.Now > disableWhiteFlagUntil)
                 {
                     disableWhiteFlagUntil = currentGameState.Now.Add(timeBetweenWhiteFlagMessages);
-                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this), 10);
                 }
             }
             if (currentGameState.FlagData.numCarsPassedIllegally >= 0
@@ -403,7 +405,7 @@ namespace CrewChiefV4.Events
                             var usableDriverName = DriverNameHelper.getUsableDriverName(currentGameState.StockCarRulesData.luckyDogNameRaw);
                             Console.WriteLine("Stock Car Rule triggered: Lucky Dog is - " + usableDriverName);
                             audioPlayer.playMessageImmediately(new QueuedMessage("flags/lucky_dog_is",
-                                MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this));
+                                MessageContents(folderOpponentIsLuckyDog, usableDriverName), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
 
@@ -413,23 +415,23 @@ namespace CrewChiefV4.Events
                         Console.WriteLine("Stock Car Rule triggered: " + currentGameState.StockCarRulesData.stockCarRuleApplicable);
                         if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_PASS_ON_LEFT)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderWeAreLuckyDog, Utilities.random.Next(3, 7), this), 10);
                         }
                         else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LUCKY_DOG_ALLOW_TO_PASS_ON_LEFT)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 7), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderAllowLuckyDogPass, Utilities.random.Next(3, 7), this), 10);
                         }
                         else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.LEADER_CHOOSE_LANE)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 7), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderLeaderChooseLane, Utilities.random.Next(3, 7), this), 10);
                         }
                         else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.WAVE_AROUND_PASS_ON_RIGHT)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderWeHaveBeenWavedAround, Utilities.random.Next(3, 7), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderWeHaveBeenWavedAround, Utilities.random.Next(3, 7), this), 10);
                         }
                         else if (currentGameState.StockCarRulesData.stockCarRuleApplicable == StockCarRule.MOVE_TO_EOLL)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 7), this));
+                            audioPlayer.playMessage(new QueuedMessage(folderEOLLPenalty, Utilities.random.Next(3, 7), this), 10);
                         }
                     }
                 }
@@ -445,7 +447,7 @@ namespace CrewChiefV4.Events
                         if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.WE_ARE_IN_LUCKY_DOG)
                         {
                             Console.WriteLine("Stock Car Rule triggered: " + currentGreenFlagLuckyDogStatus);
-                            audioPlayer.playMessage(new QueuedMessage(folderWeAreInLuckyDogPosition, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderWeAreInLuckyDogPosition, 0, this), 10);
                         }
                         else if (currentGreenFlagLuckyDogStatus == GreenFlagLuckyDogStatus.PASS_FOR_LUCKY_DOG)
                         {
@@ -453,12 +455,12 @@ namespace CrewChiefV4.Events
                             Console.WriteLine("Stock Car Rule triggered: " + currentGreenFlagLuckyDogStatus + " driver to pass: " + (carAhead != null ? carAhead.DriverRawName : "not found"));
                             if (carAhead != null && AudioPlayer.canReadName(carAhead.DriverRawName))
                             {
-                                audioPlayer.playMessage(new QueuedMessage("push_to_pass_lucky_dog", 
-                                    MessageContents(folderPassDriverForLuckyDogPositionIntro, carAhead, folderPassDriverForLuckyDogPositionOutro), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("push_to_pass_lucky_dog",
+                                    MessageContents(folderPassDriverForLuckyDogPositionIntro, carAhead, folderPassDriverForLuckyDogPositionOutro), 0, this), 10);
                             }
                             else
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderPassCarAheadForLuckyPositionDog, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderPassCarAheadForLuckyPositionDog, 0, this), 10);
                             }
                         }
                         greenFlagLuckyDogMessageCountInSession++;
@@ -555,13 +557,15 @@ namespace CrewChiefV4.Events
                         if (currentGameState.FlagData.numCarsPassedIllegally == 1)
                         {
                             // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back_repeat", MessageContents(folderGiveOnePositionsBackNextWarning), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back_repeat", MessageContents(folderGiveOnePositionsBackNextWarning), 0,
+                                null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                         else
                         {
                             // don't allow any other message to override this one:
                             audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_repeat", MessageContents(folderGivePositionsBackNextWarningIntro,
-                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackNextWarningOutro), 0, null));
+                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackNextWarningOutro), 0,
+                                null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                     else
@@ -570,13 +574,15 @@ namespace CrewChiefV4.Events
                         if (currentGameState.FlagData.numCarsPassedIllegally == 1)
                         {
                             // don't allow any other message to override this one:
-                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back", MessageContents(folderGiveOnePositionBackFirstWarning), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("give_position_back", MessageContents(folderGiveOnePositionBackFirstWarning), 0,
+                                null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                         else
                         {
                             // don't allow any other message to override this one:
                             audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back", MessageContents(folderGivePositionsBackFirstWarningIntro,
-                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackFirstWarningOutro), 0, null));
+                                currentGameState.FlagData.numCarsPassedIllegally, folderGivePositionsBackFirstWarningOutro), 0,
+                                null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                 }
@@ -586,7 +592,8 @@ namespace CrewChiefV4.Events
                     if (currentGameState.PenaltiesData.NumPenalties == 0)
                     {
                         // don't allow any other message to override this one:
-                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("give_positions_back_completed", MessageContents(folderGivePositionsBackCompleted), 0,
+                            null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                     }
                     hasAlreadyWarnedAboutIllegalPass = false;
                 }
@@ -609,7 +616,8 @@ namespace CrewChiefV4.Events
                             // don't allow any other message to override this one:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0,
+                                    null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                             }
                             // start working out who's gone off
                             if (enableOpponentCrashMessages)
@@ -624,44 +632,44 @@ namespace CrewChiefV4.Events
                         case FullCourseYellowPhase.PITS_CLOSED:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsClosedUS : folderFCYellowPitsClosedEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN_LEAD_LAP_VEHICLES:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenLeadLapCarsUS : folderFCYellowPitsOpenLeadLapCarsEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.PITS_OPEN:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPitsOpenUS : folderFCYellowPitsOpenEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.IN_PROGRESS:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowInProgressUS : folderFCYellowInProgressEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowInProgressUS : folderFCYellowInProgressEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_NEXT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapNextUS : folderFCYellowLastLapNextEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.LAST_LAP_CURRENT:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, Utilities.random.Next(1, 4), this));
+                                audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowLastLapCurrentUS : folderFCYellowLastLapCurrentEU, Utilities.random.Next(1, 4), this), 10);
                             }
                             break;
                         case FullCourseYellowPhase.RACING:
                             // don't allow any other message to override this one:
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowGreenFlag, 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage(folderFCYellowGreenFlag, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                             }
                             break;
                         default:
@@ -674,7 +682,8 @@ namespace CrewChiefV4.Events
                     // don't allow any other message to override this one:
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0,
+                            null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                     }
                 }
                 else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
@@ -725,7 +734,9 @@ namespace CrewChiefV4.Events
                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && !hasReportedIsUnderLocalYellow)
                         {
                             //Console.WriteLine("FLAG_DEBUG: queuing local yellow " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellow), 1, this, validationData));
+                            // immediate to prevent it being delayed by the hard-parts logic
+                            audioPlayer.playMessageImmediately(new QueuedMessage(localFlagChangeMessageKey + "_yellow", MessageContents(folderLocalYellow), 1, this,
+                                validationData) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                     else if (isUnderLocalYellow && !currentGameState.FlagData.isLocalYellow)
@@ -742,7 +753,7 @@ namespace CrewChiefV4.Events
                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane && hasReportedIsUnderLocalYellow)
                         {
                             //Console.WriteLine("FLAG_DEBUG: queuing local green " + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                            audioPlayer.playMessage(new QueuedMessage(localFlagChangeMessageKey, MessageContents(folderLocalYellowClear), 1, this, validationData));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(localFlagChangeMessageKey + "_clear", MessageContents(folderLocalYellowClear), 1, this, validationData));
                         }
                     }
                     else if (allSectorsAreGreen(currentGameState.FlagData))
@@ -848,15 +859,17 @@ namespace CrewChiefV4.Events
                                         if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                         {
                                             //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                            audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
-                                                folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData));
+                                            // immediate to prevent it being delayed by the hard-parts logic
+                                            audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
+                                                folderYellowFlag : folderDoubleYellowFlag), 3, this, validationData) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         }
                                     }
                                     else if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                     {
                                         //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                        audioPlayer.playMessage(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
-                                            folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData));
+                                        // immediate to prevent it being delayed by the hard-parts logic
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(sectorFlagChangeMessageKeyStart + (i + 1), MessageContents(sectorFlag == FlagEnum.YELLOW ?
+                                            folderYellowFlagSectors[i] : folderDoubleYellowFlagSectors[i]), 3, this, validationData) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
                                 if (enableOpponentCrashMessages)
@@ -881,8 +894,8 @@ namespace CrewChiefV4.Events
                                         // hack the message key if we're reporting green in the current sector. This prevents
                                         // a duplicate clear for local sectors
                                         //Console.WriteLine("FLAG_DEBUG: queuing sector " + (i + 1) + " " + sectorFlag + " at " + currentGameState.Now.ToString("HH:mm:ss"));
-                                        String messageKey = i == currentGameState.SessionData.SectorNumber - 1 ? localFlagChangeMessageKey : sectorFlagChangeMessageKeyStart + (i + 1);
-                                        audioPlayer.playMessage(new QueuedMessage(messageKey,
+                                        String messageKey = i == currentGameState.SessionData.SectorNumber - 1 ? localFlagChangeMessageKey+ "_clear" : sectorFlagChangeMessageKeyStart + (i + 1);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(messageKey,
                                             MessageContents(folderGreenFlagSectors[i]), 3, this, validationData));
                                     }
                                 }
@@ -898,7 +911,7 @@ namespace CrewChiefV4.Events
                     {
                         if (CrewChief.yellowFlagMessagesEnabled)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderClearToOvertake, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.YES;
                         lastOvertakeAllowedReportTime = currentGameState.Now;
@@ -908,7 +921,7 @@ namespace CrewChiefV4.Events
                     {
                         if (CrewChief.yellowFlagMessagesEnabled)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderNoOvertaking, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                         lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO;
                         lastOvertakeAllowedReportTime = currentGameState.Now;                                               
@@ -973,7 +986,7 @@ namespace CrewChiefV4.Events
                     disableYellowFlagUntil = currentGameState.Now.Add(timeBetweenYellowFlagMessages);
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderYellowFlag, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYellowFlag, 0, this));
                     }
                 }
             }
@@ -986,7 +999,7 @@ namespace CrewChiefV4.Events
                     disableYellowFlagUntil = currentGameState.Now.Add(timeBetweenYellowFlagMessages);
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderDoubleYellowFlag, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderDoubleYellowFlag, 0, this));
                     }
                 }
             }
@@ -1048,7 +1061,7 @@ namespace CrewChiefV4.Events
                         // report pileup
                         if (CrewChief.yellowFlagMessagesEnabled)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" +
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" +
                                 waitingForCrashedDriverInCorner), 0, this));
                         }
                     }
@@ -1091,14 +1104,14 @@ namespace CrewChiefV4.Events
                             Console.WriteLine("Incident in " + waitingForCrashedDriverInCorner + " for drivers " + String.Join(",", namesToDebug));
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", messageContents, 0, this));
+                                audioPlayer.playMessageImmediately(new QueuedMessage("incident_corner_with_driver", messageContents, 0, this));
                             }
                         }
                         else if (positionToRead != -1)
                         {
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("incident_corner_with_driver", MessageContents(
+                                audioPlayer.playMessageImmediately(new QueuedMessage("incident_corner_with_driver", MessageContents(
                                             folderPositionHasGoneOffIn[positionToRead - 1], "corners/" + waitingForCrashedDriverInCorner), 0, this));
                             }
                         }
@@ -1107,7 +1120,7 @@ namespace CrewChiefV4.Events
                             Console.WriteLine("Incident in " + waitingForCrashedDriverInCorner);
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + waitingForCrashedDriverInCorner), 0, this));
+                                audioPlayer.playMessageImmediately(new QueuedMessage("incident_corner", MessageContents(folderIncidentInCornerIntro, "corners/" + waitingForCrashedDriverInCorner), 0, this));
                             }
                         }
                     }
@@ -1300,7 +1313,8 @@ namespace CrewChiefV4.Events
             }
             if (messageContents.Count > 0 && CrewChief.yellowFlagMessagesEnabled)
             {
-                audioPlayer.playMessage(new QueuedMessage("incident_drivers", messageContents, 0, this));
+                // immediate to prevent it being delayed by the hard-parts logic
+                audioPlayer.playMessageImmediately(new QueuedMessage("incident_drivers", messageContents, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
             }
         }
 
@@ -1333,7 +1347,9 @@ namespace CrewChiefV4.Events
                         // report the pileup
                         if (CrewChief.yellowFlagMessagesEnabled)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" + crashedInLandmarkKey), 0, this));
+                            // immediate to prevent it being delayed by the hard-parts logic
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pileup_in_corner", MessageContents(folderPileupInCornerIntro, "corners/" + crashedInLandmarkKey),
+                                0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                         return true;
                     }

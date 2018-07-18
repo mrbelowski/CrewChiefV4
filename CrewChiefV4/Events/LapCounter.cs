@@ -300,7 +300,7 @@ namespace CrewChiefV4.Events
                     {
                         break;
                     }
-                    audioPlayer.playMessage(message);
+                    audioPlayer.playMessage(message, 10);
                 }
             }
             // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
@@ -378,7 +378,7 @@ namespace CrewChiefV4.Events
                          currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk))
                     {
                         playedPreLightsRollingStartWarning = true;
-                        audioPlayer.playMessage(new QueuedMessage(FrozenOrderMonitor.folderRollingStartReminder, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(FrozenOrderMonitor.folderRollingStartReminder, 0, this), 10);
                     }
 
                     // when the lights change to green, give some info:
@@ -406,6 +406,10 @@ namespace CrewChiefV4.Events
                 // We want to ensure it's switched off if we're not in a race session, for obvious reasons.
                 GameStateData.onManualFormationLap = currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps < 1;
             }
+            /*else if (currentGameState.SessionData.StartType == StartType.Rolling)
+            {
+
+            }*/
             else
             {
                 // nasty... 2 separate code paths here - one for the existing pre-lights logic which is a ball of spaghetti I don't fancy unpicking, 
@@ -420,7 +424,7 @@ namespace CrewChiefV4.Events
                             // empty the queue and play 'get ready'
                             int purgedCount = audioPlayer.purgeQueues();
                             Console.WriteLine("Purging pre-lights messages, removed = " + purgedCount + " messages");
-                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
                             playedGetReady = true;
                         }
                         else
@@ -438,11 +442,13 @@ namespace CrewChiefV4.Events
                                 //      Allow messages for countdown phase for any game
                                 //      Allow messages for gridwalk phase for any game *except* Raceroom (which treats gridwalk as its own session with different data to the race session)
                                 //      Allow messages for formation phase for Raceroom
+                                //      Allow messages for formation phase for iRacing
                                 //      Allow messages for formation phase for RF1 (AMS) and rF2 only when we enter sector 3 of the formation lap.
                                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
+                                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING) ||
                                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
                                         currentGameState.SessionData.SectorNumber == 3)))
                                 {
@@ -471,7 +477,7 @@ namespace CrewChiefV4.Events
                         (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
                         {
                             purgePreLightsMessages = true;
                         }
@@ -494,7 +500,7 @@ namespace CrewChiefV4.Events
                         {
                             audioPlayer.purgeQueues();
                         }
-                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
                         playedGetReady = true;
                     }
                 }
@@ -512,7 +518,7 @@ namespace CrewChiefV4.Events
                     {
                         Console.WriteLine("Purged " + purgeCount + " outstanding messages at green light");
                     }
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
             }
@@ -538,15 +544,15 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), 10);
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLastLapTopThree, 0, this), 10);
                     }
                     else if (position > 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderLastLapUS : folderLastLapEU, 0, this), 10);
                     }
                     else
                     {
@@ -558,24 +564,25 @@ namespace CrewChiefV4.Events
                     Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
                     if (position == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this), 10);
                     }
                     else if (position < 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this), 10);
                     }
-                    else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5)
+                    else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5 &&
+                        currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
                     {
                         // yuk... don't yell at the player for being shit if he's playing Assetto. Because assetto drivers *are* shit, and also the SessionStartClassPosition
                         // might be invalid so perhaps they're really not being shit. At the moment.
                         if (CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_32BIT && CrewChief.gameDefinition.gameEnum != GameEnum.ASSETTO_64BIT)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5);
+                            audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.BAD, 0.5, 10);
                         }
                     }
                     else if (position >= 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5);
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLeft, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, 0.5, 10);
                     }
                     else
                     {
@@ -590,7 +597,7 @@ namespace CrewChiefV4.Events
         {
             if (!playedManualStartPlayedGoGoGo)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderGreenGreenGreen, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
             }
             GameStateData.onManualFormationLap = false;
             // reset
@@ -607,7 +614,7 @@ namespace CrewChiefV4.Events
 
         private void playManualStartGetReady()
         {
-            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this));
+            audioPlayer.playMessage(new QueuedMessage(folderGetReady, 0, this), 10);
             playedManualStartGetReady = true;
         }
 
@@ -724,11 +731,11 @@ namespace CrewChiefV4.Events
             }
             if (opponentToLineUpBehind == null)
             {
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsNoName, 0, this));
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsNoName, 0, this), 10);
             }
             else
             {
-                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this));
+                audioPlayer.playMessage(new QueuedMessage("manual_start_intro", messageContentsWithName, messageContentsNoName, 0, this), 10);
             }
             playedManualStartInitialMessage = true;
         }
@@ -755,18 +762,18 @@ namespace CrewChiefV4.Events
                         if (gridSide == GridSide.LEFT)
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn), 0, this));
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheLeftColumn), 0, this), 10);
                         }
                         else
                         {
                             audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn), 0, this));
+                                    newOpponentToFollow, FrozenOrderMonitor.folderInTheRightColumn), 0, this), 10);
                         }
                     }
                     else
                     {
                         audioPlayer.playMessage(new QueuedMessage("new_car_to_follow", MessageContents(folderManualStartInitialOutroWithDriverName1,
-                                    newOpponentToFollow), 0, this));
+                                    newOpponentToFollow), 0, this), 10);
                     }
                 }
             }
@@ -775,7 +782,7 @@ namespace CrewChiefV4.Events
                 if (!playedRejoinAtBackMessage)
                 {
                     playedRejoinAtBackMessage = true;
-                    audioPlayer.playMessage(new QueuedMessage("rejoin_at_back", MessageContents(folderManualStartRejoinAtBack), 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("rejoin_at_back", MessageContents(folderManualStartRejoinAtBack), 0, this), 10);
                 }
                 setOpponentToFollowAndStartPosition(currentGameState, true, false);
             }
@@ -792,7 +799,7 @@ namespace CrewChiefV4.Events
 
                     audioPlayer.playMessage(new QueuedMessage("give_position_back",
                         MessageContents(folderGivePositionBack, folderManualStartInitialOutroWithDriverName1, getOpponent(currentGameState, manualStartOpponentToFollow)),
-                        MessageContents(folderGivePositionBack), 5, this, validationData));                    
+                        MessageContents(folderGivePositionBack), 5, this, validationData), 10);                    
                 }
             }
         }
@@ -827,7 +834,7 @@ namespace CrewChiefV4.Events
                     if (poleSitter.Speed - leaderSpeedAtAccelerationCheckStart > 5)
                     {
                         Console.WriteLine("Looks like the leader has 'gone'");
-                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderManualStartLeaderHasGone, 0, this), 10);
                         leaderHasGone = true;
                     }
                 }
@@ -874,11 +881,11 @@ namespace CrewChiefV4.Events
                 }
                 if (opponentToLineUpBehind == null)
                 {
-                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsNoName, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsNoName, 0, this), 10);
                 }
                 else
                 {
-                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage("manual_start_double_file_reminder", messageContentsWithName, messageContentsNoName, 0, this), 10);
                 }
             }
         }
@@ -934,7 +941,7 @@ namespace CrewChiefV4.Events
                         if (poleSitter != null && !playedManualStartLeaderHasCrossedLine && poleSitter.CompletedLaps == 1)
                         {
                             playedManualStartLeaderHasCrossedLine = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLeaderHasCrossedStartLine, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                         }
                     }
                 }

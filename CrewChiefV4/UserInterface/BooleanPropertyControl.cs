@@ -15,16 +15,20 @@ namespace CrewChiefV4
         public String label;
         public Boolean defaultValue;
         public Boolean originalValue;
-        public BooleanPropertyControl(String propertyId, String label, Boolean value, Boolean defaultValue, String helpText)
+        internal PropertyFilter filter = null;
+        public BooleanPropertyControl(String propertyId, String label, Boolean value, Boolean defaultValue, String helpText, String filterText, String categoryText)
         {
             InitializeComponent();
+
             this.label = label;
             this.propertyId = propertyId;
             this.originalValue = value;
-            this.checkBox1.Text = label;            
+            this.checkBox1.Text = label;
             this.checkBox1.Checked = value;
             this.defaultValue = defaultValue;
-            this.toolTip1.SetToolTip(this.checkBox1, helpText);            
+            this.toolTip1.SetToolTip(this.checkBox1, helpText);
+
+            this.filter = new PropertyFilter(filterText, categoryText, propertyId, this.label);
         }
         public Boolean getValue()
         {

@@ -99,9 +99,9 @@
 # ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
 # VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
 # VINTAGE_F1_C, VINTAGE_STOCK_CAR,
-# F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
+# F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
 # MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3,
-# RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP
+# RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, CAYMAN_CLUBSPORT, CAN_AM
 # 
 # Car classes can skip an entry if they're using the default - e.g. most cars
 # skip defaultTyreType so they use Unknown_Race - this is only overridden in
@@ -129,8 +129,8 @@
 			"carClassEnum": "GT1",
 			"raceroomClassIds": [1687],
 			"pCarsClassNames": ["GT1"],
-            "rf2ClassNames": [ "*GT1*" ],
-            "acClassNames": ["*GT1*", "rss_gt_tornado_v12", "rss_gt_vortex_v10", "rss_gt_ferruccio_55", "rss_gt_*"],
+			"rf2ClassNames": [ "*GT1*" ],
+			"acClassNames": ["*GT1*", "rss_gt_tornado_v12", "rss_gt_vortex_v10", "rss_gt_ferruccio_55", "rss_gt_*"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
@@ -150,10 +150,11 @@
 			"pCarsClassNames": ["*GTE*"],
 			"rf2ClassNames": ["*GTE*", "URD_EGT_Darche", "URD_EGT_AM", "URD_EGT_Bayro", "URD_EGT_Ferruccio", "URD_EGT_Venom", "URD_EGT_C7R"],
 			"acClassNames": ["ks_lamborghini_huracan_st", "ks_glickenhaus_scg003", "*GTE*"],
-			"iracingCarIds": [92, 93],
+			"iracingCarIds": [92, 93, 102],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "GTLM",
@@ -170,11 +171,18 @@
 			"acClassNames": ["ks_audi_r8_lms", "*GT3*"],
 			"iracingCarIds": [43, 55, 59, 72, 73, 94],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "CARRERA_CUP",
-			"raceroomClassIds": [6345],
+			"raceroomClassIds": [ 6345 ],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
+		},
+		{
+			"carClassEnum": "CAYMAN_CLUBSPORT",
+			"raceroomClassIds": [6648],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -186,7 +194,7 @@
 		},
 		{
 			"carClassEnum": "GT4",
-			"raceroomClassIds": [6648],
+			"raceroomClassIds": [5825],
 			"pCarsClassNames": ["GT4"],
 			"rf2ClassNames": ["*GT4*"],
 			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
@@ -207,7 +215,7 @@
 		},
 		{
 			"carClassEnum": "GT5",
-			"pCarsClassNames": ["GT5", "G40 Junior"],
+			"pCarsClassNames": [ "GT5", "G40 Junior" ],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -295,7 +303,8 @@
 			"raceroomClassIds": [1714],
 			"pCarsClassNames": ["LMP1"],
 			"rf2ClassNames": ["LMP1"],
-			"acClassNames": ["ks_porsche_919_hybrid_2015", "ks_porsche_919_hybrid_2016"],
+			"acClassNames": [ "ks_porsche_919_hybrid_2015", "ks_porsche_919_hybrid_2016" ],
+			"iracingCarIds": [98, 100],
 			"brakeType": "Carbon",
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
@@ -306,11 +315,12 @@
 			"carClassEnum": "LMP2",
 			"raceroomClassIds": [1923],
 			"pCarsClassNames": ["LMP2"],
-            "rf2ClassNames": [ "LMP2", "ES_P2" ],
-            "iracingCarIds": [70],
+			"rf2ClassNames": [ "LMP2", "ES_P2" ],
+			"iracingCarIds": [39, 70],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"maxSafeOilTemp" : 135
 		},
 		{
 			"carClassEnum": "LMP3",
@@ -330,6 +340,7 @@
 		},
 		{
 			"carClassEnum": "GROUPC",
+			"raceroomClassIds": [4121],
 			"pCarsClassNames": ["Group C1", "Group C"],
 			"rf2ClassNames": ["Mazda_787B"],
 			"acClassNames": ["mazda_787b", "ks_mazda_787b"],
@@ -366,10 +377,16 @@
 		},
 		{
 			"carClassEnum": "GROUPA",
-			"raceroomClassIds": [1712, 3499],
-			"pCarsClassNames": ["Group A"],
+			"raceroomClassIds": [ 1712, 3499 ],
+			"pCarsClassNames": [ "Group A" ],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+		},
+		{
+			"carClassEnum": "CAN_AM",
+			"pCarsClassNames": ["CanAm"],
+			"timesInHundredths": false,
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
 		},
 		{
 			"carClassEnum": "INDYCAR",
@@ -381,8 +398,8 @@
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-            "enabledMessageTypes": "ALL",
-            "spotterVehicleLength": 5,
+			"enabledMessageTypes": "ALL",
+			"spotterVehicleLength": 5,
 			"spotterVehicleWidth": 2,
 		},
 		{
@@ -624,12 +641,18 @@
 		},
 		{
 			"carClassEnum": "TC2",
-			"raceroomClassIds": [1922],
-			"pCarsClassNames": ["TC2", "Touring Car"],
-			"rf1ClassNames": ["Marcas"],
-			"rf2ClassNames": ["BMW 125i", "Ford Focus", "Chevrolet Cruze", "Toyota Avensis", "Civic BTCC 2013"],
+			"raceroomClassIds": [ 1922 ],
+			"pCarsClassNames": [ "TC2", "Touring Car" ],
+			"rf1ClassNames": [ "Marcas" ],
+			"rf2ClassNames": [ "BMW 125i", "Ford Focus", "Chevrolet Cruze", "Toyota Avensis", "Civic BTCC 2013" ],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+		},
+		{
+			"carClassEnum": "TCR",
+			"raceroomClassIds": [7009],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
 		},
 		{
 			"carClassEnum": "AUDI_TT_CUP",
@@ -672,8 +695,8 @@
 		},
 		{
 			"carClassEnum": "ROAD_E",
-            "pCarsClassNames": [ "Road E" ],
-            "rf1ClassNames": ["P911T"],
+			"pCarsClassNames": [ "Road E" ],
+			"rf1ClassNames": ["P911T"],
 			"defaultTyreType": "Road",
 			"brakeType": "Iron_Road",
 			"maxSafeWaterTemp": 102,
@@ -846,12 +869,18 @@
 			"spotterVehicleWidth": 1.75,
 			"limiterAvailable": false
 		},
-		{
-			"carClassEnum": "SPEC_MIATA",
-			"iracingCarIds": [67],
+        {
+            "carClassEnum": "SPEC_MIATA",
+            "iracingCarIds": [ 67 ],
+            "timesInHundredths": true,
+            "enabledMessageTypes": "FUEL",
+            "limiterAvailable": false
+        },
+        {
+			"carClassEnum": "FORMULA_RENAULT20",
+			"iracingCarIds": [74],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "FUEL",
-			"limiterAvailable": false
+			"enabledMessageTypes": "FUEL"
 		},
 
 	]

@@ -63,6 +63,17 @@ namespace CrewChiefV4.Events
 
         public static String folderWillNeedToStopAgain = "fuel/will_need_to_stop_again";
 
+        public static String folderWillNeedToAdd = "fuel/we_will_need_to_add";
+
+        public static String folderLitresToGetToTheEnd = "fuel/litres_to_get_to_the_end";
+
+        public static String folderGallonsToGetToTheEnd = "fuel/gallons_to_get_to_the_end";
+
+        // no 1 litres equivalent
+        public static String folderWillNeedToAddOneGallonToGetToTheEnd = "fuel/need_to_add_one_gallon_to_get_to_the_end";
+
+        public static String folderFuelWillBeTight = "fuel/fuel_will_be_tight";
+
         private float averageUsagePerLap;
 
         private float averageUsagePerMinute;
@@ -189,7 +200,7 @@ namespace CrewChiefV4.Events
         // fuel not implemented for HotLap/LonePractice modes
         public override List<SessionType> applicableSessionTypes
         {
-            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race }; }
+            get { return new List<SessionType> { SessionType.Practice, SessionType.Qualify, SessionType.Race, SessionType.LonePractice }; }
         }
 
         public override List<SessionPhase> applicableSessionPhases
@@ -241,7 +252,7 @@ namespace CrewChiefV4.Events
                 if (!initialised ||
                     // fuel has increased by at least 1 litre - we only check against the time window here
                     (fuelLevelWindowByTime.Count() > 0 && fuelLevelWindowByTime[0] > 0 && currentGameState.FuelData.FuelLeft > fuelLevelWindowByTime[0] + 1) ||
-                    (previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))
+                    (currentGameState.SessionData.SessionType != SessionType.Race && previousGameState != null && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane))
                 {
                     // first time in, fuel has increased, or pit exit so initialise our internal state. Note we don't blat the average use data - 
                     // this will be replaced when we get our first data point but it's still valid until we do.
@@ -352,7 +363,8 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
+                    if (!currentGameState.PitData.InPitlane
+                        && currentGameState.SessionData.SessionRunningTime > gameTimeAtLastFuelWindowUpdate + fuelUseSampleTime)
                     {
                         // it's x minutes since the last fuel window check
                         gameTimeAtLastFuelWindowUpdate = currentGameState.SessionData.SessionRunningTime;
@@ -403,13 +415,13 @@ namespace CrewChiefV4.Events
                             {
                                 // yes i know its not 2 liters but who really cares.
                                 played2LitreWarning = true;
-                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneGallonRemaining), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneGallonRemaining), 0, this), 10);
                             }
                             else if (convertLitersToGallons(currentFuel) <= 0.5f && !played1LitreWarning)
                             {
                                 //^^
                                 played1LitreWarning = true;
-                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderHalfAGallonRemaining), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderHalfAGallonRemaining), 0, this), 10);
                             }
                         }
                         else
@@ -417,12 +429,12 @@ namespace CrewChiefV4.Events
                             if (currentFuel <= 2 && !played2LitreWarning)
                             {
                                 played2LitreWarning = true;
-                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(2, folderLitresRemaining), 0, this), 10);
                             }
                             else if (currentFuel <= 1 && !played1LitreWarning)
                             {
                                 played1LitreWarning = true;
-                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/level", MessageContents(folderOneLitreRemaining), 0, this), 10);
                             }
                         }
 
@@ -442,17 +454,17 @@ namespace CrewChiefV4.Events
                                 {
                                     if (currentGameState.PitData.IsRefuellingAllowed)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
-                                        audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(folderWeEstimate, estimatedFuelLapsLeft, folderLapsRemaining), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 7);
+                                        audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(folderWeEstimate, estimatedFuelLapsLeft, folderLapsRemaining), 0, this), 7);
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this), 7);
                                     }
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this));
+                                    audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
                                 }
                             }
                             else if (raceLapsRemaining > 3 && estimatedFuelLapsLeft == 4)
@@ -467,7 +479,7 @@ namespace CrewChiefV4.Events
                                     Console.WriteLine("4 laps fuel left, starting fuel = " + initialFuelLevel.ToString("0.000") +
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft.ToString("0.000") + ", usage per lap = " + averageUsagePerLap.ToString("0.000"));  
                                 }
-                                audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this), 3);
                             }
                             else if (raceLapsRemaining > 2 && estimatedFuelLapsLeft == 3)
                             {
@@ -481,6 +493,7 @@ namespace CrewChiefV4.Events
                                     Console.WriteLine("3 laps fuel left, starting fuel = " + initialFuelLevel.ToString("0.000") +
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft.ToString("0.000") + ", usage per lap = " + averageUsagePerLap.ToString("0.000"));
                                 }
+                                audioPlayer.playMessage(new QueuedMessage(folderThreeLapsEstimate, 0, this), 5);
                             }
                             else if (raceLapsRemaining > 1 && estimatedFuelLapsLeft == 2)
                             {
@@ -494,6 +507,7 @@ namespace CrewChiefV4.Events
                                     Console.WriteLine("2 laps fuel left, starting fuel = " + initialFuelLevel.ToString("0.000") +
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft.ToString("0.000") + ", usage per lap = " + averageUsagePerLap.ToString("0.000"));
                                 }
+                                audioPlayer.playMessage(new QueuedMessage(folderTwoLapsEstimate, 0, this), 7);
                             }
                             else if (raceLapsRemaining > 0 && estimatedFuelLapsLeft == 1)
                             {
@@ -507,13 +521,13 @@ namespace CrewChiefV4.Events
                                     Console.WriteLine("1 laps fuel left, starting fuel = " + initialFuelLevel.ToString("0.000") +
                                             ", current fuel = " + currentGameState.FuelData.FuelLeft.ToString("0.000") + ", usage per lap = " + averageUsagePerLap.ToString("0.000"));
                                 }                                
-                                audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this), 10);
                                 // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                                 // but i'd have to move some stuff around and I'm an idle fucker
                                 if (!playedPitForFuelNow && raceLapsRemaining > 1)
                                 {
                                     playedPitForFuelNow = true;
-                                    audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this));
+                                    audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this), 10);
                                 }
                             }
                         }
@@ -544,18 +558,18 @@ namespace CrewChiefV4.Events
                                         if (currentGameState.PitData.IsRefuellingAllowed)
                                         {
                                             int minutesLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerMinute);
-                                            audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 7);
                                             audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", MessageContents(
-                                                folderWeEstimate, minutesLeft, folderMinutesRemaining), 0, this));
+                                                folderWeEstimate, minutesLeft, folderMinutesRemaining), 0, this), 7);
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this), 7);
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
                                     }
                                 }
                             }
@@ -578,12 +592,12 @@ namespace CrewChiefV4.Events
                                     if (currentGameState.SessionData.SessionTimeRemaining > cutoffForRefuelCall)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("pit_for_fuel_now",
-                                            MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this));
+                                            MessageContents(folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this), 10);
                                     }
                                     else
                                     {
                                         // going to run out, but don't call the player into the pits - it's up to him
-                                        audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_fuel", MessageContents(folderAboutToRunOut), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_fuel", MessageContents(folderAboutToRunOut), 0, this), 10);
                                     }
                                 }
                             }
@@ -592,26 +606,26 @@ namespace CrewChiefV4.Events
                                 playedTwoMinutesRemaining = true;
                                 playedFiveMinutesRemaining = true;
                                 playedTenMinutesRemaining = true;
-                                audioPlayer.playMessage(new QueuedMessage(folderTwoMinutesFuel, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderTwoMinutesFuel, 0, this), 10);
                             }
                             else if (estimatedFuelMinutesLeft <= 5 && estimatedFuelMinutesLeft > 4.8 && !playedFiveMinutesRemaining)
                             {
                                 playedFiveMinutesRemaining = true;
                                 playedTenMinutesRemaining = true;
-                                audioPlayer.playMessage(new QueuedMessage(folderFiveMinutesFuel, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderFiveMinutesFuel, 0, this), 7);
                             }
                             else if (estimatedFuelMinutesLeft <= 10 && estimatedFuelMinutesLeft > 9.8 && !playedTenMinutesRemaining)
                             {
                                 playedTenMinutesRemaining = true;
-                                audioPlayer.playMessage(new QueuedMessage(folderTenMinutesFuel, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderTenMinutesFuel, 0, this), 3);
 
                             }
-                            else if (!playedHalfTankWarning && currentGameState.FuelData.FuelLeft / initialFuelLevel <= 0.55 && 
-                                currentGameState.FuelData.FuelLeft / initialFuelLevel >= 0.45 && !hasBeenRefuelled)
+                            else if (!playedHalfTankWarning && currentGameState.FuelData.FuelLeft / initialFuelLevel <= 0.50 && 
+                                currentGameState.FuelData.FuelLeft / initialFuelLevel >= 0.47 && !hasBeenRefuelled)
                             {
                                 // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
                                 playedHalfTankWarning = true;
-                                audioPlayer.playMessage(new QueuedMessage(folderHalfTankWarning, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderHalfTankWarning, 0, this), 0);
                             }
                         }
                     }
@@ -915,7 +929,7 @@ namespace CrewChiefV4.Events
             return haveData;
         }
 
-        public void reportFuelStatus(Boolean allowNoDataMessage)
+        public void reportFuelStatus(Boolean allowNoDataMessage, Boolean isRace)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.FUEL))
             {
@@ -929,7 +943,55 @@ namespace CrewChiefV4.Events
 
             Boolean reportedRemaining = reportFuelRemaining(allowNoDataMessage);
             Boolean reportedConsumption = reportFuelConsumption();
-            if (!reportedConsumption && !reportedRemaining && allowNoDataMessage)
+            Boolean reportedLitresNeeded = false;
+            if (isRace)
+            {
+                int litresToEnd = getLitresToEndOfRace();
+                // TODO: TEST ME
+                if (litresToEnd > 0)
+                {
+                    int litresRemaining = (int)Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
+                    int litresNeeded = litresToEnd - litresRemaining;
+                    // -2 means we expect to have 2 litres left at the end of the race
+                    if (litresNeeded >= -2)
+                    {
+                        QueuedMessage fuelMessage;
+                        if (litresNeeded < 3)
+                        {
+                            // between 2 litres short, and 2 litres excess fuel
+                            fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
+                        }
+                        else
+                        {
+                            if (fuelReportsInGallon)
+                            {
+                                // for gallons we want both whole and fractional part cause its a stupid unit.
+                                float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                                Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
+                                if (wholeandfractional.Item2 > 0)
+                                {
+                                    fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                        wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2, folderGallonsToGetToTheEnd), 0, null);
+                                }
+                                else
+                                {
+                                    int wholeGallons = Convert.ToInt32(wholeandfractional.Item1);
+                                    fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(wholeGallons, wholeGallons == 1 ?
+                                        folderWillNeedToAddOneGallonToGetToTheEnd : folderWillNeedToAdd, wholeGallons, folderGallonsToGetToTheEnd), 0, null);
+                                }
+                            }
+                            else
+                            {
+                                fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
+                                    litresNeeded, folderLitresToGetToTheEnd), 0, null);
+                            }
+                        }
+                        audioPlayer.playMessageImmediately(fuelMessage);
+                        reportedLitresNeeded = true;
+                    }
+                }
+            }
+            if (!reportedConsumption && !reportedRemaining && !reportedLitresNeeded && allowNoDataMessage)
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
             }
@@ -971,7 +1033,8 @@ namespace CrewChiefV4.Events
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
                 SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
             {
-                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL));
+                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL),
+                    (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
@@ -1117,7 +1180,7 @@ namespace CrewChiefV4.Events
             if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
             {
                 // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
-                audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this));
+                audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this), 10);
             }
             int maxPresses = fuelCapacityInt > 0 ? fuelCapacityInt : 200;
             return litresToEnd == -1 ? 0 : litresToEnd > maxPresses ? maxPresses : litresToEnd;

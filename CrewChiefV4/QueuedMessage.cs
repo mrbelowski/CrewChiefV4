@@ -130,6 +130,9 @@ namespace CrewChiefV4
         private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         private static readonly String compoundMessageIdentifier = "COMPOUND_";
+
+        public SoundMetadata metadata = null;  // null => a generic 'regular message' meta data object will be created automatically
+                                               // for regular queue messages, and a 'high importance' metadata object create for immediate-queue messages
         
         public int maxPermittedQueueLengthForMessage = 0;         // 0 => don't check queue length
         public long dueTime;
@@ -164,7 +167,8 @@ namespace CrewChiefV4
         }
 
         public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
-            Dictionary<String, Object> validationData) : this(messageName, messageFragments, secondsDelay, abstractEvent)
+            Dictionary<String, Object> validationData)
+            : this(messageName, messageFragments, secondsDelay, abstractEvent)
         {
             this.validationData = validationData;
         }
@@ -230,6 +234,36 @@ namespace CrewChiefV4
         public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent) :
             this(messageName, delayedMessageEvent, secondsDelay, abstractEvent, null)
         { }
+
+        // called when we repeat this message - clears all the validation and sets the type to voice-command
+        public void prepareToBeRepeated(int newMessageId)
+        {
+            if (metadata == null)
+            {
+                metadata = new SoundMetadata();
+            }
+            messageName = "REPEAT_" + messageName;
+            metadata.messageId = newMessageId;
+            metadata.priority = 5;
+            metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
+            dueTime = 0;
+            expiryTime = 0;
+            abstractEvent = null;
+            validationData = null;
+            secondsDelay = 0;
+        }
+
+        public override string ToString()
+        {
+            if (messageFolders != null)
+            {
+                return "(" + String.Join(", ", messageFolders) + ")";
+            }
+            else
+            {
+                return "";
+            }
+        }
         
         public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData)
         {
