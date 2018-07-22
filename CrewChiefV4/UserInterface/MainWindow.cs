@@ -703,9 +703,9 @@ namespace CrewChiefV4
             {
                 foreach (String arg in commandLineArgs)
                 {
-                    if (arg.Equals("SMOKE_TEST"))
+                    if (arg.Equals("SOUND_TEST"))
                     {
-                        Console.WriteLine("Smoke-test enabled");
+                        Console.WriteLine("Sound-test enabled");
                         this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
                         this.buttonSmokeTest.Visible = true;
                         this.smokeTestTextBox.Visible = true;
