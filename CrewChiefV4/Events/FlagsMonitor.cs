@@ -363,7 +363,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableBlueFlagUntil)
                 {
                     disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenBlueFlagMessages);
-                    String opponentKeyBehind = currentGameState.getOpponentKeyBehindOnTrack();
+                    String opponentKeyBehind = currentGameState.getOpponentKeyBehindOnTrack(true);
                     // if the last 3 warnings are for this same driver, don't call the blue flag. Note that it's unsafe to 
                     // assume opponentKeyBehind is never null
                     if (opponentWhoTriggeredLastBlueFlag == null || !opponentWhoTriggeredLastBlueFlag.Equals(opponentKeyBehind) || blueFlagWarningCountForSingleDriver < 3)
