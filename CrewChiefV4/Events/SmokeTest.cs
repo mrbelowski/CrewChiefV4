@@ -44,7 +44,7 @@ namespace CrewChiefV4.Events
             rawDriverNames.Add(driverName);
             return opponent;
         }
-        
+
         private void testDriverNames()
         {
             List<OpponentData> driversToTest = new List<OpponentData>();
@@ -208,6 +208,94 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(TyreMonitor.folderLapsOnCurrentTyresIntro,
                 5, TyreMonitor.folderLapsOnCurrentTyresOutro), 0, this));*/
 
+        }
+        public bool soundTestPlay(String[] foldersOrStuff, int messageNumber = 1)
+        {
+            List<String> rawDriverNames = new List<string>();
+            List<MessageFragment> fragments = new List<MessageFragment>();
+            if (foldersOrStuff.Length > 0 && File.Exists(foldersOrStuff[0]))
+            {
+                foldersOrStuff = File.ReadAllLines(foldersOrStuff[0]);
+            }
+            int iter = 0;
+            String messageName = "";
+            foreach(String stuffToPlay in foldersOrStuff)            
+            {
+                messageName = "sound_test_message_" + messageNumber.ToString();
+                iter++;
+                int num;
+                bool isNumeric = int.TryParse(stuffToPlay, out num);
+                if(stuffToPlay.StartsWith("#") || stuffToPlay.Length < 1)
+                { 
+                    continue;
+                }
+                if (stuffToPlay.StartsWith("&"))
+                {                    
+                    String [] nextNessage = new String [foldersOrStuff.Length - iter];
+                    Array.Copy(foldersOrStuff, iter, nextNessage, 0, foldersOrStuff.Length - iter);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    messageNumber++;
+                    return soundTestPlay(nextNessage, messageNumber);
+                }
+                
+                if (isNumeric)
+                {
+                    fragments.Add(MessageFragment.Integer(num));
+                }
+                else if (stuffToPlay.ToLower().StartsWith("pause"))
+                {                    
+                    String pauseLength = stuffToPlay.Substring(6);
+                    isNumeric = int.TryParse(pauseLength, out num);
+                    if(isNumeric)
+                    {
+                        fragments.Add(MessageFragment.Text(Pause(num)));
+                    }                    
+                }
+                else if (stuffToPlay.ToLower().StartsWith("name"))
+                {
+                    String nameToMake = stuffToPlay.Substring(5);
+                    fragments.Add(MessageFragment.Opponent(makeTempDriver(nameToMake, rawDriverNames)));
+                }
+                else if (stuffToPlay.ToLower().StartsWith("time"))
+                {
+                    float time = 0;
+                    String timeToMake = "";
+                    Precision precision = Precision.AUTO_LAPTIMES;
+                    timeToMake = stuffToPlay.Substring(9);
+                    isNumeric = float.TryParse(timeToMake, out time);
+                    if (isNumeric)
+                    {
+                        if (stuffToPlay.ToLower().Contains("lap"))
+                        {
+                            precision = Precision.AUTO_LAPTIMES;
+                        }
+                        else if (stuffToPlay.ToLower().Contains("gap"))
+                        {
+                            precision = Precision.AUTO_GAPS;
+                        }
+                        else if (stuffToPlay.ToLower().Contains("hun"))
+                        {
+                            precision = Precision.HUNDREDTHS;
+                        }
+                        else if (stuffToPlay.ToLower().Contains("sec"))
+                        {
+                            precision = Precision.SECONDS;
+                        }
+                        else if (stuffToPlay.ToLower().Contains("ten"))
+                        {
+                            precision = Precision.TENTHS;
+                        }
+                        fragments.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(time, precision)));       
+                    }                  
+                }
+                else
+                {
+                    fragments.Add(MessageFragment.Text(stuffToPlay));
+                }
+
+            }
+            audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+            return true;
         }
 
         private void beepOutInTest()

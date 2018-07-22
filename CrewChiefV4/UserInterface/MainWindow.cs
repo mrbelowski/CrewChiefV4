@@ -697,6 +697,21 @@ namespace CrewChiefV4
             this.filenameLabel.Visible = CrewChief.Debugging;
             this.filenameTextbox.Visible = CrewChief.Debugging;
             this.playbackInterval.Visible = CrewChief.Debugging;
+           
+            String[] commandLineArgs = Environment.GetCommandLineArgs();
+            if (commandLineArgs != null)
+            {
+                foreach (String arg in commandLineArgs)
+                {
+                    if (arg.Equals("SOUND_TEST"))
+                    {
+                        Console.WriteLine("Sound-test enabled");
+                        this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
+                        this.buttonSmokeTest.Visible = true;
+                        this.smokeTestTextBox.Visible = true;
+                    }
+                }
+            }
             if (CrewChief.Debugging)
             {
                 this.recordSession.Visible = true;
@@ -704,7 +719,6 @@ namespace CrewChiefV4
             else
             {
                 this.recordSession.Visible = false;
-                String[] commandLineArgs = Environment.GetCommandLineArgs();
                 if (commandLineArgs != null)
                 {
                     foreach (String arg in commandLineArgs)
@@ -2326,6 +2340,15 @@ namespace CrewChiefV4
         private void internetPanHandler(object sender, EventArgs e)
         {
             Process.Start("http://thecrewchief.org/misc.php?do=donate");
+        }
+
+        private void playSmokeTestSounds(object sender, EventArgs e)
+        {
+            if (crewChief.audioPlayer != null)
+            {
+                new SmokeTest(crewChief.audioPlayer).soundTestPlay(this.smokeTestTextBox.Lines);
+            }
+            
         }
     }
 
