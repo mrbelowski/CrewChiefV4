@@ -2581,12 +2581,23 @@ namespace CrewChiefV4.GameState
 
         public string getOpponentKeyBehindOnTrack()
         {
+            return getOpponentKeyBehindOnTrack(false);
+        }
+
+
+        public string getOpponentKeyBehindOnTrack(Boolean onlyIncludeCarsLappingThePlayer)
+        {
             string opponentKeyClosestBehind = null;
             string opponentKeyFurthestInFront = null;
             float closestDistanceBehind = SessionData.TrackDefinition.trackLength;
             float furthestDistanceInFront = 0.0f;
             foreach (var opponent in OpponentData)
             {
+                if (onlyIncludeCarsLappingThePlayer && opponent.Value.ClassPosition > SessionData.ClassPosition)
+                {
+                    // we're ahead of this car in the race and are only interested in cars lapping us, so ignore him
+                    continue;
+                }
                 if (opponent.Value.Speed > 0.5 && !opponent.Value.isEnteringPits())
                 {
                     if (PositionAndMotionData.DistanceRoundTrack > opponent.Value.DistanceRoundTrack &&

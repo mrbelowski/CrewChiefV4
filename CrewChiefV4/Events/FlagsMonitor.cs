@@ -186,6 +186,9 @@ namespace CrewChiefV4.Events
         
         private PassAllowedUnderYellow lastReportedOvertakeAllowed = PassAllowedUnderYellow.NO_DATA;
 
+        private int blueFlagWarningCountForSingleDriver = 0;
+        private String opponentWhoTriggeredLastBlueFlag = null;
+
         public FlagsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -317,6 +320,9 @@ namespace CrewChiefV4.Events
             nextGreenFlagLuckyDogCheckDue = DateTime.MinValue;
 
             lastIncidentPositionForOpponents.Clear();
+
+            opponentWhoTriggeredLastBlueFlag = null;
+            blueFlagWarningCountForSingleDriver = 0;
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -357,8 +363,20 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableBlueFlagUntil)
                 {
                     disableBlueFlagUntil = currentGameState.Now.Add(timeBetweenBlueFlagMessages);
-                    // immediate to prevent it being delayed by the hard-parts logic
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderBlueFlag, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    String opponentKeyBehind = currentGameState.getOpponentKeyBehindOnTrack(true);
+                    // if the last 3 warnings are for this same driver, don't call the blue flag. Note that it's unsafe to 
+                    // assume opponentKeyBehind is never null
+                    if (opponentWhoTriggeredLastBlueFlag == null || !opponentWhoTriggeredLastBlueFlag.Equals(opponentKeyBehind) || blueFlagWarningCountForSingleDriver < 3)
+                    {
+                        // only update this stuff if we were able to derive the opponent behind on track
+                        if (opponentKeyBehind != null)
+                        {
+                            opponentWhoTriggeredLastBlueFlag = opponentKeyBehind;
+                            blueFlagWarningCountForSingleDriver++;
+                        }
+                        // immediate to prevent it being delayed by the hard-parts logic
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderBlueFlag, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    }
                 }
             }
             // In iRacing White flag is set on last lap if "useAmericanTerms" is enabled, this causes white flag to be announched every 40 sec on last lap.
