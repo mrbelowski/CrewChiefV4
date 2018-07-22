@@ -96,7 +96,7 @@ namespace CrewChiefV4.RaceRoom
         private int numCarsAtSessionStart = -1;
 
         // True while on HotLap/Qualifying flying start lap.
-        private bool onFlyingLap = false;
+        private bool approachingFirstFlyingLap = false;
 
         class PendingRacePositionChange
         {
@@ -321,11 +321,11 @@ namespace CrewChiefV4.RaceRoom
                             currentGameState.SessionData.SectorNumber != 1 && !currentGameState.PitData.InPitlane)
                         {
                             // Assume that Qualify/HotLap starts with flying lap.  This is cleared out when we begin the new lap.
-                            onFlyingLap = true;
+                            approachingFirstFlyingLap = true;
                         }
                         else
                         {
-                            onFlyingLap = false;
+                            approachingFirstFlyingLap = false;
                         }
                     }
                     else
@@ -654,7 +654,7 @@ namespace CrewChiefV4.RaceRoom
                             brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(currentGameState.carClass);
                         }
                     }
-                    if (currentGameState.SessionData.CurrentLapIsValid && (participantStruct.CurrentLapValid != 1 || participantStruct.LapTimeCurrentSelf == -1) && !onFlyingLap)
+                    if (currentGameState.SessionData.CurrentLapIsValid && (participantStruct.CurrentLapValid != 1 || participantStruct.LapTimeCurrentSelf == -1) && !approachingFirstFlyingLap)
                     {
                         currentGameState.SessionData.CurrentLapIsValid = false;
                     }
@@ -671,7 +671,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.IsNewLap)
                     {
                         currentGameState.readLandmarksForThisLap = false;
-                        currentGameState.SessionData.PreviousLapWasValid = currentGameState.SessionData.CurrentLapIsValid && !onFlyingLap;
+                        currentGameState.SessionData.PreviousLapWasValid = currentGameState.SessionData.CurrentLapIsValid && !approachingFirstFlyingLap;
                         currentGameState.SessionData.CurrentLapIsValid = true;
 
                         currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
@@ -692,7 +692,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.SectorNumber == 1)
                     {
                         // Don't consider this lap as flying as soon as we reach sector 1.  Ideally this should be done on new lap, but it seems that we disregard sector number in check above.
-                        onFlyingLap = false;
+                        approachingFirstFlyingLap = false;
                     }
 
                     currentGameState.SessionData.SectorNumber = participantStruct.TrackSector;
