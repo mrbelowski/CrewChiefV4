@@ -325,7 +325,7 @@ namespace CrewChiefV4.Events
                 {
                     if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                     {
-                        if (currentGameState.PitData.limiterStatus == 0)
+                        if (currentGameState.PitData.limiterStatus == 0 && currentGameState.PositionAndMotionData.CarSpeed > 1)
                         {
                             // just entered the pit lane with no limiter active
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
