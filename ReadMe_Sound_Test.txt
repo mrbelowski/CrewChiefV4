@@ -1,5 +1,5 @@
 # All lines starting with # will be ignored
-# To enable sound testing, create a shortcut and add SMOKE_TEST as startup argument 
+# To enable sound testing, create a shortcut and add SOUND_TEST as startup argument 
 # This will enable a text box on the right side of the console output window in witch you can type in what you want played or play a file with the "script" in it like this one. 
 # The syntax is as following.
 # To play the example file(this one) type in the full path to the file ex. C:\Users\{USERNAME}\Documents\CrewChiefV4\ReadMe_Sound_Test.txt
