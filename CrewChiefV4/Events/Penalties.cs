@@ -246,7 +246,7 @@ namespace CrewChiefV4.Events
                 }
             }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && 
-                !(currentGameState.SessionData.CompletedLaps == 0 && currentGameState.PitData.OnOutLap) &&
+                !currentGameState.PitData.OnOutLap &&
                 currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount &&
                 currentGameState.PenaltiesData.NumPenalties == previousGameState.PenaltiesData.NumPenalties)  // Make sure we've no new penalty for this cut.
             {
@@ -283,7 +283,7 @@ namespace CrewChiefV4.Events
             }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
               !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid &&
-                CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && !(CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && currentGameState.PitData.OnOutLap))
+                CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && !currentGameState.PitData.OnOutLap)
             {
                 // JB: don't think we need this block - the previous block should always trigger in preference to this, but we'll leave it here just in case
                 cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
