@@ -333,7 +333,7 @@ namespace CrewChiefV4
             {
                 var className = (string)reader.Value;
                 CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
-                if (Enum.TryParse<CarClassEnum>(className, out carClassID))
+                if (Enum.TryParse<CarClassEnum>(className, out carClassID) && Enum.IsDefined(typeof(CarClassEnum), carClassID))
                 {
                     return carClassID;
                 }
@@ -881,7 +881,7 @@ namespace CrewChiefV4
                     }
                     // no match, try matching on the enum directly
                     CarClassEnum carClassID = CarClassEnum.UNKNOWN_RACE;
-                    if (Enum.TryParse<CarClassEnum>(className, out carClassID))
+                    if (Enum.TryParse<CarClassEnum>(className, out carClassID) && Enum.IsDefined(typeof(CarClassEnum), carClassID))
                     {
                         CarClass existingClass = CarData.getCarClassFromEnum(carClassID);
                         Console.WriteLine("Mapped car class from ID:\"{0}\"  to:\"{1}\"", className, existingClass.getClassIdentifier());
