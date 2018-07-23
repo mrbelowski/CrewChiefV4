@@ -35,7 +35,8 @@ namespace CrewChiefV4
                 foreach (var cat in categoryNames)
                 {
                     var catEnum = PropertiesForm.PropertyCategory.UNKNOWN;
-                    if (Enum.TryParse(cat, out catEnum))
+                    if (Enum.TryParse(cat, out catEnum) 
+                        && Enum.IsDefined(typeof(PropertiesForm.PropertyCategory), catEnum))
                         this.categoryList.Add(catEnum);
                     else
                     {
@@ -63,7 +64,8 @@ namespace CrewChiefV4
             foreach (var game in gameDefinitionNames)
             {
                 GameEnum gameEnum;
-                if (Enum.TryParse(game, out gameEnum))
+                if (Enum.TryParse(game, out gameEnum)
+                    && Enum.IsDefined(typeof(GameEnum), gameEnum))
                     this.filterList.Add(gameEnum);
                 else
                 {
