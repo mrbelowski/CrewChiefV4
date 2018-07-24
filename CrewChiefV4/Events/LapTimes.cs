@@ -805,6 +805,11 @@ namespace CrewChiefV4.Events
 
         private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapComparisonData, Boolean selfPace)
         {
+            // if we've only completed a couple of laps, make this 'no data'
+            if (currentGameState.SessionData.CompletedLaps < 3)
+            {
+                return LastLapRating.NO_DATA;
+            }
             if (currentGameState.SessionData.PreviousLapWasValid && currentGameState.SessionData.LapTimePrevious > 0)
             {
                 float closeThreshold = currentGameState.SessionData.LapTimePrevious * goodLapPercent / 100;
