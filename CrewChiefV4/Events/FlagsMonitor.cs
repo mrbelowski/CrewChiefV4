@@ -385,7 +385,7 @@ namespace CrewChiefV4.Events
                 if (currentGameState.Now > disableWhiteFlagUntil)
                 {
                     disableWhiteFlagUntil = currentGameState.Now.Add(timeBetweenWhiteFlagMessages);
-                    audioPlayer.playMessage(new QueuedMessage(folderWhiteFlagEU, 0, this), 10);
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderWhiteFlagEU, 0, this));
                 }
             }
             if (currentGameState.FlagData.numCarsPassedIllegally >= 0
