@@ -3310,7 +3310,9 @@
 		{
 			"rf2TrackNames": [
 				"Sebring 12h Course",
-				"Sebring 12h Course League Edition"
+				"Sebring 12h Course League Edition",
+				"Sebring -- 12 Hour Road Course",
+				"Sebring -- Full Layout"
 			],
 			"irTrackName": "sebring international",
 			"trackLandmarks": [{
@@ -3388,7 +3390,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Sebring Club Course"],
+			"rf2TrackNames": ["Sebring Club Course", "Sebring -- Johnson Club"],
 			"irTrackName": "sebring  club course",
 			"trackLandmarks": [{
 					"landmarkName": "cunningham",
