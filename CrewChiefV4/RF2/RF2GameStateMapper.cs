@@ -835,7 +835,7 @@ namespace CrewChiefV4.rFactor2
 
                     if (cgs.SessionData.SectorNumber > 2)  // Only print in S3, that's the most interesting.
                     {
-                        Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
+                        Console.WriteLine(string.Format("New min width: {0:0.000}    lapDist: {1:0.000}    pathLat: {2:0.000}    inPit: {3}    ps: {4}    appr: {5}    lap: {6}    pit lane: {7:0.000}",
                             this.minTrackWidth,
                             playerScoring.mLapDist,
                             playerScoring.mPathLateral,
