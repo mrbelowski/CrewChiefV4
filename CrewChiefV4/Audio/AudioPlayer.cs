@@ -973,12 +973,12 @@ namespace CrewChiefV4.Audio
 
         public int purgeQueues()
         {
-            return purgeQueue(queuedClips) + purgeQueue(immediateClips);
+            return purgeQueue(queuedClips, false) + purgeQueue(immediateClips, true);
         }
 
-        private int purgeQueue(OrderedDictionary queue)
+        private int purgeQueue(OrderedDictionary queue, bool isImmediateQueue)
         {
-            Console.WriteLine("Purging queue");
+            Console.WriteLine("Purging " + (isImmediateQueue ? "immediate" : "regular") + " queue" );
             int purged = 0;
             lock (queue)
             {
