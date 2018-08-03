@@ -138,7 +138,8 @@ unknown_personalisations_language_text = The current Sound Pack has no language 
 unknown_personalisations_language_title = No Sound Pack language defined
 
 personalisations_are_up_to_date = Personalisations are up to date
-personalisation_label = M&y name (requires restart)
+personalisation_label = M&y name:
+personalisation_tooltip = Choose a name you'd like Chief to call you (requires restart)
 
 install_plugin_popup_text = Crew Chief needs additional files to be installed or updated for the selected game. Click OK to install or Cancel to Return
 install_plugin_popup_title = Plugin Needed
@@ -171,7 +172,10 @@ no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
 reset_warning_title = Reset All Settings to Default Values
 
-spotter_name_label = Spotter &voice (requires restart)
+chief_name_label = Chief &voice:
+chief_name_tooltip = Choose a Chief voice (requires restart)
+spotter_name_label = Spotter &voice:
+spotter_name_tooltip = Choose a Spotter voice (requires restart)
 messages_audio_device_label = Messages playbac&k device
 background_audio_device_label = Background playback &device
 

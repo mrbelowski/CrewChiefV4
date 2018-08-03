@@ -51,7 +51,7 @@ namespace CrewChiefV4
             this.deleteAssigmentButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.propertiesButton = new System.Windows.Forms.Button();
             this.aboutButton = new System.Windows.Forms.Button();
             this.helpButton = new System.Windows.Forms.Button();
             this.scanControllersButton = new System.Windows.Forms.Button();
@@ -91,6 +91,11 @@ namespace CrewChiefV4
             this.donateLink = new System.Windows.Forms.LinkLabel();
             this.smokeTestTextBox = new System.Windows.Forms.TextBox();
             this.buttonSmokeTest = new System.Windows.Forms.Button();
+            this.chiefNameLabel = new System.Windows.Forms.Label();
+            this.chiefNameBox = new System.Windows.Forms.ComboBox();
+            this.myNameBoxTooltip = new System.Windows.Forms.ToolTip();
+            this.chiefNameBoxTooltip = new System.Windows.Forms.ToolTip();
+            this.spotterNameBoxTooltip = new System.Windows.Forms.ToolTip();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -185,20 +190,20 @@ namespace CrewChiefV4
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(991, 105);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(143, 31);
-            this.button1.TabIndex = 110;
-            this.button1.Text = Configuration.getUIString("properties");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.editPropertiesButtonClicked);
+            this.propertiesButton.Location = new System.Drawing.Point(961, 105);
+            this.propertiesButton.Name = "properties";
+            this.propertiesButton.Size = new System.Drawing.Size(173, 31);
+            this.propertiesButton.TabIndex = 110;
+            this.propertiesButton.Text = Configuration.getUIString("properties");
+            this.propertiesButton.UseVisualStyleBackColor = true;
+            this.propertiesButton.Click += new System.EventHandler(this.editPropertiesButtonClicked);
 
             // 
             // help button
             // 
-            this.helpButton.Location = new System.Drawing.Point(991, 137);
+            this.helpButton.Location = new System.Drawing.Point(961, 137);
             this.helpButton.Name = "help";
-            this.helpButton.Size = new System.Drawing.Size(143, 31);
+            this.helpButton.Size = new System.Drawing.Size(173, 31);
             this.helpButton.TabIndex = 120;
             this.helpButton.Text = Configuration.getUIString("help");
             this.helpButton.UseVisualStyleBackColor = true;
@@ -207,9 +212,9 @@ namespace CrewChiefV4
             // 
             // about button
             // 
-            this.aboutButton.Location = new System.Drawing.Point(991, 169);
+            this.aboutButton.Location = new System.Drawing.Point(961, 169);
             this.aboutButton.Name = "about";
-            this.aboutButton.Size = new System.Drawing.Size(143, 31);
+            this.aboutButton.Size = new System.Drawing.Size(173, 31);
             this.aboutButton.TabIndex = 130;
             this.aboutButton.Text = Configuration.getUIString("about");
             this.aboutButton.UseVisualStyleBackColor = true;
@@ -324,8 +329,8 @@ namespace CrewChiefV4
             this.gameDefinitionList.Items.AddRange(GameDefinition.getGameDefinitionFriendlyNames());
             this.gameDefinitionList.Location = new System.Drawing.Point(782, 28);
             this.gameDefinitionList.Name = "gameDefinitionList";
-            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(203, 173);
-            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(203, 173);
+            this.gameDefinitionList.MinimumSize = new System.Drawing.Size(170, 173);
+            this.gameDefinitionList.MaximumSize = new System.Drawing.Size(170, 173);
             this.gameDefinitionList.TabIndex = 80;
             this.gameDefinitionList.SelectedValueChanged += new System.EventHandler(this.updateSelectedGameDefinition);
             // 
@@ -337,16 +342,6 @@ namespace CrewChiefV4
             this.label5.Size = new System.Drawing.Size(33, 13);
             this.label5.TabIndex = 79;
             this.label5.Text = Configuration.getUIString("game");
-
-            // 
-            // personalisationLabel
-            // 
-            this.personalisationLabel.AutoSize = true;
-            this.personalisationLabel.Location = new System.Drawing.Point(991, 9);
-            this.personalisationLabel.Name = "personalisationLabel";
-            this.personalisationLabel.Size = new System.Drawing.Size(33, 13);
-            this.personalisationLabel.TabIndex = 89;
-            this.personalisationLabel.Text = Configuration.getUIString("personalisation_label");
 
             // 
             // filenameTextbox
@@ -466,28 +461,81 @@ namespace CrewChiefV4
             this.personalisationsProgressBar.Name = "personalisationsProgressBar";
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
 
-            this.personalisationBox.Location = new System.Drawing.Point(991, 28);
+            //
+            // Tooltips
+            //
+            this.myNameBoxTooltip.AutoPopDelay = 5000;
+            this.myNameBoxTooltip.InitialDelay = 400;
+            this.myNameBoxTooltip.IsBalloon = true;
+            this.myNameBoxTooltip.ReshowDelay = 100;
+
+            this.chiefNameBoxTooltip.AutoPopDelay = 5000;
+            this.chiefNameBoxTooltip.InitialDelay = 400;
+            this.chiefNameBoxTooltip.IsBalloon = true;
+            this.chiefNameBoxTooltip.ReshowDelay = 100;
+
+            this.spotterNameBoxTooltip.AutoPopDelay = 5000;
+            this.spotterNameBoxTooltip.InitialDelay = 400;
+            this.spotterNameBoxTooltip.IsBalloon = true;
+            this.spotterNameBoxTooltip.ReshowDelay = 100;
+
+            // 
+            // personalisationLabel
+            // 
+            this.personalisationLabel.AutoSize = true;
+            this.personalisationLabel.Location = new System.Drawing.Point(961, 11);
+            this.personalisationLabel.Name = "personalisationLabel";
+            this.personalisationLabel.Size = new System.Drawing.Size(33, 13);
+            this.personalisationLabel.TabIndex = 89;
+            this.personalisationLabel.Text = Configuration.getUIString("personalisation_label");
+            this.myNameBoxTooltip.SetToolTip(this.personalisationLabel, Configuration.getUIString("personalisation_tooltip"));
+
+            this.personalisationBox.Location = new System.Drawing.Point(1027, 9);
             this.personalisationBox.IntegralHeight = false;
             this.personalisationBox.MaxDropDownItems = 5;
             this.personalisationBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.personalisationBox.Name = "personalisationBox";
-            this.personalisationBox.Size = new System.Drawing.Size(142, 400);
+            this.personalisationBox.Size = new System.Drawing.Size(106, 400);
             this.personalisationBox.TabIndex = 90;
+            this.myNameBoxTooltip.SetToolTip(this.personalisationBox, Configuration.getUIString("personalisation_tooltip"));
+
+            this.chiefNameLabel.AutoSize = true;
+            this.chiefNameLabel.Location = new System.Drawing.Point(961, 43);
+            this.chiefNameLabel.Name = "chiefNameLabel";
+            this.chiefNameLabel.Size = new System.Drawing.Size(33, 13);
+            this.chiefNameLabel.TabIndex = 94;
+            this.chiefNameLabel.Text = Configuration.getUIString("chief_name_label");
+            this.chiefNameBoxTooltip.SetToolTip(this.chiefNameLabel, Configuration.getUIString("chief_name_tooltip"));
+
+            this.chiefNameBox.Location = new System.Drawing.Point(1027, 41);
+            this.chiefNameBox.IntegralHeight = false;
+            this.chiefNameBox.MaxDropDownItems = 5;
+            this.chiefNameBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.chiefNameBox.Name = "chiefNameBox";
+            this.chiefNameBox.Size = new System.Drawing.Size(106, 400);
+            this.chiefNameBox.TabIndex = 95;
+            this.chiefNameBoxTooltip.SetToolTip(this.chiefNameBox, Configuration.getUIString("chief_name_tooltip"));
+
+            // TODO: move.
+            this.chiefNameBox.Items.Add("Jim");
+            this.chiefNameBox.SelectedIndex = 0;
 
             this.spotterNameLabel.AutoSize = true;
-            this.spotterNameLabel.Location = new System.Drawing.Point(991, 55);
+            this.spotterNameLabel.Location = new System.Drawing.Point(961, 75);
             this.spotterNameLabel.Name = "spotterNameLabel";
             this.spotterNameLabel.Size = new System.Drawing.Size(33, 13);
             this.spotterNameLabel.TabIndex = 99;
             this.spotterNameLabel.Text = Configuration.getUIString("spotter_name_label");
+            this.spotterNameBoxTooltip.SetToolTip(this.spotterNameLabel, Configuration.getUIString("spotter_name_tooltip"));
 
-            this.spotterNameBox.Location = new System.Drawing.Point(991, 70);
+            this.spotterNameBox.Location = new System.Drawing.Point(1027, 73);
             this.spotterNameBox.IntegralHeight = false;
             this.spotterNameBox.MaxDropDownItems = 5;
             this.spotterNameBox.DropDownStyle = ComboBoxStyle.DropDownList;
             this.spotterNameBox.Name = "spotterNameBox";
-            this.spotterNameBox.Size = new System.Drawing.Size(142, 400);
+            this.spotterNameBox.Size = new System.Drawing.Size(106, 400);
             this.spotterNameBox.TabIndex = 100;
+            this.spotterNameBoxTooltip.SetToolTip(this.spotterNameBox, Configuration.getUIString("spotter_name_tooltip"));
 
             this.donateLink.Location = new System.Drawing.Point(35, 650);
             this.donateLink.Size = new System.Drawing.Size(250, 15);
@@ -601,7 +649,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.backgroundAudioDeviceBox);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.propertiesButton);
             this.Controls.Add(this.helpButton);
             this.Controls.Add(this.aboutButton);
             this.Controls.Add(this.scanControllersButton);
@@ -625,6 +673,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.donateLink);
             this.Controls.Add(this.buttonSmokeTest);
             this.Controls.Add(this.smokeTestTextBox);
+            this.Controls.Add(this.chiefNameLabel);
+            this.Controls.Add(this.chiefNameBox);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -652,7 +702,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.Button deleteAssigmentButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button propertiesButton;
         private System.Windows.Forms.Button helpButton;
         private System.Windows.Forms.Button aboutButton;
         private System.Windows.Forms.Button scanControllersButton;
@@ -691,6 +741,10 @@ namespace CrewChiefV4
         private System.Windows.Forms.LinkLabel donateLink;
         private System.Windows.Forms.TextBox smokeTestTextBox;
         private System.Windows.Forms.Button buttonSmokeTest;
-        
+        private System.Windows.Forms.Label chiefNameLabel;
+        private System.Windows.Forms.ComboBox chiefNameBox;
+        private System.Windows.Forms.ToolTip myNameBoxTooltip;
+        private System.Windows.Forms.ToolTip chiefNameBoxTooltip;
+        private System.Windows.Forms.ToolTip spotterNameBoxTooltip;
     }
 }

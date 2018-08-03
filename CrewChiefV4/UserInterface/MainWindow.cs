@@ -1284,7 +1284,7 @@ namespace CrewChiefV4
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;
                 this.groupBox1.Enabled = false;
-                this.button1.Enabled = false;
+                this.propertiesButton.Enabled = false;
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
                 this.spotterNameBox.Enabled = false;
@@ -1339,7 +1339,7 @@ namespace CrewChiefV4
                 this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
                 Console.WriteLine("Application stopped");
-                this.button1.Enabled = true;
+                this.propertiesButton.Enabled = true;
                 this.groupBox1.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
@@ -1388,7 +1388,7 @@ namespace CrewChiefV4
                     this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
                 this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
-                this.button1.Enabled = true;
+                this.propertiesButton.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 IsAppRunning = false;
