@@ -102,6 +102,9 @@ namespace CrewChiefV4.Audio
 
         public static String soundFilesPath;
 
+        // Spotter files location does not depend on Chief voice location, and omes from the default voice pack, for now.
+        public static String soundFilesPathNoChiefOverride;
+
         private String backgroundFilesPath;
 
         public static String dtmPitWindowOpenBackground = "dtm_pit_window_open.wav";
@@ -132,8 +135,130 @@ namespace CrewChiefV4.Audio
 
         private int messageId = 0;
 
+        public static String defaultChiefId = "Jim (default)";
+        public static List<String> availableChiefVoices = new List<String>();
+
         static AudioPlayer()
         {
+            // Inintialize sound file paths.  Handle user specified override, or pick default.
+            String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
+            String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
+            DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
+            DirectoryInfo overrideSoundDirectory = null;
+            Boolean useOverride = false;
+            if (soundPackLocationOverride != null && soundPackLocationOverride.Length > 0)
+            {
+                try
+                {
+                    overrideSoundDirectory = new DirectoryInfo(soundPackLocationOverride);
+                    if (overrideSoundDirectory.Exists)
+                    {
+                        useOverride = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Specified sound pack override folder " + soundPackLocationOverride + " doesn't exist, using default");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to set override sound folder " + e.Message);
+                }
+            }
+            if (useOverride && overrideSoundDirectory != null)
+            {
+                soundFilesPath = soundFilesPathNoChiefOverride = soundPackLocationOverride;
+            }
+            else
+            {
+                soundFilesPath = soundFilesPathNoChiefOverride = defaultSoundFilesPath;
+            }
+
+            // Process alternative Chief voice locations.
+            availableChiefVoices.Clear();
+            availableChiefVoices.Add(defaultChiefId);
+            try
+            {
+                DirectoryInfo altVoicePackDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/alt/");
+                if (altVoicePackDirectory.Exists)
+                {
+                    DirectoryInfo[] directories = altVoicePackDirectory.GetDirectories();
+                    foreach (DirectoryInfo folder in directories)
+                    {
+                        if (!availableChiefVoices.Contains(folder.Name))
+                        {
+                            availableChiefVoices.Add(folder.Name);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: skipping alternative voice pack directory, because it already exists in a list: " + folder.FullName);
+                        }
+                    }
+                }
+
+                String selectedChief = UserSettings.GetUserSettings().getString("chief_name");
+                if (!string.IsNullOrWhiteSpace(selectedChief) && !defaultChiefId.Equals(selectedChief))
+                {
+                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/alt/" + selectedChief))
+                    {
+                        Console.WriteLine("Using Chief voice: " + selectedChief);
+                        /*folderStillThere = "spotter_" + selectedChief + "/still_there";
+                        folderInTheMiddle = "spotter_" + selectedChief + "/in_the_middle";
+                        folderCarLeft = "spotter_" + selectedChief + "/car_left";
+                        folderCarRight = "spotter_" + selectedChief + "/car_right";
+                        folderClearLeft = "spotter_" + selectedChief + "/clear_left";
+                        folderClearRight = "spotter_" + selectedChief + "/clear_right";
+                        folderClearAllRound = "spotter_" + selectedChief + "/clear_all_round";
+                        folderThreeWideYoureOnRight = "spotter_" + selectedChief + "/three_wide_on_right";
+                        folderThreeWideYoureOnLeft = "spotter_" + selectedChief + "/three_wide_on_left";
+                        folderCarInside = "spotter_" + selectedChief + "/car_inside";
+                        folderCarOutside = "spotter_" + selectedChief + "/car_outside";
+
+                        // Currently the Geoffrey spotter has no clear inside / clear outside sounds:
+                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedChief + "/clear_inside");
+                        folderClearInside = hasClearInside ? "spotter_" + selectedChief + "/clear_inside" : folderClearLeft;
+                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedChief + "/clear_outside");
+                        folderClearOutside = hasClearOutside ? "spotter_" + selectedChief + "/clear_outside" : folderClearRight;
+
+                        folderThreeWideYoureOnInside = "spotter_" + selectedChief + "/three_wide_on_inside";
+                        folderThreeWideYoureOnOutside = "spotter_" + selectedChief + "/three_wide_on_outside";
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedChief))
+                        {
+                            folderEnableSpotter = "acknowledge/spotterEnabled_" + selectedChief;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterDisabled_" + selectedChief))
+                        {
+                            folderDisableSpotter = "acknowledge/spotterDisabled_" + selectedChief;
+                        }
+                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/radio_check_" + selectedChief + "/test"))
+                        {
+                            folderSpotterRadioCheck = "radio_check_" + selectedChief + "/test";
+                        }*/
+                    }
+                    else
+                    {
+                        Console.WriteLine("No Chief called " + selectedChief + " exists, dropping back to the default (Jim)");
+                        UserSettings.GetUserSettings().setProperty("chief_name", defaultChiefId);
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                }
+                // check the oval specific stuff exists before enabling it:
+                /*hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);
+                if (hasOvalSpecificSounds)
+                {
+                    Console.WriteLine("Spotter " + selectedChief + " has oval-specific sounds - these will be used for tracks marked as 'oval'");
+                }
+                else
+                {
+                    Console.WriteLine("Spotter " + selectedChief + " has no oval-specific sounds");
+                }*/
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("No Chief voice sound folders available");
+            }
+
+            // Initialize optional nAudio playback.
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
                 playbackDevices.Clear();
@@ -169,50 +294,21 @@ namespace CrewChiefV4.Audio
                 }
             }
         }
-        
+
         public AudioPlayer()
         {
             this.mainThreadContext = SynchronizationContext.Current;
 
-            String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
-            String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
-            DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
-            DirectoryInfo overrideSoundDirectory = null;
-            DirectoryInfo soundDirectory = null;
-            Boolean useOverride = false;
-            if (soundPackLocationOverride != null && soundPackLocationOverride.Length > 0)
+            // TODO_AVP: only update main pack for now?
+            DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPathNoChiefOverride);
+
+            if (soundDirectory.Exists)
             {
-                try
-                {
-                    overrideSoundDirectory = new DirectoryInfo(soundPackLocationOverride);
-                    if (overrideSoundDirectory.Exists)
-                    {
-                        useOverride = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Specified sound pack override folder " + soundPackLocationOverride + " doesn't exist, using default");
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unable to set override sound folder " + e.Message);
-                }
-            }
-            if (useOverride && overrideSoundDirectory != null)
-            {
-                soundFilesPath = soundPackLocationOverride;
-                soundDirectory = overrideSoundDirectory;
-            }
-            else
-            {
-                soundFilesPath = defaultSoundFilesPath;
-                soundDirectory = defaultSoundDirectory;
-            }
-            if (soundDirectory.Exists) 
-            {
+                // TODO_AVP: version updates?
                 SoundPackVersionsHelper.currentSoundPackVersion = getSoundPackVersion(soundDirectory);
                 SoundPackVersionsHelper.currentDriverNamesVersion = getDriverNamesVersion(soundDirectory);
+
+                // TODO_AVP: pick language from possibly overriden folder?
                 soundPackLanguage = getSoundPackLanguage(soundDirectory);
                 SoundPackVersionsHelper.currentPersonalisationsVersion = getPersonalisationsVersion(soundDirectory);
             }

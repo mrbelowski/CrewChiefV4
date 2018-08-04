@@ -460,25 +460,6 @@ namespace CrewChiefV4
             this.personalisationsProgressBar.Location = new System.Drawing.Point(550, 176);
             this.personalisationsProgressBar.Name = "personalisationsProgressBar";
             this.personalisationsProgressBar.Size = new System.Drawing.Size(220, 23);
-
-            //
-            // Tooltips
-            //
-            this.myNameBoxTooltip.AutoPopDelay = 5000;
-            this.myNameBoxTooltip.InitialDelay = 400;
-            this.myNameBoxTooltip.IsBalloon = true;
-            this.myNameBoxTooltip.ReshowDelay = 100;
-
-            this.chiefNameBoxTooltip.AutoPopDelay = 5000;
-            this.chiefNameBoxTooltip.InitialDelay = 400;
-            this.chiefNameBoxTooltip.IsBalloon = true;
-            this.chiefNameBoxTooltip.ReshowDelay = 100;
-
-            this.spotterNameBoxTooltip.AutoPopDelay = 5000;
-            this.spotterNameBoxTooltip.InitialDelay = 400;
-            this.spotterNameBoxTooltip.IsBalloon = true;
-            this.spotterNameBoxTooltip.ReshowDelay = 100;
-
             // 
             // personalisationLabel
             // 
