@@ -237,8 +237,14 @@ namespace CrewChiefV4.Audio
 
             Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
-        
-        private static Boolean canInterrupt(SoundMetadata metadata)
+
+        /*
+         * CanInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
+         */
+        private static Boolean CanInterrupt(SoundMetadata metadata)
         {
             // is this sufficient? Should the spotter be able to interrupt voice comm responses?
             return metadata.type == SoundType.REGULAR_MESSAGE;
@@ -247,12 +253,6 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        /*
-         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
-         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
-         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
-         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
-         */
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
@@ -261,6 +261,7 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
                 return false;
             }
+
             if (rejectMessagesWhenTalking
                 && soundMetadata.type != SoundType.VOICE_COMMAND_RESPONSE
                 && SpeechRecogniser.waitingForSpeech 
@@ -268,9 +269,8 @@ namespace CrewChiefV4.Audio
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
                 if (messageId != 0)
-                {
-                    lastBlockedMessageId = messageId;
-                }
+                    PlaybackModerator.lastBlockedMessageId = messageId;
+
                 return false;
             }
             /*if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt && audioPlayer.delayMessagesInHardParts)
@@ -278,29 +278,26 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
                 return false;
             }*/
-            if (canInterrupt(soundMetadata))
+            if (PlaybackModerator.CanInterrupt(soundMetadata))
             {
-                SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
-                if (mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||
-                    (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
+                var mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
+                if (/*mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||*/  // VL: shouldn't blocking be optional?
+                    (PlaybackModerator.importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
-                    if (PlaybackModerator.enableTracing)
-                    {
-                        PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(
-                            importantMessagesBlockOtherMessages ? SoundType.IMPORTANT_MESSAGE : SoundType.CRITICAL_MESSAGE));
-                    }
+
+                    PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(
+                        PlaybackModerator.importantMessagesBlockOtherMessages ? SoundType.IMPORTANT_MESSAGE : SoundType.CRITICAL_MESSAGE));
+
                     if (messageId != 0)
-                    {
-                        lastBlockedMessageId = messageId;
-                    }
+                        PlaybackModerator.lastBlockedMessageId = messageId;
+
                     // ensure the blocking message won't expire
-                    QueuedMessage firstWaitingMessage = audioPlayer.getFirstWaitingImmediateMessage(mostImportantTypeInImmediateQueue);
+                    var firstWaitingMessage = PlaybackModerator.audioPlayer.getFirstWaitingImmediateMessage(mostImportantTypeInImmediateQueue);
                     if (firstWaitingMessage != null && firstWaitingMessage.expiryTime > 0)
-                    {
                         firstWaitingMessage.expiryTime = firstWaitingMessage.expiryTime + 2000;
-                    }
+
                     return false;
                 }
             }
@@ -313,7 +310,7 @@ namespace CrewChiefV4.Audio
             SoundType type;
             if (queuedMessage.metadata == null)
             {
-                Console.WriteLine("Message " + queuedMessage.messageName + " has no metadata, setting priority and type to default");
+                PlaybackModerator.Trace("Message " + queuedMessage.messageName + " has no metadata, setting priority and type to default");
                 priority = SoundMetadata.DEFAULT_PRIORITY;
                 type = SoundType.REGULAR_MESSAGE;
             }
@@ -323,8 +320,7 @@ namespace CrewChiefV4.Audio
                 type = queuedMessage.metadata.type;
             }
 
-           
-            Boolean canPlay = priority >= PlaybackModerator.minPriorityForEachVerbosity[verbosity];            
+            var canPlay = priority >= PlaybackModerator.minPriorityForEachVerbosity[verbosity];
             if (canPlay)
             {
                 // not using this Dictionary of played messages so no point in adding data to it. Will leave this code
