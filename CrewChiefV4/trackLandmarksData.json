@@ -3310,9 +3310,7 @@
 		{
 			"rf2TrackNames": [
 				"Sebring 12h Course",
-				"Sebring 12h Course League Edition",
-				"Sebring -- 12 Hour Road Course",
-				"Sebring -- Full Layout"
+				"Sebring 12h Course League Edition"
 			],
 			"irTrackName": "sebring international",
 			"trackLandmarks": [{
@@ -3390,7 +3388,7 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Sebring Club Course", "Sebring -- Johnson Club"],
+			"rf2TrackNames": ["Sebring Club Course"],
 			"irTrackName": "sebring  club course",
 			"trackLandmarks": [{
 					"landmarkName": "cunningham",
@@ -11779,88 +11777,6 @@
 			]
 		},
 		{
-			"rf2TrackNames": ["Misano World Circuit Grand Prix"],
-			"trackLandmarks": [{
-					"landmarkName": "turn1",
-					"distanceRoundLapStart": 220,
-					"distanceRoundLapEnd": 330,
-					"isCommonOvertakingSpot": true
-				},
-				{
-					"landmarkName": "turn2",
-					"distanceRoundLapStart": 345,
-					"distanceRoundLapEnd": 435,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "variante_del_parco",
-					"distanceRoundLapStart": 460,
-					"distanceRoundLapEnd": 685,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "curva_del_rio",
-					"distanceRoundLapStart": 795,
-					"distanceRoundLapEnd": 975,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "turn5",
-					"distanceRoundLapStart": 990,
-					"distanceRoundLapEnd": 1085,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "curva_quercia",
-					"distanceRoundLapStart": 1640,
-					"distanceRoundLapEnd": 1840,
-					"isCommonOvertakingSpot": true
-				},
-				{
-					"landmarkName": "curva_tramonto",
-					"distanceRoundLapStart": 2070,
-					"distanceRoundLapEnd": 232,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "curvone",
-					"distanceRoundLapStart": 2775,
-					"distanceRoundLapEnd": 2950,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "turn9",
-					"distanceRoundLapStart": 3065,
-					"distanceRoundLapEnd": 3225,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "turn10",
-					"distanceRoundLapStart": 3260,
-					"distanceRoundLapEnd": 3760,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "curva_del_carro",
-					"distanceRoundLapStart": 3415,
-					"distanceRoundLapEnd": 3550,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "turn12",
-					"distanceRoundLapStart": 3625,
-					"distanceRoundLapEnd": 3760,
-					"isCommonOvertakingSpot": false
-				},
-				{
-					"landmarkName": "curva_misano",
-					"distanceRoundLapStart": 3900,
-					"distanceRoundLapEnd": 4030,
-					"isCommonOvertakingSpot": false
-				}
-			]
-		},
-		{
 			"rf2TrackNames": ["Michigan International Speedway"],
 			"isOval": true,
 			"trackLandmarks": [{
@@ -12795,7 +12711,7 @@
 					"isCommonOvertakingSpot": true
 				},
 				{
-					"landmarkName": "coco-cola_kurve",
+					"landmarkName": "coca_cola_kurve",
 					"distanceRoundLapStart": 3195,
 					"distanceRoundLapEnd": 3395,
 					"isCommonOvertakingSpot": false
@@ -14336,6 +14252,502 @@
 			"pcars2TrackName": "Texas_Motor_Speedway:Tri_Oval",
 			"trackLandmarks": [],
 			"isOval": true
+		},
+		{
+			"rf2TrackNames": ["Sebring -- 12 Hour Road Course", "Sebring -- Full Layout"],
+			"approximateTrackLength": 5825,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 370,
+					"distanceRoundLapEnd": 610,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "kristensen",
+					"distanceRoundLapStart": 870,
+					"distanceRoundLapEnd": 1180,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "gurney",
+					"distanceRoundLapStart": 1200,
+					"distanceRoundLapEnd": 1620,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_hairpin",
+					"distanceRoundLapStart": 1915,
+					"distanceRoundLapEnd": 2130,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "fangio_chicane",
+					"distanceRoundLapStart": 2160,
+					"distanceRoundLapEnd": 2510,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "cunningham",
+					"distanceRoundLapStart": 2715,
+					"distanceRoundLapEnd": 2800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "collier",
+					"distanceRoundLapStart": 2815,
+					"distanceRoundLapEnd": 3000,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "tower",
+					"distanceRoundLapStart": 3180,
+					"distanceRoundLapEnd": 3300,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "bishop",
+					"distanceRoundLapStart": 3710,
+					"distanceRoundLapEnd": 3740,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "gendebien",
+					"distanceRoundLapStart": 3955,
+					"distanceRoundLapEnd": 74080,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "le_mans",
+					"distanceRoundLapStart": 4190,
+					"distanceRoundLapEnd": 4340,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sunset",
+					"distanceRoundLapStart": 5135,
+					"distanceRoundLapEnd": 5600,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Sebring -- Johnson Club"],
+			"approximateTrackLength": 2666,
+			"trackLandmarks": [{
+					"landmarkName": "cunningham",
+					"distanceRoundLapStart": 195,
+					"distanceRoundLapEnd": 275,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "collier",
+					"distanceRoundLapStart": 495,
+					"distanceRoundLapEnd": 655,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "tower",
+					"distanceRoundLapStart": 785,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "rabbit",
+					"distanceRoundLapStart": 930,
+					"distanceRoundLapEnd": 1020,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "gurney",
+					"distanceRoundLapStart": 1350,
+					"distanceRoundLapEnd": 1830,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "the_hairpin",
+					"distanceRoundLapStart": 2060,
+					"distanceRoundLapEnd": 2290,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "fangio_chicane",
+					"distanceRoundLapStart": 2310,
+					"distanceRoundLapEnd": 2650,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Sebring -- School"],
+			"approximateTrackLength": 3060,
+			"trackLandmarks": [{
+					"landmarkName": "turn1",
+					"distanceRoundLapStart": 370,
+					"distanceRoundLapEnd": 610,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "turn2",
+					"distanceRoundLapStart": 730,
+					"distanceRoundLapEnd": 830,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "bishop",
+					"distanceRoundLapStart": 835,
+					"distanceRoundLapEnd": 920,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "gendebien",
+					"distanceRoundLapStart": 1165,
+					"distanceRoundLapEnd": 1325,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "le_mans",
+					"distanceRoundLapStart": 1420,
+					"distanceRoundLapEnd": 1570,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "sunset",
+					"distanceRoundLapStart": 2370,
+					"distanceRoundLapEnd": 2870,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Misano World Circuit Grand Prix"],
+			"approximateTrackLength": 4279,
+			"trackLandmarks": [{
+					"landmarkName": "variante_del_parco",
+					"distanceRoundLapStart": 210,
+					"distanceRoundLapEnd": 635,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "curva_del_rio",
+					"distanceRoundLapStart": 790,
+					"distanceRoundLapEnd": 1000,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_quercia",
+					"distanceRoundLapStart": 1650,
+					"distanceRoundLapEnd": 1850,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "curva_tramonto",
+					"distanceRoundLapStart": 2090,
+					"distanceRoundLapEnd": 2335,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curvone",
+					"distanceRoundLapStart": 2790,
+					"distanceRoundLapEnd": 2965,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_del_carro",
+					"distanceRoundLapStart": 3425,
+					"distanceRoundLapEnd": 3565,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "curva_misano",
+					"distanceRoundLapStart": 3900,
+					"distanceRoundLapEnd": 4030,
+					"isCommonOvertakingSpot": false
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Zolder2016"],
+			"approximateTrackLength": 3981,
+			"trackLandmarks": [{
+					"landmarkName": "earste",
+					"distanceRoundLapStart": 180,
+					"distanceRoundLapEnd": 385,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "sterrenwachtbocht",
+					"distanceRoundLapStart": 545,
+					"distanceRoundLapEnd": 700,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "kanaalbocht",
+					"distanceRoundLapStart": 725,
+					"distanceRoundLapEnd": 915,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "lucen_bianchbocht",
+					"distanceRoundLapStart": 1025,
+					"distanceRoundLapEnd": 1240,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "kleine_chicane",
+					"distanceRoundLapStart": 1685,
+					"distanceRoundLapEnd": 1825,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "butte",
+					"distanceRoundLapStart": 2015,
+					"distanceRoundLapEnd": 2205,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "villeneuve",
+					"distanceRoundLapStart": 2255,
+					"distanceRoundLapEnd": 2445,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "terlamenbocht",
+					"distanceRoundLapStart": 2475,
+					"distanceRoundLapEnd": 2650,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "bolderbergbocht",
+					"distanceRoundLapStart": 2985,
+					"distanceRoundLapEnd": 3065,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "jochen_rindtbocht",
+					"distanceRoundLapStart": 3070,
+					"distanceRoundLapEnd": 3220,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ickxbocht",
+					"distanceRoundLapStart": 3545,
+					"distanceRoundLapEnd": 3720,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Silverstone -- GT Layout"],
+			"approximateTrackLength": 5847,
+			"trackLandmarks": [{
+					"landmarkName": "abbey",
+					"distanceRoundLapStart": 190,
+					"distanceRoundLapEnd": 345,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "farm",
+					"distanceRoundLapStart": 380,
+					"distanceRoundLapEnd": 570,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "village",
+					"distanceRoundLapStart": 680,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_loop",
+					"distanceRoundLapStart": 820,
+					"distanceRoundLapEnd": 950,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "aintree",
+					"distanceRoundLapStart": 1010,
+					"distanceRoundLapEnd": 1185,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "brooklands",
+					"distanceRoundLapStart": 1700,
+					"distanceRoundLapEnd": 1905,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "luffield",
+					"distanceRoundLapStart": 1915,
+					"distanceRoundLapEnd": 2150,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "woodcote",
+					"distanceRoundLapStart": 2275,
+					"distanceRoundLapEnd": 2525,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "copse",
+					"distanceRoundLapStart": 2790,
+					"distanceRoundLapEnd": 3050,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "maggots",
+					"distanceRoundLapStart": 3355,
+					"distanceRoundLapEnd": 3585,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "becketts",
+					"distanceRoundLapStart": 3665,
+					"distanceRoundLapEnd": 3910,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "chapel",
+					"distanceRoundLapStart": 3940,
+					"distanceRoundLapEnd": 4095,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "stowe",
+					"distanceRoundLapStart": 4735,
+					"distanceRoundLapEnd": 4985,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "vale",
+					"distanceRoundLapStart": 4995,
+					"distanceRoundLapEnd": 5150,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "club",
+					"distanceRoundLapStart": 5282,
+					"distanceRoundLapEnd": 5480,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Silverstone -- International Layout"],
+			"approximateTrackLength": 2966,
+			"trackLandmarks": [{
+					"landmarkName": "abbey",
+					"distanceRoundLapStart": 190,
+					"distanceRoundLapEnd": 345,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "farm",
+					"distanceRoundLapStart": 380,
+					"distanceRoundLapEnd": 570,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "village",
+					"distanceRoundLapStart": 680,
+					"distanceRoundLapEnd": 800,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "the_loop",
+					"distanceRoundLapStart": 980,
+					"distanceRoundLapEnd": 1095,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "stowe",
+					"distanceRoundLapStart": 1865,
+					"distanceRoundLapEnd": 2115,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "vale",
+					"distanceRoundLapStart": 2140,
+					"distanceRoundLapEnd": 2285,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "club",
+					"distanceRoundLapStart": 2400,
+					"distanceRoundLapEnd": 2600,
+					"isCommonOvertakingSpot": true
+				}
+			]
+		},
+		{
+			"rf2TrackNames": ["Nuerburg Ring GP"],
+			"approximateTrackLength": 5117,
+			"trackLandmarks": [{
+					"landmarkName": "haug_haken",
+					"distanceRoundLapStart": 520,
+					"distanceRoundLapEnd": 720,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "mercedes_arena",
+					"distanceRoundLapStart": 750,
+					"distanceRoundLapEnd": 120,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "valvoline_kurve",
+					"distanceRoundLapStart": 1570,
+					"distanceRoundLapEnd": 1730,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "ford_kurve",
+					"distanceRoundLapStart": 1760,
+					"distanceRoundLapEnd": 1905,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "dunlop_kehre",
+					"distanceRoundLapStart": 2345,
+					"distanceRoundLapEnd": 2550,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "michael_schumacer_s",
+					"distanceRoundLapStart": 2760,
+					"distanceRoundLapEnd": 3060,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "michelin_kurve",
+					"distanceRoundLapStart": 3330,
+					"distanceRoundLapEnd": 3450,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "warsteiner_kurve",
+					"distanceRoundLapStart": 3515,
+					"distanceRoundLapEnd": 3710,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "advan_bogen",
+					"distanceRoundLapStart": 3965,
+					"distanceRoundLapEnd": 4135,
+					"isCommonOvertakingSpot": false
+				},
+				{
+					"landmarkName": "ngk_shalken",
+					"distanceRoundLapStart": 4465,
+					"distanceRoundLapEnd": 4590,
+					"isCommonOvertakingSpot": true
+				},
+				{
+					"landmarkName": "coca_cola_kurve",
+					"distanceRoundLapStart": 4735,
+					"distanceRoundLapEnd": 4945,
+					"isCommonOvertakingSpot": false
+				}
+			]
 		}
 	]
 }
