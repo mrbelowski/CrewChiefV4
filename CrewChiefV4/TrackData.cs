@@ -410,6 +410,83 @@ namespace CrewChiefV4
             }
             return null;
         }
+
+        internal void checkForDuplicates()
+        {
+            var acTracks = new Dictionary<string, float>();
+            var pcarsTracks = new Dictionary<string, float>();
+            var pcars2Tracks = new Dictionary<string, float>();
+            var raceroomTracks = new Dictionary<int, float>();
+            var rf1Tracks = new Dictionary<string, float>();
+            var rf2Tracks = new Dictionary<string, float>();
+            var irTracks = new Dictionary<string, float>();
+
+            foreach (var trackLandmarks in trackLandmarksData)
+            {
+                checkForDuplicatesHelper(trackLandmarks.acTrackNames, trackLandmarks.approximateTrackLength, "AC", acTracks);
+                checkForDuplicatesHelper(trackLandmarks.pcarsTrackName, trackLandmarks.approximateTrackLength, "pCars", pcarsTracks);
+                checkForDuplicatesHelper(trackLandmarks.pcars2TrackName, trackLandmarks.approximateTrackLength, "pCars2", pcars2Tracks);
+                checkForDuplicatesHelper(trackLandmarks.raceroomLayoutId, trackLandmarks.approximateTrackLength, "RaceRoom", raceroomTracks);
+                checkForDuplicatesHelper(trackLandmarks.rf1TrackNames, trackLandmarks.approximateTrackLength, "rF1", rf1Tracks);
+                checkForDuplicatesHelper(trackLandmarks.rf2TrackNames, trackLandmarks.approximateTrackLength, "rF2", rf2Tracks);
+                checkForDuplicatesHelper(trackLandmarks.irTrackName, trackLandmarks.approximateTrackLength, "iRacing", irTracks);
+            }
+        }
+
+        private void checkForDuplicatesHelper(string[] trackNames, float approximateTrackLength, string gameName, Dictionary<string, float> gameTracksMappedSoFar)
+        {
+            foreach (var trackName in trackNames)
+            {
+                if (!string.IsNullOrWhiteSpace(trackName))
+                {
+                    if (!gameTracksMappedSoFar.ContainsKey(trackName))
+                    {
+                        gameTracksMappedSoFar.Add(trackName, approximateTrackLength);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Multiple Track Definitions found for " + gameName + " track: "
+                            + trackName + " Approx length: " + approximateTrackLength.ToString("0.000")
+                            + "  Duplicate approx length: " + gameTracksMappedSoFar[trackName].ToString("0.000"));
+                    }
+                }
+            }
+        }
+
+        private void checkForDuplicatesHelper(string trackName, float approximateTrackLength, string gameName, Dictionary<string, float> gameTracksMappedSoFar)
+        {
+            if (!string.IsNullOrWhiteSpace(trackName))
+            {
+                if (!gameTracksMappedSoFar.ContainsKey(trackName))
+                {
+                    gameTracksMappedSoFar.Add(trackName, approximateTrackLength);
+                }
+                else
+                {
+                    Console.WriteLine("Multiple Track Definitions found for " + gameName + " track: "
+                        + trackName + " Approx length: " + approximateTrackLength.ToString("0.000")
+                        + "  Duplicate approx length: " + gameTracksMappedSoFar[trackName].ToString("0.000"));
+                }
+            }
+        }
+
+        private void checkForDuplicatesHelper(int raceroomTrackId, float approximateTrackLength, string gameName, Dictionary<int, float> gameTracksMappedSoFar)
+        {
+            if (raceroomTrackId != -1)
+            {
+                if (!gameTracksMappedSoFar.ContainsKey(raceroomTrackId))
+                {
+                    gameTracksMappedSoFar.Add(raceroomTrackId, approximateTrackLength);
+                }
+                else
+                {
+                    Console.WriteLine("Multiple Track Definitions found for " + gameName + " track: "
+                        + raceroomTrackId + " Approx length: " + approximateTrackLength.ToString("0.000")
+                        + "  Duplicate approx length: " + gameTracksMappedSoFar[raceroomTrackId].ToString("0.000"));
+                }
+            }
+        }
+
     }
 
     public class TrackData
@@ -551,6 +628,11 @@ namespace CrewChiefV4
         public static void loadTrackLandmarksData()
         {
             TRACK_LANDMARKS_DATA = TrackLandmarksData.getTrackLandmarksDataFromFile(getDefaultTrackLandmarksFileLocation());
+
+#if DEBUG
+            TRACK_LANDMARKS_DATA.checkForDuplicates();
+#endif
+
             loadUserCreatedTrackLandmarkFiles();
         }
         static void loadUserCreatedTrackLandmarkFiles()
