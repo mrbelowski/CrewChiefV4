@@ -9,33 +9,48 @@ using System.Windows.Forms;
 
 namespace CrewChiefV4
 {
+    /// <summary>
+    /// this class holds the list box label -> invariant value mappings for each listbox property used in the properties
+    /// form. 
+    /// </summary>
     public class ListPropertyValues
     {
+        static ListPropertyValues()
+        {
+            // listbox items for interrupt property
+            ListBoxItem[] interruptItems = new ListBoxItem[]{
+                new ListBoxItem(Configuration.getUIString("interrupts_none"), "NONE"),
+                new ListBoxItem(Configuration.getUIString("interrupts_spotter_only"), CrewChiefV4.Audio.SoundType.SPOTTER.ToString()),
+                new ListBoxItem(Configuration.getUIString("interrupts_spotter_and_critical"), CrewChiefV4.Audio.SoundType.CRITICAL_MESSAGE.ToString()),
+                new ListBoxItem(Configuration.getUIString("interrupts_spotter_critical_and_important"), CrewChiefV4.Audio.SoundType.IMPORTANT_MESSAGE.ToString())
+            };
+            listBoxData.Add("LISTBOX_interrupt_setting", interruptItems.ToList());
+
+            // listbox items for TTS property
+            ListBoxItem[] ttsItems = new ListBoxItem[]{
+                new ListBoxItem(Configuration.getUIString("tts_never"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.NEVER.ToString()),
+                new ListBoxItem(Configuration.getUIString("tts_only_when_necessary"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.ONLY_WHEN_NECESSARY.ToString()),
+                new ListBoxItem(Configuration.getUIString("tts_any_time"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.ANY_TIME.ToString())
+            };
+            listBoxData.Add("LISTBOX_tts_setting", ttsItems.ToList());
+        }
+
+        /// <summary>
+        /// A single list box item with the language specific label for this item, and its invariant value.
+        /// The invariant value will typically be parsed to an enum
+        /// </summary>
         public class ListBoxItem
         {
             public String label;
             public String invariantValue;
-            public int index;
-            public ListBoxItem(String label, String invariantValue, int index)
+            public ListBoxItem(String label, String invariantValue)
             {
                 this.label = label;
                 this.invariantValue = invariantValue;
-                this.index = index;
             }
         }
 
         public static Dictionary<String, List<ListBoxItem>> listBoxData = new Dictionary<string, List<ListBoxItem>>();
-
-        static ListPropertyValues()
-        {
-            ListBoxItem[] interruptItems = new ListBoxItem[]{
-                new ListBoxItem(Configuration.getUIString("interrupts_none"), "NONE", 0),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_only"), CrewChiefV4.Audio.SoundType.SPOTTER.ToString(), 1),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_and_critical"), CrewChiefV4.Audio.SoundType.CRITICAL_MESSAGE.ToString(), 2),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_critical_and_important"), CrewChiefV4.Audio.SoundType.IMPORTANT_MESSAGE.ToString(), 3)
-            };
-            listBoxData.Add("LISTBOX_interrupt_setting", interruptItems.ToList());
-        }
 
         public static List<String> getListBoxLabels(String id)
         {

@@ -1310,18 +1310,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool use_tts_for_missing_names {
-            get {
-                return ((bool)(this["use_tts_for_missing_names"]));
-            }
-            set {
-                this["use_tts_for_missing_names"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_delayed_responses {
             get {
                 return ((bool)(this["enable_delayed_responses"]));
@@ -2833,18 +2821,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool use_tts_only_when_necessary {
-            get {
-                return ((bool)(this["use_tts_only_when_necessary"]));
-            }
-            set {
-                this["use_tts_only_when_necessary"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool iracing_pit_tyre_pressure_in_psi {
             get {
@@ -3380,6 +3356,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["LISTBOX_interrupt_setting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ONLY_WHEN_NECESSARY")]
+        public string LISTBOX_tts_setting {
+            get {
+                return ((string)(this["LISTBOX_tts_setting"]));
+            }
+            set {
+                this["LISTBOX_tts_setting"] = value;
             }
         }
     }

@@ -323,9 +323,6 @@
     <Setting Name="enable_pcars_pit_window_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="use_tts_for_missing_names" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="enable_delayed_responses" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -704,9 +701,6 @@
     <Setting Name="tts_volume_boost" Type="System.Single" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="use_tts_only_when_necessary" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="iracing_pit_tyre_pressure_in_psi" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -841,6 +835,9 @@
     </Setting>
     <Setting Name="LISTBOX_interrupt_setting" Type="System.String" Scope="User">
       <Value Profile="(Default)">SPOTTER</Value>
+    </Setting>
+    <Setting Name="LISTBOX_tts_setting" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ONLY_WHEN_NECESSARY</Value>
     </Setting>
   </Settings>
 </SettingsFile>

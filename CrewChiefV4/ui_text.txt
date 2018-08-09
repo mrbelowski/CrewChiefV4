@@ -1106,3 +1106,9 @@ interrupts_none = Never
 interrupts_spotter_only = Spotter only
 interrupts_spotter_and_critical = Spotter and critical messages only
 interrupts_spotter_critical_and_important = Spotter and all important messages
+
+LISTBOX_tts_setting = TTS setting
+LISTBOX_tts_setting_help = Set how often the app will use text-to-speech to read driver names
+tts_never = Don't use TTS
+tts_only_when_necessary = Use TTS only when necessary
+tts_any_time = Use TTS for all missing names

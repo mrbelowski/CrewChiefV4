@@ -63,15 +63,6 @@ namespace CrewChiefV4
             }
         }
 
-        private String[] getListboxItems(String propname)
-        {
-            if (propname.Equals(listboxPropPrefix + "interrupt_setting"))
-            {
-                return new String[] { "None", "Spotter only", "Spotter & critical", "Spotter, criticial & important" };
-            }
-            else return null;
-        }
-
         // Note: vast majority of startup time is in ShowDialog.  Looks like pretty much the only way to speed it up is by reducing
         // number of controls or splitting in tabs.
         public PropertiesForm(System.Windows.Forms.Form parent)
@@ -96,7 +87,7 @@ namespace CrewChiefV4
             int widgetCount = 0;
             foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
             {
-                if (strProp.Name.StartsWith("LISTBOX_") && getListboxItems(strProp.Name) != null)
+                if (strProp.Name.StartsWith(PropertiesForm.listboxPropPrefix) && ListPropertyValues.getListBoxLabels(strProp.Name) != null)
                 {
                     this.propertiesFlowLayoutPanel.Controls.Add(new ListPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
                        UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
