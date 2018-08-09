@@ -840,7 +840,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LISTBOX_interrupt_setting" Type="System.String" Scope="User">
-      <Value Profile="(Default)">None</Value>
+      <Value Profile="(Default)">SPOTTER</Value>
     </Setting>
   </Settings>
 </SettingsFile>
