@@ -3266,18 +3266,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool immediate_messages_block_other_messages {
-            get {
-                return ((bool)(this["immediate_messages_block_other_messages"]));
-            }
-            set {
-                this["immediate_messages_block_other_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_delayed_messages_on_hardparts {
             get {
                 return ((bool)(this["enable_delayed_messages_on_hardparts"]));

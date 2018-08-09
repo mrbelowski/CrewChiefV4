@@ -794,10 +794,6 @@ enable_pcars_pit_window_messages_help = Play pit window messages in pCARS. Don't
 enable_pcars_pit_window_messages_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 enable_pcars_pit_window_messages_category = PIT_STOPS_AND_MULTICLASS
 
-use_tts_for_missing_names = Use TTS for missing names
-use_tts_for_missing_names_help = Attempt to use text-to-speech when the app encounters a name that's not in the recorded set. On Windows 7 this will sound awful (thanks Microsoft). Windows 10's "David" voice might be a bit more bearable.
-use_tts_for_missing_names_category = AUDIO_VOICE_AND_CONTROLLERS
-
 report_yellows_in_all_sectors = Report yellows in all sectors
 report_yellows_in_all_sectors_help = If this is disabled the app will report yellow flags only in the current and next sector
 report_yellows_in_all_sectors_category = FLAGS_AND_RULES
@@ -948,10 +944,6 @@ tts_trim_end_milliseconds = Trim end of TTS sounds (milliseconds)
 tts_trim_end_milliseconds_help = Trim this many milliseconds off the end of TTS sounds to remove pauses after they play
 tts_trim_end_milliseconds_category = AUDIO_VOICE_AND_CONTROLLERS
 
-use_tts_only_when_necessary = Only use TTS when there is no alternative
-use_tts_only_when_necessary_help = Prefer generic terms for opponents or skip optional messages instead of using TTS names
-use_tts_only_when_necessary_category = AUDIO_VOICE_AND_CONTROLLERS
-
 iracing_pit_tyre_pressure_in_psi = iRacing tyre pressure adjustments in PSI
 iracing_pit_tyre_pressure_in_psi_help = Assume tyre adjust tyre pressure commands are in PSI (disable this to use kPa)
 iracing_pit_tyre_pressure_in_psi_filter = IRACING
@@ -1081,10 +1073,6 @@ enable_opponent_pit_exit_estimates = Enable opponent pit exit estimates
 enable_opponent_pit_exit_estimates_help = Play pit exit position estimates for opponent cars
 enable_opponent_pit_exit_estimates_category = PIT_STOPS_AND_MULTICLASS
 
-immediate_messages_block_other_messages = Important messages block other messages
-immediate_messages_block_other_messages_help = Command responses and important messages block other messages
-immediate_messages_block_other_messages_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
-
 enable_delayed_messages_on_hardparts = Delay messages on hard parts
 enable_delayed_messages_on_hardparts_help = Delays non immediate messages when approaching a corner (initial state).
 enable_delayed_messages_on_hardparts_category = AUDIO_VOICE_AND_CONTROLLERS
@@ -1102,6 +1090,7 @@ priortise_messages_depending_on_situation_category = AUDIO_VOICE_AND_CONTROLLERS
 
 LISTBOX_interrupt_setting = Interrupt regular messages
 LISTBOX_interrupt_setting_help = Set which important messages are allowed to interrupt regular messages
+LISTBOX_interrupt_setting_category = AUDIO_VOICE_AND_CONTROLLERS
 interrupts_none = Never
 interrupts_spotter_only = Spotter only
 interrupts_spotter_and_critical = Spotter and critical messages only
@@ -1109,6 +1098,7 @@ interrupts_spotter_critical_and_important = Spotter and all important messages
 
 LISTBOX_tts_setting = TTS setting
 LISTBOX_tts_setting_help = Set how often the app will use text-to-speech to read driver names
+LISTBOX_tts_setting_category = AUDIO_VOICE_AND_CONTROLLERS
 tts_never = Don't use TTS
 tts_only_when_necessary = Use TTS only when necessary
 tts_any_time = Use TTS for all missing names
