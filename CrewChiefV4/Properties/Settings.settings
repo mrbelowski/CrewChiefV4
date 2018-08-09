@@ -839,5 +839,8 @@
     <Setting Name="priortise_messages_depending_on_situation" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="LISTBOX_interrupt_setting" Type="System.String" Scope="User">
+      <Value Profile="(Default)">None</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

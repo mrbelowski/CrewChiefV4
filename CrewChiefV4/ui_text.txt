@@ -1099,3 +1099,8 @@ iracing_enable_auto_fuel_to_end_of_race_filter = IRACING
 priortise_messages_depending_on_situation = Advanced message prioritisation
 priortise_messages_depending_on_situation_help = Disable less important messages when under pressure, on a qualifying lap, etc
 priortise_messages_depending_on_situation_category = AUDIO_VOICE_AND_CONTROLLERS
+
+interrupts_none = None
+interrupts_spotter_only = Spotter only
+interrupts_spotter_and_critical = Spotter and critical messages
+interrupts_spotter_critical_and_important = All

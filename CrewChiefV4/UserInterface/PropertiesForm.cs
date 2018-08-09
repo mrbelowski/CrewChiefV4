@@ -22,6 +22,8 @@ namespace CrewChiefV4
         private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
         private Label noMatchedLabel = new Label() { Text = Configuration.getUIString("no_matches") };
 
+        public static String listboxPropPrefix = "LISTBOX_";
+
         private string searchTextPrev = null;
         private GameEnum gameFilterPrev = GameEnum.UNKNOWN;
 
@@ -61,6 +63,15 @@ namespace CrewChiefV4
             }
         }
 
+        private String[] getListboxItems(String propname)
+        {
+            if (propname.Equals(listboxPropPrefix + "interrupt_setting"))
+            {
+                return new String[] { "None", "Spotter only", "Spotter & critical", "Spotter, criticial & important" };
+            }
+            else return null;
+        }
+
         // Note: vast majority of startup time is in ShowDialog.  Looks like pretty much the only way to speed it up is by reducing
         // number of controls or splitting in tabs.
         public PropertiesForm(System.Windows.Forms.Form parent)
@@ -85,10 +96,20 @@ namespace CrewChiefV4
             int widgetCount = 0;
             foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
             {
-                this.propertiesFlowLayoutPanel.Controls.Add(new StringPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
-                   UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
-                   Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter"),
-                   Configuration.getUIStringStrict(strProp.Name + "_category")));
+                if (strProp.Name.StartsWith("LISTBOX_") && getListboxItems(strProp.Name) != null)
+                {
+                    this.propertiesFlowLayoutPanel.Controls.Add(new ListPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
+                       UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
+                       Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter"),
+                       Configuration.getUIStringStrict(strProp.Name + "_category")));
+                }
+                else
+                {
+                    this.propertiesFlowLayoutPanel.Controls.Add(new StringPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
+                       UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
+                       Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter"),
+                       Configuration.getUIStringStrict(strProp.Name + "_category")));
+                }
                 widgetCount++;
             }
             pad(widgetCount);
@@ -287,6 +308,12 @@ namespace CrewChiefV4
                     StringPropertyControl stringControl = (StringPropertyControl)control;
                     UserSettings.GetUserSettings().setProperty(stringControl.propertyId,
                     stringControl.getValue());
+                }
+                else if (control.GetType() == typeof(ListPropertyControl))
+                {
+                    ListPropertyControl listControl = (ListPropertyControl)control;
+                    UserSettings.GetUserSettings().setProperty(listControl.propertyId,
+                    listControl.getValue());
                 }
                 else if (control.GetType() == typeof(IntPropertyControl))
                 {

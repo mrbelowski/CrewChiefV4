@@ -3370,5 +3370,17 @@ namespace CrewChiefV4.Properties {
                 this["priortise_messages_depending_on_situation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public string LISTBOX_interrupt_setting {
+            get {
+                return ((string)(this["LISTBOX_interrupt_setting"]));
+            }
+            set {
+                this["LISTBOX_interrupt_setting"] = value;
+            }
+        }
     }
 }
