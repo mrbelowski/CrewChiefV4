@@ -161,9 +161,7 @@
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="UserInterface\PropertyFilter.cs" />
-    <Compile Include="UserInterface\ListPropertyControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="UserInterface\ListPropertyControl.cs" />
     <Compile Include="UserInterface\ListPropertyControl.Designer.cs">
       <DependentUpon>ListPropertyControl.cs</DependentUpon>
     </Compile>

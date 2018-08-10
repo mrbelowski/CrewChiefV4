@@ -568,11 +568,11 @@ namespace CrewChiefV4
                 waveIn = new NAudio.Wave.WaveInEvent();
                 waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
-            //try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
-            //catch it and tell user to go download.
+            // try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
+            // catch it and tell user to go download.
             try
-            {                
-                new SpeechRecognitionEngine();                    
+            {
+                new SpeechRecognitionEngine();
             }
             catch (Exception e)
             {
@@ -593,7 +593,7 @@ namespace CrewChiefV4
                 {
                     return;
                 }
-                Console.WriteLine("Success");
+                Console.WriteLine("Speech engine initialized successfully.");
             }
             catch (Exception e)
             {

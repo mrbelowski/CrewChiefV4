@@ -11,7 +11,7 @@ if ($args -and $args[0].ToString().ToUpperInvariant() -eq "APPDATA") {
     $cornersContents = Get-ChildItem $env:LOCALAPPDATA\CrewChiefV4\sounds\voice\corners
 }
 else {
-    echo "Reading vocalized landmarks from the git"
+    echo "Reading vocalized landmarks from the git.  Pass APPDATA to read from APPDATA."
     $cornersPath = $toolsPath + "\..\sounds\voice\corners"
     $cornersContents = Get-ChildItem $cornersPath
 }
@@ -69,7 +69,7 @@ echo "====== Partial matches: vocalized in unvocalized ======="
 foreach ($unvocalizedCorner in $unvocalizedCorners) {
     foreach ($vocalizedCorner in $vocalizedCorners) {
 
-        if ($unvocalizedCorner.Contains($vocalizedCorner)) {
+        if ($vocalizedCorner.Length -gt 1 -and $unvocalizedCorner.Contains($vocalizedCorner)) {
             echo ($mst = "Unvocalized: " + $unvocalizedCorner + " Vocalized: " + $vocalizedCorner)
         }
     }
