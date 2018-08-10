@@ -48,8 +48,10 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
-        private static bool importantMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
         private static bool autoVerbosity = UserSettings.GetUserSettings().getBoolean("priortise_messages_depending_on_situation");
+
+        private static SoundType minPriorityForInterrupt = SoundType.SPOTTER;
+
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -62,6 +64,29 @@ namespace CrewChiefV4.Audio
         private static Verbosity verbosity = Verbosity.FULL;
         private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string,MessageQueueCounter>();
         private static DateTime nextVerbosityUpdate = DateTime.MinValue;
+
+        static PlaybackModerator() {
+            String interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
+            MinPriorityForInterrupt interruptSettingEnum;
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum))
+            {
+                switch (interruptSettingEnum)
+                {
+                    case MinPriorityForInterrupt.SPOTTER_MESSAGES:
+                        minPriorityForInterrupt = SoundType.SPOTTER;
+                        break;
+                    case MinPriorityForInterrupt.CRITICAL_MESSAGES:
+                        minPriorityForInterrupt = SoundType.CRITICAL_MESSAGE;
+                        break;
+                    case MinPriorityForInterrupt.IMPORTANT_MESSAGES:
+                        minPriorityForInterrupt = SoundType.IMPORTANT_MESSAGE;
+                        break;
+                    default:
+                        minPriorityForInterrupt = SoundType.OTHER;
+                        break;
+                }
+            }
+        }
 
         private static Dictionary<Verbosity, int> minPriorityForEachVerbosity = new Dictionary<Verbosity, int>() {
             {Verbosity.FULL, 0},
@@ -256,13 +281,13 @@ namespace CrewChiefV4.Audio
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
-            if (lastBlockedMessageId == messageId)
+            if (PlaybackModerator.lastBlockedMessageId == messageId)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
                 return false;
             }
 
-            if (rejectMessagesWhenTalking
+            if (PlaybackModerator.rejectMessagesWhenTalking
                 && soundMetadata.type != SoundType.VOICE_COMMAND_RESPONSE
                 && SpeechRecogniser.waitingForSpeech 
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
@@ -273,22 +298,16 @@ namespace CrewChiefV4.Audio
 
                 return false;
             }
-            /*if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt && audioPlayer.delayMessagesInHardParts)
+
+            if (PlaybackModerator.minPriorityForInterrupt != SoundType.OTHER && PlaybackModerator.CanInterrupt(soundMetadata))
             {
-                PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
-                return false;
-            }*/
-            if (PlaybackModerator.CanInterrupt(soundMetadata))
-            {
-                var mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
-                if (/*mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||*/  // VL: shouldn't blocking be optional?
-                    (PlaybackModerator.importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
+                var mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getMinTypeInImmediateQueue();
+                if (mostImportantTypeInImmediateQueue <= PlaybackModerator.minPriorityForInterrupt)
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
 
-                    PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(
-                        PlaybackModerator.importantMessagesBlockOtherMessages ? SoundType.IMPORTANT_MESSAGE : SoundType.CRITICAL_MESSAGE));
+                    PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(minPriorityForInterrupt));
 
                     if (messageId != 0)
                         PlaybackModerator.lastBlockedMessageId = messageId;
