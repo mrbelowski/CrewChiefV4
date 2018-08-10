@@ -3337,7 +3337,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SPOTTER")]
+        [global::System.Configuration.DefaultSettingValueAttribute("SPOTTER_MESSAGES")]
         public string LISTBOX_interrupt_setting {
             get {
                 return ((string)(this["LISTBOX_interrupt_setting"]));

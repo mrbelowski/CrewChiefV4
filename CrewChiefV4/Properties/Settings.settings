@@ -831,7 +831,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LISTBOX_interrupt_setting" Type="System.String" Scope="User">
-      <Value Profile="(Default)">SPOTTER</Value>
+      <Value Profile="(Default)">SPOTTER_MESSAGES</Value>
     </Setting>
     <Setting Name="LISTBOX_tts_setting" Type="System.String" Scope="User">
       <Value Profile="(Default)">ONLY_WHEN_NECESSARY</Value>

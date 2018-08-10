@@ -17,22 +17,49 @@ namespace CrewChiefV4
     {
         static ListPropertyValues()
         {
-            // listbox items for interrupt property
-            ListBoxItem[] interruptItems = new ListBoxItem[]{
-                new ListBoxItem(Configuration.getUIString("interrupts_none"), "NONE"),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_only"), CrewChiefV4.Audio.SoundType.SPOTTER.ToString()),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_and_critical"), CrewChiefV4.Audio.SoundType.CRITICAL_MESSAGE.ToString()),
-                new ListBoxItem(Configuration.getUIString("interrupts_spotter_critical_and_important"), CrewChiefV4.Audio.SoundType.IMPORTANT_MESSAGE.ToString())
-            };
-            listBoxData.Add("LISTBOX_interrupt_setting", interruptItems.ToList());
-
+            // listbox items for interrupts option property
+            listBoxData.Add("LISTBOX_interrupt_setting", getListBoxItemsForEnum("LISTBOX_interrupt_setting", typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
             // listbox items for TTS property
-            ListBoxItem[] ttsItems = new ListBoxItem[]{
-                new ListBoxItem(Configuration.getUIString("tts_never"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.NEVER.ToString()),
-                new ListBoxItem(Configuration.getUIString("tts_only_when_necessary"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.ONLY_WHEN_NECESSARY.ToString()),
-                new ListBoxItem(Configuration.getUIString("tts_any_time"), CrewChiefV4.Audio.AudioPlayer.TTS_OPTION.ANY_TIME.ToString())
-            };
-            listBoxData.Add("LISTBOX_tts_setting", ttsItems.ToList());
+            listBoxData.Add("LISTBOX_tts_setting", getListBoxItemsForEnum("LISTBOX_tts_setting", typeof(CrewChiefV4.Audio.AudioPlayer.TTS_OPTION)));
+
+            // Note that it's also possible to hard code the contents of a listbox here if it's not backed by an enum, by getting items manually - e.g.
+            // listBoxData.Add("LISTBOX_interrupt_setting", new ListBoxItem[]{
+            //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_1"), "invariant_value_for_item_1"),
+            //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_2"), "invariant_value_for_item_2")
+            // }.ToList());
+        }
+
+        /// <summary>
+        /// 
+        /// Convenience method to populate a listbox backed by an enum. The ui_text.txt file must contain each item's label
+        /// as LISTBOX_property_name_value_n where n is the position in the specified enum type. The set must be contiguous
+        /// and complete WRT to the enum declaration
+        /// 
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="enumType"></param>
+        /// <returns></returns>
+        private static List<ListBoxItem> getListBoxItemsForEnum(String propertyName, Type enumType)
+        {
+            List<ListBoxItem> itemsList = new List<ListBoxItem>();
+            Boolean gotValue = false;
+            int index = 0;
+            do
+            {
+                String label = Configuration.getUIStringStrict(propertyName + "_value_" + index);
+                if (label != null)
+                {
+                    itemsList.Add(new ListBoxItem(label, Enum.GetName(enumType, index)));
+                    gotValue = true;
+                    index++;
+                }
+                else
+                {
+                    gotValue = false;
+                }
+            }
+            while (gotValue);
+            return itemsList;
         }
 
         /// <summary>

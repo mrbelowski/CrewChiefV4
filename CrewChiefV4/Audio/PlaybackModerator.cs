@@ -50,7 +50,7 @@ namespace CrewChiefV4.Audio
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
         private static bool autoVerbosity = UserSettings.GetUserSettings().getBoolean("priortise_messages_depending_on_situation");
 
-        private static SoundType interruptMinPriority;
+        private static SoundType minPriorityForInterrupt = SoundType.SPOTTER;
 
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
@@ -67,9 +67,24 @@ namespace CrewChiefV4.Audio
 
         static PlaybackModerator() {
             String interruptSetting = UserSettings.GetUserSettings().getString("LISTBOX_interrupt_setting");
-            if (!Enum.TryParse(interruptSetting, out interruptMinPriority))
+            MinPriorityForInterrupt interruptSettingEnum;
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum))
             {
-                interruptMinPriority = SoundType.OTHER;
+                switch (interruptSettingEnum)
+                {
+                    case MinPriorityForInterrupt.SPOTTER_MESSAGES:
+                        minPriorityForInterrupt = SoundType.SPOTTER;
+                        break;
+                    case MinPriorityForInterrupt.CRITICAL_MESSAGES:
+                        minPriorityForInterrupt = SoundType.CRITICAL_MESSAGE;
+                        break;
+                    case MinPriorityForInterrupt.IMPORTANT_MESSAGES:
+                        minPriorityForInterrupt = SoundType.IMPORTANT_MESSAGE;
+                        break;
+                    default:
+                        minPriorityForInterrupt = SoundType.OTHER;
+                        break;
+                }
             }
         }
 
@@ -288,16 +303,16 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
                 return false;
             }*/
-            if (interruptMinPriority != SoundType.OTHER && canInterrupt(soundMetadata))
+            if (minPriorityForInterrupt != SoundType.OTHER && canInterrupt(soundMetadata))
             {
                 SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
-                if (mostImportantTypeInImmediateQueue <= interruptMinPriority)
+                if (mostImportantTypeInImmediateQueue <= minPriorityForInterrupt)
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
                     if (PlaybackModerator.enableTracing)
                     {
-                        PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(interruptMinPriority));
+                        PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(minPriorityForInterrupt));
                     }
                     if (messageId != 0)
                     {

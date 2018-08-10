@@ -18,6 +18,14 @@ namespace CrewChiefV4.Audio
         OTHER           // used only for beeps (do we need this?)
     }
 
+    public enum MinPriorityForInterrupt
+    {
+        NEVER = 0,
+        SPOTTER_MESSAGES,
+        CRITICAL_MESSAGES,
+        IMPORTANT_MESSAGES
+    }
+
     public class SoundMetadata
     {
         public const int DEFAULT_PRIORITY = 5;
