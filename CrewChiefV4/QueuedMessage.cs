@@ -374,7 +374,8 @@ namespace CrewChiefV4
                                 messages.Add(usableName);
                                 canBePlayed = true;
                             }
-                            else if (usableName != null && usableName.Count() > 0 && SoundCache.useTTS && (!hasAlternative || !SoundCache.useTTSOnlyWhenNecessary))
+                            else if (usableName != null && usableName.Count() > 0 && AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER 
+                                && (!hasAlternative || AudioPlayer.ttsOption == AudioPlayer.TTS_OPTION.ANY_TIME))
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;

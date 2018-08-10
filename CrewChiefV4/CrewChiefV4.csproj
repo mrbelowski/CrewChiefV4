@@ -161,6 +161,10 @@
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="UserInterface\PropertyFilter.cs" />
+    <Compile Include="UserInterface\ListPropertyControl.cs" />
+    <Compile Include="UserInterface\ListPropertyControl.Designer.cs">
+      <DependentUpon>ListPropertyControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Validator.cs" />
     <Compile Include="NoisyCartesianCoordinateSpotter.cs" />
     <Compile Include="NumberProcessing\TimeSpanWrapper.cs" />
@@ -321,6 +325,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\Spacer.resx">
       <DependentUpon>Spacer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserInterface\ListPropertyControl.resx">
+      <DependentUpon>ListPropertyControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterface\StringPropertyControl.resx">
