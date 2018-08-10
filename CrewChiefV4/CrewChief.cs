@@ -854,8 +854,15 @@ namespace CrewChiefV4
                                 audioPlayer.purgeQueues();
                                 if (displaySessionLapTimes)
                                 {
-                                    Console.WriteLine("Session lap times:");
-                                    Console.WriteLine(String.Join(";    ", currentGameState.SessionData.formattedPlayerLapTimes));
+                                    if (currentGameState.SessionData.formattedPlayerLapTimes.Count > 0)
+                                    {
+                                        Console.WriteLine("Session lap times:");
+                                        Console.WriteLine(String.Join(";    ", currentGameState.SessionData.formattedPlayerLapTimes));
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("No valid lap times were set.");
+                                    }
                                 }
 
                                 if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
@@ -1027,8 +1034,11 @@ namespace CrewChiefV4
             faultingEventsCount.Clear();
             PlaybackModerator.ClearVerbosityData();
             PlaybackModerator.lastBlockedMessageId = -1;
-            audioPlayer.disablePearlsOfWisdom = false;
-            audioPlayer.resetSoundTypesInImmediateQueue();
+            if (audioPlayer != null)
+            {
+                audioPlayer.disablePearlsOfWisdom = false;
+                audioPlayer.resetSoundTypesInImmediateQueue();
+            }
             sessionHasFailingEvent = false;
             Console.WriteLine("Stopping queue monitor");
             if (audioPlayer != null)
@@ -1116,11 +1126,11 @@ namespace CrewChiefV4
         private void displayNewSessionInfo(GameStateData currentGameState)
         {
             Console.WriteLine("New session details...");
-            Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
-            Console.WriteLine("EventIndex " + currentGameState.SessionData.EventIndex);
-            Console.WriteLine("SessionIteration " + currentGameState.SessionData.SessionIteration);
+            Console.WriteLine("SessionType: " + currentGameState.SessionData.SessionType);
+            Console.WriteLine("EventIndex: " + currentGameState.SessionData.EventIndex);
+            Console.WriteLine("SessionIteration: " + currentGameState.SessionData.SessionIteration);
             String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
-            Console.WriteLine("TrackName " + trackName);
+            Console.WriteLine("TrackName: \"" + trackName + "\"");
         }
 
         public static Boolean isPCars()
