@@ -15,24 +15,15 @@ namespace CrewChiefV4
     /// </summary>
     public class ListPropertyValues
     {
-        static ListPropertyValues()
+        public static void addPropertyToListboxData(string propertyName, string valueEnumTypeName)
         {
-            // listbox items for interrupts option property
-            //listBoxData.Add("interrupt_setting_listprop", getListBoxItemsForEnum("interrupt_setting_listprop", typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
-            // listbox items for TTS property
-            //listBoxData.Add("tts_setting_listprop", getListBoxItemsForEnum("tts_setting_listprop", typeof(CrewChiefV4.Audio.AudioPlayer.TTS_OPTION)));
+            listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, Type.GetType(valueEnumTypeName, true)));
 
             // Note that it's also possible to hard code the contents of a listbox here if it's not backed by an enum, by getting items manually - e.g.
             // listBoxData.Add("interrupt_setting_listprop", new ListBoxItem[]{
             //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_1"), "invariant_value_for_item_1"),
             //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_2"), "invariant_value_for_item_2")
             // }.ToList());
-        }
-
-        public static void addPropertyToListboxData(string propertyName, string valueEnumTypeName)
-        {
-            //listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
-            listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, Type.GetType("CrewChiefV4.Audio.MinPriorityForInterrupt")));
         }
 
         /// <summary>
