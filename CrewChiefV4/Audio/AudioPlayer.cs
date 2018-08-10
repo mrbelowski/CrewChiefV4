@@ -26,10 +26,11 @@ namespace CrewChiefV4.Audio
         public Boolean mute = false;
 
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
-        // prefer to drop messages or use generic terms instead of TTS names
-        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
 
         public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayed_messages_on_hardparts");
+
+        public enum TTS_OPTION { NEVER, ONLY_WHEN_NECESSARY, ANY_TIME }
+        public static TTS_OPTION ttsOption = TTS_OPTION.ONLY_WHEN_NECESSARY;
 
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
@@ -134,6 +135,7 @@ namespace CrewChiefV4.Audio
 
         static AudioPlayer()
         {
+            Enum.TryParse(UserSettings.GetUserSettings().getString("tts_setting_listprop"), out ttsOption);
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
                 playbackDevices.Clear();
@@ -1352,7 +1354,7 @@ namespace CrewChiefV4.Audio
             Debug.Assert(!string.IsNullOrWhiteSpace(rawName), "rawName should never be an empty string, this is a bug.");
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
-                ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+                ((SoundCache.hasSuitableTTSVoice && ttsOption != TTS_OPTION.NEVER) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
         }
 
         // defaultSoundType is only used if we've not already added metadata

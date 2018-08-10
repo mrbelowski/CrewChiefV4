@@ -12,7 +12,7 @@ namespace CrewChiefV4.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -1304,18 +1304,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["enable_pcars_pit_window_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool use_tts_for_missing_names {
-            get {
-                return ((bool)(this["use_tts_for_missing_names"]));
-            }
-            set {
-                this["use_tts_for_missing_names"] = value;
             }
         }
         
@@ -2833,18 +2821,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool use_tts_only_when_necessary {
-            get {
-                return ((bool)(this["use_tts_only_when_necessary"]));
-            }
-            set {
-                this["use_tts_only_when_necessary"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool iracing_pit_tyre_pressure_in_psi {
             get {
@@ -3290,18 +3266,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool immediate_messages_block_other_messages {
-            get {
-                return ((bool)(this["immediate_messages_block_other_messages"]));
-            }
-            set {
-                this["immediate_messages_block_other_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_delayed_messages_on_hardparts {
             get {
                 return ((bool)(this["enable_delayed_messages_on_hardparts"]));
@@ -3368,6 +3332,30 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["priortise_messages_depending_on_situation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SPOTTER_MESSAGES")]
+        public string interrupt_setting_listprop {
+            get {
+                return ((string)(this["interrupt_setting_listprop"]));
+            }
+            set {
+                this["interrupt_setting_listprop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ONLY_WHEN_NECESSARY")]
+        public string tts_setting_listprop {
+            get {
+                return ((string)(this["tts_setting_listprop"]));
+            }
+            set {
+                this["tts_setting_listprop"] = value;
             }
         }
     }
