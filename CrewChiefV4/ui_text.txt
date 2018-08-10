@@ -1102,3 +1102,11 @@ LISTBOX_tts_setting_category = AUDIO_VOICE_AND_CONTROLLERS
 LISTBOX_tts_setting_value_0 = Don't use TTS
 LISTBOX_tts_setting_value_1 = Use TTS only when necessary
 LISTBOX_tts_setting_value_2 = Use TTS for all missing names
+
+use_trigger_word_for_always_on_sre = Enable speech recogniser trigger word
+use_trigger_word_for_always_on_sre_help = When running 'always on' mode, the will only listen for commands if it hears the trigger word
+use_trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS
+
+trigger_word_for_always_on_sre = Speech recogniser trigger word
+trigger_word_for_always_on_sre_help = When running 'always on' mode, the app lists for this trigger word before each command
+trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS

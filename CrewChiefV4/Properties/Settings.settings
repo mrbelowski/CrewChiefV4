@@ -836,5 +836,11 @@
     <Setting Name="LISTBOX_tts_setting" Type="System.String" Scope="User">
       <Value Profile="(Default)">ONLY_WHEN_NECESSARY</Value>
     </Setting>
+    <Setting Name="use_trigger_word_for_always_on_sre" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="trigger_word_for_always_on_sre" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Chief</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -230,11 +230,11 @@ namespace CrewChiefV4
         private SpeechRecognitionEngine triggerSre;
         // if we're in 'always on' mode and we're not using nAudio, set up a trigger phrase - 
         // you say "Chief" (or whatever) and the app will beep, indicating it's ready for speech input
-        private static Boolean useTriggerSre = true;
+        private static Boolean useTriggerSre = false;
 
         // This is the trigger phrase used to activate the 'full' SRE
         // TODO: put this in an option somewhere
-        private String keyWord = "Chief";
+        private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
         static SpeechRecogniser () 
         {
@@ -1143,7 +1143,8 @@ namespace CrewChiefV4
 
         public void startContinuousListening()
         {
-            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio;
+            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio &&
+                UserSettings.GetUserSettings().getBoolean("use_trigger_word_for_always_on_sre");
             if (useTriggerSre)
             {                
                 triggerSre.UnloadAllGrammars();
