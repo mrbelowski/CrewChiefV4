@@ -227,6 +227,15 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        private SpeechRecognitionEngine triggerSre;
+        // if we're in 'always on' mode and we're not using nAudio, set up a trigger phrase - 
+        // you say "Chief" (or whatever) and the app will beep, indicating it's ready for speech input
+        private static Boolean useTriggerSre = true;
+
+        // This is the trigger phrase used to activate the 'full' SRE
+        // TODO: put this in an option somewhere
+        private String keyWord = "Chief";
+
         static SpeechRecogniser () 
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
@@ -473,6 +482,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine(info.Culture.EnglishName + " - (" + info.Culture.Name + ")");
                 this.sre = new SpeechRecognitionEngine(info);
+                this.triggerSre = new SpeechRecognitionEngine(info);
                 return this.sre != null;
             }
             if (countryToUse == null)
@@ -519,7 +529,7 @@ namespace CrewChiefV4
                     " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
                 
                 return false;
-            }            
+            }
         }
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
@@ -744,6 +754,7 @@ namespace CrewChiefV4
             try
             {
                 sre.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(sre_SpeechRecognized);
+                triggerSre.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(trigger_SpeechRecognized);
             }
             catch (Exception e)
             {
@@ -956,6 +967,42 @@ namespace CrewChiefV4
             return false;
         }
 
+        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > minimum_voice_recognition_confidence)
+            {
+                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
+                triggerSre.RecognizeAsyncCancel();
+                Thread.Sleep(100);
+                crewChief.audioPlayer.playStartListeningBeep();
+                triggerSre.SetInputToNull();
+                sre.SetInputToDefaultAudioDevice();
+                recognizeAsync();
+                waitingForSpeech = true;
+
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Thread.Sleep(5000);
+                    if (waitingForSpeech)
+                    {
+                        // no result
+                        Console.WriteLine("Gave up waiting for voice command, now waiting for trigger word " + keyWord);
+                        sre.RecognizeAsyncCancel();
+                        Thread.Sleep(100);
+                        sre.SetInputToNull();
+                        triggerSre.SetInputToDefaultAudioDevice();
+                        triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                        waitingForSpeech = false;
+                    }
+                }).Start();
+            }
+            else
+            {
+                Console.WriteLine("keyword detected but confidence (" + e.Result.Confidence + ") too low");
+            }
+        }
+
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             SpeechRecogniser.waitingForSpeech = false;
@@ -1058,11 +1105,25 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    Console.WriteLine("Restarting speech recognition");
-                    recognizeAsync();
+                    if (useTriggerSre)
+                    {
+                        Console.WriteLine("Waiting for trigger word " + keyWord);
+                        sre.SetInputToNull();
+                        triggerSre.SetInputToDefaultAudioDevice();
+                        triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                        waitingForSpeech = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Restarting speech recognition");
+                        recognizeAsync();
+                        waitingForSpeech = true;
+                    }
                 }
-                // in always-on mode, we're now waiting-for-speech until we get another result
-                waitingForSpeech = true;
+                else
+                {
+                    waitingForSpeech = true;
+                }
             }
             else
             {
@@ -1072,6 +1133,34 @@ namespace CrewChiefV4
                     Console.WriteLine("Waiting for more speech");
                     waitingForSpeech = true;
                 }
+            }
+        }
+
+        public void stopTriggerRecogniser()
+        {
+            triggerSre.RecognizeAsyncCancel();
+        }
+
+        public void startContinuousListening()
+        {
+            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio;
+            if (useTriggerSre)
+            {                
+                triggerSre.UnloadAllGrammars();
+                GrammarBuilder gb = new GrammarBuilder();
+                Choices c = new Choices();
+                c.Add(keyWord);
+                gb.Culture = cultureInfo;
+                gb.Append(c);
+                triggerSre.LoadGrammar(new Grammar(gb));
+                sre.SetInputToNull();
+                triggerSre.SetInputToDefaultAudioDevice();
+                triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                Console.WriteLine("waiting for trigger word " + keyWord);
+            }
+            else
+            {
+                recognizeAsync();
             }
         }
 
