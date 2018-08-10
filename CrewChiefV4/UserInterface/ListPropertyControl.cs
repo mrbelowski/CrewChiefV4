@@ -18,21 +18,27 @@ namespace CrewChiefV4
         static ListPropertyValues()
         {
             // listbox items for interrupts option property
-            listBoxData.Add("LISTBOX_interrupt_setting", getListBoxItemsForEnum("LISTBOX_interrupt_setting", typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
+            //listBoxData.Add("interrupt_setting_listprop", getListBoxItemsForEnum("interrupt_setting_listprop", typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
             // listbox items for TTS property
-            listBoxData.Add("LISTBOX_tts_setting", getListBoxItemsForEnum("LISTBOX_tts_setting", typeof(CrewChiefV4.Audio.AudioPlayer.TTS_OPTION)));
+            //listBoxData.Add("tts_setting_listprop", getListBoxItemsForEnum("tts_setting_listprop", typeof(CrewChiefV4.Audio.AudioPlayer.TTS_OPTION)));
 
             // Note that it's also possible to hard code the contents of a listbox here if it's not backed by an enum, by getting items manually - e.g.
-            // listBoxData.Add("LISTBOX_interrupt_setting", new ListBoxItem[]{
+            // listBoxData.Add("interrupt_setting_listprop", new ListBoxItem[]{
             //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_1"), "invariant_value_for_item_1"),
             //    new ListBoxItem(Configuration.getUIString("ui_text_for_item_2"), "invariant_value_for_item_2")
             // }.ToList());
         }
 
+        public static void addPropertyToListboxData(string propertyName, string valueEnumTypeName)
+        {
+            //listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, typeof(CrewChiefV4.Audio.MinPriorityForInterrupt)));
+            listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, Type.GetType("CrewChiefV4.Audio.MinPriorityForInterrupt")));
+        }
+
         /// <summary>
         /// 
         /// Convenience method to populate a listbox backed by an enum. The ui_text.txt file must contain each item's label
-        /// as LISTBOX_property_name_value_n where n is the position in the specified enum type. The set must be contiguous
+        /// as property_name_listprop_value_n where n is the position in the specified enum type. The set must be contiguous
         /// and complete WRT to the enum declaration
         /// 
         /// </summary>
@@ -135,13 +141,14 @@ namespace CrewChiefV4
         internal PropertyFilter filter = null;
 
         public ListPropertyControl(String propertyId, String label, String currentValue, 
-            String defaultValue, String helpText, String filterText, String categoryText)
+            String defaultValue, String helpText, String filterText, String categoryText, String propertyType)
         {
             InitializeComponent();
 
             this.label = label;
             this.propertyId = propertyId;
             this.label1.Text = label;
+            ListPropertyValues.addPropertyToListboxData(propertyId, propertyType);
             this.availableValues = ListPropertyValues.getListBoxLabels(propertyId);
             this.comboBox1.BeginUpdate();
             foreach (String value in availableValues)
