@@ -135,7 +135,7 @@ namespace CrewChiefV4.Audio
 
         static AudioPlayer()
         {
-            Enum.TryParse(UserSettings.GetUserSettings().getString("LISTBOX_tts_setting"), out ttsOption);
+            Enum.TryParse(UserSettings.GetUserSettings().getString("tts_setting_listprop"), out ttsOption);
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
                 playbackDevices.Clear();

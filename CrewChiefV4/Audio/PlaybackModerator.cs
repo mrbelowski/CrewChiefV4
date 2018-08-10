@@ -66,7 +66,7 @@ namespace CrewChiefV4.Audio
         private static DateTime nextVerbosityUpdate = DateTime.MinValue;
 
         static PlaybackModerator() {
-            String interruptSetting = UserSettings.GetUserSettings().getString("LISTBOX_interrupt_setting");
+            String interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
             MinPriorityForInterrupt interruptSettingEnum;
             if (Enum.TryParse(interruptSetting, out interruptSettingEnum))
             {

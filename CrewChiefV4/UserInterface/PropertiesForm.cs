@@ -22,7 +22,7 @@ namespace CrewChiefV4
         private DateTime nextPrefsRefreshAttemptTime = DateTime.MinValue;
         private Label noMatchedLabel = new Label() { Text = Configuration.getUIString("no_matches") };
 
-        public static String listboxPropPrefix = "LISTBOX_";
+        public static String listPropPostfix = "_listprop";
 
         private string searchTextPrev = null;
         private GameEnum gameFilterPrev = GameEnum.UNKNOWN;
@@ -87,12 +87,12 @@ namespace CrewChiefV4
             int widgetCount = 0;
             foreach (SettingsProperty strProp in UserSettings.GetUserSettings().getProperties(typeof(String), null, null))
             {
-                if (strProp.Name.StartsWith(PropertiesForm.listboxPropPrefix) && ListPropertyValues.getListBoxLabels(strProp.Name) != null)
+                if (strProp.Name.EndsWith(PropertiesForm.listPropPostfix) && ListPropertyValues.getListBoxLabels(strProp.Name) != null)
                 {
                     this.propertiesFlowLayoutPanel.Controls.Add(new ListPropertyControl(strProp.Name, Configuration.getUIString(strProp.Name) + " " + Configuration.getUIString("text_prop_type"),
                        UserSettings.GetUserSettings().getString(strProp.Name), (String)strProp.DefaultValue,
                        Configuration.getUIString(strProp.Name + "_help"), Configuration.getUIStringStrict(strProp.Name + "_filter"),
-                       Configuration.getUIStringStrict(strProp.Name + "_category")));
+                       Configuration.getUIStringStrict(strProp.Name + "_category"), Configuration.getUIStringStrict(strProp.Name + "_type")));
                 }
                 else
                 {
