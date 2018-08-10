@@ -423,13 +423,34 @@ namespace CrewChiefV4
 
             foreach (var trackLandmarks in trackLandmarksData)
             {
-                checkForDuplicatesHelper(trackLandmarks.acTrackNames, trackLandmarks.approximateTrackLength, "AC", acTracks);
-                checkForDuplicatesHelper(trackLandmarks.pcarsTrackName, trackLandmarks.approximateTrackLength, "pCars", pcarsTracks);
-                checkForDuplicatesHelper(trackLandmarks.pcars2TrackName, trackLandmarks.approximateTrackLength, "pCars2", pcars2Tracks);
-                checkForDuplicatesHelper(trackLandmarks.raceroomLayoutId, trackLandmarks.approximateTrackLength, "RaceRoom", raceroomTracks);
-                checkForDuplicatesHelper(trackLandmarks.rf1TrackNames, trackLandmarks.approximateTrackLength, "rF1", rf1Tracks);
-                checkForDuplicatesHelper(trackLandmarks.rf2TrackNames, trackLandmarks.approximateTrackLength, "rF2", rf2Tracks);
-                checkForDuplicatesHelper(trackLandmarks.irTrackName, trackLandmarks.approximateTrackLength, "iRacing", irTracks);
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.acTrackNames, trackLandmarks.approximateTrackLength, "AC", acTracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.pcarsTrackName, trackLandmarks.approximateTrackLength, "pCars", pcarsTracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.pcars2TrackName, trackLandmarks.approximateTrackLength, "pCars2", pcars2Tracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.raceroomLayoutId, trackLandmarks.approximateTrackLength, "RaceRoom", raceroomTracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.rf1TrackNames, trackLandmarks.approximateTrackLength, "rF1", rf1Tracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.rf2TrackNames, trackLandmarks.approximateTrackLength, "rF2", rf2Tracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.irTrackName, trackLandmarks.approximateTrackLength, "iRacing", irTracks);
+                }
             }
         }
 
