@@ -835,7 +835,7 @@ namespace CrewChiefV4.rFactor2
 
                     if (cgs.SessionData.SectorNumber > 2)  // Only print in S3, that's the most interesting.
                     {
-                        Console.WriteLine(string.Format("New min width:{0:0.000}    lapDist:{1:0.000}    pathLat:{2:0.000}    inPit:{3}    ps:{4}    appr:{5}    lap:{6}    pit lane:{7:0.000}",
+                        Console.WriteLine(string.Format("New min width: {0:0.000}    lapDist: {1:0.000}    pathLat: {2:0.000}    inPit: {3}    ps: {4}    appr: {5}    lap: {6}    pit lane: {7:0.000}",
                             this.minTrackWidth,
                             playerScoring.mLapDist,
                             playerScoring.mPathLateral,
@@ -1727,20 +1727,19 @@ namespace CrewChiefV4.rFactor2
             if (csd.IsNewSession)
             {
                 Console.WriteLine("New session, trigger data:");
-                Console.WriteLine("EventIndex " + csd.EventIndex);
-                Console.WriteLine("SessionType " + csd.SessionType);
-                Console.WriteLine("SessionPhase " + csd.SessionPhase);
-                Console.WriteLine("SessionIteration " + csd.SessionIteration);
-                Console.WriteLine("HasMandatoryPitStop " + cgs.PitData.HasMandatoryPitStop);
-                Console.WriteLine("PitWindowStart " + cgs.PitData.PitWindowStart);
-                Console.WriteLine("PitWindowEnd " + cgs.PitData.PitWindowEnd);
-                Console.WriteLine("NumCarsAtStartOfSession " + csd.NumCarsOverallAtStartOfSession);
-                Console.WriteLine("SessionNumberOfLaps " + csd.SessionNumberOfLaps);
-                Console.WriteLine("SessionRunTime " + csd.SessionTotalRunTime);
-                Console.WriteLine("SessionStartTime " + csd.SessionStartTime);
-                Console.WriteLine("Track Name \"" + csd.TrackDefinition.name + "\"");
-                Console.WriteLine("Player is using car class " + cgs.carClass.getClassIdentifier() +
-                    " at position " + csd.OverallPosition.ToString());
+                Console.WriteLine("SessionType: " + csd.SessionType);
+                Console.WriteLine("SessionPhase: " + csd.SessionPhase);
+                Console.WriteLine("HasMandatoryPitStop: " + cgs.PitData.HasMandatoryPitStop);
+                Console.WriteLine("PitWindowStart: " + cgs.PitData.PitWindowStart);
+                Console.WriteLine("PitWindowEnd: " + cgs.PitData.PitWindowEnd);
+                Console.WriteLine("NumCarsAtStartOfSession: " + csd.NumCarsOverallAtStartOfSession);
+                Console.WriteLine("SessionNumberOfLaps: " + csd.SessionNumberOfLaps);
+                Console.WriteLine("SessionRunTime: " + csd.SessionTotalRunTime);
+                Console.WriteLine("SessionStartTime: " + csd.SessionStartTime);
+                Console.WriteLine("SessionIteration: " + csd.SessionIteration);
+                Console.WriteLine("EventIndex: " + csd.EventIndex);
+                Console.WriteLine("Player is using car class: \"" + cgs.carClass.getClassIdentifier() +
+                    "\" at position: " + csd.OverallPosition.ToString());
 
                 Utilities.TraceEventClass(cgs);
             }
