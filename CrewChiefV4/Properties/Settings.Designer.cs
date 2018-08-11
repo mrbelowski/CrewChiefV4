@@ -12,7 +12,7 @@ namespace CrewChiefV4.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -3349,13 +3349,49 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ONLY_WHEN_NECESSARY")]
+        [global::System.Configuration.DefaultSettingValueAttribute("NEVER")]
         public string tts_setting_listprop {
             get {
                 return ((string)(this["tts_setting_listprop"]));
             }
             set {
                 this["tts_setting_listprop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_trigger_word_for_always_on_sre {
+            get {
+                return ((bool)(this["use_trigger_word_for_always_on_sre"]));
+            }
+            set {
+                this["use_trigger_word_for_always_on_sre"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Chief")]
+        public string trigger_word_for_always_on_sre {
+            get {
+                return ((string)(this["trigger_word_for_always_on_sre"]));
+            }
+            set {
+                this["trigger_word_for_always_on_sre"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public float trigger_word_sre_min_confidence {
+            get {
+                return ((float)(this["trigger_word_sre_min_confidence"]));
+            }
+            set {
+                this["trigger_word_sre_min_confidence"] = value;
             }
         }
     }
