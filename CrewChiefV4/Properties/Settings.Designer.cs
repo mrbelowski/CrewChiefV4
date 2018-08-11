@@ -3349,7 +3349,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ONLY_WHEN_NECESSARY")]
+        [global::System.Configuration.DefaultSettingValueAttribute("NEVER")]
         public string tts_setting_listprop {
             get {
                 return ((string)(this["tts_setting_listprop"]));
