@@ -1113,3 +1113,6 @@ tts_setting_listprop_value_0 = Don't use TTS
 tts_setting_listprop_value_1 = Use TTS only when necessary
 tts_setting_listprop_value_2 = Use TTS for all missing names
 
+trigger_word_sre_min_confidence = Minimum trigger word confidence
+trigger_word_sre_min_confidence_help = When listening for the voice command trigger word, the app must be at least this confident it understood before starting speech recognition (0.0 - 1.0, default 0.6)
+trigger_word_sre_min_confidence_category = AUDIO_VOICE_AND_CONTROLLERS

@@ -3382,5 +3382,17 @@ namespace CrewChiefV4.Properties {
                 this["trigger_word_for_always_on_sre"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public float trigger_word_sre_min_confidence {
+            get {
+                return ((float)(this["trigger_word_sre_min_confidence"]));
+            }
+            set {
+                this["trigger_word_sre_min_confidence"] = value;
+            }
+        }
     }
 }
