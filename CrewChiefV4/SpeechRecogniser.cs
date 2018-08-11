@@ -234,7 +234,6 @@ namespace CrewChiefV4
         private static Boolean useTriggerSre = false;
 
         // This is the trigger phrase used to activate the 'full' SRE
-        // TODO: put this in an option somewhere
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
         static SpeechRecogniser () 
