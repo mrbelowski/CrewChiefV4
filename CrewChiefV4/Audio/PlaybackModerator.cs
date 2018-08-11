@@ -62,13 +62,14 @@ namespace CrewChiefV4.Audio
         public static int lastBlockedMessageId = -1;
 
         private static Verbosity verbosity = Verbosity.FULL;
-        private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string,MessageQueueCounter>();
+        private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string, MessageQueueCounter>();
         private static DateTime nextVerbosityUpdate = DateTime.MinValue;
 
-        static PlaybackModerator() {
-            String interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
+        static PlaybackModerator()
+        {
+            var interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
             MinPriorityForInterrupt interruptSettingEnum;
-            if (Enum.TryParse(interruptSetting, out interruptSettingEnum))
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum)) ;
             {
                 switch (interruptSettingEnum)
                 {
@@ -109,45 +110,41 @@ namespace CrewChiefV4.Audio
                 PlaybackModerator.verbosity = Verbosity.FULL;
                 return;
             }
+
             if (currentGameState.Now < nextVerbosityUpdate)
-            {
                 return;
-            }
+
             PlaybackModerator.nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
             PlaybackModerator.verbosity = Verbosity.FULL;
             if (currentGameState.PositionAndMotionData.CarSpeed > 5)
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                 {
-                    Boolean inCloseTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1.5 &&
-                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1.5;
-                    Boolean hasCarVeryClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1) ||
-                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1);
-                    
-                    Boolean inTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3 &&
-                         currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3;                   
-                    Boolean hasCarClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2) ||
-                        (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2);
+                    var inCloseTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1.5
+                        && currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1.5;
+
+                    var hasCarVeryClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1)
+                        || (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1);
+
+                    var inTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3
+                        && currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3;
+
+                    var hasCarClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2)
+                        || (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2);
 
                     if (inCloseTraffic || hasCarVeryClose)
-                    {
                         PlaybackModerator.verbosity = Verbosity.LOW;
-                    }
                     else if (inTraffic || hasCarClose)
-                    {
                         PlaybackModerator.verbosity = Verbosity.MED;
-                    }
-                    else if (currentGameState.SessionData.CompletedLaps == 0 ||
-                        (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps) ||
-                        (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
-                    {
+                    else if (currentGameState.SessionData.CompletedLaps == 0
+                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps)
+                        || (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
                         PlaybackModerator.verbosity = Verbosity.MED;
-                    }
                 }
-                else if (currentGameState.SessionData.SessionType == SessionType.Qualify && !currentGameState.PitData.OnOutLap && currentGameState.SessionData.CurrentLapIsValid)
-                {
+                else if (currentGameState.SessionData.SessionType == SessionType.Qualify
+                    && !currentGameState.PitData.OnOutLap
+                    && currentGameState.SessionData.CurrentLapIsValid)
                     PlaybackModerator.verbosity = Verbosity.MED;
-                }
             }
         }
 
@@ -174,7 +171,7 @@ namespace CrewChiefV4.Audio
 
         public static string GetSuggestedBleepStart()
         {
-            return GetSuggestedStartBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
+            return PlaybackModerator.GetSuggestedStartBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
         }
 
         private static string GetSuggestedStartBleep(string chiefBleepSoundName, string spotterBleepSoundName)
@@ -226,7 +223,7 @@ namespace CrewChiefV4.Audio
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(string.Format(
-                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ",
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.prevLastKey));
             }
             else
@@ -236,7 +233,7 @@ namespace CrewChiefV4.Audio
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(string.Format(
-                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ",
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.lastSoundPreProcessed.fullPath));
             }
 
@@ -289,7 +286,7 @@ namespace CrewChiefV4.Audio
 
             if (PlaybackModerator.rejectMessagesWhenTalking
                 && soundMetadata.type != SoundType.VOICE_COMMAND_RESPONSE
-                && SpeechRecogniser.waitingForSpeech 
+                && SpeechRecogniser.waitingForSpeech
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
@@ -304,7 +301,7 @@ namespace CrewChiefV4.Audio
                 var mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getMinTypeInImmediateQueue();
                 if (mostImportantTypeInImmediateQueue <= PlaybackModerator.minPriorityForInterrupt)
                 {
-                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting",
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
 
                     PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(minPriorityForInterrupt));
@@ -358,9 +355,8 @@ namespace CrewChiefV4.Audio
                 */
             }
             else
-            {
                 PlaybackModerator.Trace(string.Format("Message {0} hasn't been queued because its priority is {1} and our verbosity is currently {2}", queuedMessage.messageName, priority, verbosity));
-            }
+
             return canPlay;
         }
 
