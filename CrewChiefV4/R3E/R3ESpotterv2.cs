@@ -94,12 +94,18 @@ namespace CrewChiefV4.RaceRoom
                 return;
             }
             RaceRoomShared currentState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)currentStateObj).data;
-            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;            
+            RaceRoomShared lastState = ((CrewChiefV4.RaceRoom.R3ESharedMemoryReader.R3EStructWrapper)lastStateObj).data;
+
+            // 1 opponent with the same name as the player means we're racing the player's ghost
+            if (currentGameState.OpponentData != null && currentGameState.OpponentData.Count == 1 &&
+                String.Equals(currentGameState.OpponentData.First().Value.DriverRawName, currentGameState.SessionData.DriverRawName)) {
+                return;
+            }
             
             if (!enabled || currentState.Player.GameSimulationTime < timeAfterRaceStartToActivate ||
                 currentState.ControlType != (int)RaceRoomConstant.Control.Player || 
                 ((int)RaceRoomConstant.Session.Qualify == currentState.SessionType && (currentState.NumCars == 1 || currentState.NumCars == 2)) ||
-                currentGameState.SessionData.SessionType == SessionType.HotLap)
+                currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.LonePractice)
             {
                 return;
             }

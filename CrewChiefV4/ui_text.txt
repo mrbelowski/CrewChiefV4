@@ -1088,6 +1088,14 @@ priortise_messages_depending_on_situation = Advanced message prioritisation
 priortise_messages_depending_on_situation_help = Disable less important messages when under pressure, on a qualifying lap, etc
 priortise_messages_depending_on_situation_category = AUDIO_VOICE_AND_CONTROLLERS
 
+use_trigger_word_for_always_on_sre = Enable speech recogniser trigger word
+use_trigger_word_for_always_on_sre_help = When running 'always on' mode, the will only listen for commands if it hears the trigger word
+use_trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS
+
+trigger_word_for_always_on_sre = Speech recogniser trigger word
+trigger_word_for_always_on_sre_help = When running 'always on' mode, the app lists for this trigger word before each command
+trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS
+
 interrupt_setting_listprop = Interrupt regular messages
 interrupt_setting_listprop_help = Set which important messages are allowed to interrupt regular messages
 interrupt_setting_listprop_category = AUDIO_VOICE_AND_CONTROLLERS
@@ -1104,3 +1112,7 @@ tts_setting_listprop_type = CrewChiefV4.Audio.AudioPlayer+TTS_OPTION
 tts_setting_listprop_value_0 = Don't use TTS
 tts_setting_listprop_value_1 = Use TTS only when necessary
 tts_setting_listprop_value_2 = Use TTS for all missing names
+
+trigger_word_sre_min_confidence = Minimum trigger word confidence
+trigger_word_sre_min_confidence_help = When listening for the voice command trigger word, the app must be at least this confident it understood before starting speech recognition (0.0 - 1.0, default 0.6)
+trigger_word_sre_min_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
