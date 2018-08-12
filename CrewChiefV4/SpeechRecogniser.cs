@@ -1033,8 +1033,8 @@ namespace CrewChiefV4
                 Boolean signalled = triggerTimeoutWaitHandle.WaitOne(timeout);
                 if (signalled)
                 {
-                    // thread was stopped so we go some speech or asked the thread to shut down
-                    Console.WriteLine("trigger thread stopped");
+                    // thread was stopped so we got some speech or asked the thread to shut down
+                    // (no point in logging anything here)
                 }
                 else
                 {
