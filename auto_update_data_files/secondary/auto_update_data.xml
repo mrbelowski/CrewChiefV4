@@ -23,7 +23,7 @@ secondary update sources) can still be updated. All downloads from this source w
 		<update-pack url="http://thecrewchief.org/downloads/update_2_sound_pack.zip" updates-from-version="122"/>
 		<update-pack url="http://thecrewchief.org/downloads/update_3_sound_pack.zip" updates-from-version="146"/>
 	</voice-messages>
-	<driver-names latest-version="131">
+	<driver-names latest-version="132">
 		<update-pack url="http://thecrewchief.org/downloads/base_driver_names.zip" updates-from-version="-1"/>
 		<update-pack url="http://thecrewchief.org/downloads/update_driver_names.zip" updates-from-version="0"/>
 		<update-pack url="http://thecrewchief.org/downloads/update_2_driver_names.zip" updates-from-version="130"/>
