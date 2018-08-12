@@ -237,7 +237,6 @@ namespace CrewChiefV4
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
         private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
-        Boolean triggerTimeoutWaitThreadRunning = false;
 
         static SpeechRecogniser () 
         {
@@ -1067,6 +1066,7 @@ namespace CrewChiefV4
 
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            // cancel the thread that's waiting for a speech recognised timeout:
             triggerTimeoutWaitHandle.Set();
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = true;
