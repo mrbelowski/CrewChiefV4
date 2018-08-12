@@ -236,6 +236,8 @@ namespace CrewChiefV4
         // This is the trigger phrase used to activate the 'full' SRE
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
+        private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
+
         static SpeechRecogniser () 
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
@@ -1021,16 +1023,22 @@ namespace CrewChiefV4
             return success;
         }
 
-        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        private void restartWaitTimeoutThread(int timeout)
         {
-            if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
+            triggerTimeoutWaitHandle.Set();
+            new Thread(() =>
             {
-                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
-                switchFromTriggerToRegularRecogniser();
-                new Thread(() =>
+                triggerTimeoutWaitHandle.Reset();
+                Thread.CurrentThread.IsBackground = true;
+                Boolean signalled = triggerTimeoutWaitHandle.WaitOne(timeout);
+                if (signalled)
                 {
-                    Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(5000);
+                    // thread was stopped so we got some speech or asked the thread to shut down
+                    // (no point in logging anything here)
+                }
+                else
+                {
+                    // timeout waiting
                     if (waitingForSpeech)
                     {
                         // no result
@@ -1038,7 +1046,17 @@ namespace CrewChiefV4
                         sre.RecognizeAsyncCancel();
                         switchFromRegularToTriggerRecogniser();
                     }
-                }).Start();
+                }
+            }).Start();
+        }
+
+        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
+            {
+                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
+                switchFromTriggerToRegularRecogniser();
+                restartWaitTimeoutThread(5000);
             }
             else
             {
@@ -1048,8 +1066,11 @@ namespace CrewChiefV4
 
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            // cancel the thread that's waiting for a speech recognised timeout:
+            triggerTimeoutWaitHandle.Set();
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = true;
+            Boolean youWot = false;
             Console.WriteLine("Recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence.ToString("0.000"));
             try
             {
@@ -1078,6 +1099,7 @@ namespace CrewChiefV4
                         else
                         {
                             crewChief.youWot(true);
+                            youWot = true;
                         }
                     }
                     else if (e.Result.Confidence > minimum_voice_recognition_confidence)
@@ -1123,6 +1145,7 @@ namespace CrewChiefV4
                     else
                     {
                         crewChief.youWot(true);
+                        youWot = true;
                     }
                 }
             }
@@ -1148,14 +1171,19 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    if (useTriggerSre)
+                    if (useTriggerSre && !youWot)
                     {
                         Console.WriteLine("Waiting for trigger word " + keyWord);
-                        switchFromRegularToTriggerRecogniser();
+                         switchFromRegularToTriggerRecogniser();
                     }
                     else
                     {
                         Console.WriteLine("Restarting speech recognition");
+                        if (useTriggerSre && youWot)
+                        {
+                            // wait a little longer here as the "I didn't catch that" takes a second or two to say
+                            restartWaitTimeoutThread(7000);
+                        }
                         recognizeAsync();
                         waitingForSpeech = true;
                     }
