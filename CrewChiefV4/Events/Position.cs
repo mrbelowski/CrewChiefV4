@@ -275,7 +275,7 @@ namespace CrewChiefV4.Events
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             QueuedMessage overtakingMessage = new QueuedMessage(folderOvertaking, 0, this, validationData);
-                            audioPlayer.playMessage(overtakingMessage, PearlsOfWisdom.PearlType.GOOD, 0);
+                            audioPlayer.playMessage(overtakingMessage, PearlsOfWisdom.PearlType.GOOD, 0, 10);
                             reported = true;
                         }
                     }
@@ -317,7 +317,7 @@ namespace CrewChiefV4.Events
                             Dictionary<String, Object> validationData = new Dictionary<String, Object>();
                             validationData.Add(positionValidationKey, currentGameState.SessionData.ClassPosition);
                             QueuedMessage beingOvertakenMessage = new QueuedMessage(folderBeingOvertaken, 0, this, validationData);
-                            audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0);
+                            audioPlayer.playMessage(new QueuedMessage(folderBeingOvertaken, 0, this, validationData), PearlsOfWisdom.PearlType.BAD, 0, 10);
                             reported = true;
                         }
                     }
@@ -381,20 +381,20 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 4)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 0, this), 5);
                         }
                         else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 1)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderBadStart, 0, this), 5);
                         }
                         else if (!isLast && (currentGameState.SessionData.ClassPosition == 1 || currentGameState.SessionData.ClassPosition < currentGameState.SessionData.SessionStartClassPosition - 1))
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderGoodStart, 0, this), 5);
                         }
                         else if (!isLast && Utilities.random.NextDouble() > 0.6)
                         {
                             // only play the OK start message sometimes
-                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderOKStart, 0, this), 5);
                         }
                     }
                 }
@@ -460,7 +460,7 @@ namespace CrewChiefV4.Events
                             CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
                         DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
                             currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood);
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood, 10);
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }

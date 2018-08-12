@@ -1,4 +1,5 @@
-﻿/*
+﻿using CrewChiefV4.GameState;
+/*
  * The idea behind PlaybackModerator class is to allow us to adjust playback after all the high level logic is evaluated,
  * messages resolved, duplicates removed etc.  It is plugged into SingleSound play and couple of other low level places.
  * Currently, the only two things it does is injects fake beep-out/in between Spotter and Chief messages and decides which 
@@ -15,6 +16,25 @@ using System.Linq;
 
 namespace CrewChiefV4.Audio
 {
+    public enum Verbosity
+    {
+        SILENT = 0,
+        LOW,
+        MED,
+        FULL
+    }
+
+    public class MessageQueueCounter
+    {
+        public DateTime timeQueued;
+        public int numberOfTimesQueued;
+        public MessageQueueCounter(DateTime timeQueued)
+        {
+            this.timeQueued = timeQueued;
+            this.numberOfTimesQueued = 1;
+        }
+    }
+
     public static class PlaybackModerator
     {
 #if DEBUG
@@ -28,7 +48,10 @@ namespace CrewChiefV4.Audio
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
-        private static bool importantMessagesBlockOtherMessages = UserSettings.GetUserSettings().getBoolean("immediate_messages_block_other_messages");
+        private static bool autoVerbosity = UserSettings.GetUserSettings().getBoolean("priortise_messages_depending_on_situation");
+
+        private static SoundType minPriorityForInterrupt = SoundType.SPOTTER;
+
         private static bool lastSoundWasSpotter = false;
         private static AudioPlayer audioPlayer = null;
 
@@ -37,6 +60,93 @@ namespace CrewChiefV4.Audio
         private static SingleSound lastSoundPreProcessed = null;
 
         public static int lastBlockedMessageId = -1;
+
+        private static Verbosity verbosity = Verbosity.FULL;
+        private static Dictionary<String, MessageQueueCounter> queuedMessageCounters = new Dictionary<string, MessageQueueCounter>();
+        private static DateTime nextVerbosityUpdate = DateTime.MinValue;
+
+        static PlaybackModerator()
+        {
+            var interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
+            MinPriorityForInterrupt interruptSettingEnum;
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum)) ;
+            {
+                switch (interruptSettingEnum)
+                {
+                    case MinPriorityForInterrupt.SPOTTER_MESSAGES:
+                        minPriorityForInterrupt = SoundType.SPOTTER;
+                        break;
+                    case MinPriorityForInterrupt.CRITICAL_MESSAGES:
+                        minPriorityForInterrupt = SoundType.CRITICAL_MESSAGE;
+                        break;
+                    case MinPriorityForInterrupt.IMPORTANT_MESSAGES:
+                        minPriorityForInterrupt = SoundType.IMPORTANT_MESSAGE;
+                        break;
+                    default:
+                        minPriorityForInterrupt = SoundType.OTHER;
+                        break;
+                }
+            }
+        }
+
+        private static Dictionary<Verbosity, int> minPriorityForEachVerbosity = new Dictionary<Verbosity, int>() {
+            {Verbosity.FULL, 0},
+            {Verbosity.MED, 5},
+            {Verbosity.LOW, 10},
+            {Verbosity.SILENT, 20}
+        };
+
+        public static void ClearVerbosityData()
+        {
+            queuedMessageCounters.Clear();
+            verbosity = Verbosity.FULL;
+            nextVerbosityUpdate = DateTime.MinValue;
+        }
+
+        public static void UpdateAutoVerbosity(GameStateData currentGameState)
+        {
+            if (!autoVerbosity || currentGameState == null)
+            {
+                PlaybackModerator.verbosity = Verbosity.FULL;
+                return;
+            }
+
+            if (currentGameState.Now < nextVerbosityUpdate)
+                return;
+
+            PlaybackModerator.nextVerbosityUpdate = currentGameState.Now.AddSeconds(1);
+            PlaybackModerator.verbosity = Verbosity.FULL;
+            if (currentGameState.PositionAndMotionData.CarSpeed > 5)
+            {
+                if (currentGameState.SessionData.SessionType == SessionType.Race)
+                {
+                    var inCloseTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1.5
+                        && currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1.5;
+
+                    var hasCarVeryClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 1)
+                        || (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 1);
+
+                    var inTraffic = currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 3
+                        && currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 3;
+
+                    var hasCarClose = (currentGameState.SessionData.TimeDeltaFront > 0 && currentGameState.SessionData.TimeDeltaFront < 2)
+                        || (currentGameState.SessionData.TimeDeltaBehind > 0 && currentGameState.SessionData.TimeDeltaBehind < 2);
+
+                    if (inCloseTraffic || hasCarVeryClose)
+                        PlaybackModerator.verbosity = Verbosity.LOW;
+                    else if (inTraffic || hasCarClose)
+                        PlaybackModerator.verbosity = Verbosity.MED;
+                    else if (currentGameState.SessionData.CompletedLaps == 0
+                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps)
+                        || (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
+                        PlaybackModerator.verbosity = Verbosity.MED;
+                }
+                else if (currentGameState.SessionData.SessionType == SessionType.Qualify
+                    && !currentGameState.PitData.OnOutLap
+                    && currentGameState.SessionData.CurrentLapIsValid)
+                    PlaybackModerator.verbosity = Verbosity.MED;
+            }
+        }
 
         public static void PreProcessSound(SingleSound sound, SoundMetadata soundMetadata)
         {
@@ -61,7 +171,7 @@ namespace CrewChiefV4.Audio
 
         public static string GetSuggestedBleepStart()
         {
-            return GetSuggestedStartBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
+            return PlaybackModerator.GetSuggestedStartBleep("start_bleep" /*chiefBleepSoundName*/, "alternate_start_bleep" /*spotterBleepSoundName*/);
         }
 
         private static string GetSuggestedStartBleep(string chiefBleepSoundName, string spotterBleepSoundName)
@@ -113,7 +223,7 @@ namespace CrewChiefV4.Audio
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && !PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(string.Format(
-                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ",
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.prevLastKey));
             }
             else
@@ -123,7 +233,7 @@ namespace CrewChiefV4.Audio
                 if (PlaybackModerator.lastSoundPreProcessed != null
                     && PlaybackModerator.lastSoundPreProcessed.isSpotter)
                     PlaybackModerator.Trace(string.Format(
-                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ", 
+                        "WARNING Last key and last sound pre-processed do not agree on role: {0} vs {1} ",
                         PlaybackModerator.lastSoundPreProcessed.fullPath, PlaybackModerator.lastSoundPreProcessed.fullPath));
             }
 
@@ -149,8 +259,14 @@ namespace CrewChiefV4.Audio
 
             Console.WriteLine(string.Format("PlaybackModerator: {0}", msg));
         }
-        
-        private static Boolean canInterrupt(SoundMetadata metadata)
+
+        /*
+         * CanInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
+         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
+         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
+         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
+         */
+        private static Boolean CanInterrupt(SoundMetadata metadata)
         {
             // is this sufficient? Should the spotter be able to interrupt voice comm responses?
             return metadata.type == SoundType.REGULAR_MESSAGE;
@@ -159,65 +275,89 @@ namespace CrewChiefV4.Audio
         //public static void PostProcessSound()
         //{ }
 
-        /*
-         * canInterrupt will be true for regular messages triggered by the app's normal event logic. When a message
-         * is played from the 'immediate' queue this will be false (spotter calls, command responses, some edge cases 
-         * where the message is time-critical). If this flag is true the presence of a message in the immediate queue
-         * will make the app skip this sound if immediate_messages_block_other_messages is enabled.
-         */
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
-            if (lastBlockedMessageId == messageId)
+            if (PlaybackModerator.lastBlockedMessageId == messageId)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because other members of the same message have been blocked", singleSound.fullPath));
                 return false;
             }
-            if (rejectMessagesWhenTalking
+
+            if (PlaybackModerator.rejectMessagesWhenTalking
                 && soundMetadata.type != SoundType.VOICE_COMMAND_RESPONSE
-                && SpeechRecogniser.waitingForSpeech 
+                && SpeechRecogniser.waitingForSpeech
                 && MainWindow.voiceOption != MainWindow.VoiceOptionEnum.ALWAYS_ON)
             {
                 PlaybackModerator.Trace(string.Format("Sound {0} rejected because we're in the middle of a voice command", singleSound.fullPath));
                 if (messageId != 0)
-                {
-                    lastBlockedMessageId = messageId;
-                }
+                    PlaybackModerator.lastBlockedMessageId = messageId;
+
                 return false;
             }
-            /*if (CrewChief.currentGameState != null && CrewChief.currentGameState.IsInHardPartOfTrack && canInterrupt && audioPlayer.delayMessagesInHardParts)
+
+            if (PlaybackModerator.minPriorityForInterrupt != SoundType.OTHER && PlaybackModerator.CanInterrupt(soundMetadata))
             {
-                PlaybackModerator.Trace(string.Format("blocking queued messasge {0} because we are in a hard part of the track", sound.fullPath));
-                return false;
-            }*/
-            if (canInterrupt(soundMetadata))
-            {
-                SoundType mostImportantTypeInImmediateQueue = audioPlayer.getMinTypeInImmediateQueue();
-                if (mostImportantTypeInImmediateQueue <= SoundType.CRITICAL_MESSAGE ||
-                    (importantMessagesBlockOtherMessages && mostImportantTypeInImmediateQueue <= SoundType.IMPORTANT_MESSAGE))
+                var mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getMinTypeInImmediateQueue();
+                if (mostImportantTypeInImmediateQueue <= PlaybackModerator.minPriorityForInterrupt)
                 {
-                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting", 
+                    PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting",
                         singleSound.fullPath, mostImportantTypeInImmediateQueue));
-                    if (PlaybackModerator.enableTracing)
-                    {
-                        PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(
-                            importantMessagesBlockOtherMessages ? SoundType.IMPORTANT_MESSAGE : SoundType.CRITICAL_MESSAGE));
-                    }
+
+                    PlaybackModerator.Trace("Messages triggering block logic: " + audioPlayer.getMessagesBlocking(minPriorityForInterrupt));
+
                     if (messageId != 0)
-                    {
-                        lastBlockedMessageId = messageId;
-                    }
+                        PlaybackModerator.lastBlockedMessageId = messageId;
+
                     // ensure the blocking message won't expire
-                    QueuedMessage firstWaitingMessage = audioPlayer.getFirstWaitingImmediateMessage(mostImportantTypeInImmediateQueue);
+                    var firstWaitingMessage = PlaybackModerator.audioPlayer.getFirstWaitingImmediateMessage(mostImportantTypeInImmediateQueue);
                     if (firstWaitingMessage != null && firstWaitingMessage.expiryTime > 0)
-                    {
                         firstWaitingMessage.expiryTime = firstWaitingMessage.expiryTime + 2000;
-                    }
+
                     return false;
                 }
             }
-
             return true;
+        }
+
+        public static bool MessageCanBeQueued(QueuedMessage queuedMessage, int currentQueueDepth, DateTime now)
+        {
+            int priority;
+            SoundType type;
+            if (queuedMessage.metadata == null)
+            {
+                PlaybackModerator.Trace("Message " + queuedMessage.messageName + " has no metadata, setting priority and type to default");
+                priority = SoundMetadata.DEFAULT_PRIORITY;
+                type = SoundType.REGULAR_MESSAGE;
+            }
+            else
+            {
+                priority = queuedMessage.metadata.priority;
+                type = queuedMessage.metadata.type;
+            }
+
+            var canPlay = priority >= PlaybackModerator.minPriorityForEachVerbosity[verbosity];
+            if (canPlay)
+            {
+                // not using this Dictionary of played messages so no point in adding data to it. Will leave this code
+                // here for now in case i come up with a use-case
+                /*
+                MessageQueueCounter counter;
+                if (PlaybackModerator.queuedMessageCounters.TryGetValue(queuedMessage.messageName, out counter))
+                {
+                    counter.timeQueued = now;
+                    counter.numberOfTimesQueued = counter.numberOfTimesQueued + 1;
+                }
+                else
+                {
+                    PlaybackModerator.queuedMessageCounters.Add(queuedMessage.messageName, new MessageQueueCounter(now));
+                }
+                */
+            }
+            else
+                PlaybackModerator.Trace(string.Format("Message {0} hasn't been queued because its priority is {1} and our verbosity is currently {2}", queuedMessage.messageName, priority, verbosity));
+
+            return canPlay;
         }
 
         private static void InjectBeepOutIn(SingleSound sound, SoundMetadata soundMetadata)

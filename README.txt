@@ -222,6 +222,10 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.4.3: Fixed a few cases where messages play when they shouldn't; reduce repetition of blue flag messages; RF2 - fix 1970s F1 class mappings; iRacing - use average temp round track now this has been updated in the SDK to be dynamic
+
+Version 4.9.4.2: Prevent unimportant messages playing if the player is fighting with other cars in a race session or is on a flying lap in a qualifying session (disabled by default, enable this with the 'Advanced message prioritisation' option); allow app update check to be skipped - adding the start argument SKIP_UPDATES to your shortcut will prevent the app checking for updates (but it'll still check for sound pack updates); report yellow flag messages even if we're in a corner / braking zone; various bug fixes and tweaks
+
 Version 4.9.4.0: Fixed regression in non-English speech recognition config files - the 'defaultLocale' property name for speech recognition language had been changed to 'language', so the app was ignoring this value in existing configurations. The app will now use the 'defaultLocale' property value if it doesn't find a 'language' property
 
 Version 4.9.3.9: Allow spotter messages to play if they have interrupted another message, even if they would otherwise have expired; iRacing - enable fuel tracking in lone practice sessions; iRacing - Added option to re fuel to end of race in a race session when entering the pitlane, this will not trigger if you get a tow back to pits it only works for regular preformed pitstop!; iRacing - some multiclass fixes; pCars2 - performance improvements; internal rework - consolidated lots of timings code to make behaviour more consistent across games; Speech recognition engine initialisation improvements - better handling of language / country options, better management of installed components and error reporting; improvements to interrupting logic; various bug fixes

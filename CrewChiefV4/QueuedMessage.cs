@@ -167,13 +167,6 @@ namespace CrewChiefV4
         }
 
         public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
-            Dictionary<String, Object> validationData, SoundMetadata metadata)
-            : this(messageName, messageFragments, secondsDelay, abstractEvent, validationData)
-        {
-            this.metadata = metadata;
-        }
-
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
             Dictionary<String, Object> validationData)
             : this(messageName, messageFragments, secondsDelay, abstractEvent)
         {
@@ -381,7 +374,8 @@ namespace CrewChiefV4
                                 messages.Add(usableName);
                                 canBePlayed = true;
                             }
-                            else if (usableName != null && usableName.Count() > 0 && SoundCache.useTTS && (!hasAlternative || !SoundCache.useTTSOnlyWhenNecessary))
+                            else if (usableName != null && usableName.Count() > 0 && AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER 
+                                && (!hasAlternative || AudioPlayer.ttsOption == AudioPlayer.TTS_OPTION.ANY_TIME))
                             {
                                 messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
                                 canBePlayed = true;

@@ -99,7 +99,7 @@
 # ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
 # VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
 # VINTAGE_F1_C, VINTAGE_STOCK_CAR,
-# F1, F2, F3, F4, FF, FORMULA_E, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
+# F1, F2, F3, F4, FF, FORMULA_E, F1_70S, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
 # MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3,
 # RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, CAYMAN_CLUBSPORT, CAN_AM
 # 
@@ -129,7 +129,7 @@
 			"carClassEnum": "GT1",
 			"raceroomClassIds": [1687],
 			"pCarsClassNames": ["GT1"],
-			"rf2ClassNames": [ "*GT1*" ],
+			"rf2ClassNames": ["*GT1*"],
 			"acClassNames": ["*GT1*", "rss_gt_tornado_v12", "rss_gt_vortex_v10", "rss_gt_ferruccio_55", "rss_gt_*"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
@@ -154,7 +154,7 @@
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"maxSafeOilTemp" : 135
+			"maxSafeOilTemp": 135
 		},
 		{
 			"carClassEnum": "GTLM",
@@ -172,11 +172,11 @@
 			"iracingCarIds": [43, 55, 59, 72, 73, 94],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"maxSafeOilTemp" : 135
+			"maxSafeOilTemp": 135
 		},
 		{
 			"carClassEnum": "CARRERA_CUP",
-			"raceroomClassIds": [ 6345 ],
+			"raceroomClassIds": [6345],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -215,7 +215,7 @@
 		},
 		{
 			"carClassEnum": "GT5",
-			"pCarsClassNames": [ "GT5", "G40 Junior" ],
+			"pCarsClassNames": ["GT5", "G40 Junior"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL"
 		},
@@ -303,7 +303,7 @@
 			"raceroomClassIds": [1714],
 			"pCarsClassNames": ["LMP1"],
 			"rf2ClassNames": ["LMP1"],
-			"acClassNames": [ "ks_porsche_919_hybrid_2015", "ks_porsche_919_hybrid_2016" ],
+			"acClassNames": ["ks_porsche_919_hybrid_2015", "ks_porsche_919_hybrid_2016"],
 			"iracingCarIds": [98, 100],
 			"brakeType": "Carbon",
 			"maxSafeWaterTemp": 105,
@@ -315,12 +315,12 @@
 			"carClassEnum": "LMP2",
 			"raceroomClassIds": [1923],
 			"pCarsClassNames": ["LMP2"],
-			"rf2ClassNames": [ "LMP2", "ES_P2" ],
+			"rf2ClassNames": ["LMP2", "ES_P2"],
 			"iracingCarIds": [39, 70],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"maxSafeOilTemp" : 135
+			"maxSafeOilTemp": 135
 		},
 		{
 			"carClassEnum": "LMP3",
@@ -377,8 +377,8 @@
 		},
 		{
 			"carClassEnum": "GROUPA",
-			"raceroomClassIds": [ 1712, 3499 ],
-			"pCarsClassNames": [ "Group A" ],
+			"raceroomClassIds": [1712, 3499],
+			"pCarsClassNames": ["Group A"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
 		},
@@ -400,7 +400,7 @@
 			"useAmericanTerms": true,
 			"enabledMessageTypes": "ALL",
 			"spotterVehicleLength": 5,
-			"spotterVehicleWidth": 2,
+			"spotterVehicleWidth": 2
 		},
 		{
 			"carClassEnum": "F1",
@@ -490,6 +490,13 @@
 		{
 			"carClassEnum": "VINTAGE_F1_A",
 			"pCarsClassNames": ["Vintage F1 A"],
+			"defaultTyreType": "Bias_Ply",
+			"timesInHundredths": false,
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+		},
+		{
+			"carClassEnum": "F1_70S",
+			"rf2ClassNames": ["1975", "1976", "1977"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
 			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
@@ -641,10 +648,10 @@
 		},
 		{
 			"carClassEnum": "TC2",
-			"raceroomClassIds": [ 1922 ],
-			"pCarsClassNames": [ "TC2", "Touring Car" ],
-			"rf1ClassNames": [ "Marcas" ],
-			"rf2ClassNames": [ "BMW 125i", "Ford Focus", "Chevrolet Cruze", "Toyota Avensis", "Civic BTCC 2013" ],
+			"raceroomClassIds": [1922],
+			"pCarsClassNames": ["TC2", "Touring Car"],
+			"rf1ClassNames": ["Marcas"],
+			"rf2ClassNames": ["BMW 125i", "Ford Focus", "Chevrolet Cruze", "Toyota Avensis", "Civic BTCC 2013"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
 		},
@@ -695,7 +702,7 @@
 		},
 		{
 			"carClassEnum": "ROAD_E",
-			"pCarsClassNames": [ "Road E" ],
+			"pCarsClassNames": ["Road E"],
 			"rf1ClassNames": ["P911T"],
 			"defaultTyreType": "Road",
 			"brakeType": "Iron_Road",
@@ -869,19 +876,28 @@
 			"spotterVehicleWidth": 1.75,
 			"limiterAvailable": false
 		},
-        {
-            "carClassEnum": "SPEC_MIATA",
-            "iracingCarIds": [ 67 ],
-            "timesInHundredths": true,
-            "enabledMessageTypes": "FUEL",
-            "limiterAvailable": false
-        },
-        {
+		{
+			"carClassEnum": "SPEC_MIATA",
+			"iracingCarIds": [67],
+			"timesInHundredths": true,
+			"enabledMessageTypes": "FUEL",
+			"limiterAvailable": false
+		},
+		{
 			"carClassEnum": "FORMULA_RENAULT20",
 			"iracingCarIds": [74],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "FUEL"
 		},
-
+		{
+			"carClassEnum": "F1_90S",
+			"rf2ClassNames": ["F1_1996_SL1DE"],
+			"brakeType": "Carbon",
+			"maxSafeWaterTemp": 105,
+			"maxSafeOilTemp": 140,
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL",
+			"pitCrewPreparationTime": 17
+		}
 	]
 }

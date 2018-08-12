@@ -1310,18 +1310,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool use_tts_for_missing_names {
-            get {
-                return ((bool)(this["use_tts_for_missing_names"]));
-            }
-            set {
-                this["use_tts_for_missing_names"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_delayed_responses {
             get {
                 return ((bool)(this["enable_delayed_responses"]));
@@ -2833,18 +2821,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool use_tts_only_when_necessary {
-            get {
-                return ((bool)(this["use_tts_only_when_necessary"]));
-            }
-            set {
-                this["use_tts_only_when_necessary"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool iracing_pit_tyre_pressure_in_psi {
             get {
@@ -3290,18 +3266,6 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool immediate_messages_block_other_messages {
-            get {
-                return ((bool)(this["immediate_messages_block_other_messages"]));
-            }
-            set {
-                this["immediate_messages_block_other_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool enable_delayed_messages_on_hardparts {
             get {
                 return ((bool)(this["enable_delayed_messages_on_hardparts"]));
@@ -3356,6 +3320,78 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["iracing_enable_auto_fuel_to_end_of_race"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool priortise_messages_depending_on_situation {
+            get {
+                return ((bool)(this["priortise_messages_depending_on_situation"]));
+            }
+            set {
+                this["priortise_messages_depending_on_situation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SPOTTER_MESSAGES")]
+        public string interrupt_setting_listprop {
+            get {
+                return ((string)(this["interrupt_setting_listprop"]));
+            }
+            set {
+                this["interrupt_setting_listprop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("NEVER")]
+        public string tts_setting_listprop {
+            get {
+                return ((string)(this["tts_setting_listprop"]));
+            }
+            set {
+                this["tts_setting_listprop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool use_trigger_word_for_always_on_sre {
+            get {
+                return ((bool)(this["use_trigger_word_for_always_on_sre"]));
+            }
+            set {
+                this["use_trigger_word_for_always_on_sre"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Chief")]
+        public string trigger_word_for_always_on_sre {
+            get {
+                return ((string)(this["trigger_word_for_always_on_sre"]));
+            }
+            set {
+                this["trigger_word_for_always_on_sre"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public float trigger_word_sre_min_confidence {
+            get {
+                return ((float)(this["trigger_word_sre_min_confidence"]));
+            }
+            set {
+                this["trigger_word_sre_min_confidence"] = value;
             }
         }
     }

@@ -241,7 +241,7 @@ namespace CrewChiefV4.Events
                             if (opponentIdentifier != null)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
-                                    folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this));
+                                    folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this), 5);
                             }
                         }
 
@@ -272,7 +272,7 @@ namespace CrewChiefV4.Events
                                     (currentGameState.SessionData.SessionType != SessionType.Race && frequencyOfOpponentPracticeAndQualLapTimes > 0))
                                 {
                                     audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
-                                                TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                                TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 3);
                                 }
                             }
                             else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -288,7 +288,7 @@ namespace CrewChiefV4.Events
                                     // he's leading, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                     audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
-                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 3);
                                 }
                                 else if (currentGameState.SessionData.ClassPosition > 1 && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition - 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
@@ -296,7 +296,7 @@ namespace CrewChiefV4.Events
                                     // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                     audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
-                                           TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                           TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 0);
                                 }
                                 else if (!currentGameState.isLast() && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition + 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
@@ -304,7 +304,7 @@ namespace CrewChiefV4.Events
                                     // he's behind us, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
                                     audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
-                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this));
+                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 0);
                                 }
                             }
                         }
@@ -336,7 +336,7 @@ namespace CrewChiefV4.Events
                             }
                             if (AudioPlayer.canReadName(retiredDriver))
                             {
-                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(retiredDriver), folderHasJustRetired), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(retiredDriver), folderHasJustRetired), 0, this), 0);
                             }
                         }
                     }
@@ -347,7 +347,7 @@ namespace CrewChiefV4.Events
                             announcedRetirementsAndDQs.Add(dqDriver);
                             if (AudioPlayer.canReadName(dqDriver))
                             {
-                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(dqDriver), folderHasJustBeenDisqualified), 0, this));
+                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(dqDriver), folderHasJustBeenDisqualified), 0, this), 0);
                             }
                         }
                     }
@@ -371,7 +371,7 @@ namespace CrewChiefV4.Events
                                         Console.WriteLine("New car ahead: " + opponentName);
                                         audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
                                             Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
-                                            new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }));
+                                            new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }), 7);
                                         nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                                         onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
                                         lastNextCarAheadOpponentName = opponentName;
@@ -391,7 +391,7 @@ namespace CrewChiefV4.Events
                                 {
                                     Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
                                     audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
-                                        new Dictionary<string, object> { { validationNewLeaderKey, name } }));
+                                        new Dictionary<string, object> { { validationNewLeaderKey, name } }), 3);
                                     nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
                                     lastLeaderAnnounced = name;
                                 }
@@ -407,7 +407,7 @@ namespace CrewChiefV4.Events
                     !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
-                        folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this));
+                        folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this), 3);
                     announcedPitters.Add(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName);
                 }
 
@@ -416,7 +416,7 @@ namespace CrewChiefV4.Events
                     !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
-                        folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this));
+                        folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this), 3);
                     announcedPitters.Add(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName);
                 }
 
@@ -425,7 +425,7 @@ namespace CrewChiefV4.Events
                     !Strategy.opponentsWhoWillExitCloseBehind.Contains(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName))
                 {
                     audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
-                        folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this));
+                        folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this), 3);
                     announcedPitters.Add(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName);
                 }
                 if (Strategy.opponentFrontToWatchForPitting != null && !announcedPitters.Contains(Strategy.opponentFrontToWatchForPitting))
@@ -437,7 +437,7 @@ namespace CrewChiefV4.Events
                             if (entry.Value.InPits)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
-                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this));
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this), 3);
                                 Strategy.opponentFrontToWatchForPitting = null;
                                 break;
                             }
@@ -453,7 +453,7 @@ namespace CrewChiefV4.Events
                             if (entry.Value.InPits)
                             {
                                 audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
-                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this));
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this), 3);
                                 Strategy.opponentBehindToWatchForPitting = null;
                                 break;
                             }
@@ -846,7 +846,7 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
                                     Position.folderStub + opponent.ClassPosition), 0, null);
@@ -871,7 +871,7 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
                                     Position.folderStub + opponent.ClassPosition), 0, null);
@@ -905,7 +905,7 @@ namespace CrewChiefV4.Events
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }
@@ -937,7 +937,7 @@ namespace CrewChiefV4.Events
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }
@@ -961,7 +961,7 @@ namespace CrewChiefV4.Events
                     if (opponent != null)
                     {
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                         }
@@ -992,7 +992,7 @@ namespace CrewChiefV4.Events
                         else if (currentGameState.OpponentData.TryGetValue(opponentKey, out opponent))
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }

@@ -151,7 +151,7 @@ namespace CrewChiefV4.Events
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
                                 (folderAirAndTrackTempIncreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this));
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
                             reportedCombinedTemps = true;
                         }
                         else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport && currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
@@ -163,7 +163,7 @@ namespace CrewChiefV4.Events
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
                                 (folderAirAndTrackTempDecreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this));
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
                             reportedCombinedTemps = true;
                         }
                     }
@@ -175,7 +175,7 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airTemp", MessageContents
-                                (folderAirTempIncreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
+                                (folderAirTempIncreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this), 0);
                         }
                         else if (currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
                         {
@@ -183,7 +183,7 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("airTemp", MessageContents
-                                (folderAirTempDecreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this));
+                                (folderAirTempDecreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this), 0);
                         }
                     }
                     if (!reportedCombinedTemps && canReportTrackChange)
@@ -194,7 +194,7 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempIncreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this));
+                                (folderTrackTempIncreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
                         }
                         else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport)
                         {
@@ -202,7 +202,7 @@ namespace CrewChiefV4.Events
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
                             audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempDecreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this));
+                                (folderTrackTempDecreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
                         }
                     }
                     //pcars2 test warning
@@ -242,7 +242,7 @@ namespace CrewChiefV4.Events
                                     }
                                     if (minutes > 1)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this), 5);
                                     }
                                 }
                             }
@@ -263,13 +263,13 @@ namespace CrewChiefV4.Events
                             {
                                 rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
-                                audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 2);
                             }
                             else if (currentConditions.RainDensity == 1 && rainAtLastReport == 0)
                             {
                                 rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
-                                audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this), 5);
                             }
                         }
                         else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
@@ -282,22 +282,22 @@ namespace CrewChiefV4.Events
                                 switch (currentRainLevel)
                                 {
                                     case RainLevel.DRIZZLE:
-                                        audioPlayer.playMessage(new QueuedMessage(folderDrizzleIncreasing, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderDrizzleIncreasing, 0, this), 3);
                                         break;
                                     case RainLevel.LIGHT:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, this), 3);
                                         break;
                                     case RainLevel.MID:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, this), 3);
                                         break;
                                     case RainLevel.HEAVY:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, this), 3);
                                         break;
                                     case RainLevel.STORM:
-                                        audioPlayer.playMessage(new QueuedMessage(folderRainMax, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderRainMax, 0, this), 3);
                                         break;
                                     case RainLevel.NONE:
-                                        audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 3);
                                         break;
                                 }
                                 lastRainReport = currentGameState.Now;

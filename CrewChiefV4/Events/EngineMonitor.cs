@@ -91,13 +91,13 @@ namespace CrewChiefV4.Events
                     // don't check oil or fuel pressure if we're stalled
                     if (currentGameState.EngineData.EngineOilPressureWarning && currentGameState.Now > nextOilPressureCheck)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this), 10);
                         // don't re-check oil pressure for a couple of minutes
                         nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     }
                     if (currentGameState.EngineData.EngineFuelPressureWarning && currentGameState.Now > nextFuelPressureCheck)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this), 10);
                         // don't re-check fuel pressure for a couple of minutes
                         nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     }
@@ -119,12 +119,12 @@ namespace CrewChiefV4.Events
                         if (currentEngineStatus.HasFlag(EngineStatus.ALL_CLEAR))
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this), 5);
                         }
                         else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL) && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this), 10);
                         }
                         if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                         {
@@ -132,7 +132,7 @@ namespace CrewChiefV4.Events
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                             {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this), 10);
                             }
                         }
                         if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
@@ -141,7 +141,7 @@ namespace CrewChiefV4.Events
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                             {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this));
+                                audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this), 10);
                             }
                         }
                     }

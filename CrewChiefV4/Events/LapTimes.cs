@@ -264,6 +264,7 @@ namespace CrewChiefV4.Events
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)
             {
+                Console.WriteLine("Laptime " + currentGameState.SessionData.LapTimePrevious.ToString("0.000") + " valid = " + currentGameState.SessionData.PreviousLapWasValid);
                 if (currentGameState.SessionData.TrackDefinition != null)
                 {
                     switch (currentGameState.SessionData.TrackDefinition.trackLengthClass)
@@ -406,7 +407,7 @@ namespace CrewChiefV4.Events
                             {
                                 // If requested, always play the laptime in hotlap/lone practice mode
                                 audioPlayer.playMessage(new QueuedMessage("laptime",
-                                        MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LapTimePrevious, Precision.AUTO_LAPTIMES)), 0, this));
+                                        MessageContents(folderLapTimeIntro, TimeSpanWrapper.FromSeconds(currentGameState.SessionData.LapTimePrevious, Precision.AUTO_LAPTIMES)), 0, this), 10);
                                 playedLapTime = true;
                             }
                             else if (((currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice) && frequencyOfPlayerQualAndPracLapTimeReports > Utilities.random.NextDouble() * 10)
@@ -419,7 +420,7 @@ namespace CrewChiefV4.Events
                                 {
                                     gapFillerLapTime.maxPermittedQueueLengthForMessage = maxQueueLengthForRaceLapTimeReports;
                                 }
-                                audioPlayer.playMessage(gapFillerLapTime);
+                                audioPlayer.playMessage(gapFillerLapTime, 0);
                                 playedLapTime = true;
                             }
 
@@ -434,17 +435,17 @@ namespace CrewChiefV4.Events
                                         (isHotLappingOrLonePractice ? lastLapRating == LastLapRating.BEST_OVERALL : lastLapRating == LastLapRating.BEST_IN_CLASS 
                                             || deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), 3);
                                     }
                                     else if (deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage((isHotLappingOrLonePractice ? folderSelfLessThanATenthOffThePace : folderLessThanATenthOffThePace), 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage((isHotLappingOrLonePractice ? folderSelfLessThanATenthOffThePace : folderLessThanATenthOffThePace), 0, this), 3);
                                     }
                                     else if (deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
                                             MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS),
-                                            isHotLappingOrLonePractice ? folderSelfGapOutroOffPace : folderGapOutroOffPace), 0, this));
+                                            isHotLappingOrLonePractice ? folderSelfGapOutroOffPace : folderGapOutroOffPace), 0, this), 3);
                                     }
                                     if (!GlobalBehaviourSettings.useOvalLogic &&
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
@@ -453,7 +454,7 @@ namespace CrewChiefV4.Events
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, isHotLappingOrLonePractice /*selfPace*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("sectorsHotLap", sectorMessageFragments, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage("sectorsHotLap", sectorMessageFragments, 0, this), 3);
                                             sectorsReportedForLap = true;
                                         }
                                     }
@@ -468,17 +469,17 @@ namespace CrewChiefV4.Events
                                         newGapToSecond = true;
                                         if (currentGameState.SessionData.SessionType == SessionType.Qualify)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage(Position.folderPole, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage(Position.folderPole, 0, this), 10);
                                         }
                                         else if (currentGameState.SessionData.SessionType == SessionType.Practice)
                                         {
                                             if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                                             {
-                                                audioPlayer.playMessage(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), 0, this));
+                                                audioPlayer.playMessage(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), 0, this), 5);
                                             }
                                             else
                                             {
-                                                audioPlayer.playMessage(new QueuedMessage(Position.folderStub + 1, 0, this));
+                                                audioPlayer.playMessage(new QueuedMessage(Position.folderStub + 1, 0, this), 5);
                                             }
                                         }
                                     }
@@ -501,7 +502,7 @@ namespace CrewChiefV4.Events
                                         {
                                             // delay this a bit...
                                             audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                                MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), Utilities.random.Next(0, 8), this));
+                                                MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), Utilities.random.Next(0, 8), this), 5);
                                         }
                                     }
                                 }
@@ -511,7 +512,7 @@ namespace CrewChiefV4.Events
                                         (lastLapRating == LastLapRating.PERSONAL_BEST_STILL_SLOW || lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER ||
                                          lastLapRating == LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER))
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), 7);
                                     }
                                     // don't read this message if the rounded time gap is 0.0 seconds or it's more than 59 seconds
                                     // only play qual / prac deltas for Raceroom as the PCars data is inaccurate for sessions joined part way through
@@ -525,7 +526,7 @@ namespace CrewChiefV4.Events
                                     {
                                         // delay this a bit...
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
-                                            MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), Utilities.random.Next(0, 8), this));
+                                            MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace), Utilities.random.Next(0, 8), this), 5);
                                     }
                                     if (!GlobalBehaviourSettings.useOvalLogic && 
                                         practiceAndQualSectorReportsLapEnd && frequencyOfPracticeAndQualSectorDeltaReports > Utilities.random.NextDouble() * 10)
@@ -534,7 +535,7 @@ namespace CrewChiefV4.Events
                                             currentGameState.SessionData.LastSector2Time, lapAndSectorsComparisonData[2], currentGameState.SessionData.LastSector3Time, lapAndSectorsComparisonData[3], true, false /*selfPace*/);
                                         if (sectorMessageFragments.Count > 0)
                                         {
-                                            audioPlayer.playMessage(new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this));
+                                            audioPlayer.playMessage(new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this), 5);
                                             sectorsReportedForLap = true;
                                         }
                                     }
@@ -550,32 +551,32 @@ namespace CrewChiefV4.Events
                                     {
                                         case LastLapRating.BEST_OVERALL:
                                             playedLapMessage = true;
-                                            audioPlayer.playMessage(new QueuedMessage(folderBestLapInRace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood);
+                                            audioPlayer.playMessage(new QueuedMessage(folderBestLapInRace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood, 3);
                                             break;
                                         case LastLapRating.BEST_IN_CLASS:
                                             playedLapMessage = true;
-                                            audioPlayer.playMessage(new QueuedMessage(folderBestLapInRaceForClass, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood);
+                                            audioPlayer.playMessage(new QueuedMessage(folderBestLapInRaceForClass, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood, 3);
                                             break;
                                         case LastLapRating.SETTING_CURRENT_PACE:
                                             playedLapMessage = true;
-                                            audioPlayer.playMessage(new QueuedMessage(folderSettingCurrentRacePace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood);
+                                            audioPlayer.playMessage(new QueuedMessage(folderSettingCurrentRacePace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood, 3);
                                             break;
                                         case LastLapRating.CLOSE_TO_CURRENT_PACE:
                                             // don't keep playing this one
                                             if (Utilities.random.NextDouble() < 0.5)
                                             {
                                                 playedLapMessage = true;
-                                                audioPlayer.playMessage(new QueuedMessage(folderMatchingCurrentRacePace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood);
+                                                audioPlayer.playMessage(new QueuedMessage(folderMatchingCurrentRacePace, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood, 0);
                                             }
                                             break;
                                         case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
                                         case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
                                             playedLapMessage = true;
-                                            audioPlayer.playMessage(new QueuedMessage(folderGoodLap, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood);
+                                            audioPlayer.playMessage(new QueuedMessage(folderGoodLap, 0, this), PearlsOfWisdom.PearlType.GOOD, pearlLikelihood, 0);
                                             break;
                                         case LastLapRating.PERSONAL_BEST_STILL_SLOW:
                                             playedLapMessage = true;
-                                            audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, pearlLikelihood);
+                                            audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, pearlLikelihood, 0);
                                             break;
                                         case LastLapRating.CLOSE_TO_OVERALL_LEADER:
                                         case LastLapRating.CLOSE_TO_CLASS_LEADER:
@@ -583,7 +584,7 @@ namespace CrewChiefV4.Events
                                             if (Utilities.random.NextDouble() < 0.2)
                                             {
                                                 playedLapMessage = true;
-                                                audioPlayer.playMessage(new QueuedMessage(folderGoodLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, pearlLikelihood);
+                                                audioPlayer.playMessage(new QueuedMessage(folderGoodLap, 0, this), PearlsOfWisdom.PearlType.NEUTRAL, pearlLikelihood, 0);
                                             }
                                             break;
                                         default:
@@ -613,7 +614,7 @@ namespace CrewChiefV4.Events
                                     {
                                         QueuedMessage message = new QueuedMessage("sectorDeltas", sectorMessageFragments, 0, this);
                                         message.maxPermittedQueueLengthForMessage = maxQueueLengthForRaceSectorDeltaReports;
-                                        audioPlayer.playMessage(message);
+                                        audioPlayer.playMessage(message, 0);
                                         sectorsReportedForLap = true;
                                     }
                                 }
@@ -628,12 +629,12 @@ namespace CrewChiefV4.Events
                                     if (consistency == ConsistencyResult.CONSISTENT)
                                     {
                                         lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                        audioPlayer.playMessage(new QueuedMessage(folderConsistentTimes, Utilities.random.Next(0, 8), this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderConsistentTimes, Utilities.random.Next(0, 8), this), 0);
                                     }
                                     else if (consistency == ConsistencyResult.IMPROVING)
                                     {
                                         lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
-                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, Utilities.random.Next(0, 8), this));
+                                        audioPlayer.playMessage(new QueuedMessage(folderImprovingTimes, Utilities.random.Next(0, 8), this), 5);
                                     }
                                     else if (consistency == ConsistencyResult.WORSENING)
                                     {
@@ -648,7 +649,7 @@ namespace CrewChiefV4.Events
                                             // only complain about worsening laptimes if we've not overtaken anyone on this lap
                                             lastConsistencyUpdate = currentGameState.SessionData.CompletedLaps;
 
-                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, Utilities.random.Next(0, 8), this, new Dictionary<String, Object>()));
+                                            audioPlayer.playMessage(new QueuedMessage(folderWorseningTimes, Utilities.random.Next(0, 8), this, new Dictionary<String, Object>()), 3);
                                         }
                                     }
                                 }
@@ -696,7 +697,7 @@ namespace CrewChiefV4.Events
                         if (!GlobalBehaviourSettings.useOvalLogic && 
                             messageFragments.Count() > 0)
                         {
-                            audioPlayer.playMessage(new QueuedMessage("singleSectorDelta", messageFragments, Utilities.random.Next(2, 4), this));
+                            audioPlayer.playMessage(new QueuedMessage("singleSectorDelta", messageFragments, Utilities.random.Next(2, 4), this), 5);
                         }
                     }
                 }
@@ -805,6 +806,11 @@ namespace CrewChiefV4.Events
 
         private LastLapRating getLastLapRating(GameStateData currentGameState, float[] bestLapComparisonData, Boolean selfPace)
         {
+            // if we've only completed a couple of laps, make this 'no data'
+            if (currentGameState.SessionData.CompletedLaps < 3)
+            {
+                return LastLapRating.NO_DATA;
+            }
             if (currentGameState.SessionData.PreviousLapWasValid && currentGameState.SessionData.LapTimePrevious > 0)
             {
                 float closeThreshold = currentGameState.SessionData.LapTimePrevious * goodLapPercent / 100;
@@ -1156,7 +1162,7 @@ namespace CrewChiefV4.Events
                             if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
                             {
                                 // delay this a bit...
-                                audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
+                                audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap",
                                     MessageContents(folderGapIntro, new TimeSpanWrapper(gapBehind, Precision.AUTO_GAPS), folderQuickerThanSecondPlace), 0, this));
                             }
                         }

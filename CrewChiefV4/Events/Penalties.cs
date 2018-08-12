@@ -160,9 +160,9 @@ namespace CrewChiefV4.Events
                 {
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     // this is a new penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderNewPenaltyDriveThrough, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderNewPenaltyDriveThrough, 0, this), 10);
                     // queue a '3 laps to serve penalty' message - this might not get played
-                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this), 10);
                     // we don't already have a penalty
                     if (penaltyLap == -1 || !hasOutstandingPenalty)
                     {
@@ -180,9 +180,9 @@ namespace CrewChiefV4.Events
                 {
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     // this is a new penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderNewPenaltyStopGo, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderNewPenaltyStopGo, 0, this), 10);
                     // queue a '3 laps to serve penalty' message - this might not get played
-                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, 20, this), 10);
                     // we don't already have a penalty
                     if (penaltyLap == -1 || !hasOutstandingPenalty)
                     {
@@ -200,7 +200,7 @@ namespace CrewChiefV4.Events
                     (currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasDriveThrough))
                 {
                     // we've exited the pits but there's still an outstanding penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderPenaltyNotServed, 3, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPenaltyNotServed, 3, this), 10);
                     playedNotServedPenalty = true;
                 } 
                 else if (currentGameState.SessionData.IsNewLap && (currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasDriveThrough))
@@ -213,40 +213,40 @@ namespace CrewChiefV4.Events
                         // run out of laps, and not in the pitlane
                         if (!audioPlayer.playRant("disqualified_rant", MessageContents(folderDisqualified)))
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderDisqualified, 5, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderDisqualified, 5, this), 10);
                         }
                     }
                     else if (lapsCompleted - penaltyLap == 2 && currentGameState.PenaltiesData.HasDriveThrough)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderOneLapToServeDriveThrough, pitstopDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderOneLapToServeDriveThrough, pitstopDelay, this), 10);
                     }
                     else if (lapsCompleted - penaltyLap == 2 && currentGameState.PenaltiesData.HasStopAndGo)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderOneLapToServeStopGo, pitstopDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderOneLapToServeStopGo, pitstopDelay, this), 10);
                     }
                     else if (lapsCompleted - penaltyLap == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this), 10);
                     }
                 }
                 else if (!playedPitNow && currentGameState.SessionData.SectorNumber == 3 && currentGameState.PenaltiesData.HasStopAndGo && lapsCompleted - penaltyLap == 2)
                 {
                     playedPitNow = true;
-                    audioPlayer.playMessage(new QueuedMessage(folderPitNowStopGo, 6, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPitNowStopGo, 6, this), 10);
                 }
                 else if (!playedPitNow && currentGameState.SessionData.SectorNumber == 3 && currentGameState.PenaltiesData.HasDriveThrough && lapsCompleted - penaltyLap == 2)
                 {
                     playedPitNow = true;
-                    audioPlayer.playMessage(new QueuedMessage(folderPitNowDriveThrough, 6, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPitNowDriveThrough, 6, this), 10);
                 }
                 else if (!playedTimePenaltyMessage && currentGameState.PenaltiesData.HasTimeDeduction)
                 {
                     playedTimePenaltyMessage = true;
-                    audioPlayer.playMessage(new QueuedMessage(folderTimePenalty, 0, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderTimePenalty, 0, this), 10);
                 }
             }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && 
-                !(currentGameState.SessionData.CompletedLaps == 0 && currentGameState.PitData.OnOutLap) &&
+                !currentGameState.PitData.OnOutLap &&
                 currentGameState.PenaltiesData.CutTrackWarnings > cutTrackWarningsCount &&
                 currentGameState.PenaltiesData.NumPenalties == previousGameState.PenaltiesData.NumPenalties)  // Make sure we've no new penalty for this cut.
             {
@@ -260,7 +260,7 @@ namespace CrewChiefV4.Events
                     {
                         if (currentGameState.SessionData.SessionType == SessionType.Race)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderCutTrackInRace, 2, this));
+                            audioPlayer.playMessage(new QueuedMessage(folderCutTrackInRace, 2, this), 3);
                         }
                         else if (!playedTrackCutWarningInPracticeOrQualOnThisLap)
                         {
@@ -269,11 +269,11 @@ namespace CrewChiefV4.Events
                                 && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
                                 && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
+                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this), 10);
                             }
                             else
                             {
-                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                                audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this), 10);
                             }
                             playedTrackCutWarningInPracticeOrQualOnThisLap = true;
                         }
@@ -282,8 +282,8 @@ namespace CrewChiefV4.Events
                 }
             }
             else if (currentGameState.PositionAndMotionData.CarSpeed > 1 && playCutTrackWarnings && currentGameState.SessionData.SessionType != SessionType.Race &&
-              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid && 
-                CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && !(currentGameState.SessionData.CompletedLaps == 0 && currentGameState.PitData.OnOutLap))
+              !currentGameState.SessionData.CurrentLapIsValid && previousGameState != null && previousGameState.SessionData.CurrentLapIsValid &&
+                CrewChief.gameDefinition.gameEnum != GameEnum.IRACING && !currentGameState.PitData.OnOutLap)
             {
                 // JB: don't think we need this block - the previous block should always trigger in preference to this, but we'll leave it here just in case
                 cutTrackWarningsCount = currentGameState.PenaltiesData.CutTrackWarnings;
@@ -297,11 +297,11 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance != -1.0f
                         && currentGameState.PositionAndMotionData.DistanceRoundTrack > currentGameState.SessionData.TrackDefinition.raceroomRollingStartLapDistance)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this));
+                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQualNextLapInvalid, 2, this), 10);
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this));
+                        audioPlayer.playMessage(new QueuedMessage(Utilities.random.NextDouble() < 0.3 ? folderLapDeleted : folderCutTrackPracticeOrQual, 2, this), 10);
                     }
                     clearPenaltyState();
                 }
@@ -316,9 +316,9 @@ namespace CrewChiefV4.Events
                 {
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     // this is a new penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, Utilities.random.Next(3, 7), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderYouHavePenalty, Utilities.random.Next(3, 7), this), 10);
                     // queue a '3 laps to serve penalty' message - this might not get played
-                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, Utilities.random.Next(10, 20), this));
+                    audioPlayer.playMessage(new QueuedMessage(folderThreeLapsToServe, Utilities.random.Next(10, 20), this), 10);
                     // we don't already have a penalty
                     if (penaltyLap == -1 || !hasOutstandingPenalty)
                     {
@@ -331,7 +331,7 @@ namespace CrewChiefV4.Events
                     currentGameState.PenaltiesData.NumPenalties > 0)
                 {
                     // we've exited the pits but there's still an outstanding penalty
-                    audioPlayer.playMessage(new QueuedMessage(folderPenaltyNotServed, 3, this));
+                    audioPlayer.playMessage(new QueuedMessage(folderPenaltyNotServed, 3, this), 10);
                     playedNotServedPenalty = true;
                 }
                 else if (currentGameState.SessionData.IsNewLap && currentGameState.PenaltiesData.NumPenalties > 0)
@@ -342,18 +342,18 @@ namespace CrewChiefV4.Events
                     if (lapsCompleted - penaltyLap >= 2 && !currentGameState.PitData.InPitlane)
                     {
                         // run out of laps, an not in the pitlane
-                        audioPlayer.playMessage(new QueuedMessage(folderYouStillHavePenalty, 5, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderYouStillHavePenalty, 5, this), 10);
                     }
                     else if (lapsCompleted - penaltyLap == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this));
+                        audioPlayer.playMessage(new QueuedMessage(folderTwoLapsToServe, pitstopDelay, this), 10);
                     }
                 }
             }
             else if (currentGameState.PenaltiesData.PossibleTrackLimitsViolation && playCutTrackWarnings && !warnedOfPossibleTrackLimitsViolationOnThisLap)
             {
                 warnedOfPossibleTrackLimitsViolationOnThisLap = true;
-                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 2 + Utilities.random.Next(3), this));
+                audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 2 + Utilities.random.Next(3), this), 0);
             }
             else
             {
@@ -366,7 +366,7 @@ namespace CrewChiefV4.Events
                 (previousGameState.PenaltiesData.NumPenalties > currentGameState.PenaltiesData.NumPenalties &&
                 (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT))))
             {
-                audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this));
+                audioPlayer.playMessage(new QueuedMessage(folderPenaltyServed, 0, this), 10);
             }            
         }
 

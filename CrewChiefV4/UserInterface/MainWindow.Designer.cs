@@ -89,6 +89,8 @@ namespace CrewChiefV4
             this.backgroundAudioDeviceLabel = new System.Windows.Forms.Label();
             this.spotterNameBox = new System.Windows.Forms.ComboBox();
             this.donateLink = new System.Windows.Forms.LinkLabel();
+            this.smokeTestTextBox = new System.Windows.Forms.TextBox();
+            this.buttonSmokeTest = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
@@ -547,6 +549,28 @@ namespace CrewChiefV4
             this.backgroundAudioDeviceBox.Visible = false;
             this.backgroundAudioDeviceBox.Enabled = false;
             // the handler for this is added when we initialise
+            // 
+            // consoleTextBox
+            // 
+            this.smokeTestTextBox.Location = new System.Drawing.Point(847, 215);
+            this.smokeTestTextBox.MaxLength = 99999999;
+            this.smokeTestTextBox.Multiline = true;
+            this.smokeTestTextBox.Name = "smokeTestTextBox";
+            this.smokeTestTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.smokeTestTextBox.Size = new System.Drawing.Size(283, 270);
+            this.smokeTestTextBox.TabIndex = 502;
+            this.smokeTestTextBox.Visible = false;
+            // 
+            // buttonSmokeTest
+            // 
+            this.buttonSmokeTest.Location = new System.Drawing.Point(847, 485);
+            this.buttonSmokeTest.Name = "buttonSmokeTest";
+            this.buttonSmokeTest.Size = new System.Drawing.Size(283, 23);
+            this.buttonSmokeTest.TabIndex = 501;
+            this.buttonSmokeTest.Text = "Test Sounds";
+            this.buttonSmokeTest.UseVisualStyleBackColor = true;
+            this.buttonSmokeTest.Click += new System.EventHandler(this.playSmokeTestSounds);
+            this.buttonSmokeTest.Visible = false;
 
             // 
             // MainWindow
@@ -599,6 +623,8 @@ namespace CrewChiefV4
             this.Controls.Add(this.speechRecognitionDeviceLabel);
             this.Controls.Add(this.backgroundAudioDeviceLabel);
             this.Controls.Add(this.donateLink);
+            this.Controls.Add(this.buttonSmokeTest);
+            this.Controls.Add(this.smokeTestTextBox);
             this.Name = "MainWindow";
             this.Text = "Crew Chief V4";
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -663,5 +689,8 @@ namespace CrewChiefV4
         private System.Windows.Forms.Label backgroundAudioDeviceLabel;
         private System.Windows.Forms.ComboBox spotterNameBox;
         private System.Windows.Forms.LinkLabel donateLink;
+        private System.Windows.Forms.TextBox smokeTestTextBox;
+        private System.Windows.Forms.Button buttonSmokeTest;
+        
     }
 }

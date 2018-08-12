@@ -1101,20 +1101,19 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewSession)
             {
                 Console.WriteLine("New session, trigger data:");
-                Console.WriteLine("EventIndex " + currentGameState.SessionData.EventIndex);
-                Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
-                Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
-                Console.WriteLine("SessionIteration " + currentGameState.SessionData.SessionIteration);
-                Console.WriteLine("HasMandatoryPitStop " + currentGameState.PitData.HasMandatoryPitStop);
-                Console.WriteLine("PitWindowStart " + currentGameState.PitData.PitWindowStart);
-                Console.WriteLine("PitWindowEnd " + currentGameState.PitData.PitWindowEnd);
-                Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
-                Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
-                Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
-                Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
-                Console.WriteLine("TrackName " + currentGameState.SessionData.TrackDefinition.name);
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() +
-                    " at position " + currentGameState.SessionData.OverallPosition.ToString());
+                Console.WriteLine("EventIndex: " + currentGameState.SessionData.EventIndex);
+                Console.WriteLine("SessionType: " + currentGameState.SessionData.SessionType);
+                Console.WriteLine("SessionPhase: " + currentGameState.SessionData.SessionPhase);
+                Console.WriteLine("SessionIteration: " + currentGameState.SessionData.SessionIteration);
+                Console.WriteLine("HasMandatoryPitStop: " + currentGameState.PitData.HasMandatoryPitStop);
+                Console.WriteLine("PitWindowStart: " + currentGameState.PitData.PitWindowStart);
+                Console.WriteLine("PitWindowEnd: " + currentGameState.PitData.PitWindowEnd);
+                Console.WriteLine("NumCarsAtStartOfSession: " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
+                Console.WriteLine("SessionNumberOfLaps: " + currentGameState.SessionData.SessionNumberOfLaps);
+                Console.WriteLine("SessionRunTime: " + currentGameState.SessionData.SessionTotalRunTime);
+                Console.WriteLine("SessionStartTime: " + currentGameState.SessionData.SessionStartTime);
+                Console.WriteLine("Player is using car class: \"" + currentGameState.carClass.getClassIdentifier() +
+                    "\" at position: " + currentGameState.SessionData.OverallPosition.ToString());
                 Utilities.TraceEventClass(currentGameState);
             }
             if (previousGameState != null && previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)

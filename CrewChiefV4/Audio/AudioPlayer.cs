@@ -26,10 +26,11 @@ namespace CrewChiefV4.Audio
         public Boolean mute = false;
 
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
-        // prefer to drop messages or use generic terms instead of TTS names
-        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
 
         public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayed_messages_on_hardparts");
+
+        public enum TTS_OPTION { NEVER, ONLY_WHEN_NECESSARY, ANY_TIME }
+        public static TTS_OPTION ttsOption = TTS_OPTION.ONLY_WHEN_NECESSARY;
 
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
@@ -134,6 +135,8 @@ namespace CrewChiefV4.Audio
 
         static AudioPlayer()
         {
+            Enum.TryParse(UserSettings.GetUserSettings().getString("tts_setting_listprop"), out ttsOption);
+            Debug.Assert(Enum.IsDefined(typeof(TTS_OPTION), ttsOption));
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
                 playbackDevices.Clear();
@@ -496,6 +499,7 @@ namespace CrewChiefV4.Audio
                         {
                             Boolean doHardPartsCheck = delayMessagesInHardParts &&
                                 CrewChief.currentGameState != null &&
+                                CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
                                 (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
                                 !GameStateData.onManualFormationLap;
                             if (!doHardPartsCheck ||
@@ -972,12 +976,12 @@ namespace CrewChiefV4.Audio
 
         public int purgeQueues()
         {
-            return purgeQueue(queuedClips) + purgeQueue(immediateClips);
+            return purgeQueue(queuedClips, false) + purgeQueue(immediateClips, true);
         }
 
-        private int purgeQueue(OrderedDictionary queue)
+        private int purgeQueue(OrderedDictionary queue, bool isImmediateQueue)
         {
-            Console.WriteLine("Purging queue");
+            Console.WriteLine("Purging " + (isImmediateQueue ? "immediate" : "regular") + " queue" );
             int purged = 0;
             lock (queue)
             {
@@ -1007,7 +1011,7 @@ namespace CrewChiefV4.Audio
             return channelOpen;
         }
 
-        public void playMessage(QueuedMessage queuedMessage)
+        public void playMessage(QueuedMessage queuedMessage, int priority = SoundMetadata.DEFAULT_PRIORITY)
         {
             if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.NONE))
             {
@@ -1015,7 +1019,7 @@ namespace CrewChiefV4.Audio
             } 
             else
             {
-                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
+                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0, priority);
             }
         }
 
@@ -1184,8 +1188,7 @@ namespace CrewChiefV4.Audio
             return index;
         }
 
-
-        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
+        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability, int priority = SoundMetadata.DEFAULT_PRIORITY)
         {
             if (queuedMessage.canBePlayed)
             {
@@ -1199,30 +1202,34 @@ namespace CrewChiefV4.Audio
                     else
                     {
                         // default 'regular' message priority is 0, which is lowest
-                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, 0);
-                        PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
-                        if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
+                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, priority);
+                        DateTime now = CrewChief.currentGameState == null ? DateTime.Now : CrewChief.currentGameState.Now;
+                        if (PlaybackModerator.MessageCanBeQueued(queuedMessage, queuedClips.Count, now))
                         {
-                            pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
-                        }
+                            PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;
+                            if (pearlType != PearlsOfWisdom.PearlType.NONE && checkPearlOfWisdomValid(pearlType))
+                            {
+                                pearlPosition = pearlsOfWisdom.getMessagePosition(pearlMessageProbability);
+                            }
 
-                        int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
-                        if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
-                        {
-                            QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
-                            pearlQueuedMessage.metadata = queuedMessage.metadata;
-                            pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
-                            insertionIndex++;
-                        }
-                        queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
-                        if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
-                        {
-                            QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
-                            pearlQueuedMessage.dueTime = queuedMessage.dueTime;
-                            pearlQueuedMessage.metadata = queuedMessage.metadata;
-                            insertionIndex++;
-                            queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            int insertionIndex = getInsertionIndex(queuedClips, queuedMessage);
+                            if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.BEFORE)
+                            {
+                                QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                                pearlQueuedMessage.metadata = queuedMessage.metadata;
+                                pearlQueuedMessage.dueTime = queuedMessage.dueTime;
+                                queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                                insertionIndex++;
+                            }
+                            queuedClips.Insert(insertionIndex, queuedMessage.messageName, queuedMessage);
+                            if (pearlPosition == PearlsOfWisdom.PearlMessagePosition.AFTER)
+                            {
+                                QueuedMessage pearlQueuedMessage = new QueuedMessage(queuedMessage.abstractEvent);
+                                pearlQueuedMessage.dueTime = queuedMessage.dueTime;
+                                pearlQueuedMessage.metadata = queuedMessage.metadata;
+                                insertionIndex++;
+                                queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
+                            }
                         }
                     }
                 }
@@ -1348,7 +1355,7 @@ namespace CrewChiefV4.Audio
             Debug.Assert(!string.IsNullOrWhiteSpace(rawName), "rawName should never be an empty string, this is a bug.");
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
-                ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+                ((SoundCache.hasSuitableTTSVoice && ttsOption != TTS_OPTION.NEVER) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
         }
 
         // defaultSoundType is only used if we've not already added metadata
