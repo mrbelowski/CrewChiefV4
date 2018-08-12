@@ -846,7 +846,7 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
                                     Position.folderStub + opponent.ClassPosition), 0, null);
@@ -871,7 +871,7 @@ namespace CrewChiefV4.Events
                     {
                         OpponentData opponent = currentGameState.OpponentData[opponentKey];
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
                                     Position.folderStub + opponent.ClassPosition), 0, null);
@@ -905,7 +905,7 @@ namespace CrewChiefV4.Events
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }
@@ -937,7 +937,7 @@ namespace CrewChiefV4.Events
                         if (opponent != null)
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }
@@ -961,7 +961,7 @@ namespace CrewChiefV4.Events
                     if (opponent != null)
                     {
                         QueuedMessage queuedMessage;
-                        if (SoundCache.useTTS)
+                        if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
                             queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                         }
@@ -992,7 +992,7 @@ namespace CrewChiefV4.Events
                         else if (currentGameState.OpponentData.TryGetValue(opponentKey, out opponent))
                         {
                             QueuedMessage queuedMessage;
-                            if (SoundCache.useTTS)
+                            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
                                 queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
                             }

@@ -29,6 +29,7 @@ namespace CrewChiefV4
         private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
         private float minimum_name_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_name_voice_recognition_confidence");
+        private float minimum_trigger_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("trigger_word_sre_min_confidence");
         private float minimum_voice_recognition_confidence = UserSettings.GetUserSettings().getFloat("minimum_voice_recognition_confidence");
         private Boolean disable_alternative_voice_commands = UserSettings.GetUserSettings().getBoolean("disable_alternative_voice_commands");
         private Boolean enable_iracing_pit_stop_commands = UserSettings.GetUserSettings().getBoolean("enable_iracing_pit_stop_commands");
@@ -227,6 +228,14 @@ namespace CrewChiefV4
         // guard against race condition between closing channel and sre_SpeechRecognised event completing
         public static Boolean keepRecognisingInHoldMode = false;
 
+        private SpeechRecognitionEngine triggerSre;
+        // if we're in 'always on' mode and we're not using nAudio, set up a trigger phrase - 
+        // you say "Chief" (or whatever) and the app will beep, indicating it's ready for speech input
+        private static Boolean useTriggerSre = false;
+
+        // This is the trigger phrase used to activate the 'full' SRE
+        private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
+
         static SpeechRecogniser () 
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
@@ -397,6 +406,10 @@ namespace CrewChiefV4
             {
                 minimum_voice_recognition_confidence = 0.5f;
             }
+            if (minimum_trigger_voice_recognition_confidence < 0 || minimum_trigger_voice_recognition_confidence > 1)
+            {
+                minimum_trigger_voice_recognition_confidence = 0.6f;
+            }
         }
 
         private Tuple<String, String> parseLocalePropertyValue(String value)
@@ -473,6 +486,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine(info.Culture.EnglishName + " - (" + info.Culture.Name + ")");
                 this.sre = new SpeechRecognitionEngine(info);
+                this.triggerSre = new SpeechRecognitionEngine(info);
                 return this.sre != null;
             }
             if (countryToUse == null)
@@ -519,7 +533,7 @@ namespace CrewChiefV4
                     " It can be downloaded from https://www.microsoft.com/en-us/download/details.aspx?id=27224");
                 
                 return false;
-            }            
+            }
         }
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
@@ -558,11 +572,11 @@ namespace CrewChiefV4
                 waveIn = new NAudio.Wave.WaveInEvent();
                 waveIn.DeviceNumber = SpeechRecogniser.initialSpeechInputDeviceIndex;
             }
-            //try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
-            //catch it and tell user to go download.
+            // try to initialize SpeechRecognitionEngine if it trows user is most likely missing SpeechPlatformRuntime.msi from the system
+            // catch it and tell user to go download.
             try
-            {                
-                new SpeechRecognitionEngine();                    
+            {
+                new SpeechRecognitionEngine();
             }
             catch (Exception e)
             {
@@ -583,7 +597,7 @@ namespace CrewChiefV4
                 {
                     return;
                 }
-                Console.WriteLine("Success");
+                Console.WriteLine("Speech engine initialized successfully.");
             }
             catch (Exception e)
             {
@@ -744,6 +758,7 @@ namespace CrewChiefV4
             try
             {
                 sre.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(sre_SpeechRecognized);
+                triggerSre.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(trigger_SpeechRecognized);
             }
             catch (Exception e)
             {
@@ -956,6 +971,81 @@ namespace CrewChiefV4
             return false;
         }
 
+        private Boolean switchFromRegularToTriggerRecogniser()
+        {
+            int attempts = 0;
+            Boolean success = false;
+            while (!success && attempts < 3)
+            {
+                attempts++;
+                try
+                {
+                    sre.SetInputToNull();
+                    triggerSre.SetInputToDefaultAudioDevice();
+                    triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                    waitingForSpeech = false;
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(100);                    
+                }
+            }
+            return success;
+        }
+
+        private Boolean switchFromTriggerToRegularRecogniser()
+        {
+            int attempts = 0;
+            Boolean success = false;
+            while (!success && attempts < 3)
+            {
+                attempts++;
+                try
+                {
+                    triggerSre.RecognizeAsyncCancel();                    
+                    triggerSre.SetInputToNull();
+                    sre.SetInputToDefaultAudioDevice();
+                    success = true;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+            if (success)
+            {
+                crewChief.audioPlayer.playStartListeningBeep();
+                recognizeAsync();
+            }
+            return success;
+        }
+
+        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
+            {
+                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
+                switchFromTriggerToRegularRecogniser();
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Thread.Sleep(5000);
+                    if (waitingForSpeech)
+                    {
+                        // no result
+                        Console.WriteLine("Gave up waiting for voice command, now waiting for trigger word " + keyWord);
+                        sre.RecognizeAsyncCancel();
+                        switchFromRegularToTriggerRecogniser();
+                    }
+                }).Start();
+            }
+            else
+            {
+                Console.WriteLine("keyword detected but confidence (" + e.Result.Confidence + ") too low");
+            }
+        }
+
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             SpeechRecogniser.waitingForSpeech = false;
@@ -1058,11 +1148,22 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    Console.WriteLine("Restarting speech recognition");
-                    recognizeAsync();
+                    if (useTriggerSre)
+                    {
+                        Console.WriteLine("Waiting for trigger word " + keyWord);
+                        switchFromRegularToTriggerRecogniser();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Restarting speech recognition");
+                        recognizeAsync();
+                        waitingForSpeech = true;
+                    }
                 }
-                // in always-on mode, we're now waiting-for-speech until we get another result
-                waitingForSpeech = true;
+                else
+                {
+                    waitingForSpeech = true;
+                }
             }
             else
             {
@@ -1072,6 +1173,35 @@ namespace CrewChiefV4
                     Console.WriteLine("Waiting for more speech");
                     waitingForSpeech = true;
                 }
+            }
+        }
+
+        public void stopTriggerRecogniser()
+        {
+            triggerSre.RecognizeAsyncCancel();
+        }
+
+        public void startContinuousListening()
+        {
+            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio &&
+                UserSettings.GetUserSettings().getBoolean("use_trigger_word_for_always_on_sre");
+            if (useTriggerSre)
+            {                
+                triggerSre.UnloadAllGrammars();
+                GrammarBuilder gb = new GrammarBuilder();
+                Choices c = new Choices();
+                c.Add(keyWord);
+                gb.Culture = cultureInfo;
+                gb.Append(c);
+                triggerSre.LoadGrammar(new Grammar(gb));
+                sre.SetInputToNull();
+                triggerSre.SetInputToDefaultAudioDevice();
+                triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                Console.WriteLine("waiting for trigger word " + keyWord);
+            }
+            else
+            {
+                recognizeAsync();
             }
         }
 

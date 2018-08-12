@@ -26,10 +26,11 @@ namespace CrewChiefV4.Audio
         public Boolean mute = false;
 
         public static Boolean playWithNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio");
-        // prefer to drop messages or use generic terms instead of TTS names
-        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
 
         public static Boolean delayMessagesInHardParts = UserSettings.GetUserSettings().getBoolean("enable_delayed_messages_on_hardparts");
+
+        public enum TTS_OPTION { NEVER, ONLY_WHEN_NECESSARY, ANY_TIME }
+        public static TTS_OPTION ttsOption = TTS_OPTION.ONLY_WHEN_NECESSARY;
 
         public static int naudioMessagesPlaybackDeviceId = 0;
         public static int naudioBackgroundPlaybackDeviceId = 0;
@@ -140,6 +141,7 @@ namespace CrewChiefV4.Audio
 
         static AudioPlayer()
         {
+<<<<<<< HEAD
             // Inintialize sound file paths.  Handle user specified override, or pick default.
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
@@ -257,6 +259,9 @@ namespace CrewChiefV4.Audio
             {
                 Console.WriteLine("No Chief voice sound folders available");
             }
+
+            Enum.TryParse(UserSettings.GetUserSettings().getString("tts_setting_listprop"), out ttsOption);
+            Debug.Assert(Enum.IsDefined(typeof(TTS_OPTION), ttsOption));
 
             // Initialize optional nAudio playback.
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
@@ -1069,12 +1074,12 @@ namespace CrewChiefV4.Audio
 
         public int purgeQueues()
         {
-            return purgeQueue(queuedClips) + purgeQueue(immediateClips);
+            return purgeQueue(queuedClips, false) + purgeQueue(immediateClips, true);
         }
 
-        private int purgeQueue(OrderedDictionary queue)
+        private int purgeQueue(OrderedDictionary queue, bool isImmediateQueue)
         {
-            Console.WriteLine("Purging queue");
+            Console.WriteLine("Purging " + (isImmediateQueue ? "immediate" : "regular") + " queue" );
             int purged = 0;
             lock (queue)
             {
@@ -1448,7 +1453,7 @@ namespace CrewChiefV4.Audio
             Debug.Assert(!string.IsNullOrWhiteSpace(rawName), "rawName should never be an empty string, this is a bug.");
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
-                ((SoundCache.hasSuitableTTSVoice && !useTTSOnlyWhenNecessary) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
+                ((SoundCache.hasSuitableTTSVoice && ttsOption != TTS_OPTION.NEVER) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
         }
 
         // defaultSoundType is only used if we've not already added metadata

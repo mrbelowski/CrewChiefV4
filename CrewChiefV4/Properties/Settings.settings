@@ -323,9 +323,6 @@
     <Setting Name="enable_pcars_pit_window_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="use_tts_for_missing_names" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="enable_delayed_responses" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -704,9 +701,6 @@
     <Setting Name="tts_volume_boost" Type="System.Single" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="use_tts_only_when_necessary" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="iracing_pit_tyre_pressure_in_psi" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -818,9 +812,6 @@
     <Setting Name="enable_opponent_pit_exit_estimates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="immediate_messages_block_other_messages" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="enable_delayed_messages_on_hardparts" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -838,6 +829,21 @@
     </Setting>
     <Setting Name="priortise_messages_depending_on_situation" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="interrupt_setting_listprop" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SPOTTER_MESSAGES</Value>
+    </Setting>
+    <Setting Name="tts_setting_listprop" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NEVER</Value>
+    </Setting>
+    <Setting Name="use_trigger_word_for_always_on_sre" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="trigger_word_for_always_on_sre" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Chief</Value>
+    </Setting>
+    <Setting Name="trigger_word_sre_min_confidence" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0.6</Value>
     </Setting>
   </Settings>
 </SettingsFile>

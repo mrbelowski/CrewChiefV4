@@ -1311,7 +1311,7 @@ namespace CrewChiefV4
                 {
                     Console.WriteLine("Running speech recognition in 'always on' mode");
                     crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
-                    crewChief.speechRecogniser.recognizeAsync();
+                    crewChief.speechRecogniser.startContinuousListening();
                 }
                 if (runListenForButtonPressesThread)
                 {
@@ -1331,6 +1331,7 @@ namespace CrewChiefV4
                     {
                         SpeechRecogniser.waitingForSpeech = false;
                         crewChief.speechRecogniser.recognizeAsyncCancel();
+                        crewChief.speechRecogniser.stopTriggerRecogniser();
                     }
                     catch (Exception) { }
                 }

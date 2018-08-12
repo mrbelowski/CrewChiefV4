@@ -16,8 +16,6 @@ namespace CrewChiefV4.Audio
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static Boolean dumpListOfUnvocalizedNames = UserSettings.GetUserSettings().getBoolean("save_list_of_unvocalized_names");
-        public static Boolean useTTS = UserSettings.GetUserSettings().getBoolean("use_tts_for_missing_names");
-        public static Boolean useTTSOnlyWhenNecessary = UserSettings.GetUserSettings().getBoolean("use_tts_only_when_necessary");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
         public static float ttsVolumeBoost = UserSettings.GetUserSettings().getFloat("tts_volume_boost");
@@ -64,7 +62,7 @@ namespace CrewChiefV4.Audio
             SoundCache.availableDriverNames.Clear();
             SoundCache.availableSounds.Clear();
             SoundCache.availablePrefixesAndSuffixes.Clear();
-            if (useTTS)
+            if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
             {
                 try
                 {
@@ -122,7 +120,7 @@ namespace CrewChiefV4.Audio
                 catch (Exception) {
                     Console.WriteLine("Unable to initialise the TTS engine, TTS will not be available. " +
                                 "Check a suitable Microsoft TTS voice pack is installed");
-                    useTTS = false;
+                    AudioPlayer.ttsOption = AudioPlayer.TTS_OPTION.NEVER;
                 }
             }
             SoundCache.currentSoundsLoaded = 0;
