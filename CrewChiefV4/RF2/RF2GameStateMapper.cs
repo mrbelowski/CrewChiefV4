@@ -107,6 +107,7 @@ namespace CrewChiefV4.rFactor2
         {
             public CarData.CarClass carClass = null;
             public string driverNameRawSanitized = null;
+            public bool isGhost = false;
         }
 
         private Dictionary<long, CarInfo> idToCarInfoMap = new Dictionary<long, CarInfo>();
@@ -519,6 +520,8 @@ namespace CrewChiefV4.rFactor2
 
                 // Initialize variables that persist for the duration of a session.
                 var cci = this.GetCachedCarInfo(ref playerScoring);
+                Debug.Assert(!cci.isGhost);
+
                 cgs.carClass = cci.carClass;
                 CarData.CLASS_ID = cgs.carClass.getClassIdentifier();
                 this.brakeTempThresholdsForPlayersCar = CarData.getBrakeTempThresholds(cgs.carClass);
@@ -1163,6 +1166,9 @@ namespace CrewChiefV4.rFactor2
                 var vehicleScoring = shared.scoring.mVehicles[i];
 
                 var cci = this.GetCachedCarInfo(ref vehicleScoring);
+                if (cci.isGhost)
+                    continue;  // Skip trainer.
+
                 var driverName = cci.driverNameRawSanitized;
 
                 var numNames = -1;
@@ -1206,6 +1212,10 @@ namespace CrewChiefV4.rFactor2
                 if (ct == ControlType.Player || ct == ControlType.Replay || ct == ControlType.Unavailable)
                     continue;
 
+                var vehicleCachedInfo = this.GetCachedCarInfo(ref vehicleScoring);
+                if (vehicleCachedInfo.isGhost)
+                    continue;  // Skip trainer.
+
                 // Get telemetry for this vehicle.
                 var vehicleTelemetry = new rF2VehicleTelemetry();
                 bool vehicleTelemetryAvailable = true;
@@ -1227,7 +1237,6 @@ namespace CrewChiefV4.rFactor2
                     }
                 }
 
-                var vehicleCachedInfo = this.GetCachedCarInfo(ref vehicleScoring);
                 var driverName = vehicleCachedInfo.driverNameRawSanitized;
                 OpponentData opponentPrevious = null;
                 var duplicatesCount = driverNameCounts[driverName];
@@ -2123,6 +2132,8 @@ namespace CrewChiefV4.rFactor2
                     if (previousGameState.OpponentData.TryGetValue(possibleKey, out o))
                     {
                         var cci = this.GetCachedCarInfo(ref vehicleScoring);
+                        Debug.Assert(!cci.isGhost);
+
                         var driverNameFromScoring = cci.driverNameRawSanitized;
 
                         if (o.DriverRawName != driverNameFromScoring
@@ -2448,6 +2459,8 @@ namespace CrewChiefV4.rFactor2
                         if (v.mID == vehToFollowId)
                         {
                             var cci = this.GetCachedCarInfo(ref v);
+                            Debug.Assert(!cci.isGhost);
+
                             fod.DriverToFollowRaw = cci.driverNameRawSanitized;
 
                             toFollowDist = RF2GameStateMapper.GetDistanceCompleteded(ref scoring, ref v);
@@ -2539,11 +2552,13 @@ namespace CrewChiefV4.rFactor2
 
             var carClassId = RF2GameStateMapper.GetStringFromBytes(vehicleScoring.mVehicleClass);
             var carClass = CarData.getCarClassForClassName(carClassId);
+            var isGhost = driverName.Equals("transparent trainer");
 
             ci = new CarInfo()
             {
                 carClass = carClass,
-                driverNameRawSanitized = driverName
+                driverNameRawSanitized = driverName,
+                isGhost = isGhost
             };
 
             this.idToCarInfoMap.Add(vehicleScoring.mID, ci);
