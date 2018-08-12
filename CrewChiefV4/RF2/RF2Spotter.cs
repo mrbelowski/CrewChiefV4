@@ -70,7 +70,7 @@ namespace CrewChiefV4.rFactor2
                 || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
                 || currentState.extended.mInRealtimeFC == 0
                 || currentState.scoring.mScoringInfo.mInRealtime == 0
-                || currentState.scoring.mScoringInfo.mNumVehicles <= 2
+                || currentGameState.OpponentData.Count == 0
                 || lastState.extended.mInRealtimeFC == 0
                 || lastState.scoring.mScoringInfo.mInRealtime == 0)
                 return;
@@ -85,8 +85,8 @@ namespace CrewChiefV4.rFactor2
             float timeDiffSeconds;
             try
             {
-                currentPlayerScoring = getVehicleInfo(currentState);
-                previousPlayerScoring = getVehicleInfo(lastState);
+                currentPlayerScoring = this.getVehicleInfo(currentState);
+                previousPlayerScoring = this.getVehicleInfo(lastState);
                 timeDiffSeconds = ((float)(now - this.previousTime).TotalMilliseconds) / 1000.0f;
                 this.previousTime = now;
 
