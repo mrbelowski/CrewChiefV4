@@ -843,7 +843,7 @@
       <Value Profile="(Default)">Chief</Value>
     </Setting>
     <Setting Name="trigger_word_sre_min_confidence" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0.6</Value>
+      <Value Profile="(Default)">0.7</Value>
     </Setting>
   </Settings>
 </SettingsFile>
