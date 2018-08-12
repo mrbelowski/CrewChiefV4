@@ -17,7 +17,10 @@ namespace CrewChiefV4
     {
         public static void addPropertyToListboxData(string propertyName, string valueEnumTypeName)
         {
-            listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, Type.GetType(valueEnumTypeName, true)));
+            if (!listBoxData.ContainsKey(propertyName))
+            {
+                listBoxData.Add(propertyName, getListBoxItemsForEnum(propertyName, Type.GetType(valueEnumTypeName, true)));
+            }
 
             // Note that it's also possible to hard code the contents of a listbox here if it's not backed by an enum, by getting items manually - e.g.
             // listBoxData.Add("interrupt_setting_listprop", new ListBoxItem[]{
