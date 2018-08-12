@@ -3385,7 +3385,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.7")]
         public float trigger_word_sre_min_confidence {
             get {
                 return ((float)(this["trigger_word_sre_min_confidence"]));
