@@ -23,7 +23,7 @@ will be pulled from the thecrewchief.org ftp server. -->
 		<update-pack url="http://crewchief.isnais.de/update_2_sound_pack.zip" updates-from-version="122"/>
 		<update-pack url="http://crewchief.isnais.de/update_3_sound_pack.zip" updates-from-version="146"/>
 	</voice-messages>
-	<driver-names latest-version="131">
+	<driver-names latest-version="132">
 		<update-pack url="http://crewchief.isnais.de/base_driver_names.zip" updates-from-version="-1"/>
 		<update-pack url="http://crewchief.isnais.de/update_driver_names.zip" updates-from-version="0"/>
 		<update-pack url="http://crewchief.isnais.de/update_2_driver_names.zip" updates-from-version="130"/>
