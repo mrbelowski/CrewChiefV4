@@ -624,7 +624,8 @@
 			"carClassEnum": "CLIO_CUP",
 			"pCarsClassNames": ["TC1", "Clio Cup"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "MEGANE_TROPHY",
@@ -638,13 +639,15 @@
 			"raceroomClassIds": [4517, 6036, 6309],
 			"rf2ClassNames": ["Lada Vesta", "Honda Civic WTCC-TC1", "Chevrolet Cruze TC1", "Citroen C-Elysee", "Volvo S60 TC1"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "TC1_2014",
 			"raceroomClassIds": [3905],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "TC2",
@@ -659,13 +662,15 @@
 			"carClassEnum": "TCR",
 			"raceroomClassIds": [7009],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "AUDI_TT_CUP",
 			"raceroomClassIds": [4680, 5726],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "AUDI_TT_VLN",
@@ -774,7 +779,8 @@
 			"minTyreCircumference": 1.25,
 			"maxTyreCircumference": 2.8,
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "KTM_RR",

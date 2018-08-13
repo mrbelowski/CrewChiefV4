@@ -547,7 +547,7 @@ namespace CrewChiefV4.Events
                 {
                     if (enableBrakeLockWarnings)
                     {
-                        playedCumulativeLockingMessage = checkLocking();
+                        playedCumulativeLockingMessage = checkLocking(currentGameState.carClass.allMembersAreFWD);
                     }
                     if (enableWheelSpinWarnings)
                     {
@@ -1697,7 +1697,7 @@ namespace CrewChiefV4.Events
                     DamageReporting.getPuncture(currentState.TyreData) == CornerData.Corners.NONE);
         }
 
-        private Boolean checkLocking()
+        private Boolean checkLocking(Boolean isFWD)
         {
             Boolean playedMessage = false;
             int messageDelay = Utilities.random.Next(0, 5);
@@ -1735,7 +1735,7 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else if (!isFWD && timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
                 {
                     warnedOnLockingForLap = true;
                     if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
@@ -1751,7 +1751,7 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else if (!isFWD && timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
                 {
                     warnedOnLockingForLap = true;
                     if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)

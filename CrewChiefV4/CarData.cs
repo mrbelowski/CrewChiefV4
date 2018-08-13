@@ -414,6 +414,7 @@ namespace CrewChiefV4
             public int pitCrewPreparationTime { get; set; }
             public bool isBatteryPowered { get; set; }
             public bool limiterAvailable { get; set; }
+            public bool allMembersAreFWD { get; set; }
 
             public String placeholderClassId = "";
 
