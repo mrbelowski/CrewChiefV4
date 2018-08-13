@@ -196,8 +196,9 @@ namespace CrewChiefV4.Events
 
         private float timeLeftFrontIsLockedForLap = 0;
         private float timeRightFrontIsLockedForLap = 0; 
-        private float timeLeftRearIsLockedForLap = 0; 
+        private float timeLeftRearIsLockedForLap = 0;
         private float timeRightRearIsLockedForLap = 0;
+        private float timeBothRearsAreLockedForLap = 0;
         private float timeLeftFrontIsSpinningForLap = 0;
         private float timeRightFrontIsSpinningForLap = 0;
         private float timeLeftRearIsSpinningForLap = 0;
@@ -342,6 +343,7 @@ namespace CrewChiefV4.Events
             timeRightFrontIsLockedForLap = 0;
             timeLeftRearIsLockedForLap = 0;
             timeRightRearIsLockedForLap = 0;
+            timeBothRearsAreLockedForLap = 0;
             timeLeftFrontIsSpinningForLap = 0;
             timeRightFrontIsSpinningForLap = 0;
             timeLeftRearIsSpinningForLap = 0;
@@ -472,6 +474,7 @@ namespace CrewChiefV4.Events
                 timeRightFrontIsLockedForLap = 0;
                 timeLeftRearIsLockedForLap = 0;
                 timeRightRearIsLockedForLap = 0;
+                timeBothRearsAreLockedForLap = 0;
                 timeLeftFrontIsSpinningForLap = 0;
                 timeRightFrontIsSpinningForLap = 0;
                 timeLeftRearIsSpinningForLap = 0;
@@ -535,7 +538,8 @@ namespace CrewChiefV4.Events
             if (previousGameState != null && currentGameState.Ticks > previousGameState.Ticks) 
             {
                 addLockingAndSpinningData(currentGameState.TyreData, currentGameState.PitData.InPitlane,
-                    hasWheelMissingOrPuncture(currentGameState), previousGameState.Ticks, currentGameState.Ticks);
+                    hasWheelMissingOrPuncture(currentGameState), previousGameState.Ticks, currentGameState.Ticks,
+                    currentGameState.carClass.allMembersAreFWD);
             }
 
             // cumulative locking and spinning checks
@@ -1643,7 +1647,7 @@ namespace CrewChiefV4.Events
             }
         }
         private void addLockingAndSpinningData(TyreData tyreData, Boolean inPitLane, Boolean hasWheelMissingOrPuncture,
-            long previousTicks, long currentTicks)
+            long previousTicks, long currentTicks, Boolean isFWD)
         {
             if (hasWheelMissingOrPuncture || inPitLane)
             {
@@ -1666,13 +1670,23 @@ namespace CrewChiefV4.Events
                 {
                     timeRightFrontIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
                 }
-                if (tyreData.LeftRearIsLocked)
+                if (isFWD)
                 {
-                    timeLeftRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    if (tyreData.LeftRearIsLocked && tyreData.RightRearIsLocked)
+                    {
+                        timeBothRearsAreLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
                 }
-                if (tyreData.RightRearIsLocked)
+                else
                 {
-                    timeRightRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    if (tyreData.LeftRearIsLocked)
+                    {
+                        timeLeftRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
+                    if (tyreData.RightRearIsLocked)
+                    {
+                        timeRightRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
                 }
             }
             if (enableWheelSpinWarnings)
@@ -1741,36 +1755,48 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (!isFWD && timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else if (isFWD)
                 {
-                    warnedOnLockingForLap = true;
-                    if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                    if (timeBothRearsAreLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // lots of left rear locking, some right rear locking
+                        warnedOnLockingForLap = true;
                         audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
-                    }
-                    else
-                    {
-                        // just left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
-                else if (!isFWD && timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else
                 {
-                    warnedOnLockingForLap = true;
-                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // lots of right rear locking, some left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
+                        warnedOnLockingForLap = true;
+                        if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                        {
+                            // lots of left rear locking, some right rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
+                        else
+                        {
+                            // just left rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
                     }
-                    else
+                    else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // just right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
+                        warnedOnLockingForLap = true;
+                        if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                        {
+                            // lots of right rear locking, some left rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
+                        else
+                        {
+                            // just right rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
                     }
                 }
             }
