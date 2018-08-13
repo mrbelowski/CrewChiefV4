@@ -229,9 +229,6 @@ namespace CrewChiefV4
         public static Boolean keepRecognisingInHoldMode = false;
 
         private SpeechRecognitionEngine triggerSre;
-        // if we're in 'always on' mode and we're not using nAudio, set up a trigger phrase - 
-        // you say "Chief" (or whatever) and the app will beep, indicating it's ready for speech input
-        private static Boolean useTriggerSre = false;
 
         // This is the trigger phrase used to activate the 'full' SRE
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
@@ -373,6 +370,25 @@ namespace CrewChiefV4
                 generatedGrammars.Add(grammar);
             }
             return generatedGrammars;
+        }
+
+        // ensure the SRE has stopped waiting for speech, and if we're in trigger-word mode, reset it to the
+        // default audio input device
+        public void stop()
+        {
+            try
+            {
+                sre.RecognizeAsyncCancel();
+                if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
+                {
+                    triggerSre.RecognizeAsyncCancel();
+                    sre.SetInputToDefaultAudioDevice();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error resetting recogniser");
+            }
         }
 
         public void Dispose()
@@ -1171,25 +1187,33 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    if (useTriggerSre && !youWot)
-                    {
-                        Console.WriteLine("Waiting for trigger word " + keyWord);
-                         switchFromRegularToTriggerRecogniser();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Restarting speech recognition");
-                        if (useTriggerSre && youWot)
-                        {
-                            // wait a little longer here as the "I didn't catch that" takes a second or two to say
-                            restartWaitTimeoutThread(7000);
-                        }
-                        recognizeAsync();
-                        waitingForSpeech = true;
-                    }
+                    Console.WriteLine("Restarting speech recognition");
+                    recognizeAsync();
+                    waitingForSpeech = true;
                 }
                 else
                 {
+                    waitingForSpeech = true;
+                }
+            }
+            else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
+            {
+                sre.RecognizeAsyncStop();
+                Thread.Sleep(500);
+                if (!youWot)
+                {
+                    Console.WriteLine("Waiting for trigger word " + keyWord);
+                    switchFromRegularToTriggerRecogniser();
+                }
+                else
+                {
+                    Console.WriteLine("Restarting speech recognition");
+                    if (youWot)
+                    {
+                        // wait a little longer here as the "I didn't catch that" takes a second or two to say
+                        restartWaitTimeoutThread(7000);
+                    }
+                    recognizeAsync();
                     waitingForSpeech = true;
                 }
             }
@@ -1211,9 +1235,7 @@ namespace CrewChiefV4
 
         public void startContinuousListening()
         {
-            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio &&
-                UserSettings.GetUserSettings().getBoolean("use_trigger_word_for_always_on_sre");
-            if (useTriggerSre)
+            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
             {                
                 triggerSre.UnloadAllGrammars();
                 GrammarBuilder gb = new GrammarBuilder();

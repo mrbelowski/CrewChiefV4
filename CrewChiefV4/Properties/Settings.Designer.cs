@@ -3361,18 +3361,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool use_trigger_word_for_always_on_sre {
-            get {
-                return ((bool)(this["use_trigger_word_for_always_on_sre"]));
-            }
-            set {
-                this["use_trigger_word_for_always_on_sre"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Chief")]
         public string trigger_word_for_always_on_sre {
             get {

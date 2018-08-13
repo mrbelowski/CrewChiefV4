@@ -908,6 +908,22 @@ namespace CrewChiefV4
             {
                 this.toggleButton.Checked = true;
             }
+            else if (voiceOption == VoiceOptionEnum.TRIGGER_WORD)
+            {
+                this.triggerWordButton.Checked = true;
+            }
+
+            // don't allow trigger word or always on if using nAudio
+            if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
+            {
+                if (voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD)
+                {
+                    Console.WriteLine("Voice option " + voiceOption.ToString() + " not compatible with nAudio input");
+                    this.voiceDisableButton.Checked = true;
+                }
+                this.triggerWordButton.Enabled = false;
+                this.alwaysOnButton.Enabled = false;
+            }
             if (voiceOption != VoiceOptionEnum.DISABLED)
             {
                 initialiseSpeechEngine();
@@ -1307,10 +1323,11 @@ namespace CrewChiefV4
                     Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
                     channelOpenButtonListenerThread.Start();
                 }
-                else if (voiceOption == VoiceOptionEnum.ALWAYS_ON && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
+                else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
+                    crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
                     Console.WriteLine("Running speech recognition in 'always on' mode");
-                    crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.ALWAYS_ON;
+                    crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
                     crewChief.speechRecogniser.startContinuousListening();
                 }
                 if (runListenForButtonPressesThread)
@@ -1647,6 +1664,35 @@ namespace CrewChiefV4
                 }
             }
         }
+
+        private void triggerWordButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (((RadioButton)sender).Checked)
+            {
+                try
+                {
+                    if (initialiseSpeechEngine())
+                    {
+                        runListenForChannelOpenThread = false;
+                        runListenForButtonPressesThread = controllerConfiguration.listenForButtons(false);
+                        crewChief.speechRecogniser.voiceOptionEnum = VoiceOptionEnum.TRIGGER_WORD;
+                        voiceOption = VoiceOptionEnum.TRIGGER_WORD;
+                        UserSettings.GetUserSettings().setProperty("VOICE_OPTION", getVoiceOptionString());
+                        UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                    else
+                    {
+                        ((RadioButton)sender).Checked = false;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unable to initialise speech engine, message = " + ex.Message);
+                }
+            }
+        }
+
         private void holdButton_CheckedChanged(object sender, EventArgs e)
         {
             if (((RadioButton)sender).Checked)
@@ -1804,7 +1850,7 @@ namespace CrewChiefV4
 
         public enum VoiceOptionEnum
         {
-            DISABLED, HOLD, TOGGLE, ALWAYS_ON
+            DISABLED, HOLD, TOGGLE, ALWAYS_ON, TRIGGER_WORD
         }
 
         private void clearConsole(object sender, EventArgs e)

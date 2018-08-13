@@ -60,6 +60,7 @@ namespace CrewChiefV4
             this.toggleButton = new System.Windows.Forms.RadioButton();
             this.holdButton = new System.Windows.Forms.RadioButton();
             this.voiceDisableButton = new System.Windows.Forms.RadioButton();
+            this.triggerWordButton = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
             this.messagesVolumeSlider = new System.Windows.Forms.TrackBar();
             this.messagesAudioDeviceBox = new System.Windows.Forms.ComboBox();
@@ -222,56 +223,80 @@ namespace CrewChiefV4
             this.groupBox1.Controls.Add(this.holdButton);
             this.groupBox1.Controls.Add(this.toggleButton);
             this.groupBox1.Controls.Add(this.alwaysOnButton);
-            this.groupBox1.Location = new System.Drawing.Point(970, 520);
+            this.groupBox1.Controls.Add(this.triggerWordButton);
+            this.groupBox1.Location = new System.Drawing.Point(970, 519);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(164, 121);
+            this.groupBox1.Size = new System.Drawing.Size(164, 124);
             this.groupBox1.TabIndex = 260;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = Configuration.getUIString("voice_recognition_mode");
+            ToolTip voiceRecognitionToolTip = new ToolTip();
+            voiceRecognitionToolTip.SetToolTip(this.groupBox1, Configuration.getUIString("voice_recognition_mode_help")); 
             // 
             // alwaysOnButton
             // 
             this.alwaysOnButton.AutoSize = true;
-            this.alwaysOnButton.Location = new System.Drawing.Point(7, 91);
+            this.alwaysOnButton.Location = new System.Drawing.Point(7, 82);
             this.alwaysOnButton.Name = "alwaysOnButton";
             this.alwaysOnButton.Size = new System.Drawing.Size(75, 17);
             this.alwaysOnButton.TabStop = true;
             this.alwaysOnButton.Text = Configuration.getUIString("always_on");
             this.alwaysOnButton.UseVisualStyleBackColor = true;
             this.alwaysOnButton.CheckedChanged += new System.EventHandler(this.alwaysOnButton_CheckedChanged);
+            ToolTip voiceRecognitionAlwaysOnToolTip = new ToolTip();
+            voiceRecognitionAlwaysOnToolTip.SetToolTip(this.alwaysOnButton, Configuration.getUIString("voice_recognition_always_on_help")); 
             // 
             // toggleButton
             // 
             this.toggleButton.AutoSize = true;
-            this.toggleButton.Location = new System.Drawing.Point(7, 67);
+            this.toggleButton.Location = new System.Drawing.Point(7, 60);
             this.toggleButton.Name = "toggleButton";
             this.toggleButton.Size = new System.Drawing.Size(90, 17);
             this.toggleButton.TabStop = true;
             this.toggleButton.Text = Configuration.getUIString("toggle_button");
             this.toggleButton.UseVisualStyleBackColor = true;
             this.toggleButton.CheckedChanged += new System.EventHandler(this.toggleButton_CheckedChanged);
+            ToolTip voiceRecognitionToggleButtonToolTip = new ToolTip();
+            voiceRecognitionToggleButtonToolTip.SetToolTip(this.toggleButton, Configuration.getUIString("voice_recognition_toggle_button_help")); 
             // 
             // holdButton
             // 
             this.holdButton.AutoSize = true;
-            this.holdButton.Location = new System.Drawing.Point(7, 44);
+            this.holdButton.Location = new System.Drawing.Point(7, 39);
             this.holdButton.Name = "holdButton";
             this.holdButton.Size = new System.Drawing.Size(81, 17);
             this.holdButton.TabStop = true;
             this.holdButton.Text = Configuration.getUIString("hold_button");
             this.holdButton.UseVisualStyleBackColor = true;
             this.holdButton.CheckedChanged += new System.EventHandler(this.holdButton_CheckedChanged);
+            ToolTip voiceRecognitionHoldButtonToolTip = new ToolTip();
+            voiceRecognitionHoldButtonToolTip.SetToolTip(this.holdButton, Configuration.getUIString("voice_recognition_hold_button_help")); 
             // 
             // voiceDisableButton
             // 
             this.voiceDisableButton.AutoSize = true;
-            this.voiceDisableButton.Location = new System.Drawing.Point(7, 20);
+            this.voiceDisableButton.Location = new System.Drawing.Point(7, 16);
             this.voiceDisableButton.Name = "voiceDisableButton";
             this.voiceDisableButton.Size = new System.Drawing.Size(64, 17);
             this.voiceDisableButton.TabStop = true;
             this.voiceDisableButton.Text = Configuration.getUIString("disabled");
             this.voiceDisableButton.UseVisualStyleBackColor = true;
             this.voiceDisableButton.CheckedChanged += new System.EventHandler(this.voiceDisableButton_CheckedChanged);
+            ToolTip voiceRecognitionDisabledToolTip = new ToolTip();
+            voiceRecognitionDisabledToolTip.SetToolTip(this.voiceDisableButton, Configuration.getUIString("voice_recognition_disabled_help")); 
+            // 
+            // triggerWordButton
+            // 
+            this.triggerWordButton.AutoSize = true;
+            this.triggerWordButton.Location = new System.Drawing.Point(7, 104);
+            this.triggerWordButton.Name = "triggerWordButton";
+            this.triggerWordButton.Size = new System.Drawing.Size(64, 17);
+            this.triggerWordButton.TabStop = true;
+            this.triggerWordButton.Text = Configuration.getUIString("trigger_word") + " (\"" + UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre") + "\")";
+            this.triggerWordButton.UseVisualStyleBackColor = true;
+            this.triggerWordButton.CheckedChanged += new System.EventHandler(this.triggerWordButton_CheckedChanged);
+            ToolTip voiceRecognitionTriggerWordToolTip = new ToolTip();
+            voiceRecognitionTriggerWordToolTip.SetToolTip(this.triggerWordButton, Configuration.getUIString("voice_recognition_trigger_word_help")); 
             // 
             // button2
             // 
@@ -661,6 +686,7 @@ namespace CrewChiefV4
         private System.Windows.Forms.RadioButton toggleButton;
         private System.Windows.Forms.RadioButton holdButton;
         private System.Windows.Forms.RadioButton voiceDisableButton;
+        private System.Windows.Forms.RadioButton triggerWordButton;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TrackBar messagesVolumeSlider;
         private System.Windows.Forms.ComboBox speechRecognitionDeviceBox;

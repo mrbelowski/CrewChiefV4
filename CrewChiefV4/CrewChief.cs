@@ -1075,7 +1075,7 @@ namespace CrewChiefV4
                 DriverNameHelper.dumpUnvocalizedNames();
             }
             mapped = false;
-
+            speechRecogniser.stop();
             return true;
         }
 
