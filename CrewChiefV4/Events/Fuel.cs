@@ -778,9 +778,7 @@ namespace CrewChiefV4.Events
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
                     messageFragments.Add(MessageFragment.Text(folderFor));
                     messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.SECONDS)));
-                    messageFragments.Add(MessageFragment.Text(Battery.folderLaps));
                     messageFragments.Add(MessageFragment.Text(folderWeEstimateWeWillNeed));
-                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
                     if (fuelReportsInGallon)
                     {
                         // for gallons we want both whole and fractional part cause its a stupid unit.
