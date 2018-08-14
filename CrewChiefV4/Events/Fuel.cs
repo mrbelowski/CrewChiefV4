@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -73,6 +74,9 @@ namespace CrewChiefV4.Events
         public static String folderWillNeedToAddOneGallonToGetToTheEnd = "fuel/need_to_add_one_gallon_to_get_to_the_end";
 
         public static String folderFuelWillBeTight = "fuel/fuel_will_be_tight";
+
+        public static String folderFor = "fuel/for";
+        public static String folderWeEstimateWeWillNeed = "fuel/we_estimate_we_will_need";
 
         private float averageUsagePerLap;
 
@@ -706,7 +710,10 @@ namespace CrewChiefV4.Events
                     // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
                     // stuff like "one thirty two" - we always want "one hundred and thirty two"
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
-                    messageFragments.Add(MessageFragment.Text(folderWeEstimate));
+                    messageFragments.Add(MessageFragment.Text(folderFor));
+                    messageFragments.Add(MessageFragment.Integer(numberOfLaps, false));
+                    messageFragments.Add(MessageFragment.Text(Battery.folderLaps));
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimateWeWillNeed));
                     if(fuelReportsInGallon)
                     {
                         // for gallons we want both whole and fractional part cause its a stupid unit.
@@ -769,6 +776,10 @@ namespace CrewChiefV4.Events
                     // build up the message fragments the verbose way, so we can prevent the number reader from shortening hundreds to
                     // stuff like "one thirty two" - we always want "one hundred and thirty two"    
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
+                    messageFragments.Add(MessageFragment.Text(folderFor));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.SECONDS)));
+                    messageFragments.Add(MessageFragment.Text(Battery.folderLaps));
+                    messageFragments.Add(MessageFragment.Text(folderWeEstimateWeWillNeed));
                     messageFragments.Add(MessageFragment.Text(folderWeEstimate));
                     if (fuelReportsInGallon)
                     {

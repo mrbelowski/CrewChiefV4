@@ -2069,7 +2069,7 @@ namespace CrewChiefV4.assetto
             return Math.Min(100, mapToPercentage((minimumLevel / wearLevel) * 100, minimumLevel, 100, 0, 100));
         }
 
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             return SessionType.Unavailable;
         }

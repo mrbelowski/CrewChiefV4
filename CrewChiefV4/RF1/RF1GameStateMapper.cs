@@ -1228,7 +1228,7 @@ namespace CrewChiefV4.rFactor1
             }
         }
 
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             rFactor1Data.rfShared shared = (rFactor1Data.rfShared)memoryMappedFileStruct;
             if (CrewChief.gameDefinition == GameDefinition.rFactor1)

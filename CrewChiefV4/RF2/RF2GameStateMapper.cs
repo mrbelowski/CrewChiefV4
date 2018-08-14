@@ -2150,7 +2150,7 @@ namespace CrewChiefV4.rFactor2
             return bestKey;
         }
 
-        public override SessionType mapToSessionType(Object wrapper)
+        public SessionType mapToSessionType(Object wrapper)
         {
             var shared = wrapper as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             switch (shared.scoring.mScoringInfo.mSession)
