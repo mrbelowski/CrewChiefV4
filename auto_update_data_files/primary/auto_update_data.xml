@@ -29,11 +29,12 @@ will be pulled from the thecrewchief.org ftp server. -->
 		<update-pack url="http://crewchief.isnais.de/update_2_driver_names.zip" updates-from-version="130"/>
 		<update-pack url="http://crewchief.isnais.de/update_3_driver_names.zip" updates-from-version="131"/>
 	</driver-names>
-	<personalisations latest-version="130">
+	<personalisations latest-version="131">
 		<update-pack url="http://crewchief.isnais.de/personalisations.zip" updates-from-version="-1"/>
 		<update-pack url="http://crewchief.isnais.de/update_personalisations.zip" updates-from-version="0"/>
 		<update-pack url="http://crewchief.isnais.de/update_2_personalisations.zip" updates-from-version="121"/>
 		<update-pack url="http://crewchief.isnais.de/update_3_personalisations.zip" updates-from-version="129"/>
+		<update-pack url="http://crewchief.isnais.de/update_4_personalisations.zip" updates-from-version="130"/>
 	</personalisations>
 </sounds>
 

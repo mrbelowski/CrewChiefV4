@@ -176,6 +176,7 @@ namespace CrewChiefV4
             }
 
             gameDataReader = null;
+            speechRecogniser.stop();
             speechRecogniser = null;
             audioPlayer = null;
         }
@@ -1075,7 +1076,10 @@ namespace CrewChiefV4
                 DriverNameHelper.dumpUnvocalizedNames();
             }
             mapped = false;
-
+            if (speechRecogniser != null)
+            {
+                speechRecogniser.stop();
+            }
             return true;
         }
 
