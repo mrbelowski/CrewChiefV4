@@ -378,11 +378,20 @@ namespace CrewChiefV4
         {
             try
             {
-                sre.RecognizeAsyncCancel();
+                if (sre != null)
+                {
+                    sre.RecognizeAsyncCancel();
+                }
                 if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
                 {
-                    triggerSre.RecognizeAsyncCancel();
-                    sre.SetInputToDefaultAudioDevice();
+                    if (triggerSre != null)
+                    {
+                        triggerSre.RecognizeAsyncCancel();
+                    }
+                    if (sre != null)
+                    {
+                        sre.SetInputToDefaultAudioDevice();
+                    }
                 }
             }
             catch (Exception e)

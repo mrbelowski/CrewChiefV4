@@ -602,6 +602,17 @@ namespace CrewChiefV4
                     else
                         fpc.Visible = false;
                 }
+                else if (ctrl is ListPropertyControl)
+                {
+                    var lpc = ctrl as ListPropertyControl;
+                    if (lpc.filter.Applies(filterUpper, gameFilter, specialFilter, includeCommon, categoryFilter))
+                    {
+                        lpc.Visible = true;
+                        anyHits = true;
+                    }
+                    else
+                        lpc.Visible = false;
+                }
                 else if (ctrl is Spacer)
                 {
                     var s = ctrl as Spacer;
@@ -641,6 +652,11 @@ namespace CrewChiefV4
                 if (ctrl is StringPropertyControl)
                 {
                     var spc = ctrl as StringPropertyControl;
+                    spc.button1_Click(sender, e);
+                }
+                else if (ctrl is ListPropertyControl)
+                {
+                    var spc = ctrl as ListPropertyControl;
                     spc.button1_Click(sender, e);
                 }
                 else if (ctrl is BooleanPropertyControl)

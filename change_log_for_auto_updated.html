@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.4.5</h2>
+<ul>
+	<li>Added 'Trigger word' voice recognition mode. With this enabled voice recognition works a bit like 'OK Google' or Alexa - the app listens for a special keyword or phrase (configurable in the 'Speech recogniser trigger word' property, default value 'Chief'). When it hears the keyword it starts listening for a regular voice command for a few seconds. This doesn't work with nAudio input</li>
+	<li>Some corner name mapping fixes</li>
+	<li>Changed default interrupting behaviour so only spotter messages interrupt the Chief</li>
+	<li>Only consider rear wheels as locked if both are locked at the same time in common FWD cars like WTCC and WTCR (prevents the app warning about locking the unloaded inside rear on turn-in)</li>
+	<li>When requesting fuel estimates for a given time or lap count, the app now reads back the time / lap count you requested along with the fuel estimate (e.g. "for 25 minutes, we estimate you'll need about 30 litres")</li>
+	<li>R3E: reworked hotlap single practice mode detection - should prevent spotter playing in these game modes</li>
+	<li>Various internal fixes</li>
+</ul>
 <h2>Version 4.9.4.3</h2>
 <ul>
 	<li>Fixed a few cases where messages play when they shouldn't</li>

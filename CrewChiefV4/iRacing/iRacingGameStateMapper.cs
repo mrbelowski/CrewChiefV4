@@ -1175,7 +1175,7 @@ namespace CrewChiefV4.iRacing
             {"Race", SessionType.Race}
         };
 
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             String sessionString = (String)memoryMappedFileStruct;
             SessionType st = SessionType.Unavailable;
