@@ -196,8 +196,9 @@ namespace CrewChiefV4.Events
 
         private float timeLeftFrontIsLockedForLap = 0;
         private float timeRightFrontIsLockedForLap = 0; 
-        private float timeLeftRearIsLockedForLap = 0; 
+        private float timeLeftRearIsLockedForLap = 0;
         private float timeRightRearIsLockedForLap = 0;
+        private float timeBothRearsAreLockedForLap = 0;
         private float timeLeftFrontIsSpinningForLap = 0;
         private float timeRightFrontIsSpinningForLap = 0;
         private float timeLeftRearIsSpinningForLap = 0;
@@ -342,6 +343,7 @@ namespace CrewChiefV4.Events
             timeRightFrontIsLockedForLap = 0;
             timeLeftRearIsLockedForLap = 0;
             timeRightRearIsLockedForLap = 0;
+            timeBothRearsAreLockedForLap = 0;
             timeLeftFrontIsSpinningForLap = 0;
             timeRightFrontIsSpinningForLap = 0;
             timeLeftRearIsSpinningForLap = 0;
@@ -472,6 +474,7 @@ namespace CrewChiefV4.Events
                 timeRightFrontIsLockedForLap = 0;
                 timeLeftRearIsLockedForLap = 0;
                 timeRightRearIsLockedForLap = 0;
+                timeBothRearsAreLockedForLap = 0;
                 timeLeftFrontIsSpinningForLap = 0;
                 timeRightFrontIsSpinningForLap = 0;
                 timeLeftRearIsSpinningForLap = 0;
@@ -535,7 +538,8 @@ namespace CrewChiefV4.Events
             if (previousGameState != null && currentGameState.Ticks > previousGameState.Ticks) 
             {
                 addLockingAndSpinningData(currentGameState.TyreData, currentGameState.PitData.InPitlane,
-                    hasWheelMissingOrPuncture(currentGameState), previousGameState.Ticks, currentGameState.Ticks);
+                    hasWheelMissingOrPuncture(currentGameState), previousGameState.Ticks, currentGameState.Ticks,
+                    currentGameState.carClass.allMembersAreFWD);
             }
 
             // cumulative locking and spinning checks
@@ -547,11 +551,11 @@ namespace CrewChiefV4.Events
                 {
                     if (enableBrakeLockWarnings)
                     {
-                        playedCumulativeLockingMessage = checkLocking();
+                        playedCumulativeLockingMessage = checkLocking(currentGameState.carClass.allMembersAreFWD);
                     }
                     if (enableWheelSpinWarnings)
                     {
-                        playedCumulativeSpinningMessage = checkWheelSpinning();
+                        playedCumulativeSpinningMessage = checkWheelSpinning(currentGameState.carClass.allMembersAreFWD, currentGameState.carClass.allMembersAreRWD);
                     }
                 }
                 nextLockingAndSpinningCheck = currentGameState.Now.Add(lockingAndSpinningCheckInterval);
@@ -630,42 +634,48 @@ namespace CrewChiefV4.Events
                             float rightFrontCornerSpecificWheelSpinTime = timeRightFrontIsSpinningForLap - rightFrontExitStartWheelSpinTime;
                             float leftRearCornerSpecificWheelSpinTime = timeLeftRearIsSpinningForLap - leftRearExitStartWheelSpinTime;
                             float rightRearCornerSpecificWheelSpinTime = timeRightRearIsSpinningForLap - rightRearExitStartWheelSpinTime;
-                            if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            if (!currentGameState.carClass.allMembersAreRWD && 
+                                leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning fronts out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
                                     MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
-                            else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            else if (!currentGameState.carClass.allMembersAreFWD &&
+                                leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning rears out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
                                     MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
-                            else if (leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            else if (!currentGameState.carClass.allMembersAreRWD && 
+                                leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
                                     MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
-                            else if (rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            else if (!currentGameState.carClass.allMembersAreRWD && 
+                                rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right front out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
                                     MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
-                            else if (leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            else if (!currentGameState.carClass.allMembersAreFWD &&
+                                leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
                                     MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
-                            else if (rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
+                            else if (!currentGameState.carClass.allMembersAreFWD &&
+                                rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right rear out of " + currentCornerName);
                                 audioPlayer.playMessage(new QueuedMessage("corner_spinning",
@@ -1637,7 +1647,7 @@ namespace CrewChiefV4.Events
             }
         }
         private void addLockingAndSpinningData(TyreData tyreData, Boolean inPitLane, Boolean hasWheelMissingOrPuncture,
-            long previousTicks, long currentTicks)
+            long previousTicks, long currentTicks, Boolean isFWD)
         {
             if (hasWheelMissingOrPuncture || inPitLane)
             {
@@ -1660,13 +1670,23 @@ namespace CrewChiefV4.Events
                 {
                     timeRightFrontIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
                 }
-                if (tyreData.LeftRearIsLocked)
+                if (isFWD)
                 {
-                    timeLeftRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    if (tyreData.LeftRearIsLocked && tyreData.RightRearIsLocked)
+                    {
+                        timeBothRearsAreLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
                 }
-                if (tyreData.RightRearIsLocked)
+                else
                 {
-                    timeRightRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    if (tyreData.LeftRearIsLocked)
+                    {
+                        timeLeftRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
+                    if (tyreData.RightRearIsLocked)
+                    {
+                        timeRightRearIsLockedForLap += (float)(currentTicks - previousTicks) / (float)TimeSpan.TicksPerSecond;
+                    }
                 }
             }
             if (enableWheelSpinWarnings)
@@ -1697,7 +1717,7 @@ namespace CrewChiefV4.Events
                     DamageReporting.getPuncture(currentState.TyreData) == CornerData.Corners.NONE);
         }
 
-        private Boolean checkLocking()
+        private Boolean checkLocking(Boolean isFWD)
         {
             Boolean playedMessage = false;
             int messageDelay = Utilities.random.Next(0, 5);
@@ -1735,49 +1755,61 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else if (isFWD)
                 {
-                    warnedOnLockingForLap = true;
-                    if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                    if (timeBothRearsAreLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // lots of left rear locking, some right rear locking
+                        warnedOnLockingForLap = true;
                         audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
-                    }
-                    else
-                    {
-                        // just left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
                 }
-                else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
+                else
                 {
-                    warnedOnLockingForLap = true;
-                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // lots of right rear locking, some left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
+                        warnedOnLockingForLap = true;
+                        if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                        {
+                            // lots of left rear locking, some right rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
+                        else
+                        {
+                            // just left rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
                     }
-                    else
+                    else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
                     {
-                        // just right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
-                        playedMessage = true;
+                        warnedOnLockingForLap = true;
+                        if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
+                        {
+                            // lots of right rear locking, some left rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
+                        else
+                        {
+                            // just right rear locking
+                            audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
+                            playedMessage = true;
+                        }
                     }
                 }
             }
             return playedMessage;
         }
 
-        private Boolean checkWheelSpinning()
+        private Boolean checkWheelSpinning(Boolean isFWD, Boolean isRWD)
         {
             Boolean playedMessage = false;
             int messageDelay = Utilities.random.Next(0, 5);
             if (!warnedOnWheelspinForLap)
             {
-                if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
+                if (!isRWD && timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
                 {
                     warnedOnWheelspinForLap = true;
                     if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
@@ -1793,7 +1825,7 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
+                else if (!isRWD && timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap)
                 {
                     warnedOnWheelspinForLap = true;
                     if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
@@ -1809,7 +1841,7 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
+                else if (!isFWD && timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
                 {
                     warnedOnWheelspinForLap = true;
                     if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
@@ -1825,7 +1857,7 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
+                else if (!isFWD && timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap)
                 {
                     warnedOnWheelspinForLap = true;
                     if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)

@@ -123,7 +123,8 @@
 			"pCarsClassNames": ["GT1X"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GT1",
@@ -133,7 +134,8 @@
 			"acClassNames": ["*GT1*", "rss_gt_tornado_v12", "rss_gt_vortex_v10", "rss_gt_ferruccio_55", "rss_gt_*"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GT2",
@@ -143,7 +145,8 @@
 			"acClassNames": ["p4-5_2011", "ks_corvette_c7r", "*GT2*"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GTE",
@@ -154,14 +157,16 @@
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"maxSafeOilTemp": 135
+			"maxSafeOilTemp": 135,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GTLM",
 			"rf2ClassNames": ["*GTLM*"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GT3",
@@ -172,25 +177,29 @@
 			"iracingCarIds": [43, 55, 59, 72, 73, 94],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"maxSafeOilTemp": 135
+			"maxSafeOilTemp": 135,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "CARRERA_CUP",
 			"raceroomClassIds": [6345],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "CAYMAN_CLUBSPORT",
 			"raceroomClassIds": [6648],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GTC",
 			"rf2ClassNames": ["*GTC*"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GT4",
@@ -200,6 +209,7 @@
 			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true,
 			"acTyreTypeData": {
 				"Trofeo M Slicks (M)": {
 					"maxColdTyreTemp": 75,
@@ -217,13 +227,15 @@
 			"carClassEnum": "GT5",
 			"pCarsClassNames": ["GT5", "G40 Junior"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "BMW_235I",
 			"raceroomClassIds": [6344],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GT500",
@@ -241,7 +253,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "Kart_1",
@@ -251,7 +264,8 @@
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "Kart_2",
@@ -260,7 +274,8 @@
 			"maxTyreCircumference": 1.26,
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
-			"enabledMessageTypes": "NONE"
+			"enabledMessageTypes": "NONE",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "KART_JUNIOR",
@@ -269,7 +284,8 @@
 			"maxTyreCircumference": 1.22,
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
-			"enabledMessageTypes": "NONE"
+			"enabledMessageTypes": "NONE",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "KART_F1",
@@ -278,7 +294,8 @@
 			"maxTyreCircumference": 1.22,
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
-			"enabledMessageTypes": "NONE"
+			"enabledMessageTypes": "NONE",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "KART_X30_SENIOR",
@@ -287,7 +304,8 @@
 			"maxTyreCircumference": 1.22,
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
-			"enabledMessageTypes": "NONE"
+			"enabledMessageTypes": "NONE",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "KART_X30_RENTAL",
@@ -296,7 +314,8 @@
 			"maxTyreCircumference": 1.22,
 			"spotterVehicleLength": 2.0,
 			"spotterVehicleWidth": 1.5,
-			"enabledMessageTypes": "NONE"
+			"enabledMessageTypes": "NONE",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "LMP1",
@@ -336,7 +355,8 @@
 			"pCarsClassNames": ["LMP900"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GROUPC",
@@ -346,47 +366,54 @@
 			"acClassNames": ["mazda_787b", "ks_mazda_787b"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GROUP6",
 			"pCarsClassNames": ["Group 6"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GROUP5",
 			"raceroomClassIds": [1708],
 			"pCarsClassNames": ["Group 5"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GTO",
 			"raceroomClassIds": [1713],
 			"pCarsClassNames": ["GTO"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GROUP4",
 			"raceroomClassIds": [2378],
 			"pCarsClassNames": ["Group 4"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "GROUPA",
 			"raceroomClassIds": [1712, 3499],
 			"pCarsClassNames": ["Group A"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "CAN_AM",
 			"pCarsClassNames": ["CanAm"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "INDYCAR",
@@ -400,7 +427,8 @@
 			"useAmericanTerms": true,
 			"enabledMessageTypes": "ALL",
 			"spotterVehicleLength": 5,
-			"spotterVehicleWidth": 2
+			"spotterVehicleWidth": 2,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F1",
@@ -415,7 +443,8 @@
 			"enabledMessageTypes": "ALL",
 			"isDRSCapable": true,
 			"DRSRange": 1.0,
-			"pitCrewPreparationTime": 17
+			"pitCrewPreparationTime": 17,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F2",
@@ -426,7 +455,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "FORMULA_RENAULT",
@@ -437,7 +467,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F3",
@@ -446,7 +477,8 @@
 			"acClassNames": ["dallara_f312"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F4",
@@ -455,14 +487,16 @@
 			"timesInHundredths": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
 			"spotterVehicleLength": 4.34,
-			"spotterVehicleWidth": 1.75
+			"spotterVehicleWidth": 1.75,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "FF",
 			"raceroomClassIds": [253],
 			"pCarsClassNames": ["F5", "FF"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "FORMULA_E",
@@ -473,26 +507,30 @@
 			"timesInHundredths": true,
 			"isBatteryPowered": true,
 			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, BATTERY, LOCKING_AND_SPINNING",
-			"pitCrewPreparationTime": 17
+			"pitCrewPreparationTime": 17,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_F1_C",
 			"pCarsClassNames": ["Vintage F1 C"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_F1_B",
 			"pCarsClassNames": ["Vintage F1 B"],
 			"timesInHundredths": false,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_F1_A",
 			"pCarsClassNames": ["Vintage F1 A"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F1_70S",
@@ -513,7 +551,8 @@
 			"pCarsClassNames": ["Vintage F3 A"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_INDY_65",
@@ -521,28 +560,32 @@
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_PROTOTYPE_B",
 			"pCarsClassNames": ["Vintage GT", "Vintage Prototype B"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_GT_D",
 			"pCarsClassNames": ["Vintage GT3", "Vintage Touring-GT D"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "VINTAGE_GT_C",
 			"pCarsClassNames": ["Vintage Touring-GT C"],
 			"defaultTyreType": "Bias_Ply",
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "HISTORIC_TOURING_1",
@@ -563,14 +606,16 @@
 			"pCarsClassNames": ["Vintage Stockcar"],
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "TRANS_AM",
 			"raceroomClassIds": [1707, 1706],
 			"pCarsClassNames": ["Trans-Am"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "DTM",
@@ -582,7 +627,8 @@
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
 			"isDRSCapable": true,
-			"DRSRange": 2.0
+			"DRSRange": 2.0,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "DTM_2013",
@@ -591,7 +637,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "DTM_2014",
@@ -600,7 +647,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "DTM_2015",
@@ -609,7 +657,8 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "DTM_2016",
@@ -618,33 +667,38 @@
 			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "CLIO_CUP",
 			"pCarsClassNames": ["TC1", "Clio Cup"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "MEGANE_TROPHY",
 			"pCarsClassNames": ["Megane Trophy"],
 			"rf2ClassNames": ["*Megane Trophy*"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "TC1",
 			"raceroomClassIds": [4517, 6036, 6309],
 			"rf2ClassNames": ["Lada Vesta", "Honda Civic WTCC-TC1", "Chevrolet Cruze TC1", "Citroen C-Elysee", "Volvo S60 TC1"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "TC1_2014",
 			"raceroomClassIds": [3905],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "TC2",
@@ -659,13 +713,15 @@
 			"carClassEnum": "TCR",
 			"raceroomClassIds": [7009],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "AUDI_TT_CUP",
 			"raceroomClassIds": [4680, 5726],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "AUDI_TT_VLN",
@@ -678,7 +734,8 @@
 			"carClassEnum": "V8_SUPERCAR",
 			"pCarsClassNames": ["V8 Supercars"],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "ROAD_G",
@@ -774,7 +831,8 @@
 			"minTyreCircumference": 1.25,
 			"maxTyreCircumference": 2.8,
 			"timesInHundredths": false,
-			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreFWD": true
 		},
 		{
 			"carClassEnum": "KTM_RR",
@@ -782,7 +840,8 @@
 			"maxSafeWaterTemp": 102,
 			"maxSafeOilTemp": 115,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "HYPER_CAR",
@@ -815,7 +874,8 @@
 			"maxSafeWaterTemp": 120,
 			"maxSafeOilTemp": 125,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING"
+			"enabledMessageTypes": "TYRE_TEMPS, BRAKE_TEMPS, FUEL, LOCKING_AND_SPINNING",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "STOCK_V8",
@@ -823,7 +883,8 @@
 			"maxSafeWaterTemp": 120,
 			"maxSafeOilTemp": 125,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "NASCAR_2016",
@@ -831,21 +892,24 @@
 			"pCarsClassNames": ["Modern Stockcar"],
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "ISI_STOCKCAR_2015",
 			"rf2ClassNames": ["2015 Titan StockCar", "2015 Centennial StockCar", "2015 Edgar GT StockCar", "StockCar"],
 			"timesInHundredths": true,
 			"useAmericanTerms": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "RADICAL_SR3",
 			"rf2ClassNames": ["Radical SR3 RSX"],
 			"brakeType": "Ceramic",
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "TRACKDAY_A",
@@ -865,7 +929,8 @@
 			"carClassEnum": "R3E_SILHOUETTE",
 			"raceroomClassIds": [1717],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL"
+			"enabledMessageTypes": "ALL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "SKIP_BARBER",
@@ -874,20 +939,23 @@
 			"enabledMessageTypes": "FUEL",
 			"spotterVehicleLength": 4.34,
 			"spotterVehicleWidth": 1.75,
-			"limiterAvailable": false
+			"limiterAvailable": false,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "SPEC_MIATA",
 			"iracingCarIds": [67],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "FUEL",
-			"limiterAvailable": false
+			"limiterAvailable": false,
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "FORMULA_RENAULT20",
 			"iracingCarIds": [74],
 			"timesInHundredths": true,
-			"enabledMessageTypes": "FUEL"
+			"enabledMessageTypes": "FUEL",
+			"allMembersAreRWD": true
 		},
 		{
 			"carClassEnum": "F1_90S",
@@ -897,7 +965,8 @@
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
-			"pitCrewPreparationTime": 17
+			"pitCrewPreparationTime": 17,
+			"allMembersAreRWD": true
 		}
 	]
 }

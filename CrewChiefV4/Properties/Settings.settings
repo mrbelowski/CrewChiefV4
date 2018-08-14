@@ -836,9 +836,6 @@
     <Setting Name="tts_setting_listprop" Type="System.String" Scope="User">
       <Value Profile="(Default)">NEVER</Value>
     </Setting>
-    <Setting Name="use_trigger_word_for_always_on_sre" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="trigger_word_for_always_on_sre" Type="System.String" Scope="User">
       <Value Profile="(Default)">Chief</Value>
     </Setting>
