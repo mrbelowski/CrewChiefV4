@@ -264,7 +264,17 @@ namespace CrewChiefV4.Events
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)
             {
-                Console.WriteLine("Laptime " + currentGameState.SessionData.LapTimePrevious.ToString("0.000") + " valid = " + currentGameState.SessionData.PreviousLapWasValid);
+                if (currentGameState.SessionData.CompletedLaps > 0)
+                {
+                    if (currentGameState.SessionData.LapTimePrevious > 0.0f)
+                    {
+                        Console.WriteLine("Laptime: " + TimeSpan.FromSeconds(currentGameState.SessionData.LapTimePrevious).ToString(@"mm\:ss\.fff") + ",  Valid = " + currentGameState.SessionData.PreviousLapWasValid);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Laptime: " + currentGameState.SessionData.LapTimePrevious.ToString("0.000") + ",  Valid = " + currentGameState.SessionData.PreviousLapWasValid);
+                    }
+                }
                 if (currentGameState.SessionData.TrackDefinition != null)
                 {
                     switch (currentGameState.SessionData.TrackDefinition.trackLengthClass)
