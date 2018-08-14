@@ -660,17 +660,29 @@ namespace CrewChiefV4.Events
                 // report sector delta at the completion of a sector?
                 if (!sectorsReportedForLap && currentGameState.SessionData.IsNewSector && 
                     ((currentGameState.SessionData.SessionType == SessionType.Race && raceSectorReportsAtEachSector) ||
-                     (currentGameState.SessionData.SessionType != SessionType.Race && practiceAndQualSectorReportsAtEachSector))) 
+                     (currentGameState.SessionData.SessionType != SessionType.Race && practiceAndQualSectorReportsAtEachSector)))
                 {
                     double r = Utilities.random.NextDouble() * 10;
                     Boolean canPlayForRace = frequencyOfRaceSectorDeltaReports > r;
                     Boolean canPlayForPracAndQual = frequencyOfPracticeAndQualSectorDeltaReports > r;
+
+                    // only report sector time if this is a valid lap
+                    Boolean sectorWasOnValidLap;
+                    if (currentGameState.SessionData.IsNewLap)
+                    {
+                        sectorWasOnValidLap = currentGameState.SessionData.PreviousLapWasValid;
+                    }
+                    else
+                    {
+                        sectorWasOnValidLap = currentGameState.SessionData.CurrentLapIsValid;
+                    }
                     
-                    if ((currentGameState.SessionData.SessionType == SessionType.Race && canPlayForRace) ||
+                    if (sectorWasOnValidLap &&
+                        ((currentGameState.SessionData.SessionType == SessionType.Race && canPlayForRace) ||
                         (((currentGameState.SessionData.SessionType == SessionType.Practice && (currentGameState.OpponentData.Count > 0 || currentGameState.SessionData.CompletedLaps > 1))
                         || currentGameState.SessionData.SessionType == SessionType.Qualify ||
                         ((currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.LonePractice)
-                            && currentGameState.SessionData.CompletedLaps > 1)) && canPlayForPracAndQual))
+                            && currentGameState.SessionData.CompletedLaps > 1)) && canPlayForPracAndQual)))
                     {
                         float playerSector = -1;
                         float comparisonSector = -1;
