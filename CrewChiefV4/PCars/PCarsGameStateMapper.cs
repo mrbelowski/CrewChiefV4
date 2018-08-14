@@ -1428,7 +1428,7 @@ namespace CrewChiefV4.PCars
          * TODO: other session types. The "SESSION_TEST" above is actually the warmup. Presumably
          * an event with prac -> qual -> warmup -> race would use SESSION_PRACTICE
          * */
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
+        public SessionType mapToSessionType(Object memoryMappedFileStruct)
         {
             pCarsAPIStruct shared = (pCarsAPIStruct)memoryMappedFileStruct;
             uint sessionState = shared.mSessionState;

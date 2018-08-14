@@ -185,7 +185,7 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
             }
 
-            currentGameState.SessionData.SessionType = mapToSessionType(shared);
+            currentGameState.SessionData.SessionType = mapToSessionType(shared, previousGameState);
 
             if (previousGameState != null && currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType)
             {
@@ -1497,24 +1497,39 @@ namespace CrewChiefV4.RaceRoom
             return lastSessionPhase;
         }
 
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
+        // we use the previous gamestate here as we call this method before mapping the opponent data.
+        // If the previousGameState opponentData is empty, but the NumCars is > 1, then all driverData 
+        // sent by the game have the same name. For practice and qual this is a hint that we're looking
+        // at ghost lap data
+        public SessionType mapToSessionType(Object memoryMappedFileStruct, GameStateData previousGameState)
         {
             RaceRoomData.RaceRoomShared shared = (RaceRoomData.RaceRoomShared)memoryMappedFileStruct;
-            int r3eSessionType = shared.SessionType;
-            if ((int)RaceRoomConstant.Session.Practice == r3eSessionType || (int)RaceRoomConstant.Session.Warmup == r3eSessionType)
+            RaceRoomConstant.Session r3eSessionType = (RaceRoomConstant.Session) shared.SessionType;
+
+            if (RaceRoomConstant.Session.Practice == r3eSessionType)
+            {
+                if (previousGameState != null && shared.NumCars > 1 && previousGameState.OpponentData.Count == 0)
+                {
+                    return SessionType.LonePractice;
+                }
+                else
+                {
+                    return SessionType.Practice;
+                }
+            }
+            else if (RaceRoomConstant.Session.Warmup == r3eSessionType)
             {
                 return SessionType.Practice;
             }
-            else if ((int)RaceRoomConstant.Session.Qualify == r3eSessionType && numCarsAtSessionStart <= 2)
+            else if (RaceRoomConstant.Session.Qualify == r3eSessionType)
             {
-                // hotlap sessions are not explicity declared in R3E - have to check if it's qual and there are no more than 2 cars.
-                return SessionType.HotLap;
-            }
-            else if ((int)RaceRoomConstant.Session.Qualify == r3eSessionType)
-            {
+                if (previousGameState != null && shared.NumCars > 1 && previousGameState.OpponentData.Count == 0)
+                {
+                    return SessionType.HotLap;
+                }
                 return SessionType.Qualify;
             }
-            else if ((int)RaceRoomConstant.Session.Race == r3eSessionType)
+            else if (RaceRoomConstant.Session.Race == r3eSessionType)
             {
                 return SessionType.Race;
             }
