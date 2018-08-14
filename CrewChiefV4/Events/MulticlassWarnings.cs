@@ -168,7 +168,7 @@ namespace CrewChiefV4.Events
 
         public override List<SessionType> applicableSessionTypes
         {
-            get { return new List<SessionType> { SessionType.Race }; }
+            get { return new List<SessionType> { SessionType.Race, SessionType.Practice, SessionType.Qualify }; }
         }
 
         public override List<SessionPhase> applicableSessionPhases
@@ -255,7 +255,8 @@ namespace CrewChiefV4.Events
 
                             // when we're being caught by faster cars, if this is the first time in the session, and this guy is the leader
                             // (just in case this car has pitted and is a lap down or something) use a different message
-                            if (!caughtByFasterClassInThisSession && otherClassWarningData.numFasterCars > 0 && otherClassWarningData.fasterCarsIncludeClassLeader)
+                            if (currentGameState.SessionData.SessionType == SessionType.Race && 
+                                !caughtByFasterClassInThisSession && otherClassWarningData.numFasterCars > 0 && otherClassWarningData.fasterCarsIncludeClassLeader)
                             {
                                 caughtByFasterClassInThisSession = true;
                                 timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;
@@ -287,7 +288,7 @@ namespace CrewChiefV4.Events
                             {
                                 timeOfLastMultipleCarFasterClassWarning = currentGameState.Now;
                                 this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
-                                if (otherClassWarningData.fasterCarsIncludeClassLeader)
+                                if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.fasterCarsRacingForPosition)
                                     {
@@ -298,7 +299,7 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
-                                else if (otherClassWarningData.fasterCarsRacingForPosition)
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarsRacingForPosition)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
@@ -313,7 +314,7 @@ namespace CrewChiefV4.Events
                             {
                                 timeOfLastSingleCarFasterClassWarning = currentGameState.Now;
                                 this.driverNamesForFasterClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.fasterCarDriverNames);
-                                if (otherClassWarningData.fasterCarsIncludeClassLeader)
+                                if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                     {
@@ -324,7 +325,7 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
-                                else if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
@@ -340,7 +341,7 @@ namespace CrewChiefV4.Events
                                 
                                 // for slower cars, the first car we see might have dropped off the back of the field so we only use the "you're catching
                                 // the slower cars" message if the first slow car we see is part of a group
-                                if (!caughtSlowerClassInThisSession)
+                                if (currentGameState.SessionData.SessionType == SessionType.Race && !caughtSlowerClassInThisSession)
                                 {
                                     // if we have the class name, use it
                                     String classNameToRead;
@@ -365,7 +366,7 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreCatchingSlowerCars, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
-                                else if (otherClassWarningData.slowerCarsIncludeClassLeader)
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.slowerCarsRacingForPosition)
                                     {
@@ -376,7 +377,7 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
-                                else if (otherClassWarningData.slowerCarsRacingForPosition)
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarsRacingForPosition)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
@@ -392,7 +393,7 @@ namespace CrewChiefV4.Events
                             {
                                 timeOfLastSingleCarSlowerClassWarning = currentGameState.Now;
                                 this.driverNamesForSlowerClassLastWarnedAbout = new HashSet<string>(otherClassWarningData.slowerCarDriverNames);
-                                if (otherClassWarningData.slowerCarsIncludeClassLeader)
+                                if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                     {
@@ -403,7 +404,7 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                     }
                                 }
-                                else if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
