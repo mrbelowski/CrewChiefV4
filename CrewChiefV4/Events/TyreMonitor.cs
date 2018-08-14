@@ -1755,48 +1755,42 @@ namespace CrewChiefV4.Events
                         playedMessage = true;
                     }
                 }
-                else if (isFWD)
+                else if (isFWD && timeBothRearsAreLockedForLap > totalLockupThresholdForNextLap)
                 {
-                    if (timeBothRearsAreLockedForLap > totalLockupThresholdForNextLap)
+                    warnedOnLockingForLap = true;
+                    audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                    playedMessage = true;
+                }
+                else if (!isFWD && timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
+                {
+                    warnedOnLockingForLap = true;
+                    if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
-                        warnedOnLockingForLap = true;
+                        // lots of left rear locking, some right rear locking
                         audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
                         playedMessage = true;
                     }
-                }
-                else
-                {
-                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
+                    else
                     {
-                        warnedOnLockingForLap = true;
-                        if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
-                        {
-                            // lots of left rear locking, some right rear locking
-                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                            playedMessage = true;
-                        }
-                        else
-                        {
-                            // just left rear locking
-                            audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
-                            playedMessage = true;
-                        }
+                        // just left rear locking
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
+                        playedMessage = true;
                     }
-                    else if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
+                }
+                else if (!isFWD && timeRightRearIsLockedForLap > totalLockupThresholdForNextLap)
+                {
+                    warnedOnLockingForLap = true;
+                    if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
-                        warnedOnLockingForLap = true;
-                        if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
-                        {
-                            // lots of right rear locking, some left rear locking
-                            audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
-                            playedMessage = true;
-                        }
-                        else
-                        {
-                            // just right rear locking
-                            audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
-                            playedMessage = true;
-                        }
+                        // lots of right rear locking, some left rear locking
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                        playedMessage = true;
+                    }
+                    else
+                    {
+                        // just right rear locking
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
+                        playedMessage = true;
                     }
                 }
             }
