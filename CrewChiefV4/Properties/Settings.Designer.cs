@@ -3382,5 +3382,17 @@ namespace CrewChiefV4.Properties {
                 this["trigger_word_sre_min_confidence"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        public int trigger_word_listen_timeout {
+            get {
+                return ((int)(this["trigger_word_listen_timeout"]));
+            }
+            set {
+                this["trigger_word_listen_timeout"] = value;
+            }
+        }
     }
 }
