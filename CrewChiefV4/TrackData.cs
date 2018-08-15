@@ -234,11 +234,13 @@ namespace CrewChiefV4
         public List<TrackLandmark> trackLandmarks;
         public Boolean isOval = false;
         public float raceroomRollingStartLapDistance = -1.0f;
-        public TrackDataContainer(List<TrackLandmark> trackLandmarks, Boolean isOval, float raceroomRollingStartLapDistance = -1.0f)
+        public Boolean isDefinedInTracklandmarksData = true;
+        public TrackDataContainer(List<TrackLandmark> trackLandmarks, Boolean isOval, Boolean isDefinedInTracklandmarksData = true, float raceroomRollingStartLapDistance = -1.0f)
         {
             this.trackLandmarks = trackLandmarks;
             this.isOval = isOval;
             this.raceroomRollingStartLapDistance = raceroomRollingStartLapDistance;
+            this.isDefinedInTracklandmarksData = isDefinedInTracklandmarksData;
         }
     }
 
@@ -348,7 +350,7 @@ namespace CrewChiefV4
                 }
             }
             Console.WriteLine("No landmarks defined for this track");
-            return new TrackDataContainer(new List<TrackLandmark>(), false);
+            return new TrackDataContainer(new List<TrackLandmark>(), false, false);
         }
 
         public TrackDataContainer getTrackLandmarksForTrackLayoutId(int raceroomLayoutId)
@@ -358,10 +360,10 @@ namespace CrewChiefV4
                 if (trackLandmarksForTrack.raceroomLayoutId == raceroomLayoutId)
                 {
                     Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
-                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval, trackLandmarksForTrack.raceroomRollingStartLapDistance);
+                    return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval, true, trackLandmarksForTrack.raceroomRollingStartLapDistance);
                 }
             }
-            return new TrackDataContainer(new List<TrackLandmark>(), false);
+            return new TrackDataContainer(new List<TrackLandmark>(), false, false);
         }
 
         public static TrackLandmarksData getTrackLandmarksDataFromFile(String filename)
