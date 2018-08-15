@@ -38,6 +38,8 @@ namespace CrewChiefV4
         private static String sreConfigLanguageSetting = Configuration.getSpeechRecognitionConfigOption("language");
         private static String sreConfigDefaultLocaleSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
+        private int trigger_word_listen_timeout = UserSettings.GetUserSettings().getInt("trigger_word_listen_timeout");
+
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
         public static String[] HOWS_MY_AERO = Configuration.getSpeechRecognitionPhrases("HOWS_MY_AERO");
@@ -1081,7 +1083,7 @@ namespace CrewChiefV4
             {
                 Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
                 switchFromTriggerToRegularRecogniser();
-                restartWaitTimeoutThread(5000);
+                restartWaitTimeoutThread(trigger_word_listen_timeout);
             }
             else
             {
@@ -1220,7 +1222,7 @@ namespace CrewChiefV4
                     if (youWot)
                     {
                         // wait a little longer here as the "I didn't catch that" takes a second or two to say
-                        restartWaitTimeoutThread(7000);
+                        restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
                     }
                     recognizeAsync();
                     waitingForSpeech = true;
@@ -1301,7 +1303,7 @@ namespace CrewChiefV4
                                     Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", true /*needReport*/);
                                 }
                             }
-                            waveIn.StopRecording();
+                            StopNAudioWaveIn();
                         })).Start();
                     }
                 }
@@ -1334,7 +1336,7 @@ namespace CrewChiefV4
                 if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
                 {
                     SpeechRecogniser.keepRecognisingInHoldMode = false;
-                    waveIn.StopRecording();
+                    StopNAudioWaveIn();
                     Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
                     sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
@@ -1357,6 +1359,25 @@ namespace CrewChiefV4
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
                 sre.RecognizeAsyncCancel();
+            }
+        }
+
+        private void StopNAudioWaveIn()
+        {
+            int retries = 0;
+            Boolean stopped = false;
+            while (!stopped && retries < 3)
+            {
+                try
+                {
+                    waveIn.StopRecording();
+                    stopped = true;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(50);
+                    retries++;
+                }
             }
         }
 

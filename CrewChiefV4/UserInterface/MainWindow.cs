@@ -916,13 +916,13 @@ namespace CrewChiefV4
             // don't allow trigger word or always on if using nAudio
             if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
             {
-                if (voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD)
+                if (voiceOption == VoiceOptionEnum.TOGGLE || voiceOption == VoiceOptionEnum.TRIGGER_WORD)
                 {
                     Console.WriteLine("Voice option " + voiceOption.ToString() + " not compatible with nAudio input");
                     this.voiceDisableButton.Checked = true;
                 }
                 this.triggerWordButton.Enabled = false;
-                this.alwaysOnButton.Enabled = false;
+                this.toggleButton.Enabled = false;
             }
             if (voiceOption != VoiceOptionEnum.DISABLED)
             {
