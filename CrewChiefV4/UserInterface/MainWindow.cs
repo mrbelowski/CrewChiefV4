@@ -837,6 +837,7 @@ namespace CrewChiefV4
 
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
+            this.chiefNameBox.Items.AddRange(AudioPlayer.availableChiefVoices.ToArray());
             this.spotterNameBox.Items.AddRange(NoisyCartesianCoordinateSpotter.availableSpotters.ToArray());
             if (crewChief.audioPlayer.selectedPersonalisation == null || crewChief.audioPlayer.selectedPersonalisation.Length == 0 ||
                 crewChief.audioPlayer.selectedPersonalisation.Equals(AudioPlayer.NO_PERSONALISATION_SELECTED) ||
@@ -849,8 +850,18 @@ namespace CrewChiefV4
                 this.personalisationBox.Text = crewChief.audioPlayer.selectedPersonalisation;
             }
 
+            String savedChief = UserSettings.GetUserSettings().getString("chief_name");
+            if (!String.IsNullOrWhiteSpace(savedChief) && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedChief))
+            {
+                this.chiefNameBox.Text = savedChief;
+            }
+            else
+            {
+                this.chiefNameBox.Text = AudioPlayer.defaultChiefId;
+            }
+
             String savedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-            if (savedSpotter != null && savedSpotter.Length > 0 && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedSpotter))
+            if (!String.IsNullOrWhiteSpace(savedSpotter) && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedSpotter))
             {
                 this.spotterNameBox.Text = savedSpotter;
             }
@@ -860,6 +871,7 @@ namespace CrewChiefV4
             }
             // only register the value changed listener after loading the saved values
             this.personalisationBox.SelectedValueChanged += new System.EventHandler(this.personalisationSelected);
+            this.chiefNameBox.SelectedValueChanged += new System.EventHandler(this.chiefNameSelected);
             this.spotterNameBox.SelectedValueChanged += new System.EventHandler(this.spotterNameSelected);
 
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
@@ -1820,6 +1832,16 @@ namespace CrewChiefV4
                 UserSettings.GetUserSettings().setProperty("NAUDIO_DEVICE_GUID_BACKGROUND",
                     AudioPlayer.playbackDevices[this.backgroundAudioDeviceBox.Text].Item1);
                 UserSettings.GetUserSettings().saveUserSettings();
+            }
+        }
+
+        private void chiefNameSelected(object sender, EventArgs e)
+        {
+            if (!UserSettings.GetUserSettings().getString("chief_name").Equals(this.chiefNameBox.Text))
+            {
+                UserSettings.GetUserSettings().setProperty("chief_name", this.chiefNameBox.Text);
+                UserSettings.GetUserSettings().saveUserSettings();
+                doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
             }
         }
 

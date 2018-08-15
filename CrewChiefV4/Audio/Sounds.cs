@@ -53,7 +53,7 @@ namespace CrewChiefV4.Audio
 
         public static Boolean hasSuitableTTSVoice = false;
         
-        public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
+        public SoundCache(DirectoryInfo soundsFolder, DirectoryInfo sharedSoundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             // ensure the static state is nuked before we start updating it
             SoundCache.dynamicLoadedSounds.Clear();
@@ -128,15 +128,19 @@ namespace CrewChiefV4.Audio
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;
             SoundCache.allowCaching = allowCaching;
-            DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
-            foreach (DirectoryInfo soundFolder in soundsFolders)
+            DirectoryInfo[] sharedSoundsFolders = sharedSoundsFolder.GetDirectories();
+            foreach (DirectoryInfo soundFolder in sharedSoundsFolders)
             {
                 if (soundFolder.Name == "fx")
                 {
                     // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "personalisations")
+            }
+            DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
+            foreach (DirectoryInfo soundFolder in soundsFolders)
+            {
+                if (soundFolder.Name == "personalisations")
                 {
                     if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
                     {

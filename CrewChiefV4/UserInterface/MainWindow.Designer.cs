@@ -522,10 +522,6 @@ namespace CrewChiefV4
             this.chiefNameBox.TabIndex = 95;
             this.chiefNameBoxTooltip.SetToolTip(this.chiefNameBox, Configuration.getUIString("chief_name_tooltip"));
 
-            // TODO: move.
-            this.chiefNameBox.Items.Add("Jim");
-            this.chiefNameBox.SelectedIndex = 0;
-
             this.spotterNameLabel.AutoSize = true;
             this.spotterNameLabel.Location = new System.Drawing.Point(961, 75);
             this.spotterNameLabel.Name = "spotterNameLabel";

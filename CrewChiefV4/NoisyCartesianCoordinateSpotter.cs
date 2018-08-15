@@ -103,7 +103,6 @@ namespace CrewChiefV4
             availableSpotters.Add(defaultSpotterId);
             try
             {
-                // TODO_AVP: this is a problem because AudioPlayer.soundFilesPath is overriden.  Which static constructor invoked first?
                 DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPathNoChiefOverride + "/voice");
                 DirectoryInfo[] directories = soundsDirectory.GetDirectories();
                 foreach (DirectoryInfo folder in directories)
@@ -118,7 +117,7 @@ namespace CrewChiefV4
                 {
                     if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/spotter_" + selectedSpotter))
                     {
-                        Console.WriteLine("Using spotter " + selectedSpotter);
+                        Console.WriteLine("Using spotter: " + selectedSpotter);
                         folderStillThere = "spotter_" + selectedSpotter + "/still_there";
                         folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
                         folderCarLeft = "spotter_" + selectedSpotter + "/car_left";

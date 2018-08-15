@@ -103,7 +103,8 @@ namespace CrewChiefV4.Audio
 
         public static String soundFilesPath;
 
-        // Spotter files location does not depend on Chief voice location, and omes from the default voice pack, for now.
+        // Default voice pack root path.
+        // Spotter files location does not depend on Chief voice location, and comes from the default voice pack, for now.
         public static String soundFilesPathNoChiefOverride;
 
         private String backgroundFilesPath;
@@ -198,11 +199,12 @@ namespace CrewChiefV4.Audio
                 }
 
                 String selectedChief = UserSettings.GetUserSettings().getString("chief_name");
-                if (!string.IsNullOrWhiteSpace(selectedChief) && !defaultChiefId.Equals(selectedChief))
+                if (!String.IsNullOrWhiteSpace(selectedChief) && !defaultChiefId.Equals(selectedChief))
                 {
                     if (Directory.Exists(AudioPlayer.soundFilesPath + "/alt/" + selectedChief))
                     {
                         Console.WriteLine("Using Chief voice: " + selectedChief);
+                        AudioPlayer.soundFilesPath = AudioPlayer.soundFilesPath + "/alt/" + selectedChief;
                         /*folderStillThere = "spotter_" + selectedChief + "/still_there";
                         folderInTheMiddle = "spotter_" + selectedChief + "/in_the_middle";
                         folderCarLeft = "spotter_" + selectedChief + "/car_left";
@@ -305,20 +307,27 @@ namespace CrewChiefV4.Audio
 
             // TODO_AVP: only update main pack for now?
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPathNoChiefOverride);
-
             if (soundDirectory.Exists)
             {
-                // TODO_AVP: version updates?
+                // TODO_AVP: version updates? 
                 SoundPackVersionsHelper.currentSoundPackVersion = getSoundPackVersion(soundDirectory);
                 SoundPackVersionsHelper.currentDriverNamesVersion = getDriverNamesVersion(soundDirectory);
-
-                // TODO_AVP: pick language from possibly overriden folder?
-                soundPackLanguage = getSoundPackLanguage(soundDirectory);
                 SoundPackVersionsHelper.currentPersonalisationsVersion = getPersonalisationsVersion(soundDirectory);
             }
             else
             {
                 soundDirectory.Create();
+            }
+
+            soundDirectory = new DirectoryInfo(soundFilesPath);
+            if (soundDirectory.Exists)
+            {
+                // Pick language from possibly overriden voice location.
+                soundPackLanguage = getSoundPackLanguage(soundDirectory);
+            }
+            if (soundPackLanguage == null)
+            {
+                soundPackLanguage = "en";  // Default to Queen's English, or Northern?
             }
 
             // populate the personalisations list
@@ -371,7 +380,7 @@ namespace CrewChiefV4.Audio
         public void initialise()
         {
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPath);
-            backgroundFilesPath = Path.Combine(soundFilesPath, "background_sounds");
+            backgroundFilesPath = Path.Combine(soundFilesPathNoChiefOverride, "background_sounds");
 
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
@@ -400,7 +409,7 @@ namespace CrewChiefV4.Audio
             }
             if (this.soundCache == null)
             {
-                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath),
+                soundCache = new SoundCache(new DirectoryInfo(soundFilesPath), new DirectoryInfo(soundFilesPathNoChiefOverride),
                     new String[] { "spotter", "acknowledge" }, sweary, allowCaching, selectedPersonalisation);
             }
             initialised = true;
@@ -453,7 +462,7 @@ namespace CrewChiefV4.Audio
             {
                 if (fileInSoundDirectory.Name == "sound_pack_version_info.txt")
                 {
-                    String[] lines = File.ReadAllLines(Path.Combine(soundFilesPath, fileInSoundDirectory.Name));
+                    String[] lines = File.ReadAllLines(fileInSoundDirectory.FullName/*Path.Combine(soundFilesPath, fileInSoundDirectory.Name)*/);
                     foreach (String line in lines)
                     {
                         if (float.TryParse(line, out version))
