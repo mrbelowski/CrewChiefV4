@@ -474,7 +474,7 @@ namespace CrewChiefV4.GameState
 
         public void playerStartNewLap(int lapNumber, int overallPosition, Boolean inPits, float gameTimeAtStart)
         {
-            verifyPreviousPlayerLap();
+            verifyPlayerPreviousLap();
 
             LapData thisLapData = new LapData();
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
@@ -485,8 +485,15 @@ namespace CrewChiefV4.GameState
             PlayerLapData.Add(thisLapData);
         }
 
-        private void verifyPreviousPlayerLap()
+        // This method takes care of marking abandoned laps as invalid and missing sectors.
+        // It is intended to be called when IsNewLap is true, and _before_ new lap is added to this.PlayerLapata.
+        private void verifyPlayerPreviousLap()
         {
+            if (!IsNewLap)
+            {
+                Debug.Assert(IsNewLap, "IsNewLap is false, please fix the mapper.");
+                return;
+            }
             // Verify we have LapData flags in a sane state.  This is necessary, because if player jumps to pits
             // without completing the lap, IsValid and hasMissingSectors members may not have correct values set.
             if (PlayerLapData.Count > 0)
@@ -534,7 +541,7 @@ namespace CrewChiefV4.GameState
 
             LapTimePrevious = providedLapTime;
 
-            verifyPreviousPlayerLap();
+            verifyPlayerPreviousLap();
 
             if (lapData.IsValid && !lapData.OutLap && !lapData.InLap && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
             {
