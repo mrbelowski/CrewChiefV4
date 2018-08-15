@@ -54,6 +54,7 @@ available_actions = Available ac&tions
 properties = &Properties
 voice_recognition_mode = Voice &recognition mode
 always_on = Always on
+trigger_word = Trigger word
 toggle_button = Press and release button
 hold_button = Hold button
 disabled = Disabled
@@ -63,6 +64,12 @@ app_version = App version
 help = &Help and getting started
 about = &About Crew Chief
 save_console_output = Save console &text
+voice_recognition_mode_help = Voice recognition mode - 'Trigger word' and 'Press and release button' not available with nAudio
+voice_recognition_always_on_help = App always listens
+voice_recognition_toggle_button_help = App listens after you press and release a button  (doesn't work with nAudio)
+voice_recognition_hold_button_help = App listens while you hold down a button
+voice_recognition_disabled_help = App doesn't listen
+voice_recognition_trigger_word_help = App always listens for a key word or phrase, and after hearing this it listens for a command (doesn't work with nAudio)
 
 restore_context_menu = Restore
 start_context_menu = Start {0} mode
@@ -359,7 +366,7 @@ play_cut_track_warnings = Play cut track warnings
 play_cut_track_warnings_category = FLAGS_AND_RULES
 
 spotter_enable_three_wide_left_and_right = Spotter enable three wide left and right
-spotter_enable_three_wide_left_and_right_help = Use "three wide, you're on the left / right" mmessages (can be confusing)
+spotter_enable_three_wide_left_and_right_help = Use "three wide, you're on the left / right" messages (can be confusing)
 spotter_enable_three_wide_left_and_right_category = SPOTTER
 
 use_alternate_beeps = Use alternate beeps
@@ -1092,12 +1099,8 @@ priortise_messages_depending_on_situation = Advanced message prioritisation
 priortise_messages_depending_on_situation_help = Disable less important messages when under pressure, on a qualifying lap, etc
 priortise_messages_depending_on_situation_category = AUDIO_VOICE_AND_CONTROLLERS
 
-use_trigger_word_for_always_on_sre = Enable speech recogniser trigger word
-use_trigger_word_for_always_on_sre_help = When running 'always on' mode, the will only listen for commands if it hears the trigger word
-use_trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS
-
 trigger_word_for_always_on_sre = Speech recogniser trigger word
-trigger_word_for_always_on_sre_help = When running 'always on' mode, the app lists for this trigger word before each command
+trigger_word_for_always_on_sre_help = When running 'Trigger word' mode, the app listens for this trigger word before each command
 trigger_word_for_always_on_sre_category = AUDIO_VOICE_AND_CONTROLLERS
 
 interrupt_setting_listprop = Interrupt regular messages
@@ -1120,3 +1123,7 @@ tts_setting_listprop_value_2 = Use TTS for all missing names
 trigger_word_sre_min_confidence = Minimum trigger word confidence
 trigger_word_sre_min_confidence_help = When listening for the voice command trigger word, the app must be at least this confident it understood before starting speech recognition (0.0 - 1.0, default 0.6)
 trigger_word_sre_min_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
+
+trigger_word_listen_timeout = Trigger word listen timeout (ms)
+trigger_word_listen_timeout_help = Wait this many milliseconds for a command after receiving the trigger word
+trigger_word_listen_timeout_category = AUDIO_VOICE_AND_CONTROLLERS

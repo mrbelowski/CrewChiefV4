@@ -38,6 +38,8 @@ namespace CrewChiefV4
         private static String sreConfigLanguageSetting = Configuration.getSpeechRecognitionConfigOption("language");
         private static String sreConfigDefaultLocaleSetting = Configuration.getSpeechRecognitionConfigOption("defaultLocale");
 
+        private int trigger_word_listen_timeout = UserSettings.GetUserSettings().getInt("trigger_word_listen_timeout");
+
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
         public static String[] HOWS_MY_AERO = Configuration.getSpeechRecognitionPhrases("HOWS_MY_AERO");
@@ -229,12 +231,11 @@ namespace CrewChiefV4
         public static Boolean keepRecognisingInHoldMode = false;
 
         private SpeechRecognitionEngine triggerSre;
-        // if we're in 'always on' mode and we're not using nAudio, set up a trigger phrase - 
-        // you say "Chief" (or whatever) and the app will beep, indicating it's ready for speech input
-        private static Boolean useTriggerSre = false;
 
         // This is the trigger phrase used to activate the 'full' SRE
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
+
+        private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
 
         static SpeechRecogniser () 
         {
@@ -371,6 +372,34 @@ namespace CrewChiefV4
                 generatedGrammars.Add(grammar);
             }
             return generatedGrammars;
+        }
+
+        // ensure the SRE has stopped waiting for speech, and if we're in trigger-word mode, reset it to the
+        // default audio input device
+        public void stop()
+        {
+            try
+            {
+                if (sre != null)
+                {
+                    sre.RecognizeAsyncCancel();
+                }
+                if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
+                {
+                    if (triggerSre != null)
+                    {
+                        triggerSre.RecognizeAsyncCancel();
+                    }
+                    if (sre != null)
+                    {
+                        sre.SetInputToDefaultAudioDevice();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error resetting recogniser");
+            }
         }
 
         public void Dispose()
@@ -1021,16 +1050,22 @@ namespace CrewChiefV4
             return success;
         }
 
-        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        private void restartWaitTimeoutThread(int timeout)
         {
-            if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
+            triggerTimeoutWaitHandle.Set();
+            new Thread(() =>
             {
-                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
-                switchFromTriggerToRegularRecogniser();
-                new Thread(() =>
+                triggerTimeoutWaitHandle.Reset();
+                Thread.CurrentThread.IsBackground = true;
+                Boolean signalled = triggerTimeoutWaitHandle.WaitOne(timeout);
+                if (signalled)
                 {
-                    Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(5000);
+                    // thread was stopped so we got some speech or asked the thread to shut down
+                    // (no point in logging anything here)
+                }
+                else
+                {
+                    // timeout waiting
                     if (waitingForSpeech)
                     {
                         // no result
@@ -1038,7 +1073,17 @@ namespace CrewChiefV4
                         sre.RecognizeAsyncCancel();
                         switchFromRegularToTriggerRecogniser();
                     }
-                }).Start();
+                }
+            }).Start();
+        }
+
+        void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
+            {
+                Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
+                switchFromTriggerToRegularRecogniser();
+                restartWaitTimeoutThread(trigger_word_listen_timeout);
             }
             else
             {
@@ -1048,8 +1093,11 @@ namespace CrewChiefV4
 
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            // cancel the thread that's waiting for a speech recognised timeout:
+            triggerTimeoutWaitHandle.Set();
             SpeechRecogniser.waitingForSpeech = false;
             SpeechRecogniser.gotRecognitionResult = true;
+            Boolean youWot = false;
             Console.WriteLine("Recognised : " + e.Result.Text + " confidence = " + e.Result.Confidence.ToString("0.000"));
             try
             {
@@ -1078,6 +1126,7 @@ namespace CrewChiefV4
                         else
                         {
                             crewChief.youWot(true);
+                            youWot = true;
                         }
                     }
                     else if (e.Result.Confidence > minimum_voice_recognition_confidence)
@@ -1123,6 +1172,7 @@ namespace CrewChiefV4
                     else
                     {
                         crewChief.youWot(true);
+                        youWot = true;
                     }
                 }
             }
@@ -1148,20 +1198,33 @@ namespace CrewChiefV4
                 {
                     sre.RecognizeAsyncStop();
                     Thread.Sleep(500);
-                    if (useTriggerSre)
-                    {
-                        Console.WriteLine("Waiting for trigger word " + keyWord);
-                        switchFromRegularToTriggerRecogniser();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Restarting speech recognition");
-                        recognizeAsync();
-                        waitingForSpeech = true;
-                    }
+                    Console.WriteLine("Restarting speech recognition");
+                    recognizeAsync();
+                    waitingForSpeech = true;
                 }
                 else
                 {
+                    waitingForSpeech = true;
+                }
+            }
+            else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
+            {
+                sre.RecognizeAsyncStop();
+                Thread.Sleep(500);
+                if (!youWot)
+                {
+                    Console.WriteLine("Waiting for trigger word " + keyWord);
+                    switchFromRegularToTriggerRecogniser();
+                }
+                else
+                {
+                    Console.WriteLine("Restarting speech recognition");
+                    if (youWot)
+                    {
+                        // wait a little longer here as the "I didn't catch that" takes a second or two to say
+                        restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
+                    }
+                    recognizeAsync();
                     waitingForSpeech = true;
                 }
             }
@@ -1183,9 +1246,7 @@ namespace CrewChiefV4
 
         public void startContinuousListening()
         {
-            useTriggerSre = voiceOptionEnum == MainWindow.VoiceOptionEnum.ALWAYS_ON && !useNAudio &&
-                UserSettings.GetUserSettings().getBoolean("use_trigger_word_for_always_on_sre");
-            if (useTriggerSre)
+            if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
             {                
                 triggerSre.UnloadAllGrammars();
                 GrammarBuilder gb = new GrammarBuilder();
@@ -1242,7 +1303,7 @@ namespace CrewChiefV4
                                     Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", true /*needReport*/);
                                 }
                             }
-                            waveIn.StopRecording();
+                            StopNAudioWaveIn();
                         })).Start();
                     }
                 }
@@ -1275,7 +1336,7 @@ namespace CrewChiefV4
                 if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
                 {
                     SpeechRecogniser.keepRecognisingInHoldMode = false;
-                    waveIn.StopRecording();
+                    StopNAudioWaveIn();
                     Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
                     sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
@@ -1298,6 +1359,25 @@ namespace CrewChiefV4
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
                 sre.RecognizeAsyncCancel();
+            }
+        }
+
+        private void StopNAudioWaveIn()
+        {
+            int retries = 0;
+            Boolean stopped = false;
+            while (!stopped && retries < 3)
+            {
+                try
+                {
+                    waveIn.StopRecording();
+                    stopped = true;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(50);
+                    retries++;
+                }
             }
         }
 

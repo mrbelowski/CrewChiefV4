@@ -28,8 +28,6 @@ namespace CrewChiefV4.GameState
 
         public abstract void versionCheck(Object memoryMappedFileStruct);
 
-        public abstract SessionType mapToSessionType(Object memoryMappedFileStruct);
-
         private DateTime nextOpponentBehindPitMessageDue = DateTime.MinValue;
         private DateTime nextOpponentAheadPitMessageDue = DateTime.MinValue;
         private DateTime nextLeaderPitMessageDue = DateTime.MinValue;
