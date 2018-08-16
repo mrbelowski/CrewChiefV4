@@ -704,18 +704,22 @@ namespace CrewChiefV4.Audio
             {
                 if (namesFolder.Name.Equals(selectedPersonalisation, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    DirectoryInfo[] prefixesAndSuffixesFolders = namesFolder.GetDirectories();
-                    if (prefixesAndSuffixesFolders.Length == 1)
+                    DirectoryInfo[] nameSubfolders = namesFolder.GetDirectories();
+                    foreach (DirectoryInfo nameSubfolder in nameSubfolders)
                     {
-                        foreach (DirectoryInfo prefixesAndSuffixesFolder in prefixesAndSuffixesFolders[0].GetDirectories())
+                        if (nameSubfolder.Name.Equals("prefixes_and_suffixes"))
                         {
-                            // always keep the personalisations cached as they're reused frequently, so create the sound players immediately after the files are loaded
-                            SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, allowCaching, allowCaching, true, true);
-                            if (soundSet.hasSounds)
+                            foreach (DirectoryInfo prefixesAndSuffixesFolder in nameSubfolder.GetDirectories())
                             {
-                                availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
-                                soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
+                                // always keep the personalisations cached as they're reused frequently, so create the sound players immediately after the files are loaded
+                                SoundSet soundSet = new SoundSet(prefixesAndSuffixesFolder, this.useSwearyMessages, allowCaching, allowCaching, true, true);
+                                if (soundSet.hasSounds)
+                                {
+                                    availablePrefixesAndSuffixes.Add(prefixesAndSuffixesFolder.Name);
+                                    soundSets.Add(prefixesAndSuffixesFolder.Name, soundSet);
+                                }
                             }
+                            break;
                         }
                     }
                     break;
