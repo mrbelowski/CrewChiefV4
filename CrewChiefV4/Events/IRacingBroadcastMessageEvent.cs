@@ -180,22 +180,35 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
                     return;
                 }
-                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.GALLONS))
+                if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
                 {
+                    AddFuel(amount);
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
+                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres), 0, null));
+                }
+                else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.GALLONS))
+                {
+                    AddFuel(convertGallonsToLitres(amount));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
+                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons), 0, null));
+                }
+                else
+                {
+                    Console.WriteLine("Got fuel request with no unit, assuming " + (Fuel.fuelReportsInGallon ? " gallons" : "litres"));
                     if (!Fuel.fuelReportsInGallon)
                     {
                         AddFuel(amount);
                         audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
                             MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres), 0, null));
                     }
-                    else                    
+                    else
                     {
                         AddFuel(convertGallonsToLitres(amount));
                         audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
                             MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons), 0, null));
                     }
-                    return;
                 }
+                return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FUEL_TO_THE_END))
             {

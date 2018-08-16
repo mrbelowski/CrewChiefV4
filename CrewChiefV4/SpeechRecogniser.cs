@@ -944,6 +944,8 @@ namespace CrewChiefV4
                     litresAndGallons.AddRange(LITERS);
                     litresAndGallons.AddRange(GALLONS);
                     iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, litresAndGallons.ToArray(), true));
+                    // add the fuel choices with no unit - these use the default / reported unit for fuel
+                    iracingPitstopGrammarList.AddRange(addCompoundChoices(PIT_STOP_ADD, false, this.digitsChoices, null, true));
 
                     validateAndAdd(PIT_STOP_TEAROFF, iRacingChoices);
                     validateAndAdd(PIT_STOP_FAST_REPAIR, iRacingChoices);
