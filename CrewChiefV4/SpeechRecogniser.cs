@@ -1303,7 +1303,7 @@ namespace CrewChiefV4
                                     Utilities.ReportException(e, "Exception in SpeechRecognitionEngine.RecognizeAsync.", true /*needReport*/);
                                 }
                             }
-                            waveIn.StopRecording();
+                            StopNAudioWaveIn();
                         })).Start();
                     }
                 }
@@ -1336,7 +1336,7 @@ namespace CrewChiefV4
                 if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.HOLD)
                 {
                     SpeechRecogniser.keepRecognisingInHoldMode = false;
-                    waveIn.StopRecording();
+                    StopNAudioWaveIn();
                     Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi = new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
                     sre.SetInputToAudioStream(buffer, safi); // otherwise input gets unset
@@ -1359,6 +1359,25 @@ namespace CrewChiefV4
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
                 sre.RecognizeAsyncCancel();
+            }
+        }
+
+        private void StopNAudioWaveIn()
+        {
+            int retries = 0;
+            Boolean stopped = false;
+            while (!stopped && retries < 3)
+            {
+                try
+                {
+                    waveIn.StopRecording();
+                    stopped = true;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(50);
+                    retries++;
+                }
             }
         }
 
