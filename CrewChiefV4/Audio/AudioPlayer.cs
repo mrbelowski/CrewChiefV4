@@ -143,6 +143,7 @@ namespace CrewChiefV4.Audio
         static AudioPlayer()
         {
             // Inintialize sound file paths.  Handle user specified override, or pick default.
+            // TODO_AVP: test sound pack override.
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
@@ -205,38 +206,6 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("Using Chief voice: " + selectedChief);
                         AudioPlayer.soundFilesPath = AudioPlayer.soundFilesPath + "/alt/" + selectedChief;
-                        /*folderStillThere = "spotter_" + selectedChief + "/still_there";
-                        folderInTheMiddle = "spotter_" + selectedChief + "/in_the_middle";
-                        folderCarLeft = "spotter_" + selectedChief + "/car_left";
-                        folderCarRight = "spotter_" + selectedChief + "/car_right";
-                        folderClearLeft = "spotter_" + selectedChief + "/clear_left";
-                        folderClearRight = "spotter_" + selectedChief + "/clear_right";
-                        folderClearAllRound = "spotter_" + selectedChief + "/clear_all_round";
-                        folderThreeWideYoureOnRight = "spotter_" + selectedChief + "/three_wide_on_right";
-                        folderThreeWideYoureOnLeft = "spotter_" + selectedChief + "/three_wide_on_left";
-                        folderCarInside = "spotter_" + selectedChief + "/car_inside";
-                        folderCarOutside = "spotter_" + selectedChief + "/car_outside";
-
-                        // Currently the Geoffrey spotter has no clear inside / clear outside sounds:
-                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedChief + "/clear_inside");
-                        folderClearInside = hasClearInside ? "spotter_" + selectedChief + "/clear_inside" : folderClearLeft;
-                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedChief + "/clear_outside");
-                        folderClearOutside = hasClearOutside ? "spotter_" + selectedChief + "/clear_outside" : folderClearRight;
-
-                        folderThreeWideYoureOnInside = "spotter_" + selectedChief + "/three_wide_on_inside";
-                        folderThreeWideYoureOnOutside = "spotter_" + selectedChief + "/three_wide_on_outside";
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedChief))
-                        {
-                            folderEnableSpotter = "acknowledge/spotterEnabled_" + selectedChief;
-                        }
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterDisabled_" + selectedChief))
-                        {
-                            folderDisableSpotter = "acknowledge/spotterDisabled_" + selectedChief;
-                        }
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/radio_check_" + selectedChief + "/test"))
-                        {
-                            folderSpotterRadioCheck = "radio_check_" + selectedChief + "/test";
-                        }*/
                     }
                     else
                     {
@@ -245,16 +214,6 @@ namespace CrewChiefV4.Audio
                         UserSettings.GetUserSettings().saveUserSettings();
                     }
                 }
-                // check the oval specific stuff exists before enabling it:
-                /*hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);
-                if (hasOvalSpecificSounds)
-                {
-                    Console.WriteLine("Spotter " + selectedChief + " has oval-specific sounds - these will be used for tracks marked as 'oval'");
-                }
-                else
-                {
-                    Console.WriteLine("Spotter " + selectedChief + " has no oval-specific sounds");
-                }*/
             }
             catch (Exception)
             {
@@ -305,11 +264,10 @@ namespace CrewChiefV4.Audio
         {
             this.mainThreadContext = SynchronizationContext.Current;
 
-            // TODO_AVP: only update main pack for now?
+            // Only update main pack for now?
             DirectoryInfo soundDirectory = new DirectoryInfo(soundFilesPathNoChiefOverride);
             if (soundDirectory.Exists)
             {
-                // TODO_AVP: version updates? 
                 SoundPackVersionsHelper.currentSoundPackVersion = getSoundPackVersion(soundDirectory);
                 SoundPackVersionsHelper.currentDriverNamesVersion = getDriverNamesVersion(soundDirectory);
                 SoundPackVersionsHelper.currentPersonalisationsVersion = getPersonalisationsVersion(soundDirectory);

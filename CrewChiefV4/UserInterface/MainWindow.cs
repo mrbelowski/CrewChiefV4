@@ -1315,6 +1315,7 @@ namespace CrewChiefV4
                 this.propertiesButton.Enabled = false;
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
+                this.chiefNameBox.Enabled = false;
                 this.spotterNameBox.Enabled = false;
                 this.recordSession.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
@@ -1373,6 +1374,7 @@ namespace CrewChiefV4
                 this.groupBox1.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
+                this.chiefNameBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
                 this.recordSession.Enabled = true;
                 DriverTrainingService.completeRecordingPaceNotes();

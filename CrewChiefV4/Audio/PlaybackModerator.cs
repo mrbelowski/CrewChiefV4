@@ -43,8 +43,7 @@ namespace CrewChiefV4.Audio
         private static bool enableTracing = false;
 #endif
         // This field is necessary to avoid construction of NoisyCartesianCoordinateSpotter before AudioPlayer.
-        private static string defaultSpotterId = "Jim (default)"; // TODO_AVP: fix
-        private static bool isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == defaultSpotterId;  // TODO_AVP: fix this.
+        private static bool isSpotterAndChiefSameVoice = UserSettings.GetUserSettings().getString("spotter_name") == UserSettings.GetUserSettings().getString("chief_name");
         private static bool insertBeepOutBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_out_between_spotter_and_chief");
         private static bool insertBeepInBetweenSpotterAndChief = UserSettings.GetUserSettings().getBoolean("insert_beep_in_between_spotter_and_chief");
         private static bool rejectMessagesWhenTalking = UserSettings.GetUserSettings().getBoolean("reject_message_when_talking");
