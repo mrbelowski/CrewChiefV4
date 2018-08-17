@@ -143,7 +143,6 @@ namespace CrewChiefV4.Audio
         static AudioPlayer()
         {
             // Inintialize sound file paths.  Handle user specified override, or pick default.
-            // TODO_AVP: test sound pack override.
             String soundPackLocationOverride = UserSettings.GetUserSettings().getString("override_default_sound_pack_location");
             String defaultSoundFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\CrewChiefV4\sounds";
             DirectoryInfo defaultSoundDirectory = new DirectoryInfo(defaultSoundFilesPath);
