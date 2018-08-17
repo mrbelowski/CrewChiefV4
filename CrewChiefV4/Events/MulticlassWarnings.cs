@@ -83,6 +83,7 @@ namespace CrewChiefV4.Events
 
         private static Dictionary<CarData.CarClassEnum, string> carClassEnumToSound = new Dictionary<CarData.CarClassEnum, string>();
         private static Dictionary<TrackData.TrackLengthClass, int> minLapsForTrackLengthClass = new Dictionary<TrackData.TrackLengthClass, int>();
+        private static Dictionary<TrackData.TrackLengthClass, int> minTimeForTrackLengthClass = new Dictionary<TrackData.TrackLengthClass, int>();
 
         private DateTime nextCheckForOtherCarClasses = DateTime.MinValue;
         private TimeSpan timeBetweenOtherClassChecks = TimeSpan.FromSeconds(4);
@@ -140,6 +141,14 @@ namespace CrewChiefV4.Events
             minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.MEDIUM, 3);
             minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.LONG, 2);
             minLapsForTrackLengthClass.Add(TrackData.TrackLengthClass.VERY_LONG, 2);
+
+            // in seconds. For v short tracks we expect a lap to be < 1 minute. For very long
+            // tracks we expect a lap to be > 6 minutes
+            minTimeForTrackLengthClass.Add(TrackData.TrackLengthClass.VERY_SHORT, 60);
+            minTimeForTrackLengthClass.Add(TrackData.TrackLengthClass.SHORT, 90);
+            minTimeForTrackLengthClass.Add(TrackData.TrackLengthClass.MEDIUM, 120);
+            minTimeForTrackLengthClass.Add(TrackData.TrackLengthClass.LONG, 210);
+            minTimeForTrackLengthClass.Add(TrackData.TrackLengthClass.VERY_LONG, 390);
         }
 
         // distance ahead where we consider slower cars. As we'll be behind the opponent, the separation value is negative
@@ -196,10 +205,14 @@ namespace CrewChiefV4.Events
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
             this.currentGameState = currentGameState;
+            int minLapsCompletedBeforeGettingBestTimes = currentGameState.SessionData.SessionType == SessionType.Race ? 2 : 0;
             if (!enableMulticlassWarnings ||
                 GameStateData.onManualFormationLap || GameStateData.NumberOfClasses == 1 || CrewChief.forceSingleClass ||
                 currentGameState.SessionData.TrackDefinition == null || 
-                currentGameState.SessionData.CompletedLaps < minLapsForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass] ||
+                (currentGameState.SessionData.SessionType == SessionType.Race && 
+                    currentGameState.SessionData.CompletedLaps < minLapsForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass]) ||
+                (currentGameState.SessionData.SessionType != SessionType.Race &&
+                    currentGameState.SessionData.SessionRunningTime < minTimeForTrackLengthClass[currentGameState.SessionData.TrackDefinition.trackLengthClass]) ||
                 currentGameState.PitData.InPitlane ||
                 currentGameState.PositionAndMotionData.CarSpeed < 5 || 
                 currentGameState.PositionAndMotionData.DistanceRoundTrack <= 0)
@@ -207,7 +220,7 @@ namespace CrewChiefV4.Events
                 return;
             }
             // update the best lap for each class - do this every sector once we've completed 2 laps
-            if (currentGameState.SessionData.CompletedLaps > 1 && currentGameState.SessionData.IsNewSector)
+            if (currentGameState.SessionData.CompletedLaps >= minLapsCompletedBeforeGettingBestTimes && currentGameState.SessionData.IsNewSector)
             {
                 getBestTimesByClass(currentGameState);
             }
