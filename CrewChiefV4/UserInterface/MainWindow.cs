@@ -851,7 +851,7 @@ namespace CrewChiefV4
             }
 
             String savedChief = UserSettings.GetUserSettings().getString("chief_name");
-            if (!String.IsNullOrWhiteSpace(savedChief) && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedChief))
+            if (!String.IsNullOrWhiteSpace(savedChief) && AudioPlayer.availableChiefVoices.Contains(savedChief))
             {
                 this.chiefNameBox.Text = savedChief;
             }

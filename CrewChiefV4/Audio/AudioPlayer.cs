@@ -464,7 +464,7 @@ namespace CrewChiefV4.Audio
                     {
                         if (fileInDriverNameDirectory.Name == "driver_names_version_info.txt")
                         {
-                            String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
+                            String[] lines = File.ReadAllLines(fileInDriverNameDirectory.FullName);
                             foreach (String line in lines)
                             {
                                 if (float.TryParse(line, out version))
@@ -495,7 +495,7 @@ namespace CrewChiefV4.Audio
                     {
                         if (fileInDriverNameDirectory.Name == "personalisations_version_info.txt")
                         {
-                            String[] lines = File.ReadAllLines(Path.Combine(Path.Combine(soundFilesPath, folderInSoundDirectory.Name), fileInDriverNameDirectory.Name));
+                            String[] lines = File.ReadAllLines(fileInDriverNameDirectory.FullName);
                             foreach (String line in lines)
                             {
                                 if (float.TryParse(line, out version))
