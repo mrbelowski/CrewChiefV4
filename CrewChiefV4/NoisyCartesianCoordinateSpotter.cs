@@ -96,7 +96,6 @@ namespace CrewChiefV4
 
         /**
          * static constructor to initialise spotter subfolder stuff.
-         * 
          */
         static NoisyCartesianCoordinateSpotter()
         {
@@ -104,7 +103,7 @@ namespace CrewChiefV4
             availableSpotters.Add(defaultSpotterId);
             try
             {
-                DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPath + "/voice");
+                DirectoryInfo soundsDirectory = new DirectoryInfo(AudioPlayer.soundFilesPathNoChiefOverride + "/voice");
                 DirectoryInfo[] directories = soundsDirectory.GetDirectories();
                 foreach (DirectoryInfo folder in directories)
                 {
@@ -116,9 +115,9 @@ namespace CrewChiefV4
                 String selectedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
                 if (!defaultSpotterId.Equals(selectedSpotter))
                 {
-                    if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter))
+                    if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/spotter_" + selectedSpotter))
                     {
-                        Console.WriteLine("Using spotter " + selectedSpotter);
+                        Console.WriteLine("Using spotter: " + selectedSpotter);
                         folderStillThere = "spotter_" + selectedSpotter + "/still_there";
                         folderInTheMiddle = "spotter_" + selectedSpotter + "/in_the_middle";
                         folderCarLeft = "spotter_" + selectedSpotter + "/car_left";
@@ -132,22 +131,22 @@ namespace CrewChiefV4
                         folderCarOutside = "spotter_" + selectedSpotter + "/car_outside";
 
                         // Currently the Geoffrey spotter has no clear inside / clear outside sounds:
-                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_inside");
+                        Boolean hasClearInside = Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/spotter_" + selectedSpotter + "/clear_inside");
                         folderClearInside = hasClearInside ? "spotter_" + selectedSpotter + "/clear_inside" : folderClearLeft;
-                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/spotter_" + selectedSpotter + "/clear_outside");                        
+                        Boolean hasClearOutside = Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/spotter_" + selectedSpotter + "/clear_outside");                        
                         folderClearOutside = hasClearOutside ? "spotter_" + selectedSpotter + "/clear_outside" : folderClearRight;
 
                         folderThreeWideYoureOnInside = "spotter_" + selectedSpotter + "/three_wide_on_inside";
                         folderThreeWideYoureOnOutside = "spotter_" + selectedSpotter + "/three_wide_on_outside";
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/acknowledge/spotterEnabled_" + selectedSpotter))
                         {
                             folderEnableSpotter = "acknowledge/spotterEnabled_" + selectedSpotter;
                         }
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/acknowledge/spotterDisabled_" + selectedSpotter))
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/acknowledge/spotterDisabled_" + selectedSpotter))
                         {
                             folderDisableSpotter = "acknowledge/spotterDisabled_" + selectedSpotter;
                         }
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + "/voice/radio_check_" + selectedSpotter + "/test"))
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedSpotter + "/test"))
                         {
                             folderSpotterRadioCheck = "radio_check_" + selectedSpotter + "/test";
                         }
@@ -156,11 +155,11 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("No spotter called " + selectedSpotter + " exists, dropping back to the default (Jim)");
                         UserSettings.GetUserSettings().setProperty("spotter_name", defaultSpotterId);
-                        UserSettings.GetUserSettings().saveUserSettings();                        
+                        UserSettings.GetUserSettings().saveUserSettings();
                     }
                 }
                 // check the oval specific stuff exists before enabling it:
-                hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPath + "/voice/" + folderCarInside);                
+                hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/" + folderCarInside);                
                 if (hasOvalSpecificSounds) 
                 {
                     Console.WriteLine("Spotter " + selectedSpotter + " has oval-specific sounds - these will be used for tracks marked as 'oval'");
