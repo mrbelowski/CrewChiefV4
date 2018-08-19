@@ -989,7 +989,7 @@ namespace CrewChiefV4.RaceRoom
                     Boolean skipGhost = false;
                     if (currentGameState.OpponentData.Count() == 0 
                         &&  (currentGameState.SessionData.SessionType == SessionType.HotLap
-                             || currentGameState.SessionData.SessionType == SessionType.Practice))
+                             || currentGameState.SessionData.SessionType == SessionType.LonePractice))
                     {
                         if (!ghostOpponents.Contains(driverName))
                         {
