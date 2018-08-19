@@ -987,15 +987,19 @@ namespace CrewChiefV4.RaceRoom
                 else
                 {
                     Boolean skipGhost = false;
-                    if (currentGameState.SessionData.SessionType == SessionType.HotLap
-                        || currentGameState.SessionData.SessionType == SessionType.Practice)
+                    if (currentGameState.OpponentData.Count() == 0 
+                        &&  (currentGameState.SessionData.SessionType == SessionType.HotLap
+                             || currentGameState.SessionData.SessionType == SessionType.Practice))
                     {
                         if (!ghostOpponents.Contains(driverName))
                         {
-                            if (participantStruct.InPitlane == 0)
+                            // Not sure if this is valid check.  We need a trace of the online session with folks joining in.
+                            if (participantStruct.InPitlane == 0
+                                && participantStruct.CarSpeed == 0.0f
+                                && Math.Abs(participantStruct.LapDistance) < 50.0)
                             {
                                 ghostOpponents.Add(driverName);
-                                Console.WriteLine("Added opponent: " + driverName + " into the set of ghost vehicles");
+                                Console.WriteLine("Added opponent: " + driverName + " into the set of ghost vehicles.  At lapdist: " + participantStruct.LapDistance.ToString("0.000"));
                                 skipGhost = true;
                             }
                         }
