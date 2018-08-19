@@ -93,7 +93,7 @@ namespace CrewChiefV4.RaceRoom
         List<String> opponentDriverNamesProcessedForThisTick = new List<String>();
 
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
-        private int numCarsAtSessionStart = -1;
+        private HashSet<string> ghostOpponents = new HashSet<string>();
 
         // True while on HotLap/Qualifying flying start lap.
         private bool approachingFirstFlyingLap = false;
@@ -182,7 +182,7 @@ namespace CrewChiefV4.RaceRoom
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
 
                 // Used by mapToSessionType.
-                currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
             }
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared, previousGameState);
@@ -190,7 +190,7 @@ namespace CrewChiefV4.RaceRoom
             if (previousGameState != null && currentGameState.SessionData.SessionType != previousGameState.SessionData.SessionType)
             {
                 Console.WriteLine("Session type changed from: " + previousGameState.SessionData.SessionType + "  to: " + currentGameState.SessionData.SessionType
-                    + "  Last session phase: " + previousGameState.SessionData.SessionPhase + "  new session phase: " + currentGameState.SessionData.SessionPhase);
+                    + "  Last session phase: " + previousGameState.SessionData.SessionPhase + "  New session phase: " + currentGameState.SessionData.SessionPhase);
             }
 
             currentGameState.SessionData.SessionRunningTime = (float)shared.Player.GameSimulationTime;
@@ -259,11 +259,12 @@ namespace CrewChiefV4.RaceRoom
                 // reset the flag to allow the improvised blue flag calling
                 useImprovisedBlueFlagDetection = true;
 
-                currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
                 currentGameState.SessionData.EventIndex = shared.EventIndex;
                 currentGameState.SessionData.SessionIteration = shared.SessionIteration;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                 currentGameState.OpponentData.Clear();
+                ghostOpponents.Clear();
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
@@ -370,7 +371,7 @@ namespace CrewChiefV4.RaceRoom
                         lastActiveTimeForOpponents.Clear();
                         nextOpponentCleanupTime = currentGameState.Now + opponentCleanupInterval;
 
-                        currentGameState.SessionData.NumCarsOverallAtStartOfSession = numCarsAtSessionStart = shared.NumCars;
+                        currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
                         currentGameState.SessionData.SessionStartTime = currentGameState.Now;
                         currentGameState.carClass = CarData.getCarClassForRaceRoomId(shared.VehicleInfo.ClassId);
                         CarData.RACEROOM_CLASS_ID = shared.VehicleInfo.ClassId;
@@ -985,8 +986,30 @@ namespace CrewChiefV4.RaceRoom
                 }
                 else
                 {
-                    currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
-                        CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                    Boolean skipGhost = false;
+                    if (currentGameState.SessionData.SessionType == SessionType.HotLap
+                        || currentGameState.SessionData.SessionType == SessionType.Practice)
+                    {
+                        if (!ghostOpponents.Contains(driverName))
+                        {
+                            if (participantStruct.InPitlane == 0)
+                            {
+                                ghostOpponents.Add(driverName);
+                                Console.WriteLine("Added opponent: " + driverName + " into the set of ghost vehicles");
+                                skipGhost = true;
+                            }
+                        }
+                        else
+                        {
+                            skipGhost = true;
+                        }
+                    }
+
+                    if (!skipGhost)
+                    {
+                        currentGameState.OpponentData.Add(driverName, createOpponentData(participantStruct, driverName, true,
+                            CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId).carClassEnum, currentGameState.SessionData.TrackDefinition.trackLength));
+                    }
                 }
             }
 
@@ -1508,7 +1531,7 @@ namespace CrewChiefV4.RaceRoom
 
             if (RaceRoomConstant.Session.Practice == r3eSessionType)
             {
-                if (previousGameState != null && shared.NumCars > 1 && previousGameState.OpponentData.Count == 0)
+                if (previousGameState != null && previousGameState.OpponentData.Count == 0)
                 {
                     return SessionType.LonePractice;
                 }
@@ -1523,7 +1546,7 @@ namespace CrewChiefV4.RaceRoom
             }
             else if (RaceRoomConstant.Session.Qualify == r3eSessionType)
             {
-                if (previousGameState != null && shared.NumCars > 1 && previousGameState.OpponentData.Count == 0)
+                if (previousGameState != null && previousGameState.OpponentData.Count == 0)
                 {
                     return SessionType.HotLap;
                 }
