@@ -94,6 +94,10 @@ namespace CrewChiefV4.Events
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
+            QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
+
             //audioPlayer.playMessage(new QueuedMessage("sectortest1", LapTimes.getSectorDeltaMessages(LapTimes.SectorReportOption.ALL, 20.5f, 20, 33, 34.1f, 10, 10.1f, true), 0, this));
 
             /*for (int i = 0; i < 5; i++)

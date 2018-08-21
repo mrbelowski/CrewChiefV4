@@ -329,7 +329,7 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for text fragment " + messageFragment.text);
                             canBePlayed = false;
-                        }                     
+                        }
                         break;
                     case FragmentType.Time:
                         // if this time fragment is not the last message fragment, then some languages (Italian only at the time of writing)
