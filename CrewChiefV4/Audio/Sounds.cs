@@ -163,6 +163,10 @@ namespace CrewChiefV4.Audio
 
                     // this creates empty sound objects:
                     prepareVoiceWithoutLoading(soundFolder);
+                    if (soundsFolder.FullName != sharedSoundsFolder.FullName)
+                    {
+                        prepareSharedVoiceWithoutLoading(new DirectoryInfo(sharedSoundsFolder.FullName + "/voice"));
+                    }
                     // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
                     if (allowCaching && eagerLoadSoundFiles)
                     {
@@ -682,6 +686,47 @@ namespace CrewChiefV4.Audio
                 }
             }
             Console.WriteLine("Prepare voice message completed");
+        }
+
+        private void prepareSharedVoiceWithoutLoading(DirectoryInfo voiceDirectory)
+        {
+            Console.WriteLine("Preparing shared voice messages");
+            DirectoryInfo[] spotterFolders = voiceDirectory.GetDirectories("spotter*");
+            DirectoryInfo[] radioCheckFolders = voiceDirectory.GetDirectories("radio_check*");
+            DirectoryInfo[] eventFolders = new DirectoryInfo[spotterFolders.Length + radioCheckFolders.Length];
+            spotterFolders.CopyTo(eventFolders, 0);
+            radioCheckFolders.CopyTo(eventFolders, spotterFolders.Length);
+            foreach (DirectoryInfo eventFolder in eventFolders)
+            {
+                Boolean cachePermanently = allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
+                try
+                {
+                    DirectoryInfo[] eventDetailFolders = eventFolder.GetDirectories();
+                    foreach (DirectoryInfo eventDetailFolder in eventDetailFolders)
+                    {
+                        String fullEventName = eventFolder.Name + "/" + eventDetailFolder.Name;
+                        // if we're caching this sound set permanently, create the sound players immediately after the files are loaded
+                        SoundSet soundSet = new SoundSet(eventDetailFolder, this.useSwearyMessages, allowCaching, allowCaching, cachePermanently, cachePermanently);
+                        if (soundSet.hasSounds)
+                        {
+                            if (soundSets.ContainsKey(fullEventName))
+                            {
+                                Console.WriteLine("Event " + fullEventName + " shared sound set is already loaded");
+                            }
+                            else
+                            {
+                                availableSounds.Add(fullEventName);
+                                soundSets.Add(fullEventName, soundSet);
+                            }
+                        }
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    Console.WriteLine("Unable to find shared events folder");
+                }
+            }
+            Console.WriteLine("Prepare shared voice message completed");
         }
 
         private void prepareDriverNamesWithoutLoading(DirectoryInfo driverNamesDirectory)
