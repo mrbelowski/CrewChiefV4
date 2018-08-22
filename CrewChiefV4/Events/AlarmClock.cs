@@ -166,11 +166,15 @@ namespace CrewChiefV4.Events
                     }                
                     if (minutes < 10)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minutes), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", 
+                            MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minutes),
+                            MessageContents(AudioPlayer.folderAcknowlegeOK, hour, NumberReader.folderOh, minutes), 0, null));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minutes), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", 
+                            MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minutes),
+                            MessageContents(AudioPlayer.folderAcknowlegeOK, hour, minutes), 0, null));
                     }
                 }
             }
