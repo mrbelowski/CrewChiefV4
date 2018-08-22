@@ -92,21 +92,29 @@ namespace CrewChiefV4.Events
                 }
             }
             voiceMessage = voiceMessage.Substring(0, index);
-            Tuple<int, int> hour = getHourDigits(voiceMessage);
-            String minutes = voiceMessage.Substring(hour.Item2);
+            Tuple<int, int> hourWithIndex = getHourDigits(voiceMessage);
+            int hour = isPastMidDay ? hourWithIndex.Item1 + 12 : hourWithIndex.Item1;
+            String minutes = voiceMessage.Substring(hourWithIndex.Item2);
             int minute = getMinuteDigits(minutes);
-            if(hour.Item1 != -1 && minute != -1)
+            if(hourWithIndex.Item1 != -1 && minute != -1)
             {
-                SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, isPastMidDay ? hour.Item1 + 12 : hour.Item1, minute, 00));
-                Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, isPastMidDay ? hour.Item1 + 12 : hour.Item1, minute, 00).ToString());
-                List<MessageFragment> messages = new List<MessageFragment>();
+                SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 00));
+                Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 00).ToString());
+                if (hour == 0)
+                {
+                    hour = 24;
+                }
+                if (hour > 12)
+                {
+                    hour = hour - 12;
+                }                
                 if (minute < 10)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minute ), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hourWithIndex, NumberReader.folderOh, minute ), 0, null));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minute ), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hourWithIndex, minute ), 0, null));
                 }
             }
         }
