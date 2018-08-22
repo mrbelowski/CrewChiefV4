@@ -16,8 +16,6 @@ namespace CrewChiefV4.Events
         public static String SMOKE_TEST = "SMOKE_TEST";
         public static String SMOKE_TEST_SPOTTER = "SMOKE_TEST_SPOTTER";
 
-        private String folderTest = "radio_check/test";
-
         public SmokeTest(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -111,8 +109,12 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderRainLightDecreasing, 0, this));
             audioPlayer.playMessage(new QueuedMessage(ConditionsMonitor.folderDrizzleDecreasing, 0, this));*/
 
-            audioPlayer.playMessage(new QueuedMessage(SMOKE_TEST, MessageContents(folderTest), 0, this));
-            if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null)
+            if (AudioPlayer.folderChiefRadioCheck != null)
+            {
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST, MessageContents(AudioPlayer.folderChiefRadioCheck), 0, this), false);
+            }
+            if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null
+                && !String.Equals(UserSettings.GetUserSettings().getString("spotter_name"), UserSettings.GetUserSettings().getString("chief_name"), StringComparison.InvariantCultureIgnoreCase))  // Don't play this if spotter and chief are the same person.
             {
                 Thread.Sleep(800);
                 audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);

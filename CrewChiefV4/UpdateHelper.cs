@@ -46,12 +46,12 @@ namespace CrewChiefV4
                             String[] directives = line.Split('|');
                             if (directives[0] == "rename")
                             {
-                                File.Move(AudioPlayer.soundFilesPath + @"\" + directives[1], AudioPlayer.soundFilesPath + @"\" + directives[2]);
+                                File.Move(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + directives[1], AudioPlayer.soundFilesPathNoChiefOverride + @"\" + directives[2]);
                                 renamedCount++;
                             }
                             else if (directives[0] == "delete")
                             {
-                                File.Delete(AudioPlayer.soundFilesPath + @"\" + directives[1]);
+                                File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + directives[1]);
                                 deletedCount++;
                             }
                         }

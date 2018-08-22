@@ -48,7 +48,7 @@ namespace CrewChiefV4
 
         public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
         public static int maxUnknownClassesForAC = UserSettings.GetUserSettings().getInt("max_unknown_car_classes_for_assetto");
-        
+
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
         public AudioPlayer audioPlayer;
@@ -89,6 +89,7 @@ namespace CrewChiefV4
 
         private SessionEndMessages sessionEndMessages;
 
+        public AlarmClock alarmClock;
         // used for the pace notes recorder - need to separate out from the currentGameState so we can
         // set these even when viewing replays
         public static String trackName = "";
@@ -126,8 +127,9 @@ namespace CrewChiefV4
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
-            eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));
+            eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));            
             sessionEndMessages = new SessionEndMessages(audioPlayer);
+            alarmClock = new AlarmClock(audioPlayer);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
 
@@ -720,6 +722,9 @@ namespace CrewChiefV4
                     }
                     nextRunTime = DateTime.Now.Add(_timeInterval);
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
+
+                    alarmClock.trigger(null, null);
+                    
                     if (!loadDataFromFile)
                     {
                         // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
@@ -820,8 +825,7 @@ namespace CrewChiefV4
                         catch (Exception e)
                         {
                             Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
-                        }
-
+                        }                        
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
                         if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
