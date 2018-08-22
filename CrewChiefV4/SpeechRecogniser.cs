@@ -769,7 +769,10 @@ namespace CrewChiefV4
                 validateAndAdd(MORE_INFO, staticSpeechChoices);
 
                 validateAndAdd(I_AM_OK, staticSpeechChoices);
-
+                if(alarmClockVoiceRecognitionEnabled)
+                {
+                    validateAndAdd(CLEAR_ALARM_CLOCK, staticSpeechChoices);
+                }
                 GrammarBuilder staticGrammarBuilder = new GrammarBuilder();
                 staticGrammarBuilder.Culture = cultureInfo;
                 staticGrammarBuilder.Append(staticSpeechChoices);
@@ -818,7 +821,7 @@ namespace CrewChiefV4
                         }
                     }
                     addCompoundChoices(SET_ALARM_CLOCK, false, this.hourChoices, minuteArray.ToArray(), true);
-                    validateAndAdd(CLEAR_ALARM_CLOCK, staticSpeechChoices);
+                    
                     
                 }
 
