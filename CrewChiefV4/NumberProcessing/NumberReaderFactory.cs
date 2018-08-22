@@ -23,7 +23,14 @@ namespace CrewChiefV4.NumberProcessing
             // select the correct implementation for the language pack
             if ("it" == AudioPlayer.soundPackLanguage)
             {
-                numberReader = new NumberReaderIt();
+                if (SoundPackVersionsHelper.currentSoundPackVersion >= 150)
+                {
+                    numberReader = new NumberReaderIt2();
+                }
+                else
+                {
+                    numberReader = new NumberReaderIt();
+                }
             }
             else
             {

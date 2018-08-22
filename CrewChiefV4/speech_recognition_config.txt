@@ -128,7 +128,10 @@ I_AM_OK = yeah:yes:fine:I'm OK:I'm fine:yes I'm fine:shut up:yeah I'm fine
 PLAY_POST_PIT_POSITION_ESTIMATE = where will i be after a stop:estimate pit exit positions:what will happen if i pit
 PRACTICE_PIT_STOP = time this stop:practice pitstop:time this pitstop:pitstop benchmark
 
-
+SET_ALARM_CLOCK = set alarm to:alarm me at
+CLEAR_ALARM_CLOCK = clear alarm clock:clear alarms
+AM=a m
+PM=pe m
 #################################################
 # Dynamic recognition phrase fragments - these are used to build up recognition sentences for opponent information.
 # Multiple options are NOT supported here - each must be a single word or phrase. These are combined for each opponent
@@ -274,16 +277,16 @@ WHATS_THE_SOF = what's the sof:what is the strength of field
 # numbers - these are the text strings the voice recogniser will listen for (it's not good at listening for numeric characters)
 # These are used by the dynamic phrases, and are combined with the dynamic phrase fragments above
 #################################################
-
-1 = one
-2 = two
-3 = three
-4 = four
-5 = five
-6 = six
-7 = seven
-8 = eight
-9 = nine
+0 = zero:oh clock:a clock
+1 = one:oh one
+2 = two:oh two
+3 = three:oh three
+4 = four:oh four
+5 = five:oh five
+6 = six:oh six
+7 = seven:oh seven
+8 = eight:oh eight
+9 = nine:oh nine
 10 = ten
 11 = eleven
 12 = twelve

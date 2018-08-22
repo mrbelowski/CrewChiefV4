@@ -65,7 +65,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for a whole number of hours.
          */
-        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths)
+        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
         {
             List<String> messages = new List<String>();
             if (hours > 0)
@@ -90,7 +90,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for a whole number of minutes.
          */
-        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths)
+        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
         {
             List<String> messages = new List<String>();
             if (minutes > 0)
@@ -119,7 +119,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for a whole number of seconds.
          */
-        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths)
+        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
         {
             List<String> messages = new List<String>();
             // special case here - if we're reading a time which has hours, the seconds aren't significant so ignore them
