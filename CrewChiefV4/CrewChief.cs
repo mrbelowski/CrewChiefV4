@@ -48,7 +48,9 @@ namespace CrewChiefV4
 
         public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
         public static int maxUnknownClassesForAC = UserSettings.GetUserSettings().getInt("max_unknown_car_classes_for_assetto");
-        
+
+        public static Boolean alarmClockEnabled = UserSettings.GetUserSettings().getBoolean("enable_alarm_clock");
+
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
         public AudioPlayer audioPlayer;
@@ -89,6 +91,7 @@ namespace CrewChiefV4
 
         private SessionEndMessages sessionEndMessages;
 
+        private AlarmClock alarmClock;
         // used for the pace notes recorder - need to separate out from the currentGameState so we can
         // set these even when viewing replays
         public static String trackName = "";
@@ -126,8 +129,13 @@ namespace CrewChiefV4
             eventsList.Add("OvertakingAidsMonitor", new OvertakingAidsMonitor(audioPlayer));
             eventsList.Add("FrozenOrderMonitor", new FrozenOrderMonitor(audioPlayer));
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
-            eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));
+            eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));            
             sessionEndMessages = new SessionEndMessages(audioPlayer);
+            if (alarmClockEnabled)
+            {
+                alarmClock = new AlarmClock(audioPlayer);
+                eventsList.Add("AlarmClock", alarmClock);
+            }
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
 
@@ -720,6 +728,10 @@ namespace CrewChiefV4
                     }
                     nextRunTime = DateTime.Now.Add(_timeInterval);
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
+                    if(alarmClockEnabled)
+                    {
+                        alarmClock.trigger(null, null);
+                    }
                     if (!loadDataFromFile)
                     {
                         // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
@@ -820,8 +832,7 @@ namespace CrewChiefV4
                         catch (Exception e)
                         {
                             Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
-                        }
-
+                        }                        
                         // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
                         // persistent state information. If this is the case, don't process any stuff
                         if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
@@ -976,6 +987,10 @@ namespace CrewChiefV4
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {
+                                    if(entry.Key.Equals("AlarmClock"))
+                                    { 
+                                        continue;
+                                    }
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                     {
                                         // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events

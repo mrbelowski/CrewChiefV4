@@ -3394,5 +3394,17 @@ namespace CrewChiefV4.Properties {
                 this["trigger_word_listen_timeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool enable_alarm_clock {
+            get {
+                return ((bool)(this["enable_alarm_clock"]));
+            }
+            set {
+                this["enable_alarm_clock"] = value;
+            }
+        }
     }
 }

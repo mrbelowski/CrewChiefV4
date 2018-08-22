@@ -198,6 +198,11 @@ namespace CrewChiefV4
         public static String[] WHAT_CLASS_IS_CAR_AHEAD = Configuration.getSpeechRecognitionPhrases("WHAT_CLASS_IS_CAR_AHEAD");
         public static String[] WHAT_CLASS_IS_CAR_BEHIND = Configuration.getSpeechRecognitionPhrases("WHAT_CLASS_IS_CAR_BEHIND");
 
+        public static String[] SET_ALARM_CLOCK = Configuration.getSpeechRecognitionPhrases("SET_ALARM_CLOCK");
+        public static String[] AM = Configuration.getSpeechRecognitionPhrases("AM");
+        public static String[] PM = Configuration.getSpeechRecognitionPhrases("PM");
+
+
         private String lastRecognisedText = null;
 
         private CrewChief crewChief;
@@ -221,7 +226,13 @@ namespace CrewChiefV4
 
         public static Dictionary<String[], int> racePositionNumberToNumber = getNumberMappings(1, 64);
 
+        public static Dictionary<String[], int> hourMappings = getNumberMappings(0, 24);
+
+        public static Dictionary<String[], int> minuteMappings = getNumberMappings(0, 59);
+
         private Choices digitsChoices;
+
+        private Choices hourChoices; 
 
         public static Boolean waitingForSpeech = false;
 
@@ -670,6 +681,7 @@ namespace CrewChiefV4
                         digitsChoices.Add(numberStr);
                     }
                 }
+
                 Choices staticSpeechChoices = new Choices();
                 validateAndAdd(HOWS_MY_TYRE_WEAR, staticSpeechChoices);
                 validateAndAdd(HOWS_MY_TRANSMISSION, staticSpeechChoices);
@@ -776,6 +788,35 @@ namespace CrewChiefV4
                     fuelTimeChoices.AddRange(HOURS);
                 }
                 addCompoundChoices(CALCULATE_FUEL_FOR, false, this.digitsChoices, fuelTimeChoices.ToArray(), true);
+                if(CrewChief.alarmClockEnabled)
+                {
+                    this.hourChoices = new Choices();
+                    foreach (KeyValuePair<String[], int> entry in hourMappings)
+                    {
+                        foreach (String numberStr in entry.Key)
+                        {
+                            hourChoices.Add(numberStr);
+                        }
+                    }
+                    List<String> minuteArray = new List<String>();
+                    foreach (KeyValuePair<String[], int> entry in minuteMappings)
+                    {
+                        foreach (String numberStr in entry.Key)
+                        {
+                            minuteArray.Add(numberStr);
+                            foreach(String ams in AM)
+                            {
+                                minuteArray.Add(numberStr + " " + AM);
+                            }
+                            foreach (String pms in PM)
+                            {
+                                minuteArray.Add(numberStr + " " + PM);
+                            }
+                        }
+                    }
+                    addCompoundChoices(SET_ALARM_CLOCK, false, this.hourChoices, minuteArray.ToArray(), true);
+                }
+
             }
             catch (Exception e)
             {
@@ -1588,6 +1629,10 @@ namespace CrewChiefV4
                 ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
             {
                 return CrewChief.getEvent("Strategy");
+            }
+            else if (CrewChief.alarmClockEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK))
+            {
+                return CrewChief.getEvent("AlarmClock");
             }
             return null;
         }
