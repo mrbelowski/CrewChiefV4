@@ -850,6 +850,9 @@
     </Setting>
     <Setting Name="alarm_clock_times" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </setting>
+    <Setting Name="chief_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Jim (default)</Value>
     </Setting>
   </Settings>
 </SettingsFile>
