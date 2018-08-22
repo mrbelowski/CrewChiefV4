@@ -26,7 +26,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderASecond = folderNumbersStub + "a_second";
         private static String folderSeconds = folderNumbersStub + "seconds";
         private static String folderAnd = folderNumbersStub + "and";
-        
+
 
         private static String folderNetto = folderNumbersStub + "netto";
         private static String folderNetti = folderNumbersStub + "netti";
@@ -251,7 +251,7 @@ namespace CrewChiefV4.NumberProcessing
                 String tensAndUnits = null;
                 String hundreds = null;
                 String thousands = null;
-                
+
                 if (digits.Length == 1 || (digits[digits.Length - 2] == '0' && digits[digits.Length - 1] != '0'))
                 {
                     // if we have just 1 digit, or we have a number that ends with 01, 02, 03, etc, then the 
@@ -279,7 +279,7 @@ namespace CrewChiefV4.NumberProcessing
                     {
                         // there's a non-zero number of thousands - 10 or more
                         thousands = digits[0].ToString() + digits[1].ToString();
-                    }                    
+                    }
                 }
                 if (thousands != null)
                 {
@@ -324,8 +324,8 @@ namespace CrewChiefV4.NumberProcessing
                     return "_minutes";
                 case Unit.SECOND:
                     return "_seconds";
-               /* case Unit.TENTH:
-                    return "_tenths";*/
+                /* case Unit.TENTH:
+                     return "_tenths";*/
                 default:
                     return "";
             }
@@ -387,7 +387,7 @@ namespace CrewChiefV4.NumberProcessing
                         sounds.Add(sound);
                         Console.WriteLine("Got sound for parameters without 'and':" + String.Join(", ", sounds));
                         return sounds;
-                    }                    
+                    }
                     sounds.Add(folderAnd);
                     sounds.Add(folderNumbersStub + number);
                     sounds.Add(getSoundWithMoreInflection(unitFolder));
@@ -407,12 +407,12 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     sound = folderNumbersStub + number + unitSuffix;
                     if (SoundCache.availableSounds.Contains(sound))
-                    {        
+                    {
                         sounds.Add(folderAnd);
                         sounds.Add(sound);
                         Console.WriteLine("Got sound for parameters without 'and': " + String.Join(", ", sounds));
                         return sounds;
-                    }                    
+                    }
                     sounds.Add(folderAnd);
                     sounds.Add(folderNumbersStub + number);
                     sounds.Add(unitFolder);
@@ -432,7 +432,7 @@ namespace CrewChiefV4.NumberProcessing
                         Console.WriteLine("Got sound for all parameters: " + sound);
                         sounds.Add(sound);
                         return sounds;
-                    }                    
+                    }
                     sounds.Add(folderNumbersStub + number);
                     sounds.Add(getSoundWithMoreInflection(unitFolder));
                     Console.WriteLine("Returning individual sounds: " + String.Join(", ", sounds));
@@ -448,7 +448,7 @@ namespace CrewChiefV4.NumberProcessing
                         Console.WriteLine("Got sound for all parameters: " + sound);
                         sounds.Add(sound);
                         return sounds;
-                    }                    
+                    }
                     sounds.Add(folderNumbersStub + number);
                     sounds.Add(unitFolder);
                     Console.WriteLine("Returning individual sounds: " + String.Join(", ", sounds));
