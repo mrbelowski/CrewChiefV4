@@ -129,6 +129,7 @@ PLAY_POST_PIT_POSITION_ESTIMATE = where will i be after a stop:estimate pit exit
 PRACTICE_PIT_STOP = time this stop:practice pitstop:time this pitstop:pitstop benchmark
 
 SET_ALARM_CLOCK = set alarm to:alarm me at
+CLEAR_ALARM_CLOCK = clear alarm clock:clear alarms
 AM=a m
 PM=pe m
 #################################################

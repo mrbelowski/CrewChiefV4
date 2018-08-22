@@ -201,6 +201,7 @@ namespace CrewChiefV4
         public static String[] WHAT_CLASS_IS_CAR_BEHIND = Configuration.getSpeechRecognitionPhrases("WHAT_CLASS_IS_CAR_BEHIND");
 
         public static String[] SET_ALARM_CLOCK = Configuration.getSpeechRecognitionPhrases("SET_ALARM_CLOCK");
+        public static String[] CLEAR_ALARM_CLOCK = Configuration.getSpeechRecognitionPhrases("CLEAR_ALARM_CLOCK");
         public static String[] AM = Configuration.getSpeechRecognitionPhrases("AM");
         public static String[] PM = Configuration.getSpeechRecognitionPhrases("PM");
 
@@ -817,6 +818,8 @@ namespace CrewChiefV4
                         }
                     }
                     addCompoundChoices(SET_ALARM_CLOCK, false, this.hourChoices, minuteArray.ToArray(), true);
+                    validateAndAdd(CLEAR_ALARM_CLOCK, staticSpeechChoices);
+                    
                 }
 
             }
@@ -1632,9 +1635,9 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("Strategy");
             }
-            else if (alarmClockVoiceRecognitionEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK))
+            else if (alarmClockVoiceRecognitionEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK) || ResultContains(recognisedSpeech, CLEAR_ALARM_CLOCK))
             {
-                return CrewChief.getEvent("AlarmClock");
+                return crewChief.alarmClock;
             }
             return null;
         }

@@ -127,49 +127,59 @@ namespace CrewChiefV4.Events
 
         public override void respond(String voiceMessage)
         {
-            int index = voiceMessage.Length;
-            Boolean isPastMidDay = false;
-            foreach (String ams in SpeechRecogniser.AM)
+            
+            if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SET_ALARM_CLOCK))
             {
-                if(voiceMessage.Contains(" " + ams))
+                int index = voiceMessage.Length;
+                Boolean isPastMidDay = false;
+                foreach (String ams in SpeechRecogniser.AM)
                 {
-                    index = voiceMessage.IndexOf(" " + ams);
+                    if(voiceMessage.Contains(" " + ams))
+                    {
+                        index = voiceMessage.IndexOf(" " + ams);
+                    }
+                }
+                foreach (String pms in SpeechRecogniser.PM)
+                {
+                    if(voiceMessage.Contains(" " + pms))
+                    {
+                        index = voiceMessage.IndexOf(" " + pms);
+                        isPastMidDay = true;
+                    }
+                }
+                voiceMessage = voiceMessage.Substring(0, index);
+                Tuple<int, int> hourWithIndex = getHourDigits(voiceMessage);
+                int hour = isPastMidDay ? hourWithIndex.Item1 + 12 : hourWithIndex.Item1;
+                String minutesString = voiceMessage.Substring(hourWithIndex.Item2);
+                int minutes = getMinuteDigits(minutesString);
+                if(hourWithIndex.Item1 != -1 && minutes != -1)
+                {
+                    SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00));
+                    Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00).ToString());
+                    if (hour == 0)
+                    {
+                        hour = 24;
+                    }
+                    if (hour > 12)
+                    {
+                        hour = hour - 12;
+                    }                
+                    if (minutes < 10)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minutes), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minutes), 0, null));
+                    }
                 }
             }
-            foreach (String pms in SpeechRecogniser.PM)
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CLEAR_ALARM_CLOCK))
             {
-                if(voiceMessage.Contains(" " + pms))
-                {
-                    index = voiceMessage.IndexOf(" " + pms);
-                    isPastMidDay = true;
-                }
+                alarmTimes.Clear();
+                audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK), 0, null));
             }
-            voiceMessage = voiceMessage.Substring(0, index);
-            Tuple<int, int> hourWithIndex = getHourDigits(voiceMessage);
-            int hour = isPastMidDay ? hourWithIndex.Item1 + 12 : hourWithIndex.Item1;
-            String minutesString = voiceMessage.Substring(hourWithIndex.Item2);
-            int minutes = getMinuteDigits(minutesString);
-            if(hourWithIndex.Item1 != -1 && minutes != -1)
-            {
-                SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00));
-                Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00).ToString());
-                if (hour == 0)
-                {
-                    hour = 24;
-                }
-                if (hour > 12)
-                {
-                    hour = hour - 12;
-                }                
-                if (minutes < 10)
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minutes), 0, null));
-                }
-                else
-                {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minutes), 0, null));
-                }
-            }
+            
         }
     }
     

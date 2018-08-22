@@ -49,8 +49,6 @@ namespace CrewChiefV4
         public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
         public static int maxUnknownClassesForAC = UserSettings.GetUserSettings().getInt("max_unknown_car_classes_for_assetto");
 
-        
-
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
         public AudioPlayer audioPlayer;
@@ -91,7 +89,7 @@ namespace CrewChiefV4
 
         private SessionEndMessages sessionEndMessages;
 
-        private AlarmClock alarmClock;
+        public AlarmClock alarmClock;
         // used for the pace notes recorder - need to separate out from the currentGameState so we can
         // set these even when viewing replays
         public static String trackName = "";
@@ -132,7 +130,6 @@ namespace CrewChiefV4
             eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));            
             sessionEndMessages = new SessionEndMessages(audioPlayer);
             alarmClock = new AlarmClock(audioPlayer);
-            eventsList.Add("AlarmClock", alarmClock);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
 
@@ -983,10 +980,6 @@ namespace CrewChiefV4
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
                                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                 {
-                                    if(entry.Key.Equals("AlarmClock"))
-                                    { 
-                                        continue;
-                                    }
                                     if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                     {
                                         // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
