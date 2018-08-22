@@ -1127,3 +1127,11 @@ trigger_word_sre_min_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
 trigger_word_listen_timeout = Trigger word listen timeout (ms)
 trigger_word_listen_timeout_help = Wait this many milliseconds for a command after receiving the trigger word
 trigger_word_listen_timeout_category = AUDIO_VOICE_AND_CONTROLLERS
+
+enable_alarm_clock_voice_recognition = Enable alarm clock voice commands
+enable_alarm_clock_voice_recognition_help = Enable this if you want to use the alarm clock feature, this is disabled by default to limit the number of voice commands 
+enable_alarm_clock_voice_recognition_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS
+
+alarm_clock_times = Alarm time(s)
+alarm_clock_times_help = Set the time(s) you want the alarm to go off. Format eg. 5:11PM 5:11AM 17:11, if you want to have more then one alarm seperate times with ";" eg. 5:11PM;5:11AM
+alarm_clock_times_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS
