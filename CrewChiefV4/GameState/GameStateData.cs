@@ -320,7 +320,7 @@ namespace CrewChiefV4.GameState
 
         // Current position (1 = first place)
         public int OverallPosition = 0;
-        
+
         public int ClassPosition = 0;
 
         public float GameTimeAtLastPositionFrontChange = 0;
@@ -474,6 +474,8 @@ namespace CrewChiefV4.GameState
 
         public void playerStartNewLap(int lapNumber, int overallPosition, Boolean inPits, float gameTimeAtStart)
         {
+            verifyPlayerPreviousLap();
+
             LapData thisLapData = new LapData();
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
@@ -481,6 +483,41 @@ namespace CrewChiefV4.GameState
             thisLapData.LapNumber = lapNumber;
             CurrentLapIsValid = true;
             PlayerLapData.Add(thisLapData);
+        }
+
+        // This method takes care of marking abandoned laps as invalid and missing sectors.
+        // It is intended to be called when IsNewLap is true, and _before_ new lap is added to this.PlayerLapata.
+        private void verifyPlayerPreviousLap()
+        {
+            if (!IsNewLap)
+            {
+                Debug.Assert(IsNewLap, "IsNewLap is false, please fix the mapper.");
+                return;
+            }
+            // Verify we have LapData flags in a sane state.  This is necessary, because if player jumps to pits
+            // without completing the lap, IsValid and hasMissingSectors members may not have correct values set.
+            if (PlayerLapData.Count > 0)
+            {
+                LapData previousLap = PlayerLapData[PlayerLapData.Count - 1];
+                if (previousLap.LapTime < 0.0f)
+                {
+                    previousLap.IsValid = false;
+                    PreviousLapWasValid = false;
+                }
+                foreach (var sectorTime in previousLap.SectorTimes)
+                {
+                    if (sectorTime == 0.0f)
+                    {
+                        previousLap.hasMissingSectors = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // No previous lap.
+                PreviousLapWasValid = false;
+            }
         }
 
         public void playerCompleteLapWithProvidedLapTime(int overallPosition, float gameTimeAtLapEnd, float providedLapTime,
@@ -494,6 +531,7 @@ namespace CrewChiefV4.GameState
             CurrentLapIsValid = true;
             formattedPlayerLapTimes.Add(TimeSpan.FromSeconds(providedLapTime).ToString(@"mm\:ss\.fff"));
             PositionAtStartOfCurrentLap = overallPosition;
+            
             LapData lapData = PlayerLapData[PlayerLapData.Count - 1];
             
             LapTimePreviousEstimateForInvalidLap = SessionRunningTime - SessionTimesAtEndOfSectors[numberOfSectors - 1];
@@ -502,6 +540,9 @@ namespace CrewChiefV4.GameState
             lapData.InLap = inPitLane;
 
             LapTimePrevious = providedLapTime;
+
+            verifyPlayerPreviousLap();
+
             if (lapData.IsValid && !lapData.OutLap && !lapData.InLap && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
             {
                 PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
@@ -648,7 +689,7 @@ namespace CrewChiefV4.GameState
                         {
                             bestLapTimeAndSectorsSectors[1] = thisLapTime.SectorTimes[0];
                             bestLapTimeAndSectorsSectors[2] = thisLapTime.SectorTimes[1];
-                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];                            
+                            bestLapTimeAndSectorsSectors[3] = thisLapTime.SectorTimes[2];
                         }
                     }
                 }
