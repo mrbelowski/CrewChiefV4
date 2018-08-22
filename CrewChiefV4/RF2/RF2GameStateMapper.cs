@@ -2554,7 +2554,7 @@ namespace CrewChiefV4.rFactor2
             var carClass = CarData.getCarClassForClassName(carClassId);
 
             // Name does not appear to be localized in rF2, so hardcoding it is ok for now.
-            var isGhost = driverName.Equals("transparent trainer");
+            var isGhost = string.Equals(driverName, "transparent trainer", StringComparison.InvariantCultureIgnoreCase);
 
             ci = new CarInfo()
             {
