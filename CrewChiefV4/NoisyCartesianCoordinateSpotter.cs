@@ -86,7 +86,10 @@ namespace CrewChiefV4
         public static String folderEnableSpotter = "acknowledge/spotterEnabled";
         public static String folderDisableSpotter = "acknowledge/spotterDisabled";
 
+        // VL: there's a problem with radio check messages in a sense that they are shared between spotter and chief.
+        // So, they either shouldn't have "spotter" message in them (if same voice is chief), or, we'll have to add a way to specify chief specific radio check.
         public static String folderSpotterRadioCheck = null;
+        public static String folderSpotterRadioCheckBSlash = null;
 
         private static String spotterFolderPrefix = "spotter_";
         public static String defaultSpotterId = "Jim (default)";
@@ -149,6 +152,7 @@ namespace CrewChiefV4
                         if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedSpotter + "/test"))
                         {
                             folderSpotterRadioCheck = "radio_check_" + selectedSpotter + "/test";
+                            folderSpotterRadioCheckBSlash = "radio_check_" + selectedSpotter + "\\test";
                         }
                     }
                     else
@@ -158,9 +162,17 @@ namespace CrewChiefV4
                         UserSettings.GetUserSettings().saveUserSettings();
                     }
                 }
+                else
+                {
+                    if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check/test"))
+                    {
+                        folderSpotterRadioCheck = "radio_check/test";
+                        folderSpotterRadioCheckBSlash = "radio_check\\test";
+                    }
+                }
                 // check the oval specific stuff exists before enabling it:
                 hasOvalSpecificSounds = Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/" + folderCarInside);                
-                if (hasOvalSpecificSounds) 
+                if (hasOvalSpecificSounds)
                 {
                     Console.WriteLine("Spotter " + selectedSpotter + " has oval-specific sounds - these will be used for tracks marked as 'oval'");
                 }

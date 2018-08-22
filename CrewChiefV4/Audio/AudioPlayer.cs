@@ -139,6 +139,7 @@ namespace CrewChiefV4.Audio
 
         public static String defaultChiefId = "Jim (default)";
         public static List<String> availableChiefVoices = new List<String>();
+        public static String folderChiefRadioCheck = null;
 
         static AudioPlayer()
         {
@@ -205,12 +206,24 @@ namespace CrewChiefV4.Audio
                     {
                         Console.WriteLine("Using Chief voice: " + selectedChief);
                         AudioPlayer.soundFilesPath = AudioPlayer.soundFilesPath + "/alt/" + selectedChief;
+
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedChief + "/test"))
+                        {
+                            folderChiefRadioCheck = "radio_check_" + selectedChief + "/test";
+                        }
                     }
                     else
                     {
                         Console.WriteLine("No Chief called " + selectedChief + " exists, dropping back to the default (Jim)");
                         UserSettings.GetUserSettings().setProperty("chief_name", defaultChiefId);
                         UserSettings.GetUserSettings().saveUserSettings();
+                    }
+                }
+                else
+                {
+                    if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check/test"))
+                    {
+                        folderChiefRadioCheck = "radio_check/test";
                     }
                 }
             }
