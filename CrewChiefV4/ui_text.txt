@@ -145,7 +145,8 @@ unknown_personalisations_language_text = The current Sound Pack has no language 
 unknown_personalisations_language_title = No Sound Pack language defined
 
 personalisations_are_up_to_date = Personalisations are up to date
-personalisation_label = M&y name (requires restart)
+personalisation_label = M&y name:
+personalisation_tooltip = Choose a name you'd like Chief to call you (requires restart)
 
 install_plugin_popup_text = Crew Chief needs additional files to be installed or updated for the selected game. Click OK to install or Cancel to Return
 install_plugin_popup_title = Plugin Needed
@@ -178,7 +179,10 @@ no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
 reset_warning_title = Reset All Settings to Default Values
 
-spotter_name_label = Spotter &voice (requires restart)
+chief_name_label = Chief &voice:
+chief_name_tooltip = Choose a Chief voice (requires restart)
+spotter_name_label = Spotter &voice:
+spotter_name_tooltip = Choose a Spotter voice (requires restart)
 messages_audio_device_label = Messages playbac&k device
 background_audio_device_label = Background playback &device
 
@@ -1123,3 +1127,11 @@ trigger_word_sre_min_confidence_category = AUDIO_VOICE_AND_CONTROLLERS
 trigger_word_listen_timeout = Trigger word listen timeout (ms)
 trigger_word_listen_timeout_help = Wait this many milliseconds for a command after receiving the trigger word
 trigger_word_listen_timeout_category = AUDIO_VOICE_AND_CONTROLLERS
+
+enable_alarm_clock_voice_recognition = Enable alarm clock voice commands
+enable_alarm_clock_voice_recognition_help = Enable this if you want to use the alarm clock feature, this is disabled by default to limit the number of voice commands 
+enable_alarm_clock_voice_recognition_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS
+
+alarm_clock_times = Alarm time(s)
+alarm_clock_times_help = Set the time(s) you want the alarm to go off. Format eg. 5:11PM 5:11AM 17:11, if you want to have more then one alarm seperate times with ";" eg. 5:11PM;5:11AM
+alarm_clock_times_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS

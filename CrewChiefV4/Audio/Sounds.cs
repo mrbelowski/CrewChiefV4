@@ -53,7 +53,7 @@ namespace CrewChiefV4.Audio
 
         public static Boolean hasSuitableTTSVoice = false;
         
-        public SoundCache(DirectoryInfo soundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
+        public SoundCache(DirectoryInfo soundsFolder, DirectoryInfo sharedSoundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             // ensure the static state is nuked before we start updating it
             SoundCache.dynamicLoadedSounds.Clear();
@@ -128,15 +128,19 @@ namespace CrewChiefV4.Audio
             this.eventTypesToKeepCached = eventTypesToKeepCached;
             this.useSwearyMessages = useSwearyMessages;
             SoundCache.allowCaching = allowCaching;
-            DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
-            foreach (DirectoryInfo soundFolder in soundsFolders)
+            DirectoryInfo[] sharedSoundsFolders = sharedSoundsFolder.GetDirectories();
+            foreach (DirectoryInfo soundFolder in sharedSoundsFolders)
             {
                 if (soundFolder.Name == "fx")
                 {
                     // these are eagerly loaded on the main thread, soundPlayers are created and they're always in the SoundPlayer cache.
                     prepareFX(soundFolder);
                 }
-                else if (soundFolder.Name == "personalisations")
+            }
+            DirectoryInfo[] soundsFolders = soundsFolder.GetDirectories();
+            foreach (DirectoryInfo soundFolder in soundsFolders)
+            {
+                if (soundFolder.Name == "personalisations")
                 {
                     if (selectedPersonalisation != AudioPlayer.NO_PERSONALISATION_SELECTED)
                     {
@@ -158,7 +162,7 @@ namespace CrewChiefV4.Audio
                     // allowing them to be cached until evicted.
 
                     // this creates empty sound objects:
-                    prepareVoiceWithoutLoading(soundFolder);
+                    prepareVoiceWithoutLoading(soundFolder, new DirectoryInfo(sharedSoundsFolder.FullName + "/voice"));
                     // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
                     if (allowCaching && eagerLoadSoundFiles)
                     {
@@ -643,10 +647,29 @@ namespace CrewChiefV4.Audio
                        
         }
 
-        private void prepareVoiceWithoutLoading(DirectoryInfo voiceDirectory)
+        private void prepareVoiceWithoutLoading(DirectoryInfo voiceDirectory, DirectoryInfo sharedVoiceDirectory)
         {
             Console.WriteLine("Preparing voice messages");
-            DirectoryInfo[] eventFolders = voiceDirectory.GetDirectories();
+
+            DirectoryInfo[] eventFolders = null;
+            if (!String.Equals(voiceDirectory.FullName, sharedVoiceDirectory.FullName, StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Get shared voice directories (spotter sounds).
+                DirectoryInfo[] spotterFolders = sharedVoiceDirectory.GetDirectories("spotter*");
+                DirectoryInfo[] radioCheckFolders = sharedVoiceDirectory.GetDirectories("radio_check*");
+
+                // Get redirected voice directories.
+                DirectoryInfo[] voiceFolders = voiceDirectory.GetDirectories();
+
+                eventFolders = new DirectoryInfo[spotterFolders.Length + radioCheckFolders.Length + voiceFolders.Length];
+                spotterFolders.CopyTo(eventFolders, 0);
+                radioCheckFolders.CopyTo(eventFolders, spotterFolders.Length);
+                voiceFolders.CopyTo(eventFolders, spotterFolders.Length + radioCheckFolders.Length);
+            }
+            else
+            {
+                eventFolders = voiceDirectory.GetDirectories();
+            }
             foreach (DirectoryInfo eventFolder in eventFolders)
             {
                 Boolean cachePermanently = allowCaching && this.eventTypesToKeepCached.Contains(eventFolder.Name);
@@ -818,7 +841,11 @@ namespace CrewChiefV4.Audio
                     if (soundFile.Name.EndsWith(".wav")) {
                         Boolean isSweary = soundFile.Name.Contains("sweary");
                         Boolean isBleep = soundFile.Name.Contains("bleep");
-                        Boolean isSpotter = soundFile.FullName.Contains(@"\spotter") || soundFile.FullName.Contains(@"\radio_check_");
+                        Boolean isSpotter = soundFile.FullName.Contains(@"\spotter");
+                        if (!isSpotter && NoisyCartesianCoordinateSpotter.folderSpotterRadioCheckBSlash != null)
+                        {
+                            isSpotter = soundFile.FullName.Contains(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheckBSlash);
+                        }
                         if (this.useSwearyMessages || !isSweary)
                         {
                             if (soundFile.Name.Contains(SoundCache.REQUIRED_PREFIX_IDENTIFIER) || soundFile.Name.Contains(SoundCache.REQUIRED_SUFFIX_IDENTIFIER) ||
