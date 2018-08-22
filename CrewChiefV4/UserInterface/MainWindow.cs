@@ -837,6 +837,7 @@ namespace CrewChiefV4
 
             crewChief = new CrewChief();
             this.personalisationBox.Items.AddRange(this.crewChief.audioPlayer.personalisationsArray);
+            this.chiefNameBox.Items.AddRange(AudioPlayer.availableChiefVoices.ToArray());
             this.spotterNameBox.Items.AddRange(NoisyCartesianCoordinateSpotter.availableSpotters.ToArray());
             if (crewChief.audioPlayer.selectedPersonalisation == null || crewChief.audioPlayer.selectedPersonalisation.Length == 0 ||
                 crewChief.audioPlayer.selectedPersonalisation.Equals(AudioPlayer.NO_PERSONALISATION_SELECTED) ||
@@ -849,8 +850,18 @@ namespace CrewChiefV4
                 this.personalisationBox.Text = crewChief.audioPlayer.selectedPersonalisation;
             }
 
+            String savedChief = UserSettings.GetUserSettings().getString("chief_name");
+            if (!String.IsNullOrWhiteSpace(savedChief) && AudioPlayer.availableChiefVoices.Contains(savedChief))
+            {
+                this.chiefNameBox.Text = savedChief;
+            }
+            else
+            {
+                this.chiefNameBox.Text = AudioPlayer.defaultChiefId;
+            }
+
             String savedSpotter = UserSettings.GetUserSettings().getString("spotter_name");
-            if (savedSpotter != null && savedSpotter.Length > 0 && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedSpotter))
+            if (!String.IsNullOrWhiteSpace(savedSpotter) && NoisyCartesianCoordinateSpotter.availableSpotters.Contains(savedSpotter))
             {
                 this.spotterNameBox.Text = savedSpotter;
             }
@@ -860,6 +871,7 @@ namespace CrewChiefV4
             }
             // only register the value changed listener after loading the saved values
             this.personalisationBox.SelectedValueChanged += new System.EventHandler(this.personalisationSelected);
+            this.chiefNameBox.SelectedValueChanged += new System.EventHandler(this.chiefNameSelected);
             this.spotterNameBox.SelectedValueChanged += new System.EventHandler(this.spotterNameSelected);
 
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
@@ -1300,9 +1312,10 @@ namespace CrewChiefV4
                 this.assignButtonToAction.Enabled = false;
                 this.deleteAssigmentButton.Enabled = false;
                 this.groupBox1.Enabled = false;
-                this.button1.Enabled = false;
+                this.propertiesButton.Enabled = false;
                 this.scanControllersButton.Enabled = false;
                 this.personalisationBox.Enabled = false;
+                this.chiefNameBox.Enabled = false;
                 this.spotterNameBox.Enabled = false;
                 this.recordSession.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
@@ -1357,10 +1370,11 @@ namespace CrewChiefV4
                 this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
                 Console.WriteLine("Application stopped");
-                this.button1.Enabled = true;
+                this.propertiesButton.Enabled = true;
                 this.groupBox1.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
+                this.chiefNameBox.Enabled = true;
                 this.spotterNameBox.Enabled = true;
                 this.recordSession.Enabled = true;
                 DriverTrainingService.completeRecordingPaceNotes();
@@ -1406,7 +1420,7 @@ namespace CrewChiefV4
                     this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
                 this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
-                this.button1.Enabled = true;
+                this.propertiesButton.Enabled = true;
                 this.scanControllersButton.Enabled = true;
                 this.personalisationBox.Enabled = true;
                 IsAppRunning = false;
@@ -1823,6 +1837,16 @@ namespace CrewChiefV4
             }
         }
 
+        private void chiefNameSelected(object sender, EventArgs e)
+        {
+            if (!UserSettings.GetUserSettings().getString("chief_name").Equals(this.chiefNameBox.Text))
+            {
+                UserSettings.GetUserSettings().setProperty("chief_name", this.chiefNameBox.Text);
+                UserSettings.GetUserSettings().saveUserSettings();
+                doRestart(Configuration.getUIString("the_application_must_be_restarted_to_load_the_new_sounds"), Configuration.getUIString("load_new_sounds"));
+            }
+        }
+
         private void spotterNameSelected(object sender, EventArgs e)
         {
             if (!UserSettings.GetUserSettings().getString("spotter_name").Equals(this.spotterNameBox.Text))
@@ -1901,10 +1925,10 @@ namespace CrewChiefV4
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(soundpack_DownloadFileCompleted);
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                        File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(soundPackDownloadURL), AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                    wc.DownloadFileAsync(new Uri(soundPackDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName);
                 }
                 else if (downloadType == DownloadType.DRIVER_NAMES)
                 {
@@ -1913,10 +1937,10 @@ namespace CrewChiefV4
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(drivernames_DownloadFileCompleted);
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                        File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + driverNamesTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(drivernamesDownloadURL), AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                    wc.DownloadFileAsync(new Uri(drivernamesDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + driverNamesTempFileName);
                 }
                 else if (downloadType == DownloadType.PERSONALISATIONS)
                 {
@@ -1925,10 +1949,10 @@ namespace CrewChiefV4
                     wc.DownloadFileCompleted += new AsyncCompletedEventHandler(personalisations_DownloadFileCompleted);
                     try
                     {
-                        File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                        File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);                    
+                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);                    
                 }
             }
         }
@@ -1978,18 +2002,18 @@ namespace CrewChiefV4
                     Thread progressThread = null;
                     try
                     {
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + @"\sounds_temp"))
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp"))
                         {
-                            Directory.Delete(AudioPlayer.soundFilesPath + @"\sounds_temp", true);
+                            Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", true);
                         }
                         progressThread = createProgressThread(downloadSoundPackButton, extractingButtonText);
                         progressThread.Start(); 
-                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPath + @"\sounds_temp");
+                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp");
                         // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
                         // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
                         // with old names). As long as this is the case, it shouldn't matter what order we do these in...
-                        UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPath + @"\sounds_temp");
-                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\sounds_temp", AudioPlayer.soundFilesPath);
+                        UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp");
+                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", AudioPlayer.soundFilesPathNoChiefOverride);
                         success = true;
                     }
                     catch (Exception) { }
@@ -2005,7 +2029,7 @@ namespace CrewChiefV4
                         {
                             try
                             {
-                                File.Delete(AudioPlayer.soundFilesPath + @"\" + soundPackTempFileName);
+                                File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName);
                             }
                             catch (Exception) { }
                         }
@@ -2042,14 +2066,14 @@ namespace CrewChiefV4
                     Thread progressThread = null;
                     try
                     {
-                        if (Directory.Exists(AudioPlayer.soundFilesPath + @"\driver_names_temp"))
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp"))
                         {
-                            Directory.Delete(AudioPlayer.soundFilesPath + @"\driver_names_temp", true);
+                            Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", true);
                         }
                         progressThread = createProgressThread(downloadDriverNamesButton, extractingButtonText);
                         progressThread.Start(); 
-                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPath + @"\driver_names_temp", Encoding.UTF8);
-                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\driver_names_temp", AudioPlayer.soundFilesPath);
+                        ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", Encoding.UTF8);
+                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", AudioPlayer.soundFilesPathNoChiefOverride);
                         success = true;
                     }
                     catch (Exception) { }
@@ -2065,7 +2089,7 @@ namespace CrewChiefV4
                         {
                             try
                             {
-                                File.Delete(AudioPlayer.soundFilesPath + @"\" + driverNamesTempFileName);
+                                File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + driverNamesTempFileName);
                             }
                             catch (Exception) { }
                         }
@@ -2105,14 +2129,14 @@ namespace CrewChiefV4
                         if (e.Error == null && !e.Cancelled)
                         {
 
-                            if (Directory.Exists(AudioPlayer.soundFilesPath + @"\personalisations_temp"))
+                            if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp"))
                             {
-                                Directory.Delete(AudioPlayer.soundFilesPath + @"\personalisations_temp", true);
+                                Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", true);
                             }
                             progressThread = createProgressThread(downloadPersonalisationsButton, extractingButtonText);
                             progressThread.Start();
-                            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPath + @"\personalisations_temp", Encoding.UTF8);
-                            UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPath + @"\personalisations_temp", AudioPlayer.soundFilesPath + @"\personalisations");
+                            ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", Encoding.UTF8);
+                            UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations");
                             success = true;
                         }
                     }
@@ -2132,7 +2156,7 @@ namespace CrewChiefV4
                         {
                             try
                             {
-                                File.Delete(AudioPlayer.soundFilesPath + @"\" + personalisationsTempFileName);
+                                File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                             }
                             catch (Exception) { }
                         }
