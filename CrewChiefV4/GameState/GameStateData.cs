@@ -474,8 +474,10 @@ namespace CrewChiefV4.GameState
 
         public void playerStartNewLap(int lapNumber, int overallPosition, Boolean inPits, float gameTimeAtStart)
         {
-            verifyPlayerPreviousLap();
-
+            if (PlayerLapData.Count > 0)
+            {
+                verifyPlayerPreviousLap();
+            }
             LapData thisLapData = new LapData();
             thisLapData.GameTimeAtLapStart = gameTimeAtStart;
             thisLapData.OutLap = inPits;
