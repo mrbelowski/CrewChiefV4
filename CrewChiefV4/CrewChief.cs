@@ -49,7 +49,7 @@ namespace CrewChiefV4
         public static Boolean forceSingleClass = UserSettings.GetUserSettings().getBoolean("force_single_class");
         public static int maxUnknownClassesForAC = UserSettings.GetUserSettings().getInt("max_unknown_car_classes_for_assetto");
 
-        public static Boolean alarmClockEnabled = UserSettings.GetUserSettings().getBoolean("enable_alarm_clock");
+        
 
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
@@ -131,11 +131,8 @@ namespace CrewChiefV4
             eventsList.Add("IRacingBroadcastMessageEvent", new IRacingBroadcastMessageEvent(audioPlayer));
             eventsList.Add("MulticlassWarnings", new MulticlassWarnings(audioPlayer));            
             sessionEndMessages = new SessionEndMessages(audioPlayer);
-            if (alarmClockEnabled)
-            {
-                alarmClock = new AlarmClock(audioPlayer);
-                eventsList.Add("AlarmClock", alarmClock);
-            }
+            alarmClock = new AlarmClock(audioPlayer);
+            eventsList.Add("AlarmClock", alarmClock);
             DriverNameHelper.readRawNamesToUsableNamesFiles(AudioPlayer.soundFilesPath);
         }
 
@@ -728,10 +725,9 @@ namespace CrewChiefV4
                     }
                     nextRunTime = DateTime.Now.Add(_timeInterval);
                     nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
-                    if(alarmClockEnabled)
-                    {
-                        alarmClock.trigger(null, null);
-                    }
+
+                    alarmClock.trigger(null, null);
+                    
                     if (!loadDataFromFile)
                     {
                         // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.

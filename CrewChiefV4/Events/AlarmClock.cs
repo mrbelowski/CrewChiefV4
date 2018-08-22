@@ -12,30 +12,83 @@ namespace CrewChiefV4.Events
 
     public class AlarmClock : AbstractEvent
     {
-        private DateTime alarmTime;
-        private bool enabled = false;
+        private Boolean initialised = false;
+        private List<Alarm> alarmTimes = new List<Alarm>();
         public static String wakeUp = "alarm_clock/alarms";
         public static String notifyYouAt = "alarm_clock/notify";
 
+        private static String preSetAlarms = UserSettings.GetUserSettings().getString("alarm_clock_times");
+
+        private class Alarm
+        {
+            public Alarm(DateTime time, Boolean enabled)
+            {
+                this.alarmTime = time;
+                this.enabled = enabled;
+            }
+            public DateTime alarmTime;
+            public Boolean enabled;
+        }
         public AlarmClock(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
         }
-        void SetAlarm(DateTime alarmTime)
+        void SetAlarm(DateTime alarmTime, Boolean enabled = true)
         {
-            this.alarmTime = alarmTime;
-            enabled = true;
+            this.alarmTimes.Add(new Alarm(alarmTime, enabled));
         }
         public override void clearState()
         {
+            initialised = false;
+        }
+
+        private void setFromProperties()
+        {
+            if (preSetAlarms != null && preSetAlarms.Length > 0)
+            {                
+                String[] alarms = preSetAlarms.Split(';');
+                foreach (String alarm in alarms)
+                {
+                    int hours = -1;
+                    int minutes = -1;
+                    int index = alarm.IndexOf(":");
+                    String hourString = alarm.Substring(0, index);
+                    Int32.TryParse(hourString, out hours);
+                    String minutesString = alarm.Substring(index + 1);
+                    if (minutesString.ToLower().Contains("pm"))
+                    {
+                        hours = hours + 12;
+                        minutesString = minutesString.Substring(0, minutesString.Length - 2);
+                    }
+                    else if (minutesString.ToLower().Contains("am"))
+                    {
+                        minutesString = minutesString.Substring(0, minutesString.Length - 2);
+                    }
+
+                    Int32.TryParse(minutesString, out minutes);
+                    if (hours != -1 && minutes != -1)
+                    {
+                        SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hours, minutes, 00));
+                        Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hours, minutes, 00).ToString());
+                    }  
+                }
+            }
 
         }
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            if (enabled && DateTime.Now > alarmTime)
+            if (!initialised)
             {
-                enabled = false;
-                audioPlayer.playMessageImmediately(new QueuedMessage(AlarmClock.wakeUp, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                setFromProperties();
+                initialised = true;
+            }
+            foreach(Alarm alarm in alarmTimes)
+            {
+                if (alarm.enabled && (DateTime.Now > alarm.alarmTime && DateTime.Now < alarm.alarmTime + TimeSpan.FromSeconds(60)))
+                {
+                    alarm.enabled = false;
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AlarmClock.wakeUp, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                }
             }
         }
         Tuple<int,int> getHourDigits(String voiceMessage)
@@ -94,12 +147,12 @@ namespace CrewChiefV4.Events
             voiceMessage = voiceMessage.Substring(0, index);
             Tuple<int, int> hourWithIndex = getHourDigits(voiceMessage);
             int hour = isPastMidDay ? hourWithIndex.Item1 + 12 : hourWithIndex.Item1;
-            String minutes = voiceMessage.Substring(hourWithIndex.Item2);
-            int minute = getMinuteDigits(minutes);
-            if(hourWithIndex.Item1 != -1 && minute != -1)
+            String minutesString = voiceMessage.Substring(hourWithIndex.Item2);
+            int minutes = getMinuteDigits(minutesString);
+            if(hourWithIndex.Item1 != -1 && minutes != -1)
             {
-                SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 00));
-                Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minute, 00).ToString());
+                SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00));
+                Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hour, minutes, 00).ToString());
                 if (hour == 0)
                 {
                     hour = 24;
@@ -108,13 +161,13 @@ namespace CrewChiefV4.Events
                 {
                     hour = hour - 12;
                 }                
-                if (minute < 10)
+                if (minutes < 10)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minute), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, NumberReader.folderOh, minutes), 0, null));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minute), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("alarm", MessageContents(AudioPlayer.folderAcknowlegeOK, notifyYouAt, hour, minutes), 0, null));
                 }
             }
         }

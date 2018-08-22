@@ -3398,12 +3398,24 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_alarm_clock {
+        public bool enable_alarm_clock_voice_recognition {
             get {
-                return ((bool)(this["enable_alarm_clock"]));
+                return ((bool)(this["enable_alarm_clock_voice_recognition"]));
             }
             set {
-                this["enable_alarm_clock"] = value;
+                this["enable_alarm_clock_voice_recognition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string alarm_clock_times {
+            get {
+                return ((string)(this["alarm_clock_times"]));
+            }
+            set {
+                this["alarm_clock_times"] = value;
             }
         }
     }

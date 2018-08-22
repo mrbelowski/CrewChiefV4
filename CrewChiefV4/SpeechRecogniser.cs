@@ -40,6 +40,8 @@ namespace CrewChiefV4
 
         private int trigger_word_listen_timeout = UserSettings.GetUserSettings().getInt("trigger_word_listen_timeout");
 
+        private static Boolean alarmClockVoiceRecognitionEnabled = UserSettings.GetUserSettings().getBoolean("enable_alarm_clock_voice_recognition");
+
         public static String[] HOWS_MY_TYRE_WEAR = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TYRE_WEAR");
         public static String[] HOWS_MY_TRANSMISSION = Configuration.getSpeechRecognitionPhrases("HOWS_MY_TRANSMISSION");
         public static String[] HOWS_MY_AERO = Configuration.getSpeechRecognitionPhrases("HOWS_MY_AERO");
@@ -788,7 +790,7 @@ namespace CrewChiefV4
                     fuelTimeChoices.AddRange(HOURS);
                 }
                 addCompoundChoices(CALCULATE_FUEL_FOR, false, this.digitsChoices, fuelTimeChoices.ToArray(), true);
-                if(CrewChief.alarmClockEnabled)
+                if(alarmClockVoiceRecognitionEnabled)
                 {
                     this.hourChoices = new Choices();
                     foreach (KeyValuePair<String[], int> entry in hourMappings)
@@ -1630,7 +1632,7 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("Strategy");
             }
-            else if (CrewChief.alarmClockEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK))
+            else if (alarmClockVoiceRecognitionEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK))
             {
                 return CrewChief.getEvent("AlarmClock");
             }
