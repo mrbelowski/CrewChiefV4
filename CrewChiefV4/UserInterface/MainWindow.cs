@@ -361,9 +361,20 @@ namespace CrewChiefV4
 
         public void updateMessagesVolume(float messagesVolume)
         {
-            currentVolume = messagesVolume;
-            setMessagesVolume(messagesVolume, false);
-            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+            if (messagesVolume < 0)
+            {
+                currentVolume = 0;
+            }
+            else if (messagesVolume > 1)
+            {
+                currentVolume = 1;
+            }
+            else
+            {
+                currentVolume = messagesVolume;
+            }
+            setMessagesVolume(currentVolume, false);
+            messagesVolumeSlider.Value = (int)(currentVolume * 10f);
         }
 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
