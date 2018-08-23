@@ -86,9 +86,9 @@ namespace CrewChiefV4
         public static String folderEnableSpotter = "acknowledge/spotterEnabled";
         public static String folderDisableSpotter = "acknowledge/spotterDisabled";
 
-        // VL: there's a problem with radio check messages in a sense that they are shared between spotter and chief.
-        // So, they either shouldn't have "spotter" message in them (if same voice is chief), or, we'll have to add a way to specify chief specific radio check.
         public static String folderSpotterRadioCheck = null;
+
+        // Used for path check.
         public static String folderSpotterRadioCheckBSlash = null;
 
         private static String spotterFolderPrefix = "spotter_";
