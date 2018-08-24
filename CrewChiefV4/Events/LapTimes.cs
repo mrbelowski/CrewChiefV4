@@ -341,7 +341,18 @@ namespace CrewChiefV4.Events
                 return;
             }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
-            float[] lapAndSectorsSelfComparisonData = currentGameState.getTimeAndSectorsForSelfBestLap();
+            float[] lapAndSectorsSelfComparisonData = new float[] { -1, -1, -1, -1 };
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                // If this is a new lap, then the just completed lap became last lap.  We do not want to use it as a self pace comparison,
+                // we need previous player best time.
+                lapAndSectorsSelfComparisonData = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(true /*ignoreLast*/);
+            }
+            else
+            {
+                lapAndSectorsSelfComparisonData = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/);
+            }
+
             if (currentGameState.SessionData.IsNewSector)
             {
                 isHotLappingOrLonePractice = currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.LonePractice ||
@@ -447,11 +458,13 @@ namespace CrewChiefV4.Events
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), 3);
                                     }
-                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
+                                    else if (deltaPlayerLastToSessionBestInClass > TimeSpan.Zero  // Guard against first lap time set.
+                                        && deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
                                     {
                                         audioPlayer.playMessage(new QueuedMessage((isHotLappingOrLonePractice ? folderSelfLessThanATenthOffThePace : folderLessThanATenthOffThePace), 0, this), 3);
                                     }
-                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
+                                    else if (deltaPlayerLastToSessionBestInClass > TimeSpan.Zero  // Guard against first lap time set.
+                                        && deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
                                             MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS),
