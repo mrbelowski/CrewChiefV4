@@ -46,7 +46,7 @@ foreach ($leftNonEmpty in $nonEmptyLeftMap.Keys) {
     }
 }
 
-# Print folders that are non empty in the left tree, but are absent in the right one.
+# Print folders that are non empty in the right tree, but are absent in the left one.
 Write-Host "-------------------------------------------------------------------------"
 Write-Host "---FOLDERS EMPTY IN THE LEFT TREE PRESENT IN THE RIGHT TREE--------------"
 Write-Host "-------------------------------------------------------------------------"
