@@ -1307,18 +1307,26 @@ namespace CrewChiefV4
         public void startContinuousListening()
         {
             if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
-            {                
-                triggerSre.UnloadAllGrammars();
-                GrammarBuilder gb = new GrammarBuilder();
-                Choices c = new Choices();
-                c.Add(keyWord);
-                gb.Culture = cultureInfo;
-                gb.Append(c);
-                triggerSre.LoadGrammar(new Grammar(gb));
-                sre.SetInputToNull();
-                triggerSre.SetInputToDefaultAudioDevice();
-                triggerSre.RecognizeAsync(RecognizeMode.Multiple);
-                Console.WriteLine("waiting for trigger word " + keyWord);
+            {   
+                try
+                {
+                    triggerSre.UnloadAllGrammars();
+                    GrammarBuilder gb = new GrammarBuilder();
+                    Choices c = new Choices();
+                    c.Add(keyWord);
+                    gb.Culture = cultureInfo;
+                    gb.Append(c);
+                    triggerSre.LoadGrammar(new Grammar(gb));
+                    sre.SetInputToNull();
+                    triggerSre.SetInputToDefaultAudioDevice();
+                    triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                    Console.WriteLine("waiting for trigger word " + keyWord);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(100);
+                }
+
             }
             else
             {
