@@ -1298,6 +1298,7 @@ namespace CrewChiefV4
         {
             startApplicationButton.Enabled = false;
             doStartAppStuff();
+            Thread.Sleep(1000);
             startApplicationButton.Enabled = true;
         }
 
