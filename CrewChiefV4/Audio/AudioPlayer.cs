@@ -207,7 +207,12 @@ namespace CrewChiefV4.Audio
                         Console.WriteLine("Using Chief voice: " + selectedChief);
                         AudioPlayer.soundFilesPath = AudioPlayer.soundFilesPath + "/alt/" + selectedChief;
 
-                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedChief + "/test"))
+                        // Prefer test_chief folder, and fall back to test if it doesn't exist.
+                        if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedChief + "/test_chief"))
+                        {
+                            folderChiefRadioCheck = "radio_check_" + selectedChief + "/test_chief";
+                        }
+                        else if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check_" + selectedChief + "/test"))
                         {
                             folderChiefRadioCheck = "radio_check_" + selectedChief + "/test";
                         }
@@ -221,7 +226,12 @@ namespace CrewChiefV4.Audio
                 }
                 else
                 {
-                    if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check/test"))
+                    // Prefer test_chief folder, and fall back to test if it doesn't exist.
+                    if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check/test_chief"))
+                    {
+                        folderChiefRadioCheck = "radio_check/test_chief";
+                    }
+                    else if (Directory.Exists(AudioPlayer.soundFilesPathNoChiefOverride + "/voice/radio_check/test"))
                     {
                         folderChiefRadioCheck = "radio_check/test";
                     }

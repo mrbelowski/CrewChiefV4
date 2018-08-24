@@ -435,6 +435,15 @@ namespace CrewChiefV4
                 catch (Exception) { }
                 sre = null;
             }
+            if(triggerSre != null)
+            {
+                try
+                {
+                    triggerSre.Dispose();
+                }
+                catch (Exception) { }
+                triggerSre = null;
+            }
             initialised = false;
         }
 
