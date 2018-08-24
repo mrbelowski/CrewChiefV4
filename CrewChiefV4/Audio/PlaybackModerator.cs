@@ -421,16 +421,14 @@ namespace CrewChiefV4.Audio
 
         private static bool PrevFirstKeyWasSpotter()
         {
-            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
-                && (PlaybackModerator.prevFirstKey.Contains("spotter") || PlaybackModerator.prevFirstKey.Contains("radio_check_"));
+                && (PlaybackModerator.prevFirstKey.Contains("spotter")/* || PlaybackModerator.prevFirstKey.Contains("radio_check")*/);
         }
 
         private static bool PrevLastKeyWasSpotter()
         {
-            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
-                && (PlaybackModerator.prevLastKey.Contains("spotter") || PlaybackModerator.prevLastKey.Contains("radio_check_"));
+                && (PlaybackModerator.prevLastKey.Contains("spotter")/* || PlaybackModerator.prevLastKey.Contains("radio_check")*/);
         }
     }
 }
