@@ -1296,7 +1296,9 @@ namespace CrewChiefV4
 
         private void startApplicationButton_Click(object sender, EventArgs e)
         {
+            startApplicationButton.Enabled = false;
             doStartAppStuff();
+            startApplicationButton.Enabled = true;
         }
 
         private void doStartAppStuff()
