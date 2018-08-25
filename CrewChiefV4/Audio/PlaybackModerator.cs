@@ -422,13 +422,13 @@ namespace CrewChiefV4.Audio
         private static bool PrevFirstKeyWasSpotter()
         {
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
-                && (PlaybackModerator.prevFirstKey.Contains("spotter")/* || PlaybackModerator.prevFirstKey.Contains("radio_check")*/);
+                && (PlaybackModerator.prevFirstKey.Contains("spotter"));
         }
 
         private static bool PrevLastKeyWasSpotter()
         {
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
-                && (PlaybackModerator.prevLastKey.Contains("spotter")/* || PlaybackModerator.prevLastKey.Contains("radio_check")*/);
+                && (PlaybackModerator.prevLastKey.Contains("spotter"));
         }
     }
 }
