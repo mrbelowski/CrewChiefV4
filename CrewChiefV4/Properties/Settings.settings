@@ -782,9 +782,6 @@
     <Setting Name="iracing_fast_parsing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="enable_tight_fuel_calc" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="add_additional_fuel" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
