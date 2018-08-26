@@ -39,7 +39,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderThousand = "numbers/thousand";
         private static String folderThousands = "numbers/thousands";
 
-        private enum Unit { HOUR, MINUTE, SECOND, TENTH, HUNDREDTH }
+        private enum Unit { HOUR, MINUTE, SECOND, AND_TENTH, JUST_TENTH, AND_HUNDREDTH, JUST_HUNDREDTH }
 
         // folders for reading out times.
 
@@ -200,7 +200,9 @@ namespace CrewChiefV4.NumberProcessing
             List<String> messages = new List<String>();
             if (tenths > 0)
             {
-                messages.AddRange(resolveNumberSounds(true, tenths, Unit.TENTH, messageHasContentAfterTime));
+                Boolean haveMinutesOrSeconds = minutes > 0 || seconds > 0;
+                messages.AddRange(resolveNumberSounds(haveMinutesOrSeconds, tenths, 
+                    haveMinutesOrSeconds ? Unit.AND_TENTH : Unit.JUST_TENTH, messageHasContentAfterTime));
             }
             return messages;
         }
@@ -334,9 +336,10 @@ namespace CrewChiefV4.NumberProcessing
                     return "_minutes";
                 case Unit.SECOND:
                     return "_seconds";
-                /* case Unit.TENTH:
-                     return "_tenths";*/
+                case Unit.JUST_TENTH:
+                     return "_tenths";
                 default:
+                    // used for 'and_X' sounds
                     return "";
             }
         }
@@ -351,7 +354,7 @@ namespace CrewChiefV4.NumberProcessing
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "minute" : "minutes");
                 case Unit.SECOND:
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "second" : "seconds");
-                case Unit.TENTH:
+                case Unit.JUST_TENTH:
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "tenth" : "tenths");
                 default:
                     return "";
