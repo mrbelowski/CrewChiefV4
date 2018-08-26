@@ -170,6 +170,9 @@ namespace CrewChiefV4.Events
                     }
                     hasOutstandingPenalty = true;
                     hasHadAPenalty = true;
+
+
+                    // TODO: REMOVE THIS
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("serve penalty")
                             && CrewChiefV4.commands.MacroManager.macros["serve penalty"].allowAutomaticTriggering)
                     {
@@ -190,6 +193,9 @@ namespace CrewChiefV4.Events
                     }
                     hasOutstandingPenalty = true;
                     hasHadAPenalty = true;
+
+
+                    // TODO: REMOVE THIS
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("serve penalty")
                             && CrewChiefV4.commands.MacroManager.macros["serve penalty"].allowAutomaticTriggering)
                     {
