@@ -222,7 +222,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.4.8: Added alarm clock function - say 'set alarm at twenty oh five', for example; alternate sound pack internal rework; mark abandoned laps as invalid; more ghost detection improvements; various bug fixes
+Version 4.9.4.9: Added alarm clock function - say 'set alarm at twenty oh five', for example; alternate sound pack internal rework; mark abandoned laps as invalid; more ghost detection improvements; R3E - removed 'confirm penalty' macro as this is no longer needed and can cause issues; reworked fuel-to-end reserve calculation - you can now specify a number of laps worth of additional fuel to add as a reserve when fuelling to the end of the race. The 'Additional fuel to add to finish the race (number of laps worth)' property can be a whole or fractional number of laps; various bug fixes
 
 Version 4.9.4.6: Enable some of the multiclass warnings in qualifying and practice sessions; allow the wait timeout for Trigger Word speech recognition mode to be set ('Trigger word wait timeout', default 5 seconds). The app will wait this many milliseconds for a command after hearing the trigger word before giving up; fixed some broken personalisations from the last update (a few of the personalised messages weren't loading); iRacing - better 'oval' detection (should prevent the app using oval spotter sounds on some road courses); iRacing - allow 'add fuel' voice commands without a unit (e.g. "pitstop add 12") - will use whatever fuel unit the app is configured to read fuel amounts in
 
