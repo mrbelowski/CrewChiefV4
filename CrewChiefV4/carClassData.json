@@ -957,16 +957,32 @@
 			"enabledMessageTypes": "FUEL",
 			"allMembersAreRWD": true
 		},
+        {
+            "carClassEnum": "F1_90S",
+            "rf2ClassNames": [ "F1_1996_SL1DE" ],
+            "brakeType": "Carbon",
+            "maxSafeWaterTemp": 105,
+            "maxSafeOilTemp": 140,
+            "timesInHundredths": true,
+            "enabledMessageTypes": "ALL",
+            "pitCrewPreparationTime": 17,
+            "allMembersAreRWD": true
+        },
 		{
-			"carClassEnum": "F1_90S",
-			"rf2ClassNames": ["F1_1996_SL1DE"],
+			"carClassEnum": "INDYCAR_DALLARA_2011",
+			"iracingCarIds": [29],
 			"brakeType": "Carbon",
-			"maxSafeWaterTemp": 105,
 			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
-			"enabledMessageTypes": "ALL",
-			"pitCrewPreparationTime": 17,
-			"allMembersAreRWD": true
+			"enabledMessageTypes": "ALL"
+		},
+		{
+			"carClassEnum": "INDYCAR_DALLARA_DW12",
+			"iracingCarIds": [57],
+			"brakeType": "Carbon",
+			"maxSafeOilTemp": 140,
+			"timesInHundredths": true,
+			"enabledMessageTypes": "ALL"
 		}
 	]
 }
