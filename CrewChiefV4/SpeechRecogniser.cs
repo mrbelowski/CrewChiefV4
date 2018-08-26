@@ -21,6 +21,7 @@ namespace CrewChiefV4
         public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
         public static int initialSpeechInputDeviceIndex = 0;
         private Boolean useNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition");
+        private Boolean disableBehaviorAlteringVoiceCommands = UserSettings.GetUserSettings().getBoolean("disable_behavior_altering_voice_commands");
         private RingBufferStream.RingBufferStream buffer;
         private NAudio.Wave.WaveInEvent waveIn;
         private bool keepRecording = true;
@@ -731,25 +732,29 @@ namespace CrewChiefV4
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
 
-                validateAndAdd(KEEP_QUIET, staticSpeechChoices);
-                validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
-                validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
-                validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
-                validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
-                validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
+                if (!disableBehaviorAlteringVoiceCommands)
+                {
+                    validateAndAdd(KEEP_QUIET, staticSpeechChoices);
+                    validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
+                    validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
+                    validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
+                    validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                    validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                    validateAndAdd(ENABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
+                    validateAndAdd(DISABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
+                    validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
+                    validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
+                    validateAndAdd(SPOT, staticSpeechChoices);
+                    validateAndAdd(DONT_SPOT, staticSpeechChoices);
+                }
+
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
-                validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
-                validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
-                validateAndAdd(ENABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
-                validateAndAdd(DISABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
 
                 validateAndAdd(WHERE_AM_I_FASTER, staticSpeechChoices);
                 validateAndAdd(WHERE_AM_I_SLOWER, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
-                validateAndAdd(SPOT, staticSpeechChoices);
-                validateAndAdd(DONT_SPOT, staticSpeechChoices);
                 validateAndAdd(REPEAT_LAST_MESSAGE, staticSpeechChoices);
                 validateAndAdd(HAVE_I_SERVED_MY_PENALTY, staticSpeechChoices);
                 validateAndAdd(DO_I_HAVE_A_PENALTY, staticSpeechChoices);
