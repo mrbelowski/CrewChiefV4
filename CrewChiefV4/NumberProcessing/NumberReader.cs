@@ -18,7 +18,7 @@ namespace CrewChiefV4
          * Note this char array may contain only '0'. This will typically include words for "seconds", "tenths", "hundreds", etc
          * as well as the number sounds.
          */
-        protected abstract List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber);
+        protected abstract List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber, Boolean messageHasContentAfterNumber);
 
         /**
          * Language specific implementation to speak a number of hours, using whatever rules and words this language requires.
@@ -90,12 +90,13 @@ namespace CrewChiefV4
                 // Rounding hacks. Because we treat the tenths or hundredths as separate numbers, they may get
                 // rounded - .950 will be rounded to 'point 10' and .995 will be rounded to 'point 100', so we 
                 // move the time on a bit to ensure this doesn't happen:
-                if (precision == Precision.TENTHS && timeSpanWrapper.timeSpan.Milliseconds > 949)
+                if (precision == Precision.HUNDREDTHS && timeSpanWrapper.timeSpan.Milliseconds > 995)
                 {
                     timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
                 }
-                else if (precision == Precision.HUNDREDTHS && timeSpanWrapper.timeSpan.Milliseconds > 995)
+                else if (timeSpanWrapper.timeSpan.Milliseconds > 949)
                 {
+                    // move the time on even if we're not asking for TENTHS in our precision argument
                     timeSpanWrapper.timeSpan = timeSpanWrapper.timeSpan.Add(TimeSpan.FromMilliseconds(1000 - timeSpanWrapper.timeSpan.Milliseconds));
                 }
                 // so now these tenths and hundredths can never be 10 or 100 respectively:
@@ -164,11 +165,11 @@ namespace CrewChiefV4
         /**
          * Convert an integer to some sound files, using the current language's implementation.
          */
-        public List<String> GetIntegerSounds(int integer, Boolean allowShortHundredsForThisNumber)
+        public List<String> GetIntegerSounds(int integer, Boolean allowShortHundredsForThisNumber, Boolean useMoreInflection)
         {
             if (integer >= -99999 && integer <= 99999)
             {
-                return GetIntegerSounds(integer.ToString().ToCharArray(), allowShortHundredsForThisNumber);
+                return GetIntegerSounds(integer.ToString().ToCharArray(), allowShortHundredsForThisNumber, useMoreInflection);
             }
             else
             {

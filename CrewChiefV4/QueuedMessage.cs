@@ -317,6 +317,9 @@ namespace CrewChiefV4
                     canBePlayed = false;
                     break;
                 }
+                // if this fragment is not the last message fragment, then some languages (Italian only at the time of writing)
+                // require a different inflection to the final part of a time / number sound.
+                Boolean useMoreInflection = i < messageFragments.Count - 1;
                 switch (messageFragment.type)
                 {
                     case FragmentType.Text:
@@ -331,10 +334,7 @@ namespace CrewChiefV4
                             canBePlayed = false;
                         }
                         break;
-                    case FragmentType.Time:
-                        // if this time fragment is not the last message fragment, then some languages (Italian only at the time of writing)
-                        // require a different inflection to their tenths sounds
-                        Boolean useMoreInflection = i < messageFragments.Count - 1;
+                    case FragmentType.Time:                        
                         if (numberReader != null)
                         {
                             List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
@@ -393,7 +393,7 @@ namespace CrewChiefV4
                     case FragmentType.Integer:                        
                         if (numberReader != null)
                         {
-                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds);
+                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds, useMoreInflection);
                             if (integerFolders.Count() == 0)
                             {
                                 Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for number " + messageFragment.integer);

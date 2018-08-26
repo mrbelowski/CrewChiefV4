@@ -169,6 +169,8 @@ The app understands lots of command including:
 "where will I be after a stop?" / "Estimate pit exit positions" / "What will happen if I pit?": play estimate of traffic and race positions on pit exit, if you were to pit on this lap
 "don't talk in the [corners / braking zones]" / "no messages in the [corners / braking zones]": delay non-critical messages if the player is in a challenging section of the track
 "talk to me anywhere" / "messages at any point": disable message delay in challenging parts of the track
+"set alarm to [hour] [minutes] [optional am/pm]" / "alarm me at [hour] [minutes] [optional am/pm]": sets the alarm clock at the given time, supports both 12 and 24 hour format and multiple alarms
+"clear alarm clock" / "clear alarms": clears all the alarms set
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)

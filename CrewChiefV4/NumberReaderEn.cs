@@ -283,7 +283,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an English sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] rawDigits, Boolean allowShortHundredsForThisNumber)
+        protected override List<String> GetIntegerSounds(char[] rawDigits, Boolean allowShortHundredsForThisNumber, Boolean messageHasContentAfterNumber)
         {
             List<String> messages = new List<String>();
             char[] digits;

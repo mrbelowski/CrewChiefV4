@@ -166,7 +166,7 @@
 			"actionSequence": [ "Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200,
-			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested",
+			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested"
 		},
 		{
 			"description": "pcars2 version, keyPressTime longer",
@@ -200,22 +200,6 @@
 			"waitBetweenEachCommand": 100,
 			"allowAutomaticTriggering": false,
 			"resolveMultipleCountWithEvent": "Fuel"
-		}]
-	},
-	{
-		"name": "serve penalty",
-		"description": "selects 'drive through' or 'stop and go' when you have a penalty - r3e only. Note that the 'name' element here shouldn't be changed if you want the app to automate this - the app is hard-coded to look for an event with the name 'serve penalty'",
-		"confirmationMessage": "acknowledge/OK",
-		"voiceTriggers": [ "serve penalty" ],
-		"buttonTriggers": [],
-		"commandSets": [
-		{
-			"description": "r3e only. The 'allowAutomaticTriggering' element below tells the app that it can execute this command set when a particular event happens - in this case, the event is getting a drive through or stop-go penalty (when playing R3E)",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "WAIT_2000", "Pit Menu Toggle" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200,
-			"allowAutomaticTriggering": true
 		}]
 	},
 	{

@@ -170,11 +170,6 @@ namespace CrewChiefV4.Events
                     }
                     hasOutstandingPenalty = true;
                     hasHadAPenalty = true;
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("serve penalty")
-                            && CrewChiefV4.commands.MacroManager.macros["serve penalty"].allowAutomaticTriggering)
-                    {
-                        CrewChiefV4.commands.MacroManager.macros["serve penalty"].execute(true);
-                    }
                 }
                 else if (currentGameState.PenaltiesData.HasStopAndGo && !previousGameState.PenaltiesData.HasStopAndGo)
                 {
@@ -190,11 +185,6 @@ namespace CrewChiefV4.Events
                     }
                     hasOutstandingPenalty = true;
                     hasHadAPenalty = true;
-                    if (CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM && CrewChiefV4.commands.MacroManager.macros.ContainsKey("serve penalty")
-                            && CrewChiefV4.commands.MacroManager.macros["serve penalty"].allowAutomaticTriggering)
-                    {
-                        CrewChiefV4.commands.MacroManager.macros["serve penalty"].execute(true);
-                    }
                 }
                 else if (currentGameState.PitData.InPitlane && currentGameState.PitData.OnOutLap && !playedNotServedPenalty &&
                     (currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasDriveThrough))
