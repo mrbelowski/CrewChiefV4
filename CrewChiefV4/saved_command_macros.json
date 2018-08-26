@@ -166,7 +166,7 @@
 			"actionSequence": [ "Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle" ],
 			"keyPressTime": 10,
 			"waitBetweenEachCommand": 200,
-			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested",
+			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested"
 		},
 		{
 			"description": "pcars2 version, keyPressTime longer",

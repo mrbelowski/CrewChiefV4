@@ -136,7 +136,10 @@ namespace CrewChiefV4.NumberProcessing
                     }
                     else
                     {
-                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime && tenths == 0));
+                        // when we're here, we know that there are seconds or tenths to come. We'll either add a 'netti' for 
+                        // 0 tenths, or an 'and 8' for, e.g., 8 tenths. This means we only have 1 case where the rising inflection
+                        // is needed - some minutes, 0 seconds and some tenths with no content after the time (1 minute! and 8)
+                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime && seconds == 0));
                     }
                 }
             }
@@ -156,7 +159,7 @@ namespace CrewChiefV4.NumberProcessing
                 {
                     if (tenths == 0)
                     {
-                        messages.AddRange(resolveNumberSounds(minutes > 0, seconds, Unit.SECOND, messageHasContentAfterTime));
+                        messages.AddRange(resolveNumberSounds(minutes > 0, seconds, Unit.SECOND, !messageHasContentAfterTime));
                         if (seconds > 1)
                         {
                             if (messageHasContentAfterTime)
@@ -237,7 +240,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber)
+        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber, Boolean messageHasContentAfterNumber)
         {
             List<String> messages = new List<String>();
             // if this is just zero, return a list with just "zero"
@@ -301,6 +304,13 @@ namespace CrewChiefV4.NumberProcessing
                 {
                     messages.Add(folderNumbersStub + tensAndUnits);
                 }
+            }
+            // now add a _more inflection to the last number *or* the second to last
+            int messageCount = messages.Count;
+            int indexToAddInflection = messageHasContentAfterNumber ? messageCount : messageCount - 1;
+            if (indexToAddInflection >= 0)
+            {
+                messages[indexToAddInflection] = getSoundWithMoreInflection(messages[indexToAddInflection]);
             }
             return messages;
         }
