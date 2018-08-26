@@ -1058,8 +1058,8 @@ enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop comma
 enable_iracing_pit_stop_commands_filter = IRACING
 enable_iracing_pit_stop_commands_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
-add_additional_fuel = Additional fuel to add to finish the race(reserve)
-add_additional_fuel_help = The amount of laps of fuel you want the app to add as a reserve, set this value if you want to overwrite the buildin reserve. This value can be factions of a lap eg. 0.7
+add_additional_fuel = Additional fuel to add to finish the race (number of laps worth)
+add_additional_fuel_help = Amount of extra fuel to add as a reserve (in laps or fractions of a lap) when working out how much is needed to finish a race (e.g. 0.7 means 0.7 laps' worth)
 add_additional_fuel_category = FUEL_TEMPS_AND_DAMAGES
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
