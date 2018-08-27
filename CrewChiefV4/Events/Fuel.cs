@@ -582,17 +582,19 @@ namespace CrewChiefV4.Events
                             }
                             
                             float estimatedFuelMinutesLeft = currentGameState.FuelData.FuelLeft / averageUsagePerMinute;
-                            float estimatedLapTimeRemaining = 2.0f;
+                            float estimatedFuelTimeRemaining = 2.0f;
                             if (currentGameState.SessionData.PlayerLapTimeSessionBest != -1)
                             {
-                                estimatedLapTimeRemaining = ((currentGameState.SessionData.PlayerLapTimeSessionBest / 60) * 1.9f);                           
+                                estimatedFuelTimeRemaining = ((currentGameState.SessionData.PlayerLapTimeSessionBest / 60) * 1.2f) -
+                                    ((currentGameState.SessionData.LapTimeCurrent - currentGameState.SessionData.PlayerLapTimeSessionBest) / 60);                           
                             }
                             else if(currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass != -1)
                             {
-                                estimatedLapTimeRemaining = ((currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass / 60) * 1.9f);   
+                                estimatedFuelTimeRemaining = ((currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass / 60) * 1.2f) -
+                                    ((currentGameState.SessionData.LapTimeCurrent - currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass) / 60);  
                             }
 
-                            if (estimatedFuelMinutesLeft < estimatedLapTimeRemaining  && !playedPitForFuelNow)
+                            if (estimatedFuelMinutesLeft < estimatedFuelTimeRemaining  && !playedPitForFuelNow)
                             {
                                 playedPitForFuelNow = true;
                                 playedTwoMinutesRemaining = true;
