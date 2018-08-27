@@ -79,9 +79,11 @@ ENABLE_YELLOW_FLAG_MESSAGES = give me yellows:tell me yellows:give me incident u
 DISABLE_YELLOW_FLAG_MESSAGES = no more yellows:stop incident updates:don't give me yellows:don't tell me yellows
 ENABLE_MANUAL_FORMATION_LAP = this is the formation lap:formation lap:rolling start
 DISABLE_MANUAL_FORMATION_LAP = standing start:no formation lap
-WHATS_THE_TIME = what's the time:what time is it
 TALK_TO_ME_ANYWHERE = talk to me anywhere:messages at any point
 DONT_TALK_IN_THE_CORNERS = don't talk in the corners:no messages in the corners:don't talk in the braking zones:no messages in the braking zones
+SPOT = spot:start spotting:enabled spotter
+DONT_SPOT = don't spot
+
 
 WHOS_IN_FRONT_IN_THE_RACE = who's in front in the race:who's ahead in the race:who's in front:who's ahead
 WHOS_BEHIND_IN_THE_RACE = who's behind in the race:who's behind
@@ -93,8 +95,7 @@ WHERE_AM_I_FASTER = where should I attack:where am I faster:where can I attack
 WHERE_AM_I_SLOWER = where should I defend:where am I slower:where is he faster:where will he attack
 
 HOW_LONGS_LEFT = how long's left:how many laps left:how many laps to go
-SPOT = spot:start spotting:enabled spotter
-DONT_SPOT = don't spot
+WHATS_THE_TIME = what's the time:what time is it
 REPEAT_LAST_MESSAGE = repeat last message:say again
 HAVE_I_SERVED_MY_PENALTY = have I served my penalty
 DO_I_HAVE_A_PENALTY = do I have a penalty
