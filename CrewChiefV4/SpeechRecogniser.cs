@@ -1044,21 +1044,30 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to add iRacing pit stop commands to speech recognition engine - " + e.Message);
             }
         }
-        public static Boolean ResultContains(String result, String[] alternatives)
+        public static Boolean ResultContains(String result, String[] alternatives, Boolean logMatch = true)
         {
             result = result.ToLower();
             foreach (String alternative in alternatives)
             {
                 if (result == alternative.ToLower())
                 {
+                    if (logMatch)
+                    {
+                        Console.WriteLine("matching entire response " + result);
+                    }
                     return true;
                 }
             }
             // no result with == so try contains
             foreach (String alternative in alternatives)
             {
-                if (result.Contains(alternative.ToLower()))
+                String alternativeLower = alternative.ToLower();
+                if (result.Contains(alternativeLower))
                 {
+                    if (logMatch)
+                    {
+                        Console.WriteLine("matching partial response " + alternativeLower);
+                    }
                     return true;
                 }
             }
@@ -1170,7 +1179,7 @@ namespace CrewChiefV4
                 if (DamageReporting.waitingForDriverIsOKResponse)
                 {
                     DamageReporting damageReportingEvent = (DamageReporting)CrewChief.getEvent("DamageReporting");
-                    if (e.Result.Confidence > minimum_voice_recognition_confidence && ResultContains(e.Result.Text, I_AM_OK))
+                    if (e.Result.Confidence > minimum_voice_recognition_confidence && ResultContains(e.Result.Text, I_AM_OK, false))
                     {
                         damageReportingEvent.cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.CLEARLY_OK);
                     }
@@ -1206,11 +1215,11 @@ namespace CrewChiefV4
                             this.lastRecognisedText = e.Result.Text;
                             CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
                         }
-                        else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
+                        else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE, false))
                         {
                             crewChief.audioPlayer.repeatLastMessage();
                         }
-                        else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
+                        else if (ResultContains(e.Result.Text, MORE_INFO, false) && this.lastRecognisedText != null && !use_verbose_responses)
                         {
                             AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
                             if (abstractEvent != null)
@@ -1472,195 +1481,196 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (ResultContains(recognisedSpeech, RADIO_CHECK))
+            if (ResultContains(recognisedSpeech, RADIO_CHECK, false))
             {
                 crewChief.respondToRadioCheck();
             }
-            else if (ResultContains(recognisedSpeech, DONT_SPOT))
+            else if (ResultContains(recognisedSpeech, DONT_SPOT, false))
             {
                 crewChief.disableSpotter();
             }
-            else if (ResultContains(recognisedSpeech, SPOT))
+            else if (ResultContains(recognisedSpeech, SPOT, false))
             {
                 crewChief.enableSpotter();
             }
-            else if (ResultContains(recognisedSpeech, KEEP_QUIET))
+            else if (ResultContains(recognisedSpeech, KEEP_QUIET, false))
             {
                 crewChief.enableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, PLAY_CORNER_NAMES))
+            else if (ResultContains(recognisedSpeech, PLAY_CORNER_NAMES, false))
             {
                 crewChief.playCornerNamesForCurrentLap();
             }
-            else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS))
+            else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS, false))
             {
                 crewChief.disableDeltasMode();
             }
-            else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS))
+            else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS, false))
             {
                 crewChief.enableDeltasMode();
             }
-            else if (ResultContains(recognisedSpeech, ENABLE_YELLOW_FLAG_MESSAGES))
+            else if (ResultContains(recognisedSpeech, ENABLE_YELLOW_FLAG_MESSAGES, false))
             {
                 crewChief.enableYellowFlagMessages();
             }
-            else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES))
+            else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES, false))
             {
                 crewChief.disableYellowFlagMessages();
             }
-            else if (ResultContains(recognisedSpeech, ENABLE_MANUAL_FORMATION_LAP))
+            else if (ResultContains(recognisedSpeech, ENABLE_MANUAL_FORMATION_LAP, false))
             {
                 crewChief.enableManualFormationLapMode();
             }
-            else if (ResultContains(recognisedSpeech, DISABLE_MANUAL_FORMATION_LAP))
+            else if (ResultContains(recognisedSpeech, DISABLE_MANUAL_FORMATION_LAP, false))
             {
                 crewChief.disableManualFormationLapMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
+            else if (ResultContains(recognisedSpeech, WHATS_THE_TIME, false))
             {
                 crewChief.reportCurrentTime();
             }
-            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE))
+            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE, false))
             {
                 crewChief.disableDelayMessagesInHardParts();
             }
-            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS))
+            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS, false))
             {
                 crewChief.enableDelayMessagesInHardParts();
             }
-            else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
-               ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
-               ResultContains(recognisedSpeech, HOWS_MY_ENGINE) ||
-               ResultContains(recognisedSpeech, HOWS_MY_SUSPENSION) ||
-               ResultContains(recognisedSpeech, HOWS_MY_BRAKES))
+            else if (ResultContains(recognisedSpeech, HOWS_MY_AERO, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_ENGINE, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_SUSPENSION, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_BRAKES, false))
             {
                 return CrewChief.getEvent("DamageReporting");
             }
-            else if (ResultContains(recognisedSpeech, KEEP_ME_INFORMED))
+            else if (ResultContains(recognisedSpeech, KEEP_ME_INFORMED, false))
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL)
-                || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
-                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
-                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR)
-                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL, false)
+                || ResultContains(recognisedSpeech, HOWS_MY_FUEL, false)
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE, false)
+                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR, false)
+                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE, false))
             {
                 return CrewChief.getEvent("Fuel");
             }
             else if (// TODO: other battery queries
-                ResultContains(recognisedSpeech, HOWS_MY_BATTERY))
+                ResultContains(recognisedSpeech, HOWS_MY_BATTERY, false))
             {
                 return CrewChief.getEvent("Battery");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
-                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND) ||
-                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER) ||
-                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND, false) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER, false) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER, false))
             {
                 return CrewChief.getEvent("Timings");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_POSITION))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_POSITION, false))
             {
                 return CrewChief.getEvent("Position");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, HOWS_MY_PACE) ||
-                ResultContains(recognisedSpeech, HOWS_MY_SELF_PACE) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES) ||
-                ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME))
+            else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_PACE, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_SELF_PACE, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME, false))
             {
                 return CrewChief.getEvent("LapTimes");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_ARE_MY_TYRE_TEMPS) ||
-                ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS) ||
-                ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR) ||
-                ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES) ||
-                ResultContains(recognisedSpeech, HOW_LONG_WILL_THESE_TYRES_LAST))
+            else if (ResultContains(recognisedSpeech, WHAT_ARE_MY_TYRE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR, false) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, false) ||
+                ResultContains(recognisedSpeech, HOW_LONG_WILL_THESE_TYRES_LAST, false))
             {
                 return CrewChief.getEvent("TyreMonitor");
             }
-            else if (ResultContains(recognisedSpeech, HOW_LONGS_LEFT))
+            else if (ResultContains(recognisedSpeech, HOW_LONGS_LEFT, false))
             {
                 return CrewChief.getEvent("RaceTime");
             }
-            else if (ResultContains(recognisedSpeech, DO_I_STILL_HAVE_A_PENALTY) ||
-                ResultContains(recognisedSpeech, DO_I_HAVE_A_PENALTY) ||
-                ResultContains(recognisedSpeech, HAVE_I_SERVED_MY_PENALTY))
+            else if (ResultContains(recognisedSpeech, DO_I_STILL_HAVE_A_PENALTY, false) ||
+                ResultContains(recognisedSpeech, DO_I_HAVE_A_PENALTY, false) ||
+                ResultContains(recognisedSpeech, HAVE_I_SERVED_MY_PENALTY, false))
             {
                 return CrewChief.getEvent("Penalties");
             }
-            else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP) ||
-                ResultContains(recognisedSpeech, IS_MY_PIT_BOX_OCCUPIED))
+            else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP, false) ||
+                ResultContains(recognisedSpeech, IS_MY_PIT_BOX_OCCUPIED, false))
             {
                 return CrewChief.getEvent("PitStops");
             }
-            else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS))
+            else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS, false))
             {
                 return CrewChief.getEvent("EngineMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_THE_AIR_TEMP) ||
-               ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP))
+            else if (ResultContains(recognisedSpeech, WHATS_THE_AIR_TEMP, false) ||
+               ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP, false))
             {
                 return CrewChief.getEvent("ConditionsMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON) ||
-                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK) ||
-                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE) ||
-                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK) ||
-                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE) ||
-                ResultContains(recognisedSpeech, WHOS_LEADING))
+            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON, false) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK, false) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE, false) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK, false) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE, false) ||
+                ResultContains(recognisedSpeech, WHOS_LEADING, false))
             {
                 return CrewChief.getEvent("Opponents");
             }
             // multiple events for status reporting:
-            else if (ResultContains(recognisedSpeech, DAMAGE_REPORT))
+            else if (ResultContains(recognisedSpeech, DAMAGE_REPORT, false))
             {
                 CrewChief.getDamageReport();
             }
-            else if (ResultContains(recognisedSpeech, CAR_STATUS))
+            else if (ResultContains(recognisedSpeech, CAR_STATUS, false))
             {
                 CrewChief.getCarStatus();
             }
-            else if (ResultContains(recognisedSpeech, STATUS))
+            else if (ResultContains(recognisedSpeech, STATUS, false))
             {
                 CrewChief.getStatus();
             }
-            else if (ResultContains(recognisedSpeech, SESSION_STATUS))
+            else if (ResultContains(recognisedSpeech, SESSION_STATUS, false))
             {
                 CrewChief.getSessionStatus();
             }
-            else if (ResultContains(recognisedSpeech, START_PACE_NOTES_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, START_PACE_NOTES_PLAYBACK, false))
             {
                 if (!DriverTrainingService.isPlayingPaceNotes)
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, STOP_PACE_NOTES_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, STOP_PACE_NOTES_PLAYBACK, false))
             {
                 if (DriverTrainingService.isPlayingPaceNotes)
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, IS_CAR_AHEAD_MY_CLASS) ||
-                ResultContains(recognisedSpeech, IS_CAR_BEHIND_MY_CLASS) ||
-                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_AHEAD) ||
-                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND))
+            else if (ResultContains(recognisedSpeech, IS_CAR_AHEAD_MY_CLASS, false) ||
+                ResultContains(recognisedSpeech, IS_CAR_BEHIND_MY_CLASS, false) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_AHEAD, false) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND, false))
             {
                 return CrewChief.getEvent("MulticlassWarnings");
             }
-            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP) ||
-                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
+            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP, false) ||
+                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE, false))
             {
                 return CrewChief.getEvent("Strategy");
             }
-            else if (alarmClockVoiceRecognitionEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK) || ResultContains(recognisedSpeech, CLEAR_ALARM_CLOCK))
+            else if (alarmClockVoiceRecognitionEnabled && 
+                (ResultContains(recognisedSpeech, SET_ALARM_CLOCK, false) || ResultContains(recognisedSpeech, CLEAR_ALARM_CLOCK, false)))
             {
                 return crewChief.alarmClock;
             }
