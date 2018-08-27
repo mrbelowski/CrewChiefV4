@@ -341,7 +341,18 @@ namespace CrewChiefV4.Events
                 return;
             }
             float[] lapAndSectorsComparisonData = new float[] { -1, -1, -1, -1 };
-            float[] lapAndSectorsSelfComparisonData = currentGameState.getTimeAndSectorsForSelfBestLap();
+            float[] lapAndSectorsSelfComparisonData = new float[] { -1, -1, -1, -1 };
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                // If this is a new lap, then the just completed lap became last lap.  We do not want to use it as a 
+                // Qualification/Practice and self pace comparison, we need the previous player best time.
+                lapAndSectorsSelfComparisonData = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(true /*ignoreLast*/);
+            }
+            else
+            {
+                lapAndSectorsSelfComparisonData = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/);
+            }
+
             if (currentGameState.SessionData.IsNewSector)
             {
                 isHotLappingOrLonePractice = currentGameState.SessionData.SessionType == SessionType.HotLap || currentGameState.SessionData.SessionType == SessionType.LonePractice ||
@@ -364,21 +375,14 @@ namespace CrewChiefV4.Events
                     else if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
                         lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
-                        float[] playerBestLapAndSectors = new float[] { -1, -1, -1, -1 };
-                        if (currentGameState.SessionData.IsNewLap)
-                        {
-                            // If this is a new lap, then the just completed lap became last lap.  We do not want to use it as a comparison,
-                            // we need previous player best time.
-                            playerBestLapAndSectors = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(true /*ignoreLast*/);
-                        }
-                        else
-                        {
-                            playerBestLapAndSectors = currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/);
-                        }
-                        if (playerBestLapAndSectors[0] > 0.0 && playerBestLapAndSectors[0] < lapAndSectorsComparisonData[0])
+                        // See if it was player who was in the lead already.
+                        if (lapAndSectorsSelfComparisonData[0] > 0.0 && lapAndSectorsSelfComparisonData[0] < lapAndSectorsComparisonData[0])
                         {
                             // Use player's best lap as comparison data.
-                            lapAndSectorsComparisonData = playerBestLapAndSectors;
+                            lapAndSectorsComparisonData[0] = lapAndSectorsSelfComparisonData[0];
+                            lapAndSectorsComparisonData[1] = lapAndSectorsSelfComparisonData[1];
+                            lapAndSectorsComparisonData[2] = lapAndSectorsSelfComparisonData[2];
+                            lapAndSectorsComparisonData[3] = lapAndSectorsSelfComparisonData[3];
                         }
                     }
                 }
@@ -447,11 +451,13 @@ namespace CrewChiefV4.Events
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderPersonalBest, 0, this), 3);
                                     }
-                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
+                                    else if (deltaPlayerLastToSessionBestInClass > TimeSpan.Zero  // Guard against first lap time set.
+                                        && deltaPlayerLastToSessionBestInClass < TimeSpan.FromMilliseconds(50))
                                     {
                                         audioPlayer.playMessage(new QueuedMessage((isHotLappingOrLonePractice ? folderSelfLessThanATenthOffThePace : folderLessThanATenthOffThePace), 0, this), 3);
                                     }
-                                    else if (deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
+                                    else if (deltaPlayerLastToSessionBestInClass > TimeSpan.Zero  // Guard against first lap time set.
+                                        && deltaPlayerLastToSessionBestInClass < TimeSpan.MaxValue)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("lapTimeNotRaceGap",
                                             MessageContents(folderGapIntro, new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS),
@@ -1027,7 +1033,9 @@ namespace CrewChiefV4.Events
                 else
                 {
                     float[] bestComparisonLapData = selfPace
-                        ? currentGameState.getTimeAndSectorsForSelfBestLap()
+                        ? currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/)  // Currently, use sectors of the best valid lap for self pace comparison.
+                                                                                                                // Later down the road, we might want use best sector times out of all the valid laps,
+                                                                                                                // or report them as a response to some separate voice command.
                         : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
 
                     if (bestComparisonLapData[0] > -1 && lastLapRating != LastLapRating.NO_DATA)
@@ -1254,7 +1262,9 @@ namespace CrewChiefV4.Events
                     try
                     {
                         float[] bestComparisonLapData = selfPace
-                            ? currentGameState.getTimeAndSectorsForSelfBestLap()
+                            ? currentGameState.SessionData.getPlayerTimeAndSectorsForBestLap(false /*ignoreLast*/)  // Currently, use sectors of the best valid lap for self pace comparison.
+                                                                                                                    // Later down the road, we might want use best sector times out of all the valid laps,
+                                                                                                                    // or report them as a response to some separate voice command.
                             : currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
 
                         List<MessageFragment> sectorDeltaMessages = getSectorDeltaMessages(SectorReportOption.ALL, currentGameState.SessionData.LastSector1Time, bestComparisonLapData[1],

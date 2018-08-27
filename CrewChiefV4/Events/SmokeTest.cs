@@ -13,8 +13,8 @@ namespace CrewChiefV4.Events
 {
     class SmokeTest : AbstractEvent
     {
-        public static String SMOKE_TEST = "SMOKE_TEST";
-        public static String SMOKE_TEST_SPOTTER = "SMOKE_TEST_SPOTTER";
+        public static String SMOKE_TEST = "smoke_test_chief";
+        public static String SMOKE_TEST_SPOTTER = "smoke_test_spotter";
 
         public SmokeTest(AudioPlayer audioPlayer)
         {

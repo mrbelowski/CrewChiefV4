@@ -851,5 +851,8 @@
     <Setting Name="chief_name" Type="System.String" Scope="User">
       <Value Profile="(Default)">Jim (default)</Value>
     </Setting>
+    <Setting Name="disable_behavior_altering_voice_commands" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

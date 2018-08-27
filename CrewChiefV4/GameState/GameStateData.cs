@@ -2983,15 +2983,5 @@ namespace CrewChiefV4.GameState
             }
             return bestLapWithSectors;
         }
-
-        public float[] getTimeAndSectorsForSelfBestLap()
-        {
-            return new float[] {
-                SessionData.PlayerLapTimeSessionBest,
-                SessionData.PlayerBestSector1Time,
-                SessionData.PlayerBestSector2Time,
-                SessionData.PlayerBestSector3Time
-            };
-        }
     }
 }
