@@ -194,12 +194,11 @@ namespace CrewChiefV4.Events
             nextFuelStatusCheck = DateTime.MinValue;
             sessionHasFixedNumberOfLaps = false;
             lapsCompletedSinceFuelReset = 0;
-
+            
             lapsRemaining = -1;
             secondsRemaining = -1;
             bestLapTime = -1;
             hasExtraLap = false;
-
             fuelCapacity = 0;
         }
 
@@ -222,6 +221,7 @@ namespace CrewChiefV4.Events
             }
             fuelUseActive = currentGameState.FuelData.FuelUseActive;
             hasExtraLap = currentGameState.SessionData.HasExtraLap;
+            bestLapTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
             // if the fuel level has increased, don't trigger
             if (currentFuel > -1 && currentFuel < currentGameState.FuelData.FuelLeft)
             {
@@ -231,7 +231,7 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionHasFixedTime)
             {
                 secondsRemaining = currentGameState.SessionData.SessionTimeRemaining;
-                bestLapTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
+                
             }
             else
             {
@@ -580,19 +580,29 @@ namespace CrewChiefV4.Events
                                     }
                                 }
                             }
-
+                            
                             float estimatedFuelMinutesLeft = currentGameState.FuelData.FuelLeft / averageUsagePerMinute;
-                            if (estimatedFuelMinutesLeft < 1.5 && !playedPitForFuelNow)
+                            float estimatedLapTimeRemaining = 2.0f;
+                            if (currentGameState.SessionData.PlayerLapTimeSessionBest != -1)
+                            {
+                                estimatedLapTimeRemaining = ((currentGameState.SessionData.PlayerLapTimeSessionBest / 60) * 1.9f);                           
+                            }
+                            else if(currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass != -1)
+                            {
+                                estimatedLapTimeRemaining = ((currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass / 60) * 1.9f);   
+                            }
+
+                            if (estimatedFuelMinutesLeft < estimatedLapTimeRemaining  && !playedPitForFuelNow)
                             {
                                 playedPitForFuelNow = true;
                                 playedTwoMinutesRemaining = true;
                                 playedFiveMinutesRemaining = true;
                                 playedTenMinutesRemaining = true;
-                                float cutoffForRefuelCall = currentGameState.SessionData.PlayerLapTimeSessionBest * 2;
-                                if (cutoffForRefuelCall == 0)
+                                float cutoffForRefuelCall = 120;  
+                                //  needs to be <= as PlayerLapTimeSessionBest is initialized to -1
+                                if (currentGameState.SessionData.PlayerLapTimeSessionBest != -1)
                                 {
-                                    // shouldn't need this, but just in case...
-                                    cutoffForRefuelCall = 120;
+                                    cutoffForRefuelCall = currentGameState.SessionData.PlayerLapTimeSessionBest * 2;
                                 }
                                 if (!currentGameState.PitData.InPitlane)
                                 {
