@@ -24,19 +24,19 @@ namespace CrewChiefV4
          * Language specific implementation to speak a number of hours, using whatever rules and words this language requires.
          * This might need to take the numbers of minutes, seconds and tenths into consideration.
          */
-        protected abstract List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime);
+        protected abstract List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision);
 
         /**
          * Language specific implementation to speak a number of minutes, using whatever rules and words this language requires.
          * This might need to take the numbers of hours, seconds and tenths into consideration.
          */
-        protected abstract List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime);
+        protected abstract List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision);
 
         /**
          * Language specific implementation to speak a number of seconds, using whatever rules and words this language requires.
          * This might need to take the numbers of hours, minutes and tenths into consideration.
          */
-        protected abstract List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime);
+        protected abstract List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision);
 
         /**
          * Language specific implementation to speak a number of tenths, using whatever rules and words this language requires.
@@ -44,7 +44,7 @@ namespace CrewChiefV4
          * The useMoreInflection tells the implementation to select a different tenths sound with a rising (or hanging) inflection. This
          * is needed for Italian numbers.
          */
-        protected abstract List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime);
+        protected abstract List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision);
 
         /**
          * Separate recordings for when we just want a number of seconds with tenths. This is only used when we have no minutes part,
@@ -141,17 +141,17 @@ namespace CrewChiefV4
                     }
                     else if (precision == Precision.SECONDS)
                     {
-                        messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
-                        messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
-                        messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
+                        messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
+                        messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
+                        messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                     }                    
                 }
                 else
                 {
-                    messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
-                    messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
-                    messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
-                    messageFolders.AddRange(GetTenthsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection));
+                    messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
+                    messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
+                    messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
+                    messageFolders.AddRange(GetTenthsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                 }
 
                 if (messageFolders.Count > 0)

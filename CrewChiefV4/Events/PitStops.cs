@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -764,7 +765,7 @@ namespace CrewChiefV4.Events
                             else if (pitWindowOpenTime > 0)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
-                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
                             }
                         }
                         else
@@ -798,7 +799,7 @@ namespace CrewChiefV4.Events
                 else if (pitWindowOpenTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
                 }
                 else
                 {
