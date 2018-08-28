@@ -979,8 +979,7 @@ namespace CrewChiefV4.Events
                 if (bestLapTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("bestLapTime",
-                        MessageContents(TimeSpan.FromSeconds(bestLapTime)), 0, this));
-
+                        MessageContents(TimeSpanWrapper.FromSeconds(bestLapTime, Precision.AUTO_LAPTIMES)), 0, this));
                 }
                 else
                 {

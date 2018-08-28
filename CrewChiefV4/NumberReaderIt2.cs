@@ -57,7 +57,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of hours. Long form.
          */
-        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (hours > 0)
@@ -95,7 +95,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of minutes. Long form.
          */
-        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (minutes > 0)
@@ -111,26 +111,29 @@ namespace CrewChiefV4.NumberProcessing
                     if (seconds == 0 && tenths == 0)
                     {
                         messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime));
-                        if (minutes > 1)
+                        if (precision != Precision.MINUTES)
                         {
-                            if (messageHasContentAfterTime)
+                            if (minutes > 1)
                             {
-                                messages.Add(getSoundWithMoreInflection(folderNetti));
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetti));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetti);
+                                }
                             }
                             else
                             {
-                                messages.Add(folderNetti);
-                            }
-                        }
-                        else
-                        {
-                            if (messageHasContentAfterTime)
-                            {
-                                messages.Add(getSoundWithMoreInflection(folderNetto));
-                            }
-                            else
-                            {
-                                messages.Add(folderNetto);
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetto));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetto);
+                                }
                             }
                         }
                     }
@@ -149,7 +152,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of seconds. Long form.
          */
-        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             // special case here - if we're reading a time which has hours, the seconds aren't significant so ignore them
@@ -160,26 +163,29 @@ namespace CrewChiefV4.NumberProcessing
                     if (tenths == 0)
                     {
                         messages.AddRange(resolveNumberSounds(minutes > 0, seconds, Unit.SECOND, !messageHasContentAfterTime));
-                        if (seconds > 1)
+                        if (precision != Precision.SECONDS && precision != Precision.MINUTES)
                         {
-                            if (messageHasContentAfterTime)
+                            if (seconds > 1)
                             {
-                                messages.Add(getSoundWithMoreInflection(folderNetti));
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetti));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetti);
+                                }
                             }
                             else
                             {
-                                messages.Add(folderNetti);
-                            }
-                        }
-                        else
-                        {
-                            if (messageHasContentAfterTime)
-                            {
-                                messages.Add(getSoundWithMoreInflection(folderNetto));
-                            }
-                            else
-                            {
-                                messages.Add(folderNetto);
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetto));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetto);
+                                }
                             }
                         }
                     }
@@ -195,7 +201,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of tenths of a second.
          */
-        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (tenths > 0)

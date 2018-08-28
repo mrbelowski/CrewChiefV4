@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -196,7 +197,7 @@ namespace CrewChiefV4.Events
                 {
                     Console.WriteLine("Pre-start message for mandatory stop time");
                     possibleMessages.Add(new QueuedMessage("pit_window_time", MessageContents(PitStops.folderMandatoryPitStopsPitWindowOpensAfter,
-                        TimeSpan.FromMinutes(currentGameState.PitData.PitWindowStart)), 0, this));
+                        TimeSpanWrapper.FromMinutes(currentGameState.PitData.PitWindowStart, Precision.MINUTES)), 0, this));
                 } 
                 else
                 {

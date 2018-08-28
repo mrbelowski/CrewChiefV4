@@ -100,6 +100,7 @@ namespace CrewChiefV4.NumberProcessing
         AUTO_LAPTIMES /* used for laptimes - will report hundredthds for gaps in oval races, if the 'prefer hundredths' is set, otherwise tenths. */, 
         HUNDREDTHS, 
         TENTHS, 
-        SECONDS
+        SECONDS,
+        MINUTES
     }
 }
