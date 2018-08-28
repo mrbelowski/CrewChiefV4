@@ -107,10 +107,10 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 else
                 {
-                    // no hours, so we may be reading seconds / tenths as well. Use 'and' if there are no seconds or tenths
+                    // no hours, so we may be reading seconds / tenths as well.
                     if (seconds == 0 && tenths == 0)
                     {
-                        messages.AddRange(resolveNumberSounds(true, minutes, Unit.MINUTE, !messageHasContentAfterTime));
+                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime));
                         if (minutes > 1)
                         {
                             if (messageHasContentAfterTime)

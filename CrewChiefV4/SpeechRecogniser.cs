@@ -1118,8 +1118,16 @@ namespace CrewChiefV4
             }
             if (success)
             {
+                if (attempts > 1)
+                {
+                    Console.WriteLine("Took " + attempts + " attempts to switch from trigger to regular SRE");
+                }
                 crewChief.audioPlayer.playStartListeningBeep();
                 recognizeAsync();
+            }
+            else
+            {
+                Console.WriteLine("Failed to switch SRE after " + attempts + " attempts");
             }
             return success;
         }
