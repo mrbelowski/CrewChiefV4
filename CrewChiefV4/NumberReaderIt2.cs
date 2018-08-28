@@ -309,7 +309,7 @@ namespace CrewChiefV4.NumberProcessing
             }
             // now add a _more inflection to the last number *or* the second to last
             int messageCount = messages.Count;
-            int indexToAddInflection = messageHasContentAfterNumber ? messageCount : messageCount - 1;
+            int indexToAddInflection = messageHasContentAfterNumber ? messageCount - 1 : messageCount - 2;
             if (indexToAddInflection >= 0)
             {
                 messages[indexToAddInflection] = getSoundWithMoreInflection(messages[indexToAddInflection]);
