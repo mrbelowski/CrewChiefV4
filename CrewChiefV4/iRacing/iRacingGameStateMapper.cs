@@ -698,6 +698,8 @@ namespace CrewChiefV4.iRacing
             }
 
             GameStateData.Multiclass = shared.SessionData.NumCarClasses > 1;
+            GameStateData.NumberOfClasses = shared.SessionData.NumCarClasses;
+
             List<double> combinedStrengthOfField = new List<double>();
             foreach (Driver driver in shared.Drivers)
             {
