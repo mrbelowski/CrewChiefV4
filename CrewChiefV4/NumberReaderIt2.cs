@@ -25,7 +25,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHours = folderNumbersStub + "hours";
         private static String folderASecond = folderNumbersStub + "a_second";
         private static String folderSeconds = folderNumbersStub + "seconds";
-        private static String folderAnd = folderNumbersStub + "and";
+        public static String folderAnd = folderNumbersStub + "and";
 
 
         private static String folderNetto = folderNumbersStub + "netto";
