@@ -213,6 +213,7 @@ namespace CrewChiefV4.iRacing
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
                 currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
+                currentGameState.SessionData.StrategyData = new StrategyData(shared.SessionData.SeriesID, shared.SessionData.SeasonID, currentGameState.SessionData.TrackDefinition.name, playerCar.Car.CarId.ToString());
 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                 currentGameState.SessionData.SectorNumber = playerCar.Live.CurrentSector;
@@ -295,6 +296,7 @@ namespace CrewChiefV4.iRacing
                         currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
                         Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier() + " (car ID " + playerCar.Car.CarId + ")");
                         currentGameState.SessionData.PlayerCarNr = Parser.ParseInt(playerCar.CarNumber);
+                        currentGameState.SessionData.StrategyData = new StrategyData(shared.SessionData.SeriesID, shared.SessionData.SeasonID, currentGameState.SessionData.TrackDefinition.name, playerCar.Car.CarId.ToString());
 
                         if (previousGameState != null)
                         {
@@ -346,7 +348,7 @@ namespace CrewChiefV4.iRacing
                     currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
                     currentGameState.SessionData.SessionStartClassPosition = previousGameState.SessionData.SessionStartClassPosition;
                     currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = previousGameState.SessionData.ClassPositionAtStartOfCurrentLap;
-
+                    currentGameState.SessionData.StrategyData = previousGameState.SessionData.StrategyData;
                     currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
                     currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
                     currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
@@ -514,10 +516,13 @@ namespace CrewChiefV4.iRacing
 
             currentGameState.SessionData.NumCarsOverall = shared.PaceCarPresent ? shared.Drivers.Count - 1 : shared.Drivers.Count;
             //use qual position in race session position until we green and first lap has been started. 
+
+            Boolean sortClassPositions = true;
             if ((currentGameState.SessionData.SessionPhase == SessionPhase.Formation || currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk ||
                 currentGameState.SessionData.SessionPhase == SessionPhase.Countdown || playerCar.Live.Lap < 1) && currentGameState.SessionData.SessionType == SessionType.Race)
             {
                 currentGameState.SessionData.OverallPosition = playerCar.CurrentResults.QualifyingPosition;
+                sortClassPositions = false;
             }
             else
             {
@@ -699,7 +704,7 @@ namespace CrewChiefV4.iRacing
 
             GameStateData.Multiclass = shared.SessionData.NumCarClasses > 1;
             GameStateData.NumberOfClasses = shared.SessionData.NumCarClasses;
-
+            
             List<double> combinedStrengthOfField = new List<double>();
             foreach (Driver driver in shared.Drivers)
             {

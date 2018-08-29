@@ -243,7 +243,20 @@ namespace CrewChiefV4.GameState
         Standing,
         Rolling
     }
-
+    public class StrategyData
+    {
+        public StrategyData(String SeriesId, String SeasonId, String TrackId, String CarId)
+        {
+            this.SeriesId = SeriesId;
+            this.SeasonId = SeasonId;
+            this.TrackId = TrackId;
+            this.CarId = CarId;
+        }
+        public String SeriesId { get; set; }
+        public String SeasonId { get; set; }
+        public String TrackId { get; set; }
+        public String CarId { get; set; }
+    }
     public class SessionData
     {
         public List<String> formattedPlayerLapTimes = new List<String>();
@@ -438,6 +451,8 @@ namespace CrewChiefV4.GameState
         public StartType StartType = StartType.None;
 
         public Boolean HasCompletedSector2ThisLap = false;
+
+        public StrategyData StrategyData = null;
 
         public SessionData()
         {

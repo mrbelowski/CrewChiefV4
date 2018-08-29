@@ -17,6 +17,7 @@ namespace CrewChiefV4.iRacing
         public bool NightMode { get; set; }
         public bool IsOval { get; set; }
         public string Category { get; set; }
+        public string TrackType { get; set; }
         public static Track FromSessionInfo(string sessionString)
         {
             var track = new Track();
@@ -26,7 +27,8 @@ namespace CrewChiefV4.iRacing
             track.Length = Parser.ParseTrackLength(YamlParser.Parse(sessionString, "WeekendInfo:TrackLength:"));            
             track.NightMode = YamlParser.Parse(sessionString, "WeekendInfo:NightMode:") == "1";
             track.Category = YamlParser.Parse(sessionString, "WeekendInfo:Category:");
-            track.IsOval = track.Category.ToLower().Contains("oval");
+            track.TrackType = YamlParser.Parse(sessionString, "WeekendInfo:TrackType:");
+            track.IsOval = track.Category.ToLower().Contains("oval") && !track.TrackType.Equals("road course");
 
             return track;
         }
