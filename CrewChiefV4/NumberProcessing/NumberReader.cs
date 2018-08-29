@@ -104,7 +104,8 @@ namespace CrewChiefV4
                 int hundredths = (int)Math.Round((float)timeSpanWrapper.timeSpan.Milliseconds / 10f);
 
                 // now call the language-specific implementations
-                Boolean useNewENMinutes = SoundPackVersionsHelper.currentSoundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
+                Boolean useNewENMinutes = precision != Precision.MINUTES &&
+                    SoundPackVersionsHelper.currentSoundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
                     timeSpanWrapper.timeSpan.Minutes > 0 && timeSpanWrapper.timeSpan.Minutes < 3 && timeSpanWrapper.timeSpan.Seconds > 0 && timeSpanWrapper.timeSpan.Seconds < 60;
 
                 Boolean useNewENSeconds = SoundPackVersionsHelper.currentSoundPackVersion > 106 && getLocale() == "en" && timeSpanWrapper.timeSpan.Hours == 0 &&
@@ -139,7 +140,7 @@ namespace CrewChiefV4
                     {
                         messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths.ToString()));
                     }
-                    else if (precision == Precision.SECONDS)
+                    else if (precision == Precision.SECONDS || precision == Precision.MINUTES)
                     {
                         messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                         messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
