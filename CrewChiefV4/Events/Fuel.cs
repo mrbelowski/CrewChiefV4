@@ -792,7 +792,7 @@ namespace CrewChiefV4.Events
                     // stuff like "one thirty two" - we always want "one hundred and thirty two"    
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
                     messageFragments.Add(MessageFragment.Text(folderFor));
-                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.SECONDS)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.MINUTES)));
                     messageFragments.Add(MessageFragment.Text(folderWeEstimateWeWillNeed));
                     if (fuelReportsInGallon)
                     {
