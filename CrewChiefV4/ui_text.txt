@@ -1135,3 +1135,7 @@ alarm_clock_times_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS
 disable_behavior_altering_voice_commands = Disable behavior voice commands
 disable_behavior_altering_voice_commands_help = When checked, will disable all voice commands that affect CC behavior, for example: "Spot", "Don't spot", "Keep quiet" etc.
 disable_behavior_altering_voice_commands_category = AUDIO_VOICE_AND_CONTROLLERS
+
+slow_class_car_warnings_in_race_only = Slow car class warnings in race only
+slow_class_car_warnings_in_race_only_help = Only play 'slow car ahead' multiclass warnings in race sessions
+slow_class_car_warnings_in_race_only_category = PIT_STOPS_AND_MULTICLASS
