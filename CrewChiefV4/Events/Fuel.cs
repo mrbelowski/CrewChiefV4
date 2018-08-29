@@ -156,8 +156,12 @@ namespace CrewChiefV4.Events
         private int lapsCompletedSinceFuelReset = 0;
 
         private int lapsRemaining = -1;
+
         private float secondsRemaining = -1;
+
         private float bestLapTime = -1;
+
+        private Boolean gotPredictedPitWindow = false;
 
         private static float litresPerGallon = 3.78541f;
 
@@ -200,6 +204,7 @@ namespace CrewChiefV4.Events
             bestLapTime = -1;
             hasExtraLap = false;
             fuelCapacity = 0;
+            gotPredictedPitWindow = false;
         }
 
         // fuel not implemented for HotLap/LonePractice modes
@@ -645,6 +650,16 @@ namespace CrewChiefV4.Events
                                 // warning message for fuel left - these play as soon as the fuel reaches 1/2 tank left
                                 playedHalfTankWarning = true;
                                 audioPlayer.playMessage(new QueuedMessage(folderHalfTankWarning, 0, this), 0);
+                            }
+                        }
+                        if (!gotPredictedPitWindow && currentGameState.SessionData.SessionType == SessionType.Race &&
+                            !currentGameState.PitData.HasMandatoryPitStop)
+                        {
+                            Tuple<int,int> predictedWindow =  getPredictedPitWindow();
+                            if(predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
+                            {
+                                audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
+                                    MessageContents(folderWeEstimate, PitStops.folderMandatoryPitStopsPitWindowOpensOnLap, predictedWindow.Item1), 0, null));
                             }
                         }
                     }
@@ -1203,7 +1218,35 @@ namespace CrewChiefV4.Events
             }
             return additionalLitresNeeded;
         }
+        // Try to predict the the earliest possible time/lap and the latest possible time/lap we can come in for our pitstop and still make it to the end.
+        // we need to check if more then one stop is needed to finish the race in this case we dont care about pit window
+        public Tuple<int, int> getPredictedPitWindow()
+        {
+            Tuple<int, int> pitWindow = new Tuple<int, int>(-1, -1);
+            if (lapsCompletedSinceFuelReset > 3 && averageUsagePerLap > 0)
+            {
+                int litersNeeded = getLitresToEndOfRace();
+                if (litersNeeded > 0)
+                {
+                    // more then 1 stop needed
+                    if (litersNeeded > fuelCapacity)
+                    {
+                        return pitWindow;
+                    }
+                    int maximumLapsForFullTankOfFuel = (int)Math.Floor(fuelCapacity / averageUsagePerLap);
+                    int pitWindowEnd = (int)Math.Floor(initialFuelLevel / averageUsagePerLap); //pitwindow end
+                    int estimatedlapsWorth = (int)Math.Floor(litersNeeded / averageUsagePerLap);
+                    int diff = maximumLapsForFullTankOfFuel - pitWindowEnd;
+                    int pitWindowStart = (maximumLapsForFullTankOfFuel - diff) - estimatedlapsWorth;
 
+                    Console.WriteLine("pitwindowStart: " + pitWindowStart + " pitWindowEnd: " + pitWindowEnd +
+                        "maximumLapsForFullTankOfFuel: " + maximumLapsForFullTankOfFuel + " estimatedlapsWorth: " + estimatedlapsWorth);
+                    pitWindow = new Tuple<int, int>(pitWindowStart, pitWindowEnd);
+                }
+                gotPredictedPitWindow = true;
+            }
+            return pitWindow;
+        }
         public override int resolveMacroKeyPressCount(String macroName)
         {
             // only used for r3e auto-fuel amount selection at present
