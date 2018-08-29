@@ -23,6 +23,7 @@ namespace CrewChiefV4.Events
         private float classSeparationAdjustment = 10f;
 
         private Boolean enableMulticlassWarnings = UserSettings.GetUserSettings().getBoolean("enable_multiclass_messages");
+        private Boolean disableSlowerCarWarningsInPracAndQual = UserSettings.GetUserSettings().getBoolean("slow_class_car_warnings_in_race_only");
         private int targetWarningTimeForFasterClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_faster_class_car");
         private int targetWarningTimeForSlowerClass = UserSettings.GetUserSettings().getInt("target_warning_time_for_slower_class_car");
 
@@ -394,7 +395,7 @@ namespace CrewChiefV4.Events
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
-                                else
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race || !disableSlowerCarWarningsInPracAndQual)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
@@ -421,7 +422,7 @@ namespace CrewChiefV4.Events
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
-                                else
+                                else if (currentGameState.SessionData.SessionType == SessionType.Race || !disableSlowerCarWarningsInPracAndQual)
                                 {
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
