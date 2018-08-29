@@ -2086,12 +2086,6 @@ namespace CrewChiefV4.GameState
                         splitTimeSet = true;
                     }
                 }
-
-                if (!splitTimeSet)
-                {
-                    // This might spam, but I think we need to get understanding when this happens.
-                    Console.WriteLine("Failed to calculate split time.");
-                }
             }
             return new Tuple<int, float>(lapDifference, (float) splitTime.TotalSeconds);
         }
@@ -2159,12 +2153,6 @@ namespace CrewChiefV4.GameState
                 else
                 {
                     return 0f;
-                }
-
-                if (!splitTimeSet)
-                {
-                    // This might spam, but I think we need to get understanding when this happens.
-                    Console.WriteLine("Failed to calculate split time.");
                 }
             }
             return (float)splitTime.TotalSeconds;

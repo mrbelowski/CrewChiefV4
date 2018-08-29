@@ -565,7 +565,8 @@ namespace CrewChiefV4.Events
                                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                                 {
                                     // need a bit of slack in this estimate:
-                                    if (averageUsagePerMinute * (halfTime + currentGameState.SessionData.PlayerLapTimeSessionBest) / 60 > currentGameState.FuelData.FuelLeft)
+                                    float fuelToEnd = averageUsagePerMinute * (halfTime + currentGameState.SessionData.PlayerLapTimeSessionBest) / 60;
+                                    if (fuelToEnd > currentGameState.FuelData.FuelLeft)
                                     {
                                         if (currentGameState.PitData.IsRefuellingAllowed)
                                         {
@@ -578,6 +579,11 @@ namespace CrewChiefV4.Events
                                         {
                                             audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this), 7);
                                         }
+                                    }
+                                    else if (currentGameState.FuelData.FuelLeft - fuelToEnd <= 2)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 7);
+                                        audioPlayer.playMessage(new QueuedMessage(folderFuelWillBeTight, 0, this));
                                     }
                                     else
                                     {
