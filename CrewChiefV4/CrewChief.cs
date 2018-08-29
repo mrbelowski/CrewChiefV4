@@ -12,6 +12,7 @@ using CrewChiefV4.GameState;
 using CrewChiefV4.PCars;
 using CrewChiefV4.RaceRoom.RaceRoomData;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 
 namespace CrewChiefV4
@@ -576,23 +577,32 @@ namespace CrewChiefV4
         {
             DateTime now = DateTime.Now;
             int hour = now.Hour;
-            if (hour == 0)
-            {
-                hour = 24;
-            }
-            if (hour > 12) {
-                hour = hour - 12;
-            }
             int minute = now.Minute;
-            if (minute < 10)
+            if (AudioPlayer.soundPackLanguage == "it")
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                    AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute), 0, null));
+                    AbstractEvent.MessageContents(hour, NumberReaderIt2.folderAnd, now.Minute), 0, null));
             }
             else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                    AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+                if (hour == 0)
+                {
+                    hour = 24;
+                }
+                if (hour > 12)
+                {
+                    hour = hour - 12;
+                }
+                if (minute < 10)
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                        AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute), 0, null));
+                }
+                else
+                {
+                    audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                        AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+                }
             }
         }
 
