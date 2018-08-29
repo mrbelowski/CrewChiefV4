@@ -987,7 +987,7 @@ namespace CrewChiefV4.Events
             {
                 int litresToEnd = getLitresToEndOfRace();
                 // TODO: TEST ME
-                if (litresToEnd > 0)
+                if (litresToEnd != int.MaxValue)
                 {
                     // -2 means we expect to have 2 litres left at the end of the race
                     if (litresToEnd >= -2)
@@ -1069,11 +1069,11 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
                 int litresNeeded = getLitresToEndOfRace();
-                if (!fuelUseActive || litresNeeded == -1)
+                if (!fuelUseActive || litresNeeded == int.MaxValue)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 } 
-                else if (litresNeeded == 0)
+                else if (litresNeeded < 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
                 }
@@ -1163,10 +1163,10 @@ namespace CrewChiefV4.Events
             }
         }
 
-        // -1 means no data
+        // int.MaxValue means no data
         public int getLitresToEndOfRace()
         {
-            int additionalLitresNeeded = -1;
+            int additionalLitresNeeded = int.MaxValue;
             if (fuelUseActive)
             {
                 int additionalFuelLiters = 2;
@@ -1244,7 +1244,6 @@ namespace CrewChiefV4.Events
                         "maximumLapsForFullTankOfFuel: " + maximumLapsForFullTankOfFuel + " estimatedlapsWorth: " + estimatedlapsWorth);
                     pitWindow = new Tuple<int, int>(pitWindowStart, pitWindowEnd);
                 }
-                
             }
             return pitWindow;
         }
@@ -1256,7 +1255,7 @@ namespace CrewChiefV4.Events
 
             // limit the number of key presses to 200 here, or fuelCapacity
             int fuelCapacityInt = (int)fuelCapacity;
-            if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
+            if (fuelCapacityInt > 0 && fuelCapacityInt-currentFuel < litresToEnd)
             {
                 // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                 audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this), 10);
