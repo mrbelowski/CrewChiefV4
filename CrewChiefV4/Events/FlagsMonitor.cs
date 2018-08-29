@@ -163,7 +163,7 @@ namespace CrewChiefV4.Events
         private List<NamePositionPair> driversInvolvedInCurrentIncident = new List<NamePositionPair>();
 
         private String waitingForCrashedDriverInCorner = null;
-        private List<OpponentData> driversCrashedInCorner = new List<OpponentData>();
+        private List<String> driversCrashedInCorner = new List<String>();
         private DateTime waitingForCrashedDriverInCornerFinishTime = DateTime.MaxValue;
 
         // this will be initialised to something sensible once a yellow has been shown - if no yellow is ever 
@@ -1027,8 +1027,10 @@ namespace CrewChiefV4.Events
                 if (waitingForCrashedDriverInCorner == null)
                 {
                     // get the first stopped car and his corner
-                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                    foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        String opponentId = entry.Key;
+                        OpponentData opponent = entry.Value;
                         String landmark = opponent.stoppedInLandmark;
                         if (landmark != null && !landmark.Equals(currentGameState.SessionData.stoppedInLandmark))
                         {
@@ -1051,7 +1053,7 @@ namespace CrewChiefV4.Events
                                 (!incidentWarnings.TryGetValue(landmark, out incidentWarningTime) || incidentWarningTime + incidentRepeatFrequency < currentGameState.Now))
                             {
                                 waitingForCrashedDriverInCorner = landmark;
-                                driversCrashedInCorner.Add(opponent);
+                                driversCrashedInCorner.Add(opponentId);
                                 waitingForCrashedDriverInCornerFinishTime = currentGameState.Now + TimeSpan.FromSeconds(4);
                                 break;
                             }
@@ -1061,20 +1063,29 @@ namespace CrewChiefV4.Events
                 else if (currentGameState.Now < waitingForCrashedDriverInCornerFinishTime)
                 {
                     // get more stopped cars
-                    foreach (OpponentData opponent in currentGameState.OpponentData.Values)
+                    foreach (KeyValuePair<String, OpponentData> entry in currentGameState.OpponentData)
                     {
+                        OpponentData opponent = entry.Value;
                         String landmark = opponent.stoppedInLandmark;
-                        if (landmark == waitingForCrashedDriverInCorner && !driversCrashedInCorner.Contains(opponent))
+                        if (landmark == waitingForCrashedDriverInCorner && !driversCrashedInCorner.Contains(entry.Key))
                         {
-                            driversCrashedInCorner.Add(opponent);
+                            driversCrashedInCorner.Add(entry.Key);
                         }
                     }
                 }
                 else
                 {
                     // finished waiting, get the results and play 'em
+                    List<OpponentData> crashedOpponents = new List<OpponentData>();
+                    foreach (String opponentKey in driversCrashedInCorner)
+                    {
+                        if (currentGameState.OpponentData.ContainsKey(opponentKey) && !currentGameState.OpponentData[opponentKey].InPits)
+                        {
+                            crashedOpponents.Add(currentGameState.OpponentData[opponentKey]);
+                        }
+                    }
                     incidentWarnings[waitingForCrashedDriverInCorner] = currentGameState.Now;
-                    if (driversCrashedInCorner.Count >= pileupDriverCount)
+                    if (crashedOpponents.Count >= pileupDriverCount)
                     {
                         // report pileup
                         if (CrewChief.yellowFlagMessagesEnabled)
@@ -1089,7 +1100,7 @@ namespace CrewChiefV4.Events
                         int positionToRead = -1;
                         if (enableOpponentCrashMessages)
                         {
-                            foreach (OpponentData opponent in driversCrashedInCorner)
+                            foreach (OpponentData opponent in crashedOpponents)
                             {
                                 if (AudioPlayer.canReadName(opponent.DriverRawName))
                                 {
@@ -1228,26 +1239,21 @@ namespace CrewChiefV4.Events
 
         void reportYellowFlagDrivers(Dictionary<string, OpponentData> opponents, TrackDefinition currentTrack)
         {
-            if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack))
-            {
-                return;
-            }
-
-            // remove driver who are no longer in the opponentdata
+            // remove driver who are no longer in the opponentdata or who have pitted
             List<NamePositionPair> driversInvolvedAndConnected = new List<NamePositionPair>();
             foreach (NamePositionPair driverInvolved in driversInvolvedInCurrentIncident)
             {
-                if (opponents.ContainsKey(driverInvolved.opponentKey))
+                if (opponents.ContainsKey(driverInvolved.opponentKey) && !opponents[driverInvolved.opponentKey].InPits)
                 {
                     driversInvolvedAndConnected.Add(driverInvolved);
                 }
             }
             driversInvolvedInCurrentIncident = driversInvolvedAndConnected;
-            if (driversInvolvedInCurrentIncident.Count == 0)
+            if (driversInvolvedInCurrentIncident.Count == 0 || checkForAndReportPileup(currentTrack))
             {
-                // Corner case for all involved drivers disconnected.
                 return;
             }
+            
             // no pileup so read name / positions / corners as appropriate
             // there may be many of these, so we need to sort the list then pick the top few
             driversInvolvedInCurrentIncident.Sort(new NamePositionPairComparer(playerClassPositionAtStartOfIncident));
