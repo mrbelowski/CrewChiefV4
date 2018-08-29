@@ -974,13 +974,11 @@ namespace CrewChiefV4.Events
                 // TODO: TEST ME
                 if (litresToEnd > 0)
                 {
-                    int litresRemaining = (int)Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
-                    int litresNeeded = litresToEnd - litresRemaining;
                     // -2 means we expect to have 2 litres left at the end of the race
-                    if (litresNeeded >= -2)
+                    if (litresToEnd >= -2)
                     {
                         QueuedMessage fuelMessage;
-                        if (litresNeeded < 3)
+                        if (litresToEnd < 3)
                         {
                             // between 2 litres short, and 2 litres excess fuel
                             fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
@@ -990,7 +988,7 @@ namespace CrewChiefV4.Events
                             if (fuelReportsInGallon)
                             {
                                 // for gallons we want both whole and fractional part cause its a stupid unit.
-                                float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                                float gallonsNeeded = convertLitersToGallons(litresToEnd, true);
                                 Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
                                 if (wholeandfractional.Item2 > 0)
                                 {
@@ -1007,7 +1005,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
-                                    litresNeeded, folderLitresToGetToTheEnd), 0, null);
+                                    litresToEnd, folderLitresToGetToTheEnd), 0, null);
                             }
                         }
                         audioPlayer.playMessageImmediately(fuelMessage);
