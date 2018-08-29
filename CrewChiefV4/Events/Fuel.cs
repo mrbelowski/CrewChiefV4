@@ -653,7 +653,7 @@ namespace CrewChiefV4.Events
                             }
                         }
                         if (!gotPredictedPitWindow && currentGameState.SessionData.SessionType == SessionType.Race &&
-                            !currentGameState.PitData.HasMandatoryPitStop)
+                            !currentGameState.PitData.HasMandatoryPitStop && currentGameState.SessionData.IsNewLap)
                         {
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow();
                             if(predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
@@ -1226,6 +1226,7 @@ namespace CrewChiefV4.Events
             if (lapsCompletedSinceFuelReset > 3 && averageUsagePerLap > 0)
             {
                 int litersNeeded = getLitresToEndOfRace();
+                gotPredictedPitWindow = true;
                 if (litersNeeded > 0)
                 {
                     // more then 1 stop needed
@@ -1243,7 +1244,7 @@ namespace CrewChiefV4.Events
                         "maximumLapsForFullTankOfFuel: " + maximumLapsForFullTankOfFuel + " estimatedlapsWorth: " + estimatedlapsWorth);
                     pitWindow = new Tuple<int, int>(pitWindowStart, pitWindowEnd);
                 }
-                gotPredictedPitWindow = true;
+                
             }
             return pitWindow;
         }
