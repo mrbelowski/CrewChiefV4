@@ -113,7 +113,7 @@ namespace CrewChiefV4.Events
                 // check temperatures every minute:
                 if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastStatusCheck + statusMonitorWindowLength)
                 {
-                    EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp);
+                    EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp, currentGameState.EngineData.EngineWaterTemp);
                     if (currentEngineStatus != lastStatusMessage)
                     {
                         if (currentEngineStatus.HasFlag(EngineStatus.ALL_CLEAR))
@@ -240,7 +240,7 @@ namespace CrewChiefV4.Events
                 this.currentWaterTempWarning = engineWaterTempWarning;
                 this.currentEngineStalled = engineStalled;
             }
-            public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp)
+            public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp, float currentWaterTemp /*only used for logging*/)
             {
                 // TODO: detect a sudden drop in oil pressure without triggering false positives caused by stalling the engine
                 EngineStatus engineStatusFlags = EngineStatus.NONE;
@@ -252,10 +252,12 @@ namespace CrewChiefV4.Events
                     
                     if (averageWaterTemp > maxSafeWaterTemp)
                     {
+                        Console.WriteLine(String.Format("Water temp {0} is above safe threshold of {1} for car class", averageWaterTemp, maxSafeWaterTemp));
                         engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
                     }
                     if (averageOilTemp > maxSafeOilTemp)
                     {
+                        Console.WriteLine(String.Format("Oil temp {0} is above safe threshold of {1} for car class", averageOilTemp, maxSafeOilTemp));
                         engineStatusFlags = engineStatusFlags | EngineStatus.HOT_OIL;
                     }
                 }
@@ -269,6 +271,7 @@ namespace CrewChiefV4.Events
                 }
                 if (currentWaterTempWarning)
                 {
+                    Console.WriteLine(String.Format("Received water temp warning from game, current water temp is {0}", currentWaterTemp));
                     engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
                 }
                 if (currentEngineStalled)
