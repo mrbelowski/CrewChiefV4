@@ -36,8 +36,8 @@ namespace CrewChiefV4.NumberProcessing
         // "numbers_it/1_hundreds","numbers_it/2_hundreds", etc
         private static String folderHundredSuffix = "_hundreds";
 
-        private static String folderThousand = "numbers/thousand";
-        private static String folderThousands = "numbers/thousands";
+        private static String folderThousand = folderNumbersStub + "thousand";
+        private static String folderThousands = folderNumbersStub + "thousands";
 
         private enum Unit { HOUR, MINUTE, SECOND, AND_TENTH, JUST_TENTH, AND_HUNDREDTH, JUST_HUNDREDTH }
 
@@ -45,8 +45,8 @@ namespace CrewChiefV4.NumberProcessing
 
         // This is combined with folderNumbersStub to produce tenths sounds for tenths > 1 - numbers_it/2_tenths -> numbers_it/9_tenths
         private static String folderTenthsSuffix = "_tenths";
-        private static String folderATenth = "numbers/a_tenth";
-
+        private static String folderATenth = folderNumbersStub + "a_tenth";
+        private static String folderPoint = folderNumbersStub + "point";
 
         protected override String getLocale()
         {
@@ -222,11 +222,79 @@ namespace CrewChiefV4.NumberProcessing
         }
 
         /**
-         * Not implemented for Italian number reader.
-         * */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
+         * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
+         */
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime)
         {
-            return null;
+            // there will always be some seconds here
+            String combinedMinutesAndSecondsSoundFolder;
+            List<String> separateMinutesAndSecondsSoundFolders = new List<string>();
+            String fractionsFolder;
+            Boolean usePoint = false;
+            if (minutes > 0)
+            {
+                separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + minutes.ToString());
+                // TODO: are we using padded seconds here?
+                String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
+                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + minutes + "_" + paddedSeconds;
+                if (!messageHasContentAfterTime)
+                {
+                    separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + seconds.ToString() + moreInflectionSuffix);
+                    combinedMinutesAndSecondsSoundFolder += moreInflectionSuffix;
+                }
+                else
+                {
+                    separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + seconds.ToString());
+                }
+            }
+            else
+            {
+                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + seconds.ToString();
+                if (!messageHasContentAfterTime)
+                {
+                    combinedMinutesAndSecondsSoundFolder += moreInflectionSuffix;
+                }
+            }
+            if (fraction == "0" || fraction == "00")
+            {
+                fractionsFolder = folderNetti;
+                if (messageHasContentAfterTime)
+                {
+                    fractionsFolder += moreInflectionSuffix;
+                }
+            }
+            else if (fraction.Length == 1)
+            {
+                fractionsFolder = folderAndPrefix + fraction + folderTenthsSuffix;
+                if (messageHasContentAfterTime)
+                {
+                    fractionsFolder += moreInflectionSuffix;
+                }
+            }
+            else
+            {
+                fractionsFolder = folderNumbersStub + fraction;
+                if (messageHasContentAfterTime)
+                {
+                    fractionsFolder += moreInflectionSuffix;
+                }
+                usePoint = true;
+            }
+            List<String> messages = new List<String>();
+
+            if (SoundCache.availableSounds.Contains(combinedMinutesAndSecondsSoundFolder))
+            {
+                messages.Add(combinedMinutesAndSecondsSoundFolder);
+            } else
+            {
+                messages.AddRange(separateMinutesAndSecondsSoundFolders);
+            }
+            if (usePoint)
+            {
+                messages.Add(folderPoint);
+            }
+            messages.Add(fractionsFolder);
+            return messages;
         }
 
         /**

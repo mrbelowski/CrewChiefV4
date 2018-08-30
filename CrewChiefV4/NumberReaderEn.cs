@@ -257,7 +257,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
          */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime)
         {
             List<String> messages = new List<String>();
 			// assume minutes is always 1 or 2
