@@ -217,7 +217,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Not implemented for Italian number reader.
          * */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime)
         {
             return null;
         }
