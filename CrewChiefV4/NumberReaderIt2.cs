@@ -236,7 +236,7 @@ namespace CrewChiefV4.NumberProcessing
                 separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + minutes.ToString());
                 // TODO: are we using padded seconds here?
                 String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
-                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + minutes + "_" + paddedSeconds;
+                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + minutes + paddedSeconds;
                 if (!messageHasContentAfterTime)
                 {
                     separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + seconds.ToString() + moreInflectionSuffix);
@@ -285,8 +285,10 @@ namespace CrewChiefV4.NumberProcessing
             if (SoundCache.availableSounds.Contains(combinedMinutesAndSecondsSoundFolder))
             {
                 messages.Add(combinedMinutesAndSecondsSoundFolder);
-            } else
+            }
+            else
             {
+                Console.WriteLine("Combined minutes / seconds sound " + combinedMinutesAndSecondsSoundFolder + " not found, using separate sounds");
                 messages.AddRange(separateMinutesAndSecondsSoundFolders);
             }
             if (usePoint)
@@ -294,6 +296,7 @@ namespace CrewChiefV4.NumberProcessing
                 messages.Add(folderPoint);
             }
             messages.Add(fractionsFolder);
+            Console.WriteLine("Reading short form with sounds " + String.Join(", ", messages));
             return messages;
         }
 

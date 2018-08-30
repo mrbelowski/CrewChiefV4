@@ -112,8 +112,9 @@ namespace CrewChiefV4
                     timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
                     (precision == Precision.HUNDREDTHS && hundredths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
-                // TODO: TimeSpanWrapper needs a 'form hint'
-                Boolean useItalianShortForm = SoundPackVersionsHelper.currentSoundPackVersion > 150 && getLocale() == "it" &&
+                // TODO: TimeSpanWrapper might need a 'form hint'. For now, use the long form if we're reading with a precision of minutes or seconds
+                Boolean useItalianShortForm = precision != Precision.MINUTES && precision != Precision.SECONDS &&
+                    SoundPackVersionsHelper.currentSoundPackVersion > 150 && getLocale() == "it" &&
                     timeSpanWrapper.timeSpan.Hours == 0 && 
                         (timeSpanWrapper.timeSpan.Seconds > 0 && (timeSpanWrapper.timeSpan.Minutes > 0 || tenths > 0 || hundredths > 0));    // more checks on numbers?
 
