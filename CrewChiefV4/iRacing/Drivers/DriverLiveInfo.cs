@@ -14,17 +14,13 @@ namespace CrewChiefV4.iRacing
             PreviousLapWasValid = false;
             HasCrossedSFLine = false;
             LapTimePrevious = -1;
-            _prevSector = -1;
-            LiveLapsCompleted = -1;
-            LapsCompleted = -1;
-            insertDummyLap = false;
-            dummyInserted = false;
-            this.Sectors = new[]
-                    {
-                        new Sector() {Number = 0, StartPercentage = 0f},
-                        new Sector() {Number = 1, StartPercentage = 0.333f},
-                        new Sector() {Number = 2, StartPercentage = 0.666f}
-                    };
+            _prevSector = 0;
+            LiveLapsCompleted = 0;
+            LapsCompleted = 0;
+            insertStartLap = false;
+            startLapInserted = false;
+            Lap = 0;
+            hasCrossedSFLineToStartRace = false;
         }
 
         private readonly Driver _driver;
@@ -62,25 +58,34 @@ namespace CrewChiefV4.iRacing
         public bool PreviousLapWasValid { get; set; }
         public float LapTimePrevious { get; set; }
         public bool HasCrossedSFLine { get; set; }
-        public Sector[] Sectors { get; set; }
-        public int PlayerCarPosition { get; set; }
 
         private double _prevSpeedUpdateTime;
         private double _prevSpeedUpdateDist;
         private int _prevLap = 0;
         private int _prevSector;
-        private Boolean insertDummyLap;
-        private Boolean dummyInserted;
-        public void ParseTelemetry(iRacingData e)
+        private Boolean insertStartLap;
+        private Boolean startLapInserted;
+        private Boolean hasCrossedSFLineToStartRace;
+        public void ParseTelemetry(iRacingData e, Boolean isRaceOrQualifying)
         {   
-            this.LapDistance = Math.Abs(e.CarIdxLapDistPct[this.Driver.Id]);
-            insertDummyLap = this.Lap < e.CarIdxLap[this.Driver.Id] && e.CarIdxLap[this.Driver.Id] > 0 && dummyInserted == false && this.Driver.IsCurrentDriver;
-            this.Lap = e.CarIdxLap[this.Driver.Id];
+            LapDistance = Math.Abs(e.CarIdxLapDistPct[Driver.Id]);
+            // We need to make sure we start the first lap(IsNewLap), we cant use LapsCompleted for this as it does not increas first time we cross the s/f line but CarIdxLap does so we use that.
+            // we only wanna do this for opponents in race and qualifying
+            insertStartLap = (startLapInserted == false && Lap < e.CarIdxLap[Driver.Id] && e.CarIdxLap[Driver.Id] > 0) && ((Driver.IsCurrentDriver) || (isRaceOrQualifying && !Driver.IsCurrentDriver));
+            Lap = e.CarIdxLap[Driver.Id];            
+            TrackSurface = e.CarIdxTrackSurface[Driver.Id];
+            // turns out that the other method for setting the current sector was flawed as when first connecting it would set sector to 1 and then it would be unable to switch to sector 3 when gridding up, 
+            // so catching crossing the s/f line when the light goes green to set a HasCrossedSFLine didnt happen.
             
-            this.TrackSurface = e.CarIdxTrackSurface[this.Driver.Id];     
-            if (this._prevSector == 3 && (this.CurrentSector == 1) || 
-                (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld))
-            {                
+            CurrentSector = GetCurrentSector();
+            IsNewLap = false;
+
+            if (_prevSector == 3 && (CurrentSector == 1) ||
+                (LapsCompleted < _driver.CurrentResults.LapsComplete && !_driver.IsCurrentDriver && TrackSurface == TrackSurfaces.NotInWorld) || (insertStartLap && !Driver.IsCurrentDriver && !hasCrossedSFLineToStartRace))
+            {
+                // make sure we dont this on the opening lap more then once
+                hasCrossedSFLineToStartRace = true;
+                
                 HasCrossedSFLine = true;
                 // This is not accurate for playes that are not in live telemetry but its not used in any calculations in this case.
                 GameTimeWhenLastCrossedSFLine = (float)e.SessionTime;
@@ -89,43 +94,35 @@ namespace CrewChiefV4.iRacing
             {
                 HasCrossedSFLine = false;
             }
-            if (this._prevSector != this.CurrentSector)
+            if (_prevSector != CurrentSector)
             {
-                this._prevSector = this.CurrentSector;
+                _prevSector = CurrentSector;
             }
-            if (_driver.CurrentResults.LapsComplete > this.LapsCompleted || insertDummyLap)
+            if (_driver.CurrentResults.LapsComplete > LapsCompleted || insertStartLap)
             {
-                if(insertDummyLap)
-                {
-                    dummyInserted = true;
-                }
-                this.IsNewLap = true;
+                startLapInserted = true;
+                IsNewLap = true;
             }
-            else
-            {
-                this.IsNewLap = false;
-            }
-            this.LapsCompleted = _driver.CurrentResults.LapsComplete;
+            LapsCompleted = _driver.CurrentResults.LapsComplete;
 
-            this.CorrectedLapDistance = FixPercentagesOnLapChange(this.LapDistance);
-            this.LiveLapsCompleted = e.CarIdxLapCompleted[this.Driver.Id] < this.LapsCompleted ? this.LapsCompleted : e.CarIdxLapCompleted[this.Driver.Id];
+            CorrectedLapDistance = FixPercentagesOnLapChange(LapDistance);
+            LiveLapsCompleted = e.CarIdxLapCompleted[Driver.Id] < LapsCompleted ? LapsCompleted : e.CarIdxLapCompleted[Driver.Id];
                   
-            this.Gear = e.CarIdxGear[this.Driver.Id];
-            this.Rpm = e.CarIdxRPM[this.Driver.Id];
+            Gear = e.CarIdxGear[Driver.Id];
+            Rpm = e.CarIdxRPM[Driver.Id];
 
             //for local player we use data from telemetry as its updated faster then session info,
             //we do not have lastlaptime from opponents available in telemetry so we use data from sessioninfo.
             if(Driver.Id == e.PlayerCarIdx)
             {
-                this.LapTimePrevious = e.LapLastLapTime;                           
+                LapTimePrevious = e.LapLastLapTime;                           
             }
             else
             {
-                this.LapTimePrevious = this._driver.CurrentResults.LastTime;                
+                LapTimePrevious = _driver.CurrentResults.LastTime;                
             }
-            this.PreviousLapWasValid = this.LapTimePrevious > 1;
-            this.PlayerCarPosition = e.PlayerCarPosition;
-            this.TotalLapDistanceCorrected = this.TotalLapDistance;
+            PreviousLapWasValid = LapTimePrevious > 1;
+            TotalLapDistanceCorrected = TotalLapDistance;
         }
 
         private float FixPercentagesOnLapChange(float carIdxLapDistPct)
@@ -195,6 +192,19 @@ namespace CrewChiefV4.iRacing
                 //Log.Instance.LogError("Calculating speed of car " + this.Driver.Id, ex);
                 this.Speed = 0;
             }
+        }
+        public int GetCurrentSector()
+        {
+            int sector = 3;
+            if(this.LapDistance >= 0f && this.LapDistance < 0.333f)
+            {
+                sector = 1;
+            }
+            if(this.LapDistance >=  0.333f && this.LapDistance < 0.666f)
+            {
+                sector = 2;
+            }
+            return sector;
         }
     }
 }
