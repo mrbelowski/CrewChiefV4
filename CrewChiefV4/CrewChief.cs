@@ -570,14 +570,17 @@ namespace CrewChiefV4
         {
             getEvent("DamageReporting").respond(SpeechRecogniser.DAMAGE_REPORT[0]);
         }
-        //
-
-
+        
         public void reportCurrentTime()
         {
             DateTime now = DateTime.Now;
             int hour = now.Hour;
             int minute = now.Minute;
+            Boolean isPastMidDay = false;
+            if (hour >= 12)
+            {
+                isPastMidDay = true;
+            }
             if (AudioPlayer.soundPackLanguage == "it")
             {
                 audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
@@ -587,6 +590,7 @@ namespace CrewChiefV4
             {
                 if (hour == 0)
                 {
+                    isPastMidDay = false;
                     hour = 24;
                 }
                 if (hour > 12)
@@ -596,12 +600,12 @@ namespace CrewChiefV4
                 if (minute < 10)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                        AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute), 0, null));
+                        AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
                 }
                 else
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                        AbstractEvent.MessageContents(hour, now.Minute), 0, null));
+                        AbstractEvent.MessageContents(hour, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
                 }
             }
         }
