@@ -157,7 +157,6 @@
     <Compile Include="iRacing\Parser.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="iRacing\Sector.cs" />
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />

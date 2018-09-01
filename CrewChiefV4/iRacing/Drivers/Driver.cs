@@ -111,49 +111,9 @@ namespace CrewChiefV4.iRacing
             this.CurrentResults.ParseYaml(sessionInfo, sessionNumber, position);
         }
 
-        internal void UpdateLiveInfo(iRacingData e)
+        internal void UpdateLiveInfo(iRacingData e, Boolean isRaceOrQualifying)
         {
-            this.Live.ParseTelemetry(e);
-        }
-
-        public void UpdateSector(Track track, iRacingData telemetry)
-        {
-            if (track == null) 
-                return;
-
-            var results = this.Live;
-            if (results != null)
-            {
-
-                var p0 = _prevPos;
-                var p1 = telemetry.CarIdxLapDistPct[this.Id];
-                var dp = p1 - p0;
-
-                if (p1 < -0.5)
-                {
-                    // Not in world?
-                    return;
-                }
-
-                var t = telemetry.SessionTime;                
-                // Check lap crossing
-                if (p0 - p1 > 0.5) // more than 50% jump in track distance == lap crossing occurred from 0.99xx -> 0.00x
-                {
-                    this.Live.CurrentSector = 1;
-                    p0 -= 1;
-                }
-                    
-                // Check 'fake' sectors (divide track into thirds)
-                foreach (var s in Live.Sectors)
-                {
-                    if (p1 > s.StartPercentage && p0 <= s.StartPercentage)
-                    {                    
-                        this.Live.CurrentSector = s.Number + 1;
-                        break;
-                    }
-                }                
-                _prevPos = p1;
-            }
+            this.Live.ParseTelemetry(e, isRaceOrQualifying);
         }
     }
 }

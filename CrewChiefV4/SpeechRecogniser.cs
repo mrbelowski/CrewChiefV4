@@ -1083,6 +1083,9 @@ namespace CrewChiefV4
                 attempts++;
                 try
                 {
+                    // the cancel call takes some time to complete but returns immediately, so wait a bit before switching inputs
+                    sre.RecognizeAsyncCancel();
+                    Thread.Sleep(5);
                     sre.SetInputToNull();
                     triggerSre.SetInputToDefaultAudioDevice();
                     triggerSre.RecognizeAsync(RecognizeMode.Multiple);
@@ -1091,8 +1094,19 @@ namespace CrewChiefV4
                 }
                 catch (Exception)
                 {
-                    Thread.Sleep(100);                    
+                    Thread.Sleep(100);
                 }
+            }
+            if (success)
+            {
+                if (attempts > 1)
+                {
+                    Console.WriteLine("Took " + attempts + " attempts to switch from regular to trigger SRE");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to switch SRE after " + attempts + " attempts");
             }
             return success;
         }
@@ -1106,7 +1120,9 @@ namespace CrewChiefV4
                 attempts++;
                 try
                 {
-                    triggerSre.RecognizeAsyncCancel();                    
+                    // the cancel call takes some time to complete but returns immediately, so wait a bit before switching inputs
+                    triggerSre.RecognizeAsyncCancel();
+                    Thread.Sleep(5);
                     triggerSre.SetInputToNull();
                     sre.SetInputToDefaultAudioDevice();
                     success = true;
@@ -1152,7 +1168,6 @@ namespace CrewChiefV4
                     {
                         // no result
                         Console.WriteLine("Gave up waiting for voice command, now waiting for trigger word " + keyWord);
-                        sre.RecognizeAsyncCancel();
                         switchFromRegularToTriggerRecogniser();
                     }
                 }
@@ -1291,8 +1306,6 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
                 if (!youWot)
                 {
                     Console.WriteLine("Waiting for trigger word " + keyWord);
@@ -1300,13 +1313,8 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    Console.WriteLine("Restarting speech recognition");
-                    if (youWot)
-                    {
-                        // wait a little longer here as the "I didn't catch that" takes a second or two to say
-                        restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
-                    }
-                    recognizeAsync();
+                    // wait a little longer here as the "I didn't catch that" takes a second or two to say
+                    restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
                     waitingForSpeech = true;
                 }
             }

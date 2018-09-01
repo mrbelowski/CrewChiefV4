@@ -73,7 +73,7 @@ namespace CrewChiefV4
          * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
          * 
          */
-        protected abstract List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction);
+        protected abstract List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime);
         
         protected abstract String getLocale();
 
@@ -112,6 +112,12 @@ namespace CrewChiefV4
                     timeSpanWrapper.timeSpan.Minutes == 0 && (timeSpanWrapper.timeSpan.Seconds > 0 || tenths > 0 ||
                     (precision == Precision.HUNDREDTHS && hundredths > 0)) && timeSpanWrapper.timeSpan.Seconds < 60;
 
+                // TODO: TimeSpanWrapper might need a 'form hint'. For now, use the long form if we're reading with a precision of minutes or seconds
+                Boolean useItalianShortForm = precision != Precision.MINUTES && precision != Precision.SECONDS &&
+                    SoundPackVersionsHelper.currentSoundPackVersion > 150 && getLocale() == "it" &&
+                    timeSpanWrapper.timeSpan.Hours == 0 && 
+                        (timeSpanWrapper.timeSpan.Seconds > 0 && (timeSpanWrapper.timeSpan.Minutes > 0 || tenths > 0 || hundredths > 0));    // more checks on numbers?
+
                 if (useNewENSeconds)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
@@ -128,24 +134,23 @@ namespace CrewChiefV4
                         messageFolders.AddRange(GetSeconds(timeSpanWrapper.timeSpan.Seconds));
                     }
                 }
-                else if (useNewENMinutes)
+                else if (useNewENMinutes || useItalianShortForm)
                 {
                     messageFolders.Add(AbstractEvent.Pause(50));
                     if (precision == Precision.HUNDREDTHS)
                     {
                         String leadingZero = hundredths < 10 ? "0" : "";
-                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, leadingZero + hundredths));
+                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, leadingZero + hundredths, useMoreInflection));
                     }
                     else if (precision == Precision.TENTHS)
                     {
-                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths.ToString()));
+                        messageFolders.AddRange(GetMinutesAndSecondsWithFraction(timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths.ToString(), useMoreInflection));
                     }
                     else if (precision == Precision.SECONDS || precision == Precision.MINUTES)
                     {
-                        messageFolders.AddRange(GetHoursSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                         messageFolders.AddRange(GetMinutesSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                         messageFolders.AddRange(GetSecondsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
-                    }                    
+                    }
                 }
                 else
                 {

@@ -953,6 +953,8 @@
 		{
 			"carClassEnum": "FORMULA_RENAULT20",
 			"iracingCarIds": [74],
+			"maxSafeWaterTemp": 105,
+			"maxSafeOilTemp": 140,
 			"timesInHundredths": true,
 			"enabledMessageTypes": "FUEL",
 			"allMembersAreRWD": true
