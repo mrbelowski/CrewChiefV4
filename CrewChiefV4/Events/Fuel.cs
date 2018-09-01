@@ -667,7 +667,8 @@ namespace CrewChiefV4.Events
                             }
                         }
                         if (!gotPredictedPitWindow && currentGameState.SessionData.SessionType == SessionType.Race &&
-                            !currentGameState.PitData.HasMandatoryPitStop && currentGameState.SessionData.IsNewLap)
+                            !currentGameState.PitData.HasMandatoryPitStop &&
+                            previousGameState != null && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                         {
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow();
                             if(predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
