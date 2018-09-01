@@ -1069,7 +1069,7 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    else if (litresToEnd * -1 > minRemainingFuelToBeSafe)
+                    else if (litresToEnd * -1 < minRemainingFuelToBeSafe)
                     {
                         // we expect to have sufficient fuel, but see if it'll be tight. LitresToEnd * -1 is how much we expect
                         // to have left over
@@ -1343,15 +1343,15 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                int minLapsSinceFuelRest = 3;
+                int minLapsSinceFuelReset = 3;
                 if (CrewChief.currentGameState != null)
                 {
-                    minLapsSinceFuelRest = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG ? 1 :
+                    minLapsSinceFuelReset = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG ? 1 :
                                            CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG ? 2 :
                                            CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT ? 5 :
                                            3;
                 }
-                if (lapsCompletedSinceFuelReset > 3 && averageUsagePerMinute > 0)
+                if (lapsCompletedSinceFuelReset > minLapsSinceFuelReset && averageUsagePerMinute > 0)
                 {
                     int litersNeeded = getLitresToEndOfRace();
                     gotPredictedPitWindow = true;
