@@ -231,6 +231,9 @@ namespace CrewChiefV4.NumberProcessing
             List<String> separateMinutesAndSecondsSoundFolders = new List<string>();
             String fractionsFolder;
             Boolean usePoint = false;
+
+            // we check for the existence of a '1_23_more' type sound, so don't need to check this twice:
+            Boolean alreadyCheckedCombinedSound = false;
             if (minutes > 0)
             {
                 separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + minutes.ToString());
@@ -239,8 +242,26 @@ namespace CrewChiefV4.NumberProcessing
                 combinedMinutesAndSecondsSoundFolder = folderNumbersStub + minutes + paddedSeconds;
                 if (!messageHasContentAfterTime)
                 {
-                    separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + seconds.ToString() + moreInflectionSuffix);
-                    combinedMinutesAndSecondsSoundFolder += moreInflectionSuffix;
+                    String separateSound = folderNumbersStub + seconds.ToString();
+                    String separateSoundWithMore = separateSound + moreInflectionSuffix;
+                    String combinedSoundWithMore = combinedMinutesAndSecondsSoundFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(separateSoundWithMore))
+                    {
+                        separateMinutesAndSecondsSoundFolders.Add(separateSoundWithMore);
+                    }
+                    else
+                    {
+                        separateMinutesAndSecondsSoundFolders.Add(separateSound);
+                    }
+                    if (SoundCache.availableSounds.Contains(combinedSoundWithMore))
+                    {
+                        alreadyCheckedCombinedSound = true;
+                        combinedMinutesAndSecondsSoundFolder = combinedSoundWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + combinedSoundWithMore);
+                    }
                 }
                 else
                 {
@@ -252,7 +273,16 @@ namespace CrewChiefV4.NumberProcessing
                 combinedMinutesAndSecondsSoundFolder = folderNumbersStub + seconds.ToString();
                 if (!messageHasContentAfterTime)
                 {
-                    combinedMinutesAndSecondsSoundFolder += moreInflectionSuffix;
+                    String combinedSoundWithMore = combinedMinutesAndSecondsSoundFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(combinedSoundWithMore))
+                    {
+                        alreadyCheckedCombinedSound = true;
+                        combinedMinutesAndSecondsSoundFolder = combinedSoundWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + combinedSoundWithMore);
+                    }
                 }
             }
             if (fraction == "0" || fraction == "00")
@@ -268,7 +298,15 @@ namespace CrewChiefV4.NumberProcessing
                 fractionsFolder = folderAndPrefix + fraction + folderTenthsSuffix;
                 if (messageHasContentAfterTime)
                 {
-                    fractionsFolder += moreInflectionSuffix;
+                    String fractionsFolderWithMore = fractionsFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(fractionsFolderWithMore))
+                    {
+                        fractionsFolder = fractionsFolderWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + fractionsFolderWithMore);
+                    }
                 }
             }
             else
@@ -276,19 +314,32 @@ namespace CrewChiefV4.NumberProcessing
                 fractionsFolder = folderNumbersStub + fraction;
                 if (messageHasContentAfterTime)
                 {
-                    fractionsFolder += moreInflectionSuffix;
+                    String fractionsFolderWithMore = fractionsFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(fractionsFolderWithMore))
+                    {
+                        fractionsFolder = fractionsFolderWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + fractionsFolderWithMore);
+                    }
                 }
                 usePoint = true;
             }
             List<String> messages = new List<String>();
 
-            if (SoundCache.availableSounds.Contains(combinedMinutesAndSecondsSoundFolder))
+            Boolean addCombined = true;
+            if (!alreadyCheckedCombinedSound && !SoundCache.availableSounds.Contains(combinedMinutesAndSecondsSoundFolder))
+            {
+                addCombined = false;
+            }
+            if (addCombined) 
             {
                 messages.Add(combinedMinutesAndSecondsSoundFolder);
             }
             else
             {
-                Console.WriteLine("Combined minutes / seconds sound " + combinedMinutesAndSecondsSoundFolder + " not found, using separate sounds");
+                Console.WriteLine("Unable to find number sound: " + combinedMinutesAndSecondsSoundFolder);
                 messages.AddRange(separateMinutesAndSecondsSoundFolders);
             }
             if (usePoint)
