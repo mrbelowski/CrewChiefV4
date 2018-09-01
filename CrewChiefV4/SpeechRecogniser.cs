@@ -1320,7 +1320,7 @@ namespace CrewChiefV4
             }
             else
             {
-                // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
+                // in hold-button mode, we're now waiting-for-speech until we get another result or the button is released
                 if (SpeechRecogniser.keepRecognisingInHoldMode)
                 {
                     Console.WriteLine("Waiting for more speech");
