@@ -175,6 +175,8 @@ namespace CrewChiefV4.Events
 
         private Boolean hasExtraLap = false;
 
+        private Boolean sessionHasHadFCY = false;
+
         public Fuel(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -213,6 +215,7 @@ namespace CrewChiefV4.Events
             hasExtraLap = false;
             fuelCapacity = 0;
             gotPredictedPitWindow = false;
+            sessionHasHadFCY = false;
         }
 
         // fuel not implemented for HotLap/LonePractice modes
@@ -268,7 +271,11 @@ namespace CrewChiefV4.Events
                      currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) &&
                     // don't process fuel data in prac and qual until we're actually moving:
                     currentGameState.PositionAndMotionData.CarSpeed > 10)))
-            {    
+            {
+                if (currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow && currentGameState.SessionData.SessionType == SessionType.Race)
+                {
+                    sessionHasHadFCY = true;
+                }
                 if (!initialised ||
                     // fuel has increased by at least 1 litre - we only check against the time window here
                     (fuelLevelWindowByTime.Count() > 0 && fuelLevelWindowByTime[0] > 0 && currentGameState.FuelData.FuelLeft > fuelLevelWindowByTime[0] + 1) ||
@@ -674,7 +681,11 @@ namespace CrewChiefV4.Events
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow(currentGameState);
                             if (predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
                             {
-                                if (sessionHasFixedNumberOfLaps)
+                                if (sessionHasHadFCY)
+                                {
+                                    Console.WriteLine("skipping pit window announcement because there's been a full course yellow in this session so the data may be inaccurate");
+                                }
+                                else if (sessionHasFixedNumberOfLaps)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
                                         MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1, 
