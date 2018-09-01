@@ -80,10 +80,10 @@ namespace CrewChiefV4.Events
         public static String folderFor = "fuel/for";
         public static String folderWeEstimateWeWillNeed = "fuel/we_estimate_we_will_need";
 
-        public static String folderPitWindowForFuelOpensOnLap = "pit_window_for_fuel_opens_on_lap";
-        public static String folderPitWindowForFuelOpensAfterTime = "pit_window_for_fuel_opens_after";
-        public static String folderPitWindowForFuelClosesOnLap = "and_will_close_on_lap";
-        public static String folderPitWindowForFuelClosesAfterTime = "and_closes_after";
+        public static String folderPitWindowForFuelOpensOnLap = "fuel/pit_window_for_fuel_opens_on_lap";
+        public static String folderPitWindowForFuelOpensAfterTime = "fuel/pit_window_for_fuel_opens_after";
+        public static String folderPitWindowForFuelClosesOnLap = "fuel/and_will_close_on_lap";
+        public static String folderPitWindowForFuelClosesAfterTime = "fuel/and_closes_after";
 
 
         private float averageUsagePerLap;
@@ -1034,7 +1034,7 @@ namespace CrewChiefV4.Events
 
                     // litresToEnd to end is a measure of how much fuel we need to add to get to the end. If it's 
                     // negative we have fuel to spare
-                    QueuedMessage fuelMessage;
+                    QueuedMessage fuelMessage = null;
                     if (litresToEnd > 0)
                     {
                         // we need some fuel - see if we might be able stretch it
@@ -1069,21 +1069,17 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    else
+                    else if (litresToEnd * -1 > minRemainingFuelToBeSafe)
                     {
                         // we expect to have sufficient fuel, but see if it'll be tight. LitresToEnd * -1 is how much we expect
                         // to have left over
-                        if (litresToEnd * -1 > minRemainingFuelToBeSafe)
-                        {
-                            fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0, null);
-                        }
-                        else
-                        {
-                            fuelMessage = new QueuedMessage(folderPlentyOfFuel, 0, null);
-                        }
+                        fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0, null);                        
                     }
-                    audioPlayer.playMessageImmediately(fuelMessage);
-                    reportedLitresNeeded = true;
+                    if (fuelMessage != null)
+                    {
+                        audioPlayer.playMessageImmediately(fuelMessage);
+                        reportedLitresNeeded = true;
+                    }
                 }                
             }
             if (!reportedConsumption && !reportedRemaining && !reportedLitresNeeded && allowNoDataMessage)
@@ -1276,7 +1272,7 @@ namespace CrewChiefV4.Events
                 if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
                     float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + reserve;
-                    additionalLitresNeeded = (int) Math.Max(0, totalLitresNeededToEnd - currentFuel);
+                    additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
                     Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " +
                         currentFuel + " additional fuel needed = " + additionalLitresNeeded);
                 }
@@ -1309,7 +1305,7 @@ namespace CrewChiefV4.Events
                     {
                         totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + reserve;
                     }
-                    additionalLitresNeeded = (int)Math.Ceiling(Math.Max(0, totalLitresNeededToEnd - currentFuel));
+                    additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
                     Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " +
                         maxMinutesRemaining + " current fuel = " + currentFuel + " additional fuel needed = " + additionalLitresNeeded);
                 }
