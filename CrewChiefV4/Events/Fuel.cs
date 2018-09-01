@@ -666,17 +666,19 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderHalfTankWarning, 0, this), 0);
                             }
                         }
+
                         if (!gotPredictedPitWindow && currentGameState.SessionData.SessionType == SessionType.Race &&
                             !currentGameState.PitData.HasMandatoryPitStop &&
                             previousGameState != null && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                         {
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow();
-                            if(predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
+                            if (predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
                             {
                                 if (sessionHasFixedNumberOfLaps)
                                 {
                                     audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                        MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1, folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), 0, null));
+                                        MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1, 
+                                        folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
                                 }
                                 else
                                 {
@@ -684,7 +686,7 @@ namespace CrewChiefV4.Events
                                         MessageContents(folderPitWindowForFuelOpensAfterTime, 
                                         TimeSpanWrapper.FromMinutes(predictedWindow.Item1, Precision.MINUTES), 
                                         folderPitWindowForFuelClosesAfterTime, 
-                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), 0, null));
+                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
                                 }
                             }
                         }
@@ -1315,12 +1317,34 @@ namespace CrewChiefV4.Events
         }
         // Try to predict the the earliest possible time/lap and the latest possible time/lap we can come in for our pitstop and still make it to the end.
         // we need to check if more then one stop is needed to finish the race in this case we dont care about pit window
-        public Tuple<int, int> getPredictedPitWindow()
+        public Tuple<int, int> getPredictedPitWindow(GameStateData currentGameState)
         {
+            int minLaps;
+            if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+            {
+                minLaps = sessionHasFixedNumberOfLaps ? 2 : 1;
+            }
+            else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+            {
+                minLaps = 2 + Utilities.random.Next(2); // 2 or 3
+            }
+            else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.SHORT)
+            {
+                minLaps = 3 + Utilities.random.Next(3); // 3, 4 or 5
+            }
+            else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT)
+            {
+                minLaps = 4 + Utilities.random.Next(3); // 4, 5 or 6
+            }
+            else
+            {
+                minLaps = 3 + Utilities.random.Next(2); // 3 or 4
+            }
+
             Tuple<int, int> pitWindow = new Tuple<int, int>(-1, -1);
             if (sessionHasFixedNumberOfLaps)
             {
-                if (lapsCompletedSinceFuelReset > 3 && averageUsagePerLap > 0)
+                if (lapsCompletedSinceFuelReset > minLaps && averageUsagePerLap > 0)
                 {
                     int litersNeeded = getLitresToEndOfRace();
                     gotPredictedPitWindow = true;
@@ -1344,15 +1368,7 @@ namespace CrewChiefV4.Events
             }
             else
             {
-                int minLapsSinceFuelReset = 3;
-                if (CrewChief.currentGameState != null)
-                {
-                    minLapsSinceFuelReset = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG ? 1 :
-                                           CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG ? 2 :
-                                           CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT ? 5 :
-                                           3;
-                }
-                if (lapsCompletedSinceFuelReset > minLapsSinceFuelReset && averageUsagePerMinute > 0)
+                if (lapsCompletedSinceFuelReset > minLaps && averageUsagePerMinute > 0)
                 {
                     int litersNeeded = getLitresToEndOfRace();
                     gotPredictedPitWindow = true;
@@ -1385,7 +1401,12 @@ namespace CrewChiefV4.Events
 
             // limit the number of key presses to 200 here, or fuelCapacity
             int fuelCapacityInt = (int)fuelCapacity;
-            if (fuelCapacityInt > 0 && fuelCapacityInt-currentFuel < litresToEnd)
+            //
+            // TODO: Confirm this with Morten. The idea here is to warn the player that he'll need another stop.
+            // If we assume he's asking for 'fuel to the end', then we'll only need another stop if a full tank
+            // isn't enough, so I don't think we should subtract currentFuel from fuel capacity
+            // if (fuelCapacityInt > 0 && fuelCapacityInt-currentFuel < litresToEnd)
+            if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
             {
                 // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                 audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this), 10);
