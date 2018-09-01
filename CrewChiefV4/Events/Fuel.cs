@@ -671,7 +671,7 @@ namespace CrewChiefV4.Events
                             !currentGameState.PitData.HasMandatoryPitStop &&
                             previousGameState != null && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                         {
-                            Tuple<int,int> predictedWindow =  getPredictedPitWindow();
+                            Tuple<int,int> predictedWindow =  getPredictedPitWindow(currentGameState);
                             if (predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
                             {
                                 if (sessionHasFixedNumberOfLaps)
