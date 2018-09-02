@@ -1344,7 +1344,8 @@ namespace CrewChiefV4.RaceRoom
                 currentGameState.SessionData.SessionType != SessionType.Qualify &&
                 previousGameState != null && !previousGameState.EngineData.EngineStalledWarning &&
                 currentGameState.SessionData.SessionRunningTime > 60 && currentGameState.EngineData.EngineRpm < 5 &&
-                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)))
+                lastTimeEngineWasRunning < currentGameState.Now.Subtract(TimeSpan.FromSeconds(2)) &&
+                shared.GameInMenus == 0)  // Don't play engine stall message in menu.
             {
                 currentGameState.EngineData.EngineStalledWarning = true;
                 lastTimeEngineWasRunning = DateTime.MaxValue;
