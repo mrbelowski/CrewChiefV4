@@ -696,8 +696,23 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (sessionHasFixedNumberOfLaps)
                                 {
+                                    // sanity check this
+                                    int lapLimit = 2;
+                                    if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG || 
+                                        currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG) {
+                                        lapLimit = 1;
+                                    }
+                                    else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT || 
+                                        currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.SHORT) 
+                                    {
+                                        lapLimit = 4;
+                                    }
+                                    if (predictedWindow.Item2 > currentGameState.SessionData.SessionNumberOfLaps - lapLimit)
+                                    {
+                                        Console.WriteLine("Skipping fuel window announcement because we might make it on fuel");
+                                    }
                                     // if item1 is < current minute but item2 is sensible, we want to say "pit window for fuel closes after X laps"
-                                    if (predictedWindow.Item1 < currentGameState.SessionData.CompletedLaps)
+                                    else if (predictedWindow.Item1 < currentGameState.SessionData.CompletedLaps)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
                                             MessageContents(folderWillNeedToPitForFuelByLap, predictedWindow.Item2), Utilities.random.Next(8), null));
@@ -711,6 +726,11 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
+                                    // sanity check
+                                    if (predictedWindow.Item2 > (currentGameState.SessionData.SessionTotalRunTime / 60) - 5)
+                                    {
+                                        Console.WriteLine("Skipping fuel window announcement because we might make it on fuel");
+                                    }
                                     // if item1 is < current minute, we want to say "pit window for fuel closes after X minutes"
                                     if (predictedWindow.Item1 < currentGameState.SessionData.SessionRunningTime / 60)
                                     {
