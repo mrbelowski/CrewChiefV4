@@ -681,15 +681,11 @@ namespace CrewChiefV4.Events
                             previousGameState != null && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                         {
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow(currentGameState);
-<<<<<<< HEAD
-                            if (predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
-=======
                             // item1 is the earliest minute / lap we can pit on, item2 is the latest. Note that item1 might be negative if
                             // we *could* have finished the race without refuelling (if we'd filled the tank). It might also be less than the
                             // number of minutes / laps completed
 
                             if (predictedWindow.Item2 != -1)
->>>>>>> master
                             {
                                 if (sessionHasHadFCY)
                                 {
@@ -697,19 +693,6 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (sessionHasFixedNumberOfLaps)
                                 {
-<<<<<<< HEAD
-                                    audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                        MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1, 
-                                        folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
-                                }
-                                else
-                                {
-                                    audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                        MessageContents(folderPitWindowForFuelOpensAfterTime, 
-                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item1, Precision.MINUTES), 
-                                        folderPitWindowForFuelClosesAfterTime, 
-                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
-=======
                                     // if item1 is < current minute but item2 is sensible, we want to say "pit window for fuel closes after X laps"
                                     if (predictedWindow.Item1 < currentGameState.SessionData.CompletedLaps)
                                     {
@@ -740,7 +723,6 @@ namespace CrewChiefV4.Events
                                             folderAndPitWindowForFuelClosesAfterTime,
                                             TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
                                     }
->>>>>>> master
                                 }
                             }
                         }
@@ -1455,16 +1437,7 @@ namespace CrewChiefV4.Events
 
             // limit the number of key presses to 200 here, or fuelCapacity
             int fuelCapacityInt = (int)fuelCapacity;
-<<<<<<< HEAD
-            //
-            // TODO: Confirm this with Morten. The idea here is to warn the player that he'll need another stop.
-            // If we assume he's asking for 'fuel to the end', then we'll only need another stop if a full tank
-            // isn't enough, so I don't think we should subtract currentFuel from fuel capacity
-            // if (fuelCapacityInt > 0 && fuelCapacityInt-currentFuel < litresToEnd)
-            if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
-=======
             if (fuelCapacityInt > 0 && fuelCapacityInt - currentFuel < litresToEnd)
->>>>>>> master
             {
                 // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                 audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this), 10);
