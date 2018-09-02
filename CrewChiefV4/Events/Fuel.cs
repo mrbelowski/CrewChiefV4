@@ -80,13 +80,15 @@ namespace CrewChiefV4.Events
         public static String folderFor = "fuel/for";
         public static String folderWeEstimateWeWillNeed = "fuel/we_estimate_we_will_need";
 
-        public static String folderPitWindowForFuelOpensOnLap = "fuel/pit_window_for_fuel_opens_on_lap";
-        public static String folderPitWindowForFuelOpensAfterTime = "fuel/pit_window_for_fuel_opens_after";
-        public static String folderAndPitWindowForFuelClosesOnLap = "fuel/and_will_close_on_lap";
-        public static String folderAndPitWindowForFuelClosesAfterTime = "fuel/and_closes_after";
+        public static String folderFuelWindowOpensOnLap = "fuel/pit_window_for_fuel_opens_on_lap";
+        public static String folderFuelWindowOpensAfterTime = "fuel/pit_window_for_fuel_opens_after";
+        public static String folderAndFuelWindowClosesOnLap = "fuel/and_will_close_on_lap";
+        public static String folderAndFuelWindowClosesAfterTime = "fuel/and_closes_after";
 
-        public static String folderPitWindowForFuelClosesOnLap = "fuel/pit_window_for_fuel_closes_on_lap";
-        public static String folderPitWindowForFuelClosesAfterTime = "fuel/pit_window_for_fuel_closes_after";
+        public static String folderWillNeedToPitForFuelByLap = "fuel/pit_window_for_fuel_closes_on_lap";
+        public static String folderWillNeedToPitForFuelByTimeIntro = "fuel/will_need_to_pit_for_fuel";
+        public static String folderWillNeedToPitForFuelByTimeOutro = "fuel/into_to_race";
+        
 
 
         private float averageUsagePerLap;
@@ -698,13 +700,13 @@ namespace CrewChiefV4.Events
                                     if (predictedWindow.Item1 < currentGameState.SessionData.CompletedLaps)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                            MessageContents(folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
+                                            MessageContents(folderWillNeedToPitForFuelByLap, predictedWindow.Item2), Utilities.random.Next(8), null));
                                     }
                                     else
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                            MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1,
-                                            folderAndPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
+                                            MessageContents(folderFuelWindowOpensOnLap, predictedWindow.Item1,
+                                            folderAndFuelWindowClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
                                     }
                                 }
                                 else
@@ -713,15 +715,16 @@ namespace CrewChiefV4.Events
                                     if (predictedWindow.Item1 < currentGameState.SessionData.SessionRunningTime / 60)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                            MessageContents(folderPitWindowForFuelClosesAfterTime,
-                                            TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
+                                            MessageContents(folderWillNeedToPitForFuelByTimeIntro,
+                                            TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES),
+                                            folderWillNeedToPitForFuelByTimeOutro), Utilities.random.Next(8), null));
                                     }
                                     else
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                            MessageContents(folderPitWindowForFuelOpensAfterTime,
+                                            MessageContents(folderFuelWindowOpensAfterTime,
                                             TimeSpanWrapper.FromMinutes(predictedWindow.Item1, Precision.MINUTES),
-                                            folderAndPitWindowForFuelClosesAfterTime,
+                                            folderAndFuelWindowClosesAfterTime,
                                             TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
                                     }
                                 }
