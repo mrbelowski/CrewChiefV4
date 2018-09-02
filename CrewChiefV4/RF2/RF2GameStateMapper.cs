@@ -920,7 +920,8 @@ namespace CrewChiefV4.rFactor2
                 && pgs != null && !pgs.EngineData.EngineStalledWarning
                 && cgs.SessionData.SessionRunningTime > 60.0f
                 && cgs.EngineData.EngineRpm < 5.0f
-                && this.lastTimeEngineWasRunning < cgs.Now.Subtract(TimeSpan.FromSeconds(2)))
+                && this.lastTimeEngineWasRunning < cgs.Now.Subtract(TimeSpan.FromSeconds(2))
+                && shared.extended.mInRealtimeFC == 1 && shared.scoring.mScoringInfo.mInRealtime == 1)  // Realtime only.
             {
                 cgs.EngineData.EngineStalledWarning = true;
                 this.lastTimeEngineWasRunning = DateTime.MaxValue;
