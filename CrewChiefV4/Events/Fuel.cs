@@ -1438,12 +1438,7 @@ namespace CrewChiefV4.Events
 
             // limit the number of key presses to 200 here, or fuelCapacity
             int fuelCapacityInt = (int)fuelCapacity;
-            //
-            // TODO: Confirm this with Morten. The idea here is to warn the player that he'll need another stop.
-            // If we assume he's asking for 'fuel to the end', then we'll only need another stop if a full tank
-            // isn't enough, so I don't think we should subtract currentFuel from fuel capacity
-            // if (fuelCapacityInt > 0 && fuelCapacityInt-currentFuel < litresToEnd)
-            if (fuelCapacityInt > 0 && fuelCapacityInt < litresToEnd)
+            if (fuelCapacityInt > 0 && fuelCapacityInt - currentFuel < litresToEnd)
             {
                 // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                 audioPlayer.playMessage(new QueuedMessage(folderWillNeedToStopAgain, 4, this), 10);
