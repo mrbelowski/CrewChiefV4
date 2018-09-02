@@ -44,7 +44,7 @@ namespace CrewChiefV4.NumberProcessing
         // folders for reading out times.
 
         // This is combined with folderNumbersStub to produce tenths sounds for tenths > 1 - numbers_it/2_tenths -> numbers_it/9_tenths
-        private static String folderTenthsSuffix = "_tenths";
+        // private static String folderTenthsSuffix = "_tenths";
         private static String folderATenth = folderNumbersStub + "a_tenth";
         private static String folderPoint = folderNumbersStub + "point";
 
@@ -295,7 +295,7 @@ namespace CrewChiefV4.NumberProcessing
             }
             else if (fraction.Length == 1)
             {
-                fractionsFolder = folderAndPrefix + fraction + folderTenthsSuffix;
+                fractionsFolder = folderNumbersStub + folderAndPrefix + fraction;
                 if (messageHasContentAfterTime)
                 {
                     String fractionsFolderWithMore = fractionsFolder + moreInflectionSuffix;
