@@ -52,7 +52,7 @@ namespace CrewChiefV4.Events
         private int strenghtOfField = -1; 
         private Boolean hasLimitedIncidents = false;
         private float fuelCapacity = -1;
-        
+        private float currentFuel = -1;
         private Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
 
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
@@ -68,6 +68,7 @@ namespace CrewChiefV4.Events
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
             this.fuelCapacity = -1;
+            this.currentFuel = -1;
         }
 
         public override void clearState()
@@ -81,6 +82,8 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
+            this.fuelCapacity = -1;
+            this.currentFuel = -1;
         }
 
         public override List<SessionPhase> applicableSessionPhases
@@ -106,6 +109,7 @@ namespace CrewChiefV4.Events
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
+            currentFuel = currentGameState.FuelData.FuelLeft;
             if(autoFuelToEnd)
             {
                 if(previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane
@@ -115,19 +119,19 @@ namespace CrewChiefV4.Events
                     Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
                     int litresNeeded = fuelEvent.getLitresToEndOfRace();
 
-                    if (litresNeeded == -1)
+                    if (litresNeeded == int.MaxValue)
                     {
                         audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
-                    else if (litresNeeded == 0)
+                    else if (litresNeeded <= 0)
                     {
                         audioPlayer.playMessage(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
                     }
                     else if (litresNeeded > 0)
                     {
                         AddFuel(litresNeeded);
-                        Console.WriteLine("Auto refuel to the end of the race, adding " + litresNeeded + " liters of fuel");                        
-                        if (litresNeeded > (int)fuelCapacity)
+                        Console.WriteLine("Auto refuel to the end of the race, adding " + litresNeeded + " liters of fuel");
+                        if (litresNeeded > (int)fuelCapacity - currentFuel)
                         {
                             // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                             audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
@@ -215,18 +219,18 @@ namespace CrewChiefV4.Events
                 Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
                 int litresNeeded = fuelEvent.getLitresToEndOfRace();
 
-                if (litresNeeded == -1)
+                if (litresNeeded == int.MaxValue)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
-                else if (litresNeeded == 0)
+                else if (litresNeeded <= 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
                 }
                 else if(litresNeeded > 0)
                 {
                     AddFuel(litresNeeded);
-                    if (litresNeeded > (int)fuelCapacity)
+                    if (litresNeeded > (int)fuelCapacity-currentFuel) 
                     {
                         // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                         audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
