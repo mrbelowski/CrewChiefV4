@@ -86,8 +86,8 @@ namespace CrewChiefV4.Events
         public static String folderAndFuelWindowClosesAfterTime = "fuel/and_closes_after";
 
         public static String folderWillNeedToPitForFuelByLap = "fuel/pit_window_for_fuel_closes_on_lap";
-        public static String folderWillNeedToPitForFuelByTimeIntro = "fuel/will_need_to_pit_for_fuel";
-        public static String folderWillNeedToPitForFuelByTimeOutro = "fuel/into_to_race";
+        public static String folderWillNeedToPitForFuelByTimeIntro = "fuel/we_will_need_to_pit_for_fuel";
+        public static String folderWillNeedToPitForFuelByTimeOutro = "fuel/into_the_race";
         
 
 
