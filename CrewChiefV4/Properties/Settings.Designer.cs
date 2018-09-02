@@ -3430,7 +3430,7 @@ namespace CrewChiefV4.Properties {
                 this["disable_behavior_altering_voice_commands"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
