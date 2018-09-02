@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -651,7 +652,7 @@ namespace CrewChiefV4.Events
                         && currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
                         // Here we need to make sure that the player has intended to go into the pit's sometimes this trows if we are getting in this zone while overtaking or just defending the line  
                         || currentGameState.PitData.IsApproachingPitlane && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING
-                        && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0)
+                        && currentGameState.Now > timeStartedAppoachingPitsCheck && currentGameState.ControlData.BrakePedal <= 0 && !currentGameState.PitData.OnOutLap)
                     {
                         timeStartedAppoachingPitsCheck = DateTime.MaxValue;
                         timeSpeedInPitsWarning = currentGameState.Now;
@@ -764,7 +765,7 @@ namespace CrewChiefV4.Events
                             else if (pitWindowOpenTime > 0)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
-                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
                             }
                         }
                         else
@@ -798,7 +799,7 @@ namespace CrewChiefV4.Events
                 else if (pitWindowOpenTime > 0)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpan.FromMinutes(pitWindowOpenTime)), 0, null));
+                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
                 }
                 else
                 {

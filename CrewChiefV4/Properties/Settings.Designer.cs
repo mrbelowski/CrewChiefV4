@@ -3430,5 +3430,17 @@ namespace CrewChiefV4.Properties {
                 this["disable_behavior_altering_voice_commands"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool slow_class_car_warnings_in_race_only {
+            get {
+                return ((bool)(this["slow_class_car_warnings_in_race_only"]));
+            }
+            set {
+                this["slow_class_car_warnings_in_race_only"] = value;
+            }
+        }
     }
 }

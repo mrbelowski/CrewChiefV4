@@ -17,7 +17,7 @@ namespace CrewChiefV4
              "paul hance", "aline senna", "giuseppe sangalli", "patrick förster", "chris iwaski", "gazman", "peter koch",
              "andreas christiansen", "greg metcalf" /* twat...*/, "Aditas H1Z1Cases.com.", /* TODO: remove bruno in a future update */"Bruno Bæ",
              "maciej bugno" /* shouty entitled mong */, "patrick schilhan" /*as reward for your "make r3e app free" campaign. You turd.*/,
-             "tim heinemann" /* shit head */};
+             "tim heinemann" /* shit head */, "Josh Cassar"};
  
           public static void validate(String str)
           {

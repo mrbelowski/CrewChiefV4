@@ -57,7 +57,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of hours.
          */
-        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();            
             if (hours == 1)
@@ -90,7 +90,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of minutes.
          */
-        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
 
@@ -130,7 +130,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of seconds.
          */
-        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             // special case here - if we're reading a time which has hours, the seconds aren't significant so ignore them
@@ -177,7 +177,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of tenths of a second.
          */
-        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection)
+        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean useMoreInflection, Precision precision)
         {
             List<String> messages = new List<String>();
             String addonForMoreInflection = useMoreInflection ? moreInflectionSuffix : "";
@@ -217,7 +217,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Not implemented for Italian number reader.
          * */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime)
         {
             return null;
         }

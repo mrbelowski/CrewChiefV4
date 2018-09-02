@@ -854,5 +854,8 @@
     <Setting Name="disable_behavior_altering_voice_commands" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="slow_class_car_warnings_in_race_only" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -5,6 +5,7 @@ using System.Text;
 using CrewChiefV4.Events;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -271,7 +272,7 @@ namespace CrewChiefV4.Events
                 {
                     int minutesLeft = (int)Math.Round(timeLeft / 60f);
                     audioPlayer.playMessageImmediately(new QueuedMessage("RaceTime/time_remaining",
-                        MessageContents(TimeSpan.FromMinutes(minutesLeft), folderRemaining), 0, null));                    
+                        MessageContents(TimeSpanWrapper.FromMinutes(minutesLeft, Precision.MINUTES), folderRemaining), 0, null));                    
                 }
                 else if (timeLeft >= 60)
                 {

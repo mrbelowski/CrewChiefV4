@@ -596,25 +596,16 @@ namespace CrewChiefV4.iRacing
             currentGameState.SessionData.IsNewLap = playerCar.Live.IsNewLap;
             currentGameState.SessionData.IsNewSector = currentGameState.SessionData.SectorNumber != currentSector && currentSector != 1 || currentGameState.SessionData.IsNewLap;
 
-            if (playerCar.Live.Lap <= 0)
+            if (previousGameState != null)
             {
-                currentGameState.SessionData.CurrentLapIsValid = false;
-            }
-            else if (previousGameState != null)
-            {
-                currentGameState.SessionData.CurrentLapIsValid = (previousGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits) || previousGameState.SessionData.IsNewLap;
+                currentGameState.SessionData.CurrentLapIsValid = (previousGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits) || currentGameState.SessionData.IsNewLap;
             }
 
             currentGameState.SessionData.SectorNumber = currentSector;
 
             if (currentGameState.SessionData.IsNewSector || currentGameState.SessionData.IsNewLap)
             {
-                Boolean validSpeed = true;
-                if (playerCar.Live.Speed > 500)
-                {
-                    validSpeed = false;
-                }
-                Boolean lapValid = validSpeed && playerCar.Live.PreviousLapWasValid && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits;
+                Boolean lapValid = previousGameState != null && playerCar.Live.PreviousLapWasValid && previousGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits;
                 if (currentSector == 1 && currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
@@ -629,7 +620,7 @@ namespace CrewChiefV4.iRacing
                 else if ((currentSector == 2 || currentSector == 3) && playerCar.Live.Lap > 0)
                 {
                     currentGameState.SessionData.playerAddCumulativeSectorData(currentSector - 1, currentGameState.SessionData.OverallPosition, shared.Telemetry.LapCurrentLapTime,
-                        currentGameState.SessionData.SessionRunningTime, validSpeed && currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits, false, shared.Telemetry.TrackTempCrew, shared.Telemetry.AirTemp);
+                        currentGameState.SessionData.SessionRunningTime, currentGameState.SessionData.CurrentLapIsValid && !currentGameState.PitData.JumpedToPits, false, shared.Telemetry.TrackTempCrew, shared.Telemetry.AirTemp);
                 }
             }
 
@@ -638,7 +629,7 @@ namespace CrewChiefV4.iRacing
                 currentGameState.readLandmarksForThisLap = false;
             }
 
-            if (currentGameState.SessionData.PlayerLapData.Count == 0 || currentGameState.SessionData.IsNewLap)
+            if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, playerCar.Live.GameTimeWhenLastCrossedSFLine);
@@ -698,6 +689,8 @@ namespace CrewChiefV4.iRacing
             }
 
             GameStateData.Multiclass = shared.SessionData.NumCarClasses > 1;
+            GameStateData.NumberOfClasses = shared.SessionData.NumCarClasses;
+
             List<double> combinedStrengthOfField = new List<double>();
             foreach (Driver driver in shared.Drivers)
             {

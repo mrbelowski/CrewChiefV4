@@ -21,6 +21,7 @@ namespace CrewChiefV4.iRacing
             _leaderFinished = null;
             _gameTimeWhenWhiteFlagTriggered = -1.0;
             _paceCarPresent = false;
+            _isRaceOrQualifying = false;
         }
 
         enum RaceEndState {NONE, WAITING_TO_CROSS_LINE, FINISHED}
@@ -62,7 +63,7 @@ namespace CrewChiefV4.iRacing
         private Driver _leaderFinished = null;
         private double _gameTimeWhenWhiteFlagTriggered = -1.0;
         private const double SECONDS_OFF_WORLD_TILL_RETIRED = 20.0;
-
+        private Boolean _isRaceOrQualifying = false;
         private void UpdateDriverList(string sessionInfo, bool reloadDrivers)
         {
             this.GetDrivers(sessionInfo, reloadDrivers);
@@ -176,8 +177,7 @@ namespace CrewChiefV4.iRacing
             foreach (var driver in _drivers)
             {
                 driver.Live.CalculateSpeed(info, _sessionData.Track.Length);
-                driver.UpdateSector(_sessionData.Track, info);
-                driver.UpdateLiveInfo(info);                
+                driver.UpdateLiveInfo(info, _isRaceOrQualifying);                
             }
             this.CalculateLivePositions(info);
         }
@@ -417,6 +417,7 @@ namespace CrewChiefV4.iRacing
                 _sessionData.Update(sessionInfo, sessionNumber);
                 _sessionId = sessionId;
                 _subSessionId = subSessionId;
+                _isRaceOrQualifying = this.SessionData.SessionType == "Race" || this.SessionData.SessionType == "Lone Qualify" || this.SessionData.SessionType == "Lone Qualify";
             }
             _currentSessionNumber = sessionNumber;
             // Update drivers

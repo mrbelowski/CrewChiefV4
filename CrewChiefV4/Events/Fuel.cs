@@ -560,7 +560,8 @@ namespace CrewChiefV4.Events
                                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                                 {
                                     // need a bit of slack in this estimate:
-                                    if (averageUsagePerMinute * (halfTime + currentGameState.SessionData.PlayerLapTimeSessionBest) / 60 > currentGameState.FuelData.FuelLeft)
+                                    float fuelToEnd = averageUsagePerMinute * (halfTime + currentGameState.SessionData.PlayerLapTimeSessionBest) / 60;
+                                    if (fuelToEnd > currentGameState.FuelData.FuelLeft)
                                     {
                                         if (currentGameState.PitData.IsRefuellingAllowed)
                                         {
@@ -574,6 +575,11 @@ namespace CrewChiefV4.Events
                                             audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, this), 7);
                                         }
                                     }
+                                    else if (currentGameState.FuelData.FuelLeft - fuelToEnd <= 2)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 7);
+                                        audioPlayer.playMessage(new QueuedMessage(folderFuelWillBeTight, 0, this));
+                                    }
                                     else
                                     {
                                         audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
@@ -582,17 +588,19 @@ namespace CrewChiefV4.Events
                             }
                             
                             float estimatedFuelMinutesLeft = currentGameState.FuelData.FuelLeft / averageUsagePerMinute;
-                            float estimatedLapTimeRemaining = 2.0f;
+                            float estimatedFuelTimeRemaining = 2.0f;
                             if (currentGameState.SessionData.PlayerLapTimeSessionBest != -1)
                             {
-                                estimatedLapTimeRemaining = ((currentGameState.SessionData.PlayerLapTimeSessionBest / 60) * 1.9f);                           
+                                estimatedFuelTimeRemaining = ((currentGameState.SessionData.PlayerLapTimeSessionBest / 60) * 1.2f) -
+                                    ((currentGameState.SessionData.LapTimeCurrent - currentGameState.SessionData.PlayerLapTimeSessionBest) / 60);                           
                             }
                             else if(currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass != -1)
                             {
-                                estimatedLapTimeRemaining = ((currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass / 60) * 1.9f);   
+                                estimatedFuelTimeRemaining = ((currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass / 60) * 1.2f) -
+                                    ((currentGameState.SessionData.LapTimeCurrent - currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass) / 60);  
                             }
 
-                            if (estimatedFuelMinutesLeft < estimatedLapTimeRemaining  && !playedPitForFuelNow)
+                            if (estimatedFuelMinutesLeft < estimatedFuelTimeRemaining  && !playedPitForFuelNow)
                             {
                                 playedPitForFuelNow = true;
                                 playedTwoMinutesRemaining = true;
@@ -790,7 +798,7 @@ namespace CrewChiefV4.Events
                     // stuff like "one thirty two" - we always want "one hundred and thirty two"    
                     List<MessageFragment> messageFragments = new List<MessageFragment>();
                     messageFragments.Add(MessageFragment.Text(folderFor));
-                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.SECONDS)));
+                    messageFragments.Add(MessageFragment.Time(TimeSpanWrapper.FromMinutes(timeToUse, Precision.MINUTES)));
                     messageFragments.Add(MessageFragment.Text(folderWeEstimateWeWillNeed));
                     if (fuelReportsInGallon)
                     {
@@ -972,13 +980,11 @@ namespace CrewChiefV4.Events
                 // TODO: TEST ME
                 if (litresToEnd > 0)
                 {
-                    int litresRemaining = (int)Math.Floor(CrewChief.currentGameState.FuelData.FuelLeft);
-                    int litresNeeded = litresToEnd - litresRemaining;
                     // -2 means we expect to have 2 litres left at the end of the race
-                    if (litresNeeded >= -2)
+                    if (litresToEnd >= -2)
                     {
                         QueuedMessage fuelMessage;
-                        if (litresNeeded < 3)
+                        if (litresToEnd < 3)
                         {
                             // between 2 litres short, and 2 litres excess fuel
                             fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
@@ -988,7 +994,7 @@ namespace CrewChiefV4.Events
                             if (fuelReportsInGallon)
                             {
                                 // for gallons we want both whole and fractional part cause its a stupid unit.
-                                float gallonsNeeded = convertLitersToGallons(litresNeeded, true);
+                                float gallonsNeeded = convertLitersToGallons(litresToEnd, true);
                                 Tuple<int, int> wholeandfractional = Utilities.WholeAndFractionalPart(gallonsNeeded);
                                 if (wholeandfractional.Item2 > 0)
                                 {
@@ -1005,7 +1011,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
-                                    litresNeeded, folderLitresToGetToTheEnd), 0, null);
+                                    litresToEnd, folderLitresToGetToTheEnd), 0, null);
                             }
                         }
                         audioPlayer.playMessageImmediately(fuelMessage);
@@ -1050,14 +1056,7 @@ namespace CrewChiefV4.Events
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderAboutToRunOut, 0, null));
                 }
-            }
-            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
-                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
-            {
-                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL),
-                    (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
-            }
+            }            
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
                 int litresNeeded = getLitresToEndOfRace();
@@ -1145,6 +1144,13 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
                 }
+            }
+            else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
+                SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.STATUS))
+            {
+                reportFuelStatus(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOWS_MY_FUEL),
+                    (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.SessionType == SessionType.Race));
             }
         }
 
