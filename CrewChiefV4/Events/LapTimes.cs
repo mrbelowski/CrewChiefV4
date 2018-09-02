@@ -192,6 +192,8 @@ namespace CrewChiefV4.Events
 
         private TimeSpan lastGapToSecondWhenLeadingPracOrQual;
 
+        private int ClassPositionAtStartOfCurrentLap = -1;
+
         public LapTimes(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -238,6 +240,7 @@ namespace CrewChiefV4.Events
             currentGameState = null;
             isHotLappingOrLonePractice = false;
             lastGapToSecondWhenLeadingPracOrQual = TimeSpan.Zero;
+            ClassPositionAtStartOfCurrentLap = -1;
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
@@ -264,6 +267,7 @@ namespace CrewChiefV4.Events
             this.currentGameState = currentGameState;
             if (currentGameState.SessionData.IsNewLap)
             {
+                ClassPositionAtStartOfCurrentLap = currentGameState.SessionData.ClassPosition;
                 if (currentGameState.SessionData.CompletedLaps > 0)
                 {
                     if (currentGameState.SessionData.LapTimePrevious > 0.0f)
@@ -608,7 +612,7 @@ namespace CrewChiefV4.Events
                                     }
                                 }
 
-                                if (!GlobalBehaviourSettings.useOvalLogic && 
+                                if (!GlobalBehaviourSettings.useOvalLogic && currentGameState.SessionData.ClassPosition == ClassPositionAtStartOfCurrentLap &&
                                     raceSectorReportsAtLapEnd && frequencyOfRaceSectorDeltaReports > Utilities.random.NextDouble() * 10)
                                 {
                                     double r = Utilities.random.NextDouble();

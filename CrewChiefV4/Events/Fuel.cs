@@ -82,8 +82,11 @@ namespace CrewChiefV4.Events
 
         public static String folderPitWindowForFuelOpensOnLap = "fuel/pit_window_for_fuel_opens_on_lap";
         public static String folderPitWindowForFuelOpensAfterTime = "fuel/pit_window_for_fuel_opens_after";
-        public static String folderPitWindowForFuelClosesOnLap = "fuel/and_will_close_on_lap";
-        public static String folderPitWindowForFuelClosesAfterTime = "fuel/and_closes_after";
+        public static String folderAndPitWindowForFuelClosesOnLap = "fuel/and_will_close_on_lap";
+        public static String folderAndPitWindowForFuelClosesAfterTime = "fuel/and_closes_after";
+
+        public static String folderPitWindowForFuelClosesOnLap = "fuel/pit_window_for_fuel_closes_on_lap";
+        public static String folderPitWindowForFuelClosesAfterTime = "fuel/pit_window_for_fuel_closes_after";
 
 
         private float averageUsagePerLap;
@@ -679,7 +682,11 @@ namespace CrewChiefV4.Events
                             previousGameState != null && previousGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.SectorNumber == 2)
                         {
                             Tuple<int,int> predictedWindow =  getPredictedPitWindow(currentGameState);
-                            if (predictedWindow.Item1 != -1 && predictedWindow.Item2 != -1)
+                            // item1 is the earliest minute / lap we can pit on, item2 is the latest. Note that item1 might be negative if
+                            // we *could* have finished the race without refuelling (if we'd filled the tank). It might also be less than the
+                            // number of minutes / laps completed
+
+                            if (predictedWindow.Item2 != -1)
                             {
                                 if (sessionHasHadFCY)
                                 {
@@ -687,17 +694,36 @@ namespace CrewChiefV4.Events
                                 }
                                 else if (sessionHasFixedNumberOfLaps)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                        MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1, 
-                                        folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
+                                    // if item1 is < current minute but item2 is sensible, we want to say "pit window for fuel closes after X laps"
+                                    if (predictedWindow.Item1 < currentGameState.SessionData.CompletedLaps)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
+                                            MessageContents(folderPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
+                                            MessageContents(folderPitWindowForFuelOpensOnLap, predictedWindow.Item1,
+                                            folderAndPitWindowForFuelClosesOnLap, predictedWindow.Item2), Utilities.random.Next(8), null));
+                                    }
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
-                                        MessageContents(folderPitWindowForFuelOpensAfterTime, 
-                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item1, Precision.MINUTES), 
-                                        folderPitWindowForFuelClosesAfterTime, 
-                                        TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
+                                    // if item1 is < current minute, we want to say "pit window for fuel closes after X minutes"
+                                    if (predictedWindow.Item1 < currentGameState.SessionData.SessionRunningTime / 60)
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
+                                            MessageContents(folderPitWindowForFuelClosesAfterTime,
+                                            TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
+                                    }
+                                    else
+                                    {
+                                        audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
+                                            MessageContents(folderPitWindowForFuelOpensAfterTime,
+                                            TimeSpanWrapper.FromMinutes(predictedWindow.Item1, Precision.MINUTES),
+                                            folderAndPitWindowForFuelClosesAfterTime,
+                                            TimeSpanWrapper.FromMinutes(predictedWindow.Item2, Precision.MINUTES)), Utilities.random.Next(8), null));
+                                    }
                                 }
                             }
                         }
