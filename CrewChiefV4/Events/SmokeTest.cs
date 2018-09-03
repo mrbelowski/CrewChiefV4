@@ -111,13 +111,13 @@ namespace CrewChiefV4.Events
 
             if (AudioPlayer.folderChiefRadioCheck != null)
             {
-                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST, MessageContents(AudioPlayer.folderChiefRadioCheck), 0, this), false);
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST, MessageContents(AudioPlayer.folderChiefRadioCheck), 0, null), false);
             }
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null
                 && !String.Equals(UserSettings.GetUserSettings().getString("spotter_name"), UserSettings.GetUserSettings().getString("chief_name"), StringComparison.InvariantCultureIgnoreCase))  // Don't play this if spotter and chief are the same person.
             {
                 Thread.Sleep(800);
-                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, this), false);
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, null), false);
             }
             // TODO: remove.
             PlaybackModerator.SetTracing(true /*enabled*/);
