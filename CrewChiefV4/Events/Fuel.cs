@@ -80,6 +80,7 @@ namespace CrewChiefV4.Events
         public static String folderFor = "fuel/for";
         public static String folderWeEstimateWeWillNeed = "fuel/we_estimate_we_will_need";
 
+        // Note theserefer to 'absolute' times - 20 minutes from-race-start, not 20 minutes from-current-time.
         public static String folderFuelWindowOpensOnLap = "fuel/pit_window_for_fuel_opens_on_lap";
         public static String folderFuelWindowOpensAfterTime = "fuel/pit_window_for_fuel_opens_after";
         public static String folderAndFuelWindowClosesOnLap = "fuel/and_will_close_on_lap";
@@ -1071,26 +1072,47 @@ namespace CrewChiefV4.Events
             Boolean reportedConsumption = reportFuelConsumption();
             Boolean reportedLitresNeeded = false;
             Boolean isSufficientTimeToSaveFuel = false;
+            Boolean isCloseToRaceEnd = false;
             if (CrewChief.currentGameState != null)
             {
                 if (CrewChief.currentGameState.SessionData.SessionHasFixedTime)
                 {
                     isSufficientTimeToSaveFuel = CrewChief.currentGameState.SessionData.SessionTimeRemaining > 500;
+                    isCloseToRaceEnd = CrewChief.currentGameState.SessionData.SessionTimeRemaining < 120 || CrewChief.currentGameState.SessionData.IsLastLap;
                 }
                 else
                 {
                     int lapsRemaining = CrewChief.currentGameState.SessionData.SessionNumberOfLaps - CrewChief.currentGameState.SessionData.CompletedLaps;
-                    isSufficientTimeToSaveFuel =
-                        (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG && lapsRemaining > 1) ||
-                        (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG && lapsRemaining > 2) ||
-                        (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.MEDIUM && lapsRemaining > 4) ||
-                        lapsRemaining > 6;
+                    if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                    {
+                        isSufficientTimeToSaveFuel = lapsRemaining >= 1;
+                        isCloseToRaceEnd = lapsRemaining <= 1;
+                    }
+                    else if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                    {
+                        isSufficientTimeToSaveFuel = lapsRemaining >= 2;
+                        isCloseToRaceEnd = lapsRemaining <= 2;
+                    }
+                    else if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.MEDIUM)
+                    {
+                        isSufficientTimeToSaveFuel = lapsRemaining >= 4;
+                        isCloseToRaceEnd = lapsRemaining <= 2;
+                    }
+                    else if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.SHORT)
+                    {
+                        isSufficientTimeToSaveFuel = lapsRemaining >= 5;
+                        isCloseToRaceEnd = lapsRemaining <= 2;
+                    }
+                    else if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_SHORT)
+                    {
+                        isSufficientTimeToSaveFuel = lapsRemaining >= 6;
+                        isCloseToRaceEnd = lapsRemaining <= 3;
+                    }
                 }
             }
             if (isRace)
             {
                 int litresToEnd = getLitresToEndOfRace();
-                // TODO: TEST ME
                 if (litresToEnd != int.MaxValue)
                 {
                     int minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
@@ -1098,7 +1120,13 @@ namespace CrewChiefV4.Events
                     // litresToEnd to end is a measure of how much fuel we need to add to get to the end. If it's 
                     // negative we have fuel to spare
                     QueuedMessage fuelMessage = null;
-                    if (litresToEnd > 0)
+                    if (litresToEnd <= 0 && litresToEnd * -1 < minRemainingFuelToBeSafe)
+                    {
+                        // we expect to have sufficient fuel, but it'll be tight. LitresToEnd * -1 is how much we expect
+                        // to have left over
+                        fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0, null);                        
+                    }
+                    else if (litresToEnd > 0)
                     {
                         // we need some fuel - see if we might be able stretch it
                         if (litresToEnd < minRemainingFuelToBeSafe && isSufficientTimeToSaveFuel)
@@ -1106,7 +1134,7 @@ namespace CrewChiefV4.Events
                             // unlikely to make it, we'll have to fuel save
                             fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
                         }
-                        else
+                        else if (!isCloseToRaceEnd)
                         {
                             if (fuelReportsInGallon)
                             {
@@ -1131,12 +1159,6 @@ namespace CrewChiefV4.Events
                                     litresToEnd, folderLitresToGetToTheEnd), 0, null);
                             }
                         }
-                    }
-                    else if (litresToEnd * -1 < minRemainingFuelToBeSafe)
-                    {
-                        // we expect to have sufficient fuel, but see if it'll be tight. LitresToEnd * -1 is how much we expect
-                        // to have left over
-                        fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0, null);                        
                     }
                     if (fuelMessage != null)
                     {

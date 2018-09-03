@@ -1077,7 +1077,8 @@ namespace CrewChiefV4.Audio
                     try
                     {
                         if (!keyStr.Contains(SessionEndMessages.sessionEndMessageIdentifier) &&
-                            !keyStr.Contains(SmokeTest.SMOKE_TEST))
+                            !keyStr.Contains(SmokeTest.SMOKE_TEST) &&
+                            !keyStr.Contains(SmokeTest.SMOKE_TEST_SPOTTER))
                         {
                             queue.Remove(keyStr);
                             purged++;
