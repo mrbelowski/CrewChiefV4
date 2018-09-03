@@ -733,7 +733,7 @@ namespace CrewChiefV4.Events
                                         Console.WriteLine("Skipping fuel window announcement because we might make it on fuel");
                                     }
                                     // if item1 is < current minute, we want to say "pit window for fuel closes after X minutes"
-                                    if (predictedWindow.Item1 < currentGameState.SessionData.SessionRunningTime / 60)
+                                    else if (predictedWindow.Item1 < currentGameState.SessionData.SessionRunningTime / 60)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/pit_window_for_fuel",
                                             MessageContents(folderWillNeedToPitForFuelByTimeIntro,
