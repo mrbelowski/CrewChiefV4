@@ -11,6 +11,7 @@ namespace CrewChiefV4.NumberProcessing
     {
         public TimeSpan timeSpan;
         private Precision precision;
+        public Boolean precisionIsAutoGaps = false;
         private static TimeSpan gapsInHundredthsThreshold = TimeSpan.FromMilliseconds(500);
         private static TimeSpan ovalGapsInHundredthsThreshold = TimeSpan.FromMilliseconds(2000);
         private static TimeSpan gapsSecondsThreshold = TimeSpan.FromSeconds(10);
@@ -19,6 +20,7 @@ namespace CrewChiefV4.NumberProcessing
         {
             this.timeSpan = timeSpan;
             this.precision = precision;
+            this.precisionIsAutoGaps = precision == Precision.AUTO_GAPS;
         }
 
         public override string ToString()
