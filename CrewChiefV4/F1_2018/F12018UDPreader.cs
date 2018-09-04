@@ -215,7 +215,7 @@ namespace CrewChiefV4.F1_2018
                             break;
                         case e_PacketId.CarTelemetry:
                             workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
-                            ConvertBytesToBoolArray(workingData.packetCarTelemetryData.m_buttonStatus1, workingData.packetCarTelemetryData.m_buttonStatus2, 
+                            buttonsState = ConvertBytesToBoolArray(workingData.packetCarTelemetryData.m_buttonStatus1, workingData.packetCarTelemetryData.m_buttonStatus2, 
                                 workingData.packetCarTelemetryData.m_buttonStatus3, workingData.packetCarTelemetryData.m_buttonStatus3);
                             break;
                         case e_PacketId.Event:
