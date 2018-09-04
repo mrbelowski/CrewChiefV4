@@ -857,5 +857,17 @@
     <Setting Name="slow_class_car_warnings_in_race_only" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="f1_2017_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="f1_2017_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="launch_f1_2017" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="f1_2017_udp_data_port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20777</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

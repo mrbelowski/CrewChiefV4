@@ -3143,7 +3143,7 @@ namespace CrewChiefV4.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+		[global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public float add_additional_fuel {
@@ -3190,8 +3190,8 @@ namespace CrewChiefV4.Properties {
                 this["force_rf2_rolling_start"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool enable_pit_exit_position_estimates {
@@ -3440,6 +3440,55 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["slow_class_car_warnings_in_race_only"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2017_launch_exe {
+            get {
+                return ((string)(this["f1_2017_launch_exe"]));
+            }
+            set {
+                this["f1_2017_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2017_launch_params {
+            get {
+                return ((string)(this["f1_2017_launch_params"]));
+            }
+            set {
+                this["f1_2017_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_f1_2017 {
+            get {
+                return ((bool)(this["launch_f1_2017"]));
+            }
+            set {
+                this["launch_f1_2017"] = value;
+				
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20777")]
+        public int f1_2017_udp_data_port {
+            get {
+                return ((int)(this["f1_2017_udp_data_port"]));
+            }
+            set {
+                this["f1_2017_udp_data_port"] = value;
+				
             }
         }
     }
