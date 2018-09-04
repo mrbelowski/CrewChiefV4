@@ -10,11 +10,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CrewChiefV4.F1_2017
+namespace CrewChiefV4.F1_2018
 {
-    public class F12017UDPreader : GameDataReader
+    public class F12018UDPreader : GameDataReader
     {
-        public class F12017StructWrapper
+        public class F12018StructWrapper
         {
             public long ticksWhenRead;
             public UDPPacket data;
@@ -33,11 +33,11 @@ namespace CrewChiefV4.F1_2017
         private Boolean newSpotterData = true;
         private Boolean running = false;
         private Boolean initialised = false;
-        private List<F12017StructWrapper> dataToDump;
-        private F12017StructWrapper latestData;
-        private F12017StructWrapper[] dataReadFromFile = null;
+        private List<F12018StructWrapper> dataToDump;
+        private F12018StructWrapper latestData;
+        private F12018StructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
-        private int udpPort = UserSettings.GetUserSettings().getInt("f1_2017_udp_data_port");
+        private int udpPort = UserSettings.GetUserSettings().getInt("f1_2018_udp_data_port");
 
         private byte[] receivedDataBuffer;
 
@@ -52,7 +52,7 @@ namespace CrewChiefV4.F1_2017
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
             {
-                SerializeObject(dataToDump.ToArray<F12017StructWrapper>(), filenameToDump);
+                SerializeObject(dataToDump.ToArray<F12018StructWrapper>(), filenameToDump);
             }
         }
 
@@ -67,12 +67,12 @@ namespace CrewChiefV4.F1_2017
             {
                 dataReadFromFileIndex = 0;
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
-                dataReadFromFile = DeSerializeObject<F12017StructWrapper[]>(filePathResolved);
+                dataReadFromFile = DeSerializeObject<F12018StructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
-                F12017StructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
+                F12018StructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
                 dataReadFromFileIndex++;
                 return structWrapperData;
             }
@@ -96,9 +96,9 @@ namespace CrewChiefV4.F1_2017
 
                 if (dumpToFile)
                 {
-                    dataToDump = new List<F12017StructWrapper>();
+                    dataToDump = new List<F12018StructWrapper>();
                 }
-                // TODO: f1 2017 can operate in broadcast or point to point mode, need to add options here so we're not tied to broadcast
+                // TODO: f1 2018 can operate in broadcast or point to point mode, need to add options here so we're not tied to broadcast
                 this.broadcastAddress = new IPEndPoint(IPAddress.Any, udpPort);
                 this.udpClient = new UdpClient();
                 this.udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -155,7 +155,7 @@ namespace CrewChiefV4.F1_2017
 
         public override Object ReadGameData(Boolean forSpotter)
         {
-            F12017StructWrapper structWrapper = new F12017StructWrapper();
+            F12018StructWrapper structWrapper = new F12018StructWrapper();
             structWrapper.ticksWhenRead = DateTime.Now.Ticks;
             lock (this)
             {
@@ -193,7 +193,7 @@ namespace CrewChiefV4.F1_2017
             try
             {
                 UDPPacket telem = (UDPPacket)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(UDPPacket));
-                latestData = new F12017StructWrapper();
+                latestData = new F12018StructWrapper();
                 latestData.data = telem;
                 latestData.ticksWhenRead = DateTime.Now.Ticks;
             }

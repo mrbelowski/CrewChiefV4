@@ -8,13 +8,13 @@ using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
 using CrewChiefV4.GameState;
 
-namespace CrewChiefV4.F1_2017
+namespace CrewChiefV4.F1_2018
 {
-    class F12017Spotter : Spotter
+    class F12018Spotter : Spotter
     {
         private float twoPi = (float)(2 * Math.PI);
 
-        public F12017Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
+        public F12018Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
             this.audioPlayer = audioPlayer;
             this.enabled = initialEnabledState;
@@ -30,7 +30,7 @@ namespace CrewChiefV4.F1_2017
 
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-            CrewChiefV4.F1_2017.F12017UDPreader.F12017StructWrapper currentWrapper = (CrewChiefV4.F1_2017.F12017UDPreader.F12017StructWrapper)currentStateObj;
+            CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper currentWrapper = (CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper)currentStateObj;
             UDPPacket currentState = currentWrapper.data;
             Boolean inPits = currentState.m_in_pits > 0;
             Boolean isSpectating = currentState.m_is_spectating != 0;
@@ -39,7 +39,7 @@ namespace CrewChiefV4.F1_2017
             {
                 return;
             }
-            CrewChiefV4.F1_2017.F12017UDPreader.F12017StructWrapper previousWrapper = (CrewChiefV4.F1_2017.F12017UDPreader.F12017StructWrapper)lastStateObj;
+            CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper previousWrapper = (CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper)lastStateObj;
             UDPPacket lastState = previousWrapper.data;
 
             DateTime now = new DateTime(currentWrapper.ticksWhenRead);

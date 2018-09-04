@@ -132,10 +132,10 @@
     <Compile Include="Events\Opponents.cs" />
     <Compile Include="Events\FlagsMonitor.cs" />
     <Compile Include="Events\Spotter.cs" />
-    <Compile Include="F1_2017\F12017GameStateMapper.cs" />
-    <Compile Include="F1_2017\F12017Spotter.cs" />
-    <Compile Include="F1_2017\F12017Struct.cs" />
-    <Compile Include="F1_2017\F12017UDPreader.cs" />
+    <Compile Include="F1_2018\F12018GameStateMapper.cs" />
+    <Compile Include="F1_2018\F12018Spotter.cs" />
+    <Compile Include="F1_2018\F12018Struct.cs" />
+    <Compile Include="F1_2018\F12018UDPreader.cs" />
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />

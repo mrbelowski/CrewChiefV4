@@ -9,11 +9,11 @@ using System.Diagnostics;
 /**
  * Maps memory mapped file to a local game-agnostic representation.
  * */
-namespace CrewChiefV4.F1_2017
+namespace CrewChiefV4.F1_2018
 {
-    class F12017GameStateMapper : GameStateMapper
+    class F12018GameStateMapper : GameStateMapper
     {
-        public F12017GameStateMapper()
+        public F12018GameStateMapper()
         {
         }
 
@@ -24,19 +24,14 @@ namespace CrewChiefV4.F1_2017
 
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
-            F12017UDPreader.F12017StructWrapper wrapper = (F12017UDPreader.F12017StructWrapper)structWrapper;
+            F12018UDPreader.F12018StructWrapper wrapper = (F12018UDPreader.F12018StructWrapper)structWrapper;
             long ticks = wrapper.ticksWhenRead;
             UDPPacket rawData = wrapper.data;
 
             // TODO: one or two minor things here ;)
             return new GameStateData(ticks);
         }
-        
-        public override SessionType mapToSessionType(Object memoryMappedFileStruct)
-        {
-            return SessionType.Unavailable;
-        }
-            
+
         private PitWindow mapToPitWindow(GameStateData currentGameState, uint pitSchedule, uint pitMode)
         {
             return PitWindow.Unavailable;
