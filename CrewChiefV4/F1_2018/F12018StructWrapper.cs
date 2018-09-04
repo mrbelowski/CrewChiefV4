@@ -26,12 +26,12 @@ namespace CrewChiefV4.F1_2018
         public F12018StructWrapper CreateCopy(long ticksWhenCopied, Boolean forSpotter)
         {
             F12018StructWrapper copy = new F12018StructWrapper();
+            copy.ticksWhenRead = ticksWhenCopied;
             copy.packetLapData = this.packetLapData;
             copy.packetSessionData = this.packetSessionData;
             copy.packetMotionData = this.packetMotionData;
             if (!forSpotter)
             {
-                copy.ticksWhenRead = ticksWhenCopied;
                 copy.packetCarSetupData = this.packetCarSetupData;
                 copy.packetCarStatusData = this.packetCarStatusData;
                 copy.packetCarTelemetryData = this.packetCarTelemetryData;
