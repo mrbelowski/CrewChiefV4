@@ -30,11 +30,12 @@ namespace CrewChiefV4.F1_2018
             copy.packetLapData = this.packetLapData;
             copy.packetSessionData = this.packetSessionData;
             copy.packetMotionData = this.packetMotionData;
+            copy.packetCarTelemetryData = this.packetCarTelemetryData;
+
             if (!forSpotter)
             {
                 copy.packetCarSetupData = this.packetCarSetupData;
                 copy.packetCarStatusData = this.packetCarStatusData;
-                copy.packetCarTelemetryData = this.packetCarTelemetryData;
                 copy.packetEventData = this.packetEventData;
                 copy.packetParticipantsData = this.packetParticipantsData;
             }
