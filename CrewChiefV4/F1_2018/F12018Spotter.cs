@@ -39,11 +39,8 @@ namespace CrewChiefV4.F1_2018
             {
                 return;
             }
-            F12018StructWrapper previousWrapper = (F12018StructWrapper)lastStateObj;
-            PacketMotionData lastState = previousWrapper.packetMotionData;
 
             DateTime now = new DateTime(currentWrapper.ticksWhenRead);
-            float interval = (float)(((double)currentWrapper.ticksWhenRead - (double)previousWrapper.ticksWhenRead) / (double)TimeSpan.TicksPerSecond);
 
             if (enabled && currentWrapper.packetMotionData.m_carMotionData.Length > 1)
             {
