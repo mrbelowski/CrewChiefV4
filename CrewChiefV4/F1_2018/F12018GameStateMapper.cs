@@ -24,9 +24,8 @@ namespace CrewChiefV4.F1_2018
 
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
-            F12018UDPreader.F12018StructWrapper wrapper = (F12018UDPreader.F12018StructWrapper)structWrapper;
+            F12018StructWrapper wrapper = (F12018StructWrapper)structWrapper;
             long ticks = wrapper.ticksWhenRead;
-            UDPPacket rawData = wrapper.data;
 
             // TODO: one or two minor things here ;)
             return new GameStateData(ticks);

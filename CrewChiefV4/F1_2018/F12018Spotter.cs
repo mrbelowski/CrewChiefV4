@@ -7,6 +7,7 @@ using System.Threading;
 using CrewChiefV4.Events;
 using CrewChiefV4.Audio;
 using CrewChiefV4.GameState;
+using F1UdpNet;
 
 namespace CrewChiefV4.F1_2018
 {
@@ -30,52 +31,47 @@ namespace CrewChiefV4.F1_2018
 
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
-            CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper currentWrapper = (CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper)currentStateObj;
-            UDPPacket currentState = currentWrapper.data;
-            Boolean inPits = currentState.m_in_pits > 0;
-            Boolean isSpectating = currentState.m_is_spectating != 0;
+            F12018StructWrapper currentWrapper = (F12018StructWrapper)currentStateObj;
+            Boolean inPits = currentWrapper.packetLapData.m_lapData[currentWrapper.packetLapData.m_header.m_playerCarIndex].m_pitStatus != 0;
+            Boolean isSpectating = currentWrapper.packetSessionData.m_isSpectating != 0;
 
             if (inPits || isSpectating)
             {
                 return;
             }
-            CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper previousWrapper = (CrewChiefV4.F1_2018.F12018UDPreader.F12018StructWrapper)lastStateObj;
-            UDPPacket lastState = previousWrapper.data;
+            F12018StructWrapper previousWrapper = (F12018StructWrapper)lastStateObj;
+            PacketMotionData lastState = previousWrapper.packetMotionData;
 
             DateTime now = new DateTime(currentWrapper.ticksWhenRead);
             float interval = (float)(((double)currentWrapper.ticksWhenRead - (double)previousWrapper.ticksWhenRead) / (double)TimeSpan.TicksPerSecond);
 
-            if (enabled && currentState.m_num_cars > 1)
+            if (enabled && currentWrapper.packetMotionData.m_carMotionData.Length > 1)
             {
-                int playerIndex = currentState.m_player_car_index;
+                int playerIndex = currentWrapper.packetMotionData.m_header.m_playerCarIndex;
 
-                CarUDPData playerData = currentState.m_car_data[playerIndex];
+                CarMotionData playerData = currentWrapper.packetMotionData.m_carMotionData[playerIndex];
 
-                float[] currentPlayerPosition = new float[] { playerData.m_worldPosition[0], playerData.m_worldPosition[2] };
+                float[] currentPlayerPosition = new float[] { playerData.m_worldPositionX, playerData.m_worldPositionZ };
 
                 List<float[]> currentOpponentPositions = new List<float[]>();
                 float[] playerVelocityData = new float[3];
-                playerVelocityData[0] = currentState.m_speed;
-                playerVelocityData[1] = currentState.m_xv;
-                playerVelocityData[2] = currentState.m_zv;
+                playerVelocityData[0] = (float)Math.Sqrt(Math.Pow(currentWrapper.packetMotionData.m_localVelocityX, 2) + Math.Pow(currentWrapper.packetMotionData.m_localVelocityZ, 2));
+                playerVelocityData[1] = currentWrapper.packetMotionData.m_localVelocityX;
+                playerVelocityData[2] = currentWrapper.packetMotionData.m_localVelocityZ;
 
-                for (int i = 0; i < currentState.m_num_cars; i++)
+                for (int i = 0; i < currentWrapper.packetMotionData.m_carMotionData.Length; i++)
                 {
                     if (i == playerIndex)
                     {
                         continue;
                     }
-                    CarUDPData opponentData = currentState.m_car_data[i];
-                    if (opponentData.m_carPosition > 0 /* just a guess....*/)
-                    {
-                        float[] currentPositions = new float[] { opponentData.m_worldPosition[0], opponentData.m_worldPosition[2] };
-                        currentOpponentPositions.Add(currentPositions);
-                    }
+                    CarMotionData opponentData = currentWrapper.packetMotionData.m_carMotionData[i];
+                    float[] currentPositions = new float[] { opponentData.m_worldPositionX, opponentData.m_worldPositionZ };
+                    currentOpponentPositions.Add(currentPositions);
                 }
                 if (currentOpponentPositions.Count() > 0)
                 {
-                    // rotation data isn't documented, just guessing here
-                    float playerRotation = currentState.m_xr;
+                    float playerRotation = playerData.m_yaw;
                     if (playerRotation < 0)
                     {
                         playerRotation = playerRotation * -1;

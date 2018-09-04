@@ -134,7 +134,7 @@
     <Compile Include="Events\Spotter.cs" />
     <Compile Include="F1_2018\F12018GameStateMapper.cs" />
     <Compile Include="F1_2018\F12018Spotter.cs" />
-    <Compile Include="F1_2018\F12018Struct.cs" />
+    <Compile Include="F1_2018\F12018StructWrapper.cs" />
     <Compile Include="F1_2018\F12018UDPreader.cs" />
     <Compile Include="F1_2018\longtomjr\enums.cs" />
     <Compile Include="F1_2018\longtomjr\Structs\CarMotionData.cs" />

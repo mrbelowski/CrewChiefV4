@@ -15,27 +15,19 @@ namespace CrewChiefV4.F1_2018
 {
     public class F12018UDPreader : GameDataReader
     {
-        public class F12018StructWrapper
-        {
-            public long ticksWhenRead;
-            public UDPPacket data;
-        }
-
-        int frameLength = 1289;
-
         private long packetRateCheckInterval = 1000;
         private long packetCountAtStartOfCurrentRateCheck = 0;
         private long packetCountAtStartOfNextRateCheck = 0;
         private long ticksAtStartOfCurrentPacketRateCheck = 0;
         private float lastPacketRateEstimate = -1;
 
-        private long telemPacketCount = 0;
+        int packetCount = 0;
 
         private Boolean newSpotterData = true;
         private Boolean running = false;
         private Boolean initialised = false;
         private List<F12018StructWrapper> dataToDump;
-        private F12018StructWrapper latestData;
+        private F12018StructWrapper workingData = new F12018StructWrapper();
         private F12018StructWrapper[] dataReadFromFile = null;
         private int dataReadFromFileIndex = 0;
         private int udpPort = UserSettings.GetUserSettings().getInt("f1_2018_udp_data_port");
@@ -88,8 +80,7 @@ namespace CrewChiefV4.F1_2018
             if (!this.initialised)
             {
                 socketCallback = new AsyncCallback(ReceiveCallback);
-                telemPacketCount = 0;
-
+                packetCount = 0;
                 packetCountAtStartOfCurrentRateCheck = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
                 ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
@@ -126,6 +117,7 @@ namespace CrewChiefV4.F1_2018
                     // do something with the data
                     lock (this)
                     {
+                        packetCount++;
                         try
                         {
                             readFromOffset(0, this.receivedDataBuffer);
@@ -156,8 +148,7 @@ namespace CrewChiefV4.F1_2018
 
         public override Object ReadGameData(Boolean forSpotter)
         {
-            F12018StructWrapper structWrapper = new F12018StructWrapper();
-            structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+            F12018StructWrapper latestData = workingData.CreateCopy(DateTime.Now.Ticks, forSpotter);
             lock (this)
             {
                 if (!initialised)
@@ -172,53 +163,51 @@ namespace CrewChiefV4.F1_2018
                     newSpotterData = false;
                 }
             }
-            if (!forSpotter && dumpToFile && dataToDump != null && latestData != null /* && latestData has some sane data?*/)
+            if (!forSpotter && dumpToFile && dataToDump != null && workingData != null /* && latestData has some sane data?*/)
             {
-                dataToDump.Add(structWrapper);
+                dataToDump.Add(latestData);
             }
-            return structWrapper;
+            return latestData;
+        }
+
+        private int getFrameLength(e_PacketId packetId)
+        {
+            return -1;//
         }
 
         private int readFromOffset(int offset, byte[] rawData)
         {
             e_PacketId packetId = (e_PacketId) rawData[3];
-
+            int frameLength = getFrameLength(packetId);
             GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
             try
             {
                 switch (packetId)
                 {
                     case e_PacketId.CarSetups:
-                        PacketCarSetupData carSetupData = (PacketCarSetupData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarSetupData));
-                        // merge with the existing gamestate
+                        workingData.packetCarSetupData = (PacketCarSetupData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarSetupData));
                         break;
                     case e_PacketId.CarStatus:
-                        PacketCarStatusData carStatusData = (PacketCarStatusData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarStatusData));
-                        // merge with the existing gamestate
+                        workingData.packetCarStatusData = (PacketCarStatusData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarStatusData));
                         break;
                     case e_PacketId.CarTelemetry:
-                        PacketCarTelemetryData carTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
-                        // merge with the existing gamestate
+                        workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
                         break;
                     case e_PacketId.Event:
-                        PacketEventData eventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
-                        // merge with the existing gamestate
+                        workingData.packetEventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
                         break;
                     case e_PacketId.LapData:
-                        PacketLapData lapData = (PacketLapData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketLapData));
-                        // merge with the existing gamestate                    
+                        workingData.packetLapData = (PacketLapData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketLapData));
                         break;
                     case e_PacketId.Motion:
-                        PacketMotionData carMotionData = (PacketMotionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketMotionData));
-                        // merge with the existing gamestate                    
+                        workingData.packetMotionData = (PacketMotionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketMotionData));
+                        newSpotterData = true;
                         break;
                     case e_PacketId.Participants:
-                        PacketParticipantsData participantData = (PacketParticipantsData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketParticipantsData));
-                        // merge with the existing gamestate
+                        workingData.packetParticipantsData = (PacketParticipantsData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketParticipantsData));
                         break;
                     case e_PacketId.Session:
-                        PacketSessionData sessionData = (PacketSessionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketSessionData));
-                        // merge with the existing gamestate
+                        workingData.packetSessionData = (PacketSessionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketSessionData));
                         break;
                 }
             }
@@ -254,9 +243,9 @@ namespace CrewChiefV4.F1_2018
             {
                 udpClient.Client.Disconnect(true);
             }
-            Console.WriteLine("Stopped UDP data receiver, received " + telemPacketCount + " telem packets");
+            Console.WriteLine("Stopped UDP data receiver, received " + packetCount + " packets");
             this.initialised = false;
-            telemPacketCount = 0;
+            packetCount = 0;
         }
     }
 }
