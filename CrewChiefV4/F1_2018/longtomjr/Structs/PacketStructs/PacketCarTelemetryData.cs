@@ -37,7 +37,10 @@ namespace F1UdpNet
         /// Bit flags specifying which buttons are being
         /// pressed currently - see appendices
         /// </summary>
-        public uint m_buttonStatus;
+        public byte m_buttonStatus1;
+        public byte m_buttonStatus2;
+        public byte m_buttonStatus3;
+        public byte m_buttonStatus4;
 
     }
 }

@@ -41,6 +41,8 @@ namespace CrewChiefV4.F1_2018
 
         private AsyncCallback socketCallback;
 
+        private static Boolean[] buttonsState = new Boolean[32];
+
         public override void DumpRawGameData()
         {
             if (dumpToFile && dataToDump != null && dataToDump.Count > 0 && filenameToDump != null)
@@ -213,6 +215,8 @@ namespace CrewChiefV4.F1_2018
                             break;
                         case e_PacketId.CarTelemetry:
                             workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
+                            ConvertBytesToBoolArray(workingData.packetCarTelemetryData.m_buttonStatus1, workingData.packetCarTelemetryData.m_buttonStatus2, 
+                                workingData.packetCarTelemetryData.m_buttonStatus3, workingData.packetCarTelemetryData.m_buttonStatus3);
                             break;
                         case e_PacketId.Event:
                             workingData.packetEventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
@@ -268,6 +272,29 @@ namespace CrewChiefV4.F1_2018
             Console.WriteLine("Stopped UDP data receiver, received " + packetCount + " packets");
             this.initialised = false;
             packetCount = 0;
+        }
+
+        public static bool[] ConvertBytesToBoolArray(byte buttons1, byte buttons2, byte buttons3, byte buttons4)
+        {
+            bool[] result = new bool[24];
+            // check each bit in each of the bytes. if 1 set to true, if 0 set to false
+            for (int i = 0; i < 8; i++)
+            {
+                result[i] = (buttons1 & (1 << i)) == 0 ? false : true;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                result[i + 8] = (buttons2 & (1 << i)) == 0 ? false : true;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                result[i + 16] = (buttons3 & (1 << i)) == 0 ? false : true;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                result[i + 24] = (buttons4 & (1 << i)) == 0 ? false : true;
+            }
+            return result;
         }
     }
 }
