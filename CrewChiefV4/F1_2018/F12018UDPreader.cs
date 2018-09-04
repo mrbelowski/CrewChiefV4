@@ -1,4 +1,5 @@
-﻿using System;
+﻿using F1UdpNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
@@ -180,22 +181,46 @@ namespace CrewChiefV4.F1_2018
 
         private int readFromOffset(int offset, byte[] rawData)
         {
-            telemPacketCount++;
-            if (telemPacketCount > packetCountAtStartOfNextRateCheck)
-            {
-                lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
-                Console.WriteLine("Packet rate = " + lastPacketRateEstimate + "Hz, total = " + telemPacketCount);
-                packetCountAtStartOfCurrentRateCheck = telemPacketCount;
-                packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
-                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
-            }
+            e_PacketId packetId = (e_PacketId) rawData[3];
+
             GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
             try
             {
-                UDPPacket telem = (UDPPacket)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(UDPPacket));
-                latestData = new F12018StructWrapper();
-                latestData.data = telem;
-                latestData.ticksWhenRead = DateTime.Now.Ticks;
+                switch (packetId)
+                {
+                    case e_PacketId.CarSetups:
+                        PacketCarSetupData carSetupData = (PacketCarSetupData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarSetupData));
+                        // merge with the existing gamestate
+                        break;
+                    case e_PacketId.CarStatus:
+                        PacketCarStatusData carStatusData = (PacketCarStatusData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarStatusData));
+                        // merge with the existing gamestate
+                        break;
+                    case e_PacketId.CarTelemetry:
+                        PacketCarTelemetryData carTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
+                        // merge with the existing gamestate
+                        break;
+                    case e_PacketId.Event:
+                        PacketEventData eventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
+                        // merge with the existing gamestate
+                        break;
+                    case e_PacketId.LapData:
+                        PacketLapData lapData = (PacketLapData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketLapData));
+                        // merge with the existing gamestate                    
+                        break;
+                    case e_PacketId.Motion:
+                        PacketMotionData carMotionData = (PacketMotionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketMotionData));
+                        // merge with the existing gamestate                    
+                        break;
+                    case e_PacketId.Participants:
+                        PacketParticipantsData participantData = (PacketParticipantsData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketParticipantsData));
+                        // merge with the existing gamestate
+                        break;
+                    case e_PacketId.Session:
+                        PacketSessionData sessionData = (PacketSessionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketSessionData));
+                        // merge with the existing gamestate
+                        break;
+                }
             }
             finally
             {

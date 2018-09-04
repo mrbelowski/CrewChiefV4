@@ -40,6 +40,7 @@ assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
 rfactor2_64_bit = rFactor 2 (64 bit)
 iracing = iRacing
+f1_2018 = F1 2018
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
