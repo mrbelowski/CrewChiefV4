@@ -172,48 +172,70 @@ namespace CrewChiefV4.F1_2018
 
         private int getFrameLength(e_PacketId packetId)
         {
-            return -1;//
+            switch (packetId)
+            {
+                case e_PacketId.Motion:
+                    return 1341;
+                case e_PacketId.Session:
+                    return 147;
+                case e_PacketId.LapData:
+                    return 841;
+                case e_PacketId.Event:
+                    return 25;
+                case e_PacketId.Participants:
+                    return 1082;
+                case e_PacketId.CarSetups:
+                    return 841;
+                case e_PacketId.CarTelemetry:
+                    return 1085;
+                case e_PacketId.CarStatus:
+                    return 1061;
+            }
+            return -1;
         }
 
         private int readFromOffset(int offset, byte[] rawData)
         {
             e_PacketId packetId = (e_PacketId) rawData[3];
             int frameLength = getFrameLength(packetId);
-            GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
-            try
+            if (frameLength > 0)
             {
-                switch (packetId)
+                GCHandle handle = GCHandle.Alloc(rawData.Skip(offset).Take(frameLength).ToArray(), GCHandleType.Pinned);
+                try
                 {
-                    case e_PacketId.CarSetups:
-                        workingData.packetCarSetupData = (PacketCarSetupData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarSetupData));
-                        break;
-                    case e_PacketId.CarStatus:
-                        workingData.packetCarStatusData = (PacketCarStatusData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarStatusData));
-                        break;
-                    case e_PacketId.CarTelemetry:
-                        workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
-                        break;
-                    case e_PacketId.Event:
-                        workingData.packetEventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
-                        break;
-                    case e_PacketId.LapData:
-                        workingData.packetLapData = (PacketLapData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketLapData));
-                        break;
-                    case e_PacketId.Motion:
-                        workingData.packetMotionData = (PacketMotionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketMotionData));
-                        newSpotterData = true;
-                        break;
-                    case e_PacketId.Participants:
-                        workingData.packetParticipantsData = (PacketParticipantsData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketParticipantsData));
-                        break;
-                    case e_PacketId.Session:
-                        workingData.packetSessionData = (PacketSessionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketSessionData));
-                        break;
+                    switch (packetId)
+                    {
+                        case e_PacketId.CarSetups:
+                            workingData.packetCarSetupData = (PacketCarSetupData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarSetupData));
+                            break;
+                        case e_PacketId.CarStatus:
+                            workingData.packetCarStatusData = (PacketCarStatusData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarStatusData));
+                            break;
+                        case e_PacketId.CarTelemetry:
+                            workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
+                            break;
+                        case e_PacketId.Event:
+                            workingData.packetEventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
+                            break;
+                        case e_PacketId.LapData:
+                            workingData.packetLapData = (PacketLapData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketLapData));
+                            break;
+                        case e_PacketId.Motion:
+                            workingData.packetMotionData = (PacketMotionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketMotionData));
+                            newSpotterData = true;
+                            break;
+                        case e_PacketId.Participants:
+                            workingData.packetParticipantsData = (PacketParticipantsData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketParticipantsData));
+                            break;
+                        case e_PacketId.Session:
+                            workingData.packetSessionData = (PacketSessionData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketSessionData));
+                            break;
+                    }
                 }
-            }
-            finally
-            {
-                handle.Free();
+                finally
+                {
+                    handle.Free();
+                }
             }
             return frameLength + offset;
         }
