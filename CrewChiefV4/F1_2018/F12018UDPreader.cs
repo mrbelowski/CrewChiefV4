@@ -216,7 +216,7 @@ namespace CrewChiefV4.F1_2018
                         case e_PacketId.CarTelemetry:
                             workingData.packetCarTelemetryData = (PacketCarTelemetryData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketCarTelemetryData));
                             buttonsState = ConvertBytesToBoolArray(workingData.packetCarTelemetryData.m_buttonStatus1, workingData.packetCarTelemetryData.m_buttonStatus2, 
-                                workingData.packetCarTelemetryData.m_buttonStatus3, workingData.packetCarTelemetryData.m_buttonStatus3);
+                                workingData.packetCarTelemetryData.m_buttonStatus3, workingData.packetCarTelemetryData.m_buttonStatus4);
                             break;
                         case e_PacketId.Event:
                             workingData.packetEventData = (PacketEventData)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(PacketEventData));
@@ -276,7 +276,7 @@ namespace CrewChiefV4.F1_2018
 
         public static bool[] ConvertBytesToBoolArray(byte buttons1, byte buttons2, byte buttons3, byte buttons4)
         {
-            bool[] result = new bool[24];
+            bool[] result = new bool[32];
             // check each bit in each of the bytes. if 1 set to true, if 0 set to false
             for (int i = 0; i < 8; i++)
             {
