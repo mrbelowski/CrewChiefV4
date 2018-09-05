@@ -363,7 +363,6 @@
       <DependentUpon>BooleanPropertyControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="carClassData.json" />
-    <None Include="F1_2018\longtomjr\TeamIDs.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
