@@ -68,6 +68,8 @@ namespace CrewChiefV4.F1_2018
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
                 F12018StructWrapper structWrapperData = dataReadFromFile[dataReadFromFileIndex];
+                workingData = structWrapperData;
+                newSpotterData = true;
                 dataReadFromFileIndex++;
                 return structWrapperData;
             }
