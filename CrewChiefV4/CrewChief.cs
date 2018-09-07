@@ -168,7 +168,10 @@ namespace CrewChiefV4
             {
                 gameDataReader.Dispose();
             }
-            audioPlayer.stopMonitor();
+            if (audioPlayer != null)
+            {
+                audioPlayer.stopMonitor();
+            }
             if (speechRecogniser != null)
             {
                 speechRecogniser.Dispose();
