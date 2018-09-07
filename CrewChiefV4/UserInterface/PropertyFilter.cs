@@ -92,9 +92,13 @@ namespace CrewChiefV4
 
             if (specialFilter != PropertiesForm.SpecialFilter.UNKNOWN)
             {
+                // Any property with non empty filter is not common in a sense that it does not apply to all games ("Common Properties" selected in the UI).
+                // However, if specific game is selected, and "Show common" checkbox is checked, it is only excluded from "common" properties if the exclude filter
+                // for the selected game is specified.  Should've named that checkbox "Show shared" instead.
+                // Note: this check has a limitation that if filter has list of all games, this won't be true, even though property is common.
+                // Easy to overcome if needed by adding method to check if filter covers all games.
                 if (specialFilter == PropertiesForm.SpecialFilter.COMMON_PREFERENCES
-                    && (this.filterList != null  // This has a limitation that if filter has list of all games, this won't be true, even though property is common.
-                        || !this.includeFilter))  // If exclude filter is set, this is not a common preference.
+                    && this.filterList != null) 
                     return false;
             }
             else if (gameFilter != GameEnum.UNKNOWN)
