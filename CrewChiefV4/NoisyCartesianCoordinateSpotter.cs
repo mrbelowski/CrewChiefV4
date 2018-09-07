@@ -260,9 +260,11 @@ namespace CrewChiefV4
             
             previousPositionAndVelocityData.Clear();
         }
-        
+
+        // opponentVelocity data is optional. It should be list of 2 element arrays with x and z speed, ordered
+        // the same as currentOpponentPositions
         public void triggerInternal(float playerRotationInRadians, float[] currentPlayerPosition,
-            float[] playerVelocityData, List<float[]> currentOpponentPositions)
+            float[] playerVelocityData, List<float[]> currentOpponentPositions, List<float[]> opponentVelocityData = null)
         {
             if (GameStateData.onManualFormationLap)
             {
@@ -293,28 +295,36 @@ namespace CrewChiefV4
                         if (opponentPositionInRange(currentOpponentPosition, currentPlayerPosition))
                         {
                             Boolean isOpponentVelocityInRange = false;
-                            PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = null;
-                            if (previousPositionAndVelocityData.TryGetValue(i, out opponentPreviousPositionAndVelocityData))
+                            if (opponentVelocityData != null)
                             {
-                                float timeDiffSeconds = (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalSeconds;
-                                if (timeDiffSeconds >= calculateOpponentSpeedsEvery)
-                                {
-                                    opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
-                                    opponentPreviousPositionAndVelocityData.xSpeed = (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds;
-                                    opponentPreviousPositionAndVelocityData.zSpeed = (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.zPosition) / timeDiffSeconds;
-                                    opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
-                                    opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
-                                }
-                                // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have 2 overlaps on both sides
-                                if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
-                                {
-                                    isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
-                                            opponentPreviousPositionAndVelocityData.xSpeed, opponentPreviousPositionAndVelocityData.zSpeed);
-                                }
+                                isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                    opponentVelocityData[i][0], opponentVelocityData[i][1]);
                             }
                             else
                             {
-                                previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
+                                PreviousPositionAndVelocityData opponentPreviousPositionAndVelocityData = null;
+                                if (previousPositionAndVelocityData.TryGetValue(i, out opponentPreviousPositionAndVelocityData))
+                                {
+                                    float timeDiffSeconds = (float)(now - opponentPreviousPositionAndVelocityData.timeWhenLastUpdated).TotalSeconds;
+                                    if (timeDiffSeconds >= calculateOpponentSpeedsEvery)
+                                    {
+                                        opponentPreviousPositionAndVelocityData.timeWhenLastUpdated = now;
+                                        opponentPreviousPositionAndVelocityData.xSpeed = (currentOpponentPosition[0] - opponentPreviousPositionAndVelocityData.xPosition) / timeDiffSeconds;
+                                        opponentPreviousPositionAndVelocityData.zSpeed = (currentOpponentPosition[1] - opponentPreviousPositionAndVelocityData.zPosition) / timeDiffSeconds;
+                                        opponentPreviousPositionAndVelocityData.xPosition = currentOpponentPosition[0];
+                                        opponentPreviousPositionAndVelocityData.zPosition = currentOpponentPosition[1];
+                                    }
+                                    // we've updated this guys cached position and velocity, but we only need to check his speed if we don't already have 2 overlaps on both sides
+                                    if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)
+                                    {
+                                        isOpponentVelocityInRange = checkOpponentVelocityInRange(playerVelocityData[1], playerVelocityData[2],
+                                                opponentPreviousPositionAndVelocityData.xSpeed, opponentPreviousPositionAndVelocityData.zSpeed);
+                                    }
+                                }
+                                else
+                                {
+                                    previousPositionAndVelocityData.Add(i, new PreviousPositionAndVelocityData(currentOpponentPosition[0], currentOpponentPosition[1], now));
+                                }
                             }
                             // again, if we already have max overlaps on both sides here we don't need to calculate another
                             if (carsOnLeft < maxOverlapsPerSide || carsOnRight < maxOverlapsPerSide)

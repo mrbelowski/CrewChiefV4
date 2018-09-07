@@ -21,7 +21,7 @@ namespace CrewChiefV4.F1_2018
             this.enabled = initialEnabledState;
             this.initialEnabledState = initialEnabledState;
             // TODO: car sizes
-            this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, true, 4, 2);
+            this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, true, UserSettings.GetUserSettings().getFloat("f1_2018_spotter_car_length"), 2);
         }
 
         public override void clearState()
@@ -32,6 +32,10 @@ namespace CrewChiefV4.F1_2018
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             F12018StructWrapper currentWrapper = (F12018StructWrapper)currentStateObj;
+            if (currentWrapper.packetLapData.m_lapData == null || currentWrapper.packetMotionData.m_carMotionData == null || currentWrapper.packetCarTelemetryData.m_carTelemetryData == null)
+            {
+                return;
+            }
             Boolean inPits = currentWrapper.packetLapData.m_lapData[currentWrapper.packetLapData.m_header.m_playerCarIndex].m_pitStatus != 0;
             Boolean isSpectating = currentWrapper.packetSessionData.m_isSpectating != 0;
 
@@ -51,8 +55,9 @@ namespace CrewChiefV4.F1_2018
                 float[] currentPlayerPosition = new float[] { playerData.m_worldPositionX, playerData.m_worldPositionZ };
 
                 List<float[]> currentOpponentPositions = new List<float[]>();
+                List<float[]> currentOpponentVelocityData = new List<float[]>();
                 float[] playerVelocityData = new float[3];
-                playerVelocityData[0] = (float)currentWrapper.packetCarTelemetryData.m_carTelemetryData[currentWrapper.packetCarTelemetryData.m_header.m_playerCarIndex].m_speed;
+                playerVelocityData[0] = (float)currentWrapper.packetCarTelemetryData.m_carTelemetryData[currentWrapper.packetCarTelemetryData.m_header.m_playerCarIndex].m_speed * 0.277778f;
                 playerVelocityData[1] = currentWrapper.packetMotionData.m_localVelocityX;
                 playerVelocityData[2] = currentWrapper.packetMotionData.m_localVelocityZ;
 
@@ -65,6 +70,7 @@ namespace CrewChiefV4.F1_2018
                     CarMotionData opponentData = currentWrapper.packetMotionData.m_carMotionData[i];
                     float[] currentPositions = new float[] { opponentData.m_worldPositionX, opponentData.m_worldPositionZ };
                     currentOpponentPositions.Add(currentPositions);
+                    currentOpponentVelocityData.Add(new float[] { opponentData.m_worldVelocityX, opponentData.m_worldVelocityZ });
                 }
                 if (currentOpponentPositions.Count() > 0)
                 {
@@ -77,7 +83,7 @@ namespace CrewChiefV4.F1_2018
                     {
                         playerRotation = twoPi - playerRotation;
                     }
-                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+                    internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions, currentOpponentVelocityData);
                 }
             }
         }

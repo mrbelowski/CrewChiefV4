@@ -436,6 +436,10 @@ rf2_spotter_car_length = rF2 Spotter default car length
 rf2_spotter_car_length_filter = RF2_64BIT
 rf2_spotter_car_length_category = SPOTTER
 
+f1_2018_spotter_car_length = F1 2018 Spotter default car length
+f1_2018__spotter_car_length_filter = F1_2018
+f1_2018__spotter_car_length_category = SPOTTER
+
 spotter_gap_for_clear = Spotter gap for clear
 spotter_gap_for_clear_category = SPOTTER;MESSAGE_FREQUENCES
 
