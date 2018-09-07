@@ -140,6 +140,7 @@ namespace CrewChiefV4.Audio
         public static String defaultChiefId = "Jim (default)";
         public static List<String> availableChiefVoices = new List<String>();
         public static String folderChiefRadioCheck = null;
+        private Thread monitorQueueThread = null;
 
         static AudioPlayer()
         {
@@ -422,8 +423,10 @@ namespace CrewChiefV4.Audio
                 {
                     work = monitorQueue;
                 }
-                Thread thread = new Thread(work);
-                thread.Start();
+                Debug.Assert(monitorQueueThread == null);
+                monitorQueueThread = new Thread(work);
+                monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
+                monitorQueueThread.Start();
             }
             new SmokeTest(this).trigger(new GameStateData(DateTime.Now.Ticks), new GameStateData(DateTime.Now.Ticks));
         }
@@ -431,6 +434,15 @@ namespace CrewChiefV4.Audio
         public void stopMonitor()
         {
             monitorRunning = false;
+
+            // Wait for monitor queue thread to exit.
+            Debug.Assert(monitorQueueThread != null);
+            if (monitorQueueThread != null)
+            {
+                monitorQueueThread.Join();
+                monitorQueueThread = null;
+            }
+
             channelOpen = false;
         }
 
