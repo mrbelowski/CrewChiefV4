@@ -61,7 +61,7 @@ namespace F1UdpNet
         /// Name of participant in UTF-8 format – null terminated
         /// Will be truncated with … (U+2026) if too long
         /// </summary>
-        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 20)]
+        [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 48)]
         public byte[] m_name;
     }
 }
