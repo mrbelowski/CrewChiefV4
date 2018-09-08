@@ -677,7 +677,7 @@ namespace CrewChiefV4
             if (filenameToRun != null)
             {
                 loadDataFromFile = true;
-                GlobalBehaviourSettings.spotterEnabled = false;
+                GlobalBehaviourSettings.spotterEnabled = gameDefinition.gameEnum == GameEnum.F1_2018;
                 dumpToFile = false;
             }
             else
@@ -963,14 +963,15 @@ namespace CrewChiefV4
                                 }
                             }
                             // TODO: for AC free practice sessions, the SessionRunningTime is set to 1 hour in the mapper and stays there so this block never triggers
-                            else if (previousGameState != null &&
+                            else if (previousGameState != null && 
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 ||
                                         (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                                             currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
                                         ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
                                                 gameDefinition.gameEnum == GameEnum.PCARS2 || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
                                                 gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
-                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1))
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1)))
                             {
                                 if (!sessionFinished)
                                 {
@@ -995,14 +996,18 @@ namespace CrewChiefV4
                                 PlaybackModerator.UpdateAutoVerbosity(currentGameState);
 
                                 // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
-                                foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
+                                // for now, don't trigger any events for F1 2018 as there's no game mapping
+                                if (gameDefinition.gameEnum != GameEnum.F1_2018)
                                 {
-                                    if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
+                                    foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                     {
-                                        // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
-                                        if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
+                                        if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                         {
-                                            triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                            // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
+                                            if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
+                                            {
+                                                triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
+                                            }
                                         }
                                     }
                                 }
@@ -1013,7 +1018,8 @@ namespace CrewChiefV4
                                         DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
                                             currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                     }
-                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && !loadDataFromFile)
+                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && 
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
                                     {
                                         Console.WriteLine("********** starting spotter***********");
                                         spotter.clearState();

@@ -857,5 +857,20 @@
     <Setting Name="slow_class_car_warnings_in_race_only" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="f1_2018_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="f1_2018_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="launch_f1_2018" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="f1_2018_udp_data_port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20777</Value>
+    </Setting>
+    <Setting Name="f1_2018_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

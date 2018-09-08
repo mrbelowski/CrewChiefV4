@@ -2,7 +2,7 @@ CrewChief version 4.9
 
 Written by Jim Britton, Morten Roslev, Vytautas Leonavičius, Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
-Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden, Lee Taylor and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
+Additional material from Scoops (fantastic track layout mapping work) and Longtomjr (F1 2018 UDP data format structs). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden, Lee Taylor and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
@@ -224,6 +224,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.5.1: Added support for F1 2018 *spotter only*. This uses the UDP data stream sent by the game - the app listens on the default port 20777 (can be changed with the 'F1 2018 UDP Port' property). This is an early implementation so expect some bugs - please report them. Again, it's only the spotter - the app doesn't interpret any of the other game data so it won't give other calls or be able to answer any questions. I may add full support later, but as the crew chief built into the game is actually pretty good this isn't a high priority; RF2 - updated plugin to latest version.
+
 Version 4.9.5.0: Some fuel calculation fixes; reduced likelihood of yellow flag warnings for cars that have already quit to pits; added fuel-window messge in races which have no mandatory stop but will need a single fuel stop; some internal fixes; iRacing - fixed issues with opening lap data
 
 Version 4.9.4.9: Added alarm clock function - say 'set alarm at twenty oh five', for example or preset it in properties "Alarm time(s). "Enable alarm clock voice commands" must be enabled before the alarm clock voice commands works; alternate sound pack internal rework; mark abandoned laps as invalid; more ghost detection improvements; R3E - removed 'confirm penalty' macro as this is no longer needed and can cause issues; reworked fuel-to-end reserve calculation - you can now specify a number of laps worth of additional fuel to add as a reserve when fuelling to the end of the race. The 'Additional fuel to add to finish the race (number of laps worth)' property can be a whole or fractional number of laps; various bug fixes

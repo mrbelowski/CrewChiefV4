@@ -10,6 +10,7 @@ using System.Text;
 using CrewChiefV4.rFactor2;
 using CrewChiefV4.iRacing;
 using CrewChiefV4.PCars2;
+using CrewChiefV4.F1_2018;
 
 namespace CrewChiefV4
 {
@@ -26,6 +27,7 @@ namespace CrewChiefV4
         private RF2SharedMemoryReader rf2SharedMemoryReader;
         private ACSSharedMemoryReader ascSharedMemoryReader;
         private iRacingSharedMemoryReader iracingSharedMemoryReader;
+        private F12018UDPreader f12018UDPReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
         private PCars2GameStateMapper pcars2GameStateMapper;
@@ -34,6 +36,7 @@ namespace CrewChiefV4
         private RF2GameStateMapper rf2GameStateMapper;
         private ACSGameStateMapper ascGameStateMapper;
         private iRacingGameStateMapper iracingGameStateMapper;
+        private F12018GameStateMapper f12018GameStateMapper;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -102,6 +105,12 @@ namespace CrewChiefV4
                             iracingSharedMemoryReader = new iRacingSharedMemoryReader();
                         }
                         return iracingSharedMemoryReader;
+                    case GameEnum.F1_2018:
+                        if (f12018UDPReader == null)
+                        {
+                            f12018UDPReader = new F12018UDPreader();
+                        }
+                        return f12018UDPReader;
                 }
             }
             return null;
@@ -159,6 +168,13 @@ namespace CrewChiefV4
                             iracingGameStateMapper = new iRacingGameStateMapper();
                         }
                         return iracingGameStateMapper;
+                    case GameEnum.F1_2018:
+                        if (f12018GameStateMapper == null)
+                        {
+                            f12018GameStateMapper = new F12018GameStateMapper();
+                        }
+                        return f12018GameStateMapper;
+                        
                 }
             }
             return null;
