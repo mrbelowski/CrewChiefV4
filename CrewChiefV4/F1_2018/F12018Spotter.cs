@@ -58,8 +58,8 @@ namespace CrewChiefV4.F1_2018
                 List<float[]> currentOpponentVelocityData = new List<float[]>();
                 float[] playerVelocityData = new float[3];
                 playerVelocityData[0] = (float)currentWrapper.packetCarTelemetryData.m_carTelemetryData[currentWrapper.packetCarTelemetryData.m_header.m_playerCarIndex].m_speed * 0.277778f;
-                playerVelocityData[1] = currentWrapper.packetMotionData.m_localVelocityX;
-                playerVelocityData[2] = currentWrapper.packetMotionData.m_localVelocityZ;
+                playerVelocityData[1] = playerData.m_worldVelocityX;
+                playerVelocityData[2] = playerData.m_worldVelocityZ;
 
                 for (int i = 0; i < currentWrapper.packetMotionData.m_carMotionData.Length; i++)
                 {
