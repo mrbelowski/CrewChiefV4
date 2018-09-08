@@ -40,6 +40,7 @@ assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
 rfactor2_64_bit = rFactor 2 (64 bit)
 iracing = iRacing
+f1_2018 = F1 2018 (spotter only)
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
@@ -257,6 +258,11 @@ rf2_install_path_help = rF2 installation path for plugin installation and updati
 rf2_install_path_filter = RF2_64BIT
 rf2_install_path_category = UI_STARTUP_AND_PATHS
 
+f1_2018_install_path = F1 2018 install path
+f1_2018_install_path_help = F1 2018 installation path
+f1_2018_install_path_filter = F1_2018
+f1_2018_install_path_category = UI_STARTUP_AND_PATHS
+
 override_default_sound_pack_location = Override default Sound Pack location
 override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
 override_default_sound_pack_location_category = AUDIO_VOICE_AND_CONTROLLERS
@@ -401,6 +407,11 @@ udp_data_port_help = pCARS network data UDP port (should usually be 5606)
 udp_data_port_filter = PCARS_NETWORK
 udp_data_port_category = UI_STARTUP_AND_PATHS
 
+f1_2018_udp_data_port = F1 2018 UDP port
+f1_2018_udp_data_port_help = F1 2018 network data UDP port (should usually be 20777)
+f1_2018_udp_data_port_filter = F1_2018
+f1_2018_udp_data_port_category = UI_STARTUP_AND_PATHS
+
 acs_spotter_car_length = ACS Spotter default car length
 acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
 acs_spotter_car_length_category = SPOTTER
@@ -424,6 +435,10 @@ rf1_spotter_car_length_category = SPOTTER
 rf2_spotter_car_length = rF2 Spotter default car length
 rf2_spotter_car_length_filter = RF2_64BIT
 rf2_spotter_car_length_category = SPOTTER
+
+f1_2018_spotter_car_length = F1 2018 Spotter default car length
+f1_2018_spotter_car_length_filter = F1_2018
+f1_2018_spotter_car_length_category = SPOTTER
 
 spotter_gap_for_clear = Spotter gap for clear
 spotter_gap_for_clear_category = SPOTTER;MESSAGE_FREQUENCES
@@ -543,6 +558,11 @@ ftruck_launch_params_help = This is used to tell Steam what app to run - Formula
 ftruck_launch_params_filter = RF1
 ftruck_launch_params_category = UI_STARTUP_AND_PATHS
 
+f1_2018_launch_params = F1 2018 launch params
+f1_2018_launch_params_help = This is used to tell Steam what app to run - F1 2018's Steam app ID is ??????. If you specified a path f1_2018.exe you can leave this blank
+f1_2018_launch_params_filter = F1_2018
+f1_2018_launch_params_category = UI_STARTUP_AND_PATHS
+
 r3e_launch_exe = R3E launch exe
 r3e_launch_exe_help = This is the location of Steam.exe or the direct path to RRRE.exe. Use forward slashes to separate paths.
 r3e_launch_exe_filter = RACE_ROOM
@@ -593,6 +613,11 @@ pcars64_launch_exe_help = This is the location of Steam.exe or the direct path t
 pcars64_launch_exe_filter = PCARS_64BIT
 pcars64_launch_exe_category = UI_STARTUP_AND_PATHS
 
+f1_2018_launch_exe = F1 2018 launch exe
+f1_2018_launch_exe_help = This is the location of Steam.exe or the direct path to f1_2018.exe. Use forward slashes to separate paths.
+f1_2018_launch_exe_filter = F1_2018
+f1_2018_launch_exe_category = UI_STARTUP_AND_PATHS
+
 launch_rfactor1 = Launch rFactor 1
 launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 launch_rfactor1_filter = RF1
@@ -607,6 +632,11 @@ launch_gsc = Launch GSC
 launch_gsc_help = If this is true the application will attempt to launch Stock Car Extreme when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 launch_gsc_filter = RF1
 launch_gsc_category = UI_STARTUP_AND_PATHS
+
+launch_f1_2018 = Launch F1 2018
+launch_f1_2018_help = If this is true the application will attempt to launch F1 2018 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_f1_2018_filter = F1_2018
+launch_f1_2018_category = UI_STARTUP_AND_PATHS
 
 launch_ams = Launch AMS
 launch_ams_help = If this is true the application will attempt to launch Automobilista when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
