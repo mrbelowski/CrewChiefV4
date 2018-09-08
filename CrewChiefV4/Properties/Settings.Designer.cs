@@ -3493,7 +3493,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public float f1_2018_spotter_car_length {
             get {
                 return ((float)(this["f1_2018_spotter_car_length"]));
