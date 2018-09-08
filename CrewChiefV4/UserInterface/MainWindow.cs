@@ -108,81 +108,122 @@ namespace CrewChiefV4
 
         private void unregisterRootThreads()
         {
-            if (this.InvokeRequired)
+            /*if (this.InvokeRequired)
             {
                 Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
                 return;
-            }
+            }*/
 
             // TODO: do validation.
             rootThreads.Clear();
 
         }
+
+        private void doWatchStartup()
+        {
+            new Thread(() =>
+            {
+                this.waitForRootThreadsStart();
+            }).Start();
+        }
+
+        private void doWatchStop()
+        {
+            new Thread(() =>
+            {
+                this.waitForRootThreadsStop();
+            }).Start();
+        }
+
         private bool waitForRootThreadsStart()
         {
-            if (this.InvokeRequired)
+            try
             {
-                Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
+                if (!this.InvokeRequired)
+                {
+                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
+                    return false;
+                }
+
+                // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
+                // To reduce risk of a deadlock, keep retrying by waking main thread up.
+                for (int i = 0; i < 100; ++i)
+                {
+                    bool allThreadsRunning = true;
+                    foreach (var t in rootThreads)
+                    {
+                        // IT'S A BIT.
+                        if (t.ThreadState != System.Threading.ThreadState.Running)
+                        {
+                            allThreadsRunning = false;
+                            break;
+                        }
+                    }
+
+                    if (allThreadsRunning)
+                    {
+                        return true;
+                    }
+
+                    Thread.Sleep(50);
+                }
+
                 return false;
             }
-
-            // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
-            // To reduce risk of a deadlock, keep retrying by waking main thread up.
-            for (int i = 0; i < 100; ++i)
+            finally
             {
-                bool allThreadsRunning = true;
-                foreach (var t in rootThreads)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    if (t.ThreadState != System.Threading.ThreadState.Running)
-                    {
-                        allThreadsRunning = false;
-                        break;
-                    }
-                }
-
-                if (allThreadsRunning)
-                {
-                    return true;
-                }
-
-                Thread.Sleep(50);
+                    this.startApplicationButton.Enabled = true;
+                });
             }
-
-            return false;
         }
 
         private bool waitForRootThreadsStop()
         {
-            if (this.InvokeRequired)
+            try
             {
-                Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
+
+                if (!this.InvokeRequired)
+                {
+                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
+                    return false;
+                }
+
+                // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
+                // Right now one scenario is that runApp thread tries to write text when we wait here.
+                // To reduce risk of a deadlock, keep retrying by waking main thread up.
+                for (int i = 0; i < 1000; ++i)
+                {
+                    bool allThreadsStopped = true;
+                    foreach (var t in rootThreads)
+                    {
+                        if (t.ThreadState != System.Threading.ThreadState.Stopped)
+                        {
+                            allThreadsStopped = false;
+                            break;
+                        }
+                    }
+
+                    if (allThreadsStopped)
+                    {
+                        return true;
+                    }
+
+                    Thread.Sleep(50);
+                }
+
                 return false;
             }
-
-            // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
-            // Right now one scenario is that runApp thread tries to write text when we wait here.
-            // To reduce risk of a deadlock, keep retrying by waking main thread up.
-            for (int i = 0; i < 100; ++i)
+            finally
             {
-                bool allThreadsStopped = true;
-                foreach (var t in rootThreads)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    if (t.ThreadState != System.Threading.ThreadState.Stopped)
-                    {
-                        allThreadsStopped = false;
-                        break;
-                    }
-                }
-
-                if (allThreadsStopped)
-                {
-                    return true;
-                }
-
-                Thread.Sleep(500);
+                    unregisterRootThreads();
+                    this.startApplicationButton.Enabled = true;
+                });
             }
 
-            return false;
         }
 
         public void killChief()
@@ -1052,8 +1093,10 @@ namespace CrewChiefV4
             {
                 startApplicationButton.Enabled = false;
                 doStartAppStuff();
-                waitForRootThreadsStart();
-                startApplicationButton.Enabled = true;
+                doWatchStartup();
+
+                // TODO_THREADS: remove
+                //startApplicationButton.Enabled = true;
             }
 
             this.ResumeLayout();
@@ -1396,15 +1439,15 @@ namespace CrewChiefV4
 
             if (IsAppRunning)
             {
-                waitForRootThreadsStart();
+                doWatchStartup();
             }
             else
             {
-                waitForRootThreadsStop();
-                unregisterRootThreads();
+                doWatchStop();
+                //unregisterRootThreads();
             }
 
-            startApplicationButton.Enabled = true;
+            //startApplicationButton.Enabled = true;
         }
 
         private void doStartAppStuff()
