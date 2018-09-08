@@ -1112,7 +1112,7 @@ namespace CrewChiefV4.Events
             }
             if (isRace)
             {
-                int litresToEnd = getLitresToEndOfRace();
+                int litresToEnd = getLitresToEndOfRace(false);
                 if (litresToEnd != int.MaxValue)
                 {
                     int minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
@@ -1343,7 +1343,7 @@ namespace CrewChiefV4.Events
         }
 
         // int.MaxValue means no data
-        public int getLitresToEndOfRace()
+        public int getLitresToEndOfRace(Boolean addReserve = true)
         {
             int additionalLitresNeeded = int.MaxValue;
             if (fuelUseActive)
@@ -1356,7 +1356,7 @@ namespace CrewChiefV4.Events
                 int reserve = addAdditionalFuelLaps > 0 ? additionalFuelLiters : 2;
                 if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
-                    float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + reserve;
+                    float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + (addReserve ? reserve : 0);
                     additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
                     Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " +
                         currentFuel + " additional fuel needed = " + additionalLitresNeeded);
@@ -1384,11 +1384,13 @@ namespace CrewChiefV4.Events
                     float totalLitresNeededToEnd = 0;
                     if(averageUsagePerLap > 0)
                     {
-                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * minutesRemaining) + (int)Math.Ceiling((hasExtraLap ? averageUsagePerLap * 2 : averageUsagePerLap)) + reserve;
+                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * minutesRemaining) +
+                            (int)Math.Ceiling((hasExtraLap ? averageUsagePerLap * 2 : averageUsagePerLap)) +
+                            (addReserve ? reserve : 0);
                     }
                     else
                     {
-                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + reserve;
+                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + (addReserve ? reserve : 0);
                     }
                     additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
                     Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " +
