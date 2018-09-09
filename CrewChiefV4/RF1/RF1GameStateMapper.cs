@@ -239,6 +239,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
                 currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
             }
             if (currentGameState.FlagData.isFullCourseYellow)
             {
@@ -416,13 +417,7 @@ namespace CrewChiefV4.rFactor1
                         break;
                 }
             }
-            if (previousGameState != null)
-            {
-                foreach (String lt in previousGameState.SessionData.formattedPlayerLapTimes)
-                {
-                    currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
-                }
-            }
+
             currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor1Constant.rfFinishStatus.finished;
             currentGameState.SessionData.LeaderSectorNumber = leader.sector == 0 ? 3 : leader.sector;
             currentGameState.SessionData.TimeDeltaFront = Math.Abs(player.timeBehindNext);

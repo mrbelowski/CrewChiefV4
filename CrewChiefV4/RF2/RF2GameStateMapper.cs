@@ -634,6 +634,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
 
                 cgs.hardPartsOnTrackData = pgs.hardPartsOnTrackData;
+
+                csd.formattedPlayerLapTimes = psd.formattedPlayerLapTimes;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -892,12 +894,6 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
-            }
-
-            if (pgs != null)
-            {
-                foreach (var lt in psd.formattedPlayerLapTimes)
-                    csd.formattedPlayerLapTimes.Add(lt);
             }
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;

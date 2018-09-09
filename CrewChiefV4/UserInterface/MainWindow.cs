@@ -135,6 +135,8 @@ namespace CrewChiefV4
             }).Start();
         }
 
+        // This is not strictly necessary, because all this really does is makes sure .Start has been called on a thread, which is easy
+        // to achieve.  Still, do this for symmetry.
         private bool waitForRootThreadsStart()
         {
             try
@@ -153,8 +155,9 @@ namespace CrewChiefV4
                     foreach (var t in rootThreads)
                     {
                         // IT'S A BIT.
-                        if (t.ThreadState != System.Threading.ThreadState.Running)
+                        if (!t.IsAlive)
                         {
+                            Console.WriteLine("START:  not running - " + t.Name);
                             allThreadsRunning = false;
                             break;
                         }
@@ -183,7 +186,6 @@ namespace CrewChiefV4
         {
             try
             {
-
                 if (!this.InvokeRequired)
                 {
                     Debug.Assert(false, "This method cannot be invoked from the UI thread.");
@@ -193,13 +195,14 @@ namespace CrewChiefV4
                 // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
                 // Right now one scenario is that runApp thread tries to write text when we wait here.
                 // To reduce risk of a deadlock, keep retrying by waking main thread up.
-                for (int i = 0; i < 1000; ++i)
+                for (int i = 0; i < 100; ++i)
                 {
                     bool allThreadsStopped = true;
                     foreach (var t in rootThreads)
                     {
-                        if (t.ThreadState != System.Threading.ThreadState.Stopped)
+                        if (t.IsAlive)
                         {
+                            Console.WriteLine("STOP:  still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
                         }
@@ -220,6 +223,7 @@ namespace CrewChiefV4
                 this.Invoke((MethodInvoker)delegate
                 {
                     unregisterRootThreads();
+                    // Need to see if form is not being closed?
                     this.startApplicationButton.Enabled = true;
                 });
             }

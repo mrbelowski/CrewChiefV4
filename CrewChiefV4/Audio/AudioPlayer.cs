@@ -436,7 +436,7 @@ namespace CrewChiefV4.Audio
             monitorRunning = false;
 
             // Wait for monitor queue thread to exit.
-            Debug.Assert(monitorQueueThread != null);
+            //Debug.Assert(monitorQueueThread != null);
             if (monitorQueueThread != null)
             {
                 monitorQueueThread.Join();
