@@ -599,8 +599,16 @@ namespace CrewChiefV4
                 }
                 if (minute < 10)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                        AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                    if (minute == 0)
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                           AbstractEvent.MessageContents(hour, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                    }
+                    else
+                    {
+                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
+                            AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                    }
                 }
                 else
                 {
