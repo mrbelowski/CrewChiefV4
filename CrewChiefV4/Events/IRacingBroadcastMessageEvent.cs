@@ -117,9 +117,9 @@ namespace CrewChiefV4.Events
                     && !previousGameState.PitData.IsInGarage && !currentGameState.PitData.JumpedToPits)
                 {
                     Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
-                    int litresNeeded = fuelEvent.getLitresToEndOfRace();
+                    float litresNeeded = fuelEvent.getLitresToEndOfRace(true);
 
-                    if (litresNeeded == int.MaxValue)
+                    if (litresNeeded == float.MaxValue)
                     {
                         audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                     }
@@ -129,9 +129,10 @@ namespace CrewChiefV4.Events
                     }
                     else if (litresNeeded > 0)
                     {
-                        AddFuel(litresNeeded);
-                        Console.WriteLine("Auto refuel to the end of the race, adding " + litresNeeded + " liters of fuel");
-                        if (litresNeeded > (int)fuelCapacity - currentFuel)
+                        int roundedLitresNeeded = (int)Math.Ceiling(litresNeeded);
+                        AddFuel(roundedLitresNeeded);
+                        Console.WriteLine("Auto refuel to the end of the race, adding " + roundedLitresNeeded + " liters of fuel");
+                        if (roundedLitresNeeded > fuelCapacity - currentFuel)
                         {
                             // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                             audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
@@ -217,9 +218,9 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FUEL_TO_THE_END))
             {
                 Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
-                int litresNeeded = fuelEvent.getLitresToEndOfRace();
+                float litresNeeded = fuelEvent.getLitresToEndOfRace(true);
 
-                if (litresNeeded == int.MaxValue)
+                if (litresNeeded == float.MaxValue)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
@@ -229,8 +230,9 @@ namespace CrewChiefV4.Events
                 }
                 else if(litresNeeded > 0)
                 {
-                    AddFuel(litresNeeded);
-                    if (litresNeeded > (int)fuelCapacity-currentFuel) 
+                    int roundedLitresNeeded = (int)Math.Ceiling(litresNeeded);
+                    AddFuel(roundedLitresNeeded);
+                    if (roundedLitresNeeded > fuelCapacity - currentFuel) 
                     {
                         // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
                         audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
