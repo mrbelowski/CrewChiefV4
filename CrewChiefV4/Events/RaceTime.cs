@@ -11,14 +11,12 @@ namespace CrewChiefV4.Events
 {
     class RaceTime : AbstractEvent
     {
-        // TODO: separate position & time remaining from "push push push" and "ease off and bring it home safely" messages
         private String folder5mins = "race_time/five_minutes_left";
         private String folder5minsLeading = "race_time/five_minutes_left_leading";
         private String folder5minsPodium = "race_time/five_minutes_left_podium";
         private String folder2mins = "race_time/two_minutes_left";
         private String folder0mins = "race_time/zero_minutes_left";
-        // TODO: 2 minutes remaining messages
-        //TODO: separate messages depending on the gap
+
         private String folder10mins = "race_time/ten_minutes_left";
         private String folder15mins = "race_time/fifteen_minutes_left";
         private String folder20mins = "race_time/twenty_minutes_left";

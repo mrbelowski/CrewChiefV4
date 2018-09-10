@@ -304,7 +304,6 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessage(message, 10);
                 }
             }
-            // TODO: in the countdown / pre-lights phase, we don't know how long the race is going to be so we can't use the 'get on with it' messages :(
         }
 
         public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)

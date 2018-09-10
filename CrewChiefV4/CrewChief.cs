@@ -855,8 +855,6 @@ namespace CrewChiefV4
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
                             // TODO: derived data for practice and qually sessions, if we need it
-                            // TODO: check this is safe at session end (do any of the mappers set the sessionType to Unavailable
-                            // as soon as it finishes? Don't think they do but needs checking)
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
                             {
                                 gameStateMapper.populateDerivedRaceSessionData(currentGameState);
@@ -967,7 +965,6 @@ namespace CrewChiefV4
                                     }
                                 }
                             }
-                            // TODO: for AC free practice sessions, the SessionRunningTime is set to 1 hour in the mapper and stays there so this block never triggers
                             else if (previousGameState != null && 
                                         (gameDefinition.gameEnum == GameEnum.F1_2018 ||
                                         (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||

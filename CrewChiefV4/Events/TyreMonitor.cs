@@ -792,8 +792,6 @@ namespace CrewChiefV4.Events
                     reportedEstimatedTimeLeftOneThirdWear = false;
                     reportedEstimatedTimeLeftTwoThirdsWear = false;
 
-                    // TODO: before we clear, should we grab estimates from the previous data?
-
                     tyreLifeYPointsTime.Clear();
                     tyreLifeYPointsSectors.Clear();
                     tyreLifeXPointsLFWearBySector.Clear();
