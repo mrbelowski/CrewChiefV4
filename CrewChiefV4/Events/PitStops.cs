@@ -610,7 +610,6 @@ namespace CrewChiefV4.Events
                     }
 
                     // for Automobilista, sector update lag time means sometimes we miss the pit entrance before this message plays
-                    // TODO: Verify for rF2.
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 2 && 
                         CrewChief.gameDefinition.gameEnum == GameEnum.RF1)
                     {

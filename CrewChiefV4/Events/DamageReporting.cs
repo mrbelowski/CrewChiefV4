@@ -472,8 +472,6 @@ namespace CrewChiefV4.Events
             }
             else if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING && currentGameState.Now > triggerCheckDriverIsOKForIRacingAfter)
             {
-                // TODO: other checks in this if-block?
-                // TODO: should we always trigger this, or make it random?
                 triggerCheckDriverIsOKForIRacingAfter = DateTime.MaxValue;
                 checkIfDriverIsOK(currentGameState.Now);
             }

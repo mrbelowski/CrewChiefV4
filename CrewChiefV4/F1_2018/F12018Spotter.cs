@@ -20,7 +20,6 @@ namespace CrewChiefV4.F1_2018
             this.audioPlayer = audioPlayer;
             this.enabled = initialEnabledState;
             this.initialEnabledState = initialEnabledState;
-            // TODO: car sizes
             this.internalSpotter = new NoisyCartesianCoordinateSpotter(audioPlayer, true, UserSettings.GetUserSettings().getFloat("f1_2018_spotter_car_length"), 2);
         }
 

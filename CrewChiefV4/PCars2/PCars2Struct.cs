@@ -106,7 +106,6 @@ namespace CrewChiefV4.PCars2
             existingState.mBrakeDamage = toFloatArray(udpTelemetryData.sBrakeDamage, 255);
             existingState.mSuspensionDamage = toFloatArray(udpTelemetryData.sSuspensionDamage, 255);    
 
-            // TODO: check this - do we even need it?
             existingState.mWings = toFloatArray(udpTelemetryData.sWings, 1);
 
             existingState.mJoyPad1 = udpTelemetryData.sJoyPad1;
@@ -211,7 +210,6 @@ namespace CrewChiefV4.PCars2
             for (int i = 0; i < existingState.mParticipantData.Length; i++)
             {
                 sParticipantInfo newParticipantInfo = timingsData.sParticipants[i];
-                // TODO: is there a use for these:
                 Boolean isHuman = (newParticipantInfo.sCarIndex >> 7) == 1;
                 uint carIndex = (uint)newParticipantInfo.sCarIndex & 127;
 
@@ -220,7 +218,6 @@ namespace CrewChiefV4.PCars2
 
                 if (isActive)
                 {
-                    // TODO: active checks...:
                     existingPartInfo.mIsActive = i < existingState.mNumParticipants;
 
                     existingPartInfo.mCurrentLap = newParticipantInfo.sCurrentLap;
@@ -264,7 +261,6 @@ namespace CrewChiefV4.PCars2
 
                     newWorldPositions[0] = newWorldPositions[0] + xAdjustment;
                     newWorldPositions[2] = newWorldPositions[2] + zAdjustment;
-                    // TODO: do we need the 'has new world position' stuff from pcars1?
                     existingPartInfo.mWorldPosition = newWorldPositions;
 
                     if (i == existingState.mViewedParticipantIndex)
@@ -349,7 +345,6 @@ namespace CrewChiefV4.PCars2
                 ushort index = participantVehicleNamesData.sVehicles[i].sIndex;
                 uint classIndex = participantVehicleNamesData.sVehicles[i].sClass;
                 byte[] name = participantVehicleNamesData.sVehicles[i].sName;
-                // TODO: should we use index here instead of i?
                 int start = (offset + i) * 64;
                 int end = start + 64;
                 int sourceIndex = 0;
@@ -778,8 +773,6 @@ namespace CrewChiefV4.PCars2
         public float mEngineTorque;
 
         public int mEnforcedPitStopLap;
-
-        // TODO: front wing and rear wing 
 
         public Boolean hasNewPositionData;
 

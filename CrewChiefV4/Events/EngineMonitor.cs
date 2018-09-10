@@ -242,7 +242,6 @@ namespace CrewChiefV4.Events
             }
             public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp, float currentWaterTemp /*only used for logging*/)
             {
-                // TODO: detect a sudden drop in oil pressure without triggering false positives caused by stalling the engine
                 EngineStatus engineStatusFlags = EngineStatus.NONE;
                 if (samples > 10 && maxSafeOilTemp > 0 && maxSafeWaterTemp > 0)
                 {

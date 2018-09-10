@@ -174,7 +174,6 @@ namespace CrewChiefV4.Events
             int positionToCheck;
             if (opponentData.PositionOnApproachToPitEntry > 0)
             {
-                // TODO: THIS IS WRONG
                 positionToCheck = opponentData.PositionOnApproachToPitEntry;
             }
             else
@@ -400,7 +399,6 @@ namespace CrewChiefV4.Events
                     }
                 }
 
-                // TODO: should probably keep the leader-pitting message under FCY, not sure about the others
                 HashSet<String> announcedPitters = new HashSet<string>();
                 if (currentGameState.PitData.LeaderIsPitting &&
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
@@ -838,7 +836,7 @@ namespace CrewChiefV4.Events
                         }
                     }
                 }
-                // TODO: the ahead / behind on track need to have something about class if it's different to the player class
+
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHOS_BEHIND_ON_TRACK))
                 {
                     string opponentKey = currentGameState.getOpponentKeyBehindOnTrack();
