@@ -270,7 +270,7 @@ namespace CrewChiefV4.PCars2
                                 buttonsState = ConvertBytesToBoolArray(telem.sDPad, telem.sJoyPad1, telem.sJoyPad2);
                                 lastSequenceNumberForTelemPacket = (int)packetNumber;
                                 workingGameState = StructHelper.MergeWithExistingState(workingGameState, telem);
-                                newSpotterData = true;// TODO
+                                newSpotterData = true;
                             }
                         }
                         finally

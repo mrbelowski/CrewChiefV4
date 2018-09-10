@@ -66,7 +66,7 @@ namespace CrewChiefV4.Events
         private String folderNamesHaveGoneOffOutro = "flags/names_have_gone_off_outro";
         private String folderNamesHaveGoneOffInOutro = "flags/names_have_gone_off_in_outro";
         private String folderAnd = "flags/and";
-        // TODO: Record sweary versions of this when the kids are out
+
         private String folderPileupInCornerIntro = "flags/pileup_in_corner_intro";
 
         private String folderIncidentInCornerIntro = "flags/incident_in_corner_intro";
@@ -561,7 +561,6 @@ namespace CrewChiefV4.Events
                 Console.WriteLine("numCarsPassedIllegally has changed from " + illegalPassCarsCountAtLastAnnouncement +
                     " to  " + currentGameState.FlagData.numCarsPassedIllegally + " and penalty count has increased");
                 hasAlreadyWarnedAboutIllegalPass = false;
-                // TODO: really struggling to actually get penalised for passing under yellow, so I'm guessing here. 
                 // If we have a new penalty delay the next check for a while
                 nextIllegalPassWarning = currentGameState.Now + TimeSpan.FromSeconds(30);
             }

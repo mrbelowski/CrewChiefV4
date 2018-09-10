@@ -172,7 +172,6 @@ namespace CrewChiefV4.RaceRoom
             }
             else
             {
-                // TODO: this is also set on new session, needs cleanup.
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(getNameFromBytes(shared.TrackName), shared.LayoutId, shared.LayoutLength);
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackLandmarksForTrackLayoutId(shared.LayoutId);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
@@ -194,7 +193,7 @@ namespace CrewChiefV4.RaceRoom
             }
 
             currentGameState.SessionData.SessionRunningTime = (float)shared.Player.GameSimulationTime;
-            currentGameState.ControlData.ControlType = mapToControlType(shared.ControlType); // TODO: the rest of the control data
+            currentGameState.ControlData.ControlType = mapToControlType(shared.ControlType);
 
             // in some cases, the session start trigger gets missed and we don't have a driver name
             currentGameState.SessionData.DriverRawName = getNameFromBytes(shared.PlayerName).ToLower();
@@ -392,7 +391,6 @@ namespace CrewChiefV4.RaceRoom
                         currentGameState.PitData.HasMandatoryPitStop = currentGameState.PitData.PitWindowStart > 0 && currentGameState.PitData.PitWindowEnd > 0;                         
                         if (currentGameState.PitData.HasMandatoryPitStop)
                         {
-                            // TODO: mandatory pitstop for DTM stuff has changed since the removal of the Experiences
                             if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2014 ||
                                 currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2015 || currentGameState.carClass.carClassEnum == CarData.CarClassEnum.DTM_2016)
                             {
@@ -629,7 +627,6 @@ namespace CrewChiefV4.RaceRoom
             {
                 currentGameState.SessionData.PlayerClassSessionBestLapTime = shared.LapTimeBestLeaderClass;
             }
-            // TODO: calculate the actual session best sector times from the bollocks in the block (cumulative deltas between the last player sector time and the session best)
 
             if (previousGameState != null && !currentGameState.SessionData.IsNewSession)
             {
@@ -1058,8 +1055,6 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
 
-            // TODO: lap time previous for invalid laps (is this still needed?)
-
             if (shared.SessionType == (int)RaceRoomConstant.Session.Race && shared.SessionPhase == (int)RaceRoomConstant.SessionPhase.Checkered &&
                 previousGameState != null && (previousGameState.SessionData.SessionPhase == SessionPhase.Green || previousGameState.SessionData.SessionPhase == SessionPhase.Green))
             {
@@ -1301,14 +1296,12 @@ namespace CrewChiefV4.RaceRoom
             // some simple locking / spinning checks
             if (shared.CarSpeed > 7)
             {
-                // TODO: fix this properly - decrease the minRotatingSpeed from 2*pi to pi just to hide the problem
                 float minRotatingSpeed = (float)Math.PI * shared.CarSpeed / currentGameState.carClass.maxTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.TireRps.FrontLeft) < minRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.TireRps.FrontRight) < minRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.TireRps.RearLeft) < minRotatingSpeed;
                 currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.TireRps.RearRight) < minRotatingSpeed;
 
-                // TODO: fix this properly - increase the maxRotatingSpeed from 2*pi to 3*pi just to hide the problem
                 float maxRotatingSpeed = 3 * (float)Math.PI * shared.CarSpeed / currentGameState.carClass.minTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.TireRps.FrontLeft) > maxRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.TireRps.FrontRight) > maxRotatingSpeed;

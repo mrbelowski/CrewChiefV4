@@ -31,7 +31,7 @@ namespace CrewChiefV4.Events
         public static String folderGapIntro = "lap_times/gap_intro";
 
         public static String folderGapOutroOffPace = "lap_times/gap_outro_off_pace";
-        // TODO: add real sound
+
         public static String folderSelfGapOutroOffPace = "lap_times/off_the_self_pace";
         
         // "that was a 1:34.2, you're fastest in your class"
@@ -391,7 +391,7 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            // TODO: in R3E this previousGameState OnOutLap doesn't appear to true when we start our flying lap
+
             if (!currentGameState.PitData.OnInLap && previousGameState != null && !previousGameState.PitData.OnOutLap 
                 && !currentGameState.PitData.InPitlane   // as this is a new lap, check whether the *previous* state was an outlap
                 && !currentGameState.FlagData.previousLapWasFCY)    // don't announce lap times if we've just gone green after FCY
@@ -482,7 +482,6 @@ namespace CrewChiefV4.Events
                                 // need to be careful with the rating here as it's based on the known opponent laps, and we may have joined the session part way through
                                 else if (currentGameState.SessionData.ClassPosition == 1) 
                                 {
-                                    // TODO: rework this grotty logic...
                                     Boolean newGapToSecond = false;
                                     if (previousGameState != null && previousGameState.SessionData.ClassPosition > 1)
                                     {
@@ -788,7 +787,6 @@ namespace CrewChiefV4.Events
                 }
             }
 
-            // todo: untangle this mess....
             if (isImproving)
             {
                 if (lastConsistencyMessage == ConsistencyResult.IMPROVING)
@@ -916,7 +914,6 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    // TODO: do we need more sub states for Self lap?
                     if (bestLapComparisonData[0] > 0 && currentGameState.SessionData.LapTimePrevious == bestLapComparisonData[0])
                     {
                         return LastLapRating.PERSONAL_BEST;
@@ -1116,7 +1113,6 @@ namespace CrewChiefV4.Events
                         else
                         {
                             // Fors self pace case, announce last lap time.
-                            // TODO: implement more info where we announce personal best lap time.
                             if (lastLapTime > 0)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage("laptime",
@@ -1382,7 +1378,7 @@ namespace CrewChiefV4.Events
                         messages.Add(MessageFragment.Text(folderSector3Is));
                     }
                     messages.Add(MessageFragment.Time(TimeSpanWrapper.FromSeconds(delta, Precision.AUTO_GAPS)));
-                    messages.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));  // TODO: Off personal best?
+                    messages.Add(MessageFragment.Text(selfPace ? folderSelfOffThePace : folderOffThePace));
                 }
             }
             if (messages.Count > 0)

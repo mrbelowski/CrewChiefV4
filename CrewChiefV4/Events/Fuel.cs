@@ -1112,10 +1112,10 @@ namespace CrewChiefV4.Events
             }
             if (isRace)
             {
-                int litresToEnd = getLitresToEndOfRace(false);
-                if (litresToEnd != int.MaxValue)
+                float litresToEnd = getLitresToEndOfRace(false);
+                if (litresToEnd != float.MaxValue)
                 {
-                    int minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
+                    float minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
 
                     // litresToEnd to end is a measure of how much fuel we need to add to get to the end. If it's 
                     // negative we have fuel to spare
@@ -1156,7 +1156,7 @@ namespace CrewChiefV4.Events
                             else
                             {
                                 fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(folderWillNeedToAdd,
-                                    litresToEnd, folderLitresToGetToTheEnd), 0, null);
+                                    (int) Math.Ceiling(litresToEnd), folderLitresToGetToTheEnd), 0, null);
                             }
                         }
                     }
@@ -1177,26 +1177,32 @@ namespace CrewChiefV4.Events
          * gets a quick n dirty estimate of what counts for 'safe' in fuel terms - if we have this many litres
          * remaining.
          * Base this on consumption per lap if we have it, otherwise use track length.
+         * 
+         * This is intented to be about half a lap's worth of fuel
          */
-        private int getMinFuelRemainingToBeConsideredSafe()
+        private float getMinFuelRemainingToBeConsideredSafe()
         {
-            int closeFuelAmount = 2;
+            float closeFuelAmount = 2;
             if (averageUsagePerLap > 0)
             {
-                closeFuelAmount = (int) Math.Floor(averageUsagePerLap);
+                closeFuelAmount = averageUsagePerLap / 2;
+            }
+            else if (averageUsagePerMinute > 0 && CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+            {
+                closeFuelAmount = 0.5f * averageUsagePerMinute * CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest / 60f;
             }
             else if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
             {
                 switch (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass)
                 {
                     case TrackData.TrackLengthClass.VERY_SHORT:
-                        closeFuelAmount = 1;
+                        closeFuelAmount = 1f;
                         break;
                     case TrackData.TrackLengthClass.LONG:
-                        closeFuelAmount = 3;
+                        closeFuelAmount = 3f;
                         break;
                     case TrackData.TrackLengthClass.VERY_LONG:
-                        closeFuelAmount = 4;
+                        closeFuelAmount = 4f;
                         break;
                     default:
                         break;
@@ -1239,9 +1245,9 @@ namespace CrewChiefV4.Events
             }            
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
-                int litresNeeded = getLitresToEndOfRace();
-                int fuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
-                if (!fuelUseActive || litresNeeded == int.MaxValue)
+                float litresNeeded = getLitresToEndOfRace(true);
+                float fuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
+                if (!fuelUseActive || litresNeeded == float.MaxValue)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 } 
@@ -1276,7 +1282,8 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(litresNeeded, litresNeeded == 1 ? folderLitre : folderLitres), 0, null);
+                        int roundedLitresNeeded = (int) Math.Ceiling(litresNeeded);
+                        fuelMessage = new QueuedMessage("fuel_estimate_to_end", MessageContents(roundedLitresNeeded, roundedLitresNeeded == 1 ? folderLitre : folderLitres), 0, null);
                     }
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
@@ -1343,23 +1350,23 @@ namespace CrewChiefV4.Events
         }
 
         // int.MaxValue means no data
-        public int getLitresToEndOfRace(Boolean addReserve = true)
+        public float getLitresToEndOfRace(Boolean addReserve)
         {
-            int additionalLitresNeeded = int.MaxValue;
+            float additionalLitresNeeded = float.MaxValue;
             if (fuelUseActive)
             {
-                int additionalFuelLiters = 2;
+                float additionalFuelLiters = 2f;
                 if (averageUsagePerLap > 0 && addAdditionalFuelLaps > 0)
                 {
-                    additionalFuelLiters = (int)Math.Ceiling(addAdditionalFuelLaps * averageUsagePerLap);
+                    additionalFuelLiters = addAdditionalFuelLaps * averageUsagePerLap;
                 }
-                int reserve = addAdditionalFuelLaps > 0 ? additionalFuelLiters : 2;
+                float reserve = addAdditionalFuelLaps > 0 ? additionalFuelLiters : 2;
                 if (sessionHasFixedNumberOfLaps && averageUsagePerLap > 0)
                 {
                     float totalLitresNeededToEnd = (averageUsagePerLap * lapsRemaining) + (addReserve ? reserve : 0);
-                    additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
-                    Console.WriteLine("Use per lap = " + averageUsagePerLap + " laps to go = " + lapsRemaining + " current fuel = " +
-                        currentFuel + " additional fuel needed = " + additionalLitresNeeded);
+                    additionalLitresNeeded = totalLitresNeededToEnd - currentFuel;
+                    Console.WriteLine("Use per lap = " + averageUsagePerLap.ToString("F1") + " laps to go = " + lapsRemaining + " current fuel = " +
+                        currentFuel.ToString("F1") + " additional fuel needed = " + additionalLitresNeeded.ToString("F1"));
                 }
                 else if (averageUsagePerMinute > 0)
                 {
@@ -1368,15 +1375,15 @@ namespace CrewChiefV4.Events
                         TrackData.TrackLengthClass trackLengthClass = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass;
                         if (trackLengthClass < TrackData.TrackLengthClass.MEDIUM)
                         {
-                            reserve = 1;
+                            reserve = 1f;
                         }
                         else if (trackLengthClass == TrackData.TrackLengthClass.LONG)
                         {
-                            reserve = 3;
+                            reserve = 3f;
                         }
                         else if (trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
                         {
-                            reserve = 4;
+                            reserve = 4f;
                         }
                     }
                     float minutesRemaining = secondsRemaining / 60f;
@@ -1384,17 +1391,17 @@ namespace CrewChiefV4.Events
                     float totalLitresNeededToEnd = 0;
                     if(averageUsagePerLap > 0)
                     {
-                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * minutesRemaining) +
-                            (int)Math.Ceiling((hasExtraLap ? averageUsagePerLap * 2 : averageUsagePerLap)) +
+                        totalLitresNeededToEnd = (averageUsagePerMinute * minutesRemaining) +
+                            (hasExtraLap ? averageUsagePerLap * 2 : averageUsagePerLap) +
                             (addReserve ? reserve : 0);
                     }
                     else
                     {
-                        totalLitresNeededToEnd = (float)Math.Ceiling(averageUsagePerMinute * maxMinutesRemaining) + (addReserve ? reserve : 0);
+                        totalLitresNeededToEnd = (averageUsagePerMinute * maxMinutesRemaining) + (addReserve ? reserve : 0);
                     }
-                    additionalLitresNeeded = (int) Math.Floor(totalLitresNeededToEnd - currentFuel);
-                    Console.WriteLine("Use per minute = " + averageUsagePerMinute + " estimated minutes to go (including final lap) = " +
-                        maxMinutesRemaining + " current fuel = " + currentFuel + " additional fuel needed = " + additionalLitresNeeded);
+                    additionalLitresNeeded = totalLitresNeededToEnd - currentFuel;
+                    Console.WriteLine("Use per minute = " + averageUsagePerMinute.ToString("F1") + " estimated minutes to go (including final lap) = " +
+                        maxMinutesRemaining.ToString("F1") + " current fuel = " + currentFuel.ToString("F1") + " additional fuel needed = " + additionalLitresNeeded.ToString("F1"));
                 }
             }
             return additionalLitresNeeded;
@@ -1430,7 +1437,7 @@ namespace CrewChiefV4.Events
             {
                 if (lapsCompletedSinceFuelReset > minLaps && averageUsagePerLap > 0)
                 {
-                    int litersNeeded = getLitresToEndOfRace();
+                    float litersNeeded = getLitresToEndOfRace(false);
                     gotPredictedPitWindow = true;
                     if (litersNeeded > 0)
                     {
@@ -1454,7 +1461,7 @@ namespace CrewChiefV4.Events
             {
                 if (lapsCompletedSinceFuelReset > minLaps && averageUsagePerMinute > 0)
                 {
-                    int litersNeeded = getLitresToEndOfRace();
+                    float litersNeeded = getLitresToEndOfRace(false);
                     gotPredictedPitWindow = true;
                     if (litersNeeded > 0)
                     {
@@ -1481,7 +1488,7 @@ namespace CrewChiefV4.Events
         {
             // only used for r3e auto-fuel amount selection at present
             Console.WriteLine("Getting fuel requirement keypress count");
-            int litresToEnd = getLitresToEndOfRace();
+            int litresToEnd = (int) Math.Ceiling(getLitresToEndOfRace(true));
 
             // limit the number of key presses to 200 here, or fuelCapacity
             int fuelCapacityInt = (int)fuelCapacity;

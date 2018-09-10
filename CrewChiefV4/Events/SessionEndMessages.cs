@@ -118,7 +118,6 @@ namespace CrewChiefV4.Events
                 }
                 else if (isDNF)
                 {
-                    // TODO: different msg probably.
                     audioPlayer.playMessage(new QueuedMessage(sessionEndMessageIdentifier,
                         AbstractEvent.MessageContents(folderFinishedRaceLast), 0, null), 10);
                 }

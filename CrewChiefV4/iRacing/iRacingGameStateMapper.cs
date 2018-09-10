@@ -481,7 +481,6 @@ namespace CrewChiefV4.iRacing
 
 
             //Console.WriteLine("Voltage: " + shared.Telemetry.Voltage);
-            //TODO add yellow 
             SessionFlags flag = (SessionFlags)shared.Telemetry.SessionFlags;
             if (flag.HasFlag(SessionFlags.Black) && !flag.HasFlag(SessionFlags.Furled))
             {
@@ -509,7 +508,6 @@ namespace CrewChiefV4.iRacing
                 currentGameState.SessionData.IsLastLap = true;
             }
             currentGameState.SessionData.CompletedLaps = playerCar.Live.LiveLapsCompleted;
-            //TODO validate laptimes
             currentGameState.SessionData.LapTimeCurrent = shared.Telemetry.LapCurrentLapTime;
 
             currentGameState.SessionData.NumCarsOverall = shared.PaceCarPresent ? shared.Drivers.Count - 1 : shared.Drivers.Count;

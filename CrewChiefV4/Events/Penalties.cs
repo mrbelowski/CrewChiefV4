@@ -195,8 +195,6 @@ namespace CrewChiefV4.Events
                 } 
                 else if (currentGameState.SessionData.IsNewLap && (currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasDriveThrough))
                 {
-                    // TODO: variable number of laps to serve penalty...
-
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     if (lapsCompleted - penaltyLap == 3 && !currentGameState.PitData.InPitlane)
                     {
@@ -326,8 +324,6 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentGameState.SessionData.IsNewLap && currentGameState.PenaltiesData.NumPenalties > 0)
                 {
-                    // TODO: variable number of laps to serve penalty...
-
                     lapsCompleted = currentGameState.SessionData.CompletedLaps;
                     if (lapsCompleted - penaltyLap >= 2 && !currentGameState.PitData.InPitlane)
                     {
