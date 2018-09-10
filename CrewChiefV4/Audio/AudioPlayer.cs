@@ -439,8 +439,10 @@ namespace CrewChiefV4.Audio
             //Debug.Assert(monitorQueueThread != null);
             if (monitorQueueThread != null)
             {
+                Console.WriteLine("Waiting for queue monitor to stop...");
                 monitorQueueThread.Join();
                 monitorQueueThread = null;
+                Console.WriteLine("Monitor queue stopped");
             }
 
             channelOpen = false;

@@ -95,6 +95,12 @@ namespace CrewChiefV4.Audio
             {Verbosity.SILENT, 20}
         };
 
+        private static CrewChief crewChief = null;
+        public static void SetCrewChief(CrewChief cc)
+        {
+            PlaybackModerator.crewChief = cc;
+        }
+
         public static void ClearVerbosityData()
         {
             queuedMessageCounters.Clear();
@@ -276,6 +282,12 @@ namespace CrewChiefV4.Audio
 
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
+            if (PlaybackModerator.crewChief != null && !PlaybackModerator.crewChief.running)
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because main thread is shutting down", singleSound.fullPath));
+                return false;
+            }
+
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
             if (PlaybackModerator.lastBlockedMessageId == messageId)
             {
