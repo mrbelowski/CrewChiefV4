@@ -119,11 +119,11 @@ namespace CrewChiefV4
 
         }
 
-        private void doWatchStartup()
+        private void doWatchStartup(CrewChief cc)
         {
             new Thread(() =>
             {
-                this.waitForRootThreadsStart();
+                this.waitForRootThreadsStart(cc);
             }).Start();
         }
 
@@ -137,7 +137,7 @@ namespace CrewChiefV4
 
         // This is not strictly necessary, because all this really does is makes sure .Start has been called on a thread, which is easy
         // to achieve.  Still, do this for symmetry.
-        private bool waitForRootThreadsStart()
+        private bool waitForRootThreadsStart(CrewChief cc)
         {
             try
             {
@@ -149,6 +149,7 @@ namespace CrewChiefV4
 
                 // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
                 // To reduce risk of a deadlock, keep retrying by waking main thread up.
+                Console.WriteLine("Wating for root threads to start...");
                 for (int i = 0; i < 100; ++i)
                 {
                     bool allThreadsRunning = true;
@@ -165,6 +166,20 @@ namespace CrewChiefV4
 
                     if (allThreadsRunning)
                     {
+                        Console.WriteLine("Root threads to started");
+
+                        Console.WriteLine("Wating for run thread to initialize...");
+                        while (true)
+                        {
+                            if (cc.runThreadInitialized)
+                            {
+                                Console.WriteLine("Run thread initialized");
+                                break;
+                            }
+
+                            Thread.Sleep(50);
+                        }
+
                         return true;
                     }
 
@@ -1097,10 +1112,9 @@ namespace CrewChiefV4
             {
                 startApplicationButton.Enabled = false;
                 doStartAppStuff();
-                doWatchStartup();
 
-                // TODO_THREADS: remove
-                //startApplicationButton.Enabled = true;
+                // Will wait for threads to start, possible file load and enable the button.
+                doWatchStartup(crewChief);
             }
 
             this.ResumeLayout();
@@ -1443,7 +1457,7 @@ namespace CrewChiefV4
 
             if (IsAppRunning)
             {
-                doWatchStartup();
+                doWatchStartup(crewChief);
             }
             else
             {
@@ -1494,6 +1508,7 @@ namespace CrewChiefV4
                 // the AutoUpdater triggers and steals focus while the player is racing
                 AutoUpdater.Stop();
 
+                crewChief.runThreadInitialized = false;
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
                     && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
@@ -1576,7 +1591,7 @@ namespace CrewChiefV4
         {
             String filenameToRun = null;
             Boolean record = false;
-            if (filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
+            if (!String.IsNullOrWhiteSpace(filenameTextbox.Text))
             {
                 // This will be reenabled once file is deserialized or on failure.
                 this.startApplicationButton.Enabled = false;

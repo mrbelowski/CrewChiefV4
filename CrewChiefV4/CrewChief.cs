@@ -61,6 +61,10 @@ namespace CrewChiefV4
 
         public Boolean running = false;
 
+        // This value is set to false when we re-create main run thread, and is set to true
+        // once we get past file loading phase (which can be lenghty).
+        public Boolean runThreadInitialized = false;
+
         private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
 
         private Dictionary<String, String> faultingEvents = new Dictionary<String, String>();
@@ -168,10 +172,12 @@ namespace CrewChiefV4
             {
                 gameDataReader.Dispose();
             }
-            if (audioPlayer != null)
+            // TODO_THREADS: start/stop of queue monitor should only happen via Chief run thread.  That is because AudioPlayer is UI thread owned, 
+            // and waiting for thread to shutdown might deadlock with the UI thread.
+            /*if (audioPlayer != null)
             {
                 audioPlayer.stopMonitor();
-            }
+            }*/
             if (speechRecogniser != null)
             {
                 speechRecogniser.Dispose();
@@ -680,6 +686,8 @@ namespace CrewChiefV4
 
         public Boolean Run(String filenameToRun, Boolean dumpToFile)
         {
+            PlaybackModerator.SetCrewChief(this);
+
             loadDataFromFile = false;
             audioPlayer.mute = false;
             if (filenameToRun != null)
@@ -690,6 +698,7 @@ namespace CrewChiefV4
             }
             else
             {
+                runThreadInitialized = true;  // Don't block UI as we won't be loading from the file.
                 // ensure the playback interval is re-initialised, in case we've been mucking about with it in the previous run.
                 _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
             }
@@ -792,7 +801,7 @@ namespace CrewChiefV4
                     if (loadDataFromFile || mapped)
                     {
                         stateCleared = false;
-                        
+
                         if (loadDataFromFile)
                         {
                             try
@@ -805,12 +814,17 @@ namespace CrewChiefV4
                             }
                             finally
                             {
-                                MainWindow.instance.startApplicationButton.Enabled = true;
+                                runThreadInitialized = true;
                             }
+                            // TODO_THREADS:
+/*                            finally
+                            {
+                                MainWindow.instance.startApplicationButton.Enabled = true;
+                           }*/
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
-                                Thread.Sleep(5000);
+                                Thread.Sleep(5000);  // TODO_THREADS: this might be too high now.
                                 try
                                 {
                                     audioPlayer.purgeQueues();
