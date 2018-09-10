@@ -1115,7 +1115,7 @@ namespace CrewChiefV4.Events
                 float litresToEnd = getLitresToEndOfRace(false);
                 if (litresToEnd != float.MaxValue)
                 {
-                    int minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
+                    float minRemainingFuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
 
                     // litresToEnd to end is a measure of how much fuel we need to add to get to the end. If it's 
                     // negative we have fuel to spare
@@ -1177,26 +1177,32 @@ namespace CrewChiefV4.Events
          * gets a quick n dirty estimate of what counts for 'safe' in fuel terms - if we have this many litres
          * remaining.
          * Base this on consumption per lap if we have it, otherwise use track length.
+         * 
+         * This is intented to be about half a lap's worth of fuel
          */
-        private int getMinFuelRemainingToBeConsideredSafe()
+        private float getMinFuelRemainingToBeConsideredSafe()
         {
-            int closeFuelAmount = 2;
+            float closeFuelAmount = 2;
             if (averageUsagePerLap > 0)
             {
-                closeFuelAmount = (int) Math.Floor(averageUsagePerLap);
+                closeFuelAmount = averageUsagePerLap / 2;
+            }
+            else if (averageUsagePerMinute > 0 && CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
+            {
+                closeFuelAmount = 0.5f * averageUsagePerMinute * CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest / 60f;
             }
             else if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
             {
                 switch (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass)
                 {
                     case TrackData.TrackLengthClass.VERY_SHORT:
-                        closeFuelAmount = 1;
+                        closeFuelAmount = 1f;
                         break;
                     case TrackData.TrackLengthClass.LONG:
-                        closeFuelAmount = 3;
+                        closeFuelAmount = 3f;
                         break;
                     case TrackData.TrackLengthClass.VERY_LONG:
-                        closeFuelAmount = 4;
+                        closeFuelAmount = 4f;
                         break;
                     default:
                         break;
@@ -1240,7 +1246,7 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MUCH_FUEL_TO_END_OF_RACE))
             {
                 float litresNeeded = getLitresToEndOfRace(true);
-                int fuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
+                float fuelToBeSafe = getMinFuelRemainingToBeConsideredSafe();
                 if (!fuelUseActive || litresNeeded == float.MaxValue)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
