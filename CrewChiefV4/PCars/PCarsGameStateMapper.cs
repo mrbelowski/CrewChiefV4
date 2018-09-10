@@ -65,7 +65,6 @@ namespace CrewChiefV4.PCars
         private float severeBrakeDamageThreshold = 0.6f;
         private float destroyedBrakeDamageThreshold = 0.90f;
 
-        // TODO: have separate thresholds for tin-tops and open wheelers with wings here
         private float trivialAeroDamageThreshold = 0.1f;
         private float minorAeroDamageThreshold = 0.25f;
         private float severeAeroDamageThreshold = 0.6f;
@@ -644,7 +643,6 @@ namespace CrewChiefV4.PCars
                 // copy persistent data from the previous game state
                 //
 
-                // TODO: this is just retarded. Clone the previousGameState and update it as required...
                 if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
                 {
                     //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
@@ -1032,7 +1030,7 @@ namespace CrewChiefV4.PCars
             currentGameState.CarDamageData.BrakeDamageStatus = CornerData.getCornerData(brakeDamageThresholds,
                 shared.mBrakeDamage[0], shared.mBrakeDamage[1], shared.mBrakeDamage[2], shared.mBrakeDamage[3]);
 
-            currentGameState.EngineData.EngineOilPressure = shared.mOilPressureKPa; // todo: units conversion
+            currentGameState.EngineData.EngineOilPressure = shared.mOilPressureKPa;
             currentGameState.EngineData.EngineOilTemp = shared.mOilTempCelsius;
             currentGameState.EngineData.EngineWaterTemp = shared.mWaterTempCelsius;
             currentGameState.EngineData.EngineRpm = shared.mRPM;
@@ -1165,14 +1163,12 @@ namespace CrewChiefV4.PCars
             if (shared.mSpeed > 7 && currentGameState.carClass != null &&
                 currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_1 && currentGameState.carClass.carClassEnum != CarData.CarClassEnum.Kart_2)
             {
-                // TODO: fix this properly - decrease the minRotatingSpeed from 2*pi to pi just to hide the problem
                 float minRotatingSpeed = (float)Math.PI * shared.mSpeed / currentGameState.carClass.maxTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.mTyreRPS[0]) < minRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.mTyreRPS[1]) < minRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.mTyreRPS[2]) < minRotatingSpeed;
                 currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.mTyreRPS[3]) < minRotatingSpeed;
 
-                // TODO: fix this properly - increase the maxRotatingSpeed from 2*pi to 3*pi just to hide the problem
                 float maxRotatingSpeed = 3 * (float)Math.PI * shared.mSpeed / currentGameState.carClass.minTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.mTyreRPS[0]) > maxRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.mTyreRPS[1]) > maxRotatingSpeed;

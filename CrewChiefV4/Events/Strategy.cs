@@ -520,8 +520,7 @@ namespace CrewChiefV4.Events
                                     bestLastAndFirstSectorTime = entry.Value.bestSector2Time + entry.Value.bestSector1Time;
                                 }
                                 
-                                // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
-                                // Also note that these are zero-indexed - we want the game time at the end of sector2 on the previous lap and s1 on this lap
+                                // note that these are zero-indexed - we want the game time at the end of sector2 on the previous lap and s1 on this lap
                                 float lastLapPenultimateSectorEndTime = entry.Value.getLastLapData().GameTimeAtSectorEnd[sectorCount == 3 ? 1 : 0];
                                 float thisLapS1EndTime = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[0];
                                 // only insert data here if we have sane times
@@ -731,7 +730,6 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        // he'll be behind (TODO: work out which way the delta-points lag will bias this)
                         opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, isPlayerClass, opponentCarClassId, opponent));
                     }                    
                 }

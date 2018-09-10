@@ -1573,7 +1573,7 @@ namespace CrewChiefV4
             {
                 return CrewChief.getEvent("Fuel");
             }
-            else if (// TODO: other battery queries
+            else if (
                 ResultContains(recognisedSpeech, HOWS_MY_BATTERY, false))
             {
                 return CrewChief.getEvent("Battery");
