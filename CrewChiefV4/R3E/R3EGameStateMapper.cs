@@ -98,6 +98,8 @@ namespace CrewChiefV4.RaceRoom
         // True while on HotLap/Qualifying flying start lap.
         private bool approachingFirstFlyingLap = false;
 
+        private bool chequeredFlagShownInThisSession = false;
+
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -183,6 +185,7 @@ namespace CrewChiefV4.RaceRoom
 
                 // Used by mapToSessionType.
                 currentGameState.SessionData.NumCarsOverallAtStartOfSession = shared.NumCars;
+                chequeredFlagShownInThisSession = false;
             }
 
             currentGameState.SessionData.SessionType = mapToSessionType(shared, previousGameState);
@@ -218,7 +221,7 @@ namespace CrewChiefV4.RaceRoom
             int previousLapsCompleted = previousGameState == null ? 0 : previousGameState.SessionData.CompletedLaps;
             currentGameState.SessionData.SessionPhase = mapToSessionPhase(lastSessionPhase, currentGameState.SessionData.SessionType, lastSessionRunningTime,
                 currentGameState.SessionData.SessionRunningTime, shared.SessionPhase, currentGameState.ControlData.ControlType,
-                previousLapsCompleted, shared.CompletedLaps, isCarRunning, shared.FlagsExtended.checkered == 1);
+                previousLapsCompleted, shared.CompletedLaps, isCarRunning, chequeredFlagShownInThisSession);
 
             if ((lastSessionPhase != currentGameState.SessionData.SessionPhase && (lastSessionPhase == SessionPhase.Unavailable || lastSessionPhase == SessionPhase.Finished)) ||
                 ((lastSessionPhase == SessionPhase.Checkered || lastSessionPhase == SessionPhase.Finished || lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow) && 
@@ -226,6 +229,7 @@ namespace CrewChiefV4.RaceRoom
                 lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)
             {
                 currentGameState.SessionData.IsNewSession = true;
+                chequeredFlagShownInThisSession = false;
                 // if this is a new prac / qual session, we might have just joined a multiclass session so we need to keep
                 // updating the car class until it settles.
                 if (currentGameState.SessionData.SessionType == SessionType.Qualify || currentGameState.SessionData.SessionType == SessionType.Practice)
@@ -352,6 +356,7 @@ namespace CrewChiefV4.RaceRoom
                     if (currentGameState.SessionData.SessionPhase == SessionPhase.Green)
                     {
                         currentGameState.SessionData.JustGoneGreen = true;
+                        chequeredFlagShownInThisSession = false;
                         // just gone green, so get the session data
                         if (shared.sessionLengthFormat == 0 || shared.sessionLengthFormat == 2 || shared.SessionTimeRemaining > 0)
                         {
@@ -578,6 +583,11 @@ namespace CrewChiefV4.RaceRoom
             else if (shared.Flags.Black == 1)
             {
                 currentGameState.SessionData.Flag = FlagEnum.BLACK;
+            }
+
+            if (shared.FlagsExtended.checkered == 1 && currentGameState.SessionData.SessionPhase == SessionPhase.Green)
+            {
+                chequeredFlagShownInThisSession = true;
             }
 
             currentGameState.FlagData.numCarsPassedIllegally = shared.FlagsExtended2.yellowPositionsGained;
@@ -1460,15 +1470,14 @@ namespace CrewChiefV4.RaceRoom
          * Gets the current session phase. If the transition is valid this is returned, otherwise the
          * previous phase is returned
          */
-        private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime, 
-            int r3eSessionPhase, ControlType controlType, int previousLapsCompleted, int currentLapsCompleted, Boolean isCarRunning, Boolean gameSaysIsChequered)
+        private SessionPhase mapToSessionPhase(SessionPhase lastSessionPhase, SessionType currentSessionType, float lastSessionRunningTime, float thisSessionRunningTime,
+            int r3eSessionPhase, ControlType controlType, int previousLapsCompleted, int currentLapsCompleted, Boolean isCarRunning, Boolean chequeredFlagShownInThisSession)
         {
-
             /* prac and qual sessions go chequered after the allotted time. They never go 'finished'. If we complete a lap
              * during this period we can detect the session end and trigger the finish message. Otherwise we just can't detect
              * this period end - hence the 'isCarRunning' hack...
             */
-            if ((int)RaceRoomConstant.SessionPhase.Checkered == r3eSessionPhase || gameSaysIsChequered)
+            if ((int)RaceRoomConstant.SessionPhase.Checkered == r3eSessionPhase || chequeredFlagShownInThisSession)
             {
                 if (lastSessionPhase == SessionPhase.Green || lastSessionPhase == SessionPhase.FullCourseYellow)
                 {
