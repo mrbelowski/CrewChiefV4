@@ -349,21 +349,7 @@ namespace CrewChiefV4.GameState
         // some other conditions
         public float getPlayerBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerBestLapTime;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerBestLapTime;
-            }
-            float time;
-            if (playerBestLapTimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerBestLapTime, playerBestLapTimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
@@ -371,21 +357,7 @@ namespace CrewChiefV4.GameState
         // sector1 time from some other conditions
         public float getPlayerBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerBestLapSector1Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerBestLapSector1Time;
-            }
-            float time;
-            if (playerBestLapSector1TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerBestLapSector1Time, playerBestLapSector1TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
@@ -393,21 +365,7 @@ namespace CrewChiefV4.GameState
         // sector2 time from some other conditions
         public float getPlayerBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerBestLapSector2Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerBestLapSector2Time;
-            }
-            float time;
-            if (playerBestLapSector2TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerBestLapSector2Time, playerBestLapSector2TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
@@ -415,21 +373,7 @@ namespace CrewChiefV4.GameState
         // sector3 time from some other conditions
         public float getPlayerBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerBestLapSector3Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerBestLapSector3Time;
-            }
-            float time;
-            if (playerBestLapSector3TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerBestLapSector3Time, playerBestLapSector3TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -437,21 +381,7 @@ namespace CrewChiefV4.GameState
         // some other conditions
         public float getPlayerClassBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassBestLapTime;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassBestLapTime;
-            }
-            float time;
-            if (playerClassBestLapTimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassBestLapTime, playerClassBestLapTimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -459,21 +389,7 @@ namespace CrewChiefV4.GameState
         // sector1 time from some other conditions
         public float getPlayerClassBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassBestLapSector1Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassBestLapSector1Time;
-            }
-            float time;
-            if (playerClassBestLapSector1TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassBestLapSector1Time, playerClassBestLapSector1TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -481,21 +397,7 @@ namespace CrewChiefV4.GameState
         // sector2 time from some other conditions
         public float getPlayerClassBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassBestLapSector2Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassBestLapSector2Time;
-            }
-            float time;
-            if (playerClassBestLapSector2TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassBestLapSector2Time, playerClassBestLapSector2TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -503,21 +405,7 @@ namespace CrewChiefV4.GameState
         // sector3 time from some other conditions
         public float getPlayerClassBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassBestLapSector3Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassBestLapSector3Time;
-            }
-            float time;
-            if (playerClassBestLapSector3TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassBestLapSector3Time, playerClassBestLapSector3TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -525,21 +413,7 @@ namespace CrewChiefV4.GameState
         // some other conditions
         public float getPlayerClassOpponentBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassOpponentBestLapTime;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassOpponentBestLapTime;
-            }
-            float time;
-            if (playerClassOpponentBestLapTimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassOpponentBestLapTime, playerClassOpponentBestLapTimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -547,21 +421,7 @@ namespace CrewChiefV4.GameState
         // sector1 time from some other conditions
         public float getPlayerClassOpponentBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassOpponentBestLapSector1Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassOpponentBestLapSector1Time;
-            }
-            float time;
-            if (playerClassOpponentBestLapSector1TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassOpponentBestLapSector1Time, playerClassOpponentBestLapSector1TimeByConditions, requestedConditionsEnum);
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -569,21 +429,7 @@ namespace CrewChiefV4.GameState
         // sector2 time from some other conditions
         public float getPlayerClassOpponentBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            if (requestedConditionsEnum == ConditionsEnum.ANY)
-            {
-                return playerClassOpponentBestLapSector2Time;
-            }
-            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
-            {
-                return playerClassOpponentBestLapSector2Time;
-            }
-            float time;
-            if (playerClassOpponentBestLapSector2TimeByConditions.TryGetValue(conditionsEnum, out time))
-            {
-                return time;
-            }
-            return -1;
+            return getBestTime(playerClassOpponentBestLapSector2Time, playerClassOpponentBestLapSector2TimeByConditions, requestedConditionsEnum);            
         }
 
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
@@ -591,17 +437,23 @@ namespace CrewChiefV4.GameState
         // sector3 time from some other conditions
         public float getPlayerClassOpponentBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
+            return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, requestedConditionsEnum);
+        }
+
+        private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition,
+            ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
             if (requestedConditionsEnum == ConditionsEnum.ANY)
             {
-                return playerClassOpponentBestLapSector3Time;
+                return overallBest;
             }
             ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             if (!hasEnoughData(conditionsEnum, playerLapTimesByConditions))
             {
-                return playerClassOpponentBestLapSector3Time;
+                return overallBest;
             }
             float time;
-            if (playerClassOpponentBestLapSector3TimeByConditions.TryGetValue(conditionsEnum, out time))
+            if (timesByCondition.TryGetValue(conditionsEnum, out time))
             {
                 return time;
             }
