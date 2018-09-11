@@ -175,14 +175,8 @@ namespace CrewChiefV4.GameState
             if (!currentGameState.SessionData.SessionHasFixedTime)
             {
                 // work out the laps remaining
-                if (currentGameState.SessionData.SessionType == SessionType.Race)
-                {
-                    currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - leaderLapsCompleted;
-                }
-                else
-                {
-                    currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
-                }
+                currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - leaderLapsCompleted;
+                
             }
             
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
@@ -229,6 +223,17 @@ namespace CrewChiefV4.GameState
             if (!currentGameState.SessionData.IsRacingSameCarBehind)
             {
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
+            }
+        }
+
+
+        // so far, only the laps remaining is populated for non-race sessions. This is a bit of an edge case anyway - non-race sessions
+        // with fixed number of laps is an American thing really.
+        public virtual void populateDerivedNonRaceSessionData(GameStateData currentGameState)
+        {
+            if (!currentGameState.SessionData.SessionHasFixedTime)
+            {
+                currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
             }
         }
 
