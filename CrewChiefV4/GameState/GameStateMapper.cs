@@ -176,7 +176,6 @@ namespace CrewChiefV4.GameState
             {
                 // work out the laps remaining
                 currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - leaderLapsCompleted;
-                
             }
             
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
