@@ -303,6 +303,10 @@ namespace CrewChiefV4.GameState
         // How many laps the player has completed. If this value is 6, the player is on his 7th lap.
         public int CompletedLaps = 0;
 
+        // how many laps are left for the player. In fixed lap sessions this is totalLaps - leaderCompletedLaps, to allow for being
+        // lapped. In all other sessions it's MaxInt
+        public int SessionLapsRemaining = int.MaxValue;
+
         // Unit: Seconds (-1.0 = none)
         public Single LapTimePrevious = -1;
 
