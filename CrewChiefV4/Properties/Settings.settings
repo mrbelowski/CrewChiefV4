@@ -597,7 +597,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="pcars_enable_rain_prediction" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="READ_CORNER_NAMES_FOR_LAP_button_index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
