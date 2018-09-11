@@ -359,7 +359,7 @@ namespace CrewChiefV4.Events
                     (currentGameState.OpponentData.Count == 0 || (currentGameState.OpponentData.Count == 1 && currentGameState.OpponentData.First().Value.DriverRawName == currentGameState.SessionData.DriverRawName));
                 if (isHotLappingOrLonePractice)
                 {
-                    // TODO: self pace stuff is still overall, not conditions dependent
+                    // note that lone practice in changing conditions doesn't take conditions into account. This is a bit of an edge case
                     lapAndSectorsComparisonData[0] = lapAndSectorsSelfComparisonData[0];
                     lapAndSectorsComparisonData[1] = lapAndSectorsSelfComparisonData[1];
                     lapAndSectorsComparisonData[2] = lapAndSectorsSelfComparisonData[2];
@@ -370,39 +370,46 @@ namespace CrewChiefV4.Events
                     // in qual sessions we want absolute timings. We can also use absolute timings if the conditions are static.
                     // If the conditions are changing we want timings relative to the prevailing conditions for non-qual sessions.
                     // For race sessions we want the recent pace
-                    TimingData.ConditionsEnum conditionsForLapComparisonData = TimingData.ConditionsEnum.CURRENT;
-                    if (currentGameState.SessionData.SessionType == SessionType.Qualify || !currentGameState.TimingData.conditionsHaveChanged)
+                    if (currentGameState.SessionData.SessionType == SessionType.Race)
                     {
-                        conditionsForLapComparisonData = TimingData.ConditionsEnum.ANY;
-                    }
-                    if (currentGameState.SessionData.SessionType == SessionType.Race && !currentGameState.TimingData.conditionsHaveChanged)
-                    {
-                        // use recent data
-                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
-                    }
-                    else
-                    {
-                        // use data relevant to current conditions
-                        lapAndSectorsComparisonData = new float[] { 
-                            currentGameState.TimingData.getPlayerClassOpponentBestLapTime(conditionsForLapComparisonData),
-                            currentGameState.TimingData.getPlayerClassOpponentBestLapSector1Time(conditionsForLapComparisonData),
-                            currentGameState.TimingData.getPlayerClassOpponentBestLapSector2Time(conditionsForLapComparisonData),
-                            currentGameState.TimingData.getPlayerClassOpponentBestLapSector3Time(conditionsForLapComparisonData)
-                        };
-
-                        // in qual or prac with static conditions, revert to the old logic (which i don't fully understand)
-                        if (currentGameState.SessionData.SessionType == SessionType.Qualify || 
-                            (currentGameState.SessionData.SessionType == SessionType.Practice && !currentGameState.TimingData.conditionsHaveChanged))
+                        if (!currentGameState.TimingData.conditionsHaveChanged)
                         {
-                            if (lapAndSectorsSelfComparisonData[0] > 0.0 && lapAndSectorsSelfComparisonData[0] < lapAndSectorsComparisonData[0])
-                            {
-                                // Use player's best lap as comparison data.
-                                lapAndSectorsComparisonData[0] = lapAndSectorsSelfComparisonData[0];
-                                lapAndSectorsComparisonData[1] = lapAndSectorsSelfComparisonData[1];
-                                lapAndSectorsComparisonData[2] = lapAndSectorsSelfComparisonData[2];
-                                lapAndSectorsComparisonData[3] = lapAndSectorsSelfComparisonData[3];
-                            }
+                            // no changing conditions, get the 'pace' from the most recent laps
+                            lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(paceCheckLapsWindowForRaceToUse, currentGameState.carClass);
                         }
+                        else
+                        {
+                            // use data relevant to current conditions
+                            lapAndSectorsComparisonData = new float[] { 
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapTime(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector1Time(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector2Time(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector3Time()
+                            };
+                        }
+                    }
+                    else if (currentGameState.SessionData.SessionType == SessionType.Practice)
+                    {
+                        if (!currentGameState.TimingData.conditionsHaveChanged)
+                        {
+                            // no changing conditions, get the 'pace' from the all the recorded laps
+                            lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
+                        }
+                        else
+                        {
+                            // use data relevant to current conditions
+                            lapAndSectorsComparisonData = new float[] { 
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapTime(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector1Time(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector2Time(),
+                                currentGameState.TimingData.getPlayerClassOpponentBestLapSector3Time()
+                            };
+                        }
+                    }
+                    else if (currentGameState.SessionData.SessionType == SessionType.Qualify)
+                    {
+                        // not interested in the conditions, just want best laps from all the data we have
+                        lapAndSectorsComparisonData = currentGameState.getTimeAndSectorsForBestOpponentLapInWindow(-1, currentGameState.carClass);
                     }
                 }
             }
