@@ -260,7 +260,18 @@ namespace CrewChiefV4.GameState
             {
                 return ConditionsEnum.WARM_DRY;
             }
-            if (sample.RainDensity > 0)
+            Boolean isRaining = false;
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            {
+                isRaining = ConditionsMonitor.getRainLevel(sample.RainDensity) > ConditionsMonitor.RainLevel.DRIZZLE;
+            }
+            else if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
+            {
+                isRaining = sample.RainDensity > 0;
+            }
+            if (isRaining)
             {
                 if (sample.AmbientTemperature < 0)
                 {
@@ -287,7 +298,7 @@ namespace CrewChiefV4.GameState
                 }
                 else if (sample.AmbientTemperature < 30)
                 {
-                    return ConditionsEnum.WARM_WET;
+                    return ConditionsEnum.WARM_DRY;
                 }
                 else
                 {
