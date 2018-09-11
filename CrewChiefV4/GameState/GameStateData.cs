@@ -1088,16 +1088,19 @@ namespace CrewChiefV4.GameState
 
             verifyPlayerPreviousLap();
 
-            if (lapData.IsValid && !lapData.OutLap && !lapData.InLap && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+            if (lapData.IsValid && !lapData.OutLap && !lapData.InLap)
             {
-                PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
-                PlayerLapTimeSessionBest = lapData.LapTime;
-
-                PlayerBestLapSector1Time = lapData.SectorTimes[0];
-                PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                if (numberOfSectors > 2)
+                if (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime)
                 {
-                    PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                    PlayerLapTimeSessionBest = lapData.LapTime;
+
+                    PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                    PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                    if (numberOfSectors > 2)
+                    {
+                        PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    }
                 }
                 timingData.addPlayerLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
             }
@@ -1509,14 +1512,17 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = estimatedLapTime;
                         LastLapTime = estimatedLapTime;
-                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0)
                         {
-                            PreviousBestLapTime = CurrentBestLapTime;
-                            CurrentBestLapTime = lapData.LapTime;
+                            if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                            {
+                                PreviousBestLapTime = CurrentBestLapTime;
+                                CurrentBestLapTime = lapData.LapTime;
+                            }
                             if (isPlayerCarClass)
                             {
                                 timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
-                            }
+                            }              
                         }
                     }
                     else
@@ -1553,10 +1559,13 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = lapTime;
                         LastLapTime = lapTime;
-                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0)
                         {
-                            PreviousBestLapTime = CurrentBestLapTime;
-                            CurrentBestLapTime = lapData.LapTime;
+                            if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                            {
+                                PreviousBestLapTime = CurrentBestLapTime;
+                                CurrentBestLapTime = lapData.LapTime;
+                            }
                             if (isPlayerCarClass)
                             {
                                 timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
@@ -1617,10 +1626,13 @@ namespace CrewChiefV4.GameState
                     lapData.LapTime = providedLapTime;
                     lapData.InLap = inPits;
                     LastLapTime = providedLapTime;
-                    if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                    if (lapData.IsValid && lapData.LapTime > 0)
                     {
-                        PreviousBestLapTime = CurrentBestLapTime;
-                        CurrentBestLapTime = lapData.LapTime;
+                        if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                        {
+                            PreviousBestLapTime = CurrentBestLapTime;
+                            CurrentBestLapTime = lapData.LapTime;
+                        }
                         if (isPlayerCarClass)
                         {
                             timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
@@ -1662,10 +1674,13 @@ namespace CrewChiefV4.GameState
                 }
                 lapData.LapTime = providedLapTime;
                 LastLapTime = providedLapTime;
-                if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                if (lapData.IsValid && lapData.LapTime > 0)
                 {
-                    PreviousBestLapTime = CurrentBestLapTime;
-                    CurrentBestLapTime = lapData.LapTime;
+                    if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                    {
+                        PreviousBestLapTime = CurrentBestLapTime;
+                        CurrentBestLapTime = lapData.LapTime;
+                    }
                     if (isPlayerCarClass)
                     {
                         timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
