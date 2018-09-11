@@ -421,7 +421,6 @@ namespace CrewChiefV4.Events
                             this.averageUsagePerLap.ToString("0.000"));
 
                         var estBattLapsLeft = (int)Math.Floor(this.windowedAverageChargeLeft / this.averageUsagePerLap);
-                        int raceLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
 
                         if (this.halfDistance != -1
                             && !this.playedHalfDistanceBatteryEstimate
@@ -446,32 +445,32 @@ namespace CrewChiefV4.Events
                             else
                                 this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this), 3);
                         }
-                        else if (raceLapsRemaining > 3 && estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
+                        else if (currentGameState.SessionData.SessionLapsRemaining > 3 && estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
                         {
                             this.playedFourLapsRemaining = true;
                             Console.WriteLine("4 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this), 5);
                         }
-                        else if (raceLapsRemaining > 2 && estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
+                        else if (currentGameState.SessionData.SessionLapsRemaining > 2 && estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
                         {
                             this.playedThreeLapsRemaining = true;
                             Console.WriteLine("3 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this), 7);
                         }
-                        else if (raceLapsRemaining > 1 && estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
+                        else if (currentGameState.SessionData.SessionLapsRemaining > 1 && estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
                         {
                             this.playedTwoLapsRemaining = true;
                             Console.WriteLine("2 laps of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this), 10);
                         }
-                        else if (raceLapsRemaining > 0 && estBattLapsLeft == 1)
+                        else if (currentGameState.SessionData.SessionLapsRemaining > 0 && estBattLapsLeft == 1)
                         {
                             Console.WriteLine("1 lap of battery charge left, " + battStatusMsg);
                             this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, this), 10);
 
                             // If we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                             // but i'd have to move some stuff around and I'm an idle fucker
-                            if (!this.playedPitForBatteryNow && raceLapsRemaining > 1)
+                            if (!this.playedPitForBatteryNow && currentGameState.SessionData.SessionLapsRemaining > 1)
                             {
                                 this.playedPitForBatteryNow = true;
                                 this.audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this), 10);

@@ -314,7 +314,7 @@ namespace CrewChiefV4.Events
             // allow the retired and DQ checks under yellow:
             if (currentGameState.SessionData.SessionType == SessionType.Race &&
                 ((currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTimeRemaining > 0) ||
-                 (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps < currentGameState.SessionData.SessionNumberOfLaps)))
+                 (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionLapsRemaining > 0)))
             {
                 // don't bother processing retired and DQ'ed drivers and position changes if we're not allowed to use the names:
                 if (CrewChief.enableDriverNames)
