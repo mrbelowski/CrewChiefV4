@@ -244,6 +244,243 @@ namespace CrewChiefV4.GameState
         Rolling
     }
 
+    public class TimingData
+    {
+        // in order of potential pace - WARM_DRY is fastest
+        enum ConditionsEnum {
+            SNOW = 0, ICE, COLD_WET, WARM_WET, COLD_DRY, HOT_DRY, WARM_DRY = 6
+        }
+
+        private ConditionsEnum getConditionsEnum(Conditions.ConditionsSample sample = null)
+        {
+            if (this.conditions == null)
+            {
+                return ConditionsEnum.WARM_DRY;
+            }
+            if (sample == null)
+            {
+                sample = this.conditions.getMostRecentConditions();
+            }
+
+            if (sample == null) 
+            {
+                return ConditionsEnum.WARM_DRY;
+            }
+            if (sample.RainDensity > 0) 
+            {
+                if (sample.AmbientTemperature < 0)
+                {
+                    return ConditionsEnum.SNOW;
+                }
+                else if (sample.AmbientTemperature < 12)
+                {
+                    return ConditionsEnum.COLD_WET;
+                }
+                else
+                {
+                    return ConditionsEnum.WARM_WET;
+                }
+            }
+            else
+            {
+                if (sample.AmbientTemperature < 0)
+                {
+                    return ConditionsEnum.ICE;
+                }
+                else if (sample.AmbientTemperature < 12)
+                {
+                    return ConditionsEnum.COLD_DRY;
+                }
+                else if (sample.AmbientTemperature < 30)
+                {
+                    return ConditionsEnum.WARM_WET;
+                }
+                else
+                {
+                    return ConditionsEnum.HOT_DRY;
+                }
+            }
+        }
+
+        public Conditions conditions = null;
+
+        Dictionary<ConditionsEnum, List<float>> playerSector1Times = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerSector2Times = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerSector3Times = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerLapTimes = new Dictionary<ConditionsEnum, List<float>>();
+
+        Dictionary<ConditionsEnum, float> playerBestLapSector1Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapSector2Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapSector3Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapTime = new Dictionary<ConditionsEnum, float>();
+
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector1Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector2Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector3Time = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapTime = new Dictionary<ConditionsEnum, float>();
+
+        // if atConditions aren't specified we assume 'current conditions'
+        public float getPlayerBestLapTime(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapTime.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerBestLapSector1Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector1Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerBestLapSector2Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector2Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerBestLapSector3Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector3Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerClassBestLapTime(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerClassBestLapTime.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerClassBestLapSector1Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector1Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerClassBestLapSector2Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector2Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        public float getPlayerClassBestLapSector3Time(Conditions.ConditionsSample atConditions = null)
+        {
+            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            float time;
+            if (playerBestLapSector3Time.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+        
+        // add a player lap, updating the best lap / sectors for player and player class if necessary
+        public void addPlayerLap(float lapTime, float s1, float s2, float s3)
+        {
+            if (lapTime > 0)
+            {
+                ConditionsEnum conditionsEnum = getConditionsEnum();
+                addToData(conditionsEnum, playerLapTimes, lapTime);
+                addToData(conditionsEnum, playerSector1Times, s1);
+                addToData(conditionsEnum, playerSector2Times, s2);
+                addToData(conditionsEnum, playerSector3Times, s3);
+                updateBestTimes(conditionsEnum, lapTime, s1, s2, s3, true);
+            }
+        }
+
+        // Note that this should only be calledcif we've already checked this opponent is in the same class as the player
+        public void addOpponentPlayerClassLap(float lapTime, float s1, float s2, float s3)
+        {
+            if (lapTime > 0)
+            {
+                ConditionsEnum conditionsEnum = getConditionsEnum();
+                updateBestTimes(conditionsEnum, lapTime, s1, s2, s3, false);
+            }
+        }
+
+        private void updateBestTimes(ConditionsEnum conditionsEnum, float lapTime, float s1, float s2, float s3, Boolean isPlayer)
+        {
+            Boolean isBest;
+            float existingBestLap;
+            isBest = !(playerClassBestLapTime.TryGetValue(conditionsEnum, out existingBestLap) ||
+                lapTime < existingBestLap);
+            if (isBest)
+            {
+                playerClassBestLapTime[conditionsEnum] = lapTime;
+                playerClassBestLapSector1Time[conditionsEnum] = s1;
+                playerClassBestLapSector2Time[conditionsEnum] = s2;
+                playerClassBestLapSector3Time[conditionsEnum] = s3;
+                if (isPlayer)
+                {
+                    playerBestLapTime[conditionsEnum] = lapTime;
+                    playerBestLapSector1Time[conditionsEnum] = s1;
+                    playerBestLapSector2Time[conditionsEnum] = s2;
+                    playerBestLapSector3Time[conditionsEnum] = s3;
+                }
+            }
+            else
+            {
+                isBest = !(playerBestLapTime.TryGetValue(conditionsEnum, out existingBestLap) ||
+                    lapTime < existingBestLap);
+                if (isBest)
+                {
+                    playerBestLapTime[conditionsEnum] = lapTime;
+                    playerBestLapSector1Time[conditionsEnum] = s1;
+                    playerBestLapSector2Time[conditionsEnum] = s2;
+                    playerBestLapSector3Time[conditionsEnum] = s3;
+                }
+            }
+        }
+
+        private void addToData(ConditionsEnum conditionsEnum, Dictionary<ConditionsEnum, List<float>> data, float value) {
+            List<float> existingData;
+            if (data.TryGetValue(conditionsEnum, out existingData))
+            {
+                existingData.Add(value);
+            }
+            else
+            {
+                existingData = new List<float>();
+                existingData.Add(value);
+                data.Add(conditionsEnum, existingData);
+            }
+        }
+    }
+
     public class SessionData
     {
         public List<String> formattedPlayerLapTimes = new List<String>();
@@ -2446,6 +2683,8 @@ namespace CrewChiefV4.GameState
 
         public Conditions Conditions = new Conditions();
 
+        public TimingData TimingData = new TimingData();
+
         public OvertakingAids OvertakingAids = new OvertakingAids();
 
         public FlagData FlagData = new FlagData();
@@ -2520,6 +2759,7 @@ namespace CrewChiefV4.GameState
             this.Ticks = ticks;
             this.Now = new DateTime(ticks);
             CurrentTime = Now;
+            this.TimingData.conditions = this.Conditions;
         }
 
         // some convenience methods

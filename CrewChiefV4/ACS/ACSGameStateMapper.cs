@@ -1185,6 +1185,8 @@ namespace CrewChiefV4.assetto
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }
 
                 //------------------- Variable session data ---------------------------

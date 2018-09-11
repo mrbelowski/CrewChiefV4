@@ -693,6 +693,8 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
 
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }                
             }
 

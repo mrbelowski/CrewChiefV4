@@ -528,6 +528,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }
             }
 

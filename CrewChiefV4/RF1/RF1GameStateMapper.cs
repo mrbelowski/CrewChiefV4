@@ -360,6 +360,7 @@ namespace CrewChiefV4.rFactor1
 
                 currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
                 currentGameState.Conditions.samples = previousGameState.Conditions.samples;
+                currentGameState.TimingData = previousGameState.TimingData;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)

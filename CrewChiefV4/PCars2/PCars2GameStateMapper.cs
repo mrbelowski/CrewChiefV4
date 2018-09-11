@@ -565,6 +565,8 @@ namespace CrewChiefV4.PCars2
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
 
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }                
             }
 
