@@ -610,7 +610,7 @@ namespace CrewChiefV4.iRacing
                 {
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         playerCar.Live.LapTimePrevious, lapValid, currentGameState.PitData.InPitlane, false, shared.Telemetry.TrackTempCrew, shared.Telemetry.AirTemp,
-                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
 
                     if (currentGameState.carClass.carClassEnum == CarData.CarClassEnum.UNKNOWN_RACE)
                     {
@@ -829,7 +829,7 @@ namespace CrewChiefV4.iRacing
                                         currentGameState.SessionData.SessionType == SessionType.Race, shared.Telemetry.TrackTempCrew,
                                         shared.Telemetry.AirTemp, currentGameState.SessionData.TrackDefinition != null ? currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks : -1.0f,
                                         currentOpponentSpeed, driver.Live.GameTimeWhenLastCrossedSFLine, isInWorld, driver.Live.IsNewLap,
-                                        driver.Car.CarClassId, driver.Car.CarId);
+                                        driver.Car.CarClassId, driver.Car.CarId, currentGameState.TimingData, currentGameState.carClass);
 
                             if (currentGameState.SessionData.SessionType != SessionType.Race)
                             {
@@ -1095,7 +1095,7 @@ namespace CrewChiefV4.iRacing
             Boolean previousLapWasValid, Boolean currentLapValid, float sessionRunningTime,
             float distanceRoundTrack, Boolean sessionLengthIsTime, float sessionTimeRemaining,
             Boolean isRace, float airTemperature, float trackTempreture, float nearPitEntryPointDistance, float speed,
-            float GameTimeWhenLastCrossedStartFinishLine, bool isInWorld, bool isNewLap, int carClassId, int carId)
+            float GameTimeWhenLastCrossedStartFinishLine, bool isInWorld, bool isNewLap, int carClassId, int carId, TimingData timingData, CarData.CarClass playerCarClass)
         {
             if (opponentData.CostId != CostId)
             {
@@ -1146,7 +1146,9 @@ namespace CrewChiefV4.iRacing
             {
                 if (opponentData.OpponentLapData.Count > 0)
                 {
-                    opponentData.CompleteLapThatMightHaveMissingSectorTimes(racePosition, sessionRunningTime, completedLapTime, completedLapTime > 1 && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3);
+                    opponentData.CompleteLapThatMightHaveMissingSectorTimes(racePosition, sessionRunningTime, completedLapTime, 
+                        completedLapTime > 1 && validSpeed, false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, 3,
+                        timingData, CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass));
                     //Console.WriteLine(opponentData.ToString() + " time: " + TimeSpan.FromSeconds(completedLapTime).ToString(@"mm\:ss\.fff") + " lap valid: " + (completedLapTime > 1 && validSpeed) + " Updated From Live Data " + isInWorld); 
                 }                
                 opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, GameTimeWhenLastCrossedStartFinishLine, false, trackTempreture, airTemperature);

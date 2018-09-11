@@ -246,27 +246,19 @@ namespace CrewChiefV4.GameState
 
     public class TimingData
     {
-        // in order of potential pace - WARM_DRY is fastest
-        enum ConditionsEnum {
-            SNOW = 0, ICE, COLD_WET, WARM_WET, COLD_DRY, HOT_DRY, WARM_DRY = 6
+        // in order of potential pace - WARM_DRY is fastest, CURRENT is whatever the current conditions are
+        // and is a special case - it will always be replaced.
+        public enum ConditionsEnum {
+            SNOW = 0, ICE, COLD_WET, WARM_WET, COLD_DRY, HOT_DRY, WARM_DRY, CURRENT
         }
 
-        private ConditionsEnum getConditionsEnum(Conditions.ConditionsSample sample = null)
+        public static ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
         {
-            if (this.conditions == null)
-            {
-                return ConditionsEnum.WARM_DRY;
-            }
             if (sample == null)
             {
-                sample = this.conditions.getMostRecentConditions();
-            }
-
-            if (sample == null) 
-            {
                 return ConditionsEnum.WARM_DRY;
             }
-            if (sample.RainDensity > 0) 
+            if (sample.RainDensity > 0)
             {
                 if (sample.AmbientTemperature < 0)
                 {
@@ -319,10 +311,12 @@ namespace CrewChiefV4.GameState
         Dictionary<ConditionsEnum, float> playerClassBestLapSector3Time = new Dictionary<ConditionsEnum, float>();
         Dictionary<ConditionsEnum, float> playerClassBestLapTime = new Dictionary<ConditionsEnum, float>();
 
-        // if atConditions aren't specified we assume 'current conditions'
-        public float getPlayerBestLapTime(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // laptime set in conditions similar to the current conditions. You can also request a best laptime from
+        // some other conditions
+        public float getPlayerBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapTime.TryGetValue(conditionsEnum, out time))
             {
@@ -331,9 +325,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerBestLapSector1Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector1 time from some other conditions
+        public float getPlayerBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector1Time.TryGetValue(conditionsEnum, out time))
             {
@@ -342,9 +339,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerBestLapSector2Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector2 time from some other conditions
+        public float getPlayerBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector2Time.TryGetValue(conditionsEnum, out time))
             {
@@ -353,9 +353,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerBestLapSector3Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector3 time from some other conditions
+        public float getPlayerBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector3Time.TryGetValue(conditionsEnum, out time))
             {
@@ -364,9 +367,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerClassBestLapTime(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
+        // some other conditions
+        public float getPlayerClassBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerClassBestLapTime.TryGetValue(conditionsEnum, out time))
             {
@@ -375,9 +381,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerClassBestLapSector1Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector1 time from some other conditions
+        public float getPlayerClassBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector1Time.TryGetValue(conditionsEnum, out time))
             {
@@ -386,9 +395,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerClassBestLapSector2Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector2 time from some other conditions
+        public float getPlayerClassBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector2Time.TryGetValue(conditionsEnum, out time))
             {
@@ -397,9 +409,12 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        public float getPlayerClassBestLapSector3Time(Conditions.ConditionsSample atConditions = null)
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector3 time from some other conditions
+        public float getPlayerClassBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
-            ConditionsEnum conditionsEnum = getConditionsEnum(atConditions);
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
             float time;
             if (playerBestLapSector3Time.TryGetValue(conditionsEnum, out time))
             {
@@ -413,7 +428,7 @@ namespace CrewChiefV4.GameState
         {
             if (lapTime > 0)
             {
-                ConditionsEnum conditionsEnum = getConditionsEnum();
+                ConditionsEnum conditionsEnum = getConditionsEnum(ConditionsEnum.CURRENT);
                 addToData(conditionsEnum, playerLapTimes, lapTime);
                 addToData(conditionsEnum, playerSector1Times, s1);
                 addToData(conditionsEnum, playerSector2Times, s2);
@@ -422,22 +437,39 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        // Note that this should only be calledcif we've already checked this opponent is in the same class as the player
+        // Note that this should only be called if we've already checked this opponent is in the same class as the player
         public void addOpponentPlayerClassLap(float lapTime, float s1, float s2, float s3)
         {
             if (lapTime > 0)
             {
-                ConditionsEnum conditionsEnum = getConditionsEnum();
+                ConditionsEnum conditionsEnum = getConditionsEnum(ConditionsEnum.CURRENT);
                 updateBestTimes(conditionsEnum, lapTime, s1, s2, s3, false);
             }
         }
 
+        private ConditionsEnum getConditionsEnum(ConditionsEnum requestedConditionsEnum)
+        {
+            if (requestedConditionsEnum == ConditionsEnum.CURRENT)
+            {
+                if (this.conditions == null || this.conditions.samples == null)
+                {
+                    return ConditionsEnum.WARM_DRY;
+                }
+                return TimingData.getConditionsEnumForSample(this.conditions.getMostRecentConditions());
+            }
+            else
+            {
+                return requestedConditionsEnum;
+            }
+        }
+
+
         private void updateBestTimes(ConditionsEnum conditionsEnum, float lapTime, float s1, float s2, float s3, Boolean isPlayer)
         {
             Boolean isBest;
-            float existingBestLap;
-            isBest = !(playerClassBestLapTime.TryGetValue(conditionsEnum, out existingBestLap) ||
-                lapTime < existingBestLap);
+            float existingPlayerClassBestLap;
+            isBest = !playerClassBestLapTime.TryGetValue(conditionsEnum, out existingPlayerClassBestLap) ||
+                lapTime < existingPlayerClassBestLap;
             if (isBest)
             {
                 playerClassBestLapTime[conditionsEnum] = lapTime;
@@ -452,10 +484,11 @@ namespace CrewChiefV4.GameState
                     playerBestLapSector3Time[conditionsEnum] = s3;
                 }
             }
-            else
+            else if (isPlayer)
             {
-                isBest = !(playerBestLapTime.TryGetValue(conditionsEnum, out existingBestLap) ||
-                    lapTime < existingBestLap);
+                float existingPlayerBestLap;
+                isBest = !playerBestLapTime.TryGetValue(conditionsEnum, out existingPlayerBestLap) ||
+                    lapTime < existingPlayerBestLap;
                 if (isBest)
                 {
                     playerBestLapTime[conditionsEnum] = lapTime;
@@ -764,8 +797,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void playerCompleteLapWithProvidedLapTime(int overallPosition, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime,
-            float sessionTimeRemaining, int numberOfSectors)
+            Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, 
+            float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors, TimingData timingData)
         {
             if (PlayerLapData.Count == 0)
             {
@@ -797,6 +830,7 @@ namespace CrewChiefV4.GameState
                 {
                     PlayerBestLapSector3Time = lapData.SectorTimes[2];
                 }
+                timingData.addPlayerLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
             }
             PreviousLapWasValid = lapData.IsValid;
             if (PreviousLapWasValid && LapTimePrevious > 0 && PlayerLapTimeSessionBest == -1 || LapTimePrevious == PlayerLapTimeSessionBest)
@@ -1188,7 +1222,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             // only used by PCars where all tracks have 3 sectors
             AddCumulativeSectorData(3, position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
@@ -1209,6 +1244,10 @@ namespace CrewChiefV4.GameState
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
+                            if (isPlayerCarClass)
+                            {
+                                timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                            }
                         }
                     }
                     else
@@ -1230,7 +1269,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             AddSectorData(numberOfSectors, position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
@@ -1248,6 +1288,10 @@ namespace CrewChiefV4.GameState
                         {
                             PreviousBestLapTime = CurrentBestLapTime;
                             CurrentBestLapTime = lapData.LapTime;
+                            if (isPlayerCarClass)
+                            {
+                                timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                            }
                         }
                     }
                     else
@@ -1279,18 +1323,21 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid, Boolean inLap,
-            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             // if this completed lap is invalid, mark it as such *before* we complete it
             if (!lapWasValid)
             {
                 InvalidateCurrentLap();
             }
-            CompleteLapWithProvidedLapTime(position, gameTimeAtLapEnd, providedLapTime, InPits, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, numberOfSectors);
+            CompleteLapWithProvidedLapTime(position, gameTimeAtLapEnd, providedLapTime, InPits, isRaining, trackTemp, airTemp, sessionLengthIsTime, 
+                sessionTimeRemaining, numberOfSectors, timingData, isPlayerCarClass);
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean inPits,
-            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             if (OpponentLapData.Count > 0)
             {                
@@ -1305,6 +1352,10 @@ namespace CrewChiefV4.GameState
                     {
                         PreviousBestLapTime = CurrentBestLapTime;
                         CurrentBestLapTime = lapData.LapTime;
+                        if (isPlayerCarClass)
+                        {
+                            timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                        }
                     }
                     LastLapValid = lapData.IsValid;
                 } 
@@ -1319,7 +1370,8 @@ namespace CrewChiefV4.GameState
             }
         }
         public void CompleteLapThatMightHaveMissingSectorTimes(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid,
-        Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             if (OpponentLapData.Count > 0)
             {
@@ -1345,6 +1397,10 @@ namespace CrewChiefV4.GameState
                 {
                     PreviousBestLapTime = CurrentBestLapTime;
                     CurrentBestLapTime = lapData.LapTime;
+                    if (isPlayerCarClass)
+                    {
+                        timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                    }
                 }
                 LastLapValid = lapData.IsValid;
 
@@ -1418,7 +1474,8 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public void AddSectorData(int sectorNumberJustCompleted, int position, float thisSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void AddSectorData(int sectorNumberJustCompleted, int position, float thisSectorTime, float gameTimeAtSectorEnd,
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
         {
             if (OpponentLapData.Count > 0)
             {
