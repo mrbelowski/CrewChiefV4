@@ -84,9 +84,9 @@ namespace CrewChiefV4.Events
             addExtraLap = currentGameState.SessionData.HasExtraLap;
             leaderHasFinishedRace = currentGameState.SessionData.LeaderHasFinishedRace;
             timeLeft = currentGameState.SessionData.SessionTimeRemaining;
-            if (currentGameState.SessionData.SessionNumberOfLaps > 0)
+            if (!currentGameState.SessionData.SessionHasFixedTime)
             {
-                lapsLeft = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
+                lapsLeft = currentGameState.SessionData.SessionLapsRemaining;
                 sessionLengthIsTime = false;
             }
             else

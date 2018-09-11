@@ -253,11 +253,10 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.SessionHasFixedTime)
             {
                 secondsRemaining = currentGameState.SessionData.SessionTimeRemaining;
-                
             }
             else
             {
-                lapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
+                lapsRemaining = currentGameState.SessionData.SessionLapsRemaining;
             }
             currentFuel = currentGameState.FuelData.FuelLeft;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
@@ -480,7 +479,6 @@ namespace CrewChiefV4.Events
                             lapsCompletedSinceFuelReset > 0)
                         {
                             int estimatedFuelLapsLeft = (int)Math.Floor(currentGameState.FuelData.FuelLeft / averageUsagePerLap);
-                            int raceLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
                             if (halfDistance != -1 && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.CompletedLaps == halfDistance)
                             {
                                 if (estimatedFuelLapsLeft <= halfDistance)
@@ -500,7 +498,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceGoodFuel, 0, this), 5);
                                 }
                             }
-                            else if (raceLapsRemaining > 3 && estimatedFuelLapsLeft == 4)
+                            else if (lapsRemaining > 3 && estimatedFuelLapsLeft == 4)
                             {
                                 if(fuelReportsInGallon)
                                 {
@@ -514,7 +512,7 @@ namespace CrewChiefV4.Events
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderFourLapsEstimate, 0, this), 3);
                             }
-                            else if (raceLapsRemaining > 2 && estimatedFuelLapsLeft == 3)
+                            else if (lapsRemaining > 2 && estimatedFuelLapsLeft == 3)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -528,7 +526,7 @@ namespace CrewChiefV4.Events
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderThreeLapsEstimate, 0, this), 5);
                             }
-                            else if (raceLapsRemaining > 1 && estimatedFuelLapsLeft == 2)
+                            else if (lapsRemaining > 1 && estimatedFuelLapsLeft == 2)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -542,7 +540,7 @@ namespace CrewChiefV4.Events
                                 }
                                 audioPlayer.playMessage(new QueuedMessage(folderTwoLapsEstimate, 0, this), 7);
                             }
-                            else if (raceLapsRemaining > 0 && estimatedFuelLapsLeft == 1)
+                            else if (lapsRemaining > 0 && estimatedFuelLapsLeft == 1)
                             {
                                 if (fuelReportsInGallon)
                                 {
@@ -557,7 +555,7 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderOneLapEstimate, 0, this), 10);
                                 // if we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                                 // but i'd have to move some stuff around and I'm an idle fucker
-                                if (!playedPitForFuelNow && raceLapsRemaining > 1)
+                                if (!playedPitForFuelNow && lapsRemaining > 1)
                                 {
                                     playedPitForFuelNow = true;
                                     audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this), 10);
@@ -1082,7 +1080,6 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    int lapsRemaining = CrewChief.currentGameState.SessionData.SessionNumberOfLaps - CrewChief.currentGameState.SessionData.CompletedLaps;
                     if (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
                     {
                         isSufficientTimeToSaveFuel = lapsRemaining >= 1;
