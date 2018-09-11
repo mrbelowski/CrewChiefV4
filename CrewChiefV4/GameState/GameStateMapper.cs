@@ -64,11 +64,16 @@ namespace CrewChiefV4.GameState
             
             // sort out all the class position stuff
             int numCarsInPlayerClass = 1;
+            int leaderLapsCompleted = currentGameState.SessionData.CompletedLaps;
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
                 if (!opponent.IsActive)
                 {
                     continue;
+                }
+                if (opponent.OverallPosition == 1)
+                {
+                    leaderLapsCompleted = opponent.CompletedLaps;
                 }
                 if (singleClass || CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
@@ -167,6 +172,19 @@ namespace CrewChiefV4.GameState
                     }
                 }
             }
+            if (!currentGameState.SessionData.SessionHasFixedTime)
+            {
+                // work out the laps remaining
+                if (currentGameState.SessionData.SessionType == SessionType.Race)
+                {
+                    currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - leaderLapsCompleted;
+                }
+                else
+                {
+                    currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
+                }
+            }
+            
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {
                 currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
