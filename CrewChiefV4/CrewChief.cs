@@ -871,10 +871,13 @@ namespace CrewChiefV4
                         {
                             previousGameState = currentGameState;
                             currentGameState = nextGameState;
-                            // TODO: derived data for practice and qually sessions, if we need it
                             if (currentGameState.SessionData.SessionType == SessionType.Race)
                             {
                                 gameStateMapper.populateDerivedRaceSessionData(currentGameState);
+                            }
+                            else
+                            {
+                                gameStateMapper.populateDerivedNonRaceSessionData(currentGameState);
                             }
                             if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
                                 && previousGameState != null)

@@ -142,7 +142,7 @@ namespace CrewChiefV4.Audio
                     else if (inTraffic || hasCarClose)
                         PlaybackModerator.verbosity = Verbosity.MED;
                     else if (currentGameState.SessionData.CompletedLaps == 0
-                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps)
+                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionLapsRemaining < 2)
                         || (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
                         PlaybackModerator.verbosity = Verbosity.MED;
                 }

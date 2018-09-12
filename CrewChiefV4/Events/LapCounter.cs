@@ -532,16 +532,15 @@ namespace CrewChiefV4.Events
                 currentGameState.SessionData.SessionPhase != SessionPhase.Finished)
             {
                 // a new lap has been started in race mode
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                if (currentGameState.SessionData.SessionLapsRemaining == 2)
                 {
                     // disable pearls for the last part of the race
                     audioPlayer.disablePearlsOfWisdom = true;
                 }
                 int position = currentGameState.SessionData.ClassPosition;
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 1
-                    || currentGameState.SessionData.IsLastLap)  // Note: this might trigger in timed race.  Is this desired?
+                if (currentGameState.SessionData.SessionLapsRemaining == 1 || currentGameState.SessionData.IsLastLap)  // Note: this might trigger in timed race.  Is this desired?
                 {
-                    Console.WriteLine("1 lap remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                    Console.WriteLine("1 lap remaining");
                     if (position == 1)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderLastLapLeading, 0, this), 10);
@@ -561,7 +560,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
                 {
-                    Console.WriteLine("2 laps remaining, SessionHasFixedTime = " + currentGameState.SessionData.SessionHasFixedTime);
+                    Console.WriteLine("2 laps remaining");
                     if (position == 1)
                     {
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeftLeading, 0, this), 10);

@@ -87,10 +87,12 @@ namespace CrewChiefV4.Events
                     }
                     playedNearEndTimePush = checkGaps(currentGameState, numLapsLeft, checkPushToGain, checkPushToHold);
                 }
-                else if ((checkPushToGain || checkPushToHold) && !playedNearEndLapsPush && currentGameState.SessionData.SessionNumberOfLaps > 0 &&
-                    currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps <= 4)
+                else if ((checkPushToGain || checkPushToHold) && !playedNearEndLapsPush && !currentGameState.SessionData.SessionHasFixedTime &&
+                    ((currentGameState.SessionData.SessionLapsRemaining <= 4 && currentGameState.SessionData.TrackDefinition.trackLengthClass <= TrackData.TrackLengthClass.MEDIUM) ||
+                     (currentGameState.SessionData.SessionLapsRemaining <= 2 && currentGameState.SessionData.TrackDefinition.trackLengthClass <= TrackData.TrackLengthClass.LONG) ||
+                     (currentGameState.SessionData.SessionLapsRemaining == 1 && currentGameState.SessionData.TrackDefinition.trackLengthClass <= TrackData.TrackLengthClass.VERY_LONG)))
                 {
-                    playedNearEndLapsPush = checkGaps(currentGameState, currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps, checkPushToGain, checkPushToHold);
+                    playedNearEndLapsPush = checkGaps(currentGameState, currentGameState.SessionData.SessionLapsRemaining, checkPushToGain, checkPushToHold);
                 }
             }
             if (currentGameState.PitData.IsAtPitExit && currentGameState.PositionAndMotionData.CarSpeed > 5)

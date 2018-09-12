@@ -212,9 +212,9 @@ namespace CrewChiefV4.Events
 
         private Boolean isNearRaceEnd(GameStateData currentGameState)
         {
-            if (currentGameState.SessionData.SessionNumberOfLaps > 0)
+            if (!currentGameState.SessionData.SessionHasFixedTime)
             {
-                if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps)
+                if (currentGameState.SessionData.SessionLapsRemaining == 0)
                 {
                     // on last lap - check track length 
                     if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
