@@ -3387,6 +3387,7 @@ namespace CrewChiefV4.GameState
         public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, CarData.CarClass carClassToCheck)
         {
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
+
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
                 if (CrewChief.forceSingleClass
