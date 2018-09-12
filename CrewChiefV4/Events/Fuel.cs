@@ -564,7 +564,7 @@ namespace CrewChiefV4.Events
                             currentGameState.SessionData.SessionNumberOfLaps <= 0 && currentGameState.SessionData.SessionTotalRunTime > 0 && averageUsagePerMinute > 0)
                         {
                             float benchmarkLaptime = currentGameState.TimingData.getPlayerBestLapTime();
-                            if (benchmarkLaptime == -1)
+                            if (benchmarkLaptime <= 0)
                             {
                                 benchmarkLaptime = currentGameState.TimingData.getPlayerClassBestLapTime();
                             }
@@ -1342,7 +1342,7 @@ namespace CrewChiefV4.Events
         public float getLitresToEndOfRace(Boolean addReserve)
         {
             float additionalLitresNeeded = float.MaxValue;
-            if (fuelUseActive)
+            if (fuelUseActive && CrewChief.currentGameState != null)
             {
                 float additionalFuelLiters = 2f;
                 if (averageUsagePerLap > 0 && addAdditionalFuelLaps > 0)
@@ -1359,7 +1359,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (averageUsagePerMinute > 0)
                 {
-                    if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null && addAdditionalFuelLaps <= 0)
+                    if (CrewChief.currentGameState.SessionData.TrackDefinition != null && addAdditionalFuelLaps <= 0)
                     {
                         TrackData.TrackLengthClass trackLengthClass = CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass;
                         if (trackLengthClass < TrackData.TrackLengthClass.MEDIUM)
@@ -1376,8 +1376,12 @@ namespace CrewChiefV4.Events
                         }
                     }
                     float minutesRemaining = secondsRemaining / 60f;
-                    float playerBestLapTime = CrewChief.currentGameState != null ? CrewChief.currentGameState.TimingData.getPlayerBestLapTime() : 100;  // should never be null
-                    float maxMinutesRemaining = (secondsRemaining + (hasExtraLap ? playerBestLapTime * 2 : playerBestLapTime)) / 60f;                    
+                    float expectedLapTime = CrewChief.currentGameState.TimingData.getPlayerBestLapTime();
+                    if (expectedLapTime <= 0)
+                    {
+                        expectedLapTime = CrewChief.currentGameState.TimingData.getPlayerClassBestLapTime();
+                    }
+                    float maxMinutesRemaining = (secondsRemaining + (hasExtraLap ? expectedLapTime * 2 : expectedLapTime)) / 60f;                    
                     float totalLitresNeededToEnd = 0;
                     if(averageUsagePerLap > 0)
                     {

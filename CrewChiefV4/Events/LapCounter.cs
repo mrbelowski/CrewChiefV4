@@ -570,7 +570,7 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this), 10);
                     }
                     else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5 &&
-                        currentGameState.SessionData.LapTimePrevious > currentGameState.TimingData.getPlayerClassBestLapTime())
+                        currentGameState.SessionData.LapTimePrevious > currentGameState.TimingData.getPlayerBestLapTime())
                     {
                         // yuk... don't yell at the player for being shit if he's playing Assetto. Because assetto drivers *are* shit, and also the SessionStartClassPosition
                         // might be invalid so perhaps they're really not being shit. At the moment.

@@ -1002,14 +1002,18 @@ namespace CrewChiefV4.Events
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_BEST_LAP_TIME))
             {
-                if (CrewChief.currentGameState != null && CrewChief.currentGameState.TimingData.getPlayerBestLapTime(TimingData.ConditionsEnum.ANY) > 0)
+                Boolean gotData = false;
+                if (CrewChief.currentGameState != null)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("bestLapTime",
-                        MessageContents(TimeSpanWrapper.FromSeconds(
-                        CrewChief.currentGameState.TimingData.getPlayerBestLapTime(TimingData.ConditionsEnum.ANY), 
-                        Precision.AUTO_LAPTIMES)), 0, this));
+                    float bestLap = CrewChief.currentGameState.TimingData.getPlayerBestLapTime(TimingData.ConditionsEnum.ANY);
+                    if (bestLap > 0)
+                    {
+                        gotData = true;
+                        audioPlayer.playMessageImmediately(new QueuedMessage("bestLapTime",
+                            MessageContents(TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES)), 0, this));
+                    }
                 }
-                else
+                if (!gotData)
                 {
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
                 }
@@ -1732,7 +1736,8 @@ namespace CrewChiefV4.Events
                 // hmm....
                 return false;
             }
-            return Math.Abs(sample1.RainDensity - sample2.RainDensity) > 0.02 || Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) > 4;
+            return ConditionsMonitor.getRainLevel(sample1.RainDensity) != ConditionsMonitor.getRainLevel(sample2.RainDensity) || 
+                Math.Abs(sample1.TrackTemperature - sample2.TrackTemperature) > 4;
         }
 
         public static Boolean nearlyEqual(float a, float b)
