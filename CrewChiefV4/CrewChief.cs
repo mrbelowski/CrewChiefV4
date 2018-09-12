@@ -63,7 +63,8 @@ namespace CrewChiefV4
 
         // This value is set to false when we re-create main run thread, and is set to true
         // once we get past file loading phase (which can be lenghty).
-        public Boolean runThreadInitialized = false;
+        public Boolean dataFileReadDone = false;
+        public Boolean dataFileDumpDone = false;
 
         private TimeSpan minimumSessionParticipationTime = TimeSpan.FromSeconds(6);
 
@@ -166,6 +167,7 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            // TODO_THREADS: debug startup/shutdown, with and without app connected.
             running = false;
             spotterIsRunning = false;
             if (gameDataReader != null)
@@ -698,7 +700,7 @@ namespace CrewChiefV4
             }
             else
             {
-                runThreadInitialized = true;  // Don't block UI as we won't be loading from the file.
+                dataFileReadDone = true;  // Don't block UI as we won't be loading from the file.
                 // ensure the playback interval is re-initialised, in case we've been mucking about with it in the previous run.
                 _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
             }
@@ -814,13 +816,8 @@ namespace CrewChiefV4
                             }
                             finally
                             {
-                                runThreadInitialized = true;
+                                dataFileReadDone = true;
                             }
-                            // TODO_THREADS:
-/*                            finally
-                            {
-                                MainWindow.instance.startApplicationButton.Enabled = true;
-                           }*/
                             if (latestRawGameData == null)
                             {
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
@@ -1106,10 +1103,10 @@ namespace CrewChiefV4
                     }
                     finally
                     {
-                        // Restore start/stop buton.
-                        MainWindow.instance.startApplicationButton.Enabled = true;
+                        dataFileDumpDone = true;
                     }
                 }
+                dataFileDumpDone = true;
                 try
                 {
                     gameDataReader.stop();
