@@ -93,158 +93,6 @@ namespace CrewChiefV4
         // True, while we are in a constructor.
         private bool constructingWindow = false;
 
-        // TODO: move this crap to SynchronizationManager?
-        private List<Thread> rootThreads = new List<Thread>();
-        private void registerRootThread(Thread t)
-        {
-            if (this.InvokeRequired)
-            {
-                Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
-                return;
-            }
-
-            rootThreads.Add(t);
-        }
-
-        private void unregisterRootThreads()
-        {
-            /*if (this.InvokeRequired)
-            {
-                Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
-                return;
-            }*/
-
-            // TODO: do validation.
-            rootThreads.Clear();
-
-        }
-
-        private void doWatchStartup(CrewChief cc)
-        {
-            new Thread(() =>
-            {
-                this.waitForRootThreadsStart(cc);
-            }).Start();
-        }
-
-        private void doWatchStop()
-        {
-            new Thread(() =>
-            {
-                this.waitForRootThreadsStop();
-            }).Start();
-        }
-
-        // This is not strictly necessary, because all this really does is makes sure .Start has been called on a thread, which is easy
-        // to achieve.  Still, do this for symmetry.
-        private bool waitForRootThreadsStart(CrewChief cc)
-        {
-            try
-            {
-                if (!this.InvokeRequired)
-                {
-                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
-                    return false;
-                }
-
-                // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
-                // To reduce risk of a deadlock, keep retrying by waking main thread up.
-                Console.WriteLine("Wating for root threads to start...");
-                for (int i = 0; i < 100; ++i)
-                {
-                    bool allThreadsRunning = true;
-                    foreach (var t in rootThreads)
-                    {
-                        // IT'S A BIT.
-                        if (!t.IsAlive)
-                        {
-                            Console.WriteLine("START:  not running - " + t.Name);
-                            allThreadsRunning = false;
-                            break;
-                        }
-                    }
-
-                    if (allThreadsRunning)
-                    {
-                        Console.WriteLine("Root threads to started");
-
-                        Console.WriteLine("Wating for run thread to initialize...");
-                        while (true)
-                        {
-                            if (cc.runThreadInitialized)
-                            {
-                                Console.WriteLine("Run thread initialized");
-                                break;
-                            }
-
-                            Thread.Sleep(50);
-                        }
-
-                        return true;
-                    }
-
-                    Thread.Sleep(50);
-                }
-
-                return false;
-            }
-            finally
-            {
-                this.Invoke((MethodInvoker)delegate
-                {
-                    this.startApplicationButton.Enabled = true;
-                });
-            }
-        }
-
-        private bool waitForRootThreadsStop()
-        {
-            try
-            {
-                if (!this.InvokeRequired)
-                {
-                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
-                    return false;
-                }
-
-                // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
-                // Right now one scenario is that runApp thread tries to write text when we wait here.
-                // To reduce risk of a deadlock, keep retrying by waking main thread up.
-                for (int i = 0; i < 100; ++i)
-                {
-                    bool allThreadsStopped = true;
-                    foreach (var t in rootThreads)
-                    {
-                        if (t.IsAlive)
-                        {
-                            Console.WriteLine("STOP:  still alive - " + t.Name);
-                            allThreadsStopped = false;
-                            break;
-                        }
-                    }
-
-                    if (allThreadsStopped)
-                    {
-                        return true;
-                    }
-
-                    Thread.Sleep(50);
-                }
-
-                return false;
-            }
-            finally
-            {
-                this.Invoke((MethodInvoker)delegate
-                {
-                    unregisterRootThreads();
-                    // Need to see if form is not being closed?
-                    this.startApplicationButton.Enabled = true;
-                });
-            }
-
-        }
-
         public void killChief()
         {
             crewChief.stop();
@@ -1114,7 +962,7 @@ namespace CrewChiefV4
                 doStartAppStuff();
 
                 // Will wait for threads to start, possible file load and enable the button.
-                doWatchStartup(crewChief);
+                ThreadManager.DoWatchStartup(crewChief);
             }
 
             this.ResumeLayout();
@@ -1457,15 +1305,12 @@ namespace CrewChiefV4
 
             if (IsAppRunning)
             {
-                doWatchStartup(crewChief);
+                ThreadManager.DoWatchStartup(crewChief);
             }
             else
             {
-                doWatchStop();
-                //unregisterRootThreads();
+                ThreadManager.DoWatchStop(crewChief);
             }
-
-            //startApplicationButton.Enabled = true;
         }
 
         private void doStartAppStuff()
@@ -1501,14 +1346,16 @@ namespace CrewChiefV4
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
                 crewChiefThread.Name = "MainWindow.runApp";
-                registerRootThread(crewChiefThread);
+                ThreadManager.RegisterRootThread(crewChiefThread);
 
                 // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
                 // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
                 // the AutoUpdater triggers and steals focus while the player is racing
                 AutoUpdater.Stop();
 
-                crewChief.runThreadInitialized = false;
+                // TODO_THREADS: maybe separate method.
+                crewChief.dataFileReadDone = false;
+                crewChief.dataFileDumpDone = false;
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
                     && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
@@ -1519,7 +1366,7 @@ namespace CrewChiefV4
                     Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
 
                     channelOpenButtonListenerThread.Name = "MainWindow.listenForChannelOpen";
-                    registerRootThread(channelOpenButtonListenerThread);
+                    ThreadManager.RegisterRootThread(channelOpenButtonListenerThread);
 
                     channelOpenButtonListenerThread.Start();
                 }
@@ -1538,7 +1385,7 @@ namespace CrewChiefV4
                     Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
 
                     buttonPressesListenerThread.Name = "MainWindow.listenForButtons";
-                    registerRootThread(buttonPressesListenerThread);
+                    ThreadManager.RegisterRootThread(buttonPressesListenerThread);
 
                     buttonPressesListenerThread.Start();
                 }
@@ -1593,9 +1440,6 @@ namespace CrewChiefV4
             Boolean record = false;
             if (!String.IsNullOrWhiteSpace(filenameTextbox.Text))
             {
-                // This will be reenabled once file is deserialized or on failure.
-                this.startApplicationButton.Enabled = false;
-
                 filenameToRun = filenameTextbox.Text;
                 if (this.playbackInterval.Text.Length > 0)
                 {
@@ -1621,12 +1465,6 @@ namespace CrewChiefV4
 
         private void stopApp()
         {
-            if (this.recordSession.Checked)
-            {
-                // This will be reenabled once dump to file succeeds or fails.
-                this.startApplicationButton.Enabled = false;
-            }
-
             runListenForChannelOpenThread = false;
             runListenForButtonPressesThread = false;
             crewChief.stop();

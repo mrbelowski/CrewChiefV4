@@ -725,7 +725,7 @@ namespace CrewChiefV4
         public System.Windows.Forms.ListBox gameDefinitionList;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label personalisationLabel;
-        private System.Windows.Forms.TextBox filenameTextbox;
+        public System.Windows.Forms.TextBox filenameTextbox;
         private System.Windows.Forms.Label filenameLabel;
         private System.Windows.Forms.TextBox playbackInterval;
         private System.Windows.Forms.Label app_version;

@@ -440,6 +440,7 @@ namespace CrewChiefV4.Audio
             if (monitorQueueThread != null)
             {
                 Console.WriteLine("Waiting for queue monitor to stop...");
+                // TODO_THREADS: don't block indefinitely here.
                 monitorQueueThread.Join();
                 monitorQueueThread = null;
                 Console.WriteLine("Monitor queue stopped");
