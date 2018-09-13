@@ -80,6 +80,8 @@ namespace CrewChiefV4
 
         private Boolean runSpotterThread = false;
 
+        private Thread spotterThread = null;
+
         private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
         private GameStateMapper gameStateMapper;
@@ -633,13 +635,41 @@ namespace CrewChiefV4
         {
             if (spotter != null)
             {
+                if (spotterThread != null)
+                {
+                    // This is the corner case when spotter was disabled during runtime.
+                    stopSpotterThread();
+                    spotterThread = null;
+                }
+                Debug.Assert(spotterThread == null);
                 lastSpotterState = null;
                 currentSpotterState = null;
                 spotterIsRunning = true;
                 ThreadStart work = spotterWork;
-                Thread thread = new Thread(work);
+                spotterThread = new Thread(work);
                 runSpotterThread = true;
-                thread.Start();
+                spotterThread.Start();
+            }
+        }
+
+        private void stopSpotterThread()
+        {
+            if (spotter != null && spotterThread != null)
+            {
+                runSpotterThread = false;
+
+                if (spotterThread.IsAlive)
+                {
+                    Console.WriteLine("Waiting for spotter thread to stop...");
+                    if (!spotterThread.Join(5000))
+                    {
+                        Console.WriteLine("Warning: Timed out waiting for spotter thread to stop to stop");
+                    }
+                }
+
+                Console.WriteLine("Spotter thread stopped");
+
+                spotterThread = null;
             }
         }
 
@@ -1126,6 +1156,9 @@ namespace CrewChiefV4
             {
                 speechRecogniser.stop();
             }
+
+            stopSpotterThread();
+
             return true;
         }
 
@@ -1171,6 +1204,10 @@ namespace CrewChiefV4
         {
             running = false;
             runSpotterThread = false;
+            if (audioPlayer != null)
+            {
+                audioPlayer.monitorRunning = false;
+            }
         }
 
         private void displayNewSessionInfo(GameStateData currentGameState)

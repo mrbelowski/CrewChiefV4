@@ -16,7 +16,7 @@ namespace CrewChiefV4
 {
     public static class ThreadManager
     {
-        private const int THREAD_ALIVE_CHECK_PERIOD_MILLIS = 50;
+        private const int THREAD_ALIVE_CHECK_PERIOD_MILLIS = 200;
         private const int THREAD_ALIVE_TOTAL_WAIT_SECS = 5;
         private const int THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.THREAD_ALIVE_CHECK_PERIOD_MILLIS;
 
@@ -115,6 +115,9 @@ namespace CrewChiefV4
                     Thread.Sleep(ThreadManager.THREAD_ALIVE_CHECK_PERIOD_MILLIS);
                 }
 
+                ThreadManager.Trace("Wait for root threads start failed:");
+                ThreadManager.TraceRootThreadStats();
+
                 return false;
             }
             finally
@@ -163,6 +166,7 @@ namespace CrewChiefV4
                     {
                         if (t.IsAlive)
                         {
+                            // TODO_THREADS: remove?
                             ThreadManager.Trace("Thread still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
@@ -178,6 +182,9 @@ namespace CrewChiefV4
                     Thread.Sleep(ThreadManager.THREAD_ALIVE_CHECK_PERIOD_MILLIS);
                 }
 
+                ThreadManager.Trace("Wait for root threads stop failed:");
+                ThreadManager.TraceRootThreadStats();
+
                 return false;
             }
             finally
@@ -192,6 +199,13 @@ namespace CrewChiefV4
                     });
                 }
             }
+        }
+
+        private static void TraceRootThreadStats()
+        {
+            // If we run into bad problems, we might need to also get stack trace out.
+            foreach (var t in rootThreads)
+                ThreadManager.Trace(string.Format("Thread Name: {0}  ThreadState: {1}  IsAlive: {2}\n", t.Name, t.ThreadState, t.IsAlive));
         }
 
         private static void Trace(string msg)
