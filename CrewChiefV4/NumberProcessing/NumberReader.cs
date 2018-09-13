@@ -159,7 +159,7 @@ namespace CrewChiefV4
                     messageFolders.AddRange(GetTenthsSounds(timeSpanWrapper.timeSpan.Hours, timeSpanWrapper.timeSpan.Minutes, timeSpanWrapper.timeSpan.Seconds, tenths, useMoreInflection, precision));
                 }
 
-                if (messageFolders.Count > 0)
+                if (getLocale() == "it" && messageFolders.Count > 0)
                 {
                     Console.WriteLine(String.Join(", ", messageFolders));
                 }
