@@ -224,6 +224,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.5.2: Fix laps-to-go calculation - it's now based on the number of laps completed by the overall leader so should be correct when you've been lapped; allow for changing conditions when determining the player's pace and best lap time - comparisons are only made to laps completed in broadly similar conditions and best lap set in the current conditions is used when working out things like expected laps remaining and required fuel loads; fixed rounding errors in fuel calculations that could accumulate to substantial amounts; R3E - fixed some missing state transitions; pCars2 - use updated RainDensity data for more fine-grained rain calls
+
 Version 4.9.5.1: Added support for F1 2018 *spotter only*. This uses the UDP data stream sent by the game - the app listens on the default port 20777 (can be changed with the 'F1 2018 UDP Port' property). This is an early implementation so expect some bugs - please report them. Again, it's only the spotter - the app doesn't interpret any of the other game data so it won't give other calls or be able to answer any questions. I may add full support later, but as the crew chief built into the game is actually pretty good this isn't a high priority; RF2 - updated plugin to latest version.
 
 Version 4.9.5.0: Some fuel calculation fixes; reduced likelihood of yellow flag warnings for cars that have already quit to pits; added fuel-window messge in races which have no mandatory stop but will need a single fuel stop; some internal fixes; iRacing - fixed issues with opening lap data
