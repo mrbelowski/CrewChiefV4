@@ -18,7 +18,7 @@ namespace CrewChiefV4.Events
         private static float drizzleMin = 0.01f;
         private static float drizzleMax = 0.15f;
         private static float lightRainMax = 0.3f;
-        private static float midRainMax = 0.5f;
+        private static float midRainMax = 0.6f;
         private static float heavyRainMax = 0.75f;
 
         public enum RainLevel
