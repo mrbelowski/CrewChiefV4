@@ -70,7 +70,7 @@ namespace CrewChiefV4.Audio
         private int lastDelayedQueueSize = -1;
         private Dictionary<String, int> playedMessagesCount = new Dictionary<String, int>();
 
-        private Boolean monitorRunning = false;
+        public Boolean monitorRunning = false;
 
         private Boolean keepQuiet = false;
         private Boolean channelOpen = false;
@@ -436,12 +436,16 @@ namespace CrewChiefV4.Audio
             monitorRunning = false;
 
             // Wait for monitor queue thread to exit.
-            //Debug.Assert(monitorQueueThread != null);
             if (monitorQueueThread != null)
-            {
-                Console.WriteLine("Waiting for queue monitor to stop...");
-                // TODO_THREADS: don't block indefinitely here.
-                monitorQueueThread.Join();
+            {                
+                if (monitorQueueThread.IsAlive)
+                {
+                    Console.WriteLine("Waiting for queue monitor to stop...");
+                    if (!monitorQueueThread.Join(5000))
+                    {
+                        Console.WriteLine("Warning: Timed out waiting for queue monitor to stop");
+                    }
+                }
                 monitorQueueThread = null;
                 Console.WriteLine("Monitor queue stopped");
             }
@@ -644,6 +648,8 @@ namespace CrewChiefV4.Audio
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
+
+            // TODO_THREADS: This throws on shutdown, sometimes (UI thread no longer exists).
             this.backgroundPlayer.stop();
         }
 
