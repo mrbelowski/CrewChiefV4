@@ -94,7 +94,6 @@ namespace CrewChiefV4
                     if (allThreadsRunning)
                     {
                         ThreadManager.Trace("Root threads started");
-
                         if (!string.IsNullOrWhiteSpace(MainWindow.instance.filenameTextbox.Text))
                         {
                             ThreadManager.Trace("Wating for run thread to read data file...");
