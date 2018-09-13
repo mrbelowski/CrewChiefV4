@@ -279,19 +279,19 @@ namespace CrewChiefV4.Events
                                 switch (currentRainLevel)
                                 {
                                     case RainLevel.DRIZZLE:
-                                        audioPlayer.playMessage(new QueuedMessage(folderDrizzleIncreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderDrizzleIncreasing, 0, null));
                                         break;
                                     case RainLevel.LIGHT:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, null));
                                         break;
                                     case RainLevel.MID:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, null));
                                         break;
                                     case RainLevel.HEAVY:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, null));
                                         break;
                                     case RainLevel.STORM:
-                                        audioPlayer.playMessage(new QueuedMessage(folderRainMax, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderRainMax, 0, null));
                                         break;
                                     case RainLevel.NONE:
                                         audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 3);
