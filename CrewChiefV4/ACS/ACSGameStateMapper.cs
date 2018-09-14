@@ -1185,6 +1185,8 @@ namespace CrewChiefV4.assetto
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }
 
                 //------------------- Variable session data ---------------------------
@@ -1241,7 +1243,8 @@ namespace CrewChiefV4.assetto
 
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         lastLapTime, currentGameState.SessionData.CurrentLapIsValid, currentGameState.PitData.InPitlane, false,
-                        shared.acsPhysics.roadTemp, shared.acsPhysics.airTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, numberOfSectorsOnTrack);
+                        shared.acsPhysics.roadTemp, shared.acsPhysics.airTemp, currentGameState.SessionData.SessionHasFixedTime,
+                        currentGameState.SessionData.SessionTimeRemaining, numberOfSectorsOnTrack, currentGameState.TimingData);
                     currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                         currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
                 }
@@ -1439,7 +1442,8 @@ namespace CrewChiefV4.assetto
                                         currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                         previousOpponentCompletedLaps, previousOpponentDataWaitingForNewLapData,
                                         previousOpponentNewLapDataTimerExpiry, previousOpponentLastLapTime, previousOpponentLastLapValid, previousCompletedLapsWhenHasNewLapDataWasLastTrue,
-                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine);
+                                        previousOpponentGameTimeWhenLastCrossedStartFinishLine,
+                                        currentGameState.TimingData, currentGameState.carClass);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1879,7 +1883,8 @@ namespace CrewChiefV4.assetto
             /* previous tick data for hasNewLapData check*/
             int previousOpponentDataLapsCompleted, Boolean previousOpponentDataWaitingForNewLapData,
             DateTime previousOpponentNewLapDataTimerExpiry, float previousOpponentLastLapTime, Boolean previousOpponentLastLapValid,
-            int previousCompletedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine)
+            int previousCompletedLapsWhenHasNewLapDataWasLastTrue, float previousOpponentGameTimeWhenLastCrossedStartFinishLine,
+            TimingData timingData, CarData.CarClass playerCarClass)
         {
             if (opponentData.CurrentSectorNumber == 0)
             {
@@ -1942,7 +1947,8 @@ namespace CrewChiefV4.assetto
                         else
                         {
                             opponentData.CompleteLapWithProvidedLapTime(leaderBoardPosition, sessionRunningTime, lastLapTime, isInPits,
-                                false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, ACSGameStateMapper.numberOfSectorsOnTrack);
+                                false, trackTempreture, airTemperature, sessionLengthIsTime, sessionTimeRemaining, ACSGameStateMapper.numberOfSectorsOnTrack,
+                                timingData, CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass));
                         }
                     }
 

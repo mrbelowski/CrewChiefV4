@@ -85,14 +85,24 @@ namespace CrewChiefV4.GameState
     public class FlagData
     {
         // holds newer (AMS, RF2 & Raceroom) flag data. This is game dependent - only AMS, RF2 and R3E will use this.
-        public FlagEnum[] sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };
+        private FlagEnum[] _sectorFlags;
+        public FlagEnum[] sectorFlags {
+            get
+            {
+                if (_sectorFlags == null)
+                {
+                    _sectorFlags = new FlagEnum[] { FlagEnum.GREEN, FlagEnum.GREEN, FlagEnum.GREEN };                    
+                }
+                return _sectorFlags;
+            }
+        }
         public Boolean isFullCourseYellow; // FCY rules apply, no other announcements
         public Boolean isLocalYellow;  // local yellow - no overtaking, slow down
         // note that for RaceRoom we might have to calculate this. < 0 means we've passed the incident.
         public float distanceToNearestIncident = -1;
         public FullCourseYellowPhase fcyPhase = FullCourseYellowPhase.RACING;
-        public Boolean currentLapIsFCY = false;
-        public Boolean previousLapWasFCY = false;
+        public Boolean currentLapIsFCY;
+        public Boolean previousLapWasFCY;
         public int lapCountWhenLastWentGreen = -1;
         // cars passed under yellow - need to give back this many places to avoid penalty (only implemented for R3E)
         public int numCarsPassedIllegally = 0;
@@ -107,7 +117,7 @@ namespace CrewChiefV4.GameState
     {
         public StockCarRule stockCarRuleApplicable = StockCarRule.NONE;
         public String luckyDogNameRaw;
-        public Boolean stockCarRulesEnabled = false;
+        public Boolean stockCarRulesEnabled;
     }
 
     public class TransmissionData
@@ -123,61 +133,61 @@ namespace CrewChiefV4.GameState
     public class EngineData
     {
         // Engine speed
-        public Single EngineRpm = 0;
+        public Single EngineRpm;
 
         // Maximum engine speed
-        public Single MaxEngineRpm = 0;
+        public Single MaxEngineRpm;
 
         // Unit: Celcius
-        public Single EngineWaterTemp = 0;
+        public Single EngineWaterTemp;
 
         // Unit: Celcius
-        public Single EngineOilTemp = 0;
+        public Single EngineOilTemp;
 
         // Unit: ?
-        public Single EngineOilPressure = 0;
+        public Single EngineOilPressure;
 
-        public int MinutesIntoSessionBeforeMonitoring = 0;
+        public int MinutesIntoSessionBeforeMonitoring;
 
-        public Boolean EngineWaterTempWarning = false;
+        public Boolean EngineWaterTempWarning;
 
-        public Boolean EngineOilPressureWarning = false;
+        public Boolean EngineOilPressureWarning;
 
-        public Boolean EngineFuelPressureWarning = false;
+        public Boolean EngineFuelPressureWarning;
 
-        public Boolean EngineStalledWarning = false;
+        public Boolean EngineStalledWarning;
 
     }
 
     public class FuelData
     {
         // Unit: ?
-        public Single FuelPressure = 0;
+        public Single FuelPressure;
 
         // Current amount of fuel in the tank(s)
         // Unit: Liters (l)
-        public Single FuelLeft = 0;
+        public Single FuelLeft;
 
         // Maximum capacity of fuel tank(s)
         // Unit: Liters (l)
-        public Single FuelCapacity = 0;
+        public Single FuelCapacity;
 
-        public Boolean FuelUseActive = false;
+        public Boolean FuelUseActive;
     }
 
     public class BatteryData
     {
         // Current battery charge level
         // Unit: % of full charge (100%)
-        public Single BatteryPercentageLeft = 0;
+        public Single BatteryPercentageLeft;
 
-        public Boolean BatteryUseActive = false;
+        public Boolean BatteryUseActive;
     }
 
 
     public class CarDamageData
     {
-        public Boolean DamageEnabled = false;
+        public Boolean DamageEnabled;
 
         public DamageLevel OverallTransmissionDamage = DamageLevel.UNKNOWN;
 
@@ -185,9 +195,39 @@ namespace CrewChiefV4.GameState
 
         public DamageLevel OverallAeroDamage = DamageLevel.UNKNOWN;
 
-        public CornerData SuspensionDamageStatus = new CornerData();
+        private CornerData _SuspensionDamageStatus;
+        public CornerData SuspensionDamageStatus
+        {
+            get
+            {
+                if (_SuspensionDamageStatus == null)
+                {
+                    _SuspensionDamageStatus = new CornerData();
+                }
+                return _SuspensionDamageStatus;
+            }
+            set
+            {
+                _SuspensionDamageStatus = value;
+            }
+        }
 
-        public CornerData BrakeDamageStatus = new CornerData();
+        private CornerData _BrakeDamageStatus;
+        public CornerData BrakeDamageStatus
+        {
+            get
+            {
+                if (_BrakeDamageStatus == null)
+                {
+                    _BrakeDamageStatus = new CornerData();
+                }
+                return _BrakeDamageStatus;
+            }
+            set
+            {
+                _BrakeDamageStatus = value;
+            }
+        }
 
         public float LastImpactTime = -1.0f;
     }
@@ -244,49 +284,515 @@ namespace CrewChiefV4.GameState
         Rolling
     }
 
+    public class TimingData
+    {
+        public Boolean conditionsHaveChanged;
+        private ConditionsEnum initialConditions = ConditionsEnum.ANY;  // not set
+        // in order of potential pace - WARM_DRY is fastest, CURRENT is whatever the current conditions are,
+        // ANY is all conditions
+        public enum ConditionsEnum {
+            SNOW = 0, ICE, VERY_WET, COLD_WET, WARM_WET, COLD_DAMP, WARM_DAMP, COLD_DRY, HOT_DRY, WARM_DRY, CURRENT, ANY
+        }
+
+        public static ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
+        {
+            if (sample == null)
+            {
+                return ConditionsEnum.WARM_DRY;
+            }
+            ConditionsMonitor.RainLevel rainLevel = ConditionsMonitor.RainLevel.NONE;
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            {
+                rainLevel = ConditionsMonitor.getRainLevel(sample.RainDensity);
+            }
+            else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
+                sample.RainDensity > 0)
+            {
+                rainLevel = ConditionsMonitor.RainLevel.MID;
+            }
+            if (rainLevel == ConditionsMonitor.RainLevel.NONE)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    return ConditionsEnum.COLD_DRY;
+                }
+                else if (sample.AmbientTemperature < 30)
+                {
+                    return ConditionsEnum.WARM_DRY;
+                }
+                else
+                {
+                    return ConditionsEnum.HOT_DRY;
+                }
+            }
+            else if (sample.AmbientTemperature < 0)
+            {
+                if (rainLevel >= ConditionsMonitor.RainLevel.LIGHT)
+                {
+                    return ConditionsEnum.SNOW;
+                }
+                else
+                {
+                    return ConditionsEnum.ICE;
+                }
+            }
+            else if (rainLevel >= ConditionsMonitor.RainLevel.HEAVY)
+            {
+                return ConditionsEnum.VERY_WET;
+            }
+            else if (rainLevel == ConditionsMonitor.RainLevel.MID)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    return ConditionsEnum.COLD_WET;
+                }
+                else
+                {
+                    return ConditionsEnum.WARM_WET;
+                }
+            }
+            else if (rainLevel == ConditionsMonitor.RainLevel.LIGHT)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    return ConditionsEnum.COLD_DAMP;
+                }
+                else
+                {
+                    return ConditionsEnum.WARM_DAMP;
+                }
+            }
+            return ConditionsEnum.WARM_DRY;
+        }
+        
+        Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        Dictionary<ConditionsEnum, List<float>> playerLapTimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+
+        List<float> allPlayerSector1Times = new List<float>();
+        List<float> allPlayerSector2Times = new List<float>();
+        List<float> allPlayerSector3Times = new List<float>();
+        List<float> allPlayerLapTimes = new List<float>();
+
+
+        // Player only best times
+        Dictionary<ConditionsEnum, float> playerBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        float playerBestLapSector1Time = -1;
+        float playerBestLapSector2Time = -1;
+        float playerBestLapSector3Time = -1;
+        float playerBestLapTime = -1;
+
+
+        // Player class best times (player + opponents)
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        float playerClassBestLapSector1Time = -1;
+        float playerClassBestLapSector2Time = -1;
+        float playerClassBestLapSector3Time = -1;
+        float playerClassBestLapTime = -1;
+
+
+        // opponets in player class best times
+        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        float playerClassOpponentBestLapSector1Time = -1;
+        float playerClassOpponentBestLapSector2Time = -1;
+        float playerClassOpponentBestLapSector3Time = -1;
+        float playerClassOpponentBestLapTime = -1;
+
+        Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
+        
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // laptime set in conditions similar to the current conditions. You can also request a best laptime from
+        // some other conditions
+        public float getPlayerBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapTime, playerBestLapTimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector1 time from some other conditions
+        public float getPlayerBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector1Time, playerBestLapSector1TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector2 time from some other conditions
+        public float getPlayerBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector2Time, playerBestLapSector2TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector3 time from some other conditions
+        public float getPlayerBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector3Time, playerBestLapSector3TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
+        // some other conditions
+        public float getPlayerClassBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapTime, playerClassBestLapTimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector1 time from some other conditions
+        public float getPlayerClassBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector1Time, playerClassBestLapSector1TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector2 time from some other conditions
+        public float getPlayerClassBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector2Time, playerClassBestLapSector2TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector3 time from some other conditions
+        public float getPlayerClassBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector3Time, playerClassBestLapSector3TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
+        // some other conditions
+        public float getPlayerClassOpponentBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapTime, playerClassOpponentBestLapTimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector1 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector1Time, playerClassOpponentBestLapSector1TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector2 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector2Time, playerClassOpponentBestLapSector2TimeByConditions, false, requestedConditionsEnum);            
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector3 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition, Boolean checkForSufficientPlayerData,
+            ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            if (requestedConditionsEnum == ConditionsEnum.ANY)
+            {
+                return overallBest;
+            }
+            ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
+            if (!hasEnoughData(conditionsEnum, checkForSufficientPlayerData))
+            {
+                return overallBest;
+            }
+            float time;
+            if (timesByCondition.TryGetValue(conditionsEnum, out time))
+            {
+                return time;
+            }
+            return -1;
+        }
+
+        private Boolean hasEnoughData(ConditionsEnum requestedConditionsEnum, Boolean checkForSufficientPlayerData)
+        {
+            int minLapsUnderConditions = 2;
+            // eeewwwww
+            if (CrewChief.currentGameState != null && CrewChief.currentGameState.SessionData.TrackDefinition != null)
+            {
+                switch (CrewChief.currentGameState.SessionData.TrackDefinition.trackLengthClass)
+                {
+                    case TrackData.TrackLengthClass.VERY_LONG:
+                    case TrackData.TrackLengthClass.LONG:
+                        minLapsUnderConditions = 1;
+                        break;
+                    case TrackData.TrackLengthClass.SHORT:
+                    case TrackData.TrackLengthClass.VERY_SHORT:
+                        minLapsUnderConditions = 3;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (checkForSufficientPlayerData)
+            {
+                // 'enough data' means enough recorded player laps
+                List<float> list;
+                return playerLapTimesByConditions.TryGetValue(requestedConditionsEnum, out list) && list.Count >= minLapsUnderConditions;
+            }
+            else
+            {
+                // 'enough data' means enough recorded laps for any participant in the player's class
+                int totalLapsInTheseConditions;
+                return totalLapsInEachCondition.TryGetValue(requestedConditionsEnum, out totalLapsInTheseConditions) && totalLapsInTheseConditions >= minLapsUnderConditions;
+            }            
+        }
+        
+        // add a player lap, updating the best lap / sectors for player and player class if necessary
+        public void addPlayerLap(float lapTime, float s1, float s2, float s3)
+        {
+            if (lapTime > 0)
+            {
+                ConditionsEnum conditionsEnum = getConditionsEnum(ConditionsEnum.CURRENT);
+                if (initialConditions == ConditionsEnum.ANY)
+                {
+                    initialConditions = conditionsEnum;
+                }
+                else if (initialConditions != conditionsEnum)
+                {
+                    conditionsHaveChanged = true;
+                }
+                int totalLapsInTheseConditions;
+                if (totalLapsInEachCondition.TryGetValue(conditionsEnum, out totalLapsInTheseConditions))
+                {
+                    totalLapsInEachCondition[conditionsEnum] = totalLapsInTheseConditions + 1;
+                }
+                else
+                {
+                    totalLapsInEachCondition[conditionsEnum] = 1;
+                }
+                addToData(conditionsEnum, playerLapTimesByConditions, lapTime);
+                allPlayerLapTimes.Add(lapTime);
+                addToData(conditionsEnum, playerSector1TimesByConditions, s1);
+                allPlayerSector1Times.Add(s1);
+                addToData(conditionsEnum, playerSector2TimesByConditions, s2);
+                allPlayerSector2Times.Add(s2);
+                addToData(conditionsEnum, playerSector3TimesByConditions, s3);
+                allPlayerSector3Times.Add(s3);
+                updateBestTimes(conditionsEnum, lapTime, s1, s2, s3, true);
+            }
+        }
+
+        // Note that this should only be called if we've already checked this opponent is in the same class as the player
+        public void addOpponentPlayerClassLap(float lapTime, float s1, float s2, float s3)
+        {
+            if (lapTime > 0)
+            {
+                ConditionsEnum conditionsEnum = getConditionsEnum(ConditionsEnum.CURRENT);
+                if (initialConditions == ConditionsEnum.ANY)
+                {
+                    initialConditions = conditionsEnum;
+                }
+                else if (initialConditions != conditionsEnum)
+                {
+                    conditionsHaveChanged = true;
+                }
+                int totalLapsInTheseConditions;
+                if (totalLapsInEachCondition.TryGetValue(conditionsEnum, out totalLapsInTheseConditions))
+                {
+                    totalLapsInEachCondition[conditionsEnum] = totalLapsInTheseConditions + 1;
+                }
+                else
+                {
+                    totalLapsInEachCondition[conditionsEnum] = 1;
+                }
+                updateBestTimes(conditionsEnum, lapTime, s1, s2, s3, false);
+            }
+        }
+
+        private ConditionsEnum getConditionsEnum(ConditionsEnum requestedConditionsEnum)
+        {
+            if (requestedConditionsEnum == ConditionsEnum.CURRENT)
+            {
+                // TODO: need a better way to link the Conditions state with this TimingData state object, without needlessly invoking the ctor
+                if (CrewChief.currentGameState == null || CrewChief.currentGameState.Conditions == null || CrewChief.currentGameState.Conditions.samples == null)
+                {
+                    return ConditionsEnum.WARM_DRY;
+                }
+                return TimingData.getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
+            }
+            else
+            {
+                return requestedConditionsEnum;
+            }
+        }
+
+
+        private void updateBestTimes(ConditionsEnum conditionsEnum, float lapTime, float s1, float s2, float s3, Boolean isPlayer)
+        {
+            if (playerClassBestLapTime == -1 || lapTime < playerClassBestLapTime)
+            {
+                playerClassBestLapTime = lapTime;
+                playerClassBestLapSector1Time = s1;
+                playerClassBestLapSector2Time = s2;
+                playerClassBestLapSector3Time = s3;
+            }
+            if (isPlayer) 
+            {
+                if (playerBestLapTime == -1 || lapTime < playerBestLapTime)
+                {
+                    playerBestLapTime = lapTime;
+                    playerBestLapSector1Time = s1;
+                    playerBestLapSector2Time = s2;
+                    playerBestLapSector3Time = s3;
+                }
+            }
+            else
+            {
+                if (playerClassOpponentBestLapTime == -1 || lapTime < playerClassOpponentBestLapTime)
+                {
+                    playerClassOpponentBestLapTime = lapTime;
+                    playerClassOpponentBestLapSector1Time = s1;
+                    playerClassOpponentBestLapSector2Time = s2;
+                    playerClassOpponentBestLapSector3Time = s3;
+                }
+            }
+            Boolean isBest;
+            float existingPlayerClassBestLap;
+            isBest = !playerClassBestLapTimeByConditions.TryGetValue(conditionsEnum, out existingPlayerClassBestLap) ||
+                lapTime < existingPlayerClassBestLap;
+            if (isBest)
+            {
+                playerClassBestLapTimeByConditions[conditionsEnum] = lapTime;
+                playerClassBestLapSector1TimeByConditions[conditionsEnum] = s1;
+                playerClassBestLapSector2TimeByConditions[conditionsEnum] = s2;
+                playerClassBestLapSector3TimeByConditions[conditionsEnum] = s3;
+                if (isPlayer)
+                {
+                    playerBestLapTimeByConditions[conditionsEnum] = lapTime;
+                    playerBestLapSector1TimeByConditions[conditionsEnum] = s1;
+                    playerBestLapSector2TimeByConditions[conditionsEnum] = s2;
+                    playerBestLapSector3TimeByConditions[conditionsEnum] = s3;
+                }
+            }
+            else if (isPlayer)
+            {
+                float existingPlayerBestLap;
+                isBest = !playerBestLapTimeByConditions.TryGetValue(conditionsEnum, out existingPlayerBestLap) ||
+                    lapTime < existingPlayerBestLap;
+                if (isBest)
+                {
+                    playerBestLapTimeByConditions[conditionsEnum] = lapTime;
+                    playerBestLapSector1TimeByConditions[conditionsEnum] = s1;
+                    playerBestLapSector2TimeByConditions[conditionsEnum] = s2;
+                    playerBestLapSector3TimeByConditions[conditionsEnum] = s3;
+                }
+            }
+            if (!isPlayer)
+            {
+                float existingPlayerClassOpponentBestLap;
+                isBest = !playerClassOpponentBestLapTimeByConditions.TryGetValue(conditionsEnum, out existingPlayerClassOpponentBestLap) ||
+                    lapTime < existingPlayerClassOpponentBestLap;
+                if (isBest)
+                {
+                    playerClassOpponentBestLapTimeByConditions[conditionsEnum] = lapTime;
+                    playerClassOpponentBestLapSector1TimeByConditions[conditionsEnum] = s1;
+                    playerClassOpponentBestLapSector2TimeByConditions[conditionsEnum] = s2;
+                    playerClassOpponentBestLapSector3TimeByConditions[conditionsEnum] = s3;
+                }
+            }
+        }
+
+        private void addToData(ConditionsEnum conditionsEnum, Dictionary<ConditionsEnum, List<float>> data, float value) {
+            List<float> existingData;
+            if (data.TryGetValue(conditionsEnum, out existingData))
+            {
+                existingData.Add(value);
+            }
+            else
+            {
+                existingData = new List<float>();
+                existingData.Add(value);
+                data.Add(conditionsEnum, existingData);
+            }
+        }
+    }
+
     public class SessionData
     {
-        public List<String> formattedPlayerLapTimes = new List<String>();
+        private List<String> _formattedPlayerLapTimes;
+        public List<String> formattedPlayerLapTimes
+        {
+            get
+            {
+                if (_formattedPlayerLapTimes == null)
+                {
+                    _formattedPlayerLapTimes = new List<String>();
+                }
+                return _formattedPlayerLapTimes;
+            }
+            set
+            {
+                _formattedPlayerLapTimes = value;
+            }
+        }
 
-        public TrackDefinition TrackDefinition = null;
+        public TrackDefinition TrackDefinition;
 
-        public Boolean IsDisqualified = false;
+        public Boolean IsDisqualified;
 
-        public Boolean IsDNF = false;
+        public Boolean IsDNF;
 
         public FlagEnum Flag = FlagEnum.GREEN;
 
         public DateTime YellowFlagStartTime = DateTime.Now;
 
         // used for race sessions that have just started
-        public Boolean JustGoneGreen = false;
+        public Boolean JustGoneGreen;
 
-        public Boolean IsNewSession = false;
+        public Boolean IsNewSession;
 
-        public Boolean SessionHasFixedTime = false;
+        public Boolean SessionHasFixedTime;
 
         public SessionType SessionType = SessionType.Unavailable;
 
         public DateTime SessionStartTime;
 
         // in minutes, 0 if this session is a fixed number of laps rather than a fixed time.
-        public float SessionTotalRunTime = 0;
+        public float SessionTotalRunTime;
 
-        public int SessionNumberOfLaps = 0;
+        public int SessionNumberOfLaps;
 
         // some timed sessions have an extra lap added after the timer reaches zero
-        public Boolean HasExtraLap = false;
+        public Boolean HasExtraLap;
 
-        public int SessionStartClassPosition = 0;
+        public int SessionStartClassPosition;
 
-        public int NumCarsOverallAtStartOfSession = 0;
-        public int NumCarsInPlayerClassAtStartOfSession = 0;
+        public int NumCarsOverallAtStartOfSession;
+        public int NumCarsInPlayerClassAtStartOfSession;
 
         // race number in ongoing championship (zero indexed)
-        public int EventIndex = 0;
+        public int EventIndex;
 
         // zero indexed - you multi iteration sessions like DTM qual
-        public int SessionIteration = 0;
+        public int SessionIteration;
 
         //iRacing session id, if changed we have a new session(usefull for detecting practice session to practice session change)
         public int SessionId = -1;
@@ -298,10 +804,10 @@ namespace CrewChiefV4.GameState
 
         public SessionPhase SessionPhase = SessionPhase.Unavailable;
 
-        public Boolean IsNewLap = false;
+        public Boolean IsNewLap;
 
         // How many laps the player has completed. If this value is 6, the player is on his 7th lap.
-        public int CompletedLaps = 0;
+        public int CompletedLaps;
 
         // how many laps are left for the player. In fixed lap sessions this is totalLaps - leaderCompletedLaps, to allow for being
         // lapped. In all other sessions it's MaxInt
@@ -315,30 +821,30 @@ namespace CrewChiefV4.GameState
         // Unit: Seconds (-1.0 = none)
         public Single LapTimeCurrent = -1;
 
-        public Boolean LeaderHasFinishedRace = false;
+        public Boolean LeaderHasFinishedRace;
 
-        public int LeaderSectorNumber = 0;
+        public int LeaderSectorNumber;
 
-        public int PositionAtStartOfCurrentLap = 0;
-        public int ClassPositionAtStartOfCurrentLap = 0;
+        public int PositionAtStartOfCurrentLap;
+        public int ClassPositionAtStartOfCurrentLap;
 
         // Current position (1 = first place)
-        public int OverallPosition = 0;
+        public int OverallPosition;
 
-        public int ClassPosition = 0;
+        public int ClassPosition;
 
-        public float GameTimeAtLastPositionFrontChange = 0;
+        public float GameTimeAtLastPositionFrontChange;
 
-        public float GameTimeAtLastPositionBehindChange = 0;
+        public float GameTimeAtLastPositionBehindChange;
 
         // Number of cars (including the player) in the race
-        public int NumCarsOverall = 0;
-        public int NumCarsInPlayerClass = 0;
+        public int NumCarsOverall;
+        public int NumCarsInPlayerClass;
 
-        public Single SessionRunningTime = 0;
+        public Single SessionRunningTime;
 
         // ...
-        public Single SessionTimeRemaining = 0;
+        public Single SessionTimeRemaining;
 
         // ...
         public Single PlayerLapTimeSessionBest = -1;
@@ -364,9 +870,9 @@ namespace CrewChiefV4.GameState
         public int LapsDeltaBehind = -1;
 
         // 0 means we don't know what sector we're in. This is 1-indexed
-        public int SectorNumber = 0;
+        public int SectorNumber;
 
-        public Boolean IsNewSector = false;
+        public Boolean IsNewSector;
 
         // these are used for quick n dirty checks to see if we're racing the same opponent in front / behind,
         // without iterating over the Opponents list. Or for cases (like R3E) where we don't have an opponents list
@@ -374,9 +880,21 @@ namespace CrewChiefV4.GameState
 
         public Boolean IsRacingSameCarBehind = true;
 
-        public Boolean HasLeadChanged = false;
+        public Boolean HasLeadChanged;
 
-        public Dictionary<int, float> SessionTimesAtEndOfSectors = new Dictionary<int, float>();
+        private Dictionary<int, float> _SessionTimesAtEndOfSectors;
+        public Dictionary<int, float> SessionTimesAtEndOfSectors {
+            get {
+                if (_SessionTimesAtEndOfSectors == null) {
+                    _SessionTimesAtEndOfSectors = new Dictionary<int, float>();
+                }
+                return _SessionTimesAtEndOfSectors;
+            }
+            set
+            {
+                _SessionTimesAtEndOfSectors = value;
+            }
+        }
 
         public String DriverRawName;
 
@@ -398,50 +916,140 @@ namespace CrewChiefV4.GameState
         public float SessionFastestLapTimeFromGame = -1;
         public float SessionFastestLapTimeFromGamePlayerClass = -1;
 
-        public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
+        private TrackLandmarksTiming _trackLandmarksTiming;
+        public TrackLandmarksTiming trackLandmarksTiming
+        {
+            get
+            {
+                if (_trackLandmarksTiming == null)
+                {
+                    _trackLandmarksTiming = new TrackLandmarksTiming();
+                }
+                return _trackLandmarksTiming;
+            }
+            set
+            {
+                _trackLandmarksTiming = value;
+            }
+        }
 
         // Player lap times with sector information
-        public List<LapData> PlayerLapData = new List<LapData>();
+        private List<LapData> _PlayerLapData;
+        public List<LapData> PlayerLapData
+        {
+            get
+            {
+                if (_PlayerLapData == null)
+                {
+                    _PlayerLapData = new List<LapData>();
+                }
+                return _PlayerLapData;
+            }
+            set
+            {
+                _PlayerLapData = value;
+            }
+        }
 
-        public String stoppedInLandmark = null;
+        public String stoppedInLandmark;
 
         // Currently, used by rFactor family of games to indicate that user finished session
         // by proceeding to the next session while in the monitor.  Currently, those games do not go
         // in into "Finished" phase in such case.  If this is true, SessionPhase is set to Finished
         // artificially by mappers, not by the game.
-        public Boolean AbruptSessionEndDetected = false;
+        public Boolean AbruptSessionEndDetected;
 
-        public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
+        private Dictionary<TyreType, float> _PlayerClassSessionBestLapTimeByTyre;
+        public Dictionary<TyreType, float> PlayerClassSessionBestLapTimeByTyre
+        {
+            get
+            {
+                if (_PlayerClassSessionBestLapTimeByTyre == null)
+                {
+                    _PlayerClassSessionBestLapTimeByTyre = new Dictionary<TyreType, float>();
+                }
+                return _PlayerClassSessionBestLapTimeByTyre;
+            }
+            set
+            {
+                _PlayerClassSessionBestLapTimeByTyre = value;
+            }
+        }
 
         // as above, but for the player only
-        public Dictionary<TyreType, float> PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
+        private Dictionary<TyreType, float> _PlayerBestLapTimeByTyre;
+        public Dictionary<TyreType, float> PlayerBestLapTimeByTyre
+        {
+            get
+            {
+                if (_PlayerBestLapTimeByTyre == null)
+                {
+                    _PlayerBestLapTimeByTyre = new Dictionary<TyreType, float>();
+                }
+                return _PlayerBestLapTimeByTyre;
+            }
+            set
+            {
+                _PlayerBestLapTimeByTyre = value;
+            }
+        }
 
-        public DeltaTime DeltaTime = new DeltaTime();
+        private DeltaTime _DeltaTime;
+        public DeltaTime DeltaTime
+        {
+            get
+            {
+                if (_DeltaTime == null)
+                {
+                    _DeltaTime = new DeltaTime();
+                }
+                return _DeltaTime;
+            }
+            set
+            {
+                _DeltaTime = value;
+            }
+        }
 
         public int PlayerCarNr = -1;
 
         // Currently only used in iRacing.
         public int MaxIncidentCount = -1;
 
-        public int CurrentIncidentCount = 0;
+        public int CurrentIncidentCount ;
 
-        public int CurrentTeamIncidentCount = 0;
+        public int CurrentTeamIncidentCount ;
 
-        public int CurrentDriverIncidentCount = 0;
+        public int CurrentDriverIncidentCount ;
 
-        public Boolean HasLimitedIncidents = false;
+        public Boolean HasLimitedIncidents;
 
-        public Tuple<String, float> LicenseLevel = new Tuple<String, float>("invalid", -1);
+        private Tuple<String, float> _LicenseLevel;
+        public Tuple<String, float> LicenseLevel
+        {
+            get
+            {
+                if (_LicenseLevel == null)
+                {
+                    _LicenseLevel = new Tuple<String, float>("invalid", -1);;
+                }
+                return _LicenseLevel;
+            }
+            set
+            {
+                _LicenseLevel = value;
+            }
+        }
 
-        public int iRating = 0;
+        public int iRating;
 
-        public int StrengthOfField = 0;
+        public int StrengthOfField;
 
-        public Boolean IsLastLap = false;
+        public Boolean IsLastLap;
 
         public StartType StartType = StartType.None;
 
-        public Boolean HasCompletedSector2ThisLap = false;
+        public Boolean HasCompletedSector2ThisLap;
 
         public SessionData()
         {
@@ -527,8 +1135,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void playerCompleteLapWithProvidedLapTime(int overallPosition, float gameTimeAtLapEnd, float providedLapTime,
-            Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime,
-            float sessionTimeRemaining, int numberOfSectors)
+            Boolean lapIsValid /*IMPORTANT: this is 'current lap is valid'*/, Boolean inPitLane, Boolean isRaining, float trackTemp, 
+            float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors, TimingData timingData)
         {
             if (PlayerLapData.Count == 0)
             {
@@ -549,17 +1157,21 @@ namespace CrewChiefV4.GameState
 
             verifyPlayerPreviousLap();
 
-            if (lapData.IsValid && !lapData.OutLap && !lapData.InLap && (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime))
+            if (lapData.IsValid && !lapData.OutLap && !lapData.InLap)
             {
-                PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
-                PlayerLapTimeSessionBest = lapData.LapTime;
-
-                PlayerBestLapSector1Time = lapData.SectorTimes[0];
-                PlayerBestLapSector2Time = lapData.SectorTimes[1];
-                if (numberOfSectors > 2)
+                if (PlayerLapTimeSessionBest == -1 || PlayerLapTimeSessionBest > lapData.LapTime)
                 {
-                    PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    PlayerLapTimeSessionBestPrevious = PlayerLapTimeSessionBest;
+                    PlayerLapTimeSessionBest = lapData.LapTime;
+
+                    PlayerBestLapSector1Time = lapData.SectorTimes[0];
+                    PlayerBestLapSector2Time = lapData.SectorTimes[1];
+                    if (numberOfSectors > 2)
+                    {
+                        PlayerBestLapSector3Time = lapData.SectorTimes[2];
+                    }
                 }
+                timingData.addPlayerLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
             }
             PreviousLapWasValid = lapData.IsValid;
             if (PreviousLapWasValid && LapTimePrevious > 0 && PlayerLapTimeSessionBest == -1 || LapTimePrevious == PlayerLapTimeSessionBest)
@@ -739,34 +1351,34 @@ namespace CrewChiefV4.GameState
         public Boolean IsActive = true;
 
         // the name read directly from the game data - might be a 'handle' with all kinds of random crap in it
-        public String DriverRawName = null;
+        public String DriverRawName;
         
         //iRacing costumer ID used to check for driver changes.
         public int CostId = -1;
 
-        public Boolean DriverNameSet = false;
+        public Boolean DriverNameSet;
 
-        public int OverallPosition = 0;
+        public int OverallPosition;
 
-        public int OverallPositionAtPreviousTick = 0;
+        public int OverallPositionAtPreviousTick;
 
-        public int ClassPosition = 0;
+        public int ClassPosition;
 
-        public int ClassPositionAtPreviousTick = 0;
+        public int ClassPositionAtPreviousTick;
 
         public float SessionTimeAtLastPositionChange = -1;
 
-        public int CompletedLaps = 0;
+        public int CompletedLaps;
 
-        public int CurrentSectorNumber = 0;
+        public int CurrentSectorNumber;
 
-        public float Speed = 0;
+        public float Speed;
 
         public float[] WorldPosition;
 
-        public Boolean IsNewLap = false;
+        public Boolean IsNewLap;
 
-        public float DistanceRoundTrack = 0;
+        public float DistanceRoundTrack;
 
         public float CurrentBestLapTime = -1;
 
@@ -782,46 +1394,138 @@ namespace CrewChiefV4.GameState
 
         public Boolean LastLapValid = true;
 
-        public List<LapData> OpponentLapData = new List<LapData>();
+        private List<LapData> _OpponentLapData;
+        public List<LapData> OpponentLapData
+        {
+            get
+            {
+                if (_OpponentLapData == null)
+                {
+                    _OpponentLapData = new List<LapData>();
+                }
+                return _OpponentLapData;
+            }
+            set
+            {
+                _OpponentLapData = value;
+            }
+        }
 
-        public CarData.CarClass CarClass = new CarData.CarClass();
+        private CarData.CarClass _CarClass;
+        public CarData.CarClass CarClass
+        {
+            get
+            {
+                if (_CarClass == null)
+                {
+                    _CarClass = new CarData.CarClass();
+                }
+                return _CarClass;
+            }
+            set
+            {
+                _CarClass = value;
+            }
+        }
 
-        public Boolean HasStartedExtraLap = false;
+        public Boolean HasStartedExtraLap ;
 
         public TyreType CurrentTyres = TyreType.Unknown_Race;
 
-        public Boolean isProbablyLastLap = false;
+        public Boolean isProbablyLastLap ;
 
-        public int IsReallyDisconnectedCounter = 0;
+        public int IsReallyDisconnectedCounter;
 
         // be careful with this one, not all games actually set it...
-        public Boolean InPits = false;
-        public Boolean JustEnteredPits = false; // true for 1 tick only
+        public Boolean InPits ;
+        public Boolean JustEnteredPits ; // true for 1 tick only
         // and this one:
-        public int NumPitStops = 0;
+        public int NumPitStops;
 
-        public TrackLandmarksTiming trackLandmarksTiming = new TrackLandmarksTiming();
+        private TrackLandmarksTiming _trackLandmarksTiming;
+        public TrackLandmarksTiming trackLandmarksTiming
+        {
+            get
+            {
+                if (_trackLandmarksTiming == null)
+                {
+                    _trackLandmarksTiming = new TrackLandmarksTiming();
+                }
+                return _trackLandmarksTiming;
+            }
+            set
+            {
+                _trackLandmarksTiming = value;
+            }
+        }
 
-        public String stoppedInLandmark = null;
+        public String stoppedInLandmark;
 
-        public int PitStopCount = 0;
+        public int PitStopCount;
 
         // these are only set for R3E
-        public Dictionary<int, TyreType> TyreChangesByLap = new Dictionary<int, TyreType>();
-        public Dictionary<TyreType, float> BestLapTimeByTyreType = new Dictionary<TyreType, float>();
+        public Dictionary<int, TyreType> _TyreChangesByLap;
+        public Dictionary<int, TyreType> TyreChangesByLap
+        {
+            get
+            {
+                if (_TyreChangesByLap == null)
+                {
+                    _TyreChangesByLap = new Dictionary<int, TyreType>();
+                }
+                return _TyreChangesByLap;
+            }
+            set
+            {
+                _TyreChangesByLap = value;
+            }
+        }
+
+        public Dictionary<int, TyreType> _BestLapTimeByTyreType;
+        public Dictionary<int, TyreType> BestLapTimeByTyreType
+        {
+            get
+            {
+                if (_BestLapTimeByTyreType == null)
+                {
+                    _BestLapTimeByTyreType = new Dictionary<int, TyreType>();
+                }
+                return _BestLapTimeByTyreType;
+            }
+            set
+            {
+                _BestLapTimeByTyreType = value;
+            }
+        }
+
         // will be true for 1 tick
-        public Boolean hasJustChangedToDifferentTyreType = false;
+        public Boolean hasJustChangedToDifferentTyreType ;
 
         // this is a bit of a guess - it's actually the race position when the car is 300m(?) from the start line
         public int PositionOnApproachToPitEntry = -1;
 
-        public DeltaTime DeltaTime = null;
+        public DeltaTime DeltaTime;
 
-        public bool isApporchingPits = false;
+        public bool isApporchingPits;
 
         public int CarNr = -1;
 
-        public Tuple<String, float> LicensLevel = new Tuple<String, float>("invalid", -1);
+        private Tuple<String, float> _LicensLevel;
+        public Tuple<String, float> LicensLevel
+        {
+            get
+            {
+                if (_LicensLevel == null)
+                {
+                    _LicensLevel = new Tuple<String, float>("invalid", -1);
+                }
+                return _LicensLevel;
+            }
+            set
+            {
+                _LicensLevel = value;
+            }
+        }
 
         public int iRating = -1;
 
@@ -951,7 +1655,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithEstimatedLapTime(int position, float gameTimeAtLapEnd, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             // only used by PCars where all tracks have 3 sectors
             AddCumulativeSectorData(3, position, -1, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
@@ -968,10 +1673,17 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = estimatedLapTime;
                         LastLapTime = estimatedLapTime;
-                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0)
                         {
-                            PreviousBestLapTime = CurrentBestLapTime;
-                            CurrentBestLapTime = lapData.LapTime;
+                            if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                            {
+                                PreviousBestLapTime = CurrentBestLapTime;
+                                CurrentBestLapTime = lapData.LapTime;
+                            }
+                            if (isPlayerCarClass)
+                            {
+                                timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                            }              
                         }
                     }
                     else
@@ -993,7 +1705,8 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithLastSectorTime(int position, float lastSectorTime, float gameTimeAtLapEnd,
-            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             AddSectorData(numberOfSectors, position, lastSectorTime, gameTimeAtLapEnd, lapIsValid, isRaining, trackTemp, airTemp);
             if (OpponentLapData.Count > 0)
@@ -1007,10 +1720,17 @@ namespace CrewChiefV4.GameState
                     {
                         lapData.LapTime = lapTime;
                         LastLapTime = lapTime;
-                        if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                        if (lapData.IsValid && lapData.LapTime > 0)
                         {
-                            PreviousBestLapTime = CurrentBestLapTime;
-                            CurrentBestLapTime = lapData.LapTime;
+                            if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                            {
+                                PreviousBestLapTime = CurrentBestLapTime;
+                                CurrentBestLapTime = lapData.LapTime;
+                            }
+                            if (isPlayerCarClass)
+                            {
+                                timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                            }
                         }
                     }
                     else
@@ -1042,18 +1762,21 @@ namespace CrewChiefV4.GameState
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid, Boolean inLap,
-            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             // if this completed lap is invalid, mark it as such *before* we complete it
             if (!lapWasValid)
             {
                 InvalidateCurrentLap();
             }
-            CompleteLapWithProvidedLapTime(position, gameTimeAtLapEnd, providedLapTime, InPits, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, numberOfSectors);
+            CompleteLapWithProvidedLapTime(position, gameTimeAtLapEnd, providedLapTime, InPits, isRaining, trackTemp, airTemp, sessionLengthIsTime, 
+                sessionTimeRemaining, numberOfSectors, timingData, isPlayerCarClass);
         }
 
         public void CompleteLapWithProvidedLapTime(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean inPits,
-            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             if (OpponentLapData.Count > 0)
             {                
@@ -1064,10 +1787,17 @@ namespace CrewChiefV4.GameState
                     lapData.LapTime = providedLapTime;
                     lapData.InLap = inPits;
                     LastLapTime = providedLapTime;
-                    if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                    if (lapData.IsValid && lapData.LapTime > 0)
                     {
-                        PreviousBestLapTime = CurrentBestLapTime;
-                        CurrentBestLapTime = lapData.LapTime;
+                        if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                        {
+                            PreviousBestLapTime = CurrentBestLapTime;
+                            CurrentBestLapTime = lapData.LapTime;
+                        }
+                        if (isPlayerCarClass)
+                        {
+                            timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                        }
                     }
                     LastLapValid = lapData.IsValid;
                 } 
@@ -1082,7 +1812,8 @@ namespace CrewChiefV4.GameState
             }
         }
         public void CompleteLapThatMightHaveMissingSectorTimes(int position, float gameTimeAtLapEnd, float providedLapTime, Boolean lapWasValid,
-        Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors)
+            Boolean isRaining, float trackTemp, float airTemp, Boolean sessionLengthIsTime, float sessionTimeRemaining, int numberOfSectors,
+            TimingData timingData, Boolean isPlayerCarClass)
         {
             if (OpponentLapData.Count > 0)
             {
@@ -1104,10 +1835,17 @@ namespace CrewChiefV4.GameState
                 }
                 lapData.LapTime = providedLapTime;
                 LastLapTime = providedLapTime;
-                if (lapData.IsValid && lapData.LapTime > 0 && (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime))
+                if (lapData.IsValid && lapData.LapTime > 0)
                 {
-                    PreviousBestLapTime = CurrentBestLapTime;
-                    CurrentBestLapTime = lapData.LapTime;
+                    if (CurrentBestLapTime == -1 || CurrentBestLapTime > lapData.LapTime)
+                    {
+                        PreviousBestLapTime = CurrentBestLapTime;
+                        CurrentBestLapTime = lapData.LapTime;
+                    }
+                    if (isPlayerCarClass)
+                    {
+                        timingData.addOpponentPlayerClassLap(lapData.LapTime, lapData.SectorTimes[0], lapData.SectorTimes[1], lapData.SectorTimes[2]);
+                    }
                 }
                 LastLapValid = lapData.IsValid;
 
@@ -1181,7 +1919,8 @@ namespace CrewChiefV4.GameState
             }
         }
 
-        public void AddSectorData(int sectorNumberJustCompleted, int position, float thisSectorTime, float gameTimeAtSectorEnd, Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
+        public void AddSectorData(int sectorNumberJustCompleted, int position, float thisSectorTime, float gameTimeAtSectorEnd,
+            Boolean lapIsValid, Boolean isRaining, float trackTemp, float airTemp)
         {
             if (OpponentLapData.Count > 0)
             {
@@ -1317,8 +2056,8 @@ namespace CrewChiefV4.GameState
         {
             public float biggestTimeDifference = -1;
             public float biggestStartSpeedDifference = -1;
-            public String biggestTimeDifferenceLandmark = null;
-            public String biggestStartSpeedDifferenceLandmark = null;
+            public String biggestTimeDifferenceLandmark ;
+            public String biggestStartSpeedDifferenceLandmark;
             public LandmarkDeltaContainer(float biggestTimeDifference, String biggestTimeDifferenceLandmark, float biggestStartSpeedDifference, String biggestStartSpeedDifferenceLandmark)
             {
                 this.biggestTimeDifference = biggestTimeDifference;
@@ -1384,16 +2123,16 @@ namespace CrewChiefV4.GameState
 
         // temporary variables for tracking landmark timings during a session - we add a timing when these are non-null and
         // we hit the end of this named landmark.
-        private String landmarkNameStart = null;
+        private String landmarkNameStart ;
         private float landmarkStartTime = -1;
         private float landmarkStartSpeed = -1;
-        private int landmarkStoppedCount = 0;
+        private int landmarkStoppedCount;
 
         // wonder if this'll work...
-        private String nearLandmarkName = null;
+        private String nearLandmarkName;
 
         // quick n dirty tracking of when we're at the mid-point of a landmark - maybe the apex. This is only non-null for a single tick.
-        public String atMidPointOfLandmark = null;
+        public String atMidPointOfLandmark;
 
         private void addTimeAndSpeeds(String landmarkName, float time, float startSpeed, float endSpeed, Boolean isCommonOvertakingSpot)
         {
@@ -1666,18 +2405,78 @@ namespace CrewChiefV4.GameState
 
     public class LapData
     {
-        public int LapNumber = 0;
-        public int PositionAtStart = 0;
+        public int LapNumber;
+        public int PositionAtStart;
         public Boolean IsValid = true;
         public float LapTime = -1;
-        public float GameTimeAtLapStart = 0;
-        public float[] SectorTimes = new float[3];
-        public float[] GameTimeAtSectorEnd = new float[3];
-        public LapConditions[] Conditions = new LapConditions[3];
-        public int[] SectorPositions = new int[3];
-        public Boolean OutLap = false;
-        public Boolean InLap = false;
-        public Boolean hasMissingSectors = false;
+        public float GameTimeAtLapStart;
+        private float[] _SectorTimes;
+        public float[] SectorTimes
+        {
+            get
+            {
+                if (_SectorTimes == null)
+                {
+                    _SectorTimes = new float[3];
+                }
+                return _SectorTimes;
+            }
+            set
+            {
+                _SectorTimes = value;
+            }
+        }
+        private float[] _GameTimeAtSectorEnd;
+        public float[] GameTimeAtSectorEnd
+        {
+            get
+            {
+                if (_GameTimeAtSectorEnd == null)
+                {
+                    _GameTimeAtSectorEnd = new float[3];
+                }
+                return _GameTimeAtSectorEnd;
+            }
+            set
+            {
+                _GameTimeAtSectorEnd = value;
+            }
+        }
+        private LapConditions[] _Conditions;
+        public LapConditions[] Conditions
+        {
+            get
+            {
+                if (_Conditions == null)
+                {
+                    _Conditions = new LapConditions[3];
+                }
+                return _Conditions;
+            }
+            set
+            {
+                _Conditions = value;
+            }
+        }
+        private int[] _SectorPositions;
+        public int[] SectorPositions
+        {
+            get
+            {
+                if (_SectorPositions == null)
+                {
+                    _SectorPositions = new int[3];
+                }
+                return _SectorPositions;
+            }
+            set
+            {
+                _SectorPositions = value;
+            }
+        }
+        public Boolean OutLap;
+        public Boolean InLap;
+        public Boolean hasMissingSectors;
     }
 
     public class LapConditions
@@ -1699,16 +2498,16 @@ namespace CrewChiefV4.GameState
         public ControlType ControlType = ControlType.Unavailable;
 
         // ...
-        public Single ThrottlePedal = 0;
+        public Single ThrottlePedal;
 
         // ...
-        public Single BrakePedal = 0;
+        public Single BrakePedal;
 
         // ...
-        public Single ClutchPedal = 0;
+        public Single ClutchPedal;
 
         // ...
-        public Single BrakeBias = 0;
+        public Single BrakeBias;
     }
 
     public class PitData
@@ -1718,51 +2517,51 @@ namespace CrewChiefV4.GameState
         // The minute/lap into which you're allowed/obligated to pit
         // Unit: Minutes in time-based sessions, otherwise lap
 
-        public Boolean InPitlane = false;
+        public Boolean InPitlane;
 
-        public Boolean IsApproachingPitlane = false;
+        public Boolean IsApproachingPitlane;
 
-        public Boolean OnInLap = false;
+        public Boolean OnInLap;
 
-        public Boolean OnOutLap = false;
+        public Boolean OnOutLap;
 
-        public Boolean IsMakingMandatoryPitStop = false;
+        public Boolean IsMakingMandatoryPitStop;
 
         // the pit window stuff isn't right here - the state can be 'completed' but then change to something
         // else, so we need to keep track of whether we've completed a mandatory stop separately.
-        public Boolean MandatoryPitStopCompleted = false;
+        public Boolean MandatoryPitStopCompleted;
 
         // this is true for one tick, when the player is about to exit the pits
-        public Boolean IsAtPitExit = false;
+        public Boolean IsAtPitExit;
 
-        public Boolean IsRefuellingAllowed = false;
+        public Boolean IsRefuellingAllowed;
 
-        public Boolean IsElectricVehicleSwapAllowed = false;
+        public Boolean IsElectricVehicleSwapAllowed;
 
-        public Boolean HasRequestedPitStop = false;
+        public Boolean HasRequestedPitStop;
 
-        public Boolean PitStallOccupied = false;
+        public Boolean PitStallOccupied;
 
-        public Boolean LeaderIsPitting = false;
+        public Boolean LeaderIsPitting;
 
-        public Boolean CarInFrontIsPitting = false;
+        public Boolean CarInFrontIsPitting;
 
-        public Boolean CarBehindIsPitting = false;
+        public Boolean CarBehindIsPitting;
 
         // yuk...
-        public OpponentData OpponentForLeaderPitting = null;
-        public OpponentData OpponentForCarAheadPitting = null;
-        public OpponentData OpponentForCarBehindPitting = null;
+        public OpponentData OpponentForLeaderPitting;
+        public OpponentData OpponentForCarAheadPitting;
+        public OpponentData OpponentForCarBehindPitting;
 
-        public int PitWindowStart = 0;
+        public int PitWindowStart;
 
         // The minute/lap into which you can/should pit
         // Unit: Minutes in time based sessions, otherwise lap
-        public int PitWindowEnd = 0;
+        public int PitWindowEnd;
 
-        public Boolean HasMandatoryPitStop = false;
+        public Boolean HasMandatoryPitStop;
 
-        public Boolean HasMandatoryTyreChange = false;
+        public Boolean HasMandatoryTyreChange;
 
         public TyreType MandatoryTyreChangeRequiredTyreType = TyreType.Unknown_Race;
 
@@ -1778,46 +2577,46 @@ namespace CrewChiefV4.GameState
         // RF1/RF2 hack for mandatory pit stop windows, which are used to trigger 'box now' messages
         public Boolean ResetEvents;
 
-        public int NumPitStops = 0;
+        public int NumPitStops;
 
-        public Boolean IsPitCrewDone = false;
+        public Boolean IsPitCrewDone;
 
-        public Boolean IsPitCrewReady = false;
+        public Boolean IsPitCrewReady;
 
         public float PitSpeedLimit = -1.0f;
 
         // distance round track of pit box
         public float PitBoxPositionEstimate = -1.0f;
 
-        public Boolean IsTeamRacing = false;
+        public Boolean IsTeamRacing;
 
-        public Boolean JumpedToPits = false;
+        public Boolean JumpedToPits;
 
-        public Boolean IsInGarage = false;
+        public Boolean IsInGarage;
     }
 
     public class PenatiesData
     {
-        public Boolean HasDriveThrough = false;
+        public Boolean HasDriveThrough;
 
-        public Boolean HasStopAndGo = false;
+        public Boolean HasStopAndGo;
 
         // from R3E data - what is this??
-        public Boolean HasPitStop = false;
+        public Boolean HasPitStop;
 
-        public Boolean HasTimeDeduction = false;
+        public Boolean HasTimeDeduction;
 
-        public Boolean HasSlowDown = false;
+        public Boolean HasSlowDown;
 
         // Number of penalties pending for the player
-        public int NumPenalties = 0;
+        public int NumPenalties;
 
         // Total number of cut track warnings
-        public int CutTrackWarnings = 0;
+        public int CutTrackWarnings;
 
-        public Boolean IsOffRacingSurface = false;
+        public Boolean IsOffRacingSurface;
 
-        public Boolean PossibleTrackLimitsViolation = false;
+        public Boolean PossibleTrackLimitsViolation;
     }
 
     public class TyreData
@@ -1827,7 +2626,7 @@ namespace CrewChiefV4.GameState
         public Boolean LeftRearAttached = true;
         public Boolean RightRearAttached = true;
 
-        public Boolean TyreWearActive = false;
+        public Boolean TyreWearActive;
 
         // true if all tyres are the same type
         public Boolean HasMatchedTyreTypes = true;
@@ -1838,61 +2637,121 @@ namespace CrewChiefV4.GameState
         public TyreType RearRightTyreType = TyreType.Unknown_Race;
         public String TyreTypeName = "";
 
-        public Single FrontLeft_LeftTemp = 0;
-        public Single FrontLeft_CenterTemp = 0;
-        public Single FrontLeft_RightTemp = 0;
+        public Single FrontLeft_LeftTemp;
+        public Single FrontLeft_CenterTemp;
+        public Single FrontLeft_RightTemp;
 
-        public Single FrontRight_LeftTemp = 0;
-        public Single FrontRight_CenterTemp = 0;
-        public Single FrontRight_RightTemp = 0;
+        public Single FrontRight_LeftTemp;
+        public Single FrontRight_CenterTemp;
+        public Single FrontRight_RightTemp;
 
-        public Single RearLeft_LeftTemp = 0;
-        public Single RearLeft_CenterTemp = 0;
-        public Single RearLeft_RightTemp = 0;
+        public Single RearLeft_LeftTemp;
+        public Single RearLeft_CenterTemp;
+        public Single RearLeft_RightTemp;
 
-        public Single RearRight_LeftTemp = 0;
-        public Single RearRight_CenterTemp = 0;
-        public Single RearRight_RightTemp = 0;
+        public Single RearRight_LeftTemp;
+        public Single RearRight_CenterTemp;
+        public Single RearRight_RightTemp;
 
-        public Single PeakFrontLeftTemperatureForLap = 0;
-        public Single PeakFrontRightTemperatureForLap = 0;
-        public Single PeakRearLeftTemperatureForLap = 0;
-        public Single PeakRearRightTemperatureForLap = 0;
+        public Single PeakFrontLeftTemperatureForLap;
+        public Single PeakFrontRightTemperatureForLap;
+        public Single PeakRearLeftTemperatureForLap;
+        public Single PeakRearRightTemperatureForLap;
 
-        public float FrontLeftPercentWear = 0;
-        public float FrontRightPercentWear = 0;
-        public float RearLeftPercentWear = 0;
-        public float RearRightPercentWear = 0;
+        public float FrontLeftPercentWear;
+        public float FrontRightPercentWear;
+        public float RearLeftPercentWear;
+        public float RearRightPercentWear;
 
-        public Single FrontLeftPressure = 0;
-        public Single FrontRightPressure = 0;
-        public Single RearLeftPressure = 0;
-        public Single RearRightPressure = 0;
+        public Single FrontLeftPressure;
+        public Single FrontRightPressure;
+        public Single RearLeftPressure;
+        public Single RearRightPressure;
 
-        public CornerData TyreTempStatus = new CornerData();
+        private CornerData _TyreTempStatus;
+        public CornerData TyreTempStatus
+        {
+            get
+            {
+                if (_TyreTempStatus == null)
+                {
+                    _TyreTempStatus = new CornerData();
+                }
+                return _TyreTempStatus;
+            }
+            set
+            {
+                _TyreTempStatus = value;
+            }
+        }
 
-        public CornerData TyreConditionStatus = new CornerData();
+        private CornerData _TyreConditionStatus;
+        public CornerData TyreConditionStatus
+        {
+            get
+            {
+                if (_TyreConditionStatus == null)
+                {
+                    _TyreConditionStatus = new CornerData();
+                }
+                return _TyreConditionStatus;
+            }
+            set
+            {
+                _TyreConditionStatus = value;
+            }
+        }
 
-        public CornerData BrakeTempStatus = new CornerData();
+        private CornerData _BrakeTempStatus;
+        public CornerData BrakeTempStatus
+        {
+            get
+            {
+                if (_BrakeTempStatus == null)
+                {
+                    _BrakeTempStatus = new CornerData();
+                }
+                return _BrakeTempStatus;
+            }
+            set
+            {
+                _BrakeTempStatus = value;
+            }
+        }
 
-        public Single LeftFrontBrakeTemp = 0;
-        public Single RightFrontBrakeTemp = 0;
-        public Single LeftRearBrakeTemp = 0;
-        public Single RightRearBrakeTemp = 0;
+        public Single LeftFrontBrakeTemp;
+        public Single RightFrontBrakeTemp;
+        public Single LeftRearBrakeTemp;
+        public Single RightRearBrakeTemp;
 
-        public Boolean LeftFrontIsLocked = false;
-        public Boolean RightFrontIsLocked = false;
-        public Boolean LeftRearIsLocked = false;
-        public Boolean RightRearIsLocked = false;
-        public Boolean LeftFrontIsSpinning = false;
-        public Boolean RightFrontIsSpinning = false;
-        public Boolean LeftRearIsSpinning = false;
-        public Boolean RightRearIsSpinning = false;
+        public Boolean LeftFrontIsLocked;
+        public Boolean RightFrontIsLocked;
+        public Boolean LeftRearIsLocked;
+        public Boolean RightRearIsLocked;
+        public Boolean LeftFrontIsSpinning;
+        public Boolean RightFrontIsSpinning;
+        public Boolean LeftRearIsSpinning;
+        public Boolean RightRearIsSpinning;
     }
 
     public class Conditions
     {
-        public List<ConditionsSample> samples = new List<ConditionsSample>();
+        private List<ConditionsSample> _samples;
+        public List<ConditionsSample> samples
+        {
+            get
+            {
+                if (_samples == null)
+                {
+                    _samples = new List<ConditionsSample>();
+                }
+                return _samples;
+            }
+            set
+            {
+                _samples = value;
+            }
+        }
         public class ConditionsSample
         {
             public DateTime Time;
@@ -1960,16 +2819,16 @@ namespace CrewChiefV4.GameState
 
     public class OvertakingAids
     {
-        public Boolean PushToPassAvailable = false;
-        public Boolean PushToPassEngaged = false;
-        public int PushToPassActivationsRemaining = 0;
-        public Single PushToPassEngagedTimeLeft = 0;
-        public Single PushToPassWaitTimeLeft = 0;
+        public Boolean PushToPassAvailable;
+        public Boolean PushToPassEngaged;
+        public int PushToPassActivationsRemaining;
+        public Single PushToPassEngagedTimeLeft;
+        public Single PushToPassWaitTimeLeft;
 
-        public Boolean DrsEnabled = false;
-        public Boolean DrsAvailable = false;
-        public Boolean DrsEngaged = false;
-        public Single DrsRange = 0;
+        public Boolean DrsEnabled;
+        public Boolean DrsAvailable;
+        public Boolean DrsEngaged;
+        public Single DrsRange;
     }
 
     public class DeltaTime
@@ -2065,7 +2924,6 @@ namespace CrewChiefV4.GameState
 
                 DateTime otherCarTime;
                 DateTime thisCarTime;
-                var splitTimeSet = false;
                 if (totalDistanceTravelled < otherCarDelta.totalDistanceTravelled)
                 {
                     // I'm behind otherCar, so we want to know time between otherCar reaching the last deltaPoint I've just hit, and me reaching it.
@@ -2074,7 +2932,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else if (totalDistanceTravelled > otherCarDelta.totalDistanceTravelled)
@@ -2086,7 +2943,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
             }
@@ -2133,7 +2989,6 @@ namespace CrewChiefV4.GameState
             {
                 DateTime otherCarTime;
                 DateTime thisCarTime;
-                var splitTimeSet = false;
                 //opponent is behind
                 if (distanceRoundTrackOnCurrentLap < otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
@@ -2141,7 +2996,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else if (distanceRoundTrackOnCurrentLap > otherCarDelta.distanceRoundTrackOnCurrentLap)
@@ -2150,7 +3004,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else
@@ -2401,76 +3254,408 @@ namespace CrewChiefV4.GameState
         // first some static crap to ensure the code is sufficiently badly factored
 
         // public because who the fuck knows what'll set and unset these...
-        public static Boolean useManualFormationLap = false;
-        public static Boolean onManualFormationLap = false;
+        public static Boolean useManualFormationLap;
+        public static Boolean onManualFormationLap;
 
         // This is updated on every tick so should always be accurate. NOTE THIS IS NOT SET FOR IRACING!
         public static int NumberOfClasses = 1;
-        public static Boolean Multiclass = false;
+        public static Boolean Multiclass;
 
         public static DateTime CurrentTime = DateTime.Now;
 
-        public Boolean sortClassPositionsCompleted = false;
+        public Boolean sortClassPositionsCompleted;
 
         public long Ticks;
 
         public DateTime Now;
         // lazily initialised only when we're using trace playback:
-        public String CurrentTimeStr = null;
+        public String CurrentTimeStr;
 
-        public CarData.CarClass carClass = new CarData.CarClass();
+        private CarData.CarClass _carClass;
+        public CarData.CarClass carClass
+        {
+            get
+            {
+                if (_carClass == null)
+                {
+                    _carClass = new CarData.CarClass();
+                }
+                return _carClass;
+            }
+            set
+            {
+                _carClass = value;
+            }
+        }
 
-        public EngineData EngineData = new EngineData();
+        private EngineData _EngineData;
+        public EngineData EngineData
+        {
+            get
+            {
+                if (_EngineData == null)
+                {
+                    _EngineData = new EngineData();
+                }
+                return _EngineData;
+            }
+            set
+            {
+                _EngineData = value;
+            }
+        }
 
-        public TransmissionData TransmissionData = new TransmissionData();
+        private TransmissionData _TransmissionData;
+        public TransmissionData TransmissionData
+        {
+            get
+            {
+                if (_TransmissionData == null)
+                {
+                    _TransmissionData = new TransmissionData();
+                }
+                return _TransmissionData;
+            }
+            set
+            {
+                _TransmissionData = value;
+            }
+        }
 
-        public FuelData FuelData = new FuelData();
+        private FuelData _FuelData;
+        public FuelData FuelData
+        {
+            get
+            {
+                if (_FuelData == null)
+                {
+                    _FuelData  = new FuelData();
+                }
+                return _FuelData;
+            }
+            set
+            {
+                _FuelData = value;
+            }
+        }
 
-        public BatteryData BatteryData = new BatteryData();
+        private BatteryData _BatteryData;
+        public BatteryData BatteryData
+        {
+            get
+            {
+                if (_BatteryData == null)
+                {
+                    _BatteryData = new BatteryData();
+                }
+                return _BatteryData;
+            }
+            set
+            {
+                _BatteryData = value;
+            }
+        }
 
-        public CarDamageData CarDamageData = new CarDamageData();
+        private CarDamageData _CarDamageData;
+        public CarDamageData CarDamageData
+        {
+            get
+            {
+                if (_CarDamageData == null)
+                {
+                    _CarDamageData  = new CarDamageData();
+                }
+                return _CarDamageData;
+            }
+            set
+            {
+                _CarDamageData = value;
+            }
+        }
 
-        public ControlData ControlData = new ControlData();
+        private ControlData _ControlData;
+        public ControlData ControlData
+        {
+            get
+            {
+                if (_ControlData == null)
+                {
+                    _ControlData = new ControlData();
+                }
+                return _ControlData;
+            }
+            set
+            {
+                _ControlData = value;
+            }
+        }
 
-        public SessionData SessionData = new SessionData();
+        private SessionData _SessionData;
+        public SessionData SessionData
+        {
+            get
+            {
+                if (_SessionData == null)
+                {
+                    _SessionData = new SessionData();
+                }
+                return _SessionData;
+            }
+            set
+            {
+                _SessionData = value;
+            }
+        }
 
-        public PitData PitData = new PitData();
+        private PitData _PitData;
+        public PitData PitData
+        {
+            get
+            {
+                if (_PitData == null)
+                {
+                    _PitData = new PitData();
+                }
+                return _PitData;
+            }
+            set
+            {
+                _PitData = value;
+            }
+        }
 
-        public PenatiesData PenaltiesData = new PenatiesData();
+        private PenatiesData _PenaltiesData;
+        public PenatiesData PenaltiesData
+        {
+            get
+            {
+                if (_PenaltiesData == null)
+                {
+                    _PenaltiesData = new PenatiesData();
+                }
+                return _PenaltiesData;
+            }
+            set
+            {
+                _PenaltiesData = value;
+            }
+        }
 
-        public TyreData TyreData = new TyreData();
+        private TyreData _TyreData;
+        public TyreData TyreData
+        {
+            get
+            {
+                if (_TyreData == null)
+                {
+                    _TyreData = new TyreData();
+                }
+                return _TyreData;
+            }
+            set
+            {
+                _TyreData = value;
+            }
+        }
 
-        public PositionAndMotionData PositionAndMotionData = new PositionAndMotionData();
+        private PositionAndMotionData _PositionAndMotionData;
+        public PositionAndMotionData PositionAndMotionData
+        {
+            get
+            {
+                if (_PositionAndMotionData == null)
+                {
+                    _PositionAndMotionData = new PositionAndMotionData();
+                }
+                return _PositionAndMotionData;
+            }
+            set
+            {
+                _PositionAndMotionData = value;
+            }
+        }
 
-        public Dictionary<string, OpponentData> OpponentData = new Dictionary<string, OpponentData>();
+        private Dictionary<string, OpponentData> _OpponentData;
+        public Dictionary<string, OpponentData> OpponentData
+        {
+            get
+            {
+                if (_OpponentData == null)
+                {
+                    _OpponentData = new Dictionary<string, OpponentData>();
+                }
+                return _OpponentData;
+            }
+            set
+            {
+                _OpponentData = value;
+            }
+        }
 
-        public Conditions Conditions = new Conditions();
+        private Conditions _Conditions;
+        public Conditions Conditions
+        {
+            get
+            {
+                if (_Conditions == null)
+                {
+                    _Conditions = new Conditions();
+                }
+                return _Conditions;
+            }
+            set
+            {
+                _Conditions = value;
+            }
+        }
 
-        public OvertakingAids OvertakingAids = new OvertakingAids();
+        private TimingData _TimingData;
+        public TimingData TimingData
+        {
+            get
+            {
+                if (_TimingData == null)
+                {
+                    _TimingData = new TimingData();
+                }
+                return _TimingData;
+            }
+            set
+            {
+                _TimingData = value;
+            }
+        }
 
-        public FlagData FlagData = new FlagData();
+        private OvertakingAids _OvertakingAids;
+        public OvertakingAids OvertakingAids
+        {
+            get
+            {
+                if (_OvertakingAids == null)
+                {
+                    _OvertakingAids = new OvertakingAids();
+                }
+                return _OvertakingAids;
+            }
+            set
+            {
+                _OvertakingAids = value;
+            }
+        }
 
-        public StockCarRulesData StockCarRulesData = new StockCarRulesData();
+        private FlagData _FlagData;
+        public FlagData FlagData
+        {
+            get
+            {
+                if (_FlagData == null)
+                {
+                    _FlagData = new FlagData();
+                }
+                return _FlagData;
+            }
+            set
+            {
+                _FlagData = value;
+            }
+        }
 
-        public FrozenOrderData FrozenOrderData = new FrozenOrderData();
+        private StockCarRulesData _StockCarRulesData;
+        public StockCarRulesData StockCarRulesData
+        {
+            get
+            {
+                if (_StockCarRulesData == null)
+                {
+                    _StockCarRulesData = new StockCarRulesData();
+                }
+                return _StockCarRulesData;
+            }
+            set
+            {
+                _StockCarRulesData = value;
+            }
+        }
 
-        public HashSet<String> retriedDriverNames = new HashSet<String>();
+        private FrozenOrderData _FrozenOrderData;
+        public FrozenOrderData FrozenOrderData
+        {
+            get
+            {
+                if (_FrozenOrderData == null)
+                {
+                    _FrozenOrderData = new FrozenOrderData();
+                }
+                return _FrozenOrderData;
+            }
+            set
+            {
+                _FrozenOrderData = value;
+            }
+        }
 
-        public HashSet<String> disqualifiedDriverNames = new HashSet<String>();
+        private HashSet<String> _retriedDriverNames;
+        public HashSet<String> retriedDriverNames
+        {
+            get
+            {
+                if (_retriedDriverNames == null)
+                {
+                    _retriedDriverNames = new HashSet<String>();
+                }
+                return _retriedDriverNames;
+            }
+            set
+            {
+                _retriedDriverNames = value;
+            }
+        }
+
+        private HashSet<String> _disqualifiedDriverNames;
+        public HashSet<String> disqualifiedDriverNames
+        {
+            get
+            {
+                if (_disqualifiedDriverNames == null)
+                {
+                    _disqualifiedDriverNames = new HashSet<String>();
+                }
+                return _disqualifiedDriverNames;
+            }
+            set
+            {
+                _disqualifiedDriverNames = value;
+            }
+        }
         
         private static TimeSpan MaxWaitForNewLapData = TimeSpan.FromSeconds(3);
 
         private DateTime NewLapDataTimerExpiry = DateTime.MaxValue;
 
-        private Boolean WaitingForNewLapData = false;
+        private Boolean WaitingForNewLapData;
 
-        public HardPartsOnTrackData hardPartsOnTrackData = new HardPartsOnTrackData();
+        private HardPartsOnTrackData _hardPartsOnTrackData;
+        public HardPartsOnTrackData hardPartsOnTrackData
+        {
+            get
+            {
+                if (_hardPartsOnTrackData == null)
+                {
+                    _hardPartsOnTrackData = new HardPartsOnTrackData();
+                }
+                return _hardPartsOnTrackData;
+            }
+            set
+            {
+                _hardPartsOnTrackData = value;
+            }
+        }
                 
         // special case for pcars2 CloudBrightness and rain because we want to track this in real-time
         public float CloudBrightness = -1;
         public float RainDensity = -1;
 
-        public Boolean readLandmarksForThisLap = false;
+        public Boolean readLandmarksForThisLap;
         public float GameTimeWhenLastCrossedStartFinishLine = -1;
         public int CompletedLapsWhenHasNewLapDataWasLastTrue = -2;
         //call this after setting currentGameState.SessionData.SectorNumber and currentGameState.SessionData.IsNewSector
@@ -2943,6 +4128,7 @@ namespace CrewChiefV4.GameState
         public float[] getTimeAndSectorsForBestOpponentLapInWindow(int lapsToCheck, CarData.CarClass carClassToCheck)
         {
             float[] bestLapWithSectors = new float[] { -1, -1, -1, -1 };
+
             foreach (KeyValuePair<string, OpponentData> entry in OpponentData)
             {
                 if (CrewChief.forceSingleClass

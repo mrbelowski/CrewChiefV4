@@ -634,6 +634,8 @@ namespace CrewChiefV4.rFactor2
                 cgs.PitData.PitBoxPositionEstimate = pgs.PitData.PitBoxPositionEstimate;
 
                 cgs.hardPartsOnTrackData = pgs.hardPartsOnTrackData;
+
+                cgs.TimingData = pgs.TimingData;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;
@@ -1441,7 +1443,7 @@ namespace CrewChiefV4.rFactor2
                             (float)shared.scoring.mScoringInfo.mAmbientTemp,
                             csd.SessionHasFixedTime,
                             csd.SessionTimeRemaining,
-                            3);
+                            3, cgs.TimingData, CarData.IsCarClassEqual(opponent.CarClass, cgs.carClass));
                     }
                     opponent.StartNewLap(
                         opponent.CompletedLaps + 1,
@@ -1969,7 +1971,7 @@ namespace CrewChiefV4.rFactor2
                         (float)scoring.mScoringInfo.mAmbientTemp,
                         csd.SessionHasFixedTime,
                         csd.SessionTimeRemaining,
-                        3);
+                        3, cgs.TimingData);
                 }
 
                 csd.playerStartNewLap(

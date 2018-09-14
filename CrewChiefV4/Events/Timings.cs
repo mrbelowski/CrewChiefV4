@@ -759,24 +759,6 @@ namespace CrewChiefV4.Events
             CLOSE, INCREASING, DECREASING, OTHER, NONE
         }
 
-        private float getOpponentBestLap(List<float> opponentLapTimes, int lapsToCheck)
-        {
-            if (opponentLapTimes == null && opponentLapTimes.Count == 0)
-            {
-                return -1;
-            }
-            float bestLap = opponentLapTimes[opponentLapTimes.Count - 1];
-            int minIndex = opponentLapTimes.Count - lapsToCheck;
-            for (int i = opponentLapTimes.Count - 1; i >= minIndex; i--)
-            {
-                if (opponentLapTimes[i] > 0 && opponentLapTimes[i] < bestLap)
-                {
-                    bestLap = opponentLapTimes[i];
-                }
-            }
-            return bestLap;
-        }
-
         private Boolean IsNewSectorOrGapPoint(GameStateData previousGameState, GameStateData currentGameState)
         {
             if (currentGameState.SessionData.TrackDefinition.gapPoints.Count() > 0) {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -15,15 +16,15 @@ namespace CrewChiefV4.Events
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
         }
 
-        private static float drizzleMin = 0.02f;
-        private static float drizzleMax = 0.1f;
-        private static float lightRainMax = 0.25f;
-        private static float midRainMax = 0.5f;
+        private static float drizzleMin = 0.01f;
+        private static float drizzleMax = 0.15f;
+        private static float lightRainMax = 0.3f;
+        private static float midRainMax = 0.6f;
         private static float heavyRainMax = 0.75f;
 
-        private enum RainLevel
+        public enum RainLevel
         {
-            NONE, LIGHT, DRIZZLE, MID, HEAVY, STORM
+            NONE, DRIZZLE, LIGHT, MID, HEAVY, STORM
         }
 
         private Boolean enableTrackAndAirTempReports = UserSettings.GetUserSettings().getBoolean("enable_track_and_air_temp_reports");
@@ -237,7 +238,8 @@ namespace CrewChiefV4.Events
 
                                     if (minutes > 2)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this), 5);
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain,
+                                            new TimeSpanWrapper(TimeSpan.FromMinutes(minutes), Precision.MINUTES)), 0, this), 5);
                                     }
                                 }
                             }
@@ -252,7 +254,9 @@ namespace CrewChiefV4.Events
                     if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
                     {
                         // for PCars mRainDensity value is 0 or 1
-                        if (CrewChief.isPCars())
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                         {
                             if (currentGameState.RainDensity == 0 && rainAtLastReport == 1)
                             {
@@ -267,7 +271,7 @@ namespace CrewChiefV4.Events
                                 audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this), 5);
                             }
                         }
-                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                         {
                             RainLevel currentRainLevel = getRainLevel(currentConditions.RainDensity);
                             RainLevel lastReportedRainLevel = getRainLevel(rainAtLastReport);                            
@@ -304,7 +308,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private RainLevel getRainLevel(float amount)
+        public static RainLevel getRainLevel(float amount)
         {
             if (amount > drizzleMin && amount <= drizzleMax)
             {
