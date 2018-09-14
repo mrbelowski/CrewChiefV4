@@ -16,10 +16,8 @@ namespace CrewChiefV4.F1_2018
     public class F12018UDPreader : GameDataReader
     {
         private long packetRateCheckInterval = 1000;
-        private long packetCountAtStartOfCurrentRateCheck = 0;
         private long packetCountAtStartOfNextRateCheck = 0;
         private long ticksAtStartOfCurrentPacketRateCheck = 0;
-        private float lastPacketRateEstimate = -1;
 
         int packetCount = 0;
 
@@ -85,10 +83,8 @@ namespace CrewChiefV4.F1_2018
             {
                 socketCallback = new AsyncCallback(ReceiveCallback);
                 packetCount = 0;
-                packetCountAtStartOfCurrentRateCheck = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
                 ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
-                lastPacketRateEstimate = -1;
 
                 if (dumpToFile)
                 {

@@ -528,6 +528,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }
             }
 
@@ -684,7 +686,7 @@ namespace CrewChiefV4.RaceRoom
 
                         currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                             shared.LapTimePreviousSelf, currentGameState.SessionData.CurrentLapIsValid, currentGameState.PitData.InPitlane, false,
-                            30, 25, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                            30, 25, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                         currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                             currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
                     }
@@ -921,7 +923,9 @@ namespace CrewChiefV4.RaceRoom
                                 currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
                                 participantStruct.CarSpeed,
                                 participantStruct.LapTimeCurrentSelf,
-                                participantStruct.DriverInfo.ClassId, currentGameState.Now);
+                                participantStruct.DriverInfo.ClassId, currentGameState.Now,
+                                currentGameState.TimingData,
+                                currentGameState.carClass);
 
                         currentOpponentData.DeltaTime.SetNextDeltaPoint(currentOpponentLapDistance, currentOpponentData.CompletedLaps, currentOpponentData.Speed, currentGameState.Now);
 
@@ -1666,7 +1670,7 @@ namespace CrewChiefV4.RaceRoom
             float[] previousWorldPosition, float distanceRoundTrack, int tire_type_front, int tyre_sub_type_front, int tire_type_rear, int tyre_sub_type_rear,  
             Boolean sessionLengthIsTime, float sessionTimeRemaining, Boolean isRace, float nearPitEntryPointDistance, float speed,
             /* currentLapTime is used only to correct the game time at lap start */float currentLapTime,
-            /* may need to recalculate car classes for a short time at session start */int carClassId, DateTime now)
+            /* may need to recalculate car classes for a short time at session start */int carClassId, DateTime now, TimingData timingData, CarData.CarClass playerCarClass)
         {
             // hack to work around delayed car class data in online sessions
             if (now < recheckCarClassesUntil)
@@ -1681,6 +1685,7 @@ namespace CrewChiefV4.RaceRoom
                 }
             }
 
+            Boolean isPlayerCarClass = CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass);
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             opponentData.DistanceRoundTrack = distanceRoundTrack;
             opponentData.Speed = speed;
@@ -1745,7 +1750,7 @@ namespace CrewChiefV4.RaceRoom
                             completedLapTime = sessionRunningTime - currentLapData.GameTimeAtLapStart;
                         }
                         opponentData.CompleteLapWithProvidedLapTime(racePosition, sessionRunningTime, currentLapData.IsValid ? completedLapTime : -1, 
-                            isInPits, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            isInPits, false, 20, 20, sessionLengthIsTime, sessionTimeRemaining, 3, timingData, isPlayerCarClass);
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, false, 20, 20);
                     opponentData.IsNewLap = true;

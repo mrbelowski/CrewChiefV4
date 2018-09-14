@@ -565,6 +565,8 @@ namespace CrewChiefV4.PCars2
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
 
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }                
             }
 
@@ -636,7 +638,8 @@ namespace CrewChiefV4.PCars2
 
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         shared.mLastLapTime, currentGameState.SessionData.CurrentLapIsValid, currentGameState.PitData.InPitlane, shared.mRainDensity > 0, 
-                        shared.mTrackTemperature, shared.mAmbientTemperature, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        shared.mTrackTemperature, shared.mAmbientTemperature, currentGameState.SessionData.SessionHasFixedTime,
+                        currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
             }
@@ -796,7 +799,8 @@ namespace CrewChiefV4.PCars2
                                             participantStruct.mCurrentLapDistance, shared.mRainDensity == 1,
                                             shared.mAmbientTemperature, shared.mTrackTemperature,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
-                                            lastSectorTime, shared.mLapsInvalidated[i] == 1, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
+                                            lastSectorTime, shared.mLapsInvalidated[i] == 1, currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
+                                            currentGameState.TimingData, currentGameState.carClass);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1299,7 +1303,8 @@ namespace CrewChiefV4.PCars2
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float speed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, 
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance,
+            TimingData timingData, CarData.CarClass playerCarClass)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             
@@ -1330,7 +1335,8 @@ namespace CrewChiefV4.PCars2
                             lapInvalidated = true;
                         }
                         opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                            !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3, timingData, 
+                            CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass));
                         
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits || isLeavingPits, sessionRunningTime, isRaining, trackTemp, airTemp);

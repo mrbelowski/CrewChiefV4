@@ -124,11 +124,11 @@ namespace CrewChiefV4.Events
             carClassEnumToSound.Add(CarData.CarClassEnum.GTC, folderGTC);
             carClassEnumToSound.Add(CarData.CarClassEnum.GTE, folderGTE);
             carClassEnumToSound.Add(CarData.CarClassEnum.GTLM, folderGTLM);
-            //carClassEnumToSound.Add(CarData.CarClassEnum.GT300, folderGT300);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GT300, folderGT300);
             carClassEnumToSound.Add(CarData.CarClassEnum.GT500, folderGT500);
             carClassEnumToSound.Add(CarData.CarClassEnum.DTM, folderDTM);
             carClassEnumToSound.Add(CarData.CarClassEnum.GROUPA, folderGroupA);
-            //carClassEnumToSound.Add(CarData.CarClassEnum.GROUPB, folderGroupB);
+            carClassEnumToSound.Add(CarData.CarClassEnum.GROUPB, folderGroupB);
             carClassEnumToSound.Add(CarData.CarClassEnum.GROUPC, folderGroupC);
             carClassEnumToSound.Add(CarData.CarClassEnum.GROUP4, folderGroup4);
             carClassEnumToSound.Add(CarData.CarClassEnum.GROUP5, folderGroup5);

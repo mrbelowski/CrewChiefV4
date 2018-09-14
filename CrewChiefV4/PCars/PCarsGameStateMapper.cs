@@ -693,6 +693,8 @@ namespace CrewChiefV4.PCars
                     currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
 
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }                
             }
 
@@ -750,7 +752,7 @@ namespace CrewChiefV4.PCars
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
                         shared.mLastLapTime, currentGameState.SessionData.CurrentLapIsValid, currentGameState.PitData.InPitlane,
                         shared.mRainDensity == 1, shared.mTrackTemperature, shared.mAmbientTemperature,
-                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, currentGameState.PitData.InPitlane, currentGameState.SessionData.SessionRunningTime);
             }
@@ -872,7 +874,8 @@ namespace CrewChiefV4.PCars
                                             shared.mAmbientTemperature, shared.mTrackTemperature, opponentCarClass,
                                             currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining,
                                             shared.mLastSectorData == null ? -1 : shared.mLastSectorData[i], shared.mLapInvalidatedData == null ? false : shared.mLapInvalidatedData[i],
-                                            currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks);
+                                            currentGameState.SessionData.TrackDefinition.distanceForNearPitEntryChecks,
+                                            currentGameState.TimingData, currentGameState.carClass);
 
                                     if (previousOpponentData != null)
                                     {
@@ -1270,7 +1273,8 @@ namespace CrewChiefV4.PCars
             float sessionRunningTime, float secondsSinceLastUpdate, float[] currentWorldPosition, float[] previousWorldPosition,
             float previousSpeed, float worldRecordLapTime, float worldRecordS1Time, float worldRecordS2Time, float worldRecordS3Time, 
             float distanceRoundTrack, Boolean isRaining, float trackTemp, float airTemp, CarData.CarClass carClass,
-            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance)
+            Boolean sessionLengthIsTime, float sessionTimeRemaining, float lastSectorTime, Boolean lapInvalidated, float nearPitEntryPointDistance,
+            TimingData timingData, CarData.CarClass playerCarClass)
         {
             float previousDistanceRoundTrack = opponentData.DistanceRoundTrack;
             if (opponentData.DriverRawName.StartsWith(NULL_CHAR_STAND_IN) && name != null && name.Trim().Length > 0 && !name.StartsWith(NULL_CHAR_STAND_IN))
@@ -1340,14 +1344,16 @@ namespace CrewChiefV4.PCars
                                 lastSectorTime = -1;
                                 lapInvalidated = true;
                             }
-                            opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime, 
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3);
+                            opponentData.CompleteLapWithLastSectorTime(racePosition, lastSectorTime, sessionRunningTime,
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, 3, timingData,
+                                CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass));
                         }
                         else
                         {
                             // use the inbuilt timing
                             opponentData.CompleteLapWithEstimatedLapTime(racePosition, sessionRunningTime, worldRecordLapTime, worldRecordS1Time, worldRecordS2Time, worldRecordS3Time,
-                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining);
+                                !lapInvalidated, isRaining, trackTemp, airTemp, sessionLengthIsTime, sessionTimeRemaining, timingData,
+                                CarData.IsCarClassEqual(opponentData.CarClass, playerCarClass));
                         }
                     }
                     opponentData.StartNewLap(completedLaps + 1, racePosition, isInPits, sessionRunningTime, isRaining, trackTemp, airTemp);

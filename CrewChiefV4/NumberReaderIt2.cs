@@ -13,9 +13,6 @@ namespace CrewChiefV4.NumberProcessing
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers/";
-        private static String folderHoursSuffix = "_hours";
-        private static String folderMinutesSuffix = "_minutes";
-        private static String folderSecondsSuffix = "_seconds";
         private static String folderAndPrefix = "and_";
         // the number sounds for tenths sometimes need a 'hanging inflection' - add this suffix when they do
         private static String moreInflectionSuffix = "_more";
@@ -46,7 +43,6 @@ namespace CrewChiefV4.NumberProcessing
         // This is combined with folderNumbersStub to produce tenths sounds for tenths > 1 - numbers_it/2_tenths -> numbers_it/9_tenths
         // private static String folderTenthsSuffix = "_tenths";
         private static String folderATenth = folderNumbersStub + "a_tenth";
-        private static String folderPoint = folderNumbersStub + "point";
 
         protected override String getLocale()
         {

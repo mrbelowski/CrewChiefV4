@@ -136,7 +136,6 @@ namespace CrewChiefV4.Events
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
         private Boolean played100MetreWarning = false;
         private Boolean played50MetreWarning = false;
-        private Boolean playedMoreThan150MetreWarning = false;
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -188,7 +187,6 @@ namespace CrewChiefV4.Events
             pitStallOccupied = false;
             warnedAboutOccupiedPitOnThisLap = false;
             previousDistanceToBox = -1;
-            playedMoreThan150MetreWarning = false;
             played100MetreWarning = false;
             played50MetreWarning = false;
             playedLimiterLineToPitBoxDistanceWarning = false;
@@ -258,7 +256,6 @@ namespace CrewChiefV4.Events
                 {
                     // just entered the pitlane
                     previousDistanceToBox = 0;
-                    playedMoreThan150MetreWarning = false;
                     played100MetreWarning = false;
                     played50MetreWarning = false;
                     if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
@@ -278,7 +275,6 @@ namespace CrewChiefV4.Events
                         firstPitCountdown.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
                         audioPlayer.playMessage(firstPitCountdown, 10);
 
-                        playedMoreThan150MetreWarning = true;
                     }
                     playedLimiterLineToPitBoxDistanceWarning = true;
                 }
