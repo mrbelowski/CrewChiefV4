@@ -366,9 +366,7 @@ namespace CrewChiefV4.GameState
             }
             return ConditionsEnum.WARM_DRY;
         }
-
-        public Conditions conditions;
-
+        
         Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
         Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
         Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
@@ -416,7 +414,7 @@ namespace CrewChiefV4.GameState
         float playerClassOpponentBestLapTime = -1;
 
         Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
-
+        
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
         // laptime set in conditions similar to the current conditions. You can also request a best laptime from
         // some other conditions
@@ -633,11 +631,12 @@ namespace CrewChiefV4.GameState
         {
             if (requestedConditionsEnum == ConditionsEnum.CURRENT)
             {
-                if (this.conditions == null || this.conditions.samples == null)
+                // TODO: need a better way to link the Conditions state with this TimingData state object, without needlessly invoking the ctor
+                if (CrewChief.currentGameState == null || CrewChief.currentGameState.Conditions == null || CrewChief.currentGameState.Conditions.samples == null)
                 {
                     return ConditionsEnum.WARM_DRY;
                 }
-                return TimingData.getConditionsEnumForSample(this.conditions.getMostRecentConditions());
+                return TimingData.getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
             }
             else
             {
@@ -3712,7 +3711,6 @@ namespace CrewChiefV4.GameState
             this.Ticks = ticks;
             this.Now = new DateTime(ticks);
             CurrentTime = Now;
-            this.TimingData.conditions = this.Conditions;
         }
 
         // some convenience methods
