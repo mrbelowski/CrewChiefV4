@@ -558,7 +558,7 @@ namespace CrewChiefV4.Events
                         Console.WriteLine("1 lap left but position is < 1");
                     }
                 }
-                else if (currentGameState.SessionData.CompletedLaps == currentGameState.SessionData.SessionNumberOfLaps - 2)
+                else if (currentGameState.SessionData.SessionLapsRemaining == 2)
                 {
                     Console.WriteLine("2 laps remaining");
                     if (position == 1)
@@ -570,7 +570,7 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessage(new QueuedMessage(folderTwoLeftTopThree, 0, this), 10);
                     }
                     else if (position >= currentGameState.SessionData.SessionStartClassPosition + 5 &&
-                        currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
+                        currentGameState.SessionData.LapTimePrevious > currentGameState.TimingData.getPlayerBestLapTime())
                     {
                         // yuk... don't yell at the player for being shit if he's playing Assetto. Because assetto drivers *are* shit, and also the SessionStartClassPosition
                         // might be invalid so perhaps they're really not being shit. At the moment.

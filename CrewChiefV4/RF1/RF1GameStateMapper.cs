@@ -361,6 +361,7 @@ namespace CrewChiefV4.rFactor1
 
                 currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
                 currentGameState.Conditions.samples = previousGameState.Conditions.samples;
+                currentGameState.TimingData = previousGameState.TimingData;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
@@ -388,7 +389,8 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        lastSectorTime, lastSectorTime > 0, player.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        lastSectorTime, lastSectorTime > 0, player.inPits == 1, false, shared.trackTemp, shared.ambientTemp, 
+                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.OverallPosition, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime);
             }
             else if (currentGameState.SessionData.IsNewSector)
@@ -854,8 +856,9 @@ namespace CrewChiefV4.rFactor1
                 if (opponent.IsNewLap)
                 {
                     opponent.CompleteLapWithProvidedLapTime(opponent.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                            lastSectorTime, lastSectorTime > 0, vehicle.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, 
-                            currentGameState.SessionData.SessionTimeRemaining, 3);
+                            lastSectorTime, lastSectorTime > 0, vehicle.inPits == 1, false, shared.trackTemp, shared.ambientTemp, 
+                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData, 
+                            CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass));
                     opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.OverallPosition, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
                 }
                 else if (isNewSector)

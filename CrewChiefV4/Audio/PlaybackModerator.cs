@@ -68,7 +68,7 @@ namespace CrewChiefV4.Audio
         {
             var interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
             MinPriorityForInterrupt interruptSettingEnum;
-            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum)) ;
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum))
             {
                 switch (interruptSettingEnum)
                 {
