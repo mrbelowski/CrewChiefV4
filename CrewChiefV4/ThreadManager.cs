@@ -232,6 +232,7 @@ namespace CrewChiefV4
             }
         }
 
+        // Note: wait for file dump on shutdown is not supported.
         public static bool WaitForRootThreadsShutdown()
         {
             // Possibly, print to debug log?
@@ -263,6 +264,7 @@ namespace CrewChiefV4
             Debug.WriteLine("Shutdown: Wait for root threads stop failed, thread states:");
             ThreadManager.DebugTraceRootThreadStats();
 
+            // Note: wait for file dump on shutdown is not supported.
             Debug.Assert(false, "Shutdown: Wait for root threads stop failed, please investigate.");
 
             return false;

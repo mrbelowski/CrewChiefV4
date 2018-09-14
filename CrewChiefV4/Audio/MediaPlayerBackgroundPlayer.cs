@@ -122,6 +122,7 @@ namespace CrewChiefV4.Audio
 
         public override void stop()
         {
+            // TODO_THREADS: this needs to be done before form closes.
             if (backgroundPlayer == null || !initialised)
                 return;
             try
