@@ -49,6 +49,7 @@ namespace CrewChiefV4
         private Boolean newDriverNamesAvailable = false;
         private Boolean newPersonalisationsAvailable = false;
 
+        // Shared with worker thread.
         private ControllerConfiguration controllerConfiguration;
 
         private CrewChief crewChief;
@@ -707,6 +708,8 @@ namespace CrewChiefV4
             }
 
             controllerConfiguration = new ControllerConfiguration(this);
+            GlobalResources.controllerConfiguration = controllerConfiguration;
+
             setSelectedGameType();
 
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
