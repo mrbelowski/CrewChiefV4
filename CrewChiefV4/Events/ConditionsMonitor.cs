@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -237,7 +238,8 @@ namespace CrewChiefV4.Events
 
                                     if (minutes > 2)
                                     {
-                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this), 5);
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain,
+                                            new TimeSpanWrapper(TimeSpan.FromMinutes(minutes), Precision.MINUTES)), 0, this), 5);
                                     }
                                 }
                             }

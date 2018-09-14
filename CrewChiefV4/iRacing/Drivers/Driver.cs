@@ -56,7 +56,6 @@ namespace CrewChiefV4.iRacing
             return YamlParser.Parse(sessionInfo, string.Format(driverYamlPath, this.Id, Node));
         }
         
-        private double _prevPos;
         public void ParseDynamicSessionInfo(string sessionInfo, bool isPlayerCar)
         {
             // Parse only session info that could have changed (driver dependent)

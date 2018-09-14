@@ -28,6 +28,7 @@ namespace CrewChiefV4.NumberProcessing
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers/";
 
+        private static String folderMinutes = "numbers/minutes";
         private static String folderThousand = "numbers/thousand";
         private static String folderThousandAnd = "numbers/thousand_and";
         private static String folderHundred = "numbers/hundred";

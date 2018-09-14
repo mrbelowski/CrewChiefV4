@@ -411,7 +411,7 @@ namespace CrewChiefV4
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("Error resetting recogniser");
             }

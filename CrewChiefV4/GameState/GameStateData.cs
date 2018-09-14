@@ -2924,7 +2924,6 @@ namespace CrewChiefV4.GameState
 
                 DateTime otherCarTime;
                 DateTime thisCarTime;
-                var splitTimeSet = false;
                 if (totalDistanceTravelled < otherCarDelta.totalDistanceTravelled)
                 {
                     // I'm behind otherCar, so we want to know time between otherCar reaching the last deltaPoint I've just hit, and me reaching it.
@@ -2933,7 +2932,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else if (totalDistanceTravelled > otherCarDelta.totalDistanceTravelled)
@@ -2945,7 +2943,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
             }
@@ -2992,7 +2989,6 @@ namespace CrewChiefV4.GameState
             {
                 DateTime otherCarTime;
                 DateTime thisCarTime;
-                var splitTimeSet = false;
                 //opponent is behind
                 if (distanceRoundTrackOnCurrentLap < otherCarDelta.distanceRoundTrackOnCurrentLap)
                 {
@@ -3000,7 +2996,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else if (distanceRoundTrackOnCurrentLap > otherCarDelta.distanceRoundTrackOnCurrentLap)
@@ -3009,7 +3004,6 @@ namespace CrewChiefV4.GameState
                         && deltaPoints.TryGetValue(otherCarDelta.currentDeltaPoint, out thisCarTime))
                     {
                         splitTime = otherCarTime - thisCarTime;
-                        splitTimeSet = true;
                     }
                 }
                 else
