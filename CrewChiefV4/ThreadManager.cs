@@ -23,11 +23,14 @@ namespace CrewChiefV4
         private static List<Thread> rootThreads = new List<Thread>();
         public static void RegisterRootThread(Thread t)
         {
-            if (MainWindow.instance != null 
-                && MainWindow.instance.InvokeRequired)
+            lock (MainWindow.instanceLock)
             {
-                Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
-                return;
+                if (MainWindow.instance != null
+                    && MainWindow.instance.InvokeRequired)
+                {
+                    Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
+                    return;
+                }
             }
 
             ThreadManager.rootThreads.Add(t);
@@ -35,6 +38,7 @@ namespace CrewChiefV4
 
         public static void UnregisterRootThreads()
         {
+            // This is special case, no locking here because this is only invoked on a UI thread, and lock is alread held.
             if (MainWindow.instance != null
                 && MainWindow.instance.InvokeRequired)
             {
@@ -42,7 +46,6 @@ namespace CrewChiefV4
                 return;
             }
 
-            // TODO_THREADS: do validation.
             ThreadManager.rootThreads.Clear();
         }
 
@@ -68,11 +71,14 @@ namespace CrewChiefV4
         {
             try
             {
-                if (MainWindow.instance != null
-                    && !MainWindow.instance.InvokeRequired)
+                lock (MainWindow.instanceLock)
                 {
-                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
-                    return false;
+                    if (MainWindow.instance != null
+                       && !MainWindow.instance.InvokeRequired)
+                    {
+                        Debug.Assert(false, "This method cannot be invoked from the UI thread.");
+                        return false;
+                    }
                 }
 
                 // TODO_THREADS: ok, this won't work.  If anyone tries to write to console while we are waiting, this will deadlock.  Need to keep thinking.
@@ -94,7 +100,13 @@ namespace CrewChiefV4
                     if (allThreadsRunning)
                     {
                         ThreadManager.Trace("Root threads started");
-                        if (!string.IsNullOrWhiteSpace(MainWindow.instance.filenameTextbox.Text))
+                        var isTraceFileSet = false;
+                        lock (MainWindow.instanceLock)
+                        {
+                            isTraceFileSet = MainWindow.instance != null && string.IsNullOrWhiteSpace(MainWindow.instance.filenameTextbox.Text);
+                        }
+
+                        if (isTraceFileSet)
                         {
                             ThreadManager.Trace("Wating for run thread to read data file...");
                             while (true)
@@ -122,12 +134,15 @@ namespace CrewChiefV4
             }
             finally
             {
-                if (MainWindow.instance != null)
+                lock (MainWindow.instanceLock)
                 {
-                    MainWindow.instance.Invoke((MethodInvoker)delegate
+                    if (MainWindow.instance != null)
                     {
-                        MainWindow.instance.startApplicationButton.Enabled = true;
-                    });
+                        MainWindow.instance.Invoke((MethodInvoker)delegate
+                        {
+                            MainWindow.instance.startApplicationButton.Enabled = true;
+                        });
+                    }
                 }
             }
         }
@@ -136,14 +151,23 @@ namespace CrewChiefV4
         {
             try
             {
-                if (MainWindow.instance != null
-                    && !MainWindow.instance.InvokeRequired)
+                lock (MainWindow.instanceLock)
                 {
-                    Debug.Assert(false, "This method cannot be invoked from the UI thread.");
-                    return false;
+                    if (MainWindow.instance != null
+                        && !MainWindow.instance.InvokeRequired)
+                    {
+                        Debug.Assert(false, "This method cannot be invoked from the UI thread.");
+                        return false;
+                    }
                 }
 
-                if (MainWindow.instance.recordSession.Checked)
+                var recordSessionChecked = false;
+                lock (MainWindow.instanceLock)
+                {
+                    recordSessionChecked = MainWindow.instance != null && MainWindow.instance.recordSession.Checked;
+                }
+
+                if (recordSessionChecked)
                 {
                     ThreadManager.Trace("Wating for run thread to dump data file...");
                     while (true)
@@ -189,14 +213,16 @@ namespace CrewChiefV4
             }
             finally
             {
-                if (MainWindow.instance != null)
+                lock (MainWindow.instanceLock)
                 {
-                    MainWindow.instance.Invoke((MethodInvoker)delegate
+                    if (MainWindow.instance != null)
                     {
-                        ThreadManager.UnregisterRootThreads();
-                        // TODO_THREADS: Need to see if form is not being closed?
-                        MainWindow.instance.startApplicationButton.Enabled = true;
-                    });
+                        MainWindow.instance.Invoke((MethodInvoker)delegate
+                        {
+                            ThreadManager.UnregisterRootThreads();
+                            MainWindow.instance.startApplicationButton.Enabled = true;
+                        });
+                    }
                 }
             }
         }

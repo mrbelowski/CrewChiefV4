@@ -198,18 +198,24 @@ namespace CrewChiefV4
                 Value = SpecialFilter.COMMON_PREFERENCES
             });
 
-            var currSelectedGameFriendlyName = MainWindow.instance.gameDefinitionList.Text;
-            foreach (var game in MainWindow.instance.gameDefinitionList.Items)
+            lock (MainWindow.instanceLock)
             {
-                var friendlyGameName = game.ToString();
-                this.filterBox.Items.Add(new ComboBoxItem<GameEnum>()
+                if (MainWindow.instance != null)
                 {
-                    Label = friendlyGameName,
-                    Value = GameDefinition.getGameDefinitionForFriendlyName(friendlyGameName).gameEnum
-                });
+                    var currSelectedGameFriendlyName = MainWindow.instance.gameDefinitionList.Text;
+                    foreach (var game in MainWindow.instance.gameDefinitionList.Items)
+                    {
+                        var friendlyGameName = game.ToString();
+                        this.filterBox.Items.Add(new ComboBoxItem<GameEnum>()
+                        {
+                            Label = friendlyGameName,
+                            Value = GameDefinition.getGameDefinitionForFriendlyName(friendlyGameName).gameEnum
+                        });
 
-                if (friendlyGameName == currSelectedGameFriendlyName)
-                    this.filterBox.SelectedIndex = this.filterBox.Items.Count - 1;
+                        if (friendlyGameName == currSelectedGameFriendlyName)
+                            this.filterBox.SelectedIndex = this.filterBox.Items.Count - 1;
+                    }
+                }
             }
 
             // Special case for no game selected.
