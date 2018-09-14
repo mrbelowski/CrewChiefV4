@@ -473,7 +473,7 @@ namespace CrewChiefV4.GameState
             return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, false, requestedConditionsEnum);
         }
 
-        private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition, Boolean requireEnoughPlayerData,
+        private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition, Boolean checkForSufficientPlayerData,
             ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
             if (requestedConditionsEnum == ConditionsEnum.ANY)
@@ -481,7 +481,7 @@ namespace CrewChiefV4.GameState
                 return overallBest;
             }
             ConditionsEnum conditionsEnum = getConditionsEnum(requestedConditionsEnum);
-            if (!hasEnoughData(conditionsEnum, requireEnoughPlayerData ? playerLapTimesByConditions : null))
+            if (!hasEnoughData(conditionsEnum, checkForSufficientPlayerData))
             {
                 return overallBest;
             }
@@ -493,7 +493,7 @@ namespace CrewChiefV4.GameState
             return -1;
         }
 
-        private Boolean hasEnoughData(ConditionsEnum requestedConditionsEnum, Dictionary<ConditionsEnum, List<float>> playerData)
+        private Boolean hasEnoughData(ConditionsEnum requestedConditionsEnum, Boolean checkForSufficientPlayerData)
         {
             int minLapsUnderConditions = 2;
             // eeewwwww
@@ -513,16 +513,18 @@ namespace CrewChiefV4.GameState
                         break;
                 }
             }
-            if (playerData == null)
+            if (checkForSufficientPlayerData)
             {
-                int totalLapsInTheseConditions;
-                return totalLapsInEachCondition.TryGetValue(requestedConditionsEnum, out totalLapsInTheseConditions) && totalLapsInTheseConditions >= minLapsUnderConditions;
+                // 'enough data' means enough recorded player laps
+                List<float> list;
+                return playerLapTimesByConditions.TryGetValue(requestedConditionsEnum, out list) && list.Count >= minLapsUnderConditions;
             }
             else
             {
-                List<float> list;
-                return playerData.TryGetValue(requestedConditionsEnum, out list) && list.Count >= minLapsUnderConditions;
-            }
+                // 'enough data' means enough recorded laps for any participant in the player's class
+                int totalLapsInTheseConditions;
+                return totalLapsInEachCondition.TryGetValue(requestedConditionsEnum, out totalLapsInTheseConditions) && totalLapsInTheseConditions >= minLapsUnderConditions;
+            }            
         }
         
         // add a player lap, updating the best lap / sectors for player and player class if necessary
