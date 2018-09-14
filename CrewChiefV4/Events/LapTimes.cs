@@ -885,14 +885,11 @@ namespace CrewChiefV4.Events
 
                 if (!selfPace)
                 {
-                    float playerClassSessionBestTime = currentGameState.TimingData.getPlayerClassBestLapTime();
-                    float playerSessionBestTime = currentGameState.TimingData.getPlayerBestLapTime();
-
                     if (currentGameState.SessionData.OverallSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
                         return LastLapRating.BEST_OVERALL;
                     }
-                    else if (playerClassSessionBestTime == currentGameState.SessionData.LapTimePrevious)
+                    else if (GameStateData.Multiclass && currentGameState.SessionData.PlayerClassSessionBestLapTime == currentGameState.SessionData.LapTimePrevious)
                     {
                         return LastLapRating.BEST_IN_CLASS;
                     }
@@ -904,7 +901,7 @@ namespace CrewChiefV4.Events
                     {
                         return LastLapRating.CLOSE_TO_CURRENT_PACE;
                     }
-                    else if (currentGameState.SessionData.LapTimePrevious == playerSessionBestTime)
+                    else if (currentGameState.SessionData.LapTimePrevious == currentGameState.SessionData.PlayerLapTimeSessionBest)
                     {
                         if (currentGameState.SessionData.OpponentsLapTimeSessionBestOverall > currentGameState.SessionData.LapTimePrevious - closeThreshold)
                         {
@@ -927,12 +924,17 @@ namespace CrewChiefV4.Events
                     {
                         return LastLapRating.CLOSE_TO_CLASS_LEADER;
                     }
-                    else if (playerSessionBestTime >= currentGameState.SessionData.LapTimePrevious - closeThreshold
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest >= currentGameState.SessionData.LapTimePrevious - closeThreshold
                         && currentGameState.SessionData.CompletedLaps > 1)
                     {
                         return LastLapRating.CLOSE_TO_PERSONAL_BEST;
                     }
-                    else if (playerSessionBestTime > 0)
+                    else if (bestLapComparisonData[0] > 0 && bestLapComparisonData[0] < currentGameState.SessionData.LapTimePrevious - 3)
+                    {
+                        // 3 seconds off the pace
+                        return LastLapRating.BAD;
+                    }
+                    else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
                     {
                         return LastLapRating.MEH;
                     }
@@ -947,6 +949,11 @@ namespace CrewChiefV4.Events
                         && currentGameState.SessionData.CompletedLaps > 1)
                     {
                         return LastLapRating.CLOSE_TO_PERSONAL_BEST;
+                    }
+                    else if (bestLapComparisonData[0] > 0 && bestLapComparisonData[0] < currentGameState.SessionData.LapTimePrevious - 3)
+                    {
+                        // 3 seconds off the pace
+                        return LastLapRating.BAD;
                     }
                     else if (currentGameState.SessionData.PlayerLapTimeSessionBest > 0)
                     {
@@ -1144,6 +1151,13 @@ namespace CrewChiefV4.Events
                                     }
                                     break;
                                 case LastLapRating.MEH:
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                case LastLapRating.BAD:
                                     messages.Add(MessageFragment.Text(folderPaceBad));
                                     if (timeToFindFolder != null)
                                     {
@@ -1185,8 +1199,15 @@ namespace CrewChiefV4.Events
                                         audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
                                     }
                                     break;
-                                case LastLapRating.MEH:
+                                case LastLapRating.BAD:
                                     messages.Add(MessageFragment.Text(folderPaceBad));
+                                    if (timeToFindFolder != null)
+                                    {
+                                        messages.Add(MessageFragment.Text(timeToFindFolder));
+                                    }
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
+                                    break;
+                                case LastLapRating.MEH:
                                     if (timeToFindFolder != null)
                                     {
                                         messages.Add(MessageFragment.Text(timeToFindFolder));
@@ -1296,6 +1317,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessageImmediately(new QueuedMessage(folderPaceOK, 0, null));
                                     break;
                                 case LastLapRating.MEH:
+                                case LastLapRating.BAD:
                                     messages.Add(MessageFragment.Text(folderPaceBad));
                                     audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeRacePaceReport", messages, 0, null));
                                     break;
@@ -1342,7 +1364,7 @@ namespace CrewChiefV4.Events
         {
             BEST_OVERALL, BEST_IN_CLASS, SETTING_CURRENT_PACE, CLOSE_TO_CURRENT_PACE, PERSONAL_BEST, PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER,
             PERSONAL_BEST_CLOSE_TO_CLASS_LEADER, PERSONAL_BEST_STILL_SLOW, CLOSE_TO_OVERALL_LEADER, CLOSE_TO_CLASS_LEADER,
-            CLOSE_TO_PERSONAL_BEST, MEH, NO_DATA
+            CLOSE_TO_PERSONAL_BEST, MEH, BAD, NO_DATA
         }
 
         public enum SectorSet
