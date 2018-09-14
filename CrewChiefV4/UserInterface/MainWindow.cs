@@ -88,7 +88,9 @@ namespace CrewChiefV4
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
 
+        // instance 
         public static MainWindow instance = null;
+        public static object instanceLock = new object();
 
         // True, while we are in a constructor.
         private bool constructingWindow = false;
@@ -662,7 +664,11 @@ namespace CrewChiefV4
 
         public MainWindow()
         {
-            MainWindow.instance = this;
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = this;
+            }
+
             this.constructingWindow = true;
 
             InitializeComponent();
@@ -1431,6 +1437,11 @@ namespace CrewChiefV4
 
         private void stopApp(object sender, FormClosedEventArgs e)
         {
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = null;
+            }
+
             stopApp();
         }
 
@@ -2465,49 +2476,52 @@ namespace CrewChiefV4
 
         public override void WriteLine(string value)
         {
-            if (enable || MainWindow.instance.recordSession.Checked)
+            lock (MainWindow.instanceLock)
             {
-                Boolean gotDateStamp = false;
-                StringBuilder sb = new StringBuilder();
-                if (CrewChief.loadDataFromFile)
+                if (MainWindow.instance != null && (enable || MainWindow.instance.recordSession.Checked))
                 {
-                    if (CrewChief.currentGameState != null)
+                    Boolean gotDateStamp = false;
+                    StringBuilder sb = new StringBuilder();
+                    if (CrewChief.loadDataFromFile)
                     {
-                        if (CrewChief.currentGameState.CurrentTimeStr == null)
+                        if (CrewChief.currentGameState != null)
                         {
-                            CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
-                        }
-                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
-                        gotDateStamp = true;
-                    }
-                }
-                if (!gotDateStamp)
-                {
-                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
-                }
-                sb.Append(" : ").Append(value).AppendLine();
-                if (enable)
-                {
-                    if (textbox != null && !textbox.IsDisposed)
-                    {
-                        try
-                        {
-                            lock (this)
+                            if (CrewChief.currentGameState.CurrentTimeStr == null)
                             {
-                                textbox.AppendText(sb.ToString());
+                                CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
+                            }
+                            sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                            gotDateStamp = true;
+                        }
+                    }
+                    if (!gotDateStamp)
+                    {
+                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
+                    }
+                    sb.Append(" : ").Append(value).AppendLine();
+                    if (enable)
+                    {
+                        if (textbox != null && !textbox.IsDisposed)
+                        {
+                            try
+                            {
+                                lock (this)
+                                {
+                                    textbox.AppendText(sb.ToString());
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                // swallow - nothing to log it to
                             }
                         }
-                        catch (Exception)
-                        {
-                            // swallow - nothing to log it to
-                        }
                     }
-                }
-                else
-                {
-                    lock (this)
+                    else
                     {
-                        builder.Append(sb.ToString());
+                        lock (this)
+                        {
+                            builder.Append(sb.ToString());
+                        }
                     }
                 }
             }
