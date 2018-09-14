@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace CrewChiefV4
 {
-    class ControllerConfiguration : IDisposable
+    public class ControllerConfiguration : IDisposable
     {
         private static Guid UDP_NETWORK_CONTROLLER_GUID = new Guid("2bbfed03-a04f-4408-91cf-e0aa6b20b8ff");
 

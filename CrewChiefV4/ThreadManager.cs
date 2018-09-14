@@ -20,6 +20,11 @@ namespace CrewChiefV4
         private const int THREAD_ALIVE_TOTAL_WAIT_SECS = 5;
         private const int THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.THREAD_ALIVE_CHECK_PERIOD_MILLIS;
 
+        private const int SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS = 50;
+        private const int SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS = 5;
+        private const int SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS;
+
+
         private static List<Thread> rootThreads = new List<Thread>();
         public static void RegisterRootThread(Thread t)
         {
@@ -227,11 +232,54 @@ namespace CrewChiefV4
             }
         }
 
+        public static bool WaitForRootThreadsShutdown()
+        {
+            // Possibly, print to debug log?
+            Debug.WriteLine("Shutdown: Wating for root threads to stop...");
+            for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
+            {
+                var allThreadsStopped = true;
+                foreach (var t in rootThreads)
+                {
+                    if (t.IsAlive)
+                    {
+                        // TODO_THREADS: remove?
+                        Debug.WriteLine("Shutdown: Thread still alive - " + t.Name);
+                        allThreadsStopped = false;
+                        break;
+                    }
+                }
+
+                if (allThreadsStopped)
+                {
+                    Debug.WriteLine("Shutdown: Root threads stopped");
+                    return true;
+                }
+
+                Thread.Sleep(ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS);
+            }
+
+            
+            Debug.WriteLine("Shutdown: Wait for root threads stop failed, thread states:");
+            ThreadManager.DebugTraceRootThreadStats();
+
+            Debug.Assert(false, "Shutdown: Wait for root threads stop failed, please investigate.");
+
+            return false;
+        }
+
         private static void TraceRootThreadStats()
         {
             // If we run into bad problems, we might need to also get stack trace out.
             foreach (var t in rootThreads)
-                ThreadManager.Trace(string.Format("Thread Name: {0}  ThreadState: {1}  IsAlive: {2}\n", t.Name, t.ThreadState, t.IsAlive));
+                ThreadManager.Trace(string.Format("Thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
+        }
+
+        private static void DebugTraceRootThreadStats()
+        {
+            // If we run into bad problems, we might need to also get stack trace out.
+            foreach (var t in rootThreads)
+                Debug.WriteLine(string.Format("Thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
         }
 
         private static void Trace(string msg)

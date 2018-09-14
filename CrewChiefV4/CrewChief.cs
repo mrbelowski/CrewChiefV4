@@ -29,6 +29,7 @@ namespace CrewChiefV4
 
         public static Boolean loadDataFromFile = false;
 
+        // TODO_THREADS: shared resource
         public SpeechRecogniser speechRecogniser;
 
         public static GameDefinition gameDefinition;
@@ -52,6 +53,7 @@ namespace CrewChiefV4
 
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
+        // TODO_THREADS: shared resource
         public AudioPlayer audioPlayer;
 
         Object lastSpotterState;
@@ -114,6 +116,10 @@ namespace CrewChiefV4
         {
             speechRecogniser = new SpeechRecogniser(this);
             audioPlayer = new AudioPlayer();
+
+            GlobalResources.speechRecogniser = speechRecogniser;
+            GlobalResources.audioPlayer = audioPlayer;
+
             audioPlayer.initialise();
             eventsList.Add("Timings", new Timings(audioPlayer));
             eventsList.Add("Position", new Position(audioPlayer));
@@ -169,32 +175,6 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
-            // TODO_THREADS: debug startup/shutdown, with and without app connected.
-            running = false;
-            spotterIsRunning = false;
-            if (gameDataReader != null)
-            {
-                gameDataReader.Dispose();
-            }
-            // TODO_THREADS: start/stop of queue monitor should only happen via Chief run thread.  That is because AudioPlayer is UI thread owned, 
-            // and waiting for thread to shutdown might deadlock with the UI thread.
-            /*if (audioPlayer != null)
-            {
-                audioPlayer.stopMonitor();
-            }*/
-            if (speechRecogniser != null)
-            {
-                speechRecogniser.Dispose();
-            }
-            if (audioPlayer != null)
-            {
-                audioPlayer.Dispose();
-            }
-
-            gameDataReader = null;
-            speechRecogniser.stop();
-            speechRecogniser = null;
-            audioPlayer = null;
         }
 
         public static AbstractEvent getEvent(String eventName)
@@ -1148,14 +1128,16 @@ namespace CrewChiefV4
                     DriverNameHelper.dumpUnvocalizedNames();
                 }
                 mapped = false;
-                // TODO_THREADS: review.
+            }
+            finally
+            {
+                // Thread cleanup.
+
                 if (speechRecogniser != null)
                 {
                     speechRecogniser.stop();
                 }
-            }
-            finally
-            {
+
                 // Wait on child threads and release owned resources here.
                 Console.WriteLine("Stopping queue monitor");
                 if (audioPlayer != null)
@@ -1165,6 +1147,13 @@ namespace CrewChiefV4
                 }
 
                 stopSpotterThread();
+
+                // Release thread resources:
+                if (gameDataReader != null)
+                {
+                    gameDataReader.Dispose();
+                    gameDataReader = null;
+                }
             }
 
             return true;
