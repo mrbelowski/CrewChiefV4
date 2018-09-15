@@ -13,7 +13,7 @@ namespace CrewChiefV4.Audio
     {
         private SynchronizationContext mainThreadContext = null;
         
-        // All access should be via UI thread.
+        // All access should be done via main thread, because that is the thread owning MediaPlayer object.
         private MediaPlayer backgroundPlayer;
 
         public MediaPlayerBackgroundPlayer(SynchronizationContext mainThreadContext, String backgroundFilesPath, String defaultBackgroundSound)
@@ -31,13 +31,14 @@ namespace CrewChiefV4.Audio
             }
             else if (getBackgroundVolume() > 0 && !muted)
             {
+                Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
+
                 lock (MainWindow.instanceLock)
                 {
                     if (MainWindow.instance != null)
                     {
                         this.mainThreadContext.Send(delegate
                         {
-                            Console.WriteLine("Setting background sounds file to  " + backgroundSoundName);
                             String path = Path.Combine(backgroundFilesPath, backgroundSoundName);
                             if (initialised)
                             {
@@ -102,10 +103,8 @@ namespace CrewChiefV4.Audio
                             {
                                 backgroundDuration = (backgroundPlayer.NaturalDuration.TimeSpan.Minutes * 60) +
                                     backgroundPlayer.NaturalDuration.TimeSpan.Seconds;
-                                //Console.WriteLine("Duration from file is " + backgroundDuration);
                                 backgroundOffset = Utilities.random.Next(0, backgroundDuration - backgroundLeadout);
                             }
-                            //Console.WriteLine("Background offset = " + backgroundOffset);
                             backgroundPlayer.Position = TimeSpan.FromSeconds(backgroundOffset);
 
                             // Restore the desired volume.
@@ -162,17 +161,9 @@ namespace CrewChiefV4.Audio
 
         private void backgroundPlayer_MediaEnded(object sender, EventArgs e)
         {
-            lock (MainWindow.instanceLock)
-            {
-                if (MainWindow.instance != null)
-                {
-                    this.mainThreadContext.Send(delegate
-                    {
-                        Console.WriteLine("Looping...");
-                        backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
-                    }, null);
-                }
-            }
+            // This is called from the main thread, no need to marshal.
+            Console.WriteLine("Looping...");
+            backgroundPlayer.Position = TimeSpan.FromMilliseconds(1);
         }
     }
 }
