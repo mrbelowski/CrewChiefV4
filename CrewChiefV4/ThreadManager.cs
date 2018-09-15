@@ -108,7 +108,7 @@ namespace CrewChiefV4
                         var isTraceFileSet = false;
                         lock (MainWindow.instanceLock)
                         {
-                            isTraceFileSet = MainWindow.instance != null && string.IsNullOrWhiteSpace(MainWindow.instance.filenameTextbox.Text);
+                            isTraceFileSet = MainWindow.instance != null && !string.IsNullOrWhiteSpace(MainWindow.instance.filenameTextbox.Text);
                         }
 
                         if (isTraceFileSet)
@@ -267,7 +267,8 @@ namespace CrewChiefV4
             Debug.WriteLine("Shutdown: Wait for root threads stop failed, thread states:");
             ThreadManager.DebugTraceRootThreadStats();
 
-            // Note: wait for file dump on shutdown is not supported.
+            // Note: wait for file dump on shutdown is not supported, if this assert annoys you, remove it.
+            // Alternatively, change this code to wait for dump to finish?
             Debug.Assert(false, "Shutdown: Wait for root threads stop failed, please investigate.");
 
             return false;

@@ -2477,6 +2477,8 @@ namespace CrewChiefV4
             this.textbox = textbox;
         }
 
+        // Threading note: don't call this function while holding MainWindow.instanceLock.
+        // Notably, not in a code marshalled to the UI/main thread.
         public override void WriteLine(string value)
         {
             lock (MainWindow.instanceLock)
