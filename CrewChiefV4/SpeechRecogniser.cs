@@ -1356,7 +1356,6 @@ namespace CrewChiefV4
                 {
                     Thread.Sleep(100);
                 }
-
             }
             else
             {
@@ -1385,6 +1384,7 @@ namespace CrewChiefV4
                         (new Thread(() =>
                         {
                             waveIn.StartRecording();
+                            // TOOD_THREADS:  See WTF is this.
                             while (keepRecording)
                             {
                                 Thread.Sleep(5000); // fill the 5s ringbuffer, then process
