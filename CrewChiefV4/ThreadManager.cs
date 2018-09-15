@@ -235,6 +235,9 @@ namespace CrewChiefV4
         // Note: wait for file dump on shutdown is not supported.
         public static bool WaitForRootThreadsShutdown()
         {
+            if (rootThreads.Count == 0)
+                return true;
+
             // Possibly, print to debug log?
             Debug.WriteLine("Shutdown: Wating for root threads to stop...");
             for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
