@@ -360,7 +360,8 @@ namespace CrewChiefV4.Events
             // maxRainChangeRate is in rain-points-per-second, so *60 gives us rain-points-per-minute.
             if (ConditionsMonitor.maxRainChangeRate == -1)
             {
-                return TimeSpan.FromMinutes(2); // complete guesswork
+                return TimeSpan.FromMinutes(2); // complete guesswork - this applies to pcars1 rain changes, and any other changes that
+                                                // don't involve rain (i.e. the delay between ambient temp changes and track condition changes)
             }
             // numbers i pulled out of my botty.
             return TimeSpan.FromMinutes(0.3 / (ConditionsMonitor.maxRainChangeRate * 60));
