@@ -536,6 +536,15 @@ namespace CrewChiefV4.GameState
                     waitingForTrackConditionsToCatchUp = false;
                     return pendingTrackConditions;
                 }
+                else if (conditionsEnum < pendingTrackConditions)
+                {
+                    // special case - if current conditions are worse than the pending conditions, skip straight to the pending
+                    // conditions and reset the timer
+                    timeWhenTrackConditionsHaveCaughtUp = sample.Time.Add(ConditionsMonitor.getTrackConditionsChangeDelay());
+                    previousTrackConditions = pendingTrackConditions;
+                    pendingTrackConditions = conditionsEnum;
+                    return previousTrackConditions;
+                }
                 else
                 {
                     return previousTrackConditions;
