@@ -288,132 +288,66 @@ namespace CrewChiefV4.GameState
     {
         public Boolean conditionsHaveChanged;
         private ConditionsEnum initialConditions = ConditionsEnum.ANY;  // not set
+
+        // used for delaying transitions to allow track conditions to catch up with weather conditions
+        private ConditionsEnum previousTrackConditions = ConditionsEnum.ANY; // not set
+        private ConditionsEnum pendingTrackConditions = ConditionsEnum.ANY; // not set
+        private DateTime timeWhenTrackConditionsHaveCaughtUp = DateTime.MaxValue;
+        private Boolean waitingForTrackConditionsToCatchUp = false;
+
         // in order of potential pace - WARM_DRY is fastest, CURRENT is whatever the current conditions are,
         // ANY is all conditions
         public enum ConditionsEnum {
             SNOW = 0, ICE, VERY_WET, COLD_WET, WARM_WET, COLD_DAMP, WARM_DAMP, COLD_DRY, HOT_DRY, WARM_DRY, CURRENT, ANY
         }
 
-        public static ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
-        {
-            if (sample == null)
-            {
-                return ConditionsEnum.WARM_DRY;
-            }
-            ConditionsMonitor.RainLevel rainLevel = ConditionsMonitor.RainLevel.NONE;
-            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
-            {
-                rainLevel = ConditionsMonitor.getRainLevel(sample.RainDensity);
-            }
-            else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
-                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
-                sample.RainDensity > 0)
-            {
-                rainLevel = ConditionsMonitor.RainLevel.MID;
-            }
-            if (rainLevel == ConditionsMonitor.RainLevel.NONE)
-            {
-                if (sample.AmbientTemperature < 12)
-                {
-                    return ConditionsEnum.COLD_DRY;
-                }
-                else if (sample.AmbientTemperature < 30)
-                {
-                    return ConditionsEnum.WARM_DRY;
-                }
-                else
-                {
-                    return ConditionsEnum.HOT_DRY;
-                }
-            }
-            else if (sample.AmbientTemperature < 0)
-            {
-                if (rainLevel >= ConditionsMonitor.RainLevel.LIGHT)
-                {
-                    return ConditionsEnum.SNOW;
-                }
-                else
-                {
-                    return ConditionsEnum.ICE;
-                }
-            }
-            else if (rainLevel >= ConditionsMonitor.RainLevel.HEAVY)
-            {
-                return ConditionsEnum.VERY_WET;
-            }
-            else if (rainLevel == ConditionsMonitor.RainLevel.MID)
-            {
-                if (sample.AmbientTemperature < 12)
-                {
-                    return ConditionsEnum.COLD_WET;
-                }
-                else
-                {
-                    return ConditionsEnum.WARM_WET;
-                }
-            }
-            else if (rainLevel == ConditionsMonitor.RainLevel.LIGHT)
-            {
-                if (sample.AmbientTemperature < 12)
-                {
-                    return ConditionsEnum.COLD_DAMP;
-                }
-                else
-                {
-                    return ConditionsEnum.WARM_DAMP;
-                }
-            }
-            return ConditionsEnum.WARM_DRY;
-        }
-        
-        Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerLapTimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerLapTimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
 
-        List<float> allPlayerSector1Times = new List<float>();
-        List<float> allPlayerSector2Times = new List<float>();
-        List<float> allPlayerSector3Times = new List<float>();
-        List<float> allPlayerLapTimes = new List<float>();
+        private List<float> allPlayerSector1Times = new List<float>();
+        private List<float> allPlayerSector2Times = new List<float>();
+        private List<float> allPlayerSector3Times = new List<float>();
+        private List<float> allPlayerLapTimes = new List<float>();
 
 
         // Player only best times
-        Dictionary<ConditionsEnum, float> playerBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
 
-        float playerBestLapSector1Time = -1;
-        float playerBestLapSector2Time = -1;
-        float playerBestLapSector3Time = -1;
-        float playerBestLapTime = -1;
+        private float playerBestLapSector1Time = -1;
+        private float playerBestLapSector2Time = -1;
+        private float playerBestLapSector3Time = -1;
+        private float playerBestLapTime = -1;
 
 
         // Player class best times (player + opponents)
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
 
-        float playerClassBestLapSector1Time = -1;
-        float playerClassBestLapSector2Time = -1;
-        float playerClassBestLapSector3Time = -1;
-        float playerClassBestLapTime = -1;
+        private float playerClassBestLapSector1Time = -1;
+        private float playerClassBestLapSector2Time = -1;
+        private float playerClassBestLapSector3Time = -1;
+        private float playerClassBestLapTime = -1;
 
 
         // opponets in player class best times
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
 
-        float playerClassOpponentBestLapSector1Time = -1;
-        float playerClassOpponentBestLapSector2Time = -1;
-        float playerClassOpponentBestLapSector3Time = -1;
-        float playerClassOpponentBestLapTime = -1;
+        private float playerClassOpponentBestLapSector1Time = -1;
+        private float playerClassOpponentBestLapSector2Time = -1;
+        private float playerClassOpponentBestLapSector3Time = -1;
+        private float playerClassOpponentBestLapTime = -1;
 
-        Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
+        private Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
         
         // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
         // laptime set in conditions similar to the current conditions. You can also request a best laptime from
@@ -509,6 +443,125 @@ namespace CrewChiefV4.GameState
         public float getPlayerClassOpponentBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
         {
             return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        private ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
+        {
+            if (sample == null)
+            {
+                return ConditionsEnum.WARM_DRY;
+            }
+            ConditionsMonitor.RainLevel rainLevel = ConditionsMonitor.RainLevel.NONE;
+            if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+            {
+                rainLevel = ConditionsMonitor.getRainLevel(sample.RainDensity);
+            }
+            else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                     CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK) &&
+                sample.RainDensity > 0)
+            {
+                rainLevel = ConditionsMonitor.RainLevel.MID;
+            }
+
+            ConditionsEnum conditionsEnum = ConditionsEnum.WARM_DRY;
+
+            if (rainLevel == ConditionsMonitor.RainLevel.NONE)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    conditionsEnum = ConditionsEnum.COLD_DRY;
+                }
+                else if (sample.AmbientTemperature < 30)
+                {
+                    conditionsEnum = ConditionsEnum.WARM_DRY;
+                }
+                else
+                {
+                    conditionsEnum = ConditionsEnum.HOT_DRY;
+                }
+            }
+            else if (sample.AmbientTemperature < 0)
+            {
+                if (rainLevel >= ConditionsMonitor.RainLevel.LIGHT)
+                {
+                    conditionsEnum = ConditionsEnum.SNOW;
+                }
+                else
+                {
+                    conditionsEnum = ConditionsEnum.ICE;
+                }
+            }
+            else if (rainLevel >= ConditionsMonitor.RainLevel.HEAVY)
+            {
+                return ConditionsEnum.VERY_WET;
+            }
+            else if (rainLevel == ConditionsMonitor.RainLevel.MID)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    conditionsEnum = ConditionsEnum.COLD_WET;
+                }
+                else
+                {
+                    conditionsEnum = ConditionsEnum.WARM_WET;
+                }
+            }
+            else if (rainLevel == ConditionsMonitor.RainLevel.LIGHT)
+            {
+                if (sample.AmbientTemperature < 12)
+                {
+                    conditionsEnum = ConditionsEnum.COLD_DAMP;
+                }
+                else
+                {
+                    conditionsEnum = ConditionsEnum.WARM_DAMP;
+                }
+            }
+
+            // so now we have the weather conditions we need to apply the delay to estimate the track conditions
+            if (previousTrackConditions == ConditionsEnum.ANY)
+            {
+                previousTrackConditions = conditionsEnum;
+                pendingTrackConditions = conditionsEnum;
+                waitingForTrackConditionsToCatchUp = false;
+                return conditionsEnum;
+            }
+            else if (waitingForTrackConditionsToCatchUp)
+            {
+                if (sample.Time > timeWhenTrackConditionsHaveCaughtUp)
+                {
+                    // conditions changed some time ago and we've allowed the track conditions to catch up
+                    previousTrackConditions = pendingTrackConditions;
+                    waitingForTrackConditionsToCatchUp = false;
+                    return pendingTrackConditions;
+                }
+                else if (conditionsEnum < pendingTrackConditions)
+                {
+                    // special case - if current conditions are worse than the pending conditions, skip straight to the pending
+                    // conditions and reset the timer
+                    timeWhenTrackConditionsHaveCaughtUp = sample.Time.Add(ConditionsMonitor.getTrackConditionsChangeDelay());
+                    previousTrackConditions = pendingTrackConditions;
+                    pendingTrackConditions = conditionsEnum;
+                    return previousTrackConditions;
+                }
+                else
+                {
+                    return previousTrackConditions;
+                }
+            }
+            else if (previousTrackConditions != conditionsEnum)
+            {
+                // conditions have changed so start the timer for the track to catch up
+                timeWhenTrackConditionsHaveCaughtUp = sample.Time.Add(ConditionsMonitor.getTrackConditionsChangeDelay());
+                waitingForTrackConditionsToCatchUp = true;
+                pendingTrackConditions = conditionsEnum;
+                return previousTrackConditions;
+            }
+            else
+            {
+                return previousTrackConditions;
+            }
         }
 
         private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition, Boolean checkForSufficientPlayerData,
@@ -636,7 +689,7 @@ namespace CrewChiefV4.GameState
                 {
                     return ConditionsEnum.WARM_DRY;
                 }
-                return TimingData.getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
+                return getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
             }
             else
             {

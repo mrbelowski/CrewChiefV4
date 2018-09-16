@@ -627,10 +627,9 @@ namespace CrewChiefV4.Events
             {
                 String playerCarClassIdentifier = currentGameState.carClass.getClassIdentifier();
                 float playerBestTime = currentGameState.SessionData.PlayerLapTimeSessionBest;
-                this.bestTimesByClass.Clear();
                 if (playerBestTime > 0)
                 {
-                    bestTimesByClass.Add(playerCarClassIdentifier, playerBestTime);
+                    bestTimesByClass[playerCarClassIdentifier] = playerBestTime;
                 }
                 foreach (OpponentData opponentData in currentGameState.OpponentData.Values)
                 {
@@ -700,14 +699,15 @@ namespace CrewChiefV4.Events
                 {
                     getBestTimesByClass(currentGameState);
                 }
+                String playerCarClassId = currentGameState.carClass.getClassIdentifier();
                 foreach (String carClassIdentifier in bestTimesByClass.Keys)
                 {
-                    if (String.Equals(carClassIdentifier, opponentClassIdentifier))
+                    if (!gotOpponentClassBestLap && String.Equals(carClassIdentifier, opponentClassIdentifier))
                     {
                         opponentClassBestLap = bestTimesByClass[carClassIdentifier];
                         gotOpponentClassBestLap = true;
                     }
-                    else if (String.Equals(carClassIdentifier, currentGameState.carClass.getClassIdentifier()))
+                    if (!gotPlayerClassBestLap && String.Equals(carClassIdentifier, playerCarClassId))
                     {
                         playerClassBestLap = bestTimesByClass[carClassIdentifier];
                         gotPlayerClassBestLap = true;
