@@ -86,12 +86,18 @@ namespace CrewChiefV4.Events
         private Conditions.ConditionsSample currentConditions;
         private Conditions.ConditionsSample conditionsAtStartOfThisLap;
 
+        private static float maxRainDelta = -1;
+        private float rainDensityAtLastCheck = -1;
 
         // PCars2 only
         private DateTime timeWhenCloudIncreased = DateTime.MinValue;
         private DateTime timeWhenRainExpected = DateTime.MinValue;
         private Boolean waitingForRainEstimate = false;
 
+        // units here are 'rain quantity per second', where rain quantity is 0 -> 1, direct from the pcars2 or rf2 game data.
+        // The number is always positive (it's the absolute change)
+        private static float maxRainChangeRate = -1;
+        
         public ConditionsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -110,6 +116,9 @@ namespace CrewChiefV4.Events
             timeWhenCloudIncreased = DateTime.MinValue;
             timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
+            ConditionsMonitor.maxRainDelta = -1;
+            rainDensityAtLastCheck = -1;
+            maxRainChangeRate = -1;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -141,6 +150,7 @@ namespace CrewChiefV4.Events
                     Boolean canReportTrackChange = enableTrackAndAirTempReports &&
                         currentGameState.Now > lastTrackTempReport.Add(TrackTemperatureReportMaxFrequency);
                     Boolean reportedCombinedTemps = false;
+                    TimeSpan rainReportFrequency = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars;
                     if (canReportAirChange || canReportTrackChange)
                     {
                         if (trackTempToUse > trackTempAtLastReport + minTrackTempDeltaToReport && currentConditions.AmbientTemperature > airTempAtLastReport + minAirTempDeltaToReport)
@@ -251,7 +261,7 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
+                    if (currentGameState.Now > lastRainReport.Add(rainReportFrequency))
                     {
                         // for PCars mRainDensity value is 0 or 1
                         if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
@@ -273,6 +283,15 @@ namespace CrewChiefV4.Events
                         }
                         else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                         {
+                            if (rainDensityAtLastCheck != -1 && rainDensityAtLastCheck != currentConditions.RainDensity)
+                            {
+                                float rainChangeRate = (float) (Math.Abs(rainDensityAtLastCheck - currentConditions.RainDensity) / rainReportFrequency.TotalSeconds);
+                                if (rainChangeRate > ConditionsMonitor.maxRainChangeRate)
+                                {
+                                    ConditionsMonitor.maxRainChangeRate = rainChangeRate;
+                                }
+                            }
+                            rainDensityAtLastCheck = currentConditions.RainDensity;
                             RainLevel currentRainLevel = getRainLevel(currentConditions.RainDensity);
                             RainLevel lastReportedRainLevel = getRainLevel(rainAtLastReport);                            
                             if (currentRainLevel != lastReportedRainLevel)
@@ -334,6 +353,18 @@ namespace CrewChiefV4.Events
             {
                 return RainLevel.NONE;
             }
+        }
+
+        public static TimeSpan getTrackConditionsChangeDelay()
+        {
+            // maxRainChangeRate is in rain-points-per-second, so *60 gives us rain-points-per-minute.
+            if (ConditionsMonitor.maxRainChangeRate == -1)
+            {
+                return TimeSpan.FromMinutes(2); // complete guesswork - this applies to pcars1 rain changes, and any other changes that
+                                                // don't involve rain (i.e. the delay between ambient temp changes and track condition changes)
+            }
+            // numbers i pulled out of my botty.
+            return TimeSpan.FromMinutes(0.3 / (ConditionsMonitor.maxRainChangeRate * 60));
         }
 
         public override void respond(string voiceMessage)
