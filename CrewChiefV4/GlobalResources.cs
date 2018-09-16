@@ -65,7 +65,6 @@ namespace CrewChiefV4
         {
             if (GlobalResources.speechRecogniserReference != null)
             {
-                // Logging?
                 GlobalResources.speechRecogniserReference.recognizeAsyncCancel();
                 GlobalResources.speechRecogniserReference.stopTriggerRecogniser();
 

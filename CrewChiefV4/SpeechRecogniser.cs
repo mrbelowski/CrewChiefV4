@@ -437,7 +437,7 @@ namespace CrewChiefV4
                 catch (Exception) { }
                 sre = null;
             }
-            if(triggerSre != null)
+            if (triggerSre != null)
             {
                 try
                 {
