@@ -288,13 +288,20 @@ namespace CrewChiefV4.GameState
     {
         public Boolean conditionsHaveChanged;
         private ConditionsEnum initialConditions = ConditionsEnum.ANY;  // not set
+
+        // used for delaying transitions to allow track conditions to catch up with weather conditions
+        private ConditionsEnum previousTrackConditions = ConditionsEnum.ANY; // not set
+        private ConditionsEnum pendingTrackConditions = ConditionsEnum.ANY; // not set
+        private DateTime timeWhenTrackConditionsHaveCaughtUp = DateTime.MaxValue;
+        private Boolean waitingForTrackConditionsToCatchUp = false;
+
         // in order of potential pace - WARM_DRY is fastest, CURRENT is whatever the current conditions are,
         // ANY is all conditions
         public enum ConditionsEnum {
             SNOW = 0, ICE, VERY_WET, COLD_WET, WARM_WET, COLD_DAMP, WARM_DAMP, COLD_DRY, HOT_DRY, WARM_DRY, CURRENT, ANY
         }
 
-        public static ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
+        private ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
         {
             if (sample == null)
             {
@@ -312,30 +319,33 @@ namespace CrewChiefV4.GameState
             {
                 rainLevel = ConditionsMonitor.RainLevel.MID;
             }
+
+            ConditionsEnum conditionsEnum = ConditionsEnum.WARM_DRY;
+
             if (rainLevel == ConditionsMonitor.RainLevel.NONE)
             {
                 if (sample.AmbientTemperature < 12)
                 {
-                    return ConditionsEnum.COLD_DRY;
+                    conditionsEnum = ConditionsEnum.COLD_DRY;
                 }
                 else if (sample.AmbientTemperature < 30)
                 {
-                    return ConditionsEnum.WARM_DRY;
+                    conditionsEnum = ConditionsEnum.WARM_DRY;
                 }
                 else
                 {
-                    return ConditionsEnum.HOT_DRY;
+                    conditionsEnum = ConditionsEnum.HOT_DRY;
                 }
             }
             else if (sample.AmbientTemperature < 0)
             {
                 if (rainLevel >= ConditionsMonitor.RainLevel.LIGHT)
                 {
-                    return ConditionsEnum.SNOW;
+                    conditionsEnum = ConditionsEnum.SNOW;
                 }
                 else
                 {
-                    return ConditionsEnum.ICE;
+                    conditionsEnum = ConditionsEnum.ICE;
                 }
             }
             else if (rainLevel >= ConditionsMonitor.RainLevel.HEAVY)
@@ -346,25 +356,59 @@ namespace CrewChiefV4.GameState
             {
                 if (sample.AmbientTemperature < 12)
                 {
-                    return ConditionsEnum.COLD_WET;
+                    conditionsEnum = ConditionsEnum.COLD_WET;
                 }
                 else
                 {
-                    return ConditionsEnum.WARM_WET;
+                    conditionsEnum = ConditionsEnum.WARM_WET;
                 }
             }
             else if (rainLevel == ConditionsMonitor.RainLevel.LIGHT)
             {
                 if (sample.AmbientTemperature < 12)
                 {
-                    return ConditionsEnum.COLD_DAMP;
+                    conditionsEnum = ConditionsEnum.COLD_DAMP;
                 }
                 else
                 {
-                    return ConditionsEnum.WARM_DAMP;
+                    conditionsEnum = ConditionsEnum.WARM_DAMP;
                 }
             }
-            return ConditionsEnum.WARM_DRY;
+
+            // so now we have the weather conditions we need to apply the delay to estimate the track conditions
+            if (previousTrackConditions == ConditionsEnum.ANY)
+            {
+                previousTrackConditions = conditionsEnum;
+                pendingTrackConditions = conditionsEnum;
+                waitingForTrackConditionsToCatchUp = false;
+                return conditionsEnum;
+            }
+            else if (waitingForTrackConditionsToCatchUp)
+            {
+                if (sample.Time > timeWhenTrackConditionsHaveCaughtUp)
+                {
+                    // conditions changed some time ago and we've allowed the track conditions to catch up
+                    previousTrackConditions = pendingTrackConditions;
+                    waitingForTrackConditionsToCatchUp = false;
+                    return pendingTrackConditions;
+                }
+                else
+                {
+                    return previousTrackConditions;
+                }
+            }
+            else if (previousTrackConditions != conditionsEnum)
+            {
+                // conditions have changed so start the timer for the track to catch up
+                timeWhenTrackConditionsHaveCaughtUp = sample.Time.Add(ConditionsMonitor.getTrackConditionsChangeDelay());
+                waitingForTrackConditionsToCatchUp = true;
+                pendingTrackConditions = conditionsEnum;
+                return previousTrackConditions;
+            }
+            else
+            {
+                return previousTrackConditions;
+            }
         }
         
         Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
@@ -636,7 +680,7 @@ namespace CrewChiefV4.GameState
                 {
                     return ConditionsEnum.WARM_DRY;
                 }
-                return TimingData.getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
+                return getConditionsEnumForSample(CrewChief.currentGameState.Conditions.getMostRecentConditions());
             }
             else
             {
