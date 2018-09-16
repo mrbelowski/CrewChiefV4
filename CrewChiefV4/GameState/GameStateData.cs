@@ -301,6 +301,150 @@ namespace CrewChiefV4.GameState
             SNOW = 0, ICE, VERY_WET, COLD_WET, WARM_WET, COLD_DAMP, WARM_DAMP, COLD_DRY, HOT_DRY, WARM_DRY, CURRENT, ANY
         }
 
+        private Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+        private Dictionary<ConditionsEnum, List<float>> playerLapTimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
+
+        private List<float> allPlayerSector1Times = new List<float>();
+        private List<float> allPlayerSector2Times = new List<float>();
+        private List<float> allPlayerSector3Times = new List<float>();
+        private List<float> allPlayerLapTimes = new List<float>();
+
+
+        // Player only best times
+        private Dictionary<ConditionsEnum, float> playerBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        private float playerBestLapSector1Time = -1;
+        private float playerBestLapSector2Time = -1;
+        private float playerBestLapSector3Time = -1;
+        private float playerBestLapTime = -1;
+
+
+        // Player class best times (player + opponents)
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        private float playerClassBestLapSector1Time = -1;
+        private float playerClassBestLapSector2Time = -1;
+        private float playerClassBestLapSector3Time = -1;
+        private float playerClassBestLapTime = -1;
+
+
+        // opponets in player class best times
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
+        private Dictionary<ConditionsEnum, float> playerClassOpponentBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
+
+        private float playerClassOpponentBestLapSector1Time = -1;
+        private float playerClassOpponentBestLapSector2Time = -1;
+        private float playerClassOpponentBestLapSector3Time = -1;
+        private float playerClassOpponentBestLapTime = -1;
+
+        private Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
+        
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // laptime set in conditions similar to the current conditions. You can also request a best laptime from
+        // some other conditions
+        public float getPlayerBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapTime, playerBestLapTimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector1 time from some other conditions
+        public float getPlayerBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector1Time, playerBestLapSector1TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector2 time from some other conditions
+        public float getPlayerBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector2Time, playerBestLapSector2TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a best lap
+        // sector3 time from some other conditions
+        public float getPlayerBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerBestLapSector3Time, playerBestLapSector3TimeByConditions, true, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
+        // some other conditions
+        public float getPlayerClassBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapTime, playerClassBestLapTimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector1 time from some other conditions
+        public float getPlayerClassBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector1Time, playerClassBestLapSector1TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector2 time from some other conditions
+        public float getPlayerClassBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector2Time, playerClassBestLapSector2TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector3 time from some other conditions
+        public float getPlayerClassBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassBestLapSector3Time, playerClassBestLapSector3TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
+        // some other conditions
+        public float getPlayerClassOpponentBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapTime, playerClassOpponentBestLapTimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector1 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector1Time, playerClassOpponentBestLapSector1TimeByConditions, false, requestedConditionsEnum);
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector2 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector2Time, playerClassOpponentBestLapSector2TimeByConditions, false, requestedConditionsEnum);            
+        }
+
+        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
+        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
+        // sector3 time from some other conditions
+        public float getPlayerClassOpponentBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
+        {
+            return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, false, requestedConditionsEnum);
+        }
+
         private ConditionsEnum getConditionsEnumForSample(Conditions.ConditionsSample sample)
         {
             if (sample == null)
@@ -409,150 +553,6 @@ namespace CrewChiefV4.GameState
             {
                 return previousTrackConditions;
             }
-        }
-        
-        Dictionary<ConditionsEnum, List<float>> playerSector1TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerSector2TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerSector3TimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-        Dictionary<ConditionsEnum, List<float>> playerLapTimesByConditions = new Dictionary<ConditionsEnum, List<float>>();
-
-        List<float> allPlayerSector1Times = new List<float>();
-        List<float> allPlayerSector2Times = new List<float>();
-        List<float> allPlayerSector3Times = new List<float>();
-        List<float> allPlayerLapTimes = new List<float>();
-
-
-        // Player only best times
-        Dictionary<ConditionsEnum, float> playerBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
-
-        float playerBestLapSector1Time = -1;
-        float playerBestLapSector2Time = -1;
-        float playerBestLapSector3Time = -1;
-        float playerBestLapTime = -1;
-
-
-        // Player class best times (player + opponents)
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
-
-        float playerClassBestLapSector1Time = -1;
-        float playerClassBestLapSector2Time = -1;
-        float playerClassBestLapSector3Time = -1;
-        float playerClassBestLapTime = -1;
-
-
-        // opponets in player class best times
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector1TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector2TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapSector3TimeByConditions = new Dictionary<ConditionsEnum, float>();
-        Dictionary<ConditionsEnum, float> playerClassOpponentBestLapTimeByConditions = new Dictionary<ConditionsEnum, float>();
-
-        float playerClassOpponentBestLapSector1Time = -1;
-        float playerClassOpponentBestLapSector2Time = -1;
-        float playerClassOpponentBestLapSector3Time = -1;
-        float playerClassOpponentBestLapTime = -1;
-
-        Dictionary<ConditionsEnum, int> totalLapsInEachCondition = new Dictionary<ConditionsEnum, int>();
-        
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
-        // laptime set in conditions similar to the current conditions. You can also request a best laptime from
-        // some other conditions
-        public float getPlayerBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerBestLapTime, playerBestLapTimeByConditions, true, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
-        // lap sector1 time set in conditions similar to the current conditions. You can also request a best lap
-        // sector1 time from some other conditions
-        public float getPlayerBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerBestLapSector1Time, playerBestLapSector1TimeByConditions, true, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
-        // lap sector2 time set in conditions similar to the current conditions. You can also request a best lap
-        // sector2 time from some other conditions
-        public float getPlayerBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerBestLapSector2Time, playerBestLapSector2TimeByConditions, true, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player
-        // lap sector3 time set in conditions similar to the current conditions. You can also request a best lap
-        // sector3 time from some other conditions
-        public float getPlayerBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerBestLapSector3Time, playerBestLapSector3TimeByConditions, true, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
-        // some other conditions
-        public float getPlayerClassBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassBestLapTime, playerClassBestLapTimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector1 time from some other conditions
-        public float getPlayerClassBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassBestLapSector1Time, playerClassBestLapSector1TimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector2 time from some other conditions
-        public float getPlayerClassBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassBestLapSector2Time, playerClassBestLapSector2TimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector3 time from some other conditions
-        public float getPlayerClassBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassBestLapSector3Time, playerClassBestLapSector3TimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap time set in conditions similar to the current conditions. You can also request a player class best laptime from
-        // some other conditions
-        public float getPlayerClassOpponentBestLapTime(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassOpponentBestLapTime, playerClassOpponentBestLapTimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector1 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector1 time from some other conditions
-        public float getPlayerClassOpponentBestLapSector1Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassOpponentBestLapSector1Time, playerClassOpponentBestLapSector1TimeByConditions, false, requestedConditionsEnum);
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector2 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector2 time from some other conditions
-        public float getPlayerClassOpponentBestLapSector2Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassOpponentBestLapSector2Time, playerClassOpponentBestLapSector2TimeByConditions, false, requestedConditionsEnum);            
-        }
-
-        // if requestedConditionsEnum aren't specified we assume 'current conditions' - that is, get the best player class
-        // lap sector3 time set in conditions similar to the current conditions. You can also request a player class best lap
-        // sector3 time from some other conditions
-        public float getPlayerClassOpponentBestLapSector3Time(ConditionsEnum requestedConditionsEnum = ConditionsEnum.CURRENT)
-        {
-            return getBestTime(playerClassOpponentBestLapSector3Time, playerClassOpponentBestLapSector3TimeByConditions, false, requestedConditionsEnum);
         }
 
         private float getBestTime(float overallBest, Dictionary<ConditionsEnum, float> timesByCondition, Boolean checkForSufficientPlayerData,

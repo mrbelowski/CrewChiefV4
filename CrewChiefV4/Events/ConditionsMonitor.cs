@@ -358,12 +358,11 @@ namespace CrewChiefV4.Events
         public static TimeSpan getTrackConditionsChangeDelay()
         {
             // maxRainChangeRate is in rain-points-per-second, so *60 gives us rain-points-per-minute.
-            // 
             if (ConditionsMonitor.maxRainChangeRate == -1)
             {
                 return TimeSpan.FromMinutes(2); // complete guesswork
             }
-            // numbers i pulled out of my botty:
+            // numbers i pulled out of my botty.
             return TimeSpan.FromMinutes(0.3 / (ConditionsMonitor.maxRainChangeRate * 60));
         }
 
