@@ -65,14 +65,18 @@ namespace CrewChiefV4
         {
             if (GlobalResources.speechRecogniserReference != null)
             {
+                // Logging?
+                GlobalResources.speechRecogniserReference.recognizeAsyncCancel();
+                GlobalResources.speechRecogniserReference.stopTriggerRecogniser();
+
                 GlobalResources.speechRecogniserReference.Dispose();
                 GlobalResources.speechRecogniserReference = null;
             }
 
-            if (GlobalResources.speechRecogniserReference != null)
+            if (GlobalResources.audioPlayerReference != null)
             {
-                GlobalResources.speechRecogniserReference.Dispose();
-                GlobalResources.speechRecogniserReference = null;
+                GlobalResources.audioPlayerReference.Dispose();
+                GlobalResources.audioPlayerReference = null;
             }
 
             if (GlobalResources.controllerConfigurationReference != null)

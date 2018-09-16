@@ -43,13 +43,14 @@ namespace CrewChiefV4
 
         public static void UnregisterRootThreads()
         {
+            /* TODO_THREADS: lock ?
             // This is special case, no locking here because this is only invoked on a UI thread, and lock is alread held.
             if (MainWindow.instance != null
                 && MainWindow.instance.InvokeRequired)
             {
                 Debug.Assert(false, "This method is supposed to be invoked only from the UI thread.");
                 return;
-            }
+            }*/
 
             ThreadManager.rootThreads.Clear();
         }
@@ -143,10 +144,7 @@ namespace CrewChiefV4
                 {
                     if (MainWindow.instance != null)
                     {
-                        MainWindow.instance.Invoke((MethodInvoker)delegate
-                        {
-                            MainWindow.instance.startApplicationButton.Enabled = true;
-                        });
+                        MainWindow.instance.startApplicationButton.Enabled = true;
                     }
                 }
             }
@@ -222,11 +220,8 @@ namespace CrewChiefV4
                 {
                     if (MainWindow.instance != null)
                     {
-                        MainWindow.instance.Invoke((MethodInvoker)delegate
-                        {
-                            ThreadManager.UnregisterRootThreads();
-                            MainWindow.instance.startApplicationButton.Enabled = true;
-                        });
+                        ThreadManager.UnregisterRootThreads();
+                        MainWindow.instance.startApplicationButton.Enabled = true;
                     }
                 }
             }

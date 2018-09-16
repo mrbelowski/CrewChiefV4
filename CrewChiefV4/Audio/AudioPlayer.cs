@@ -437,7 +437,7 @@ namespace CrewChiefV4.Audio
 
             // Wait for monitor queue thread to exit.
             if (monitorQueueThread != null)
-            {                
+            {
                 if (monitorQueueThread.IsAlive)
                 {
                     Console.WriteLine("Waiting for queue monitor to stop...");
