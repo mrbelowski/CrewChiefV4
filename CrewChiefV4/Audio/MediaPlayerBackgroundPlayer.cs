@@ -122,6 +122,7 @@ namespace CrewChiefV4.Audio
             if (backgroundPlayer == null || !initialised)
                 return;
 
+            // TODO_THREADS: this deadlocks :(
             lock (MainWindow.instanceLock)
             {
                 if (MainWindow.instance != null)

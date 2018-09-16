@@ -24,8 +24,9 @@ namespace CrewChiefV4
         private Boolean disableBehaviorAlteringVoiceCommands = UserSettings.GetUserSettings().getBoolean("disable_behavior_altering_voice_commands");
         private RingBufferStream.RingBufferStream buffer;
         private NAudio.Wave.WaveInEvent waveIn;
-        private bool keepRecording = true;
-        //
+
+        private Thread nAudioAlwaysOnListenerThread = null;
+        private bool nAudioAlwaysOnkeepRecording = false;
 
         private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
@@ -1380,14 +1381,19 @@ namespace CrewChiefV4
                     }
                     else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
                     {
-                        keepRecording = true;
-                        (new Thread(() =>
+                        nAudioAlwaysOnkeepRecording = true;
+                        Debug.Assert(nAudioAlwaysOnListenerThread == null, "nAudio AlwaysOn Listener Thread wasn't shut down correctly.");
+                        nAudioAlwaysOnListenerThread = new Thread(() =>
                         {
                             waveIn.StartRecording();
-                            // TOOD_THREADS:  See WTF is this.
-                            while (keepRecording)
+                            // TODO_THREADS:  See WTF is this.
+                            while (nAudioAlwaysOnkeepRecording
+                                && crewChief.running)  // Exit as soon as we begin shutting down.
                             {
-                                Thread.Sleep(5000); // fill the 5s ringbuffer, then process
+                                if (!Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 1000 /*waitWindowMillis*/, () => nAudioAlwaysOnkeepRecording && crewChief.running) /*keepWaitingPredicate*/)
+                                {
+                                    break;
+                                }
                                 Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
                                     new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
@@ -1402,7 +1408,11 @@ namespace CrewChiefV4
                                 }
                             }
                             StopNAudioWaveIn();
-                        })).Start();
+                        });
+
+                        nAudioAlwaysOnListenerThread.Name = "SpeechRecogniser.nAudioAlwaysOnListenerThread";
+                        nAudioAlwaysOnListenerThread.Start();
+
                     }
                 }
                 else
@@ -1449,8 +1459,25 @@ namespace CrewChiefV4
                 }
                 else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
                 {
-                    keepRecording = false;
+                    nAudioAlwaysOnkeepRecording = false;
                     sre.RecognizeAsyncCancel();
+
+                    // Wait for nAudioAlwaysOnListenerThread thread to exit.
+                    if (nAudioAlwaysOnListenerThread != null)
+                    {
+                        if (nAudioAlwaysOnListenerThread.IsAlive)
+                        {
+                            Console.WriteLine("Waiting for nAudio Always On listener to stop...");
+                            if (!nAudioAlwaysOnListenerThread.Join(5000))
+                            {
+                                var errMsg = "Warning: Timed out waiting for nAudio Always On listener to stop";
+                                Console.WriteLine(errMsg);
+                                Debug.WriteLine(errMsg);
+                            }
+                        }
+                        nAudioAlwaysOnListenerThread = null;
+                        Console.WriteLine("nAudio Always On listener stopped");
+                    }
                 }
             }
             else

@@ -1996,7 +1996,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);                    
+                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                 }
             }
         }
@@ -2477,8 +2477,6 @@ namespace CrewChiefV4
             this.textbox = textbox;
         }
 
-        // Threading note: don't call this function while holding MainWindow.instanceLock.
-        // Notably, not in a code marshalled to the UI/main thread.
         public override void WriteLine(string value)
         {
             lock (MainWindow.instanceLock)
