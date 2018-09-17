@@ -1386,11 +1386,10 @@ namespace CrewChiefV4
                         nAudioAlwaysOnListenerThread = new Thread(() =>
                         {
                             waveIn.StartRecording();
-                            // TODO_THREADS:  See WTF is this.
                             while (nAudioAlwaysOnkeepRecording
                                 && crewChief.running)  // Exit as soon as we begin shutting down.
                             {
-                                if (!Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 1000 /*waitWindowMillis*/, () => nAudioAlwaysOnkeepRecording && crewChief.running) /*keepWaitingPredicate*/)
+                                if (!Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 1000 /*waitWindowMillis*/, () => nAudioAlwaysOnkeepRecording && crewChief.running /*keepWaitingPredicate*/))
                                 {
                                     break;
                                 }
