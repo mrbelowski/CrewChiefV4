@@ -24,7 +24,6 @@ namespace CrewChiefV4
         private const int SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS = 5;
         private const int SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS;
 
-
         private static List<Thread> rootThreads = new List<Thread>();
         public static void RegisterRootThread(Thread t)
         {
@@ -144,6 +143,8 @@ namespace CrewChiefV4
                 {
                     if (MainWindow.instance != null)
                     {
+                        // Not entirely sure if Invoke is necessary here, seems to work well without it.  If we decide
+                        // invoke is needed, Post might be best option here.
                         MainWindow.instance.startApplicationButton.Enabled = true;
                     }
                 }
