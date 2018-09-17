@@ -924,7 +924,6 @@ namespace CrewChiefV4
                                 PlaybackModerator.ClearVerbosityData();
                                 PlaybackModerator.lastBlockedMessageId = -1;
                                 audioPlayer.disablePearlsOfWisdom = false;
-                                audioPlayer.resetSoundTypesInImmediateQueue();
                                 displayNewSessionInfo(currentGameState);
                                 sessionFinished = false;
                                 if (!stateCleared)
@@ -1070,7 +1069,6 @@ namespace CrewChiefV4
             if (audioPlayer != null)
             {
                 audioPlayer.disablePearlsOfWisdom = false;
-                audioPlayer.resetSoundTypesInImmediateQueue();
             }
             sessionHasFailingEvent = false;
             Console.WriteLine("Stopping queue monitor");

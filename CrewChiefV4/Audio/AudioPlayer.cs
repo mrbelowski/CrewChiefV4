@@ -17,9 +17,6 @@ namespace CrewChiefV4.Audio
 {
     public class AudioPlayer
     {
-        // keep track of the counts of each type of message in the immediate queue:
-        private Dictionary<SoundType, int> soundTypesInImmediateQueue = new Dictionary<SoundType, int>();
-
         public static String PAUSE_ID = "insert_pause";
 
         public Boolean disablePearlsOfWisdom = false;   // used for the last 2 laps / 3 minutes of a race session only
@@ -327,16 +324,6 @@ namespace CrewChiefV4.Audio
             {
                 selectedPersonalisation = savedPersonalisation;
             }
-            resetSoundTypesInImmediateQueue();
-        }
-
-        public void resetSoundTypesInImmediateQueue()
-        {
-            soundTypesInImmediateQueue[SoundType.SPOTTER] = 0;
-            soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] = 0;
-            soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] = 0;
-            soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] = 0;
-            soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] = 0;
         }
 
         // for debugging the moderator message block process
@@ -364,13 +351,25 @@ namespace CrewChiefV4.Audio
 
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
+                AudioPlayer.naudioBackgroundPlaybackDeviceId = 10;
                 this.backgroundPlayer = new NAudioBackgroundPlayer(backgroundFilesPath, dtmPitWindowClosedBackground);
+                try
+                {
+                    this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unable to initialise nAudio background player: " + e.Message);
+                    Console.WriteLine("Using WindowsMediaPlayer for background sounds");
+                    this.backgroundPlayer = new MediaPlayerBackgroundPlayer(mainThreadContext, backgroundFilesPath, dtmPitWindowClosedBackground);
+                    this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
+                }
             }
             else
             {
                 this.backgroundPlayer = new MediaPlayerBackgroundPlayer(mainThreadContext, backgroundFilesPath, dtmPitWindowClosedBackground);
+                this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
             }
-            this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
 
             if (!soundDirectory.Exists)
             {
@@ -808,10 +807,6 @@ namespace CrewChiefV4.Audio
                             queueToPlay.Remove(key);
                         }
                     }
-                    if (isImmediateMessages && queueToPlay.Count == 0)
-                    {
-                        resetSoundTypesInImmediateQueue();
-                    }
                 }
             }
             // now we go back and play anything else that's been inserted into the queue since we started, but only if
@@ -948,10 +943,6 @@ namespace CrewChiefV4.Audio
                                     thisMessage.resolveDelayedContents();
                                 }
                                 soundCache.Play(thisMessage.messageFolders, thisMessage.metadata);
-                                if (isImmediateMessages)
-                                {
-                                    soundTypesInImmediateQueue[thisMessage.metadata.type] = soundTypesInImmediateQueue[thisMessage.metadata.type] - 1;
-                                }
                                 timeOfLastMessageEnd = GameStateData.CurrentTime;
                             }
                             else
@@ -1143,29 +1134,10 @@ namespace CrewChiefV4.Audio
             }).Start();            
         }
 
-        public SoundType getMinTypeInImmediateQueue()
+        public SoundType getPriortyOfFirstWaitingImmediateMessage()
         {
-            if (soundTypesInImmediateQueue[SoundType.SPOTTER] > 0)
-            {
-                return SoundType.SPOTTER;
-            }
-            if (soundTypesInImmediateQueue[SoundType.CRITICAL_MESSAGE] > 0)
-            {
-                return SoundType.CRITICAL_MESSAGE;
-            }
-            if (soundTypesInImmediateQueue[SoundType.VOICE_COMMAND_RESPONSE] > 0)
-            {
-                return SoundType.VOICE_COMMAND_RESPONSE;
-            }
-            if (soundTypesInImmediateQueue[SoundType.IMPORTANT_MESSAGE] > 0)
-            {
-                return SoundType.IMPORTANT_MESSAGE;
-            }
-            if (soundTypesInImmediateQueue[SoundType.REGULAR_MESSAGE] > 0)
-            {
-                return SoundType.REGULAR_MESSAGE;
-            }
-            return SoundType.OTHER;
+            QueuedMessage message = getFirstWaitingImmediateMessage(SoundType.OTHER);
+            return message == null ? SoundType.OTHER : message.metadata.type;
         }
 
         public QueuedMessage getFirstWaitingImmediateMessage(SoundType minType)
@@ -1216,11 +1188,6 @@ namespace CrewChiefV4.Audio
                             Console.WriteLine("Message " + queuedMessage.messageName + " is in the immediate queue but is type 'regular' - this will not play. Setting the type to 'important'");
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
-                        if (immediateClips.Count == 0)
-                        {
-                            resetSoundTypesInImmediateQueue();
-                        }
-                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }
@@ -1248,11 +1215,6 @@ namespace CrewChiefV4.Audio
                         this.holdChannelOpen = keepChannelOpen;
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
-                        if (immediateClips.Count == 0)
-                        {
-                            resetSoundTypesInImmediateQueue();
-                        }
-                        soundTypesInImmediateQueue[queuedMessage.metadata.type] = soundTypesInImmediateQueue[queuedMessage.metadata.type] + 1;
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
                     }
                 }

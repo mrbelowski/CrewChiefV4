@@ -176,12 +176,14 @@ namespace CrewChiefV4.Events
                     if (minutes < 10)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("alarm",
-                            MessageContents(notifyYouAt, hour, NumberReader.folderOh, minutes, isPastMidDay ? folderPM : folderAM), 0, null));
+                            MessageContents(notifyYouAt, hour, NumberReader.folderOh, minutes, isPastMidDay ? folderPM : folderAM), 0, null)
+                            { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 0) });
                     }
                     else
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("alarm",
-                            MessageContents(notifyYouAt, hour, minutes, isPastMidDay ? folderPM : folderAM), 0, null));
+                            MessageContents(notifyYouAt, hour, minutes, isPastMidDay ? folderPM : folderAM), 0, null)
+                            { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 0) });
                     }
                 }
             }
