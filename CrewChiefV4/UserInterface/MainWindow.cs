@@ -49,7 +49,7 @@ namespace CrewChiefV4
         private Boolean newDriverNamesAvailable = false;
         private Boolean newPersonalisationsAvailable = false;
 
-        // Shared with worker thread.
+        // Shared with worker thread.  This should be disposed after root threads stopped, in GlobalResources.Dispose.
         private ControllerConfiguration controllerConfiguration;
 
         private CrewChief crewChief;
@@ -1362,9 +1362,7 @@ namespace CrewChiefV4
                 // the AutoUpdater triggers and steals focus while the player is racing
                 AutoUpdater.Stop();
 
-                // TODO_THREADS: maybe separate method.
-                crewChief.dataFileReadDone = false;
-                crewChief.dataFileDumpDone = false;
+                crewChief.onRestart();
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
                     && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
@@ -1382,7 +1380,6 @@ namespace CrewChiefV4
                 else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
                     crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
-                    // TODO_THREADS: check this
                     Console.WriteLine("Running speech recognition in 'always on' mode");
                     crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
                     crewChief.speechRecogniser.startContinuousListening();

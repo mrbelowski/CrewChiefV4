@@ -649,7 +649,6 @@ namespace CrewChiefV4.Audio
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
 
-            // TODO_THREADS: This throws on shutdown, sometimes (UI thread no longer exists).
             this.backgroundPlayer.stop();
         }
 

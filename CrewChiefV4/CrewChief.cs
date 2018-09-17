@@ -21,6 +21,10 @@ namespace CrewChiefV4
     {
         public static Boolean Debugging = System.Diagnostics.Debugger.IsAttached;
 
+        // speechRecognizer and audioPlayer are shared by many threads.  They should be disposed after root threads stopped, in GlobalResources.Dispose.
+        public SpeechRecogniser speechRecogniser;
+        public AudioPlayer audioPlayer;
+
         readonly int timeBetweenProcConnectCheckMillis = 500;
         readonly int timeBetweenProcDisconnectCheckMillis = 2000;
         readonly int maxEventFailuresBeforeDisabling = 10;
@@ -28,10 +32,6 @@ namespace CrewChiefV4
         bool isGameProcessRunning = false;
 
         public static Boolean loadDataFromFile = false;
-
-        // TODO_THREADS: shared resource
-        public SpeechRecogniser speechRecogniser;
-
         public static GameDefinition gameDefinition;
 
         public static Boolean readOpponentDeltasForEveryLap = false;
@@ -53,8 +53,6 @@ namespace CrewChiefV4
 
         private static Dictionary<String, AbstractEvent> eventsList = new Dictionary<String, AbstractEvent>();
 
-        // TODO_THREADS: shared resource
-        public AudioPlayer audioPlayer;
 
         Object lastSpotterState;
         Object currentSpotterState;
@@ -833,7 +831,7 @@ namespace CrewChiefV4
                                 if (latestRawGameData == null)
                                 {
                                     Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
-                                    Thread.Sleep(5000);  // TODO_THREADS: this might be too high now.
+                                    Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 50 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                     try
                                     {
                                         audioPlayer.purgeQueues();
@@ -1224,6 +1222,13 @@ namespace CrewChiefV4
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 ||
                 CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK;
+        }
+
+        // This has to be called before starting man Chief thread (runApp).
+        public void onRestart()
+        {
+            dataFileReadDone = false;
+            dataFileDumpDone = false;
         }
     }
 }
