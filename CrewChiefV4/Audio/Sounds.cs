@@ -202,7 +202,7 @@ namespace CrewChiefV4.Audio
                 {
                     // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
                     // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
-                    prepareDriverNamesWithoutLoading(soundFolder);                    
+                    prepareDriverNamesWithoutLoading(soundFolder);
                 }                
             }
             if (AudioPlayer.playWithNAudio)
