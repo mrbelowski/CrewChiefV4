@@ -300,19 +300,19 @@ namespace CrewChiefV4.Events
                                 switch (currentRainLevel)
                                 {
                                     case RainLevel.DRIZZLE:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderDrizzleIncreasing, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderDrizzleIncreasing, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         break;
                                     case RainLevel.LIGHT:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         break;
                                     case RainLevel.MID:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         break;
                                     case RainLevel.HEAVY:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         break;
                                     case RainLevel.STORM:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderRainMax, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderRainMax, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                         break;
                                     case RainLevel.NONE:
                                         audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 3);
