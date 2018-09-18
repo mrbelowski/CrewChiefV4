@@ -416,18 +416,8 @@ namespace CrewChiefV4.Audio
                 Console.WriteLine("Starting queue monitor");
                 monitorRunning = true;
                 // spawn a Thread to monitor the queue
-                ThreadStart work;
-                if (disableImmediateMessages)
-                {
-                    Console.WriteLine("Interupting and immediate messages are disabled - no spotter or 'green green green'");
-                    work = monitorQueueNoImmediateMessages;
-                }
-                else
-                {
-                    work = monitorQueue;
-                }
                 Debug.Assert(monitorQueueThread == null);
-                monitorQueueThread = new Thread(work);
+                monitorQueueThread = new Thread(monitorQueue);
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
             }
@@ -454,6 +444,7 @@ namespace CrewChiefV4.Audio
             }
 
             channelOpen = false;
+            manualResetEvent.Set();
         }
 
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
@@ -671,32 +662,6 @@ namespace CrewChiefV4.Audio
         {
             playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null));
             keepQuiet = false;
-        }
-
-        private void monitorQueueNoImmediateMessages()
-        {
-            // ensure the BGP is initialised:
-            this.backgroundPlayer.initialise(dtmPitWindowClosedBackground); 
-            while (monitorRunning)
-            {
-                Thread.Sleep(queueMonitorInterval);
-                try
-                {
-                    playQueueContents(queuedClips, false);
-                    allowPearlsOnNextPlay = true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception processing queued clips: " + e.Message);
-                }
-                if (!holdChannelOpen && channelOpen)
-                {
-                    closeRadioInternalChannel();
-                }
-            }
-            writeMessagePlayedStats();
-            playedMessagesCount.Clear();
-            this.backgroundPlayer.stop();
         }
 
         private void playQueueContents(OrderedDictionary queueToPlay, Boolean isImmediateMessages)
