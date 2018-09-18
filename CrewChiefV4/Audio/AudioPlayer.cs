@@ -615,7 +615,7 @@ namespace CrewChiefV4.Audio
                             immediateClips.Clear();
                         }
                     }
-                    waitTimeout = 100;
+                    waitTimeout = 10;
                 }
                 else if (!regularQueuePaused && queuedClips.Count > 0)
                 {
@@ -632,8 +632,11 @@ namespace CrewChiefV4.Audio
                             queuedClips.Clear();
                         }
                     }
-                    waitTimeout = 100;
+                    waitTimeout = 10;
                 }
+                // -1 timeout means wait-till-notified. 10 timeout kicks the loop off again almost immediately. This
+                // should happen once after playing messages, to allow the channel to be closed. After the channel is closed
+                // we're back to a -1 timeout
                 monitorQueueWakeUpEvent.WaitOne(waitTimeout);
             }
             //writeMessagePlayedStats();
