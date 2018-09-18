@@ -1136,8 +1136,8 @@ namespace CrewChiefV4.Audio
                         // CC was reported to crash here.  Not sure how's that possible, AFAIK all paths come the file system.
                         // Maybe we have a race somewhere, or there's something going on during sound unpacking.  For now, trace
                         // and keep an eye on this.
-                        Console.WriteLine(string.Format("Exception loading file:{0}  msg:{1}  stack:{2}"), fullPath, ex.Message,
-                            ex.StackTrace + (ex.InnerException != null ? ex.InnerException.Message + " " + ex.InnerException.StackTrace : ""));
+                        Console.WriteLine(string.Format("Exception loading file:{0}  msg:{1}  stack:{2}", fullPath, ex.Message,
+                            ex.StackTrace + (ex.InnerException != null ? ex.InnerException.Message + " " + ex.InnerException.StackTrace : "")));
                     }
                 }
             }

@@ -936,6 +936,7 @@ namespace CrewChiefV4
 
                                     sessionFinished = true;
                                     audioPlayer.disablePearlsOfWisdom = false;
+                                    audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                     if (loadDataFromFile)
                                     {
                                         // TODO_THREADS: review all sleeps.
@@ -991,6 +992,7 @@ namespace CrewChiefV4
                                             SoundCache.loadDriverNameSounds(usableDriverNames);
                                         }
                                     }
+                                    audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                 }
                                 else if (previousGameState != null &&
                                             (gameDefinition.gameEnum == GameEnum.F1_2018 ||
@@ -1039,6 +1041,7 @@ namespace CrewChiefV4
                                                 }
                                             }
                                         }
+                                        audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                     }
                                     if (!sessionFinished)
                                     {

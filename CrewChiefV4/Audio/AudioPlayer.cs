@@ -64,7 +64,6 @@ namespace CrewChiefV4.Audio
         private QueuedMessage lastMessagePlayed = null;
 
         private Boolean allowPearlsOnNextPlay = true;
-        private int lastDelayedQueueSize = -1;
         private Dictionary<String, int> playedMessagesCount = new Dictionary<String, int>();
 
         public Boolean monitorRunning = false;
@@ -78,20 +77,12 @@ namespace CrewChiefV4.Audio
         private TimeSpan maxTimeToHoldEmptyChannelOpen = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency") + 1);
         private DateTime timeOfLastMessageEnd = DateTime.MinValue;
 
-        private readonly TimeSpan queueMonitorInterval = TimeSpan.FromMilliseconds(1000);
-
-        // TODO_THREADS: Move monitor queues to events.
-        private readonly int immediateMessagesMonitorInterval = 10;  // TODO_THREADS: this is possibly too little, 50 or even 100 might be more reasonable.
-
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
 
         private readonly TimeSpan minTimeBetweenPearlsOfWisdom = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("minimum_time_between_pearls_of_wisdom"));
 
         private Boolean sweary = UserSettings.GetUserSettings().getBoolean("use_sweary_messages");
         private Boolean allowCaching = UserSettings.GetUserSettings().getBoolean("cache_sounds");
-
-        // if this is true, no 'green green green', 'get ready', or spotter messages are played
-        private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
 
         private OrderedDictionary queuedClips = new OrderedDictionary();
 
@@ -122,7 +113,7 @@ namespace CrewChiefV4.Audio
         private String lastImmediateMessageName = null;
         private DateTime lastImmediateMessageTime = DateTime.MinValue;
 
-        private DateTime unpauseTime = DateTime.MinValue;
+        private Boolean regularQueuePaused = false;
 
         private SoundCache soundCache;
 
@@ -141,7 +132,9 @@ namespace CrewChiefV4.Audio
         private Thread monitorQueueThread = null;
 
 
-        ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+        AutoResetEvent monitorQueueWakeUpEvent = new AutoResetEvent(false);
+        private Boolean regularMessagesQueuedSinceLastWakeup = false;
+        private DateTime nextWakeupDueTime = DateTime.MinValue;
 
         static AudioPlayer()
         {
@@ -331,6 +324,39 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        // if it's more than 200ms since the last call, and message have been queued, wake the monitor thread
+        public void wakeMonitorThreadForRegularMessages(DateTime now)
+        {
+            if (regularMessagesQueuedSinceLastWakeup && now > nextWakeupDueTime)
+            {
+                Boolean doHardPartsCheck = delayMessagesInHardParts &&
+                            CrewChief.currentGameState != null &&
+                            CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
+                            (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
+                            !GameStateData.onManualFormationLap;
+                if (doHardPartsCheck &&
+                    CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
+                {
+                    // we're in a hard part of the track. The monitor thread shouldn't be woken here unless an immediate message jumps the queue.
+                    // If there are no messages in the immediate queue, ensure the radio channel is closed here
+                    Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
+                    if (shouldCloseChannel)
+                    {
+                        // This call is synchronous so will throw out the timing on the nextWakeupCallDue - that is, we'll be adding 200ms
+                        // to 'now' as it was before we played the closeChannel sound. So the nextWakeupDueTime will always in be in the past if we do this.
+                        // This is a bit of an edge case with minimal impact
+                        closeRadioInternalChannel();
+                    }
+                }
+                else
+                {
+                    regularMessagesQueuedSinceLastWakeup = false;
+                    monitorQueueWakeUpEvent.Set();
+                }
+                nextWakeupDueTime = now.AddMilliseconds(200);
+            }
+        }
+
         // for debugging the moderator message block process
         public String getMessagesBlocking(SoundType blockLevel)
         {
@@ -444,7 +470,7 @@ namespace CrewChiefV4.Audio
             }
 
             channelOpen = false;
-            manualResetEvent.Set();
+            monitorQueueWakeUpEvent.Set();
         }
 
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
@@ -590,37 +616,12 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
-                else if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
+                else if (!regularQueuePaused && queuedClips.Count > 0)
                 {
                     try
                     {
-                        Boolean doHardPartsCheck = delayMessagesInHardParts &&
-                            CrewChief.currentGameState != null &&
-                            CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
-                            (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
-                            !GameStateData.onManualFormationLap;
-                        if (!doHardPartsCheck ||
-                            !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
-                        {
-                            playQueueContents(queuedClips, false);
-                            allowPearlsOnNextPlay = true;
-                            lastDelayedQueueSize = -1;
-                        }
-                        else
-                        {
-                            // if there are no messages in the immediate queue, ensure the radio channel is closed here
-                            Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
-                            if (shouldCloseChannel)
-                            {
-                                closeRadioInternalChannel();
-                            }
-                            if (queuedClips.Count != lastDelayedQueueSize)
-                            {
-                                lastDelayedQueueSize = queuedClips.Count;
-                                Console.WriteLine("Hard parts:  Delaying message playback because we're in a hard part of a track.  Queue size: " +
-                                    lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
-                            }
-                        }
+                        playQueueContents(queuedClips, false);
+                        allowPearlsOnNextPlay = true;
                     }
                     catch (Exception e)
                     {
@@ -633,8 +634,7 @@ namespace CrewChiefV4.Audio
                 }
                 else
                 {
-                    manualResetEvent.Reset();
-                    manualResetEvent.WaitOne();
+                    monitorQueueWakeUpEvent.WaitOne();
                 }
             }
             //writeMessagePlayedStats();
@@ -1144,10 +1144,6 @@ namespace CrewChiefV4.Audio
 
         public void playMessageImmediately(QueuedMessage queuedMessage)
         {
-            if (disableImmediateMessages)
-            {
-                return;
-            }
             if (queuedMessage.canBePlayed)
             {
                 lock (immediateClips)
@@ -1175,7 +1171,9 @@ namespace CrewChiefV4.Audio
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
-                        manualResetEvent.Set();
+
+                        // wake up the monitor thread immediately
+                        monitorQueueWakeUpEvent.Set();
                     }
                 }
             }            
@@ -1183,10 +1181,6 @@ namespace CrewChiefV4.Audio
 
         public void playSpotterMessage(QueuedMessage queuedMessage, Boolean keepChannelOpen)
         {
-            if (disableImmediateMessages)
-            {
-                return;
-            }
             if (queuedMessage.canBePlayed)
             {
                 lock (immediateClips)
@@ -1203,7 +1197,9 @@ namespace CrewChiefV4.Audio
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
-                        manualResetEvent.Set();
+
+                        // wake up the monitor thread immediately
+                        monitorQueueWakeUpEvent.Set();
                     }
                 }
             }            
@@ -1267,7 +1263,9 @@ namespace CrewChiefV4.Audio
                                 insertionIndex++;
                                 queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
                             }
-                            manualResetEvent.Set();
+
+                            // note that we don't wake the monitor Thread here - wait until all the events have completed on this tick
+                            regularMessagesQueuedSinceLastWakeup = true;
                         }
                     }
                 }
@@ -1381,10 +1379,17 @@ namespace CrewChiefV4.Audio
 
         public void pauseQueue(int seconds)
         {
-            // only pause if it's not already paused
-            if (unpauseTime < DateTime.Now)
+            if (!regularQueuePaused)
             {
-                unpauseTime = DateTime.Now + TimeSpan.FromSeconds(seconds);
+                regularQueuePaused = true;
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    Thread.Sleep(seconds * 1000);
+                    regularQueuePaused = false;
+                    // wake the monitor thread as soon as the pause has expired
+                    this.monitorQueueWakeUpEvent.Set();
+                }).Start();
             }
         }
 
