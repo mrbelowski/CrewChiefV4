@@ -52,6 +52,8 @@ namespace CrewChiefV4.Audio
         public static SpeechSynthesizer synthesizer;
 
         public static Boolean hasSuitableTTSVoice = false;
+
+        public static Boolean cancelLazyLoading = false;
         
         public SoundCache(DirectoryInfo soundsFolder, DirectoryInfo sharedSoundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
@@ -173,18 +175,27 @@ namespace CrewChiefV4.Audio
                             // load the permanently cached sounds first, then the rest
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
-                                if (soundSet.cacheSoundPlayersPermanently)
+                                if (SoundCache.cancelLazyLoading)
+                                {
+                                    break;
+                                }
+                                else if (soundSet.cacheSoundPlayersPermanently)
                                 {
                                     soundSet.loadAll();
                                 }
                             }
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
-                                if (!soundSet.cacheSoundPlayersPermanently)
+                                if (SoundCache.cancelLazyLoading)
+                                {
+                                    break;
+                                }
+                                else if (!soundSet.cacheSoundPlayersPermanently)
                                 {
                                     soundSet.loadAll();
                                 }
                             }
+                            SoundCache.cancelLazyLoading = false;
                             if (AudioPlayer.playWithNAudio)
                             {
                                 Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
