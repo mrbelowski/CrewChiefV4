@@ -1332,7 +1332,10 @@ namespace CrewChiefV4
 
         public void stopTriggerRecogniser()
         {
-            triggerSre.RecognizeAsyncCancel();
+            if (triggerSre != null)
+            {
+                triggerSre.RecognizeAsyncCancel();
+            }
         }
 
         public void startContinuousListening()
@@ -1436,6 +1439,11 @@ namespace CrewChiefV4
 
         public void recognizeAsyncCancel()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             Console.WriteLine("Cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
             if (useNAudio)
@@ -1482,6 +1490,7 @@ namespace CrewChiefV4
             else
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
+                // TODO_THREADS: this throws.
                 sre.RecognizeAsyncCancel();
             }
         }
@@ -1507,10 +1516,13 @@ namespace CrewChiefV4
 
         public void changeInputDevice(int dev)
         {
-            if (initialised)
+            // TODO_THREADS: extend to all methods.
+            if (!initialised)
             {
-                waveIn.DeviceNumber = dev;
+                return;
             }
+
+            waveIn.DeviceNumber = dev;
         }
 
         private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)

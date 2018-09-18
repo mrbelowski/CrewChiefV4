@@ -83,7 +83,7 @@ namespace CrewChiefV4.Audio
 
         private readonly TimeSpan queueMonitorInterval = TimeSpan.FromMilliseconds(1000);
 
-        private readonly int immediateMessagesMonitorInterval = 10;
+        private readonly int immediateMessagesMonitorInterval = 10;  // TODO_THREADS: this is possibly too little, 50 or even 100 might be more reasonable.
 
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
 
@@ -1160,7 +1160,7 @@ namespace CrewChiefV4.Audio
                 Thread.CurrentThread.IsBackground = true;
                 Thread.Sleep(queuedMessage.secondsDelay * 1000);
                 playMessageImmediately(queuedMessage);
-            }).Start();            
+            }).Start();
         }
 
         public SoundType getMinTypeInImmediateQueue()

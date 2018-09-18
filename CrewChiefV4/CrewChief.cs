@@ -938,6 +938,7 @@ namespace CrewChiefV4
                                     audioPlayer.disablePearlsOfWisdom = false;
                                     if (loadDataFromFile)
                                     {
+                                        // TODO_THREADS: review all sleeps.
                                         Thread.Sleep(2000);
                                     }
                                 }
