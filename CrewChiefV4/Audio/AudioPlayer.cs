@@ -590,9 +590,9 @@ namespace CrewChiefV4.Audio
             Console.WriteLine("Monitor starting");
             // ensure the BGP is initialised:
             this.backgroundPlayer.initialise(dtmPitWindowClosedBackground);
-            DateTime nextQueueCheck = DateTime.Now;
             while (monitorRunning)
             {
+                int waitTimeout = -1;
                 if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
@@ -615,6 +615,7 @@ namespace CrewChiefV4.Audio
                             immediateClips.Clear();
                         }
                     }
+                    waitTimeout = 100;
                 }
                 else if (!regularQueuePaused && queuedClips.Count > 0)
                 {
@@ -631,11 +632,9 @@ namespace CrewChiefV4.Audio
                             queuedClips.Clear();
                         }
                     }
+                    waitTimeout = 100;
                 }
-                else
-                {
-                    monitorQueueWakeUpEvent.WaitOne();
-                }
+                monitorQueueWakeUpEvent.WaitOne(waitTimeout);
             }
             //writeMessagePlayedStats();
             playedMessagesCount.Clear();
