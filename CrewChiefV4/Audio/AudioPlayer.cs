@@ -140,6 +140,9 @@ namespace CrewChiefV4.Audio
         public static String folderChiefRadioCheck = null;
         private Thread monitorQueueThread = null;
 
+
+        ManualResetEvent manualResetEvent = new ManualResetEvent(false);
+
         static AudioPlayer()
         {
             // Inintialize sound file paths.  Handle user specified override, or pick default.
@@ -564,6 +567,7 @@ namespace CrewChiefV4.Audio
             this.backgroundPlayer.mute(doMute);
         }
 
+
         private void monitorQueue()
         {
             Console.WriteLine("Monitor starting");
@@ -595,39 +599,35 @@ namespace CrewChiefV4.Audio
                         }
                     }
                 }
-                else if (DateTime.Now > nextQueueCheck)
+                else if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
                 {
-                    nextQueueCheck = nextQueueCheck.Add(queueMonitorInterval);
                     try
                     {
-                        if (DateTime.Now > unpauseTime && queuedClips.Count > 0)
+                        Boolean doHardPartsCheck = delayMessagesInHardParts &&
+                            CrewChief.currentGameState != null &&
+                            CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
+                            (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
+                            !GameStateData.onManualFormationLap;
+                        if (!doHardPartsCheck ||
+                            !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
                         {
-                            Boolean doHardPartsCheck = delayMessagesInHardParts &&
-                                CrewChief.currentGameState != null &&
-                                CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
-                                (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
-                                !GameStateData.onManualFormationLap;
-                            if (!doHardPartsCheck ||
-                                !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
+                            playQueueContents(queuedClips, false);
+                            allowPearlsOnNextPlay = true;
+                            lastDelayedQueueSize = -1;
+                        }
+                        else
+                        {
+                            // if there are no messages in the immediate queue, ensure the radio channel is closed here
+                            Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
+                            if (shouldCloseChannel)
                             {
-                                playQueueContents(queuedClips, false);
-                                allowPearlsOnNextPlay = true;
-                                lastDelayedQueueSize = -1;
+                                closeRadioInternalChannel();
                             }
-                            else
+                            if (queuedClips.Count != lastDelayedQueueSize)
                             {
-                                // if there are no messages in the immediate queue, ensure the radio channel is closed here
-                                Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
-                                if (shouldCloseChannel)
-                                {
-                                    closeRadioInternalChannel();
-                                }
-                                if (queuedClips.Count != lastDelayedQueueSize)
-                                {
-                                    lastDelayedQueueSize = queuedClips.Count;
-                                    Console.WriteLine("Hard parts:  Delaying message playback because we're in a hard part of a track.  Queue size: " +
-                                        lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
-                                }
+                                lastDelayedQueueSize = queuedClips.Count;
+                                Console.WriteLine("Hard parts:  Delaying message playback because we're in a hard part of a track.  Queue size: " +
+                                    lastDelayedQueueSize + " should close channel = " + shouldCloseChannel);
                             }
                         }
                     }
@@ -642,8 +642,8 @@ namespace CrewChiefV4.Audio
                 }
                 else
                 {
-                    Thread.Sleep(immediateMessagesMonitorInterval);
-                    continue;
+                    manualResetEvent.Reset();
+                    manualResetEvent.WaitOne();
                 }
             }
             //writeMessagePlayedStats();
@@ -1210,9 +1210,10 @@ namespace CrewChiefV4.Audio
                             queuedMessage.metadata.type = SoundType.IMPORTANT_MESSAGE;
                         }
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
+                        manualResetEvent.Set();
                     }
                 }
-            }
+            }            
         }
 
         public void playSpotterMessage(QueuedMessage queuedMessage, Boolean keepChannelOpen)
@@ -1237,9 +1238,10 @@ namespace CrewChiefV4.Audio
                         // default spotter priority is 10
                         populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
+                        manualResetEvent.Set();
                     }
                 }
-            }
+            }            
         }
 
         private int getInsertionIndex(OrderedDictionary queue, QueuedMessage queuedMessage)
@@ -1300,10 +1302,11 @@ namespace CrewChiefV4.Audio
                                 insertionIndex++;
                                 queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
                             }
+                            manualResetEvent.Set();
                         }
                     }
                 }
-            }
+            }            
         }
 
         public Boolean removeQueuedMessage(String eventName)
