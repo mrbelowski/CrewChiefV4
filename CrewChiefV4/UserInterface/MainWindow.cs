@@ -1435,12 +1435,16 @@ namespace CrewChiefV4
                 this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");  // Or idling, smoking, any good jokes?
         }
 
+        // called from the close callback on the main form
         private void stopApp(object sender, FormClosedEventArgs e)
         {
             lock (MainWindow.instanceLock)
             {
                 MainWindow.instance = null;
             }
+
+            // SoundCache spawns a Thread to lazy-load the sound data. Cancel this:
+            SoundCache.cancelLazyLoading = true;
 
             stopApp();
         }
