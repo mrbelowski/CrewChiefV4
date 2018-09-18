@@ -1548,7 +1548,6 @@ namespace CrewChiefV4
             else
             {
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
-                // TODO_THREADS: this throws.
                 sre.RecognizeAsyncCancel();
             }
         }
@@ -1579,7 +1578,6 @@ namespace CrewChiefV4
 
         public void changeInputDevice(int dev)
         {
-            // TODO_THREADS: extend to all methods.
             if (!initialised)
             {
                 return;
