@@ -80,6 +80,7 @@ namespace CrewChiefV4.Audio
 
         private readonly TimeSpan queueMonitorInterval = TimeSpan.FromMilliseconds(1000);
 
+        // TODO_THREADS: Move monitor queues to events.
         private readonly int immediateMessagesMonitorInterval = 10;  // TODO_THREADS: this is possibly too little, 50 or even 100 might be more reasonable.
 
         private Boolean useListenBeep = UserSettings.GetUserSettings().getBoolean("use_listen_beep");
