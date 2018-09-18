@@ -50,6 +50,7 @@ namespace CrewChiefV4
         private static List<Thread> rootThreads = new List<Thread>();
 
         // TODO_THREADS: implement temporary thread registration/wait.
+        private static HashSet<Thread> temporaryThreads = new HashSet<Thread>();
 
         public static void RegisterRootThread(Thread t)
         {
@@ -69,6 +70,17 @@ namespace CrewChiefV4
             }
         }
 
+        public static void RegisterTemporaryThread(Thread t)
+        {
+            lock (ThreadManager.temporaryThreads)
+            {
+                if (!ThreadManager.temporaryThreads.Contains(t))
+                    ThreadManager.temporaryThreads.Add(t);
+                else
+                    Debug.Assert(false, "Temporary thread already registered, this should not happen.");
+            }
+        }
+
         private static void UnregisterRootThreads()
         {
             lock (ThreadManager.rootThreads)
@@ -76,6 +88,21 @@ namespace CrewChiefV4
                 ThreadManager.rootThreads.Clear();
             }
         }
+
+        public static void UnregisterTemporaryThread(Thread t)
+        {
+            if (t == null)
+                return;
+
+            lock (ThreadManager.temporaryThreads)
+            {
+                if (ThreadManager.temporaryThreads.Contains(t))
+                    ThreadManager.temporaryThreads.Remove(t);
+                else
+                    Debug.Assert(false, "Temporary thread is not registered, this should not happen.");
+            }
+        }
+
 
         public static void DoWatchStartup(CrewChief cc)
         {
@@ -119,7 +146,6 @@ namespace CrewChiefV4
                         {
                             if (!t.IsAlive)
                             {
-                                ThreadManager.Trace("Thread not running - " + t.Name);
                                 allThreadsRunning = false;
                                 break;
                             }
@@ -220,7 +246,6 @@ namespace CrewChiefV4
                         {
                             if (t.IsAlive)
                             {
-                                ThreadManager.Trace("Thread still alive - " + t.Name);
                                 allThreadsStopped = false;
                                 break;
                             }
@@ -261,7 +286,7 @@ namespace CrewChiefV4
                 return true;
 
             // Possibly, print to debug log?
-            Debug.WriteLine("Shutdown: Wating for root threads to stop...");
+            ThreadManager.Trace("Shutdown - Wating for root threads to stop...");
             for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
             {
                 var allThreadsStopped = true;
@@ -271,7 +296,7 @@ namespace CrewChiefV4
                     {
                         if (t.IsAlive)
                         {
-                            Debug.WriteLine("Shutdown: Thread still alive - " + t.Name);
+                            ThreadManager.Trace("Shutdown - Thread still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
                         }
@@ -280,7 +305,7 @@ namespace CrewChiefV4
 
                 if (allThreadsStopped)
                 {
-                    Debug.WriteLine("Shutdown: Root threads stopped");
+                    ThreadManager.Trace("Shutdown - Root threads stopped");
                     return true;
                 }
 
@@ -288,12 +313,53 @@ namespace CrewChiefV4
             }
 
             
-            Debug.WriteLine("Shutdown: Wait for root threads stop failed, thread states:");
-            ThreadManager.DebugTraceRootThreadStats();
+            ThreadManager.Trace("Shutdown - Wait for root threads stop failed, thread states:");
+            ThreadManager.TraceRootThreadStats();
 
             // Note: wait for file dump on shutdown is not supported, if this assert annoys you, remove it.
             // Alternatively, change this code to wait for dump to finish?
-            Debug.Assert(false, "Shutdown: Wait for root threads stop failed, please investigate.");
+            Debug.Assert(false, "Shutdown - Wait for root threads stop failed, please investigate.");
+
+            return false;
+        }
+
+        public static bool WaitForTemporaryThreadsShutdown()
+        {
+            if (ThreadManager.temporaryThreads.Count == 0)
+                return true;
+
+            // Possibly, print to debug log?
+            ThreadManager.Trace("Wating for temporary threads to stop...");
+            for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
+            {
+                var allThreadsStopped = true;
+                lock (ThreadManager.temporaryThreads)
+                {
+                    foreach (var t in ThreadManager.temporaryThreads)
+                    {
+                        if (t.IsAlive)
+                        {
+                            ThreadManager.Trace("TemporaryThread still alive - " + t.Name);
+                            allThreadsStopped = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (allThreadsStopped)
+                {
+                    ThreadManager.Trace("Temporary threads stopped");
+                    return true;
+                }
+
+                Thread.Sleep(ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS);
+            }
+
+
+            ThreadManager.Trace("Wait for temporary threads stop failed, thread states:");
+            ThreadManager.TraceTemporaryThreadStats();
+
+            Debug.Assert(false, "Wait for temporary threads stop failed, please investigate.");
 
             return false;
         }
@@ -308,19 +374,23 @@ namespace CrewChiefV4
             }
         }
 
-        private static void DebugTraceRootThreadStats()
+        private static void TraceTemporaryThreadStats()
         {
             // If we run into bad problems, we might also need to get stack trace out.
-            lock (ThreadManager.rootThreads)
+            lock (ThreadManager.temporaryThreads)
             {
-                foreach (var t in ThreadManager.rootThreads)
-                    Debug.WriteLine(string.Format("Thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
+                foreach (var t in ThreadManager.temporaryThreads)
+                    ThreadManager.Trace(string.Format("Temorary thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
             }
         }
 
         private static void Trace(string msg)
         {
-            Console.WriteLine(string.Format("ThreadManager: {0}", msg));
+            var msgPrefixed = string.Format("ThreadManager: {0}", msg);
+            if (MainWindow.instance != null)  // Safe to take no lock here (why?)
+                Console.WriteLine(msgPrefixed);
+            else
+                Debug.WriteLine(msgPrefixed);
         }
     }
 }
