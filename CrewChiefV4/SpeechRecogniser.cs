@@ -447,6 +447,7 @@ namespace CrewChiefV4
             {
                 try
                 {
+                    // TODO_THREADS: with always on listening, this causes significant delay on shutdown, investigate (some worker thread alive).  Repro:  start app/close 
                     sre.Dispose();
                 }
                 catch (Exception) { }
