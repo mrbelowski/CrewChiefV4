@@ -1,5 +1,14 @@
 ﻿/*
- * TODO_THREADS:
+ * This class is responsible for disposing global shared resources.  Disposal is done after main window is closed and root threads are stopped.
+ * 
+ * The reason for this is that with multiple threads using shared resources, it is not easy to make shutdown order of those threads predictable.  This
+ * is basically a compromise between completely correct implementation (proper locking, and ordered shutdown of threads) and practical solution.  In other
+ * words, it's a hack :)
+ * 
+ * Only resources that are too difficult too assign proper ownership to should be put here as a last resort, this class shouldn't grow much.
+ * 
+ * Also, see ThreadManager for general threading suggestions for the Crew Chief.
+ * 
  * Official website: thecrewchief.org 
  * License: MIT
  */

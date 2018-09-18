@@ -939,7 +939,7 @@ namespace CrewChiefV4
                                     if (loadDataFromFile)
                                     {
                                         // TODO_THREADS: review all sleeps.
-                                        Thread.Sleep(2000);
+                                        Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 100 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                     }
                                 }
                                 float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;

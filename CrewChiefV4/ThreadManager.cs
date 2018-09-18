@@ -1,5 +1,28 @@
 ﻿/*
- * * TODO_THREADS: 
+ * This class' responsibility is to provide some corrdination between starting/stopping threads in CC.  Here's proposal for strategy of
+ * dealing with threads in CC, aka "Architecture":
+ * 
+ * 1. each root thread (the one we start from MainWindow/UI thread) has to be registered with ThreadManager and named
+ * 
+ * 1.1: FUTURE: each temporary Thread should also be registered
+ * 
+ * 2. if any of the root thread creates a long lived thread, it has to wait for it to exit when root thread exits.
+ * 
+ * 3. each thread should release/dispose it's resources on exit, unless it is too complicated/unpractical (See GlobalResources class)
+ * 
+ * 4. global shared resources will be released after form close (and all root threads stopped, if they stop within agreed time, otherwise - undefined behavior).
+ * 
+ * 5. access to main window should be synchronized with lock.  Be extra careful, if you are marshalling to the main thread, do a Post, not Send, so that lock is not held
+ *    Failing to follow above might cause deadlocks.
+ * 
+ * 6. For Sleeps consider using Utilities.InterruptedSleep to avoid long shutdown delays.
+ * 
+ * 7. Work worker threads that pump some data, don't just use Sleep, use Events to wake them up.
+ * 
+ * Future: unsolved problems
+ *  - Download threasds
+ *  - File dump in main run thread
+ *
  * Official website: thecrewchief.org 
  * License: MIT
  */
@@ -25,6 +48,8 @@ namespace CrewChiefV4
         private const int SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS;
 
         private static List<Thread> rootThreads = new List<Thread>();
+
+        // TODO_THREADS: implement temporary thread registration/wait.
 
         public static void RegisterRootThread(Thread t)
         {
