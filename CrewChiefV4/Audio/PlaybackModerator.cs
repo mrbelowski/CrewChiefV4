@@ -310,7 +310,7 @@ namespace CrewChiefV4.Audio
 
             if (PlaybackModerator.minPriorityForInterrupt != SoundType.OTHER && PlaybackModerator.CanInterrupt(soundMetadata))
             {
-                var mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getMinTypeInImmediateQueue();
+                SoundType mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getPriortyOfFirstWaitingImmediateMessage();
                 if (mostImportantTypeInImmediateQueue <= PlaybackModerator.minPriorityForInterrupt)
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting",

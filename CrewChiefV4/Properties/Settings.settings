@@ -207,7 +207,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_race_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_race_lap_times" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
