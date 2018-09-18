@@ -346,6 +346,11 @@ namespace CrewChiefV4
         // opponent grammar processing stuff needs this.
         private List<Grammar> addCompoundChoices(String[] phrases, Boolean alwaysUseAllPhrases, Choices choices, String[] append, Boolean alwaysUseAllAppends)
         {
+            if (!initialised)
+            {
+                return null;
+            }
+
             List<Grammar> generatedGrammars = new List<Grammar>();
             foreach (string s in phrases)
             {
@@ -394,6 +399,11 @@ namespace CrewChiefV4
         // default audio input device
         public void stop()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             try
             {
                 if (sre != null)
@@ -420,6 +430,11 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (waveIn != null)
             {
                 try
@@ -488,6 +503,12 @@ namespace CrewChiefV4
 
         private Boolean initWithLocale()
         {
+            Debug.Assert(!initialised);
+            if (initialised)
+            {
+                return false;
+            }
+
             String overrideCountry = null;
             if(localeCountryPropertySetting != null && localeCountryPropertySetting.Length == 2)
             {
@@ -592,6 +613,8 @@ namespace CrewChiefV4
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
         {
+            Debug.Assert(!initialised);  // Unless, we plan to add stuff dynamically, this should be false.
+
             if (speechPhrases != null && speechPhrases.Count() > 0)
             {
                 Boolean valid = true;
@@ -1077,6 +1100,11 @@ namespace CrewChiefV4
 
         private Boolean switchFromRegularToTriggerRecogniser()
         {
+            if (!initialised)
+            {
+                return false;
+            }
+
             int attempts = 0;
             Boolean success = false;
             while (!success && attempts < 3)
@@ -1114,6 +1142,11 @@ namespace CrewChiefV4
 
         private Boolean switchFromTriggerToRegularRecogniser()
         {
+            if (!initialised)
+            {
+                return false;
+            }
+
             int attempts = 0;
             Boolean success = false;
             while (!success && attempts < 3)
@@ -1177,6 +1210,11 @@ namespace CrewChiefV4
 
         void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
             {
                 Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
@@ -1191,6 +1229,11 @@ namespace CrewChiefV4
 
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             // cancel the thread that's waiting for a speech recognised timeout:
             triggerTimeoutWaitHandle.Set();
             SpeechRecogniser.waitingForSpeech = false;
@@ -1332,6 +1375,11 @@ namespace CrewChiefV4
 
         public void stopTriggerRecogniser()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (triggerSre != null)
             {
                 triggerSre.RecognizeAsyncCancel();
@@ -1340,6 +1388,11 @@ namespace CrewChiefV4
 
         public void startContinuousListening()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
             {   
                 try
@@ -1369,6 +1422,11 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             Console.WriteLine("Opened channel - waiting for speech");
             SpeechRecogniser.waitingForSpeech = true;
             SpeechRecogniser.gotRecognitionResult = false;
@@ -1497,6 +1555,11 @@ namespace CrewChiefV4
 
         private void StopNAudioWaveIn()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             int retries = 0;
             Boolean stopped = false;
             while (!stopped && retries < 3)
@@ -1527,6 +1590,11 @@ namespace CrewChiefV4
 
         private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             lock (buffer)
             {
                 buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
@@ -1535,6 +1603,11 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
+            if (!initialised)
+            {
+                return null;
+            }
+
             if (ResultContains(recognisedSpeech, RADIO_CHECK, false))
             {
                 crewChief.respondToRadioCheck();
