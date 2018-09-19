@@ -438,7 +438,7 @@ namespace CrewChiefV4.Audio
         public void stopMonitor()
         {
             monitorRunning = false;
-
+            monitorQueueWakeUpEvent.Set();
             // Wait for monitor queue thread to exit.
             if (monitorQueueThread != null)
             {
@@ -453,9 +453,7 @@ namespace CrewChiefV4.Audio
                 monitorQueueThread = null;
                 Console.WriteLine("Monitor queue stopped");
             }
-
             channelOpen = false;
-            monitorQueueWakeUpEvent.Set();
         }
 
         public float getSoundPackVersion(DirectoryInfo soundDirectory)
