@@ -8,7 +8,7 @@ namespace CrewChiefV4
 {
     public enum GameEnum
     {
-        RACE_ROOM, PCARS2, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, PCARS2_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT, RF2_64BIT, IRACING, F1_2018, UNKNOWN
+        RACE_ROOM, PCARS2, PCARS_64BIT, PCARS_32BIT, PCARS_NETWORK, PCARS2_NETWORK, RF1, ASSETTO_64BIT, ASSETTO_32BIT, RF2_64BIT, IRACING, F1_2018, ACC, UNKNOWN
     }
     public class GameDefinition
     {
@@ -44,6 +44,8 @@ namespace CrewChiefV4
             "iracing_launch_exe", "iracing_launch_params", "launch_iracing", false);
         public static GameDefinition f1_2018 = new GameDefinition(GameEnum.F1_2018, "f1_2018", null, "CrewChiefV4.F1_2018.F12018Spotter",
             "f1_2018_launch_exe", "f1_2018_launch_params", "launch_f1_2018", false);
+        public static GameDefinition acc = new GameDefinition(GameEnum.ACC, "acc", "AC2-Win64-Shipping", "CrewChiefV4.ACC.ACCSpotter",
+            "acc_launch_exe", "acc_launch_params", "launch_acc", false);
 
 
         public static List<GameDefinition> getAllGameDefinitions()
@@ -60,6 +62,7 @@ namespace CrewChiefV4
             definitions.Add(assetto64Bit); definitions.Add(assetto32Bit); definitions.Add(rfactor2_64bit);
             definitions.Add(iracing);
             definitions.Add(f1_2018);
+            definitions.Add(acc);
             return definitions;
         }
 
