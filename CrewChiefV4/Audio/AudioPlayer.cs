@@ -333,21 +333,8 @@ namespace CrewChiefV4.Audio
                             CrewChief.currentGameState.PositionAndMotionData.CarSpeed > 5 &&
                             (CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Green || CrewChief.currentGameState.SessionData.SessionPhase == SessionPhase.Checkered) &&
                             !GameStateData.onManualFormationLap;
-                if (doHardPartsCheck &&
-                    CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
-                {
-                    // we're in a hard part of the track. The monitor thread shouldn't be woken here unless an immediate message jumps the queue.
-                    // If there are no messages in the immediate queue, ensure the radio channel is closed here
-                    Boolean shouldCloseChannel = channelOpen && immediateClips.Count == 0;
-                    if (shouldCloseChannel)
-                    {
-                        // This call is synchronous so will throw out the timing on the nextWakeupCallDue - that is, we'll be adding 200ms
-                        // to 'now' as it was before we played the closeChannel sound. So the nextWakeupDueTime will always in be in the past if we do this.
-                        // This is a bit of an edge case with minimal impact
-                        closeRadioInternalChannel();
-                    }
-                }
-                else
+                if (!doHardPartsCheck ||
+                    !CrewChief.currentGameState.hardPartsOnTrackData.isInHardPart(CrewChief.currentGameState.PositionAndMotionData.DistanceRoundTrack))
                 {
                     monitorQueueWakeUpEvent.Set();
                 }
