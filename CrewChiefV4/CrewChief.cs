@@ -933,10 +933,10 @@ namespace CrewChiefV4
                                             previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
                                             currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
                                     }
-
+                                    audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                     sessionFinished = true;
                                     audioPlayer.disablePearlsOfWisdom = false;
-                                    audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
+
                                     if (loadDataFromFile)
                                     {
                                         // TODO_THREADS: review all sleeps.
