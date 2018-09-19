@@ -82,8 +82,6 @@ namespace CrewChiefV4
 
         private Thread spotterThread = null;
 
-        private Boolean disableImmediateMessages = UserSettings.GetUserSettings().getBoolean("disable_immediate_messages");
-
         private GameStateMapper gameStateMapper;
 
         private GameDataReader gameDataReader;
@@ -383,11 +381,7 @@ namespace CrewChiefV4
 
         public void enableSpotter()
         {
-            if (disableImmediateMessages)
-            {
-                Console.WriteLine("Unable to start spotter - immediate messages are disabled");
-            }
-            else if (spotter == null)
+            if (spotter == null)
             {
                 Console.WriteLine("No spotter configured for this game");
             }
