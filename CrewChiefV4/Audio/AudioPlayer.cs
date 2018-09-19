@@ -133,8 +133,7 @@ namespace CrewChiefV4.Audio
 
 
         AutoResetEvent monitorQueueWakeUpEvent = new AutoResetEvent(false);
-        private Boolean regularMessagesQueuedSinceLastWakeup = false;
-        private DateTime nextWakeupDueTime = DateTime.MinValue;
+        private DateTime nextWakeupCheckTime = DateTime.MinValue;
 
         static AudioPlayer()
         {
@@ -327,7 +326,7 @@ namespace CrewChiefV4.Audio
         // if it's more than 200ms since the last call, and message have been queued, wake the monitor thread
         public void wakeMonitorThreadForRegularMessages(DateTime now)
         {
-            if (regularMessagesQueuedSinceLastWakeup && now > nextWakeupDueTime)
+            if (now > nextWakeupCheckTime && queuedClips.Count > 0)
             {
                 Boolean doHardPartsCheck = delayMessagesInHardParts &&
                             CrewChief.currentGameState != null &&
@@ -350,10 +349,9 @@ namespace CrewChiefV4.Audio
                 }
                 else
                 {
-                    regularMessagesQueuedSinceLastWakeup = false;
                     monitorQueueWakeUpEvent.Set();
                 }
-                nextWakeupDueTime = now.AddMilliseconds(200);
+                nextWakeupCheckTime = now.AddMilliseconds(200);
             }
         }
 
@@ -1266,8 +1264,8 @@ namespace CrewChiefV4.Audio
                                 queuedClips.Insert(insertionIndex, PearlsOfWisdom.getMessageFolder(pearlType), pearlQueuedMessage);
                             }
 
-                            // note that we don't wake the monitor Thread here - wait until all the events have completed on this tick
-                            regularMessagesQueuedSinceLastWakeup = true;
+                            // note that we don't wake the monitor Thread here - we wait until all the events have completed on this tick
+                            // then check the queue
                         }
                     }
                 }
