@@ -116,7 +116,7 @@ namespace CrewChiefV4.PCars
                         }
                     }
                     PCarsStructWrapper structWrapper = new PCarsStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = _pcarsapistruct;
                     if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
                         _pcarsapistruct.mTrackLocation.Length > 0)

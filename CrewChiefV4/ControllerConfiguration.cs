@@ -721,17 +721,17 @@ namespace CrewChiefV4
             ThreadManager.UnregisterTemporaryThread(asyncDisposeThread);
             asyncDisposeThread = new Thread(() =>
             {
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 Thread.CurrentThread.IsBackground = true;
                 String name = joystick.Information.InstanceName;
                 try
                 {                    
                     joystick.Dispose();
-                    //Console.WriteLine("Disposed of temporary " + deviceType + " object " + name + " after " + (DateTime.Now - now).TotalSeconds + " seconds");
+                    //Console.WriteLine("Disposed of temporary " + deviceType + " object " + name + " after " + (DateTime.UtcNow - now).TotalSeconds + " seconds");
                 }
                 catch (Exception e) { 
                     //log and swallow 
-                    Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.Now - now).TotalSeconds + " seconds: " + e.Message);
+                    Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.UtcNow - now).TotalSeconds + " seconds: " + e.Message);
                 }
             });
             asyncDisposeThread.Name = "ControllerConfiguration.asyncDisposeThread";

@@ -142,7 +142,7 @@ namespace CrewChiefV4.PCars2
                     } while (_pcarsapistruct.mSequenceNumber % 2 != 0);
                     tornFramesCount += retries;
                     PCars2StructWrapper structWrapper = new PCars2StructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = _pcarsapistruct;
                     if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
                         _pcarsapistruct.mTrackLocation.Length > 0)

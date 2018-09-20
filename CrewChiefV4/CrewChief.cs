@@ -648,14 +648,14 @@ namespace CrewChiefV4
         private void spotterWork()
         {
             int threadSleepTime = ((int) spotterInterval.Milliseconds / 10) + 1;
-            DateTime nextRunTime = DateTime.Now;
+            DateTime nextRunTime = DateTime.UtcNow;
             Console.WriteLine("Invoking spotter every " + spotterInterval.Milliseconds + "ms, pausing " + threadSleepTime + "ms between invocations");
 
             try
             {
                 while (runSpotterThread)
                 {
-                    DateTime now = DateTime.Now;
+                    DateTime now = DateTime.UtcNow;
                     if (now > nextRunTime && spotter != null && gameDataReader.hasNewSpotterData())
                     {
                         currentSpotterState = gameDataReader.ReadGameData(true);
@@ -671,7 +671,7 @@ namespace CrewChiefV4
                             }
                         }
                         lastSpotterState = currentSpotterState;
-                        nextRunTime = DateTime.Now.Add(spotterInterval);
+                        nextRunTime = DateTime.UtcNow.Add(spotterInterval);
                     }
                     Thread.Sleep(threadSleepTime);
                 }
@@ -728,7 +728,7 @@ namespace CrewChiefV4
                     spotter = null;
                 }
                 running = true;
-                DateTime nextRunTime = DateTime.Now;
+                DateTime nextRunTime = DateTime.UtcNow;
                 if (!audioPlayer.initialised)
                 {
                     Console.WriteLine("Failed to initialise audio player");
@@ -741,7 +741,7 @@ namespace CrewChiefV4
                 Boolean sessionFinished = false;
                 while (running)
                 {
-                    DateTime now = DateTime.Now;
+                    DateTime now = DateTime.UtcNow;
                     //GameStateData.CurrentTime = now;
                     if (now > nextRunTime)
                     {
@@ -760,7 +760,7 @@ namespace CrewChiefV4
                                 audioPlayer.mute = true;
                             }
                         }
-                        nextRunTime = DateTime.Now.Add(_timeInterval);
+                        nextRunTime = DateTime.UtcNow.Add(_timeInterval);
                         nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
 
                         alarmClock.trigger(null, null);

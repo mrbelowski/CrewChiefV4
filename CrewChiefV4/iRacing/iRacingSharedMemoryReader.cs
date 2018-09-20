@@ -210,7 +210,7 @@ namespace CrewChiefV4.iRacing
                         sim.SdkOnTelemetryUpdated(irData);
 
                         iRacingStructWrapper structWrapper = new iRacingStructWrapper();
-                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                        structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                         structWrapper.data = sim;
 
                         if (dumpToFile && dataToDump != null)
