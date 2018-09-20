@@ -401,7 +401,7 @@ namespace CrewChiefV4
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            this.nextPrefsRefreshAttemptTime = DateTime.Now.Add(AUTO_SEARCH_DELAY_SPAN);
+            this.nextPrefsRefreshAttemptTime = DateTime.UtcNow.Add(AUTO_SEARCH_DELAY_SPAN);
 
             if (this.searchTextBox.Text == DEFAULT_SEARCH_TEXT)
                 return;
@@ -417,7 +417,7 @@ namespace CrewChiefV4
 
         private void SearchTimer_Tick(object sender, EventArgs e)
         {
-            if (DateTime.Now < this.nextPrefsRefreshAttemptTime)
+            if (DateTime.UtcNow < this.nextPrefsRefreshAttemptTime)
                 return;
 
             var text = this.searchTextBox.Text;

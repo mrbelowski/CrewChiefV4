@@ -1998,7 +1998,7 @@ namespace CrewChiefV4.assetto
             opponentData.CurrentSectorNumber = 0;
             opponentData.WorldPosition = new float[] { participantStruct.worldPosition.x, participantStruct.worldPosition.z };
             opponentData.DistanceRoundTrack = spLineLengthToDistanceRoundTrack(trackSplineLength, participantStruct.spLineLength);
-            opponentData.DeltaTime = new DeltaTime(trackSplineLength, opponentData.DistanceRoundTrack, DateTime.Now);
+            opponentData.DeltaTime = new DeltaTime(trackSplineLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
             opponentData.CarClass = carClass;
             opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;

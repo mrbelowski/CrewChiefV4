@@ -1785,7 +1785,7 @@ namespace CrewChiefV4.RaceRoom
             opponentData.CurrentSectorNumber = participantStruct.TrackSector;
             opponentData.WorldPosition = new float[] { participantStruct.Position.X, participantStruct.Position.Z };
             opponentData.DistanceRoundTrack = participantStruct.LapDistance;
-            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
             opponentData.CarClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
             opponentData.CurrentTyres = mapToTyreType(participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                 participantStruct.TireTypeRear, participantStruct.TireSubTypeRear, playerCarClass);

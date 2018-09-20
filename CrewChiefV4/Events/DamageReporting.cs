@@ -159,7 +159,7 @@ namespace CrewChiefV4.Events
             damageToReportNext = null;
             reportedDamagesLevels.Clear();
             minDamageToReport = DamageLevel.TRIVIAL;
-            nextPunctureCheck = DateTime.Now + timeToWaitForDamageToSettle;
+            nextPunctureCheck = DateTime.UtcNow + timeToWaitForDamageToSettle;
             componentDestroyed = Component.NONE;
             orientationSamples.Clear();
             nextOrientationCheckDue = DateTime.MinValue;
@@ -698,7 +698,7 @@ namespace CrewChiefV4.Events
                         audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                         int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                         audioPlayer.pauseQueue(secondsDelay);
-                        damageMessage.dueTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
+                        damageMessage.dueTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
                         audioPlayer.playDelayedImmediateMessage(damageMessage);
                     }
                     else

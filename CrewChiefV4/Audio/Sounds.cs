@@ -170,7 +170,7 @@ namespace CrewChiefV4.Audio
                     {
                         new Thread(() =>
                         {
-                            DateTime start = DateTime.Now;
+                            DateTime start = DateTime.UtcNow;
                             Thread.CurrentThread.IsBackground = true;
                             // load the permanently cached sounds first, then the rest
                             foreach (SoundSet soundSet in soundSets.Values)
@@ -198,12 +198,12 @@ namespace CrewChiefV4.Audio
                             SoundCache.cancelLazyLoading = false;
                             if (AudioPlayer.playWithNAudio)
                             {
-                                Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                                Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
                                     SoundCache.currentSoundsLoaded + " loaded message sounds");
                             }
                             else
                             {
-                                Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                                Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
                                     SoundCache.currentSoundsLoaded + " loaded message sounds with " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
                             }
                         }).Start();
@@ -252,7 +252,7 @@ namespace CrewChiefV4.Audio
             new Thread(() =>
             {
                 int loadedCount = 0;
-                DateTime start = DateTime.Now;
+                DateTime start = DateTime.UtcNow;
                 foreach (String name in names)
                 {
                     loadedCount++;
@@ -260,12 +260,12 @@ namespace CrewChiefV4.Audio
                 }
                 if (AudioPlayer.playWithNAudio)
                 {
-                    Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " seconds to load " +
+                    Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + " seconds to load " +
                         loadedCount + " driver name sounds. There are now " + SoundCache.currentSoundsLoaded + " sound files loaded");
                 }
                 else
                 {
-                    Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " seconds to load " +
+                    Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + " seconds to load " +
                         loadedCount + " driver name sounds. There are now " + SoundCache.currentSoundsLoaded +
                         " sound files loaded with " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
                 }

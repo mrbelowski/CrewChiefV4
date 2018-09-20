@@ -118,7 +118,7 @@ namespace CrewChiefV4.rFactor1
                         handle.Free();
                     }
                     RF1StructWrapper structWrapper = new RF1StructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = _rf1apistruct;
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {

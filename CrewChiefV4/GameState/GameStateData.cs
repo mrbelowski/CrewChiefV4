@@ -815,7 +815,7 @@ namespace CrewChiefV4.GameState
 
         public FlagEnum Flag = FlagEnum.GREEN;
 
-        public DateTime YellowFlagStartTime = DateTime.Now;
+        public DateTime YellowFlagStartTime = DateTime.UtcNow;
 
         // used for race sessions that have just started
         public Boolean JustGoneGreen;
@@ -2041,7 +2041,7 @@ namespace CrewChiefV4.GameState
             {
                 // reset the timer and start waiting for an updated laptime...
                 this.WaitingForNewLapData = true;
-                this.NewLapDataTimerExpiry = DateTime.Now.Add(TimeSpan.FromSeconds(3));
+                this.NewLapDataTimerExpiry = DateTime.UtcNow.Add(TimeSpan.FromSeconds(3));
                 this.GameTimeWhenLastCrossedStartFinishLine = sessionRunningTime;
             }
             else
@@ -2052,7 +2052,7 @@ namespace CrewChiefV4.GameState
                 this.GameTimeWhenLastCrossedStartFinishLine = previousOpponentGameTimeWhenLastCrossedStartFinishLine;
             }
             // if we're waiting, see if the timer has expired or we have a change in the previous laptime value
-            if (this.WaitingForNewLapData && (previousOpponentLastLapTime != gameProvidedLastLapTime || DateTime.Now > this.NewLapDataTimerExpiry))
+            if (this.WaitingForNewLapData && (previousOpponentLastLapTime != gameProvidedLastLapTime || DateTime.UtcNow > this.NewLapDataTimerExpiry))
             {
                 // the timer has expired or we have new data
                 this.WaitingForNewLapData = false;
@@ -3314,7 +3314,7 @@ namespace CrewChiefV4.GameState
         public static int NumberOfClasses = 1;
         public static Boolean Multiclass;
 
-        public static DateTime CurrentTime = DateTime.Now;
+        public static DateTime CurrentTime = DateTime.UtcNow;
 
         public Boolean sortClassPositionsCompleted;
 

@@ -422,7 +422,7 @@ namespace CrewChiefV4.rFactor2
                         telemetry = this.telemetry,
                         rules = this.rules,
                         scoring = this.scoring,
-                        ticksWhenRead = DateTime.Now.Ticks
+                        ticksWhenRead = DateTime.UtcNow.Ticks
                     };
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)
