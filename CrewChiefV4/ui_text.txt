@@ -424,6 +424,10 @@ pcars_spotter_car_length = pCARS Spotter default car length
 pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 pcars_spotter_car_length_category = SPOTTER
 
+pcars2_spotter_car_length = pCARS2 Spotter default car length
+pcars2_spotter_car_length_filter = PCARS2
+pcars2_spotter_car_length_category = SPOTTER
+
 r3e_spotter_car_length = R3E Spotter default car length
 r3e_spotter_car_length_filter = RACE_ROOM
 r3e_spotter_car_length_category = SPOTTER
