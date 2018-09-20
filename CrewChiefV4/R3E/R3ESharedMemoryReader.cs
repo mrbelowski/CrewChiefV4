@@ -123,7 +123,7 @@ namespace CrewChiefV4.RaceRoom
                         }
                     }
                     R3EStructWrapper structWrapper = new R3EStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = _raceroomapistruct;
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
