@@ -101,7 +101,7 @@
   <ItemGroup>
     <Compile Include="ACC\ACCData.cs" />
     <Compile Include="ACC\ACCGameStateMapper.cs" />
-    <Compile Include="ACC\ACCSharedMemoryReadyer.cs" />
+    <Compile Include="ACC\ACCSharedMemoryReader.cs" />
     <Compile Include="ACC\ACCSpotter.cs" />
     <Compile Include="ACS\ACSData.cs" />
     <Compile Include="ACS\ACSGameStateMapper.cs" />
