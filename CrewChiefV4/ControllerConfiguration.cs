@@ -54,6 +54,7 @@ namespace CrewChiefV4
         
         // yuk...
         public Dictionary<String, int> buttonAssignmentIndexes = new Dictionary<String, int>();
+        private Thread asyncDisposeThread = null;
 
         public void Dispose()
         {
@@ -717,8 +718,9 @@ namespace CrewChiefV4
 
         private void asyncDispose(DeviceType deviceType, Joystick joystick)
         {
-            new Thread(() =>
-            {                
+            ThreadManager.UnregisterTemporaryThread(asyncDisposeThread);
+            asyncDisposeThread = new Thread(() =>
+            {
                 DateTime now = DateTime.Now;
                 Thread.CurrentThread.IsBackground = true;
                 String name = joystick.Information.InstanceName;
@@ -731,7 +733,10 @@ namespace CrewChiefV4
                     //log and swallow 
                     Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.Now - now).TotalSeconds + " seconds: " + e.Message);
                 }
-            }).Start();
+            });
+            asyncDisposeThread.Name = "ControllerConfiguration.asyncDisposeThread";
+            ThreadManager.RegisterTemporaryThread(asyncDisposeThread);
+            asyncDisposeThread.Start();
         }
 
         public class ControllerData

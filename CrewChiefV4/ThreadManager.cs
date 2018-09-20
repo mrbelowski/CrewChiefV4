@@ -106,6 +106,7 @@ namespace CrewChiefV4
 
         public static void DoWatchStartup(CrewChief cc)
         {
+            // Thread does not need registration as it is watcher thread.
             new Thread(() =>
             {
                 ThreadManager.WaitForRootThreadsStart(cc);
@@ -114,6 +115,7 @@ namespace CrewChiefV4
 
         public static void DoWatchStop(CrewChief cc)
         {
+            // Thread does not need registration as it is watcher thread.
             new Thread(() =>
             {
                 ThreadManager.WaitForRootThreadsStop(cc);
