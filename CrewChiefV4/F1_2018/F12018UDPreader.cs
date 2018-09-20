@@ -84,7 +84,7 @@ namespace CrewChiefV4.F1_2018
                 socketCallback = new AsyncCallback(ReceiveCallback);
                 packetCount = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
-                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                ticksAtStartOfCurrentPacketRateCheck = DateTime.UtcNow.Ticks;
 
                 if (dumpToFile)
                 {
@@ -147,7 +147,7 @@ namespace CrewChiefV4.F1_2018
 
         public override Object ReadGameData(Boolean forSpotter)
         {
-            F12018StructWrapper latestData = workingData.CreateCopy(DateTime.Now.Ticks, forSpotter);
+            F12018StructWrapper latestData = workingData.CreateCopy(DateTime.UtcNow.Ticks, forSpotter);
             lock (this)
             {
                 if (!initialised)

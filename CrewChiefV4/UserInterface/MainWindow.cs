@@ -1090,7 +1090,7 @@ namespace CrewChiefV4
 
         private void listenForButtons()
         {
-            DateTime lastButtoncheck = DateTime.Now;
+            DateTime lastButtoncheck = DateTime.UtcNow;
             if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
             {
                 Console.WriteLine("Running speech recognition in 'toggle button' mode");
@@ -1098,7 +1098,7 @@ namespace CrewChiefV4
             while (runListenForButtonPressesThread)
             {
                 Thread.Sleep(100);
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 controllerConfiguration.pollForButtonClicks(voiceOption == VoiceOptionEnum.TOGGLE);
                 int nextPollWait = 0;
                 if (now > lastButtoncheck.Add(buttonCheckInterval))

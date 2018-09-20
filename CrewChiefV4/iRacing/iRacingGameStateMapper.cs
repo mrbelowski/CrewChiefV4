@@ -1325,7 +1325,7 @@ namespace CrewChiefV4.iRacing
             opponentData.OverallPosition = driver.Live.Position;
             opponentData.CompletedLaps = driver.Live.LiveLapsCompleted;
             opponentData.DistanceRoundTrack = driver.Live.CorrectedLapDistance * trackLength;
-            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
             opponentData.CarClass = CarData.getCarClassForIRacingId(driver.Car.CarClassId, driver.Car.CarId);
             opponentData.CurrentSectorNumber = driver.Live.CurrentSector;
             opponentData.CarNr = Parser.ParseInt(driver.CarNumber);

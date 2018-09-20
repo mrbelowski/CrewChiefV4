@@ -21,8 +21,8 @@ namespace CrewChiefV4.PCars
         // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
         private float carLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
-        
-        private DateTime timeToStartSpotting = DateTime.Now;
+
+        private DateTime timeToStartSpotting = DateTime.UtcNow;
 
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
 
@@ -50,7 +50,7 @@ namespace CrewChiefV4.PCars
 
         public override void clearState()
         {
-            timeToStartSpotting = DateTime.Now;
+            timeToStartSpotting = DateTime.UtcNow;
             internalSpotter.clearState();
         }
 

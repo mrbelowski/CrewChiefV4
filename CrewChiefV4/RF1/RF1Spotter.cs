@@ -21,7 +21,7 @@ namespace CrewChiefV4.rFactor1
         
         private float carWidth = 1.8f;
 
-        private DateTime previousTime = DateTime.Now;
+        private DateTime previousTime = DateTime.UtcNow;
 
         private string currentPlayerCarClassID = "#not_set#";
 
@@ -35,7 +35,7 @@ namespace CrewChiefV4.rFactor1
 
         public override void clearState()
         {
-            previousTime = DateTime.Now;
+            previousTime = DateTime.UtcNow;
             internalSpotter.clearState();
         }
 
@@ -67,7 +67,7 @@ namespace CrewChiefV4.rFactor1
                 return;
             }
 
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             rfVehicleInfo currentPlayerData;
             rfVehicleInfo previousPlayerData;
             float timeDiffSeconds;

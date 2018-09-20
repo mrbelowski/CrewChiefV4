@@ -104,7 +104,7 @@ namespace CrewChiefV4.Audio
 
         private PearlsOfWisdom pearlsOfWisdom = new PearlsOfWisdom();
 
-        DateTime timeLastPearlOfWisdomPlayed = DateTime.Now;
+        DateTime timeLastPearlOfWisdomPlayed = DateTime.UtcNow;
 
         public Boolean initialised = false;
 
@@ -435,7 +435,7 @@ namespace CrewChiefV4.Audio
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
             }
-            new SmokeTest(this).trigger(new GameStateData(DateTime.Now.Ticks), new GameStateData(DateTime.Now.Ticks));
+            new SmokeTest(this).trigger(new GameStateData(DateTime.UtcNow.Ticks), new GameStateData(DateTime.UtcNow.Ticks));
         }
 
         public void stopMonitor()
@@ -579,7 +579,7 @@ namespace CrewChiefV4.Audio
             while (monitorRunning)
             {
                 int waitTimeout = -1;
-                if (channelOpen && (!holdChannelOpen || DateTime.Now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                if (channelOpen && (!holdChannelOpen || DateTime.UtcNow > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -1229,7 +1229,7 @@ namespace CrewChiefV4.Audio
                     {
                         // default 'regular' message priority is 0, which is lowest
                         populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, priority);
-                        DateTime now = CrewChief.currentGameState == null ? DateTime.Now : CrewChief.currentGameState.Now;
+                        DateTime now = CrewChief.currentGameState == null ? DateTime.UtcNow : CrewChief.currentGameState.Now;
                         if (PlaybackModerator.MessageCanBeQueued(queuedMessage, queuedClips.Count, now))
                         {
                             PearlsOfWisdom.PearlMessagePosition pearlPosition = PearlsOfWisdom.PearlMessagePosition.NONE;

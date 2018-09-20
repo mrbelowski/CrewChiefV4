@@ -305,7 +305,7 @@ namespace CrewChiefV4.Events
             PlaybackModerator.SetTracing(true /*enabled*/);
 
             QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
-            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             Thread.Sleep(5000);
@@ -319,12 +319,12 @@ namespace CrewChiefV4.Events
 
             Thread.Sleep(5000);
             inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
-            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             return; 
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
-            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
@@ -340,7 +340,7 @@ namespace CrewChiefV4.Events
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
             Thread.Sleep(8000);
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
-            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
+            inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             Thread.Sleep(2000);
@@ -352,7 +352,7 @@ namespace CrewChiefV4.Events
 
             Thread.Sleep(4000);
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
-            inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
+            inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             Thread.Sleep(5000);
@@ -389,7 +389,7 @@ namespace CrewChiefV4.Events
             audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
 
             QueuedMessage inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
-            //inTheMiddleMessage.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+            //inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
         }
     }

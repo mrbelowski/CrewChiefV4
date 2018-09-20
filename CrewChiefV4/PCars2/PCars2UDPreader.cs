@@ -125,7 +125,7 @@ namespace CrewChiefV4.PCars2
 
                 packetCountAtStartOfCurrentRateCheck = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
-                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                ticksAtStartOfCurrentPacketRateCheck = DateTime.UtcNow.Ticks;
                 lastPacketRateEstimate = -1;
 
                 if (dumpToFile)
@@ -189,7 +189,7 @@ namespace CrewChiefV4.PCars2
         public override Object ReadGameData(Boolean forSpotter)
         {
             CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper structWrapper = new CrewChiefV4.PCars2.PCars2SharedMemoryReader.PCars2StructWrapper();
-            structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+            structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
             lock (this)
             {
                 if (!initialised)
@@ -232,7 +232,7 @@ namespace CrewChiefV4.PCars2
                     telemPacketCount++;
                     if (telemPacketCount > packetCountAtStartOfNextRateCheck)
                     {
-                        lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.Now.Ticks - ticksAtStartOfCurrentPacketRateCheck));
+                        lastPacketRateEstimate = (int)((float)TimeSpan.TicksPerSecond * (float)(telemPacketCount - packetCountAtStartOfCurrentRateCheck) / (float)(DateTime.UtcNow.Ticks - ticksAtStartOfCurrentPacketRateCheck));
                         Console.WriteLine("Packet rate = " + lastPacketRateEstimate + 
                             "Hz, totals:" +
                             "\rtelem = " + telemPacketCount +
@@ -247,7 +247,7 @@ namespace CrewChiefV4.PCars2
                             "\rin sequence = " + inSequenceTelemCount + " oos accepted = " + acceptedOutOfSequenceTelemCount + " oos rejected = " + discardedTelemCount);
                         packetCountAtStartOfCurrentRateCheck = telemPacketCount;
                         packetCountAtStartOfNextRateCheck = packetCountAtStartOfCurrentRateCheck + packetRateCheckInterval;
-                        ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                        ticksAtStartOfCurrentPacketRateCheck = DateTime.UtcNow.Ticks;
                     }
                     frameLength = UDPPacketSizes.telemetryPacketSize;
                     Boolean sequenceCheckOK = isNextInSequence(packetNumber);
@@ -449,8 +449,8 @@ namespace CrewChiefV4.PCars2
                 InitialiseInternal();
             }
             int pressedIndex = -1;
-            DateTime timeout = DateTime.Now.Add(TimeSpan.FromSeconds(10));
-            while (pressedIndex == -1 && DateTime.Now < timeout)
+            DateTime timeout = DateTime.UtcNow.Add(TimeSpan.FromSeconds(10));
+            while (pressedIndex == -1 && DateTime.UtcNow < timeout)
             {
                 for (int i = 0; i < buttonsState.Count(); i++)
                 {

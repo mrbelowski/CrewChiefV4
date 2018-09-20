@@ -182,7 +182,7 @@ namespace CrewChiefV4.assetto
                     }
 
                     ACSStructWrapper structWrapper = new ACSStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = acsShared;
 
                     if (!forSpotter && dumpToFile && dataToDump != null)

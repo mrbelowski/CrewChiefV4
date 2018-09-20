@@ -25,8 +25,8 @@ namespace CrewChiefV4.rFactor2
 
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private readonly int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
-        
-        private DateTime previousTime = DateTime.Now;
+
+        private DateTime previousTime = DateTime.UtcNow;
         private string currentPlayerCarClassID = "#not_set#";
 
         public RF2Spotter(AudioPlayer audioPlayer, Boolean initialEnabledState)
@@ -40,7 +40,7 @@ namespace CrewChiefV4.rFactor2
 
         public override void clearState()
         {
-            this.previousTime = DateTime.Now;
+            this.previousTime = DateTime.UtcNow;
             this.internalSpotter.clearState();
         }
 
@@ -79,7 +79,7 @@ namespace CrewChiefV4.rFactor2
             if (currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation)
                 return;
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             rF2VehicleScoring currentPlayerScoring;
             rF2VehicleScoring previousPlayerScoring;
             float timeDiffSeconds;
