@@ -54,7 +54,7 @@ namespace CrewChiefV4.F1_2018
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
@@ -62,6 +62,7 @@ namespace CrewChiefV4.F1_2018
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<F12018StructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
@@ -84,7 +85,7 @@ namespace CrewChiefV4.F1_2018
                 socketCallback = new AsyncCallback(ReceiveCallback);
                 packetCount = 0;
                 packetCountAtStartOfNextRateCheck = packetRateCheckInterval;
-                ticksAtStartOfCurrentPacketRateCheck = DateTime.Now.Ticks;
+                ticksAtStartOfCurrentPacketRateCheck = DateTime.UtcNow.Ticks;
 
                 if (dumpToFile)
                 {
@@ -147,7 +148,7 @@ namespace CrewChiefV4.F1_2018
 
         public override Object ReadGameData(Boolean forSpotter)
         {
-            F12018StructWrapper latestData = workingData.CreateCopy(DateTime.Now.Ticks, forSpotter);
+            F12018StructWrapper latestData = workingData.CreateCopy(DateTime.UtcNow.Ticks, forSpotter);
             lock (this)
             {
                 if (!initialised)

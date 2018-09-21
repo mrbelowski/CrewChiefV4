@@ -14,17 +14,6 @@ namespace CrewChiefV4
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            this.runListenForChannelOpenThread = false;
-            this.runListenForButtonPressesThread = false;
-            if (crewChief != null)
-            {
-                crewChief.stop();
-                crewChief.Dispose();
-            }
-            if (controllerConfiguration != null)
-            {
-                controllerConfiguration.Dispose();
-            }
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -41,7 +30,8 @@ namespace CrewChiefV4
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            this.consoleTextBox = new System.Windows.Forms.TextBox();
+            this.consoleTextBox = new System.Windows.Forms.RichTextBox();
+            this.consoleTextBoxBackgroundPanel = new System.Windows.Forms.Panel();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.saveConsoleOutputButton = new System.Windows.Forms.Button();
@@ -101,6 +91,10 @@ namespace CrewChiefV4
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
             this.SuspendLayout();
+
+            this.consoleTextBoxBackgroundPanel.Location = new System.Drawing.Point(41, 215);
+            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBoxBackgroundPanel.BorderStyle = BorderStyle.FixedSingle;
             // 
             // consoleTextBox
             // 
@@ -109,9 +103,12 @@ namespace CrewChiefV4
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "textBox1";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
             this.consoleTextBox.TabIndex = 200;
+            this.consoleTextBox.BorderStyle = BorderStyle.None;
+            this.consoleTextBox.Dock = DockStyle.Fill;
+            this.consoleTextBoxBackgroundPanel.Controls.Add(this.consoleTextBox);
+
             // 
             // startApplicationButton
             // 
@@ -664,7 +661,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.saveConsoleOutputButton);
-            this.Controls.Add(this.consoleTextBox);
+            this.Controls.Add(this.consoleTextBoxBackgroundPanel);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.spotterNameBox);
             this.Controls.Add(this.personalisationLabel);
@@ -693,7 +690,8 @@ namespace CrewChiefV4
 
         #endregion
 
-        public System.Windows.Forms.TextBox consoleTextBox;
+        public System.Windows.Forms.RichTextBox consoleTextBox;
+        private Panel consoleTextBoxBackgroundPanel;
         public System.Windows.Forms.Button startApplicationButton;
         public System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.Button forceVersionCheckButton;
@@ -725,7 +723,7 @@ namespace CrewChiefV4
         public System.Windows.Forms.ListBox gameDefinitionList;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label personalisationLabel;
-        private System.Windows.Forms.TextBox filenameTextbox;
+        public System.Windows.Forms.TextBox filenameTextbox;
         private System.Windows.Forms.Label filenameLabel;
         private System.Windows.Forms.TextBox playbackInterval;
         private System.Windows.Forms.Label app_version;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using iRSDKSharp;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Threading;
 
 namespace CrewChiefV4.iRacing
 {
@@ -68,7 +69,7 @@ namespace CrewChiefV4.iRacing
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if(sim == null)
             {
@@ -80,6 +81,7 @@ namespace CrewChiefV4.iRacing
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<iRacingStructDumpWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
@@ -210,7 +212,7 @@ namespace CrewChiefV4.iRacing
                         sim.SdkOnTelemetryUpdated(irData);
 
                         iRacingStructWrapper structWrapper = new iRacingStructWrapper();
-                        structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                        structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                         structWrapper.data = sim;
 
                         if (dumpToFile && dataToDump != null)

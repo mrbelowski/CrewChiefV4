@@ -49,6 +49,7 @@ namespace CrewChiefV4
         private Boolean newDriverNamesAvailable = false;
         private Boolean newPersonalisationsAvailable = false;
 
+        // Shared with worker thread.  This should be disposed after root threads stopped, in GlobalResources.Dispose.
         private ControllerConfiguration controllerConfiguration;
 
         private CrewChief crewChief;
@@ -88,10 +89,14 @@ namespace CrewChiefV4
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
 
+        // instance 
         public static MainWindow instance = null;
+        public static object instanceLock = new object();
 
         // True, while we are in a constructor.
         private bool constructingWindow = false;
+
+        public static bool autoScrollConsole = true;
 
         public void killChief()
         {
@@ -662,7 +667,11 @@ namespace CrewChiefV4
 
         public MainWindow()
         {
-            MainWindow.instance = this;
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = this;
+            }
+
             this.constructingWindow = true;
 
             InitializeComponent();
@@ -701,6 +710,8 @@ namespace CrewChiefV4
             }
 
             controllerConfiguration = new ControllerConfiguration(this);
+            GlobalResources.controllerConfiguration = controllerConfiguration;
+
             setSelectedGameType();
 
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -958,7 +969,11 @@ namespace CrewChiefV4
             if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
+                startApplicationButton.Enabled = false;
                 doStartAppStuff();
+
+                // Will wait for threads to start, possible file load and enable the button.
+                ThreadManager.DoWatchStartup(crewChief);
             }
 
             this.ResumeLayout();
@@ -1077,7 +1092,7 @@ namespace CrewChiefV4
 
         private void listenForButtons()
         {
-            DateTime lastButtoncheck = DateTime.Now;
+            DateTime lastButtoncheck = DateTime.UtcNow;
             if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
             {
                 Console.WriteLine("Running speech recognition in 'toggle button' mode");
@@ -1085,7 +1100,7 @@ namespace CrewChiefV4
             while (runListenForButtonPressesThread)
             {
                 Thread.Sleep(100);
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 controllerConfiguration.pollForButtonClicks(voiceOption == VoiceOptionEnum.TOGGLE);
                 int nextPollWait = 0;
                 if (now > lastButtoncheck.Add(buttonCheckInterval))
@@ -1298,8 +1313,15 @@ namespace CrewChiefV4
         {
             startApplicationButton.Enabled = false;
             doStartAppStuff();
-            Thread.Sleep(1000);
-            startApplicationButton.Enabled = true;
+
+            if (IsAppRunning)
+            {
+                ThreadManager.DoWatchStartup(crewChief);
+            }
+            else
+            {
+                ThreadManager.DoWatchStop(crewChief);
+            }
         }
 
         private void doStartAppStuff()
@@ -1307,6 +1329,8 @@ namespace CrewChiefV4
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
             {
+                Console.WriteLine("Pausing console scrolling");
+                MainWindow.autoScrollConsole = false;
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
                 {
@@ -1334,12 +1358,15 @@ namespace CrewChiefV4
                 this.recordSession.Enabled = false;
                 ThreadStart crewChiefWork = runApp;
                 Thread crewChiefThread = new Thread(crewChiefWork);
+                crewChiefThread.Name = "MainWindow.runApp";
+                ThreadManager.RegisterRootThread(crewChiefThread);
 
                 // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
                 // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
                 // the AutoUpdater triggers and steals focus while the player is racing
                 AutoUpdater.Stop();
 
+                crewChief.onRestart();
                 crewChiefThread.Start();
                 runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
                     && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
@@ -1348,6 +1375,10 @@ namespace CrewChiefV4
                     Console.WriteLine("Listening on default audio input device");
                     ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
                     Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
+
+                    channelOpenButtonListenerThread.Name = "MainWindow.listenForChannelOpen";
+                    ThreadManager.RegisterRootThread(channelOpenButtonListenerThread);
+
                     channelOpenButtonListenerThread.Start();
                 }
                 else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
@@ -1362,11 +1393,17 @@ namespace CrewChiefV4
                     Console.WriteLine("Listening for buttons");
                     ThreadStart buttonPressesListenerWork = listenForButtons;
                     Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
+
+                    buttonPressesListenerThread.Name = "MainWindow.listenForButtons";
+                    ThreadManager.RegisterRootThread(buttonPressesListenerThread);
+
                     buttonPressesListenerThread.Start();
                 }
             }
             else
             {
+                Console.WriteLine("Resuming console scrolling");
+                MainWindow.autoScrollConsole = true;
                 MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
@@ -1407,8 +1444,14 @@ namespace CrewChiefV4
         // called from the close callback on the main form
         private void stopApp(object sender, FormClosedEventArgs e)
         {
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = null;
+            }
+
             // SoundCache spawns a Thread to lazy-load the sound data. Cancel this:
             SoundCache.cancelLazyLoading = true;
+
             stopApp();
         }
 
@@ -1416,11 +1459,8 @@ namespace CrewChiefV4
         {
             String filenameToRun = null;
             Boolean record = false;
-            if (filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
+            if (!String.IsNullOrWhiteSpace(filenameTextbox.Text))
             {
-                // This will be reenabled once file is deserialized or on failure.
-                this.startApplicationButton.Enabled = false;
-
                 filenameToRun = filenameTextbox.Text;
                 if (this.playbackInterval.Text.Length > 0)
                 {
@@ -1446,12 +1486,6 @@ namespace CrewChiefV4
 
         private void stopApp()
         {
-            if (this.recordSession.Checked)
-            {
-                // This will be reenabled once dump to file succeeds or fails.
-                this.startApplicationButton.Enabled = false;
-            }
-
             runListenForChannelOpenThread = false;
             runListenForButtonPressesThread = false;
             crewChief.stop();
@@ -1969,7 +2003,7 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);                    
+                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                 }
             }
         }
@@ -2442,35 +2476,37 @@ namespace CrewChiefV4
 
     public class ControlWriter : TextWriter
     {
-        public TextBox textbox = null;
+        public RichTextBox textbox = null;
         public Boolean enable = true;
         public StringBuilder builder = new StringBuilder();
-        public ControlWriter(TextBox textbox)
+        public ControlWriter(RichTextBox textbox)
         {
             this.textbox = textbox;
+            this.textbox.WordWrap = false;
         }
 
         public override void WriteLine(string value)
         {
-            if (enable || MainWindow.instance.recordSession.Checked)
+            if (MainWindow.instance != null && (enable || MainWindow.instance.recordSession.Checked))
             {
                 Boolean gotDateStamp = false;
                 StringBuilder sb = new StringBuilder();
+                DateTime now = DateTime.Now;
                 if (CrewChief.loadDataFromFile)
                 {
                     if (CrewChief.currentGameState != null)
                     {
-                        if (CrewChief.currentGameState.CurrentTimeStr == null)
+                        if (CrewChief.currentGameState.CurrentTimeStr == null || CrewChief.currentGameState.CurrentTimeStr == "")
                         {
                             CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
                         }
-                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                        sb.Append(now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
                         gotDateStamp = true;
                     }
                 }
                 if (!gotDateStamp)
                 {
-                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
+                    sb.Append(now.ToString("HH:mm:ss.fff"));
                 }
                 sb.Append(" : ").Append(value).AppendLine();
                 if (enable)
@@ -2479,7 +2515,7 @@ namespace CrewChiefV4
                     {
                         try
                         {
-                            lock (this)
+                            lock (MainWindow.instanceLock)
                             {
                                 textbox.AppendText(sb.ToString());
                             }
@@ -2492,13 +2528,25 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    lock (this)
+                    lock (MainWindow.instanceLock)
                     {
                         builder.Append(sb.ToString());
                     }
                 }
             }
+            if (MainWindow.autoScrollConsole && textbox != null && !textbox.IsDisposed)
+            {
+                try
+                {
+                    textbox.ScrollToCaret();
+                }
+                catch (Exception)
+                {
+                    // ignore
+                }
+            }
         }
+        
 
         public override Encoding Encoding
         {

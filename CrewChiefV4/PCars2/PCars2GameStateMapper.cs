@@ -1375,7 +1375,7 @@ namespace CrewChiefV4.PCars2
             opponentData.CurrentSectorNumber = (int)participantStruct.mCurrentSector + 1;   // zero indexed
             opponentData.WorldPosition = new float[] { participantStruct.mWorldPosition[0], participantStruct.mWorldPosition[2] };
             opponentData.DistanceRoundTrack = participantStruct.mCurrentLapDistance;
-            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
             opponentData.CarClass = carClass;
             opponentData.IsActive = true;
             String nameToLog = opponentData.DriverRawName == null ? "unknown" : opponentData.DriverRawName;

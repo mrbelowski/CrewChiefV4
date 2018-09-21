@@ -1,5 +1,4 @@
-﻿using CrewChiefV4.GameState;
-/*
+﻿/*
  * The idea behind PlaybackModerator class is to allow us to adjust playback after all the high level logic is evaluated,
  * messages resolved, duplicates removed etc.  It is plugged into SingleSound play and couple of other low level places.
  * Currently, the only two things it does is injects fake beep-out/in between Spotter and Chief messages and decides which 
@@ -9,6 +8,7 @@
  * Official website: thecrewchief.org 
  * License: MIT
  */
+using CrewChiefV4.GameState;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -94,6 +94,12 @@ namespace CrewChiefV4.Audio
             {Verbosity.LOW, 10},
             {Verbosity.SILENT, 20}
         };
+
+        private static CrewChief crewChief = null;
+        public static void SetCrewChief(CrewChief cc)
+        {
+            PlaybackModerator.crewChief = cc;
+        }
 
         public static void ClearVerbosityData()
         {
@@ -251,6 +257,7 @@ namespace CrewChiefV4.Audio
 
             PlaybackModerator.audioPlayer = audioPlayer;
         }
+
         private static void Trace(string msg)
         {
             if (!PlaybackModerator.enableTracing)
@@ -276,6 +283,12 @@ namespace CrewChiefV4.Audio
 
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
+            if (PlaybackModerator.crewChief != null && !PlaybackModerator.crewChief.running)
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because main thread is shutting down", singleSound.fullPath));
+                return false;
+            }
+
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
             if (PlaybackModerator.lastBlockedMessageId == messageId)
             {

@@ -272,7 +272,7 @@ namespace CrewChiefV4.Events
                         messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                         messageContents.Add(MessageFragment.Text(folderMetres));
                         QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, this);
-                        firstPitCountdown.expiryTime = (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+                        firstPitCountdown.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
                         audioPlayer.playMessage(firstPitCountdown, 10);
 
                     }

@@ -30,6 +30,8 @@ namespace CrewChiefV4.commands
         Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
         public Boolean allowAutomaticTriggering;
+        private Thread executableCommandMacroThread = null;
+
         public ExecutableCommandMacro(AudioPlayer audioPlayer, Macro macro, Dictionary<String, KeyBinding[]> assignmentsByGame, Boolean allowAutomaticTriggering)
         {
             this.audioPlayer = audioPlayer;
@@ -106,7 +108,8 @@ namespace CrewChiefV4.commands
                     {
                         Strategy.playPitPositionEstimates = true;
                     }
-                    new Thread(() =>
+                    ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
+                    executableCommandMacroThread = new Thread(() =>
                     {
                         // only allow macros to excute one at a time
                         lock (ExecutableCommandMacro.mutex)
@@ -155,7 +158,10 @@ namespace CrewChiefV4.commands
                                 SetForegroundWindow(currentForgroundWindow);
                             }
                         }
-                    }).Start();
+                    });
+                    executableCommandMacroThread.Name = "CommandMacro.executableCommandMacroThread";
+                    ThreadManager.RegisterTemporaryThread(executableCommandMacroThread);
+                    executableCommandMacroThread.Start();
                     break;
                 }
             }            
