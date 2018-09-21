@@ -252,6 +252,7 @@ namespace CrewChiefV4
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
         private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
+        private Thread restartWaitTimeoutThreadReference = null;
 
         static SpeechRecogniser () 
         {
@@ -1186,7 +1187,8 @@ namespace CrewChiefV4
         private void restartWaitTimeoutThread(int timeout)
         {
             triggerTimeoutWaitHandle.Set();
-            new Thread(() =>
+            ThreadManager.UnregisterTemporaryThread(restartWaitTimeoutThreadReference);
+            restartWaitTimeoutThreadReference = new Thread(() =>
             {
                 triggerTimeoutWaitHandle.Reset();
                 Thread.CurrentThread.IsBackground = true;
@@ -1206,7 +1208,10 @@ namespace CrewChiefV4
                         switchFromRegularToTriggerRecogniser();
                     }
                 }
-            }).Start();
+            });
+            restartWaitTimeoutThreadReference.Name = "SpeachRecognizer.restartWaitTimeoutThreadReference";
+            ThreadManager.RegisterTemporaryThread(restartWaitTimeoutThreadReference);
+            restartWaitTimeoutThreadReference.Start();
         }
 
         void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -1445,6 +1450,8 @@ namespace CrewChiefV4
                     {
                         nAudioAlwaysOnkeepRecording = true;
                         Debug.Assert(nAudioAlwaysOnListenerThread == null, "nAudio AlwaysOn Listener Thread wasn't shut down correctly.");
+
+                        // This thread is synchronized in recongizeAsyncCancel
                         nAudioAlwaysOnListenerThread = new Thread(() =>
                         {
                             waveIn.StartRecording();
