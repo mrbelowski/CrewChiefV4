@@ -123,7 +123,7 @@ namespace CrewChiefV4.ACC
             {
                 return;
             }
-            /*if (currentGameState != null)
+            if (currentGameState != null)
             {
                 var carClass = currentGameState.carClass;
                 if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
@@ -132,7 +132,7 @@ namespace CrewChiefV4.ACC
                     this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
                     this.currentPlayerCarClassID = carClass.getClassIdentifier();
                 }
-            }*/
+            }
             float[] currentPlayerPosition = new float[] { currentPlayerData.location.x, currentPlayerData.location.y };
 
             List<float[]> currentOpponentPositions = new List<float[]>();
