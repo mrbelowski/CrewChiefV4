@@ -97,6 +97,8 @@ namespace CrewChiefV4
         private bool constructingWindow = false;
 
         public static bool autoScrollConsole = true;
+        private Thread youWotThread = null;
+        private Thread assignButtonThread = null;
 
         public void killChief()
         {
@@ -121,7 +123,7 @@ namespace CrewChiefV4
             if (!CrewChief.Debugging ||
                 SoundPackVersionsHelper.currentSoundPackVersion <= 0 || SoundPackVersionsHelper.currentPersonalisationsVersion <= 0 || SoundPackVersionsHelper.currentDriverNamesVersion <=0)
             {
-                new Thread(() =>
+                var checkForUpdatesThread = new Thread(() =>
                 {
                     Console.WriteLine("Checking for updates");
                     String firstUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL2 : autoUpdateXMLURL1;
@@ -323,7 +325,10 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("Unable to get update data");
                     }
-                }).Start();
+                });
+                checkForUpdatesThread.Name = "MainWindow.checkForUpdatesThread";
+                ThreadManager.RegisterResourceThread(checkForUpdatesThread);
+                checkForUpdatesThread.Start();
             }
             else
             {
@@ -1075,14 +1080,18 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Invoking speech recognition...");
                             crewChief.speechRecogniser.recognizeAsyncCancel();
-                            new Thread(() =>
+                            ThreadManager.UnregisterTemporaryThread(youWotThread);
+                            youWotThread = new Thread(() =>
                             {
                                 Thread.Sleep(2000);
                                 if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
                                 {
                                     crewChief.youWot(false);
                                 }
-                            }).Start();
+                            });
+                            youWotThread.Name = "MainWindow.youWotThread";
+                            ThreadManager.RegisterTemporaryThread(youWotThread);
+                            youWotThread.Start();
                         }
                         channelOpen = false;
                     }
@@ -1549,7 +1558,11 @@ namespace CrewChiefV4
                     isAssigningButton = true;
                     this.assignButtonToAction.Text = Configuration.getUIString("waiting_for_button_click_to_cancel");
                     ThreadStart assignButtonWork = assignButton;
-                    Thread assignButtonThread = new Thread(assignButtonWork);
+                    // TODO_THREADS: This might be controller thread, review
+                    ThreadManager.UnregisterTemporaryThread(assignButtonThread);
+                    assignButtonThread = new Thread(assignButtonWork);
+                    assignButtonThread.Name = "MainWindow.assignButtonThread";
+                    ThreadManager.RegisterTemporaryThread(assignButtonThread);
                     assignButtonThread.Start();
                 }
             }
@@ -2046,7 +2059,7 @@ namespace CrewChiefV4
             {
                 String extractingButtonText = Configuration.getUIString("extracting_sound_pack");
                 downloadSoundPackButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractSoundPackThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2058,7 +2071,7 @@ namespace CrewChiefV4
                             Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", true);
                         }
                         progressThread = createProgressThread(downloadSoundPackButton, extractingButtonText);
-                        progressThread.Start(); 
+                        progressThread.Start();
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp");
                         // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
                         // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
@@ -2096,7 +2109,10 @@ namespace CrewChiefV4
                     {
                         soundPackUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractSoundPackThread.Name = "MainWindow.extractSoundPackThread";
+                ThreadManager.RegisterResourceThread(extractSoundPackThread);
+                extractSoundPackThread.Start();
             }
             else
             {
@@ -2110,7 +2126,7 @@ namespace CrewChiefV4
             {
                 String extractingButtonText = Configuration.getUIString("extracting_driver_names");
                 downloadDriverNamesButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractDriverNamesThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2156,7 +2172,10 @@ namespace CrewChiefV4
                     {
                         driverNamesUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractDriverNamesThread.Name = "MainWindow.extractDriverNamesThread";
+                ThreadManager.RegisterResourceThread(extractDriverNamesThread);
+                extractDriverNamesThread.Start();
             }
             else
             {
@@ -2170,7 +2189,7 @@ namespace CrewChiefV4
             {
                 String extractingButtonText = Configuration.getUIString("extracting_personalisations");
                 downloadPersonalisationsButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractPersonalizationsThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2223,7 +2242,10 @@ namespace CrewChiefV4
                     {
                         personalisationsUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractPersonalizationsThread.Name = "MainWindow.extractPersonalizationsThread";
+                ThreadManager.RegisterResourceThread(extractPersonalizationsThread);
+                extractPersonalizationsThread.Start();
             }
             else
             {
@@ -2234,6 +2256,7 @@ namespace CrewChiefV4
         // 'ticks' the button so the user knows something's happening
         private Thread createProgressThread(Button button, String text)
         {
+            // This thread is managed by sound file extractor threads.
             return new Thread(() =>
             {
                 Boolean cancelled = false;
@@ -2241,14 +2264,41 @@ namespace CrewChiefV4
                 {
                     while (!cancelled)
                     {
-                        button.Text = text + ".";
-                        Thread.Sleep(300);
-                        button.Text = text + "..";
-                        Thread.Sleep(300);
-                        button.Text = text + "...";
-                        Thread.Sleep(300);
-                        button.Text = text;
-                        Thread.Sleep(300);
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + ".";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + "..";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + "...";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text;
+                                Thread.Sleep(300);
+                            }
+                        }
                     }
                 }
                 catch (ThreadAbortException)
@@ -2511,18 +2561,21 @@ namespace CrewChiefV4
                 sb.Append(" : ").Append(value).AppendLine();
                 if (enable)
                 {
-                    if (textbox != null && !textbox.IsDisposed)
+                    lock (MainWindow.instanceLock)
                     {
-                        try
+                        if (MainWindow.instance != null)
                         {
-                            lock (MainWindow.instanceLock)
+                            if (textbox != null && !textbox.IsDisposed)
                             {
-                                textbox.AppendText(sb.ToString());
+                                try
+                                {
+                                    textbox.AppendText(sb.ToString());
+                                }
+                                catch (Exception)
+                                {
+                                    // swallow - nothing to log it to
+                                }
                             }
-                        }
-                        catch (Exception)
-                        {
-                            // swallow - nothing to log it to
                         }
                     }
                 }

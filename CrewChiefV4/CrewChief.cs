@@ -618,7 +618,10 @@ namespace CrewChiefV4
                 currentSpotterState = null;
                 spotterIsRunning = true;
                 ThreadStart work = spotterWork;
+
+                // Thread owned and managed by CrewChief.Run thread.
                 spotterThread = new Thread(work);
+
                 runSpotterThread = true;
                 spotterThread.Start();
             }

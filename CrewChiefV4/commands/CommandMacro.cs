@@ -111,6 +111,7 @@ namespace CrewChiefV4.commands
                     ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
                     executableCommandMacroThread = new Thread(() =>
                     {
+                        // TODO_THREADS: this needs to be capable of early exit, for sure.
                         // only allow macros to excute one at a time
                         lock (ExecutableCommandMacro.mutex)
                         {
@@ -124,7 +125,7 @@ namespace CrewChiefV4.commands
                                     break;
                                 }
                                 if (actionItem.pauseMillis > 0)
-                                {                                   
+                                {
                                     Thread.Sleep(actionItem.pauseMillis);
                                 }
                                 else

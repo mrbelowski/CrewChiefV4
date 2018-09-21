@@ -52,6 +52,8 @@ namespace CrewChiefV4
         // TODO_THREADS: implement temporary thread registration/wait.
         private static HashSet<Thread> temporaryThreads = new HashSet<Thread>();
 
+        private static List<Thread> resourceThreads = new List<Thread>();
+
         public static void RegisterRootThread(Thread t)
         {
             lock (MainWindow.instanceLock)
@@ -89,6 +91,14 @@ namespace CrewChiefV4
             }
         }
 
+        public static void RegisterResourceThread(Thread t)
+        {
+            lock (ThreadManager.resourceThreads)
+            {
+                ThreadManager.resourceThreads.Add(t);
+            }
+        }
+
         public static void UnregisterTemporaryThread(Thread t)
         {
             if (t == null)
@@ -97,7 +107,14 @@ namespace CrewChiefV4
             lock (ThreadManager.temporaryThreads)
             {
                 if (ThreadManager.temporaryThreads.Contains(t))
+                {
+                    Debug.Assert(!t.IsAlive, "Temporary thread is still alive upon unregistering, we might need investigate here");
+
+                    if (t.IsAlive)
+                        ThreadManager.Trace("Temporary thread is still alive upon unregistering, we might need investigate here.  Name - " + t.Name);
+
                     ThreadManager.temporaryThreads.Remove(t);
+                }
                 else
                     Debug.Assert(false, "Temporary thread is not registered, this should not happen.");
             }
@@ -331,7 +348,7 @@ namespace CrewChiefV4
                 return true;
 
             // Possibly, print to debug log?
-            ThreadManager.Trace("Wating for temporary threads to stop...");
+            ThreadManager.Trace("Waiting for temporary threads to stop...");
             for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
             {
                 var allThreadsStopped = true;
@@ -341,7 +358,7 @@ namespace CrewChiefV4
                     {
                         if (t.IsAlive)
                         {
-                            ThreadManager.Trace("TemporaryThread still alive - " + t.Name);
+                            ThreadManager.Trace("Temporary Thread still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
                         }
@@ -366,6 +383,47 @@ namespace CrewChiefV4
             return false;
         }
 
+        public static bool WaitForResourceThreadsShutdown()
+        {
+            if (ThreadManager.resourceThreads.Count == 0)
+                return true;
+
+            // Possibly, print to debug log?
+            ThreadManager.Trace("Waiting for temporary threads to stop...");
+            for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
+            {
+                var allThreadsStopped = true;
+                lock (ThreadManager.resourceThreads)
+                {
+                    foreach (var t in ThreadManager.resourceThreads)
+                    {
+                        if (t.IsAlive)
+                        {
+                            ThreadManager.Trace("Resource Thread still alive - " + t.Name);
+                            allThreadsStopped = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (allThreadsStopped)
+                {
+                    ThreadManager.Trace("Resource threads stopped");
+                    return true;
+                }
+
+                Thread.Sleep(ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS);
+            }
+
+
+            ThreadManager.Trace("Wait for Resource threads stop failed, thread states:");
+            ThreadManager.TraceResourceThreadStats();
+
+            Debug.Assert(false, "Wait for Resource threads stop failed, please investigate.");
+
+            return false;
+        }
+
         private static void TraceRootThreadStats()
         {
             // If we run into bad problems, we might also need to get stack trace out.
@@ -383,6 +441,16 @@ namespace CrewChiefV4
             {
                 foreach (var t in ThreadManager.temporaryThreads)
                     ThreadManager.Trace(string.Format("Temorary thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
+            }
+        }
+
+        private static void TraceResourceThreadStats()
+        {
+            // If we run into bad problems, we might also need to get stack trace out.
+            lock (ThreadManager.resourceThreads)
+            {
+                foreach (var t in ThreadManager.resourceThreads)
+                    ThreadManager.Trace(string.Format("Resource thread Name: {0}  ThreadState: {1}  IsAlive: {2}", t.Name, t.ThreadState, t.IsAlive));
             }
         }
 

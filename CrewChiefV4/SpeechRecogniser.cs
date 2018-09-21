@@ -1451,7 +1451,7 @@ namespace CrewChiefV4
                         nAudioAlwaysOnkeepRecording = true;
                         Debug.Assert(nAudioAlwaysOnListenerThread == null, "nAudio AlwaysOn Listener Thread wasn't shut down correctly.");
 
-                        // This thread is synchronized in recongizeAsyncCancel
+                        // This thread is manually synchronized in recongizeAsyncCancel
                         nAudioAlwaysOnListenerThread = new Thread(() =>
                         {
                             waveIn.StartRecording();
