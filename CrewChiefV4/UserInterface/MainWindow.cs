@@ -1329,6 +1329,7 @@ namespace CrewChiefV4
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
             {
+                Console.WriteLine("Pausing console scrolling");
                 MainWindow.autoScrollConsole = false;
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
@@ -1401,6 +1402,7 @@ namespace CrewChiefV4
             }
             else
             {
+                Console.WriteLine("Resuming console scrolling");
                 MainWindow.autoScrollConsole = true;
                 MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
