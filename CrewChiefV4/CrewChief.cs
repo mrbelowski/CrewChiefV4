@@ -727,7 +727,7 @@ namespace CrewChiefV4
                     return false;
                 }
                 // mute the audio player for anything < 10ms
-                audioPlayer.mute = CrewChief.playbackIntervalMilliseconds < 10;
+                audioPlayer.mute = loadDataFromFile && CrewChief.playbackIntervalMilliseconds < 10;
                 audioPlayer.startMonitor();
                 Boolean attemptedToRunGame = false;
 
