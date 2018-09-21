@@ -2537,14 +2537,11 @@ namespace CrewChiefV4
                     }
                 }
             }
-            if (textbox != null && !textbox.IsDisposed)
+            if (MainWindow.autoScrollConsole && textbox != null && !textbox.IsDisposed)
             {
                 try
                 {
-                    if (MainWindow.autoScrollConsole)
-                    {
-                        textbox.ScrollToCaret();
-                    }
+                    textbox.ScrollToCaret();
                 }
                 catch (Exception)
                 {
