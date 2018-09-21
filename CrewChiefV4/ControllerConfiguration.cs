@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace CrewChiefV4
 {
-    class ControllerConfiguration : IDisposable
+    public class ControllerConfiguration : IDisposable
     {
         private static Guid UDP_NETWORK_CONTROLLER_GUID = new Guid("2bbfed03-a04f-4408-91cf-e0aa6b20b8ff");
 
@@ -54,6 +54,7 @@ namespace CrewChiefV4
         
         // yuk...
         public Dictionary<String, int> buttonAssignmentIndexes = new Dictionary<String, int>();
+        private Thread asyncDisposeThread = null;
 
         public void Dispose()
         {
@@ -717,21 +718,25 @@ namespace CrewChiefV4
 
         private void asyncDispose(DeviceType deviceType, Joystick joystick)
         {
-            new Thread(() =>
-            {                
-                DateTime now = DateTime.Now;
+            ThreadManager.UnregisterTemporaryThread(asyncDisposeThread);
+            asyncDisposeThread = new Thread(() =>
+            {
+                DateTime now = DateTime.UtcNow;
                 Thread.CurrentThread.IsBackground = true;
                 String name = joystick.Information.InstanceName;
                 try
                 {                    
                     joystick.Dispose();
-                    //Console.WriteLine("Disposed of temporary " + deviceType + " object " + name + " after " + (DateTime.Now - now).TotalSeconds + " seconds");
+                    //Console.WriteLine("Disposed of temporary " + deviceType + " object " + name + " after " + (DateTime.UtcNow - now).TotalSeconds + " seconds");
                 }
                 catch (Exception e) { 
                     //log and swallow 
-                    Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.Now - now).TotalSeconds + " seconds: " + e.Message);
+                    Console.WriteLine("Failed to dispose of temporary " + deviceType + " object " + name + "after " + (DateTime.UtcNow - now).TotalSeconds + " seconds: " + e.Message);
                 }
-            }).Start();
+            });
+            asyncDisposeThread.Name = "ControllerConfiguration.asyncDisposeThread";
+            ThreadManager.RegisterTemporaryThread(asyncDisposeThread);
+            asyncDisposeThread.Start();
         }
 
         public class ControllerData

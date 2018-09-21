@@ -321,7 +321,7 @@ namespace CrewChiefV4.rFactor2
             this.dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if (this.dataReadFromFile == null || filename != this.lastReadFileName)
             {
@@ -331,6 +331,7 @@ namespace CrewChiefV4.rFactor2
                 dataReadFromFile = DeSerializeObject<RF2StructWrapper[]>(filePathResolved);
 
                 this.lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > this.dataReadFromFileIndex)
             {
@@ -422,7 +423,7 @@ namespace CrewChiefV4.rFactor2
                         telemetry = this.telemetry,
                         rules = this.rules,
                         scoring = this.scoring,
-                        ticksWhenRead = DateTime.Now.Ticks
+                        ticksWhenRead = DateTime.UtcNow.Ticks
                     };
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)

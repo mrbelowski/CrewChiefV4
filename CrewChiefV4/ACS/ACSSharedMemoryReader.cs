@@ -7,6 +7,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -66,7 +67,7 @@ namespace CrewChiefV4.assetto
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
 
             if (dataReadFromFile == null || filename != lastReadFileName)
@@ -75,6 +76,7 @@ namespace CrewChiefV4.assetto
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<ACSStructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
@@ -182,7 +184,7 @@ namespace CrewChiefV4.assetto
                     }
 
                     ACSStructWrapper structWrapper = new ACSStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = acsShared;
 
                     if (!forSpotter && dumpToFile && dataToDump != null)

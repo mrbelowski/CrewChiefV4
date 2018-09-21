@@ -71,10 +71,6 @@ namespace CrewChiefV4.RaceRoom
         // a configurable 'max above baseline' for each. Assuming the base line temps are sensible (say, 85 for water 105 for oil), 
         // then anthing over 95 for water and 120 for oil is 'bad' - the numbers in the config reflect this
 
-        // record the average temperature between minutes 3 and 5 of driving
-        private int baselineEngineDataSamplesStart = (int)(3d * 60d / CrewChief._timeInterval.TotalSeconds);
-        private int baselineEngineDataSamplesEnd = (int)(5d * 60d / CrewChief._timeInterval.TotalSeconds);
-
         private float targetEngineWaterTemp = 88;
         private float targetEngineOilTemp = 105;
         private float baselineEngineDataOilTemp = 88;
@@ -1149,38 +1145,6 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.EngineData.MaxEngineRpm = shared.MaxEngineRps * (60 / (2 * (Single)Math.PI));
             currentGameState.EngineData.MinutesIntoSessionBeforeMonitoring = 5;
             
-            // all this 'baseline' engine temp logic was only ever a hack and is now disabled
-            /*
-            if (!gotBaselineEngineData)
-            {
-                currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp;
-                currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp;
-                if (isCarRunning)
-                {
-                    baselineEngineDataSamples++;
-                    if (baselineEngineDataSamples > baselineEngineDataSamplesStart)
-                    {
-                        if (baselineEngineDataSamples < baselineEngineDataSamplesEnd)
-                        {
-                            baselineEngineDataWaterTemp += shared.EngineWaterTemp;
-                            baselineEngineDataOilTemp += shared.EngineOilTemp;
-                        }
-                        else
-                        {
-                            gotBaselineEngineData = true;
-                            baselineEngineDataOilTemp = baselineEngineDataOilTemp / (baselineEngineDataSamples - baselineEngineDataSamplesStart);
-                            baselineEngineDataWaterTemp = baselineEngineDataWaterTemp / (baselineEngineDataSamples - baselineEngineDataSamplesStart);
-                            Console.WriteLine("Got baseline engine temps, water = " + baselineEngineDataWaterTemp + ", oil = " + baselineEngineDataOilTemp);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp * targetEngineOilTemp / baselineEngineDataOilTemp;
-                currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp * targetEngineWaterTemp / baselineEngineDataWaterTemp;
-            }
-            */
             currentGameState.EngineData.EngineOilTemp = shared.EngineOilTemp;
             currentGameState.EngineData.EngineWaterTemp = shared.EngineWaterTemp;
 
@@ -1785,7 +1749,7 @@ namespace CrewChiefV4.RaceRoom
             opponentData.CurrentSectorNumber = participantStruct.TrackSector;
             opponentData.WorldPosition = new float[] { participantStruct.Position.X, participantStruct.Position.Z };
             opponentData.DistanceRoundTrack = participantStruct.LapDistance;
-            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.Now);
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
             opponentData.CarClass = CarData.getCarClassForRaceRoomId(participantStruct.DriverInfo.ClassId);
             opponentData.CurrentTyres = mapToTyreType(participantStruct.TireTypeFront, participantStruct.TireSubTypeFront,
                 participantStruct.TireTypeRear, participantStruct.TireSubTypeRear, playerCarClass);

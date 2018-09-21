@@ -160,6 +160,7 @@
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
+    <Compile Include="GlobalResources.cs" />
     <Compile Include="iRacing\Bitfields\CameraState.cs" />
     <Compile Include="iRacing\Bitfields\EngineWarning.cs" />
     <Compile Include="iRacing\Bitfields\PitServiceFlag.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="NumberReaderIt2.cs" />
+    <Compile Include="ThreadManager.cs" />
     <Compile Include="UserInterface\PropertyFilter.cs" />
     <Compile Include="UserInterface\ListPropertyControl.cs">
       <SubType>UserControl</SubType>

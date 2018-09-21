@@ -259,7 +259,7 @@ namespace CrewChiefV4.rFactor2
                         Console.WriteLine("Abrupt Session End: start to wait for session end.");
 
                         // Start waiting for session end.
-                        this.ticksWhenSessionEnded = DateTime.Now.Ticks;
+                        this.ticksWhenSessionEnded = DateTime.UtcNow.Ticks;
                         this.waitingToTerminateSession = true;
                         this.sessionWaitMessageCounter = 0;
 
@@ -268,7 +268,7 @@ namespace CrewChiefV4.rFactor2
 
                     if (!sessionStarted)
                     {
-                        var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.Now.Ticks - this.ticksWhenSessionEnded);
+                        var timeSinceWaitStarted = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - this.ticksWhenSessionEnded);
                         if (timeSinceWaitStarted.TotalMilliseconds < RF2GameStateMapper.waitForSessionEndMillis)
                         {
                             if (this.sessionWaitMessageCounter % 10 == 0)
@@ -635,6 +635,7 @@ namespace CrewChiefV4.rFactor2
 
                 cgs.hardPartsOnTrackData = pgs.hardPartsOnTrackData;
 
+                csd.formattedPlayerLapTimes = psd.formattedPlayerLapTimes;
                 cgs.TimingData = pgs.TimingData;
             }
 
@@ -894,12 +895,6 @@ namespace CrewChiefV4.rFactor2
                     default:
                         break;
                 }
-            }
-
-            if (pgs != null)
-            {
-                foreach (var lt in psd.formattedPlayerLapTimes)
-                    csd.formattedPlayerLapTimes.Add(lt);
             }
 
             csd.LeaderHasFinishedRace = leaderScoring.mFinishStatus == (int)rFactor2Constants.rF2FinishStatus.Finished;
@@ -1383,7 +1378,7 @@ namespace CrewChiefV4.rFactor2
                 }
                 else
                 {
-                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
+                    opponent.DeltaTime = new DeltaTime(csd.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.UtcNow);
                 }
                 opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, cgs.Now);
 
