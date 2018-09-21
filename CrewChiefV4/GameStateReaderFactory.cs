@@ -11,7 +11,7 @@ using CrewChiefV4.rFactor2;
 using CrewChiefV4.iRacing;
 using CrewChiefV4.PCars2;
 using CrewChiefV4.F1_2018;
-
+using CrewChiefV4.ACC;
 namespace CrewChiefV4
 {
     class GameStateReaderFactory
@@ -28,6 +28,7 @@ namespace CrewChiefV4
         private ACSSharedMemoryReader ascSharedMemoryReader;
         private iRacingSharedMemoryReader iracingSharedMemoryReader;
         private F12018UDPreader f12018UDPReader;
+        private ACCSharedMemoryReader accSharedMemoryReader;
 
         private PCarsGameStateMapper pcarsGameStateMapper;
         private PCars2GameStateMapper pcars2GameStateMapper;
@@ -37,6 +38,7 @@ namespace CrewChiefV4
         private ACSGameStateMapper ascGameStateMapper;
         private iRacingGameStateMapper iracingGameStateMapper;
         private F12018GameStateMapper f12018GameStateMapper;
+        private ACCGameStateMapper accGameStateMapper;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -111,6 +113,12 @@ namespace CrewChiefV4
                             f12018UDPReader = new F12018UDPreader();
                         }
                         return f12018UDPReader;
+                    case GameEnum.ACC:
+                        if (accSharedMemoryReader == null)
+                        {
+                            accSharedMemoryReader = new ACCSharedMemoryReader();
+                        }
+                        return accSharedMemoryReader;
                 }
             }
             return null;
@@ -174,6 +182,12 @@ namespace CrewChiefV4
                             f12018GameStateMapper = new F12018GameStateMapper();
                         }
                         return f12018GameStateMapper;
+                    case GameEnum.ACC:
+                        if (accGameStateMapper == null)
+                        {
+                            accGameStateMapper = new ACCGameStateMapper();
+                        }
+                        return accGameStateMapper;
                         
                 }
             }

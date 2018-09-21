@@ -13,6 +13,7 @@ using CrewChiefV4.PCars;
 using CrewChiefV4.RaceRoom.RaceRoomData;
 using CrewChiefV4.Audio;
 using CrewChiefV4.NumberProcessing;
+using CrewChiefV4.ACC;
 
 
 namespace CrewChiefV4
@@ -682,7 +683,7 @@ namespace CrewChiefV4
             if (filenameToRun != null)
             {
                 loadDataFromFile = true;
-                GlobalBehaviourSettings.spotterEnabled = gameDefinition.gameEnum == GameEnum.F1_2018;
+                GlobalBehaviourSettings.spotterEnabled = gameDefinition.gameEnum == GameEnum.F1_2018 || gameDefinition.gameEnum == GameEnum.ACC;
                 dumpToFile = false;
             }
             else
@@ -967,8 +968,8 @@ namespace CrewChiefV4
                                     }
                                 }
                             }
-                            else if (previousGameState != null && 
-                                        (gameDefinition.gameEnum == GameEnum.F1_2018 ||
+                            else if (previousGameState != null &&
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 || gameDefinition.gameEnum == GameEnum.ACC ||
                                         (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                                             currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
@@ -1022,8 +1023,8 @@ namespace CrewChiefV4
                                         DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
                                             currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                     }
-                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning && 
-                                        (gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
+                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning &&
+                                        (gameDefinition.gameEnum == GameEnum.ACC || gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
                                     {
                                         Console.WriteLine("********** starting spotter***********");
                                         spotter.clearState();
