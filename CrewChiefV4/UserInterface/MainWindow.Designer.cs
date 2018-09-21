@@ -30,7 +30,7 @@ namespace CrewChiefV4
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            this.consoleTextBox = new System.Windows.Forms.TextBox();
+            this.consoleTextBox = new System.Windows.Forms.RichTextBox();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.saveConsoleOutputButton = new System.Windows.Forms.Button();
@@ -98,9 +98,9 @@ namespace CrewChiefV4
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "textBox1";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
             this.consoleTextBox.TabIndex = 200;
+
             // 
             // startApplicationButton
             // 
@@ -682,7 +682,7 @@ namespace CrewChiefV4
 
         #endregion
 
-        public System.Windows.Forms.TextBox consoleTextBox;
+        public System.Windows.Forms.RichTextBox consoleTextBox;
         public System.Windows.Forms.Button startApplicationButton;
         public System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.Button forceVersionCheckButton;
