@@ -34,6 +34,7 @@ namespace CrewChiefV4.ACC
 		    Hotlap = 11,
 		    Hotstint = 12,
 		    HotlapSuperpole = 13,
+            RaceSessionType_Max = 14,
 	    };
 	    public enum  RaceSessionPhase  : byte
 	    {
@@ -45,6 +46,7 @@ namespace CrewChiefV4.ACC
 		    SessionOverTime = 5,
 		    PostSessionTime = 6,
 		    ResultUI = 7,
+            RaceSessionPhase_Max = 8, 
 	    };
 	    public enum  DriverCategory  : byte
 	    {
@@ -175,7 +177,7 @@ namespace CrewChiefV4.ACC
 		    GearBox = 0x7,
 	    };
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Vec3
         {
@@ -184,7 +186,7 @@ namespace CrewChiefV4.ACC
             public float z;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Rotation
         {
@@ -193,7 +195,7 @@ namespace CrewChiefV4.ACC
             public float roll;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Track
         {
@@ -203,7 +205,7 @@ namespace CrewChiefV4.ACC
             public int corners;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Driver
         {
@@ -221,35 +223,35 @@ namespace CrewChiefV4.ACC
 	
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct SessionData
         {
-            public float sessionStartTime;
-            public float sessionEndTime;
-            public UInt16 currentEventIndex;
-            public UInt16 currentSessionIndex;
             public RaceSessionType currentSessionType;
             public RaceSessionPhase currentSessionPhase;
-            public bool isEventInitializated;
-            public bool isSessionInitializated;
-            public double physicsTime;
-		    public double sessionStartTimeStamp;
-		    public double receivedServerTime;
-		    public double serverTimeOffset;
+            public float physicsTime;
+            public float sessionStartTime;
+            public float sessionEndTime;            
+            public float sessionStartTimeStamp;
+            public float receivedServerTime;
+            public float serverTimeOffset;
             public bool isServer;
             public bool isClient;
             public bool areCarsInitializated;
             public bool isTimeStopped;
-        }
+            public bool isEventInitializated;
+            public bool isSessionInitializated;
+            public int currentEventIndex;
+            public int currentSessionIndex;
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
+
+        }
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct  ACCSharedMemoryData
         {
             public bool isReady;
-            public double update;
-            
+            public double update;            
             public Track track;
             public Driver playerDriver;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
