@@ -22,7 +22,7 @@ namespace CrewChiefV4
 
         public abstract void DumpRawGameData();
 
-        public abstract Object ReadGameDataFromFile(String filename);
+        public abstract Object ReadGameDataFromFile(String filename, int pauseBeforeStart);
 
         public abstract void ResetGameDataFromFile();
 
