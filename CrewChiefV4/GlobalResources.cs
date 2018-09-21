@@ -77,6 +77,7 @@ namespace CrewChiefV4
                 GlobalResources.speechRecogniserReference.recognizeAsyncCancel();
                 GlobalResources.speechRecogniserReference.stopTriggerRecogniser();
 
+                // TODO: do we need to wait a few millis here? The cancel call is async, the SRE will may be finishing its work when .Dispose is called
                 GlobalResources.speechRecogniserReference.Dispose();
                 GlobalResources.speechRecogniserReference = null;
             }

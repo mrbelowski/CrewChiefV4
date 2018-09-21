@@ -42,9 +42,9 @@ namespace CrewChiefV4
                 
         public static Boolean enableDriverNames = UserSettings.GetUserSettings().getBoolean("enable_driver_names");
 
-        public static TimeSpan _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
+        private static int timeInterval = UserSettings.GetUserSettings().getInt("update_interval");
 
-        public static TimeSpan spotterInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("spotter_update_interval"));
+        private static int spotterInterval = UserSettings.GetUserSettings().getInt("spotter_update_interval");
 
         private Boolean displaySessionLapTimes = UserSettings.GetUserSettings().getBoolean("display_session_lap_times");
 
@@ -647,16 +647,12 @@ namespace CrewChiefV4
 
         private void spotterWork()
         {
-            int threadSleepTime = ((int) spotterInterval.Milliseconds / 10) + 1;
-            DateTime nextRunTime = DateTime.UtcNow;
-            Console.WriteLine("Invoking spotter every " + spotterInterval.Milliseconds + "ms, pausing " + threadSleepTime + "ms between invocations");
-
+            Console.WriteLine("Invoking spotter every " + spotterInterval);
             try
             {
                 while (runSpotterThread)
                 {
-                    DateTime now = DateTime.UtcNow;
-                    if (now > nextRunTime && spotter != null && gameDataReader.hasNewSpotterData())
+                    if (spotter != null && gameDataReader.hasNewSpotterData())
                     {
                         currentSpotterState = gameDataReader.ReadGameData(true);
                         if (lastSpotterState != null && currentSpotterState != null)
@@ -671,9 +667,8 @@ namespace CrewChiefV4
                             }
                         }
                         lastSpotterState = currentSpotterState;
-                        nextRunTime = DateTime.UtcNow.Add(spotterInterval);
                     }
-                    Thread.Sleep(threadSleepTime);
+                    Thread.Sleep(spotterInterval + Utilities.random.Next(5) - 2);
                 }
             }
             catch (Exception)  // Exceptions can happen on Stop and DisconnectFromProcess.
@@ -705,8 +700,6 @@ namespace CrewChiefV4
                 else
                 {
                     dataFileReadDone = true;  // Don't block UI as we won't be loading from the file.
-                                              // ensure the playback interval is re-initialised, in case we've been mucking about with it in the previous run.
-                    _timeInterval = TimeSpan.FromMilliseconds(UserSettings.GetUserSettings().getInt("update_interval"));
                 }
                 SpeechRecogniser.waitingForSpeech = false;
                 SpeechRecogniser.gotRecognitionResult = false;
@@ -728,348 +721,337 @@ namespace CrewChiefV4
                     spotter = null;
                 }
                 running = true;
-                DateTime nextRunTime = DateTime.UtcNow;
                 if (!audioPlayer.initialised)
                 {
                     Console.WriteLine("Failed to initialise audio player");
                     return false;
                 }
+                // mute the audio player for anything < 10ms
+                audioPlayer.mute = CrewChief.playbackIntervalMilliseconds < 10;
                 audioPlayer.startMonitor();
                 Boolean attemptedToRunGame = false;
 
-                Console.WriteLine("Polling for shared data every " + _timeInterval.Milliseconds + "ms");
+                Console.WriteLine("Polling for shared data every " + timeInterval + "ms");
                 Boolean sessionFinished = false;
                 while (running)
                 {
                     DateTime now = DateTime.UtcNow;
                     //GameStateData.CurrentTime = now;
-                    if (now > nextRunTime)
+                   
+                    alarmClock.trigger(null, null);
+
+                    if (!loadDataFromFile)
                     {
-                        // ensure the updates don't get synchronised with the spotter / UDP receiver
-                        int updateTweak = Utilities.random.Next(10) - 5;
-                        if (filenameToRun != null)
+                        // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
+                        if (now > nextProcessStateCheck)
                         {
-                            if (CrewChief.playbackIntervalMilliseconds > 0)
-                            {
-                                _timeInterval = TimeSpan.FromMilliseconds(CrewChief.playbackIntervalMilliseconds);
-                                audioPlayer.mute = false;
-                            }
-                            else
-                            {
-                                _timeInterval = TimeSpan.Zero;
-                                audioPlayer.mute = true;
-                            }
+                            nextProcessStateCheck = now.Add(
+                                TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
+                            isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
                         }
-                        nextRunTime = DateTime.UtcNow.Add(_timeInterval);
-                        nextRunTime.Add(TimeSpan.FromMilliseconds(updateTweak));
 
-                        alarmClock.trigger(null, null);
-
-                        if (!loadDataFromFile)
+                        if (mapped
+                            && !isGameProcessRunning
+                            && gameDefinition.HasAnyProcessNameAssociated())
                         {
-                            // Turns our checking for running process by name is an expensive system call.  So don't do that on every tick.
-                            if (now > nextProcessStateCheck)
-                            {
-                                nextProcessStateCheck = now.Add(
-                                    TimeSpan.FromMilliseconds(isGameProcessRunning ? timeBetweenProcDisconnectCheckMillis : timeBetweenProcConnectCheckMillis));
-                                isGameProcessRunning = Utilities.IsGameRunning(gameDefinition.processName, gameDefinition.alternativeProcessNames);
-                            }
+                            gameDataReader.DisconnectFromProcess();
+                            mapped = false;
+                        }
 
-                            if (mapped
-                                && !isGameProcessRunning
-                                && gameDefinition.HasAnyProcessNameAssociated())
+                        if (!gameDefinition.HasAnyProcessNameAssociated()  // Network data case.
+                            || isGameProcessRunning)
+                        {
+                            if (!mapped)
                             {
-                                gameDataReader.DisconnectFromProcess();
-                                mapped = false;
-                            }
+                                mapped = gameDataReader.Initialise();
 
-                            if (!gameDefinition.HasAnyProcessNameAssociated()  // Network data case.
-                                || isGameProcessRunning)
-                            {
+                                // Instead of stressing process to death on failed mapping,
+                                // give a it a break.
                                 if (!mapped)
-                                {
-                                    mapped = gameDataReader.Initialise();
-
-                                    // Instead of stressing process to death on failed mapping,
-                                    // give a it a break.
-                                    if (!mapped)
-                                        Thread.Sleep(1000);
-                                }
-                            }
-                            else if (UserSettings.GetUserSettings().getBoolean(gameDefinition.gameStartEnabledProperty) && !attemptedToRunGame)
-                            {
-                                Utilities.runGame(UserSettings.GetUserSettings().getString(gameDefinition.gameStartCommandProperty),
-                                    UserSettings.GetUserSettings().getString(gameDefinition.gameStartCommandOptionsProperty));
-                                attemptedToRunGame = true;
+                                    Thread.Sleep(1000);
                             }
                         }
-
-                        if (loadDataFromFile || mapped)
+                        else if (UserSettings.GetUserSettings().getBoolean(gameDefinition.gameStartEnabledProperty) && !attemptedToRunGame)
                         {
-                            stateCleared = false;
+                            Utilities.runGame(UserSettings.GetUserSettings().getString(gameDefinition.gameStartCommandProperty),
+                                UserSettings.GetUserSettings().getString(gameDefinition.gameStartCommandOptionsProperty));
+                            attemptedToRunGame = true;
+                        }
+                    }
 
-                            if (loadDataFromFile)
-                            {
-                                try
-                                {
-                                    latestRawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun);
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("Error reading game data: " + e.StackTrace);
-                                }
-                                finally
-                                {
-                                    dataFileReadDone = true;
-                                }
-                                if (latestRawGameData == null)
-                                {
-                                    Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
-                                    Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 50 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
-                                    try
-                                    {
-                                        audioPlayer.purgeQueues();
-                                    }
-                                    catch (Exception)
-                                    {
-                                        // ignore
-                                    }
-                                    running = false;
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    latestRawGameData = gameDataReader.ReadGameData(false);
-                                }
-                                catch (GameDataReadException e)
-                                {
-                                    Console.WriteLine("Error reading game data " + e.cause.StackTrace);
-                                    continue;
-                                }
-                            }
-                            // another Thread may have stopped the app - check here before processing the game data
-                            if (!running)
-                            {
-                                continue;
-                            }
-                            gameStateMapper.versionCheck(latestRawGameData);
+                    if (loadDataFromFile || mapped)
+                    {
+                        stateCleared = false;
 
-                            GameStateData nextGameState = null;
+                        if (loadDataFromFile)
+                        {
                             try
                             {
-                                nextGameState = gameStateMapper.mapToGameStateData(latestRawGameData, currentGameState);
+                                latestRawGameData = gameDataReader.ReadGameDataFromFile(filenameToRun, 3000);
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
+                                Console.WriteLine("Error reading game data: " + e.StackTrace);
                             }
-                            // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
-                            // persistent state information. If this is the case, don't process any stuff
-                            if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
+                            finally
                             {
-                                previousGameState = currentGameState;
-                                currentGameState = nextGameState;
-                                if (currentGameState.SessionData.SessionType == SessionType.Race)
+                                dataFileReadDone = true;
+                            }
+                            if (latestRawGameData == null)
+                            {
+                                MainWindow.autoScrollConsole = true;
+                                Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
+                                Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 50 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                try
                                 {
-                                    gameStateMapper.populateDerivedRaceSessionData(currentGameState);
+                                    audioPlayer.purgeQueues();
+                                }
+                                catch (Exception)
+                                {
+                                    // ignore
+                                }
+                                running = false;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                latestRawGameData = gameDataReader.ReadGameData(false);
+                            }
+                            catch (GameDataReadException e)
+                            {
+                                Console.WriteLine("Error reading game data " + e.cause.StackTrace);
+                                continue;
+                            }
+                        }
+                        // another Thread may have stopped the app - check here before processing the game data
+                        if (!running)
+                        {
+                            continue;
+                        }
+                        gameStateMapper.versionCheck(latestRawGameData);
+
+                        GameStateData nextGameState = null;
+                        try
+                        {
+                            nextGameState = gameStateMapper.mapToGameStateData(latestRawGameData, currentGameState);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error mapping game data: " + e.Message + ", " + e.StackTrace);
+                        }
+                        // if we're paused or viewing another car, the mapper will just return the previous game state so we don't lose all the
+                        // persistent state information. If this is the case, don't process any stuff
+                        if (nextGameState != null && (nextGameState.SessionData.AbruptSessionEndDetected || nextGameState != currentGameState))
+                        {
+                            previousGameState = currentGameState;
+                            currentGameState = nextGameState;
+                            if (currentGameState.SessionData.SessionType == SessionType.Race)
+                            {
+                                gameStateMapper.populateDerivedRaceSessionData(currentGameState);
+                            }
+                            else
+                            {
+                                gameStateMapper.populateDerivedNonRaceSessionData(currentGameState);
+                            }
+                            if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
+                                && previousGameState != null)
+                            {
+                                string positionMsg;
+                                if (currentGameState.SessionData.IsDisqualified)
+                                {
+                                    positionMsg = "Disqualified";
+                                }
+                                else if (currentGameState.SessionData.IsDNF)
+                                {
+                                    positionMsg = "DNF";
                                 }
                                 else
                                 {
-                                    gameStateMapper.populateDerivedNonRaceSessionData(currentGameState);
+                                    positionMsg = currentGameState.SessionData.ClassPosition.ToString();
                                 }
-                                if (!sessionFinished && currentGameState.SessionData.SessionPhase == SessionPhase.Finished
-                                    && previousGameState != null)
+                                Console.WriteLine("Session finished, position = " + positionMsg);
+                                audioPlayer.purgeQueues();
+                                if (displaySessionLapTimes)
                                 {
-                                    string positionMsg;
-                                    if (currentGameState.SessionData.IsDisqualified)
+                                    if (currentGameState.SessionData.formattedPlayerLapTimes.Count > 0)
                                     {
-                                        positionMsg = "Disqualified";
-                                    }
-                                    else if (currentGameState.SessionData.IsDNF)
-                                    {
-                                        positionMsg = "DNF";
+                                        Console.WriteLine("Session lap times:");
+                                        Console.WriteLine(String.Join(";    ", currentGameState.SessionData.formattedPlayerLapTimes));
                                     }
                                     else
                                     {
-                                        positionMsg = currentGameState.SessionData.ClassPosition.ToString();
+                                        Console.WriteLine("No valid lap times were set.");
                                     }
-                                    Console.WriteLine("Session finished, position = " + positionMsg);
+                                }
+
+                                if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+                                {
+                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
+                                        previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
+                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                }
+                                else
+                                {
+                                    // In iRacing, use currentGameState.SessionData.ClassPosition.  I don't completely understand what is going on, but sometimes position is very wrong right
+                                    // before finishing line.
+                                    sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
+                                        previousGameState.SessionData.SessionStartClassPosition, currentGameState.SessionData.ClassPosition,
+                                        previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
+                                        currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                }
+                                audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
+                                sessionFinished = true;
+                                audioPlayer.disablePearlsOfWisdom = false;
+
+                                if (loadDataFromFile)
+                                {
+                                    // TODO_THREADS: review all sleeps.
+                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 100 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                }
+                            }
+                            float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;
+                            if (currentGameState.SessionData.IsNewSession)
+                            {
+                                Console.WriteLine("New session");
+                                PlaybackModerator.ClearVerbosityData();
+                                PlaybackModerator.lastBlockedMessageId = -1;
+                                audioPlayer.disablePearlsOfWisdom = false;
+                                displayNewSessionInfo(currentGameState);
+                                sessionFinished = false;
+                                if (!stateCleared)
+                                {
+                                    Console.WriteLine("Clearing game state...");
                                     audioPlayer.purgeQueues();
-                                    if (displaySessionLapTimes)
+
+                                    foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                     {
-                                        if (currentGameState.SessionData.formattedPlayerLapTimes.Count > 0)
+                                        entry.Value.clearState();
+                                    }
+                                    if (spotter != null)
+                                    {
+                                        spotter.clearState();
+                                    }
+                                    faultingEvents.Clear();
+                                    faultingEventsCount.Clear();
+                                    sessionHasFailingEvent = false;
+                                    stateCleared = true;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
+                                    PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
+                                    PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_INDEX = -1;
+                                }
+                                if (enableDriverNames)
+                                {
+                                    List<String> rawDriverNames = currentGameState.getRawDriverNames();
+                                    if (currentGameState.SessionData.DriverRawName != null && currentGameState.SessionData.DriverRawName.Length > 0 &&
+                                        !rawDriverNames.Contains(currentGameState.SessionData.DriverRawName))
+                                    {
+                                        rawDriverNames.Add(currentGameState.SessionData.DriverRawName);
+                                    }
+                                    if (rawDriverNames.Count > 0)
+                                    {
+                                        List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames);
+                                        if (speechRecogniser != null && speechRecogniser.initialised)
                                         {
-                                            Console.WriteLine("Session lap times:");
-                                            Console.WriteLine(String.Join(";    ", currentGameState.SessionData.formattedPlayerLapTimes));
+                                            speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);
+                                        }
+                                        // now load all the sound files for this set of driver names
+                                        SoundCache.loadDriverNameSounds(usableDriverNames);
+                                    }
+                                }
+                                audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
+                            }
+                            else if (previousGameState != null &&
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 ||
+                                        (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
+                                            currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
+                                        (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
+                                        ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                                                gameDefinition.gameEnum == GameEnum.PCARS2 || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
+                                                gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
+                                            currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1)))
+                            {
+                                if (!sessionFinished)
+                                {
+                                    if (spotter != null)
+                                    {
+                                        if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
+                                        {
+                                            spotter.pause();
                                         }
                                         else
                                         {
-                                            Console.WriteLine("No valid lap times were set.");
+                                            spotter.unpause();
                                         }
                                     }
-
-                                    if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
+                                    if (currentGameState.SessionData.IsNewLap)
                                     {
-                                        sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                            previousGameState.SessionData.SessionStartClassPosition, previousGameState.SessionData.ClassPosition,
-                                            previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                            currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
+                                        currentGameState.display();
                                     }
-                                    else
-                                    {
-                                        // In iRacing, use currentGameState.SessionData.ClassPosition.  I don't completely understand what is going on, but sometimes position is very wrong right
-                                        // before finishing line.
-                                        sessionEndMessages.trigger(previousGameState.SessionData.SessionRunningTime, previousGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase,
-                                            previousGameState.SessionData.SessionStartClassPosition, currentGameState.SessionData.ClassPosition,
-                                            previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
-                                            currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
-                                    }
-                                    audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
-                                    sessionFinished = true;
-                                    audioPlayer.disablePearlsOfWisdom = false;
-
-                                    if (loadDataFromFile)
-                                    {
-                                        // TODO_THREADS: review all sleeps.
-                                        Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 100 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
-                                    }
+                                    stateCleared = false;
                                 }
-                                float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;
-                                if (currentGameState.SessionData.IsNewSession)
-                                {
-                                    Console.WriteLine("New session");
-                                    PlaybackModerator.ClearVerbosityData();
-                                    PlaybackModerator.lastBlockedMessageId = -1;
-                                    audioPlayer.disablePearlsOfWisdom = false;
-                                    displayNewSessionInfo(currentGameState);
-                                    sessionFinished = false;
-                                    if (!stateCleared)
-                                    {
-                                        Console.WriteLine("Clearing game state...");
-                                        audioPlayer.purgeQueues();
+                                // update the auto-verbosity
+                                PlaybackModerator.UpdateAutoVerbosity(currentGameState);
 
-                                        foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
-                                        {
-                                            entry.Value.clearState();
-                                        }
-                                        if (spotter != null)
-                                        {
-                                            spotter.clearState();
-                                        }
-                                        faultingEvents.Clear();
-                                        faultingEventsCount.Clear();
-                                        sessionHasFailingEvent = false;
-                                        stateCleared = true;
-                                        PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_NAME = null;
-                                        PCarsGameStateMapper.WARNED_ABOUT_MISSING_STEAM_ID = false;
-                                        PCarsGameStateMapper.FIRST_VIEWED_PARTICIPANT_INDEX = -1;
-                                    }
-                                    if (enableDriverNames)
+                                // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
+                                // for now, don't trigger any events for F1 2018 as there's no game mapping
+                                if (gameDefinition.gameEnum != GameEnum.F1_2018)
+                                {
+                                    foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
                                     {
-                                        List<String> rawDriverNames = currentGameState.getRawDriverNames();
-                                        if (currentGameState.SessionData.DriverRawName != null && currentGameState.SessionData.DriverRawName.Length > 0 &&
-                                            !rawDriverNames.Contains(currentGameState.SessionData.DriverRawName))
+                                        if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
                                         {
-                                            rawDriverNames.Add(currentGameState.SessionData.DriverRawName);
-                                        }
-                                        if (rawDriverNames.Count > 0)
-                                        {
-                                            List<String> usableDriverNames = DriverNameHelper.getUsableDriverNames(rawDriverNames);
-                                            if (speechRecogniser != null && speechRecogniser.initialised)
+                                            // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
+                                            if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
                                             {
-                                                speechRecogniser.addOpponentSpeechRecognition(usableDriverNames, enableDriverNames);
+                                                triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
                                             }
-                                            // now load all the sound files for this set of driver names
-                                            SoundCache.loadDriverNameSounds(usableDriverNames);
                                         }
                                     }
                                     audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                 }
-                                else if (previousGameState != null &&
-                                            (gameDefinition.gameEnum == GameEnum.F1_2018 ||
-                                            (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
-                                                currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
-                                            (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
-                                            ((gameDefinition.gameEnum == GameEnum.PCARS_32BIT || gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
-                                                    gameDefinition.gameEnum == GameEnum.PCARS2 || gameDefinition.gameEnum == GameEnum.PCARS_NETWORK ||
-                                                    gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
-                                                currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime == -1)))
+                                if (!sessionFinished)
                                 {
-                                    if (!sessionFinished)
+                                    if (DriverTrainingService.isPlayingPaceNotes)
                                     {
-                                        if (spotter != null)
-                                        {
-                                            if (currentGameState.FlagData.isFullCourseYellow || DamageReporting.waitingForDriverIsOKResponse)
-                                            {
-                                                spotter.pause();
-                                            }
-                                            else
-                                            {
-                                                spotter.unpause();
-                                            }
-                                        }
-                                        if (currentGameState.SessionData.IsNewLap)
-                                        {
-                                            currentGameState.display();
-                                        }
-                                        stateCleared = false;
+                                        DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
+                                            currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                     }
-                                    // update the auto-verbosity
-                                    PlaybackModerator.UpdateAutoVerbosity(currentGameState);
-
-                                    // Allow events to be processed after session finish.  Event should use applicableSessionPhases/applicableSessionTypes to opt in/out.
-                                    // for now, don't trigger any events for F1 2018 as there's no game mapping
-                                    if (gameDefinition.gameEnum != GameEnum.F1_2018)
+                                    if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning &&
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
                                     {
-                                        foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
-                                        {
-                                            if (entry.Value.isApplicableForCurrentSessionAndPhase(currentGameState.SessionData.SessionType, currentGameState.SessionData.SessionPhase))
-                                            {
-                                                // special case - if we've crashed heavily and are waiting for a response from the driver, don't trigger other events
-                                                if (entry.Key.Equals("DamageReporting") || !DamageReporting.waitingForDriverIsOKResponse)
-                                                {
-                                                    triggerEvent(entry.Key, entry.Value, previousGameState, currentGameState);
-                                                }
-                                            }
-                                        }
-                                        audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
+                                        Console.WriteLine("********** starting spotter***********");
+                                        spotter.clearState();
+                                        startSpotterThread();
                                     }
-                                    if (!sessionFinished)
+                                    else if (spotterIsRunning && !GlobalBehaviourSettings.spotterEnabled)
                                     {
-                                        if (DriverTrainingService.isPlayingPaceNotes)
-                                        {
-                                            DriverTrainingService.checkDistanceAndPlayIfNeeded(currentGameState.Now, previousGameState.PositionAndMotionData.DistanceRoundTrack,
-                                                currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
-                                        }
-                                        if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning &&
-                                            (gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
-                                        {
-                                            Console.WriteLine("********** starting spotter***********");
-                                            spotter.clearState();
-                                            startSpotterThread();
-                                        }
-                                        else if (spotterIsRunning && !GlobalBehaviourSettings.spotterEnabled)
-                                        {
-                                            runSpotterThread = false;
-                                        }
+                                        runSpotterThread = false;
                                     }
-                                }
-                                else if (spotter != null)
-                                {
-                                    spotter.pause();
                                 }
                             }
+                            else if (spotter != null)
+                            {
+                                spotter.pause();
+                            }
+                        }
+                    }
+                    if (filenameToRun != null)
+                    {
+                        // mute the audio player for anything < 10ms
+                        audioPlayer.mute = CrewChief.playbackIntervalMilliseconds < 10;
+                        if (CrewChief.playbackIntervalMilliseconds > 0)
+                        {
+                            Thread.Sleep(CrewChief.playbackIntervalMilliseconds);
                         }
                     }
                     else
                     {
-                        // ensure the updates don't get synchronised with the spotter / UDP receiver
-                        int threadSleepTime = 5 + Utilities.random.Next(10);
-                        Thread.Sleep(threadSleepTime);
-                        continue;
+                        // ensure the updates don't get synchronised with the spotter / UDP receiver, add +/- 5ms
+                        Thread.Sleep(timeInterval + Utilities.random.Next(10) - 5);
                     }
                 }
                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)

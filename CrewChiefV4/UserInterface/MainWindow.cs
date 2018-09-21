@@ -2487,53 +2487,50 @@ namespace CrewChiefV4
 
         public override void WriteLine(string value)
         {
-            lock (MainWindow.instanceLock)
+            if (MainWindow.instance != null && (enable || MainWindow.instance.recordSession.Checked))
             {
-                if (MainWindow.instance != null && (enable || MainWindow.instance.recordSession.Checked))
+                Boolean gotDateStamp = false;
+                StringBuilder sb = new StringBuilder();
+                DateTime now = DateTime.Now;
+                if (CrewChief.loadDataFromFile)
                 {
-                    Boolean gotDateStamp = false;
-                    StringBuilder sb = new StringBuilder();
-                    DateTime now = DateTime.Now;
-                    if (CrewChief.loadDataFromFile)
+                    if (CrewChief.currentGameState != null)
                     {
-                        if (CrewChief.currentGameState != null)
+                        if (CrewChief.currentGameState.CurrentTimeStr == null || CrewChief.currentGameState.CurrentTimeStr == "")
                         {
-                            if (CrewChief.currentGameState.CurrentTimeStr == null || CrewChief.currentGameState.CurrentTimeStr == "")
-                            {
-                                CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
-                            }
-                            sb.Append(now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
-                            gotDateStamp = true;
+                            CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
                         }
+                        sb.Append(now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                        gotDateStamp = true;
                     }
-                    if (!gotDateStamp)
+                }
+                if (!gotDateStamp)
+                {
+                    sb.Append(now.ToString("HH:mm:ss.fff"));
+                }
+                sb.Append(" : ").Append(value).AppendLine();
+                if (enable)
+                {
+                    if (textbox != null && !textbox.IsDisposed)
                     {
-                        sb.Append(now.ToString("HH:mm:ss.fff"));
-                    }
-                    sb.Append(" : ").Append(value).AppendLine();
-                    if (enable)
-                    {
-                        if (textbox != null && !textbox.IsDisposed)
+                        try
                         {
-                            try
+                            lock (MainWindow.instanceLock)
                             {
-                                lock (this)
-                                {
-                                    textbox.AppendText(sb.ToString());
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                // swallow - nothing to log it to
+                                textbox.AppendText(sb.ToString());
                             }
                         }
-                    }
-                    else
-                    {
-                        lock (this)
+                        catch (Exception)
                         {
-                            builder.Append(sb.ToString());
+                            // swallow - nothing to log it to
                         }
+                    }
+                }
+                else
+                {
+                    lock (MainWindow.instanceLock)
+                    {
+                        builder.Append(sb.ToString());
                     }
                 }
             }
@@ -2549,6 +2546,7 @@ namespace CrewChiefV4
                 }
             }
         }
+        
 
         public override Encoding Encoding
         {
