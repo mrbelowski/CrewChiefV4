@@ -96,6 +96,8 @@ namespace CrewChiefV4
         // True, while we are in a constructor.
         private bool constructingWindow = false;
 
+        public static bool autoScrollConsole = true;
+
         public void killChief()
         {
             crewChief.stop();
@@ -1327,6 +1329,8 @@ namespace CrewChiefV4
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
             {
+                Console.WriteLine("Pausing console scrolling");
+                MainWindow.autoScrollConsole = false;
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
                 {
@@ -1398,6 +1402,8 @@ namespace CrewChiefV4
             }
             else
             {
+                Console.WriteLine("Resuming console scrolling");
+                MainWindow.autoScrollConsole = true;
                 MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
@@ -2470,12 +2476,13 @@ namespace CrewChiefV4
 
     public class ControlWriter : TextWriter
     {
-        public TextBox textbox = null;
+        public RichTextBox textbox = null;
         public Boolean enable = true;
         public StringBuilder builder = new StringBuilder();
-        public ControlWriter(TextBox textbox)
+        public ControlWriter(RichTextBox textbox)
         {
             this.textbox = textbox;
+            this.textbox.WordWrap = false;
         }
 
         public override void WriteLine(string value)
@@ -2486,21 +2493,22 @@ namespace CrewChiefV4
                 {
                     Boolean gotDateStamp = false;
                     StringBuilder sb = new StringBuilder();
+                    DateTime now = DateTime.Now;
                     if (CrewChief.loadDataFromFile)
                     {
                         if (CrewChief.currentGameState != null)
                         {
-                            if (CrewChief.currentGameState.CurrentTimeStr == null)
+                            if (CrewChief.currentGameState.CurrentTimeStr == null || CrewChief.currentGameState.CurrentTimeStr == "")
                             {
                                 CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
                             }
-                            sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                            sb.Append(now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
                             gotDateStamp = true;
                         }
                     }
                     if (!gotDateStamp)
                     {
-                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
+                        sb.Append(now.ToString("HH:mm:ss.fff"));
                     }
                     sb.Append(" : ").Append(value).AppendLine();
                     if (enable)
@@ -2527,6 +2535,17 @@ namespace CrewChiefV4
                             builder.Append(sb.ToString());
                         }
                     }
+                }
+            }
+            if (MainWindow.autoScrollConsole && textbox != null && !textbox.IsDisposed)
+            {
+                try
+                {
+                    textbox.ScrollToCaret();
+                }
+                catch (Exception)
+                {
+                    // ignore
                 }
             }
         }
