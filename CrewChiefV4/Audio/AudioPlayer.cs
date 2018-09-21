@@ -351,7 +351,6 @@ namespace CrewChiefV4.Audio
 
             if (UserSettings.GetUserSettings().getBoolean("use_naudio"))
             {
-                AudioPlayer.naudioBackgroundPlaybackDeviceId = 10;
                 this.backgroundPlayer = new NAudioBackgroundPlayer(backgroundFilesPath, dtmPitWindowClosedBackground);
                 try
                 {

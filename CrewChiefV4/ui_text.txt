@@ -154,14 +154,14 @@ install_plugin_popup_text = Crew Chief needs additional files to be installed or
 install_plugin_popup_title = Plugin Needed
 install_plugin_select_directory_start = Please select 
 install_plugin_select_directory_end = installation directory
-install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancle to Return
+install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancel to Return
 install_plugin_popup_enable_title = Enable Plugin
 
 install_speechplatform_popup_title = Missing dependency
-install_speechplatform_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Press OK to get redirected to the download location, Or Cancle to return
+install_speechplatform_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Press OK to get redirected to the download location, Or Cancel to return
 install_any_speechlanguage_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Please download and install one of the following MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi,MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
 install_single_speechlanguage_popup_text_start = It appears that your system is missing a dependency for speech recogniser to work. Please download and install MSSpeech_SR_
-install_single_speechlanguage_popup_text_end = _TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
+install_single_speechlanguage_popup_text_end = _TELE.msi. Press OK to get redirected to the download location, Or Cancel to return
 
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = E&xit without Saving
@@ -429,6 +429,10 @@ ams_spotter_car_length_category = SPOTTER
 pcars_spotter_car_length = pCARS Spotter default car length
 pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 pcars_spotter_car_length_category = SPOTTER
+
+pcars2_spotter_car_length = pCARS2 Spotter default car length
+pcars2_spotter_car_length_filter = PCARS2
+pcars2_spotter_car_length_category = SPOTTER
 
 r3e_spotter_car_length = R3E Spotter default car length
 r3e_spotter_car_length_filter = RACE_ROOM

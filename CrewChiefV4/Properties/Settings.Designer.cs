@@ -3501,10 +3501,17 @@ namespace CrewChiefV4.Properties {
             set {
                 this["f1_2018_spotter_car_length"] = value;
             }
-        }
-        
+        }        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public float pcars2_spotter_car_length {
+            get {
+                return ((float)(this["pcars2_spotter_car_length"]));
+            }
+            set {
+                this["pcars2_spotter_car_length"] = value;
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string acc_launch_exe {
             get {
