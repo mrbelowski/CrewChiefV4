@@ -668,7 +668,7 @@ namespace CrewChiefV4
                         }
                         lastSpotterState = currentSpotterState;
                     }
-                    Thread.Sleep(spotterInterval + Utilities.random.Next(5) - 2);
+                    Thread.Sleep(spotterInterval);
                 }
             }
             catch (Exception)  // Exceptions can happen on Stop and DisconnectFromProcess.
@@ -1050,8 +1050,7 @@ namespace CrewChiefV4
                     }
                     else
                     {
-                        // ensure the updates don't get synchronised with the spotter / UDP receiver, add +/- 5ms
-                        Thread.Sleep(timeInterval + Utilities.random.Next(10) - 5);
+                        Thread.Sleep(timeInterval);
                     }
                 }
                 foreach (KeyValuePair<String, AbstractEvent> entry in eventsList)
