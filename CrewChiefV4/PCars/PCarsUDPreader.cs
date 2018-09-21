@@ -82,7 +82,7 @@ namespace CrewChiefV4.PCars
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
@@ -90,6 +90,7 @@ namespace CrewChiefV4.PCars
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<CrewChiefV4.PCars.PCarsSharedMemoryReader.PCarsStructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
