@@ -430,7 +430,7 @@ namespace CrewChiefV4.Audio
                 // spawn a Thread to monitor the queue
                 Debug.Assert(monitorQueueThread == null);
 
-                // This thread is managed by the Chief Run thread.
+                // This thread is managed by the Chief Run thread directly.
                 monitorQueueThread = new Thread(monitorQueue);
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
