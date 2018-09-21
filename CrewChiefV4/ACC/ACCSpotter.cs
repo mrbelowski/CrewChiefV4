@@ -78,6 +78,19 @@ namespace CrewChiefV4.ACC
             TimeSpan ts = TimeSpan.FromTicks(time);
             return (float)ts.TotalMilliseconds * 10;
         }
+        public double ConvertToRadians(double angle)
+        {
+            return (Math.PI / 180) * angle;
+        }
+        public float constrainAngle(float x)
+        {
+            x = x + 180.0f % 360.0f;
+            if (x < 0.0f)
+            {
+                x += 360.0f;
+            }                
+            return x - 180.0f;
+        }
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
@@ -127,26 +140,14 @@ namespace CrewChiefV4.ACC
             playerVelocityData[0] = currentPlayerData.speed;
             playerVelocityData[1] = (currentPlayerData.location.x - previousPlayerData.location.x) / timeDiffSeconds;
             playerVelocityData[2] = (currentPlayerData.location.y - previousPlayerData.location.y) / timeDiffSeconds;
-
-            for (int i = 0; i < currentState.opponentDriverCount; i++)
+                                             
+            for (int i = 1; i < currentState.opponentDriverCount; i++)
             {
                 Driver vehicle = currentState.opponentDrivers[i];
                 currentOpponentPositions.Add(new float[] { vehicle.location.x, vehicle.location.y });
             }
-            float playerRotation = currentState.playerDriver.rotation.yaw;
-            //Console.WriteLine("rotation " + playerRotation + " x " + currentPlayerData.location.x + " y " + currentPlayerData.location.y);
-            if (playerRotation < 0)
-            {
-                playerRotation = (float)(2 * Math.PI) + playerRotation;
-            }
-            playerRotation = (float)(2 * Math.PI) - playerRotation;
-
-            /*if (playerRotation < 0)
-            {
-                playerRotation = Math.Abs((float)(2 * Math.PI) + playerRotation) * 2;
-            }*/
-            Console.WriteLine("rotation " + playerRotation + "position x " + currentPlayerData.location.x + " y " + currentPlayerData.location.y);
-            internalSpotter.triggerInternal(playerRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
+            float playerRadRotation = (float)ConvertToRadians(currentState.playerDriver.rotation.yaw);
+            internalSpotter.triggerInternal(playerRadRotation, currentPlayerPosition, playerVelocityData, currentOpponentPositions);
             
         }
     }
