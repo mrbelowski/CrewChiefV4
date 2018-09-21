@@ -9,7 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using CrewChiefV4.ACC;
 using CrewChiefV4.ACC.Data;
-
+using System.Threading;
 
 namespace CrewChiefV4.ACC
 {
@@ -50,7 +50,7 @@ namespace CrewChiefV4.ACC
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart )
         {
 
             if (dataReadFromFile == null || filename != lastReadFileName)
@@ -59,6 +59,7 @@ namespace CrewChiefV4.ACC
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<ACCStructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
