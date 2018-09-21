@@ -587,9 +587,10 @@ namespace CrewChiefV4.Events
                     }
                     if (!currentGameState.isLast())
                     {
+                        // play the gap behind at the point when the opponent crosses the line, so the gap is about the same as our current laptime
                         if (!playedGapBehindForThisLap && currentGapBehind > 0.05 && currentGameState.SessionData.LapTimeCurrent > 0 &&
                             currentGameState.SessionData.LapTimeCurrent >= currentGapBehind &&
-                            currentGameState.SessionData.LapTimeCurrent <= currentGapBehind + CrewChief._timeInterval.TotalSeconds)
+                            currentGameState.SessionData.LapTimeCurrent <= currentGapBehind + 1)
                         {
                             playedGapBehindForThisLap = true;
                             OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition + 1, currentGameState.carClass);

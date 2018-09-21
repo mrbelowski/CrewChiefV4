@@ -956,7 +956,17 @@ namespace CrewChiefV4.Audio
             if (!channelOpen)
             {
                 channelOpen = true;
-                this.backgroundPlayer.play();
+                if (!mute)
+                {
+                    try
+                    {
+                        this.backgroundPlayer.play();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore
+                    }
+                }
                 if (useShortBeepWhenOpeningChannel)
                 {
                     playShortStartSpeakingBeep();
@@ -973,7 +983,17 @@ namespace CrewChiefV4.Audio
             if (channelOpen)
             {
                 playEndSpeakingBeep();
-                this.backgroundPlayer.stop();
+                if (!mute)
+                {
+                    try
+                    {
+                        this.backgroundPlayer.stop();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore
+                    }
+                }
                 if (soundCache != null)
                 {
                     soundCache.ExpireCachedSounds();
