@@ -31,6 +31,7 @@ namespace CrewChiefV4
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.consoleTextBox = new System.Windows.Forms.RichTextBox();
+            this.consoleTextBoxBackgroundPanel = new System.Windows.Forms.Panel();
             this.startApplicationButton = new System.Windows.Forms.Button();
             this.forceVersionCheckButton = new System.Windows.Forms.Button();
             this.saveConsoleOutputButton = new System.Windows.Forms.Button();
@@ -90,6 +91,10 @@ namespace CrewChiefV4
             ((System.ComponentModel.ISupportInitialize)(this.messagesVolumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).BeginInit();
             this.SuspendLayout();
+
+            this.consoleTextBoxBackgroundPanel.Location = new System.Drawing.Point(41, 215);
+            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBoxBackgroundPanel.BorderStyle = BorderStyle.FixedSingle;
             // 
             // consoleTextBox
             // 
@@ -100,6 +105,9 @@ namespace CrewChiefV4
             this.consoleTextBox.ReadOnly = true;
             this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
             this.consoleTextBox.TabIndex = 200;
+            this.consoleTextBox.BorderStyle = BorderStyle.None;
+            this.consoleTextBox.Dock = DockStyle.Fill;
+            this.consoleTextBoxBackgroundPanel.Controls.Add(this.consoleTextBox);
 
             // 
             // startApplicationButton
@@ -653,7 +661,7 @@ namespace CrewChiefV4
             this.Controls.Add(this.startApplicationButton);
             this.Controls.Add(this.forceVersionCheckButton);
             this.Controls.Add(this.saveConsoleOutputButton);
-            this.Controls.Add(this.consoleTextBox);
+            this.Controls.Add(this.consoleTextBoxBackgroundPanel);
             this.Controls.Add(this.personalisationBox);
             this.Controls.Add(this.spotterNameBox);
             this.Controls.Add(this.personalisationLabel);
@@ -683,6 +691,7 @@ namespace CrewChiefV4
         #endregion
 
         public System.Windows.Forms.RichTextBox consoleTextBox;
+        private Panel consoleTextBoxBackgroundPanel;
         public System.Windows.Forms.Button startApplicationButton;
         public System.Windows.Forms.CheckBox recordSession;
         private System.Windows.Forms.Button forceVersionCheckButton;

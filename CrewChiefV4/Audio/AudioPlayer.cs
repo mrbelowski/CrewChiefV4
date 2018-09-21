@@ -134,6 +134,8 @@ namespace CrewChiefV4.Audio
 
         AutoResetEvent monitorQueueWakeUpEvent = new AutoResetEvent(false);
         private DateTime nextWakeupCheckTime = DateTime.MinValue;
+        private Thread playeDelayedImmediateMessageThread = null;
+        private Thread pauseQueueThread = null;
 
         static AudioPlayer()
         {
@@ -427,6 +429,8 @@ namespace CrewChiefV4.Audio
                 monitorRunning = true;
                 // spawn a Thread to monitor the queue
                 Debug.Assert(monitorQueueThread == null);
+
+                // This thread is managed by the Chief Run thread.
                 monitorQueueThread = new Thread(monitorQueue);
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
@@ -1116,12 +1120,17 @@ namespace CrewChiefV4.Audio
         // message via the 'immediate' mechanism, but not until the secondsDelay has expired.
         public void playDelayedImmediateMessage(QueuedMessage queuedMessage)
         {
-            new Thread(() =>
+            ThreadManager.UnregisterTemporaryThread(playeDelayedImmediateMessageThread);
+            playeDelayedImmediateMessageThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
+                // TODO_THREADS: interrupt
                 Thread.Sleep(queuedMessage.secondsDelay * 1000);
                 playMessageImmediately(queuedMessage);
-            }).Start();
+            });
+            playeDelayedImmediateMessageThread.Name = "AudioPlayer.playeDelayedImmediateMessageThread";
+            playeDelayedImmediateMessageThread.Start();
+            ThreadManager.RegisterTemporaryThread(playeDelayedImmediateMessageThread);
         }
 
         public SoundType getPriortyOfFirstWaitingImmediateMessage()
@@ -1386,14 +1395,19 @@ namespace CrewChiefV4.Audio
             if (!regularQueuePaused)
             {
                 regularQueuePaused = true;
-                new Thread(() =>
+
+                ThreadManager.UnregisterTemporaryThread(pauseQueueThread);
+                pauseQueueThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(seconds * 1000);
+                    Thread.Sleep(seconds * 1000); // TODO_THREADS:
                     regularQueuePaused = false;
                     // wake the monitor thread as soon as the pause has expired
                     this.monitorQueueWakeUpEvent.Set();
-                }).Start();
+                });
+                pauseQueueThread.Name = "AudioPlayer.pauseQueueThread";
+                ThreadManager.RegisterTemporaryThread(pauseQueueThread);
+                pauseQueueThread.Start();
             }
         }
 
