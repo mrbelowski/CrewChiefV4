@@ -22,7 +22,7 @@ namespace CrewChiefV4
 
         public abstract void DumpRawGameData();
 
-        public abstract Object ReadGameDataFromFile(String filename);
+        public abstract Object ReadGameDataFromFile(String filename, int pauseBeforeStart);
 
         public abstract void ResetGameDataFromFile();
 
@@ -84,8 +84,14 @@ namespace CrewChiefV4
                     }
                 }
 
-                File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleWriter.enable ?
-                    MainWindow.instance.consoleTextBox.Text : MainWindow.instance.consoleWriter.builder.ToString());
+                lock (MainWindow.instanceLock)
+                {
+                    if (MainWindow.instance != null)
+                    {
+                        File.WriteAllText(Path.ChangeExtension(fileName, "txt"), MainWindow.instance.consoleWriter.enable ?
+                            MainWindow.instance.consoleTextBox.Text : MainWindow.instance.consoleWriter.builder.ToString());
+                    }
+                }
 
                 Console.WriteLine("Done writing session data log to: " + fileName);
                 Console.WriteLine("PLEASE RESTART THE APPLICATION BEFORE ATTEMPTING TO RECORD ANOTHER SESSION");

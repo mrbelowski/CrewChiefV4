@@ -69,8 +69,9 @@ namespace CrewChiefV4.Events
                     Int32.TryParse(minutesString, out minutes);
                     if (hours != -1 && minutes != -1)
                     {
-                        SetAlarm(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hours, minutes, 00));
-                        Console.WriteLine("Alarm has been set to " + new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, hours, minutes, 00).ToString());
+                        DateTime now = DateTime.Now;
+                        SetAlarm(new DateTime(now.Year, now.Month, now.Day, hours, minutes, 00));
+                        Console.WriteLine("Alarm has been set to " + new DateTime(now.Year, now.Month, now.Day, hours, minutes, 00).ToString());
                     }
                 }
             }

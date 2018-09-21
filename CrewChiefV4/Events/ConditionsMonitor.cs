@@ -86,7 +86,6 @@ namespace CrewChiefV4.Events
         private Conditions.ConditionsSample currentConditions;
         private Conditions.ConditionsSample conditionsAtStartOfThisLap;
 
-        private static float maxRainDelta = -1;
         private float rainDensityAtLastCheck = -1;
 
         // PCars2 only
@@ -116,7 +115,6 @@ namespace CrewChiefV4.Events
             timeWhenCloudIncreased = DateTime.MinValue;
             timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
-            ConditionsMonitor.maxRainDelta = -1;
             rainDensityAtLastCheck = -1;
             maxRainChangeRate = -1;
         }

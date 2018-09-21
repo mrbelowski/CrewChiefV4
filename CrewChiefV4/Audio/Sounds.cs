@@ -54,7 +54,11 @@ namespace CrewChiefV4.Audio
         public static Boolean hasSuitableTTSVoice = false;
 
         public static Boolean cancelLazyLoading = false;
-        
+        private Thread cacheSoundsThread = null;
+        private static Thread loadDriverNameSoundsThread = null;
+        private Thread expireCachedSoundsThread = null;
+        private Thread stopAndUnloadAllThread = null;
+
         public SoundCache(DirectoryInfo soundsFolder, DirectoryInfo sharedSoundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
             // ensure the static state is nuked before we start updating it
@@ -168,11 +172,13 @@ namespace CrewChiefV4.Audio
                     // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
                     if (allowCaching && eagerLoadSoundFiles)
                     {
-                        new Thread(() =>
+                        ThreadManager.UnregisterTemporaryThread(cacheSoundsThread);
+                        cacheSoundsThread = new Thread(() =>
                         {
-                            DateTime start = DateTime.Now;
+                            DateTime start = DateTime.UtcNow;
                             Thread.CurrentThread.IsBackground = true;
                             // load the permanently cached sounds first, then the rest
+                            // TODO_THREADS: allow early terminate.
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
                                 if (SoundCache.cancelLazyLoading)
@@ -198,22 +204,25 @@ namespace CrewChiefV4.Audio
                             SoundCache.cancelLazyLoading = false;
                             if (AudioPlayer.playWithNAudio)
                             {
-                                Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                                Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
                                     SoundCache.currentSoundsLoaded + " loaded message sounds");
                             }
                             else
                             {
-                                Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
+                                Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + "s to lazy load remaining message sounds, there are now " +
                                     SoundCache.currentSoundsLoaded + " loaded message sounds with " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
                             }
-                        }).Start();
+                        });
+                        cacheSoundsThread.Name = "SoundCache.cacheSoundsThread";
+                        ThreadManager.RegisterTemporaryThread(cacheSoundsThread);
+                        cacheSoundsThread.Start();
                     }
                 }
                 else if (soundFolder.Name == "driver_names")
                 {
                     // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
                     // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
-                    prepareDriverNamesWithoutLoading(soundFolder);                    
+                    prepareDriverNamesWithoutLoading(soundFolder);
                 }                
             }
             if (AudioPlayer.playWithNAudio)
@@ -249,10 +258,12 @@ namespace CrewChiefV4.Audio
 
         public static void loadDriverNameSounds(List<String> names)
         {
-            new Thread(() =>
+            ThreadManager.UnregisterTemporaryThread(loadDriverNameSoundsThread);
+            loadDriverNameSoundsThread = new Thread(() =>
             {
                 int loadedCount = 0;
-                DateTime start = DateTime.Now;
+                DateTime start = DateTime.UtcNow;
+                // TODO_THREADS: allow early terminate
                 foreach (String name in names)
                 {
                     loadedCount++;
@@ -260,16 +271,19 @@ namespace CrewChiefV4.Audio
                 }
                 if (AudioPlayer.playWithNAudio)
                 {
-                    Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " seconds to load " +
+                    Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + " seconds to load " +
                         loadedCount + " driver name sounds. There are now " + SoundCache.currentSoundsLoaded + " sound files loaded");
                 }
                 else
                 {
-                    Console.WriteLine("Took " + (DateTime.Now - start).TotalSeconds.ToString("0.00") + " seconds to load " +
+                    Console.WriteLine("Took " + (DateTime.UtcNow - start).TotalSeconds.ToString("0.00") + " seconds to load " +
                         loadedCount + " driver name sounds. There are now " + SoundCache.currentSoundsLoaded +
                         " sound files loaded with " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
                 }
-            }).Start();            
+            });
+            loadDriverNameSoundsThread.Name = "SoundCache.loadDriverNameSoundsThread";
+            ThreadManager.RegisterTemporaryThread(loadDriverNameSoundsThread);
+            loadDriverNameSoundsThread.Start();
         }
 
         public static void loadDriverNameSound(String name)
@@ -467,7 +481,8 @@ namespace CrewChiefV4.Audio
             if (!purging && SoundCache.activeSoundPlayerObjects > maxSoundPlayerCacheSize)
             {
                 purging = true;
-                new Thread(() =>
+                ThreadManager.UnregisterTemporaryThread(expireCachedSoundsThread);
+                expireCachedSoundsThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -477,6 +492,7 @@ namespace CrewChiefV4.Audio
                     {
                         soundToPurge = SoundCache.dynamicLoadedSounds.First;
                     }
+                    // TODO_THREADS: allow cancellation
                     while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
                     {
                         String soundToPurgeValue = soundToPurge.Value;
@@ -504,14 +520,17 @@ namespace CrewChiefV4.Audio
                     var elapsedMs = watch.ElapsedMilliseconds;
                     Console.WriteLine("Purged " + purgeCount + " sounds in " + elapsedMs + "ms, there are now " + SoundCache.activeSoundPlayerObjects + " active SoundPlayer objects");
                     purging = false;
-                }).Start();
+                });
+                expireCachedSoundsThread.Name = "SoundCache.expireCachedSoundsThread";
+                ThreadManager.RegisterTemporaryThread(expireCachedSoundsThread);
+                expireCachedSoundsThread.Start();
             }
-            
         }
 
         public void StopAndUnloadAll()
         {
-            new Thread(() =>
+            ThreadManager.UnregisterTemporaryThread(stopAndUnloadAllThread);
+            stopAndUnloadAllThread = new Thread(() =>
             {
                 if (synthesizer != null)
                 {
@@ -522,6 +541,7 @@ namespace CrewChiefV4.Audio
                     }
                     catch (Exception) { }
                 }
+                // TODO_THREADS: allow cancellation.
                 foreach (SoundSet soundSet in soundSets.Values)
                 {
                     try
@@ -540,7 +560,10 @@ namespace CrewChiefV4.Audio
                     }
                     catch (Exception) { }
                 }
-            }).Start();
+            });
+            stopAndUnloadAllThread.Name = "SoundCache.stopAndUnloadAllThread";
+            ThreadManager.RegisterTemporaryThread(stopAndUnloadAllThread);
+            stopAndUnloadAllThread.Start();
         }
 
         public void StopAll()
@@ -1136,8 +1159,8 @@ namespace CrewChiefV4.Audio
                         // CC was reported to crash here.  Not sure how's that possible, AFAIK all paths come the file system.
                         // Maybe we have a race somewhere, or there's something going on during sound unpacking.  For now, trace
                         // and keep an eye on this.
-                        Console.WriteLine(string.Format("Exception loading file:{0}  msg:{1}  stack:{2}"), fullPath, ex.Message,
-                            ex.StackTrace + (ex.InnerException != null ? ex.InnerException.Message + " " + ex.InnerException.StackTrace : ""));
+                        Console.WriteLine(string.Format("Exception loading file:{0}  msg:{1}  stack:{2}", fullPath, ex.Message,
+                            ex.StackTrace + (ex.InnerException != null ? ex.InnerException.Message + " " + ex.InnerException.StackTrace : "")));
                     }
                 }
             }

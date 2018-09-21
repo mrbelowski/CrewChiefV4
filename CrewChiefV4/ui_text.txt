@@ -497,10 +497,6 @@ custom_device_guid = Custom device GUID
 custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list
 custom_device_guid_category = AUDIO_VOICE_AND_CONTROLLERS
 
-disable_immediate_messages = Disable immediate messages
-disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
-disable_immediate_messages_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
-
 max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
 max_safe_oil_temp_over_baseline_category = FUEL_TEMPS_AND_DAMAGES
 
