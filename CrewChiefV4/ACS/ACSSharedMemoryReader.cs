@@ -251,6 +251,7 @@ namespace CrewChiefV4.assetto
                 }
                 catch (Exception) { }
             }
+            this.initialised = false;
         }
     }
 }

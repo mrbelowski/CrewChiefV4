@@ -161,6 +161,7 @@ namespace CrewChiefV4.rFactor1
                     memoryMappedFile.Dispose();
                 }
                 catch (Exception) { }
+                this.initialised = false;
             }
         }
     }

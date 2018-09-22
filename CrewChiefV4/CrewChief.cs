@@ -1128,6 +1128,9 @@ namespace CrewChiefV4
                 {
                     gameDataReader.Dispose();
                     gameDataReader = null;
+                    GameStateReaderFactory.getInstance().clearCachedReaders();
+                    // The GameDataReader instance is cached by the factory to ensure each process that uses it gets the same instance.
+                    // Once we've disposed it, clear the factory's state
                 }
             }
 
