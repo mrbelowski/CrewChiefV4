@@ -407,6 +407,7 @@ namespace CrewChiefV4.PCars2
                 {
                     stop();
                     udpClient.Close();
+                    initialised = false;
                 }
                 catch (Exception) { }
             }
