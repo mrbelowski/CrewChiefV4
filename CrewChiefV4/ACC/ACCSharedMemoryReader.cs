@@ -128,7 +128,7 @@ namespace CrewChiefV4.ACC
                     }
 
                     ACCStructWrapper structWrapper = new ACCStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = accShared;
 
                     if (!forSpotter && dumpToFile && dataToDump != null)

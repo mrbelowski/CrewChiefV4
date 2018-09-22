@@ -22,7 +22,7 @@ namespace CrewChiefV4.ACC
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
-        private DateTime previousTime = DateTime.Now;
+        private DateTime previousTime = DateTime.UtcNow;
 
         private string currentPlayerCarClassID = "#not_set#";
 
@@ -37,7 +37,7 @@ namespace CrewChiefV4.ACC
 
         public override void clearState()
         {
-            previousTime = DateTime.Now;
+            previousTime = DateTime.UtcNow;
             internalSpotter.clearState();
         }
 
@@ -104,7 +104,7 @@ namespace CrewChiefV4.ACC
             {
                 return;
             }
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             Driver currentPlayerData;
             Driver previousPlayerData;
             float timeDiffSeconds;
