@@ -252,6 +252,7 @@ namespace CrewChiefV4.F1_2018
                     udpClient.Close();
                 }
                 catch (Exception) { }
+                this.initialised = false;
             }
         }
 

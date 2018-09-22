@@ -166,6 +166,7 @@ namespace CrewChiefV4.RaceRoom
                     memoryMappedFile.Dispose();
                 }
                 catch (Exception) { }
+                this.initialised = false;
             }
         }
     }
