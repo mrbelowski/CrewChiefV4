@@ -2511,18 +2511,18 @@ namespace CrewChiefV4
                 sb.Append(" : ").Append(value).AppendLine();
                 if (enable)
                 {
-                    if (textbox != null && !textbox.IsDisposed)
+                    lock (MainWindow.instanceLock)
                     {
-                        try
+                        if (MainWindow.instance != null && textbox != null && !textbox.IsDisposed)
                         {
-                            lock (MainWindow.instanceLock)
+                            try
                             {
                                 textbox.AppendText(sb.ToString());
                             }
-                        }
-                        catch (Exception)
-                        {
-                            // swallow - nothing to log it to
+                            catch (Exception)
+                            {
+                                // swallow - nothing to log it to
+                            }
                         }
                     }
                 }
