@@ -380,7 +380,7 @@ namespace CrewChiefV4.rFactor2
                         this.DisconnectInternal();
                     }
                 }
-                return initialised;
+                return this.initialised;
             }
         }
 
@@ -394,7 +394,7 @@ namespace CrewChiefV4.rFactor2
         {
             lock (this)
             {
-                if (!initialised)
+                if (!this.initialised)
                 {
                     if (!this.InitialiseInternal())
                     {
@@ -529,6 +529,7 @@ namespace CrewChiefV4.rFactor2
         private void DisconnectInternal()
         {
             // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
+            // TODO_THREADS: locking might be no longer needed here.
             lock (this)
             {
                 this.initialised = false;
