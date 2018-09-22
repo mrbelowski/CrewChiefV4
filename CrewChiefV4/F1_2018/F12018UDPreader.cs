@@ -250,10 +250,10 @@ namespace CrewChiefV4.F1_2018
                 {
                     stop();
                     udpClient.Close();
-                    initialised = false;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()
