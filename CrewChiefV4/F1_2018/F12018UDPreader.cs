@@ -253,6 +253,7 @@ namespace CrewChiefV4.F1_2018
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()
