@@ -45,6 +45,24 @@ namespace CrewChiefV4
             return INSTANCE;
         }
 
+        public void clearCachedReaders()
+        {
+            lock (this)
+            {
+                 pcarsUDPreader = null;
+                 pcars2UDPreader = null;
+                 pcarsSharedMemoryReader = null;
+                 pcars2SharedMemoryReader = null;
+                 r3eSharedMemoryReader = null;
+                 rf1SharedMemoryReader = null;
+                 ascSharedMemoryReader = null;
+                 rf2SharedMemoryReader = null;
+                 iracingSharedMemoryReader = null;
+                 f12018UDPReader = null;
+                 accSharedMemoryReader = null;
+            }
+        }
+
         public GameDataReader getGameStateReader(GameDefinition gameDefinition)
         {
             lock (this)
