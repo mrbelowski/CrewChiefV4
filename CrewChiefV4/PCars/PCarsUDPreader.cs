@@ -348,10 +348,10 @@ namespace CrewChiefV4.PCars
                 {
                     stop();
                     udpClient.Close();
-                    initialised = false;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()

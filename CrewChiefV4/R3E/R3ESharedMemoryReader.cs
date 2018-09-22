@@ -165,10 +165,10 @@ namespace CrewChiefV4.RaceRoom
                 {
                     memoryMappedFile.Dispose();
                     memoryMappedFile = null;
-                    initialised = false;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
     }
 }

@@ -160,10 +160,10 @@ namespace CrewChiefV4.rFactor1
                 {
                     memoryMappedFile.Dispose();
                     memoryMappedFile = null;
-                    initialised = false;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
     }
 }
