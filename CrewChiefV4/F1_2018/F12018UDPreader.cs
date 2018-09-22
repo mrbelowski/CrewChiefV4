@@ -248,7 +248,10 @@ namespace CrewChiefV4.F1_2018
             {
                 try
                 {
-                    stop();
+                    if (running)
+                    {
+                        stop();
+                    }
                     udpClient.Close();
                 }
                 catch (Exception) { }
