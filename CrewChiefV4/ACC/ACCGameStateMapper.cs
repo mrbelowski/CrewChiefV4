@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 using CrewChiefV4.GameState;
 using CrewChiefV4.ACC;
 using CrewChiefV4.ACC.Data;
+using System.Runtime.InteropServices;
 namespace CrewChiefV4.ACC
 {
     class ACCGameStateMapper : GameStateMapper
     {
         public ACCGameStateMapper()
         {
+            Console.WriteLine("OffsetOf currentSessionIndex " + Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionIndex").ToString("d"));
+            Console.WriteLine( "sizeOf SessionData " + Marshal.SizeOf(typeof(CrewChiefV4.ACC.Data.SessionData)).ToString("X"));
         }
 
         public override void versionCheck(Object memoryMappedFileStruct)
         {
             // no version data in the stream so this is a no-op
+
         }
         public override void setSpeechRecogniser(SpeechRecogniser speechRecogniser)
         {
@@ -32,10 +36,7 @@ namespace CrewChiefV4.ACC
             ACCSharedMemoryData data = wrapper.data;
             if (!previousRaceSessionType.Equals(data.sessionData.currentSessionType))
             {
-                Console.WriteLine("physicsTime " + data.sessionData.physicsTime + " size of SessionData " + System.Runtime.InteropServices.Marshal.SizeOf(typeof(CrewChiefV4.ACC.Data.SessionData)) +
-                    " size of float " + sizeof(float));
-
-                Console.WriteLine(System.Runtime.InteropServices.Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionPhase"));
+                Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
             }

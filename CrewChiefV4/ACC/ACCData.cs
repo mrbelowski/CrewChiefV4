@@ -177,7 +177,7 @@ namespace CrewChiefV4.ACC
 		    GearBox = 0x7,
 	    };
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
         public struct Vec3
         {
@@ -186,7 +186,7 @@ namespace CrewChiefV4.ACC
             public float z;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
         public struct Rotation
         {
@@ -195,7 +195,7 @@ namespace CrewChiefV4.ACC
             public float roll;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
         public struct Track
         {
@@ -205,7 +205,7 @@ namespace CrewChiefV4.ACC
             public int corners;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
         public struct Driver
         {
@@ -223,30 +223,46 @@ namespace CrewChiefV4.ACC
 	
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Explicit)]
         [Serializable]
         public struct SessionData
         {
+            [FieldOffset(0)]
             public RaceSessionType currentSessionType;
+            [FieldOffset(1)]
             public RaceSessionPhase currentSessionPhase;
+            [FieldOffset(4)]
             public float physicsTime;
+            [FieldOffset(8)]
             public float sessionStartTime;
-            public float sessionEndTime;            
+            [FieldOffset(12)]
+            public float sessionEndTime;
+            [FieldOffset(16)]
             public float sessionStartTimeStamp;
+            [FieldOffset(20)]
             public float receivedServerTime;
+            [FieldOffset(24)]
             public float serverTimeOffset;
+            [FieldOffset(28)]
             public bool isServer;
+            [FieldOffset(29)]
             public bool isClient;
+            [FieldOffset(30)]
             public bool areCarsInitializated;
+            [FieldOffset(31)]
             public bool isTimeStopped;
+            [FieldOffset(32)]
             public bool isEventInitializated;
+            [FieldOffset(33)]
             public bool isSessionInitializated;
+            [FieldOffset(36)]           
             public int currentEventIndex;
+            [FieldOffset(40)]
             public int currentSessionIndex;
 
 
         }
-        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
         public struct  ACCSharedMemoryData
         {
