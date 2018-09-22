@@ -2563,18 +2563,15 @@ namespace CrewChiefV4
                 {
                     lock (MainWindow.instanceLock)
                     {
-                        if (MainWindow.instance != null)
+                        if (MainWindow.instance != null && textbox != null && !textbox.IsDisposed)
                         {
-                            if (textbox != null && !textbox.IsDisposed)
+                            try
                             {
-                                try
-                                {
-                                    textbox.AppendText(sb.ToString());
-                                }
-                                catch (Exception)
-                                {
-                                    // swallow - nothing to log it to
-                                }
+                                textbox.AppendText(sb.ToString());
+                            }
+                            catch (Exception)
+                            {
+                                // swallow - nothing to log it to
                             }
                         }
                     }
