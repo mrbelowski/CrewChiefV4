@@ -410,6 +410,7 @@ namespace CrewChiefV4.PCars2
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()

@@ -141,9 +141,11 @@ namespace CrewChiefV4.PCars
                 try
                 {
                     memoryMappedFile.Dispose();
+                    memoryMappedFile = null;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
     }
 }
