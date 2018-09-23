@@ -347,11 +347,6 @@ namespace CrewChiefV4
         // opponent grammar processing stuff needs this.
         private List<Grammar> addCompoundChoices(String[] phrases, Boolean alwaysUseAllPhrases, Choices choices, String[] append, Boolean alwaysUseAllAppends)
         {
-            if (!initialised)
-            {
-                return null;
-            }
-
             List<Grammar> generatedGrammars = new List<Grammar>();
             foreach (string s in phrases)
             {
@@ -861,8 +856,6 @@ namespace CrewChiefV4
                         }
                     }
                     addCompoundChoices(SET_ALARM_CLOCK, false, this.hourChoices, minuteArray.ToArray(), true);
-                    
-                    
                 }
 
             }
