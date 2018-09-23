@@ -18,6 +18,8 @@ namespace CrewChiefV4
     {
         private static GameStateReaderFactory INSTANCE = new GameStateReaderFactory();
 
+        // the Reader objects may be used by other Threads, so the factory must cache them and return the same instance
+        // when called.
         private PCarsUDPreader pcarsUDPreader;
         private PCars2UDPreader pcars2UDPreader;
         private PCarsSharedMemoryReader pcarsSharedMemoryReader;
@@ -28,15 +30,6 @@ namespace CrewChiefV4
         private ACSSharedMemoryReader ascSharedMemoryReader;
         private iRacingSharedMemoryReader iracingSharedMemoryReader;
         private F12018UDPreader f12018UDPReader;
-
-        private PCarsGameStateMapper pcarsGameStateMapper;
-        private PCars2GameStateMapper pcars2GameStateMapper;
-        private R3EGameStateMapper r3eGameStateMapper;
-        private RF1GameStateMapper rf1GameStateMapper;
-        private RF2GameStateMapper rf2GameStateMapper;
-        private ACSGameStateMapper ascGameStateMapper;
-        private iRacingGameStateMapper iracingGameStateMapper;
-        private F12018GameStateMapper f12018GameStateMapper;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -118,66 +111,32 @@ namespace CrewChiefV4
 
         public GameStateMapper getGameStateMapper(GameDefinition gameDefinition)
         {
-            lock (this)
+            switch (gameDefinition.gameEnum)
             {
-                switch (gameDefinition.gameEnum)
-                {
-                    case GameEnum.PCARS_NETWORK:
-                    case GameEnum.PCARS_32BIT:
-                    case GameEnum.PCARS_64BIT:
-                        if (pcarsGameStateMapper == null)
-                        {
-                            pcarsGameStateMapper = new PCarsGameStateMapper();
-                        }
-                        return pcarsGameStateMapper;
-                    case GameEnum.PCARS2_NETWORK:
-                    case GameEnum.PCARS2:
-                        if (pcars2GameStateMapper == null)
-                        {
-                            pcars2GameStateMapper = new PCars2GameStateMapper();
-                        }
-                        return pcars2GameStateMapper;
-                    case GameEnum.RACE_ROOM:
-                        if (r3eGameStateMapper == null)
-                        {
-                            r3eGameStateMapper = new R3EGameStateMapper();
-                        }
-                        return r3eGameStateMapper;
-                    case GameEnum.RF1:
-                        if (rf1GameStateMapper == null)
-                        {
-                            rf1GameStateMapper = new RF1GameStateMapper();
-                        }
-                        return rf1GameStateMapper;
-                    case GameEnum.ASSETTO_64BIT:
-                    case GameEnum.ASSETTO_32BIT:
-                        if (ascGameStateMapper == null)
-                        {
-                            ascGameStateMapper = new ACSGameStateMapper();
-                        }
-                        return ascGameStateMapper;
-                    case GameEnum.RF2_64BIT:
-                        if (rf2GameStateMapper == null)
-                        {
-                            rf2GameStateMapper = new RF2GameStateMapper();
-                        }
-                        return rf2GameStateMapper;
-                    case GameEnum.IRACING:
-                        if (iracingGameStateMapper == null)
-                        {
-                            iracingGameStateMapper = new iRacingGameStateMapper();
-                        }
-                        return iracingGameStateMapper;
-                    case GameEnum.F1_2018:
-                        if (f12018GameStateMapper == null)
-                        {
-                            f12018GameStateMapper = new F12018GameStateMapper();
-                        }
-                        return f12018GameStateMapper;
-                        
-                }
+                case GameEnum.PCARS_NETWORK:
+                case GameEnum.PCARS_32BIT:
+                case GameEnum.PCARS_64BIT:
+                    return new PCarsGameStateMapper();
+                case GameEnum.PCARS2_NETWORK:
+                case GameEnum.PCARS2:
+                    return new PCars2GameStateMapper();
+                case GameEnum.RACE_ROOM:
+                    return new R3EGameStateMapper();
+                case GameEnum.RF1:
+                    return new RF1GameStateMapper();
+                case GameEnum.ASSETTO_64BIT:
+                case GameEnum.ASSETTO_32BIT:
+                    return new ACSGameStateMapper();
+                case GameEnum.RF2_64BIT:
+                    return new RF2GameStateMapper();
+                case GameEnum.IRACING:
+                    return new iRacingGameStateMapper();
+                case GameEnum.F1_2018:
+                    return new F12018GameStateMapper();
+                default:
+                    Console.WriteLine("No mapper is defined for GameDefinition " + gameDefinition.friendlyName);
+                    return null;
             }
-            return null;
         }
     }
 }
