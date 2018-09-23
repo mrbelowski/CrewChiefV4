@@ -563,11 +563,14 @@ namespace CrewChiefV4
                     }
                 }
             }
-        }
-
-        private void updateSelectedGame()
-        {
-
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -1957,6 +1960,14 @@ namespace CrewChiefV4
             {
                 controllerConfiguration.removeNetworkControllerFromList();
             }
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
+            }
             getControllers();
         }
 
@@ -2511,18 +2522,18 @@ namespace CrewChiefV4
                 sb.Append(" : ").Append(value).AppendLine();
                 if (enable)
                 {
-                    if (textbox != null && !textbox.IsDisposed)
+                    lock (MainWindow.instanceLock)
                     {
-                        try
+                        if (MainWindow.instance != null && textbox != null && !textbox.IsDisposed)
                         {
-                            lock (MainWindow.instanceLock)
+                            try
                             {
                                 textbox.AppendText(sb.ToString());
                             }
-                        }
-                        catch (Exception)
-                        {
-                            // swallow - nothing to log it to
+                            catch (Exception)
+                            {
+                                // swallow - nothing to log it to
+                            }
                         }
                     }
                 }
