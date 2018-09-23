@@ -134,9 +134,7 @@ namespace CrewChiefV4.iRacing
             }*/
 
 
-            if (currentGameState.SessionData.SessionType != SessionType.Unavailable && shared.Telemetry.IsNewSession
-                && (lastSessionType != currentGameState.SessionData.SessionType ||
-                sessionNumber != previousSessionNumber || previousSessionId != currentGameState.SessionData.SessionId))
+            if (currentGameState.SessionData.SessionType != SessionType.Unavailable && shared.Telemetry.IsNewSession)
             {
                 CarData.clearCachedIRacingClassData();
                 currentGameState.SessionData.IsNewSession = true;

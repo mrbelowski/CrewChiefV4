@@ -417,14 +417,13 @@ namespace CrewChiefV4.iRacing
                 _sessionData.Update(sessionInfo, sessionNumber);
                 _sessionId = sessionId;
                 _subSessionId = subSessionId;
-                _isRaceOrQualifying = this.SessionData.SessionType == "Race" || this.SessionData.SessionType == "Lone Qualify" || this.SessionData.SessionType == "Lone Qualify";
+                _isRaceOrQualifying = this.SessionData.SessionType == "Race" || this.SessionData.SessionType == "Open Qualify" || this.SessionData.SessionType == "Lone Qualify";
             }
             _currentSessionNumber = sessionNumber;
             // Update drivers
             this.UpdateDriverList(sessionInfo, reloadDrivers);
             
-            return reloadDrivers;
-         
+            return reloadDrivers;         
         }
 
         public void SdkOnTelemetryUpdated(iRacingData telemetry)
