@@ -62,14 +62,14 @@ namespace CrewChiefV4.ACC
 
         protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
-           /* AssettoCorsaShared latestRawData = (AssettoCorsaShared)currentStateObj;
-            foreach (acsVehicleInfo vehicleInfo in latestRawData.acsChief.vehicle)
+            ACCSharedMemoryData latestRawData = (ACCSharedMemoryData)currentStateObj;
+            foreach (Driver vehicleInfo in latestRawData.opponentDrivers)
             {
-                if (vehicleInfo.carLeaderboardPosition == position)
+                if (vehicleInfo.realTimePosition == position)
                 {
-                    return new float[] { vehicleInfo.worldPosition.x, vehicleInfo.worldPosition.y };
+                    return new float[] { vehicleInfo.location.x, vehicleInfo.location.y };
                 }
-            }*/
+            }
             return new float[] { 0, 0 };
         }
 
@@ -82,15 +82,6 @@ namespace CrewChiefV4.ACC
         {
             return (Math.PI / 180) * angle;
         }
-        public float constrainAngle(float x)
-        {
-            x = x + 180.0f % 360.0f;
-            if (x < 0.0f)
-            {
-                x += 360.0f;
-            }                
-            return x - 180.0f;
-        }
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
             if (paused)
@@ -100,12 +91,11 @@ namespace CrewChiefV4.ACC
             ACCSharedMemoryData currentState = ((ACCSharedMemoryReader.ACCStructWrapper)currentStateObj).data;
             ACCSharedMemoryData lastState = ((ACCSharedMemoryReader.ACCStructWrapper)lastStateObj).data;
 
-            if (!enabled 
-                /*|| currentState.sessionData.currentSessionPhase != RaceSessionPhase.SessionTime ||
-                currentState.sessionData.currentSessionPhase != RaceSessionPhase.SessionOverTime ||
-                currentState.sessionData.currentSessionType == RaceSessionType.Hotlap ||
-                currentState.sessionData.currentSessionType == RaceSessionType.Hotstint
-                */)
+            if (!enabled || !(currentState.sessionData.currentSessionPhase == RaceSessionPhase.SessionTime ||
+                currentState.sessionData.currentSessionPhase == RaceSessionPhase.SessionOverTime) ||
+                (currentState.sessionData.currentSessionType == RaceSessionType.Hotlap ||
+                currentState.sessionData.currentSessionType == RaceSessionType.Hotstint)
+                )
             {
                 return;
             }
