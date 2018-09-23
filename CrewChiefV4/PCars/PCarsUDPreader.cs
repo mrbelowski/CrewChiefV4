@@ -346,7 +346,10 @@ namespace CrewChiefV4.PCars
             {
                 try
                 {
-                    stop();
+                    if (running)
+                    {
+                        stop();
+                    }
                     udpClient.Close();
                 }
                 catch (Exception) { }
