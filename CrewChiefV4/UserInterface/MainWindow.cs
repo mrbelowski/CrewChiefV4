@@ -1354,70 +1354,72 @@ namespace CrewChiefV4
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
                 {
-                    crewChief.setGameDefinition(gameDefinition);
+                    crewChief.setGameDefinition(gameDefinition);                
+
+                    MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
+                    CarData.loadCarClassData();
+                    TrackData.loadTrackLandmarksData();
+                    this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+                    this.assignButtonToAction.Enabled = false;
+                    this.deleteAssigmentButton.Enabled = false;
+                    this.groupBox1.Enabled = false;
+                    this.propertiesButton.Enabled = false;
+                    this.scanControllersButton.Enabled = false;
+                    this.personalisationBox.Enabled = false;
+                    this.chiefNameBox.Enabled = false;
+                    this.spotterNameBox.Enabled = false;
+                    this.recordSession.Enabled = false;
+                    ThreadStart crewChiefWork = runApp;
+                    Thread crewChiefThread = new Thread(crewChiefWork);
+                    crewChiefThread.Name = "MainWindow.runApp";
+                    ThreadManager.RegisterRootThread(crewChiefThread);
+
+                    // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
+                    // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
+                    // the AutoUpdater triggers and steals focus while the player is racing
+                    AutoUpdater.Stop();
+
+                    crewChief.onRestart();
+                    crewChiefThread.Start();
+                    runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
+                        && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
+                    if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
+                    {
+                        Console.WriteLine("Listening on default audio input device");
+                        ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
+                        Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
+
+                        channelOpenButtonListenerThread.Name = "MainWindow.listenForChannelOpen";
+                        ThreadManager.RegisterRootThread(channelOpenButtonListenerThread);
+
+                        channelOpenButtonListenerThread.Start();
+                    }
+                    else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
+                        crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
+                    {
+                        Console.WriteLine("Running speech recognition in 'always on' mode");
+                        crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
+                        crewChief.speechRecogniser.startContinuousListening();
+                    }
+                    if (runListenForButtonPressesThread)
+                    {
+                        Console.WriteLine("Listening for buttons");
+                        ThreadStart buttonPressesListenerWork = listenForButtons;
+                        Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
+
+                        buttonPressesListenerThread.Name = "MainWindow.listenForButtons";
+                        ThreadManager.RegisterRootThread(buttonPressesListenerThread);
+
+                        buttonPressesListenerThread.Start();
+                    }
+
                 }
                 else
                 {
                     MessageBox.Show(Configuration.getUIString("please_choose_a_game_option"), Configuration.getUIString("no_game_selected"),
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    IsAppRunning = false;
                     return;
-                }
-
-                MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
-                CarData.loadCarClassData();
-                TrackData.loadTrackLandmarksData();
-                this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
-                this.assignButtonToAction.Enabled = false;
-                this.deleteAssigmentButton.Enabled = false;
-                this.groupBox1.Enabled = false;
-                this.propertiesButton.Enabled = false;
-                this.scanControllersButton.Enabled = false;
-                this.personalisationBox.Enabled = false;
-                this.chiefNameBox.Enabled = false;
-                this.spotterNameBox.Enabled = false;
-                this.recordSession.Enabled = false;
-                ThreadStart crewChiefWork = runApp;
-                Thread crewChiefThread = new Thread(crewChiefWork);
-                crewChiefThread.Name = "MainWindow.runApp";
-                ThreadManager.RegisterRootThread(crewChiefThread);
-
-                // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
-                // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
-                // the AutoUpdater triggers and steals focus while the player is racing
-                AutoUpdater.Stop();
-
-                crewChief.onRestart();
-                crewChiefThread.Start();
-                runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
-                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
-                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
-                {
-                    Console.WriteLine("Listening on default audio input device");
-                    ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
-                    Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
-
-                    channelOpenButtonListenerThread.Name = "MainWindow.listenForChannelOpen";
-                    ThreadManager.RegisterRootThread(channelOpenButtonListenerThread);
-
-                    channelOpenButtonListenerThread.Start();
-                }
-                else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
-                    crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
-                {
-                    Console.WriteLine("Running speech recognition in 'always on' mode");
-                    crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
-                    crewChief.speechRecogniser.startContinuousListening();
-                }
-                if (runListenForButtonPressesThread)
-                {
-                    Console.WriteLine("Listening for buttons");
-                    ThreadStart buttonPressesListenerWork = listenForButtons;
-                    Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
-
-                    buttonPressesListenerThread.Name = "MainWindow.listenForButtons";
-                    ThreadManager.RegisterRootThread(buttonPressesListenerThread);
-
-                    buttonPressesListenerThread.Start();
                 }
             }
             else
