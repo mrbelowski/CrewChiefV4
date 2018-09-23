@@ -547,7 +547,6 @@ namespace CrewChiefV4.rFactor2
                 this.DisconnectInternal();
             }
             catch (Exception) { }
-            this.initialised = false;
         }
     }
 }

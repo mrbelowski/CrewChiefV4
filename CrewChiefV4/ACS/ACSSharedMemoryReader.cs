@@ -224,6 +224,7 @@ namespace CrewChiefV4.assetto
                 try
                 {
                     memoryMappedPhysicsFile.Dispose();
+                    memoryMappedPhysicsFile = null;
                 }
                 catch (Exception) { }
             }
@@ -232,6 +233,7 @@ namespace CrewChiefV4.assetto
                 try
                 {
                     memoryMappedGraphicFile.Dispose();
+                    memoryMappedGraphicFile = null;
                 }
                 catch (Exception) { }
             }
@@ -240,6 +242,7 @@ namespace CrewChiefV4.assetto
                 try
                 {
                     memoryMappedStaticFile.Dispose();
+                    memoryMappedStaticFile = null;
                 }
                 catch (Exception) { }
             }
@@ -248,10 +251,11 @@ namespace CrewChiefV4.assetto
                 try
                 {
                     memoryMappedCrewChiefFile.Dispose();
+                    memoryMappedCrewChiefFile = null;
                 }
                 catch (Exception) { }
             }
-            this.initialised = false;
+            initialised = false;
         }
     }
 }

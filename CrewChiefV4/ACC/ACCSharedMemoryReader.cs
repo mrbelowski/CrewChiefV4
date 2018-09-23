@@ -167,8 +167,8 @@ namespace CrewChiefV4.ACC
                     memoryMappedCrewChiefFile.Dispose();
                 }
                 catch (Exception) { }
-                this.initialised = false;
             }
+            initialised = false;
         }
     }
 }
