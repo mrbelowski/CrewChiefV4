@@ -167,10 +167,11 @@ namespace CrewChiefV4.PCars2
                 try
                 {
                     memoryMappedFile.Dispose();
+                    memoryMappedFile = null;
                 }
                 catch (Exception) { }
-                this.initialised = false;
             }
+            initialised = false;
         }
     }
 }

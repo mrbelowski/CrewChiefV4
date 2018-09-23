@@ -346,14 +346,12 @@ namespace CrewChiefV4.PCars
             {
                 try
                 {
-                    if (running)
-                    {
-                        stop();
-                    }
+                    stop();
                     udpClient.Close();
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()
