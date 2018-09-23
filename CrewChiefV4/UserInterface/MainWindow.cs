@@ -568,11 +568,14 @@ namespace CrewChiefV4
                     }
                 }
             }
-        }
-
-        private void updateSelectedGame()
-        {
-
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -1977,6 +1980,14 @@ namespace CrewChiefV4
             else
             {
                 controllerConfiguration.removeNetworkControllerFromList();
+            }
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
             }
             getControllers();
         }

@@ -82,8 +82,6 @@ namespace CrewChiefV4
 
         private Thread spotterThread = null;
 
-        private GameStateMapper gameStateMapper;
-
         private GameDataReader gameDataReader;
 
         // hmm....
@@ -707,7 +705,7 @@ namespace CrewChiefV4
                 SpeechRecogniser.waitingForSpeech = false;
                 SpeechRecogniser.gotRecognitionResult = false;
                 SpeechRecogniser.keepRecognisingInHoldMode = false;
-                gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
+                GameStateMapper gameStateMapper = GameStateReaderFactory.getInstance().getGameStateMapper(gameDefinition);
                 gameStateMapper.setSpeechRecogniser(speechRecogniser);
                 gameDataReader = GameStateReaderFactory.getInstance().getGameStateReader(gameDefinition);
                 gameDataReader.ResetGameDataFromFile();
