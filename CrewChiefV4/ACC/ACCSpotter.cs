@@ -67,7 +67,7 @@ namespace CrewChiefV4.ACC
             {
                 if (vehicleInfo.realTimePosition == position)
                 {
-                    return new float[] { vehicleInfo.location.x, vehicleInfo.location.y };
+                    return new float[] { vehicleInfo.location.x, vehicleInfo.location.z };
                 }
             }
             return new float[] { 0, 0 };
