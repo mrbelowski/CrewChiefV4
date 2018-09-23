@@ -47,6 +47,8 @@ namespace CrewChiefV4
         private const int SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS = 5;
         private const int SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS = ThreadManager.SHUTDOWN_THREAD_ALIVE_TOTAL_WAIT_SECS * 1000 / ThreadManager.SHUTDOWN_THREAD_ALIVE_CHECK_PERIOD_MILLIS;
 
+        private const int TEMP_THREADS_TRIM_THRESHOLD = 50;
+
         private static List<Thread> rootThreads = new List<Thread>();
 
         // TODO_THREADS: implement temporary thread registration/wait.
@@ -76,10 +78,34 @@ namespace CrewChiefV4
         {
             lock (ThreadManager.temporaryThreads)
             {
+                ThreadManager.TrimTemporaryThreads();
+
                 if (!ThreadManager.temporaryThreads.Contains(t))
                     ThreadManager.temporaryThreads.Add(t);
                 else
                     Debug.Assert(false, "Temporary thread already registered, this should not happen.");
+            }
+        }
+
+        private static void TrimTemporaryThreads()
+        {
+            lock (ThreadManager.temporaryThreads)
+            {
+                // Normally, temporary threads are short-lived and kicked off infrequently.  Sometimes, however,
+                // new thread of the same work is kicked off while previous instance is still alive.  Such threads
+                // are kept in a temporaryThreads collection upon unregistering them, so that they are still under TM control.
+                //
+                // However, that means that temporaryThreads collection grows unbounded.  In the extreme case, this
+                // is also an indicator of a severe bug in the app itsel, and needs to be investigated, understood and fixed.
+                if (ThreadManager.temporaryThreads.Count > ThreadManager.TEMP_THREADS_TRIM_THRESHOLD)
+                {
+                    var msg = "Trimming temporary thread collection.  This should not happen normally, see log file for ThreadManager warnings.";
+                    Debug.Assert(false, msg);
+                    ThreadManager.Trace(msg);
+
+                    // Remove temporary threads that aren't running anymore.
+                    ThreadManager.temporaryThreads.RemoveWhere(t => !t.IsAlive);
+                }
             }
         }
 
@@ -108,12 +134,13 @@ namespace CrewChiefV4
             {
                 if (ThreadManager.temporaryThreads.Contains(t))
                 {
-                    Debug.Assert(!t.IsAlive, "Temporary thread is still alive upon unregistering, we might need investigate here");
+                    var warningMsg = "WARNING - Temporary thread is still alive upon unregistering, we might need to investigate here.";
+                    Debug.Assert(!t.IsAlive, warningMsg);
 
                     if (t.IsAlive)
-                        ThreadManager.Trace("Temporary thread is still alive upon unregistering, we might need investigate here.  Name - " + t.Name);
-
-                    ThreadManager.temporaryThreads.Remove(t);
+                        ThreadManager.Trace(warningMsg + "  Name - " + t.Name);
+                    else
+                        ThreadManager.temporaryThreads.Remove(t);
                 }
                 else
                     Debug.Assert(false, "Temporary thread is not registered, this should not happen.");
