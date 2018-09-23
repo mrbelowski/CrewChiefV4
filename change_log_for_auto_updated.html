@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.5.3</h2>
+<ul>
+	<li>Internal overhaul for better performance and stability. Fixes some threading / resource issues that could cause instability on shutdown, changes to how the internal event processing works to make it faster and less resource-hungry, removed 'disable immediate messages' option as this is no longer needed, reduced CPU overhead in lots of other places</li>
+	<li>Fixed app crash when failing to initialise nAudio background sounds player</li>
+	<li>pCars2 - added 'pCars 2 spotter car length' property, default 5 metres (app was using whatever had been set in the pCars1 version of this property)</li>
+</ul>
 <h2>Version 4.9.5.2</h2>
 <ul>
 	<li>Fix laps-to-go calculation - it's now based on the number of laps completed by the overall leader so should be correct when you've been lapped</li>
