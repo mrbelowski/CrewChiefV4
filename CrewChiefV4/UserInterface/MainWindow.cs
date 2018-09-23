@@ -1080,18 +1080,26 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Invoking speech recognition...");
                             crewChief.speechRecogniser.recognizeAsyncCancel();
-                            ThreadManager.UnregisterTemporaryThread(youWotThread);
-                            youWotThread = new Thread(() =>
+                            if (youWotThread == null
+                                || !youWotThread.IsAlive)
                             {
-                                Thread.Sleep(2000);
-                                if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                ThreadManager.UnregisterTemporaryThread(youWotThread);
+                                youWotThread = new Thread(() =>
                                 {
-                                    crewChief.youWot(false);
-                                }
-                            });
-                            youWotThread.Name = "MainWindow.youWotThread";
-                            ThreadManager.RegisterTemporaryThread(youWotThread);
-                            youWotThread.Start();
+                                    Thread.Sleep(2000);
+                                    if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                    {
+                                        crewChief.youWot(false);
+                                    }
+                                });
+                                youWotThread.Name = "MainWindow.youWotThread";
+                                ThreadManager.RegisterTemporaryThread(youWotThread);
+                                youWotThread.Start();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Skipping new instance of youWot thread because previous is still running.");
+                            }
                         }
                         channelOpen = false;
                     }
