@@ -11,6 +11,22 @@ namespace CrewChiefV4.ACC
 {
     class ACCGameStateMapper : GameStateMapper
     {
+
+        RaceSessionType previousRaceSessionType = RaceSessionType.RaceSessionType_Max;
+        RaceSessionPhase previousRaceSessionPhase = RaceSessionPhase.RaceSessionPhase_Max;
+
+        private void PrintProperties<T>(T myObj)
+        {
+            foreach (var prop in myObj.GetType().GetProperties())
+            {
+                Console.WriteLine(Marshal.OffsetOf(typeof(T), prop.Name).ToString("d") + " prop " + prop.Name + ": " + prop.GetValue(myObj, null));
+            }
+
+            foreach (var field in myObj.GetType().GetFields())
+            {
+                Console.WriteLine(Marshal.OffsetOf(typeof(T), field.Name).ToString("d") + " field " + field.Name + ": " + field.GetValue(myObj));
+            }
+        }
         public ACCGameStateMapper()
         {
             Console.WriteLine("OffsetOf currentSessionIndex " + Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionIndex").ToString("d"));
@@ -27,8 +43,7 @@ namespace CrewChiefV4.ACC
             speechRecogniser.addiRacingSpeechRecogniser();
             this.speechRecogniser = speechRecogniser;
         }
-        RaceSessionType previousRaceSessionType = RaceSessionType.RaceSessionType_Max;
-        RaceSessionPhase previousRaceSessionPhase = RaceSessionPhase.RaceSessionPhase_Max;
+
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
             ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;
@@ -36,12 +51,15 @@ namespace CrewChiefV4.ACC
             ACCSharedMemoryData data = wrapper.data;
             if (!previousRaceSessionType.Equals(data.sessionData.currentSessionType))
             {
-                Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
+                PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
+                PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
+                //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
             }
-            if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))
+            if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
+                PrintProperties(data.sessionData);
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }

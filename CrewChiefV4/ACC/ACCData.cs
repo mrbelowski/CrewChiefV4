@@ -18,7 +18,8 @@ namespace CrewChiefV4.ACC
 	        ECarLocation__PitExit = 4,
 	        ECarLocation__ECarLocation_MAX = 5
         };
-        public enum  RaceSessionType : byte
+
+        public enum RaceSessionType : byte
 	    {
 		    FreePractice1 = 0,
 		    FreePractice2 = 1,
@@ -36,6 +37,7 @@ namespace CrewChiefV4.ACC
 		    HotlapSuperpole = 13,
             RaceSessionType_Max = 14,
 	    };
+
 	    public enum  RaceSessionPhase  : byte
 	    {
 		    StartingUI = 0,
@@ -48,6 +50,7 @@ namespace CrewChiefV4.ACC
 		    ResultUI = 7,
             RaceSessionPhase_Max = 8, 
 	    };
+
 	    public enum  DriverCategory  : byte
 	    {
 		    EDriverCategory__Platinum = 0,
@@ -56,6 +59,7 @@ namespace CrewChiefV4.ACC
 		    EDriverCategory__Bronze = 3,
 		    EDriverCategory__EDriverCategory_MAX = 4
 	    };
+
 	    public enum  Nationality  : byte
 	    {
 		    ENationality__Any = 0,
@@ -97,6 +101,7 @@ namespace CrewChiefV4.ACC
 		    ENationality__Portugal = 36,
 		    ENationality__ENationality_MAX = 37
 	    };
+
 	    public enum  CarModelType  : byte
 	    {
 		    ECarModelType__Porsche_991_GT3_R = 0,
@@ -118,6 +123,7 @@ namespace CrewChiefV4.ACC
 		    ECarModelType__Lamborghini_Huracan_GT301 = 16,
 		    ECarModelType__ECarModelType_MAX = 17
 	    };
+
 	    public enum  MarshalFlagType  : byte
 	    {
 		    EMarshalFlagType__White = 0,
@@ -133,6 +139,7 @@ namespace CrewChiefV4.ACC
 		    EMarshalFlagType__None = 10,
 		    EMarshalFlagType__EMarshalFlagType_MAX = 11
 	    };
+
 	    public enum  CupCategory  : byte
 	    {
 		    ECupCategory__Overall = 0,
@@ -142,6 +149,7 @@ namespace CrewChiefV4.ACC
 		    ECupCategory__National = 4,
 		    ECupCategory__ECupCategory_MAX = 5
 	    };
+
 	    public enum RaceEventType  : byte
 	    {
 		    ERaceEventType__A_3H = 0,
@@ -150,6 +158,7 @@ namespace CrewChiefV4.ACC
 		    ERaceEventType__D_1H = 3,
 		    ERaceEventType__ERaceEventType_MAX = 4
 	    };
+
 	    public enum LapStateFlags : byte
 	    {
 		    HasCut = 0x0,
@@ -165,6 +174,7 @@ namespace CrewChiefV4.ACC
 		    IsOnPitWorkingZone = 10,
 		    DriverSwap = 11,
 	    };
+
 	    public enum PitStopRepairType : byte
 	    {
 		    Chassis = 0x0,
@@ -194,18 +204,31 @@ namespace CrewChiefV4.ACC
             public float yaw;
             public float roll;
         }
-
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [Serializable]
+        public struct WeatherStatus
+        {
+            public float ambientTemperature;
+            public float roadTemperature;
+            public float wetLevel;
+            public float windSpeed;
+            public float windDirection;
+            public float rainLevel;
+            public float cloudLevel;
+        };
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct Track
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
             public String name;
-            public int length;
+            public int Id;
+            public float length;
             public int corners;
+            public WeatherStatus weatherState;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct Driver
         {
@@ -219,62 +242,46 @@ namespace CrewChiefV4.ACC
             public float distanceRoundTrack;
             public float speed;
             public int lapCount;
-            public CarLocation trackLocation;
-	
+            public CarLocation trackLocation;	
         }
 
-        [StructLayout(LayoutKind.Explicit)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
         public struct SessionData
         {
-            [FieldOffset(0)]
-            public RaceSessionType currentSessionType;
-            [FieldOffset(1)]
-            public RaceSessionPhase currentSessionPhase;
-            [FieldOffset(4)]
             public float physicsTime;
-            [FieldOffset(8)]
-            public float sessionStartTime;
-            [FieldOffset(12)]
-            public float sessionEndTime;
-            [FieldOffset(16)]
             public float sessionStartTimeStamp;
-            [FieldOffset(20)]
             public float receivedServerTime;
-            [FieldOffset(24)]
             public float serverTimeOffset;
-            [FieldOffset(28)]
+            public float sessionStartTime;
+            public float sessionEndTime;
             public bool isServer;
-            [FieldOffset(29)]
             public bool isClient;
-            [FieldOffset(30)]
             public bool areCarsInitializated;
-            [FieldOffset(31)]
             public bool isTimeStopped;
-            [FieldOffset(32)]
             public bool isEventInitializated;
-            [FieldOffset(33)]
-            public bool isSessionInitializated;
-            [FieldOffset(36)]           
-            public int currentEventIndex;
-            [FieldOffset(40)]
-            public int currentSessionIndex;
-
-
+            public bool isSessionInitializated;        
+            public UInt16 currentEventIndex;
+            public UInt16 currentSessionIndex;
+            public RaceSessionType currentSessionType;
+            public RaceSessionPhase currentSessionPhase;
+            char pad1;
+            char pad2;        
         }
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
         public struct  ACCSharedMemoryData
         {
-            public bool isReady;
-            public double update;            
+            public SessionData sessionData;
             public Track track;
+            public bool isReady;
+            public float update;            
             public Driver playerDriver;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
             public Driver[]opponentDrivers;
 	        public int opponentDriverCount;
-            public SessionData sessionData;
-        }
-        
+
+        }        
     }    
 }
