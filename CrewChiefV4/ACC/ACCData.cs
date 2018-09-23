@@ -224,8 +224,11 @@ namespace CrewChiefV4.ACC
             public String name;
             public int Id;
             public float length;
+            public int sectors;
             public int corners;
+            public bool isPolesitterOnLeft;
             public WeatherStatus weatherState;
+            
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
@@ -237,11 +240,24 @@ namespace CrewChiefV4.ACC
 	        public int nation;
 	        public Vec3 location;
 	        public Rotation rotation;
-            public int position;
-            public int realTimePosition;
             public float distanceRoundTrack;
             public float speed;
+            public float lastSectorTimeStamp;
+            public int position;
+            public int realTimePosition;
             public int lapCount;
+            public int totalTime;
+	        public int currentDelta;
+	        public uint sectorCount;
+            public int currentlaptime;
+	        public bool isBetweenSafetyCarLines;	        
+	        public bool isSessionOver;
+	        public bool isDisqualified;
+	        public bool isRetired;
+            char pad1;
+            char pad2;   
+            public UInt16 driverIndex;
+            public byte formationLapCounter;
             public CarLocation trackLocation;	
         }
 

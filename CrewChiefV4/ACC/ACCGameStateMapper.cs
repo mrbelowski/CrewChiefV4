@@ -17,20 +17,20 @@ namespace CrewChiefV4.ACC
 
         private void PrintProperties<T>(T myObj)
         {
-            foreach (var prop in myObj.GetType().GetProperties())
+            /*foreach (var prop in myObj.GetType().GetProperties())
             {
                 Console.WriteLine(Marshal.OffsetOf(typeof(T), prop.Name).ToString("d") + " prop " + prop.Name + ": " + prop.GetValue(myObj, null));
-            }
-
+            }*/
+            Console.WriteLine("sizeOf: " + myObj.ToString() + " " + Marshal.SizeOf(typeof(T)).ToString("X"));
             foreach (var field in myObj.GetType().GetFields())
             {
-                Console.WriteLine(Marshal.OffsetOf(typeof(T), field.Name).ToString("d") + " field " + field.Name + ": " + field.GetValue(myObj));
+                Console.WriteLine("0x" + Marshal.OffsetOf(typeof(T), field.Name).ToString("X") + " " + field.Name + ": " + field.GetValue(myObj));
             }
         }
         public ACCGameStateMapper()
         {
-            Console.WriteLine("OffsetOf currentSessionIndex " + Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionIndex").ToString("d"));
-            Console.WriteLine( "sizeOf SessionData " + Marshal.SizeOf(typeof(CrewChiefV4.ACC.Data.SessionData)).ToString("X"));
+            //Console.WriteLine("OffsetOf currentSessionIndex " + Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionIndex").ToString("d"));
+            Console.WriteLine("sizeOf Driver " + Marshal.SizeOf(typeof(CrewChiefV4.ACC.Data.Driver)).ToString("X"));
         }
 
         public override void versionCheck(Object memoryMappedFileStruct)
@@ -53,9 +53,14 @@ namespace CrewChiefV4.ACC
             {
                 PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
                 PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
+                PrintProperties<CrewChiefV4.ACC.Data.WeatherStatus>(data.track.weatherState);
                 //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
+                for(int i = 0; i < data.opponentDriverCount; i++)
+                {
+                    PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
+                }
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
