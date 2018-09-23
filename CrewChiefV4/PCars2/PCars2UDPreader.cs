@@ -405,11 +405,15 @@ namespace CrewChiefV4.PCars2
             {
                 try
                 {
-                    stop();
+                    if (running)
+                    {
+                        stop();
+                    }
                     udpClient.Close();
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
 
         public override bool hasNewSpotterData()
