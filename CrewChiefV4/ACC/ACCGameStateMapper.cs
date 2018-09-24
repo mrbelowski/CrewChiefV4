@@ -46,9 +46,13 @@ namespace CrewChiefV4.ACC
 
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
-            ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;
+            ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;            
             long ticks = wrapper.ticksWhenRead;
             ACCSharedMemoryData data = wrapper.data;
+            if(!data.isReady)
+            {
+                return null;
+            }
             if (!previousRaceSessionType.Equals(data.sessionData.currentSessionType))
             {
                 PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
@@ -57,21 +61,18 @@ namespace CrewChiefV4.ACC
                 //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
-                for(int i = 0; i < data.opponentDriverCount; i++)
-                {
-                    PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
-                }
+
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
-                PrintProperties(data.sessionData);
+                PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
+                for (int i = 0; i < data.opponentDriverCount; i++)
+                {
+                    PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
+                }
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }
-
-
-
-
             // TODO: one or two minor things here ;)
             return new GameStateData(ticks);
         }

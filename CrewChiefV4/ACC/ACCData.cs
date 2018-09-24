@@ -248,8 +248,12 @@ namespace CrewChiefV4.ACC
             public int lapCount;
             public int totalTime;
 	        public int currentDelta;
-	        public uint sectorCount;
+	        public uint currentSector;
             public int currentlaptime;
+            public float trottle;
+            public float brake;
+            public float clutch;
+            public float rpm;
 	        public bool isBetweenSafetyCarLines;	        
 	        public bool isSessionOver;
 	        public bool isDisqualified;
