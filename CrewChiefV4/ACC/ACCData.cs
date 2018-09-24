@@ -193,9 +193,18 @@ namespace CrewChiefV4.ACC
         {
             public float startPos;
             public float endPos;
-            public MarshalFlagType flag;
+            public MarshalFlagType flag;	
+        }
 
-        };
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [Serializable]
+        public struct Marshals
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public ACCMarshal[] marshals;
+            public int marshalCount;
+            public byte checkeredFlagMarshalIndex;
+        }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         [Serializable]
@@ -311,9 +320,8 @@ namespace CrewChiefV4.ACC
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
             public Driver[]opponentDrivers;
 	        public int opponentDriverCount;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-            public ACCMarshal [] marshals;
-            public int marshalCount;
+            public Marshals marshals;
+
         }        
     }    
 }

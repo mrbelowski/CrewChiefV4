@@ -71,9 +71,9 @@ namespace CrewChiefV4.ACC
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
                 }
-                for (int i = 0; i < data.marshalCount; i++)
+                for (int i = 0; i < data.marshals.marshalCount; i++)
                 {
-                    PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals[i]);
+                    PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals.marshals[i]);
                 }
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
