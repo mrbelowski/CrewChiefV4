@@ -1458,7 +1458,6 @@ namespace CrewChiefV4
             SoundCache.cancelLazyLoading = true;
 
             stopApp();
-            crewChief.speechRecogniser.Dispose();
         }
 
         private void runApp()
