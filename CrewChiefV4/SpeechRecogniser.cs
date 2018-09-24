@@ -254,7 +254,6 @@ namespace CrewChiefV4
         private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
         private Thread restartWaitTimeoutThreadReference = null;
 
-        private Boolean disposed = false;
         static SpeechRecogniser () 
         {
             if (UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition"))
@@ -427,11 +426,12 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
-            if (!initialised || disposed)
+            if (!initialised)
             {
                 return;
             }
-
+            return;
+            
             if (waveIn != null)
             {
                 try
@@ -460,7 +460,6 @@ namespace CrewChiefV4
                 triggerSre = null;
             }
             initialised = false;
-            disposed = true;
         }
 
         public SpeechRecogniser(CrewChief crewChief)

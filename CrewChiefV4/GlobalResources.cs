@@ -77,6 +77,11 @@ namespace CrewChiefV4
                 GlobalResources.speechRecogniserReference.recognizeAsyncCancel();
                 GlobalResources.speechRecogniserReference.stopTriggerRecogniser();
 
+                // these stop calls return immediately but take a millisecond or so to complete their work. Don't
+                // attempt to Dispose until this work is (probably) complete. Doing so will make the Dispose call
+                // hang for 30 seconds.
+                System.Threading.Thread.Sleep(100);
+
                 // TODO: do we need to wait a few millis here? The cancel call is async, the SRE will may be finishing its work when .Dispose is called
                 GlobalResources.speechRecogniserReference.Dispose();
                 GlobalResources.speechRecogniserReference = null;
