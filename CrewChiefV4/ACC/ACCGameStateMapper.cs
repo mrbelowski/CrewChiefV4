@@ -58,6 +58,7 @@ namespace CrewChiefV4.ACC
                 PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
                 PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
                 PrintProperties<CrewChiefV4.ACC.Data.WeatherStatus>(data.track.weatherState);
+
                 //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
@@ -69,6 +70,10 @@ namespace CrewChiefV4.ACC
                 for (int i = 0; i < data.opponentDriverCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
+                }
+                for (int i = 0; i < data.marshalCount; i++)
+                {
+                    PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals[i]);
                 }
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
