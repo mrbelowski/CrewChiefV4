@@ -430,7 +430,8 @@ namespace CrewChiefV4
             {
                 return;
             }
-
+            return;
+            
             if (waveIn != null)
             {
                 try
