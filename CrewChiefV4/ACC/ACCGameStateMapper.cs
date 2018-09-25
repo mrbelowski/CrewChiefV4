@@ -89,7 +89,7 @@ namespace CrewChiefV4.ACC
                 previousSessionType = previousGameState.SessionData.SessionType;
                 previousSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
             }
-
+            //test commit
             SessionType currentSessionType = mapToSessionType(data.sessionData.currentSessionType);
             currentGameState.SessionData.SessionType = currentSessionType;
             currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;          
