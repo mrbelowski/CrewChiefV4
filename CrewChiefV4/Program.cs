@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -81,8 +82,25 @@ namespace CrewChiefV4
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());
 
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             ThreadManager.WaitForRootThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Root threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            ThreadManager.WaitForTemporaryThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Temporary threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            ThreadManager.WaitForResourceThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Resource threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
             GlobalResources.Dispose();
+            watch.Stop();
+            Debug.WriteLine("Resource Disposal took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms");
         }
     }
 }

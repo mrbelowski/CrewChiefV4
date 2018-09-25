@@ -328,6 +328,8 @@ namespace CrewChiefV4
         // Note: wait for file dump on shutdown is not supported.
         public static bool WaitForRootThreadsShutdown()
         {
+            // There's no race here, because Root threads are added on the UI thread,
+            // and main window is closed already.
             if (ThreadManager.rootThreads.Count == 0)
                 return true;
 
@@ -371,11 +373,13 @@ namespace CrewChiefV4
 
         public static bool WaitForTemporaryThreadsShutdown()
         {
+            // There's no race here, because by the time we call this function Root threads should've stopped already,
+            // which means no new Temporary threads are added (if Root threads stopped within 5 seconds).
             if (ThreadManager.temporaryThreads.Count == 0)
                 return true;
 
             // Possibly, print to debug log?
-            ThreadManager.Trace("Waiting for temporary threads to stop...");
+            ThreadManager.Trace("Shutdown - Waiting for temporary threads to stop...");
             for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
             {
                 var allThreadsStopped = true;
@@ -385,7 +389,7 @@ namespace CrewChiefV4
                     {
                         if (t.IsAlive)
                         {
-                            ThreadManager.Trace("Temporary Thread still alive - " + t.Name);
+                            ThreadManager.Trace("Shutdown - Temporary Thread still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
                         }
@@ -394,7 +398,7 @@ namespace CrewChiefV4
 
                 if (allThreadsStopped)
                 {
-                    ThreadManager.Trace("Temporary threads stopped");
+                    ThreadManager.Trace("Shutdown - Temporary threads stopped");
                     return true;
                 }
 
@@ -402,21 +406,22 @@ namespace CrewChiefV4
             }
 
 
-            ThreadManager.Trace("Wait for temporary threads stop failed, thread states:");
+            ThreadManager.Trace("Shutdown - Wait for temporary threads stop failed, thread states:");
             ThreadManager.TraceTemporaryThreadStats();
 
-            Debug.Assert(false, "Wait for temporary threads stop failed, please investigate.");
+            Debug.Assert(false, "Shutdown - Wait for temporary threads stop failed, please investigate.");
 
             return false;
         }
 
         public static bool WaitForResourceThreadsShutdown()
         {
+            // There's no race here as both Root threads and main window should be closed by now.
             if (ThreadManager.resourceThreads.Count == 0)
                 return true;
 
             // Possibly, print to debug log?
-            ThreadManager.Trace("Waiting for temporary threads to stop...");
+            ThreadManager.Trace("Shutdown - Waiting for resource threads to stop...");
             for (int i = 0; i < ThreadManager.SHUTDOWN_THREAD_ALIVE_WAIT_ITERATIONS; ++i)
             {
                 var allThreadsStopped = true;
@@ -426,7 +431,7 @@ namespace CrewChiefV4
                     {
                         if (t.IsAlive)
                         {
-                            ThreadManager.Trace("Resource Thread still alive - " + t.Name);
+                            ThreadManager.Trace("Shutdown - Resource thread still alive - " + t.Name);
                             allThreadsStopped = false;
                             break;
                         }
@@ -435,7 +440,7 @@ namespace CrewChiefV4
 
                 if (allThreadsStopped)
                 {
-                    ThreadManager.Trace("Resource threads stopped");
+                    ThreadManager.Trace("Shutdown - Resource threads stopped");
                     return true;
                 }
 
@@ -443,10 +448,10 @@ namespace CrewChiefV4
             }
 
 
-            ThreadManager.Trace("Wait for Resource threads stop failed, thread states:");
+            ThreadManager.Trace("Shutdown - Wait for Resource threads stop failed, thread states:");
             ThreadManager.TraceResourceThreadStats();
 
-            Debug.Assert(false, "Wait for Resource threads stop failed, please investigate.");
+            Debug.Assert(false, "Shutdown - Wait for Resource threads stop failed, please investigate.");
 
             return false;
         }
