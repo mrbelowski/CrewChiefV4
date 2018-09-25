@@ -70,7 +70,7 @@ namespace CrewChiefV4.ACC
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
-                /*PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
+                PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 for (int i = 0; i < data.opponentDriverCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
@@ -78,7 +78,7 @@ namespace CrewChiefV4.ACC
                 for (int i = 0; i < data.marshals.marshalCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals.marshals[i]);
-                }*/
+                }
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }

@@ -273,7 +273,9 @@ namespace CrewChiefV4.ACC
             public float brake;
             public float clutch;
             public float rpm;
-	        public bool isBetweenSafetyCarLines;	        
+	        public float fuel;
+            public float maxFuel;
+            public bool isBetweenSafetyCarLines;	        
 	        public bool isSessionOver;
 	        public bool isDisqualified;
 	        public bool isRetired;
