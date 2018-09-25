@@ -173,7 +173,6 @@ namespace CrewChiefV4.Audio
                             DateTime start = DateTime.UtcNow;
                             Thread.CurrentThread.IsBackground = true;
                             // load the permanently cached sounds first, then the rest
-                            // TODO_THREADS: allow early terminate.
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
                                 if (SoundCache.cancelLazyLoading)
@@ -209,7 +208,6 @@ namespace CrewChiefV4.Audio
                             }
                         });
                         cacheSoundsThread.Name = "SoundCache.cacheSoundsThread";
-                        // TODO_THREADS: See how this can be aborted on Shutdown, but not on Stop button.
                         ThreadManager.RegisterResourceThread(cacheSoundsThread);
                         cacheSoundsThread.Start();
                     }
@@ -219,7 +217,7 @@ namespace CrewChiefV4.Audio
                     // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
                     // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
                     prepareDriverNamesWithoutLoading(soundFolder);
-                }                
+                }
             }
             if (AudioPlayer.playWithNAudio)
             {
@@ -258,7 +256,8 @@ namespace CrewChiefV4.Audio
             {
                 int loadedCount = 0;
                 DateTime start = DateTime.UtcNow;
-                // TODO_THREADS: allow early terminate
+                // No need to early terminate this thread on form close, because it only loads driver names in 
+                // a session, which isn't 1000's.
                 foreach (String name in names)
                 {
                     loadedCount++;
@@ -524,40 +523,33 @@ namespace CrewChiefV4.Audio
 
         public void StopAndUnloadAll()
         {
-            var stopAndUnloadAllThread = new Thread(() =>
+            if (synthesizer != null)
             {
-                if (synthesizer != null)
+                try
                 {
-                    try
-                    {
-                        synthesizer.Dispose();
-                        synthesizer = null;
-                    }
-                    catch (Exception) { }
+                    synthesizer.Dispose();
+                    synthesizer = null;
                 }
-                // TODO_THREADS: allow cancellation.
-                foreach (SoundSet soundSet in soundSets.Values)
+                catch (Exception) { }
+            }
+            foreach (SoundSet soundSet in soundSets.Values)
+            {
+                try
                 {
-                    try
-                    {
-                        soundSet.StopAll();
-                        soundSet.UnLoadAll();
-                    }
-                    catch (Exception) { }
+                    soundSet.StopAll();
+                    soundSet.UnLoadAll();
                 }
-                foreach (SingleSound singleSound in singleSounds.Values)
+                catch (Exception) { }
+            }
+            foreach (SingleSound singleSound in singleSounds.Values)
+            {
+                try
                 {
-                    try
-                    {
-                        singleSound.Stop();
-                        singleSound.UnLoad();
-                    }
-                    catch (Exception) { }
+                    singleSound.Stop();
+                    singleSound.UnLoad();
                 }
-            });
-            stopAndUnloadAllThread.Name = "SoundCache.stopAndUnloadAllThread";
-            ThreadManager.RegisterResourceThread(stopAndUnloadAllThread);
-            stopAndUnloadAllThread.Start();
+                catch (Exception) { }
+            }
         }
 
         public void StopAll()
