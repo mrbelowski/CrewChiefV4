@@ -43,11 +43,15 @@ namespace CrewChiefV4.ACC
             speechRecogniser.addiRacingSpeechRecogniser();
             this.speechRecogniser = speechRecogniser;
         }
-
+        public float mapToFloatTime(int time)
+        {
+            TimeSpan ts = TimeSpan.FromTicks(time);
+            return (float)ts.TotalMilliseconds * 10;
+        }
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
             ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;            
-            long ticks = wrapper.ticksWhenRead;
+            GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             ACCSharedMemoryData data = wrapper.data;
             if(!data.isReady)
             {
@@ -55,7 +59,7 @@ namespace CrewChiefV4.ACC
             }
             if (!previousRaceSessionType.Equals(data.sessionData.currentSessionType))
             {
-                PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
+                PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
                 PrintProperties<CrewChiefV4.ACC.Data.WeatherStatus>(data.track.weatherState);
 
@@ -66,7 +70,7 @@ namespace CrewChiefV4.ACC
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
-                PrintProperties<CrewChiefV4.ACC.Data.SessionData>(data.sessionData);
+                /*PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 for (int i = 0; i < data.opponentDriverCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
@@ -74,17 +78,91 @@ namespace CrewChiefV4.ACC
                 for (int i = 0; i < data.marshals.marshalCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals.marshals[i]);
-                }
+                }*/
                 previousRaceSessionPhase = data.sessionData.currentSessionPhase;
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }
-            // TODO: one or two minor things here ;)
-            return new GameStateData(ticks);
+            SessionType previousSessionType = SessionType.Unavailable;
+            float previousSessionRunningTime = -1;
+            if(previousGameState != null)
+            {
+                previousSessionType = previousGameState.SessionData.SessionType;
+                previousSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
+            }
+
+            SessionType currentSessionType = mapToSessionType(data.sessionData.currentSessionType);
+            currentGameState.SessionData.SessionType = currentSessionType;
+            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;          
+            currentGameState.SessionData.SessionTotalRunTime = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.sessionStartTime)).TotalSeconds;
+
+            if (currentSessionType != SessionType.Unavailable && (previousSessionType != currentSessionType ||
+                currentGameState.SessionData.SessionRunningTime < previousSessionRunningTime)) // session restarted.
+            {
+                //currentGameState.SessionData.IsNewSession = true;
+
+                //Console.WriteLine("currentSessionPhase " + currentGameState.SessionData.SessionRunningTime);
+                
+                
+                //currentGameState.SessionData.SessionStartTime = currentGameState.Now;
+                
+            }
+            //currentGameState.SessionData.SessionPhase = SessionPhase.Green;
+            return currentGameState;
         }
 
-        private PitWindow mapToPitWindow(GameStateData currentGameState, uint pitSchedule, uint pitMode)
+        private SessionType mapToSessionType(RaceSessionType sessionType)
         {
-            return PitWindow.Unavailable;
+            switch (sessionType)
+            {
+                case RaceSessionType.FreePractice1:
+                case RaceSessionType.FreePractice2:
+                    return SessionType.Practice;
+                case RaceSessionType.Hotstint:
+                case RaceSessionType.Hotlap:
+                    return SessionType.HotLap;
+                case RaceSessionType.PreQualifying:
+                case RaceSessionType.Qualifying:
+                case RaceSessionType.Qualifying1:
+                case RaceSessionType.Qualifying3:
+                case RaceSessionType.Qualifying4:
+                case RaceSessionType.Superpole:
+                case RaceSessionType.HotlapSuperpole:
+                    return SessionType.Qualify;
+                case RaceSessionType.Race:
+                    return SessionType.Race;        
+            }
+            return SessionType.Unavailable;
         }
+        private SessionPhase mapToSessionPhase(RaceSessionPhase currentRaceSessionPhase, RaceSessionPhase previousRaceSessionPhase,
+            SessionPhase previousPhase, SessionType currentSessionType)
+        {
+            /*public enum  RaceSessionPhase  : byte
+	        {
+		        StartingUI = 0,
+		        PreFormationTime = 1,
+		        FormationTime = 2,
+		        PreSessionTime = 3,
+		        SessionTime = 4,
+		        SessionOverTime = 5,
+		        PostSessionTime = 6,
+		        ResultUI = 7,
+                RaceSessionPhase_Max = 8, 
+	        };*/
+            /*if (previousRaceSessionPhase == RaceSessionPhase.StartingUI || previousPhase == SessionPhase.Unavailable)
+            {
+                switch(currentSessionType)
+                {
+                    case SessionType.Practice:
+                    case SessionType.HotLap:
+                    case SessionType.Qualify:
+                }
+                if(currentRaceSessionPhase == RaceSessionPhase.FormationTime || currentRaceSessionPhase )
+                {
+                    return SessionPhase.
+                }
+            }*/
+            return SessionPhase.Green;
+        }
+
     }
 }

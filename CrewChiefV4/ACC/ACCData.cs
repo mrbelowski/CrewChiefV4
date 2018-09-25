@@ -286,7 +286,7 @@ namespace CrewChiefV4.ACC
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
-        public struct SessionData
+        public struct ACCSessionData
         {
             public float physicsTime;
             public float sessionStartTimeStamp;
@@ -312,7 +312,7 @@ namespace CrewChiefV4.ACC
         [Serializable]
         public struct  ACCSharedMemoryData
         {
-            public SessionData sessionData;
+            public ACCSessionData sessionData;
             public Track track;
             public bool isReady;
             public float update;            
