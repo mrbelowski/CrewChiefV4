@@ -53,6 +53,7 @@ namespace CrewChiefV4.ACC
             ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;            
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             ACCSharedMemoryData data = wrapper.data;
+            
             if(!data.isReady)
             {
                 return null;
@@ -62,7 +63,7 @@ namespace CrewChiefV4.ACC
                 PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
                 PrintProperties<CrewChiefV4.ACC.Data.WeatherStatus>(data.track.weatherState);
-
+                //PrintProperties<CrewChiefV4.ACC.Data.SPageFilePhysics>(wrapper.physicsData);
                 //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
@@ -70,7 +71,7 @@ namespace CrewChiefV4.ACC
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
-                PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
+               /* PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 for (int i = 0; i < data.opponentDriverCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.Driver>(data.opponentDrivers[i]);
@@ -78,34 +79,58 @@ namespace CrewChiefV4.ACC
                 for (int i = 0; i < data.marshals.marshalCount; i++)
                 {
                     PrintProperties<CrewChiefV4.ACC.Data.ACCMarshal>(data.marshals.marshals[i]);
-                }
-                previousRaceSessionPhase = data.sessionData.currentSessionPhase;
+                }*/
+                
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }
+            //Console.WriteLine("tyre temp" + wrapper.physicsData.tyreTempM[0]);
             SessionType previousSessionType = SessionType.Unavailable;
+            SessionPhase previousSessionPhase = SessionPhase.Unavailable;
             float previousSessionRunningTime = -1;
             if(previousGameState != null)
             {
                 previousSessionType = previousGameState.SessionData.SessionType;
                 previousSessionRunningTime = previousGameState.SessionData.SessionRunningTime;
+                previousSessionPhase = previousGameState.SessionData.SessionPhase;
             }
             //test commit
             SessionType currentSessionType = mapToSessionType(data.sessionData.currentSessionType);
             currentGameState.SessionData.SessionType = currentSessionType;
-            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;          
+            SessionPhase currentSessioPhase = mapToSessionPhase(data.sessionData.currentSessionPhase, currentSessionType);
+            currentGameState.SessionData.SessionPhase = currentSessioPhase;
+
+            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;
             currentGameState.SessionData.SessionTotalRunTime = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.sessionStartTime)).TotalSeconds;
+            currentGameState.SessionData.SessionTimeRemaining = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.physicsTime)).TotalSeconds;
+            
+            currentGameState.SessionData.SessionHasFixedTime = true;
 
+            //this needs fixing
             if (currentSessionType != SessionType.Unavailable && (previousSessionType != currentSessionType ||
-                currentGameState.SessionData.SessionRunningTime < previousSessionRunningTime)) // session restarted.
+                (currentGameState.SessionData.SessionRunningTime < previousSessionRunningTime) && 
+                !(currentSessioPhase == SessionPhase.Green && currentSessionType == SessionType.Race) ))
             {
-                //currentGameState.SessionData.IsNewSession = true;
+                currentGameState.SessionData.IsNewSession = true;
+                Console.WriteLine("New session, trigger data:");
+                Console.WriteLine("SessionType = " + currentGameState.SessionData.SessionType);
+                Console.WriteLine("lastSessionPhase = " + previousSessionPhase);
+                Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
+                Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
+                Console.WriteLine("NumCarsAtStartOfSession = " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
 
-                //Console.WriteLine("currentSessionPhase " + currentGameState.SessionData.SessionRunningTime);
-                
-                
-                //currentGameState.SessionData.SessionStartTime = currentGameState.Now;
-                
+                //currentGameState.SessionData.DriverRawName = playerName;
+                currentGameState.OpponentData.Clear();
+                currentGameState.SessionData.PlayerLapData.Clear();
+                currentGameState.SessionData.SessionStartTime = currentGameState.Now;            
             }
+            else
+            {
+                if (previousSessionPhase != currentGameState.SessionData.SessionPhase)
+                {
+
+                }
+            }
+            previousRaceSessionPhase = data.sessionData.currentSessionPhase;
             //currentGameState.SessionData.SessionPhase = SessionPhase.Green;
             return currentGameState;
         }
@@ -133,36 +158,38 @@ namespace CrewChiefV4.ACC
             }
             return SessionType.Unavailable;
         }
-        private SessionPhase mapToSessionPhase(RaceSessionPhase currentRaceSessionPhase, RaceSessionPhase previousRaceSessionPhase,
-            SessionPhase previousPhase, SessionType currentSessionType)
+        private SessionPhase mapToSessionPhase(RaceSessionPhase currentRaceSessionPhase, SessionType currentSessionType)
         {
-            /*public enum  RaceSessionPhase  : byte
-	        {
-		        StartingUI = 0,
-		        PreFormationTime = 1,
-		        FormationTime = 2,
-		        PreSessionTime = 3,
-		        SessionTime = 4,
-		        SessionOverTime = 5,
-		        PostSessionTime = 6,
-		        ResultUI = 7,
-                RaceSessionPhase_Max = 8, 
-	        };*/
-            /*if (previousRaceSessionPhase == RaceSessionPhase.StartingUI || previousPhase == SessionPhase.Unavailable)
+            switch(currentSessionType)
             {
-                switch(currentSessionType)
-                {
-                    case SessionType.Practice:
-                    case SessionType.HotLap:
-                    case SessionType.Qualify:
-                }
-                if(currentRaceSessionPhase == RaceSessionPhase.FormationTime || currentRaceSessionPhase )
-                {
-                    return SessionPhase.
-                }
-            }*/
-            return SessionPhase.Green;
+                case SessionType.Practice:
+                case SessionType.HotLap:
+                case SessionType.Qualify:
+                        return SessionPhase.Green;
+                case SessionType.Race:
+                    {
+                        switch(currentRaceSessionPhase)
+                        {
+                            case RaceSessionPhase.StartingUI:
+                                return SessionPhase.Garage;
+                            case RaceSessionPhase.FormationTime: //here we are in our car on the grid waition to roll
+                                return SessionPhase.Gridwalk;
+                            case RaceSessionPhase.PreSessionTime:
+                                return SessionPhase.Formation;
+                            case RaceSessionPhase.SessionTime:
+                                return SessionPhase.Green;
+                            case RaceSessionPhase.SessionOverTime:
+                                return SessionPhase.Checkered;
+                            case RaceSessionPhase.ResultUI:
+                            case RaceSessionPhase.PostSessionTime:
+                                return SessionPhase.Finished;
+                            default:
+                                return SessionPhase.Unavailable;
+                        }
+                    }
+                default:
+                    return SessionPhase.Unavailable;
+            }
         }
-
     }
 }

@@ -6,9 +6,118 @@ namespace CrewChiefV4.ACC
     class ACCConstant
     {
         public const string SharedMemoryName = "Local\\CrewChief_ACC";
+        public const string SharedMemoryNamePhysics = "Local\\acpmf_physics"; // Local\\acpmf_physics
     }    
     namespace Data
     {
+        public enum AC_WHEELS
+        {
+            FL = 0,
+            FR = 1,
+            RL = 2,
+            RR = 3,
+        }
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
+        [Serializable]
+        public struct acsVec3
+        {
+            public float x;
+            public float y;
+            public float z;
+        }
+        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Unicode)]
+        [Serializable]
+        public struct SPageFilePhysics
+        {
+
+            public int packetId;
+            public float gas;
+            public float brake;
+            public float fuel;
+            public int gear;
+            public int rpms;
+            public float steerAngle;
+            public float speedKmh;
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public float[] velocity;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public float[] accG;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] wheelSlip;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] wheelLoad;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] wheelsPressure;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] wheelAngularSpeed;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreWear;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreDirtyLevel;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreCoreTemperature;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] camberRAD;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] suspensionTravel;
+
+            public float drs;
+            public float tc;
+            public float heading;
+            public float pitch;
+            public float roll;
+            public float cgHeight;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
+            public float[] carDamage;
+            public int numberOfTyresOut;
+            public int pitLimiterOn;
+            public float abs;
+            public float kersCharge;
+            public float kersInput;
+            public int autoShifterOn;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+            public float[] rideHeight;
+            public float turboBoost;
+            public float ballast;
+            public float airDensity;
+            public float airTemp;
+            public float roadTemp;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public float[] localAngularVel;
+            public float finalFF;
+            public float performanceMeter;
+
+            public int engineBrake;
+            public int ersRecoveryLevel;
+            public int ersPowerLevel;
+            public int ersHeatCharging;
+            public int ersIsCharging;
+            public float kersCurrentKJ;
+
+            public int drsAvailable;
+            public int drsEnabled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] brakeTemp;
+            public float clutch;
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempI;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempM;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public float[] tyreTempO;
+            public int isAIControlled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactPoint;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactNormal;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+            public acsVec3[] tyreContactHeading;
+            float brakeBias;
+            public acsVec3 localVelocity;
+        }
+
         public enum CarLocation  : byte
         {
 	        ECarLocation__Null = 0,
@@ -296,6 +405,9 @@ namespace CrewChiefV4.ACC
             public float serverTimeOffset;
             public float sessionStartTime;
             public float sessionEndTime;
+            public UInt32 pitWindowOpenAtTime;
+            public UInt32 pitWindowCloseAtTime;
+            public UInt32 maxDrivingTime;
             public bool isServer;
             public bool isClient;
             public bool areCarsInitializated;
@@ -306,8 +418,8 @@ namespace CrewChiefV4.ACC
             public UInt16 currentSessionIndex;
             public RaceSessionType currentSessionType;
             public RaceSessionPhase currentSessionPhase;
-            char pad1;
-            char pad2;        
+            public byte mandatoryPitStopCount;
+            public byte pitlaneSpeedLimitKmh;    
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

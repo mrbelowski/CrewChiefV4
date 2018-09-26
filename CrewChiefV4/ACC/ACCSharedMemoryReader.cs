@@ -20,6 +20,10 @@ namespace CrewChiefV4.ACC
         private byte[] sharedMemoryCrewChiefReadBuffer;
         private GCHandle handleCrewChief;
 
+        private MemoryMappedFile memoryMappedPhysicsFile;
+        private int sharedmemoryPhysicssize;
+        private byte[] sharedMemoryPhysicsReadBuffer;
+        private GCHandle handlePhysics;
 
         private Boolean initialised = false;
         private List<ACCStructWrapper> dataToDump;
@@ -31,6 +35,8 @@ namespace CrewChiefV4.ACC
         {
             public long ticksWhenRead;
             public ACCSharedMemoryData data;
+            public SPageFilePhysics physicsData;
+
 
         }
         public override void DumpRawGameData()
@@ -40,6 +46,7 @@ namespace CrewChiefV4.ACC
                 foreach (ACCStructWrapper wrapper in dataToDump)
                 {
                     wrapper.data.opponentDrivers = getPopulatedDriverDataArray(wrapper.data.opponentDrivers);
+                    wrapper.data.marshals.marshals = getPopulatedMarshalDataArray(wrapper.data.marshals.marshals);
                 }
                 SerializeObject(dataToDump.ToArray<ACCStructWrapper>(), filenameToDump);
             }
@@ -88,7 +95,10 @@ namespace CrewChiefV4.ACC
                         memoryMappedCrewChiefFile = MemoryMappedFile.OpenExisting(ACCConstant.SharedMemoryName);
                         sharedmemoryCrewChiefsize = Marshal.SizeOf(typeof(ACCSharedMemoryData));
                         sharedMemoryCrewChiefReadBuffer = new byte[sharedmemoryCrewChiefsize];
-
+                        
+                        memoryMappedPhysicsFile = MemoryMappedFile.OpenExisting(ACCConstant.SharedMemoryNamePhysics);
+                        sharedmemoryPhysicssize = Marshal.SizeOf(typeof(SPageFilePhysics));
+                        sharedMemoryPhysicsReadBuffer = new byte[sharedmemoryPhysicssize];
                         initialised = true;
                         Console.WriteLine("Initialised Assetto Corsa Competizione shared memory");
                     }
@@ -109,6 +119,7 @@ namespace CrewChiefV4.ACC
             lock (this)
             {
                 ACCSharedMemoryData accShared = new ACCSharedMemoryData();
+                SPageFilePhysics physicsData = new SPageFilePhysics();
                 if (!initialised)
                 {
                     if (!InitialiseInternal())
@@ -118,6 +129,14 @@ namespace CrewChiefV4.ACC
                 }
                 try
                 {
+                    using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
+                    {
+                        BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
+                        sharedMemoryPhysicsReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryPhysicssize);
+                        handlePhysics = GCHandle.Alloc(sharedMemoryPhysicsReadBuffer, GCHandleType.Pinned);
+                        physicsData = (SPageFilePhysics)Marshal.PtrToStructure(handlePhysics.AddrOfPinnedObject(), typeof(SPageFilePhysics));
+                        handlePhysics.Free();
+                    }
                     using (var sharedMemoryStreamView = memoryMappedCrewChiefFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -130,6 +149,7 @@ namespace CrewChiefV4.ACC
                     ACCStructWrapper structWrapper = new ACCStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = accShared;
+                    structWrapper.physicsData = physicsData;
 
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
@@ -158,6 +178,20 @@ namespace CrewChiefV4.ACC
             return populated.ToArray();
         }
 
+        private ACCMarshal[] getPopulatedMarshalDataArray(ACCMarshal[] raw)
+        {
+            List<ACCMarshal> populated = new List<ACCMarshal>();
+            foreach (ACCMarshal rawData in raw)
+            {
+                populated.Add(rawData);
+            }
+            if (populated.Count == 0)
+            {
+                populated.Add(raw[0]);
+            }
+            return populated.ToArray();
+        }
+
         public override void Dispose()
         {
             if (memoryMappedCrewChiefFile != null)
@@ -165,6 +199,15 @@ namespace CrewChiefV4.ACC
                 try
                 {
                     memoryMappedCrewChiefFile.Dispose();
+                }
+                catch (Exception) { }
+            }
+            if (memoryMappedPhysicsFile != null)
+            {
+                try
+                {
+                    memoryMappedPhysicsFile.Dispose();
+                    memoryMappedPhysicsFile = null;
                 }
                 catch (Exception) { }
             }
