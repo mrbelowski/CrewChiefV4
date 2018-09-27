@@ -444,7 +444,8 @@ namespace CrewChiefV4
             {
                 try
                 {
-                    // TODO_THREADS: with always on listening, this causes significant delay on shutdown, investigate (some worker thread alive).  Repro:  start app/close 
+                    // VL: there's a bug with recognizeAsyncCancel racing with Dispose.  Current workaround is a bit of Sleep.
+                    // See GlobalResources.Dispose
                     sre.Dispose();
                 }
                 catch (Exception) { }

@@ -1,7 +1,7 @@
 ﻿/*
  * This class' responsibility is to provide some corrdination between starting/stopping threads in CC.  Here's proposal for strategy of
  * dealing with threads in CC, aka "Architecture":
- * 
+ *  TODO_THREADS: update for temp and resource threads
  * 1. each root thread (the one we start from MainWindow/UI thread) has to be registered with ThreadManager and named
  * 
  * 1.1: FUTURE: each temporary Thread should also be registered
@@ -50,10 +50,7 @@ namespace CrewChiefV4
         private const int TEMP_THREADS_TRIM_THRESHOLD = 50;
 
         private static List<Thread> rootThreads = new List<Thread>();
-
-        // TODO_THREADS: implement temporary thread registration/wait.
         private static HashSet<Thread> temporaryThreads = new HashSet<Thread>();
-
         private static List<Thread> resourceThreads = new List<Thread>();
 
         public static void RegisterRootThread(Thread t)
@@ -162,6 +159,7 @@ namespace CrewChiefV4
             // Thread does not need registration as it is watcher thread.
             new Thread(() =>
             {
+                // TODO_THREADS: also wait for temp threads.
                 ThreadManager.WaitForRootThreadsStop(cc);
             }).Start();
         }

@@ -486,7 +486,7 @@ namespace CrewChiefV4.Audio
                     {
                         soundToPurge = SoundCache.dynamicLoadedSounds.First;
                     }
-                    // TODO_THREADS: allow cancellation
+                    // No need to support cancellation of this thread, as it is not slow enough and we can wait for it.
                     while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
                     {
                         String soundToPurgeValue = soundToPurge.Value;
