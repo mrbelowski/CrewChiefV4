@@ -296,7 +296,7 @@ namespace CrewChiefV4.ACC
 		    GearBox = 0x7,
 	    };
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct ACCMarshal
         {
@@ -305,7 +305,7 @@ namespace CrewChiefV4.ACC
             public MarshalFlagType flag;	
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Marshals
         {
@@ -315,7 +315,7 @@ namespace CrewChiefV4.ACC
             public byte checkeredFlagMarshalIndex;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Vec3
         {
@@ -324,7 +324,7 @@ namespace CrewChiefV4.ACC
             public float z;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct Rotation
         {
@@ -332,7 +332,7 @@ namespace CrewChiefV4.ACC
             public float yaw;
             public float roll;
         }
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct WeatherStatus
         {
@@ -344,7 +344,7 @@ namespace CrewChiefV4.ACC
             public float rainLevel;
             public float cloudLevel;
         };
-        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct Track
         {
@@ -354,12 +354,12 @@ namespace CrewChiefV4.ACC
             public float length;
             public int sectors;
             public int corners;
-            public bool isPolesitterOnLeft;
+            public byte isPolesitterOnLeft;
             public WeatherStatus weatherState;
             
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct Driver
         {
@@ -385,18 +385,16 @@ namespace CrewChiefV4.ACC
             public float rpm;
 	        public float fuel;
             public float maxFuel;
-            public bool isBetweenSafetyCarLines;	        
-	        public bool isSessionOver;
-	        public bool isDisqualified;
-	        public bool isRetired;
-            char pad1;
-            char pad2;   
+            public byte isBetweenSafetyCarLines;
+            public byte isSessionOver;
+            public byte isDisqualified;
+            public byte isRetired;   
             public UInt16 driverIndex;
             public byte formationLapCounter;
             public CarLocation trackLocation;	
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct ACCSessionData
         {
@@ -409,12 +407,12 @@ namespace CrewChiefV4.ACC
             public UInt32 pitWindowOpenAtTime;
             public UInt32 pitWindowCloseAtTime;
             public UInt32 maxDrivingTime;
-            public bool isServer;
-            public bool isClient;
-            public bool areCarsInitializated;
-            public bool isTimeStopped;
-            public bool isEventInitializated;
-            public bool isSessionInitializated;        
+            public byte isServer;
+            public byte isClient;
+            public byte areCarsInitializated;
+            public byte isTimeStopped;
+            public byte isEventInitializated;
+            public byte isSessionInitializated;        
             public UInt16 currentEventIndex;
             public UInt16 currentSessionIndex;
             public RaceSessionType currentSessionType;
@@ -423,13 +421,13 @@ namespace CrewChiefV4.ACC
             public byte pitlaneSpeedLimitKmh;    
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
         [Serializable]
         public struct  ACCSharedMemoryData
         {
             public ACCSessionData sessionData;
             public Track track;
-            public bool isReady;
+            public byte isReady;
             public float update;            
             public Driver playerDriver;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]

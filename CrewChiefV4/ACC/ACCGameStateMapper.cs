@@ -54,7 +54,7 @@ namespace CrewChiefV4.ACC
             GameStateData currentGameState = new GameStateData(wrapper.ticksWhenRead);
             ACCSharedMemoryData data = wrapper.data;
             
-            if(!data.isReady)
+            if(data.isReady != 1)
             {
                 return previousGameState;
             }

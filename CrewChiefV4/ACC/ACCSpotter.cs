@@ -84,7 +84,7 @@ namespace CrewChiefV4.ACC
             ACCSharedMemoryData currentState = ((ACCSharedMemoryReader.ACCStructWrapper)currentStateObj).data;
             ACCSharedMemoryData lastState = ((ACCSharedMemoryReader.ACCStructWrapper)lastStateObj).data;
 
-            if (!currentState.isReady || !enabled || !(currentState.sessionData.currentSessionPhase == RaceSessionPhase.SessionTime ||
+            if (currentState.isReady != 1|| !enabled || !(currentState.sessionData.currentSessionPhase == RaceSessionPhase.SessionTime ||
                 currentState.sessionData.currentSessionPhase == RaceSessionPhase.SessionOverTime) ||
                 (currentState.sessionData.currentSessionType == RaceSessionType.Hotlap ||
                 currentState.sessionData.currentSessionType == RaceSessionType.Hotstint))
