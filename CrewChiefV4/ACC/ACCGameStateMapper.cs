@@ -70,7 +70,8 @@ namespace CrewChiefV4.ACC
 
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
-            {                
+            {
+                PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
             }
             
@@ -91,7 +92,7 @@ namespace CrewChiefV4.ACC
             currentGameState.SessionData.SessionPhase = currentSessioPhase;
 
             currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;
-            currentGameState.SessionData.SessionTotalRunTime = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.sessionStartTime)).TotalSeconds;
+            currentGameState.SessionData.SessionTotalRunTime = (float)data.sessionData.sessionDuration;
             currentGameState.SessionData.SessionTimeRemaining = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.physicsTime)).TotalSeconds;
             
             currentGameState.SessionData.SessionHasFixedTime = true;
@@ -103,8 +104,9 @@ namespace CrewChiefV4.ACC
                 currentGameState.SessionData.IsNewSession = true;
                 PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 //Console.WriteLine("New session, trigger data:");
-                //Console.WriteLine("SessionType = " + currentGameState.SessionData.SessionType);
-                //Console.WriteLine("lastSessionPhase = " + previousSessionPhase);
+                Console.WriteLine("SessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining);
+                Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
+                Console.WriteLine("SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 //Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
                 //Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 //Console.WriteLine("NumCarsAtStartOfSession = " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);

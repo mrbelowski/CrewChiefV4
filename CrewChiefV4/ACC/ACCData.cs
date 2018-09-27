@@ -404,6 +404,7 @@ namespace CrewChiefV4.ACC
             public float serverTimeOffset;
             public float sessionStartTime;
             public float sessionEndTime;
+            public int sessionDuration;
             public UInt32 pitWindowOpenAtTime;
             public UInt32 pitWindowCloseAtTime;
             public UInt32 maxDrivingTime;
