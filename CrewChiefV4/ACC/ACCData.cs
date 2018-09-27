@@ -369,7 +369,8 @@ namespace CrewChiefV4.ACC
 	        public Vec3 location;
 	        public Rotation rotation;
             public float distanceRoundTrack;
-            public float speed;
+            public float speedMS;
+            public float speedKMH;
             public float lastSectorTimeStamp;
             public int position;
             public int realTimePosition;

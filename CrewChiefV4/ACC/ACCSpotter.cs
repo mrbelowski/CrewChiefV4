@@ -18,7 +18,6 @@ namespace CrewChiefV4.ACC
 
         private float carWidth = 1.8f;
 
-        private float twoPi = (float)(2 * Math.PI);
         // don't activate the spotter unless this many seconds have elapsed (race starts are messy)
         private int timeAfterRaceStartToActivate = UserSettings.GetUserSettings().getInt("time_after_race_start_for_spotter");
 
@@ -67,16 +66,10 @@ namespace CrewChiefV4.ACC
             {
                 if (vehicleInfo.realTimePosition == position)
                 {
-                    return new float[] { vehicleInfo.location.x, vehicleInfo.location.z };
+                    return new float[] { vehicleInfo.location.x, vehicleInfo.location.y };
                 }
             }
             return new float[] { 0, 0 };
-        }
-
-        public float mapToFloatTime(int time)
-        {
-            TimeSpan ts = TimeSpan.FromTicks(time);
-            return (float)ts.TotalMilliseconds * 10;
         }
         public double ConvertToRadians(double angle)
         {
@@ -131,7 +124,7 @@ namespace CrewChiefV4.ACC
 
             List<float[]> currentOpponentPositions = new List<float[]>();
             float[] playerVelocityData = new float[3];
-            playerVelocityData[0] = currentPlayerData.speed;
+            playerVelocityData[0] = currentPlayerData.speedMS;
             playerVelocityData[1] = (currentPlayerData.location.x - previousPlayerData.location.x) / timeDiffSeconds;
             playerVelocityData[2] = (currentPlayerData.location.y - previousPlayerData.location.y) / timeDiffSeconds;
                                              

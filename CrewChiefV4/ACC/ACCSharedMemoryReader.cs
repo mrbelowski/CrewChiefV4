@@ -199,6 +199,7 @@ namespace CrewChiefV4.ACC
                 try
                 {
                     memoryMappedCrewChiefFile.Dispose();
+                    memoryMappedCrewChiefFile = null;
                 }
                 catch (Exception) { }
             }

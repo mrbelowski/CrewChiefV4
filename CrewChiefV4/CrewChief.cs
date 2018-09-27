@@ -692,7 +692,7 @@ namespace CrewChiefV4
                 if (filenameToRun != null)
                 {
                     loadDataFromFile = true;
-                    GlobalBehaviourSettings.spotterEnabled = gameDefinition.gameEnum == GameEnum.F1_2018 || gameDefinition.gameEnum == GameEnum.ACC;
+                    GlobalBehaviourSettings.spotterEnabled = gameDefinition.gameEnum == GameEnum.F1_2018;
                     dumpToFile = false;
                 }
                 else
@@ -963,7 +963,7 @@ namespace CrewChiefV4
                                 audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                             }
                             else if (previousGameState != null &&
-                                        (gameDefinition.gameEnum == GameEnum.F1_2018 || gameDefinition.gameEnum == GameEnum.ACC ||
+                                        (gameDefinition.gameEnum == GameEnum.F1_2018 ||
                                         (((gameDefinition.gameEnum == GameEnum.PCARS2 && currentGameState.SessionData.SessionPhase == SessionPhase.Countdown) ||
                                             currentGameState.SessionData.SessionRunningTime > previousGameState.SessionData.SessionRunningTime) ||
                                         (previousGameState.SessionData.SessionPhase != currentGameState.SessionData.SessionPhase)) ||
@@ -1019,7 +1019,7 @@ namespace CrewChiefV4
                                             currentGameState.PositionAndMotionData.DistanceRoundTrack, audioPlayer);
                                     }
                                     if (spotter != null && GlobalBehaviourSettings.spotterEnabled && !spotterIsRunning &&
-                                         (gameDefinition.gameEnum == GameEnum.ACC || gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
+                                         (gameDefinition.gameEnum == GameEnum.F1_2018 || !loadDataFromFile))
                                     {
                                         Console.WriteLine("********** starting spotter***********");
                                         spotter.clearState();
