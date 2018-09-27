@@ -612,7 +612,7 @@ namespace CrewChiefV4.Audio
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Exception processing queued clips: " + e.Message);
+                        Console.WriteLine("Exception processing queued clips: " + e.Message + " stack " + e.StackTrace);
                         lock (queuedClips)
                         {
                             queuedClips.Clear();
