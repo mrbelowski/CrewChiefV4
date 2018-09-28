@@ -78,6 +78,9 @@ namespace CrewChiefV4
                     case GameEnum.RACE_ROOM:
                         currentRecording.raceroomLayoutId = trackId;
                         break;
+                    case GameEnum.ACC:
+                        currentRecording.accTrackName = trackName;
+                        break;
                     default:
                         break;
                 }
@@ -208,6 +211,7 @@ namespace CrewChiefV4
         public String irTrackName { get; set; }
         public String pcarsTrackName { get; set; }
         public String pcars2TrackName { get; set; }
+        public String accTrackName { get; set; }
         public int raceroomLayoutId { get; set; }
         public float approximateTrackLength { get; set; }   // this is optional and used to differentiate duplicated names
         public List<TrackLandmark> trackLandmarks { get; set; }
@@ -224,6 +228,7 @@ namespace CrewChiefV4
             this.pcarsTrackName = "";
             this.pcars2TrackName = "";
             this.irTrackName = "";
+            this.accTrackName = "";
             this.isOval = false;
             this.raceroomRollingStartLapDistance = -1.0f;
         }
@@ -345,6 +350,17 @@ namespace CrewChiefV4
                             }
                         }
                         break;
+                    case GameEnum.ACC:
+                        if (trackLandmarksForTrack.accTrackName != null)
+                        {
+                            if (String.Equals(trackLandmarksForTrack.accTrackName, trackName, StringComparison.OrdinalIgnoreCase)
+                                && checkForAndMatchOnLength(lengthFromGame, trackLandmarksForTrack.approximateTrackLength))
+                            {
+                                Console.WriteLine(trackLandmarksForTrack.trackLandmarks.Count + " landmarks defined for this track");
+                                return new TrackDataContainer(trackLandmarksForTrack.trackLandmarks, trackLandmarksForTrack.isOval);
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -422,7 +438,7 @@ namespace CrewChiefV4
             var rf1Tracks = new Dictionary<string, float>();
             var rf2Tracks = new Dictionary<string, float>();
             var irTracks = new Dictionary<string, float>();
-
+            var accTracks = new Dictionary<string, float>();
             foreach (var trackLandmarks in trackLandmarksData)
             {
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT || CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT)
@@ -452,6 +468,10 @@ namespace CrewChiefV4
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
                     checkForDuplicatesHelper(trackLandmarks.irTrackName, trackLandmarks.approximateTrackLength, "iRacing", irTracks);
+                }
+                if (CrewChief.gameDefinition.gameEnum == GameEnum.ACC)
+                {
+                    checkForDuplicatesHelper(trackLandmarks.accTrackName, trackLandmarks.approximateTrackLength, "ACC", irTracks);
                 }
             }
         }

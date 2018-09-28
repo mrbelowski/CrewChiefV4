@@ -14,6 +14,9 @@ namespace CrewChiefV4.ACC
 
         RaceSessionType previousRaceSessionType = RaceSessionType.FreePractice1;
         RaceSessionPhase previousRaceSessionPhase = RaceSessionPhase.RaceSessionPhase_Max;
+           
+        // next track conditions sample due after:
+        private DateTime nextConditionsSampleDue = DateTime.MinValue;
 
         private void PrintProperties<T>(T myObj)
         {
@@ -58,15 +61,11 @@ namespace CrewChiefV4.ACC
                 return previousGameState;
             }
             if (!previousRaceSessionType.Equals(data.sessionData.currentSessionType))
-            {
-                
+            {   
                 PrintProperties<CrewChiefV4.ACC.Data.Track>(data.track);
                 PrintProperties<CrewChiefV4.ACC.Data.WeatherStatus>(data.track.weatherState);
-                //PrintProperties<CrewChiefV4.ACC.Data.SPageFilePhysics>(wrapper.physicsData);
-                //Console.WriteLine("physicsTime " + data.sessionData.physicsTime);
                 previousRaceSessionType = data.sessionData.currentSessionType;
                 Console.WriteLine("currentSessionType " + data.sessionData.currentSessionType);
-
             }
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
@@ -109,16 +108,64 @@ namespace CrewChiefV4.ACC
                 Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 Console.WriteLine("SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 currentGameState.SessionData.NumCarsOverallAtStartOfSession = data.driverCount;
-                //Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
-                //Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
-                //Console.WriteLine("NumCarsAtStartOfSession = " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
 
-                //currentGameState.SessionData.DriverRawName = playerName;
+                currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(data.track.name, 0, data.track.length);
+                if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                {
+                    if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                    {
+                        if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                        {
+                            currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
+                            currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                            currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                            currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                        }
+                    }
+                }
+                TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(data.track.name, currentGameState.SessionData.TrackDefinition.trackLength);
+                currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                if (tdc.isDefinedInTracklandmarksData)
+                {
+                    currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
+                }
+                else
+                {
+                    currentGameState.SessionData.TrackDefinition.isOval = false;
+                }
+                currentGameState.SessionData.TrackDefinition.setGapPoints();
+                GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                 currentGameState.OpponentData.Clear();
                 currentGameState.SessionData.PlayerLapData.Clear();
-                currentGameState.SessionData.SessionStartTime = currentGameState.Now;            
+                currentGameState.SessionData.SessionStartTime = currentGameState.Now;
+
+                currentGameState.SessionData.LeaderHasFinishedRace = false;
+                currentGameState.PitData.IsRefuellingAllowed = true;
+                currentGameState.SessionData.SessionHasFixedTime = true;
+
+                currentGameState.PitData.InPitlane = playerDriver.trackLocation == CarLocation.ECarLocation__Track;
+                currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerDriver.distanceRoundTrack * currentGameState.SessionData.TrackDefinition.trackLength);
+
+                //TODO update car classes shuold be easy as they will all be GT3 :D
+                currentGameState.carClass = CarData.getCarClassFromEnum(CarData.CarClassEnum.GT3);
+                GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
+
+
+                currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+                currentGameState.SessionData.SectorNumber = (int)playerDriver.currentSector + 1;
+
+                for(int i = 1; i < data.driverCount; i++)
+                {
+                    Driver driver = data.drivers[i];
+                        currentGameState.OpponentData.Add(driver.name, createOpponentData(driver, true,
+                            currentGameState.SessionData.TrackDefinition.trackLength));
+                }
+                // add a conditions sample when we first start a session so we're not using stale or default data in the pre-lights phase
+                currentGameState.Conditions.addSample(currentGameState.Now, 0, 1, data.track.weatherState.ambientTemperature, data.track.weatherState.roadTemperature, 
+                    data.track.weatherState.rainLevel, data.track.weatherState.windSpeed, 0, 0, 0, true);
             }
-            else
+            else if(currentSessionType != SessionType.Unavailable)
             {
                 if (previousSessionPhase != currentGameState.SessionData.SessionPhase)
                 {
@@ -130,6 +177,25 @@ namespace CrewChiefV4.ACC
             return currentGameState;
         }
 
+
+        private OpponentData createOpponentData(Driver driver, Boolean loadDriverName, float trackLength)
+        {
+            String driverName = driver.name.ToLower();
+            if (loadDriverName && CrewChief.enableDriverNames)
+            {
+                speechRecogniser.addNewOpponentName(driverName);
+            }
+            OpponentData opponentData = new OpponentData();
+            opponentData.IsActive = true;
+            opponentData.DriverRawName = driverName;
+            opponentData.OverallPosition = driver.position;
+            opponentData.CompletedLaps = driver.lapCount;
+            opponentData.DistanceRoundTrack = driver.distanceRoundTrack * trackLength;
+            opponentData.DeltaTime = new DeltaTime(trackLength, opponentData.DistanceRoundTrack, DateTime.UtcNow);
+            opponentData.CarClass = CarData.getCarClassFromEnum(CarData.CarClassEnum.GT3);
+            opponentData.CurrentSectorNumber = (int)driver.currentSector + 1;
+            return opponentData;
+        }
         private SessionType mapToSessionType(RaceSessionType sessionType)
         {
             switch (sessionType)

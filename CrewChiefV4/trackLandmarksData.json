@@ -2017,7 +2017,8 @@
 			"pcars2TrackName": "Nurburgring:GP",
 			"raceroomLayoutId": 1691,
 			"raceroomRollingStartLapDistance": 4591,
-			"rf2TrackNames": ["Nuerburg GP"],
+            "rf2TrackNames": [ "Nuerburg GP" ],
+            "accTrackName":  "nurburgring" ,
 			"trackLandmarks": [{
 					"landmarkName": "turn1",
 					"distanceRoundLapStart": 600,
