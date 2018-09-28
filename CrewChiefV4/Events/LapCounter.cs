@@ -337,7 +337,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public List<MessageFragment> getSessionTotalRunningTimeTimeMessages(float sessionTotalRunningTimeWnenQueued)
+        public Tuple<List<MessageFragment>, List<MessageFragment>> getSessionTotalRunningTimeTimeMessages(float sessionTotalRunningTimeWnenQueued)
         {
             if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
             {
@@ -348,13 +348,13 @@ namespace CrewChiefV4.Events
             if (this.currentPosition > 3 && minutes < 20 && minutes > 1)
             {
                 Console.WriteLine("Pre-start message for race time + get on with it");
-                return MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt);
+                return new Tuple<List<MessageFragment>,List<MessageFragment>> (MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), null);
             }
             //dont play pre-start message for race time unless its more then 2 minuts
             else
             {
                 Console.WriteLine("Pre-start message for race time");
-                return MessageContents(minutes, Battery.folderMinutes);
+                return new Tuple<List<MessageFragment>,List<MessageFragment>> (MessageContents(minutes, Battery.folderMinutes), null);
             }
         }
 
