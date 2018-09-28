@@ -123,6 +123,8 @@ namespace CrewChiefV4.commands
         public void execute(Boolean supressConfirmationMessage)
         {
             // blocking...
+            Boolean isPCars2 = CrewChief.gameDefinition == GameDefinition.pCars2;
+            Boolean isR3e = CrewChief.gameDefinition == GameDefinition.raceRoom;
             foreach (CommandSet commandSet in macro.commandSets)
             {
                 // only execute for the requested game - is this check sensible?
@@ -132,10 +134,14 @@ namespace CrewChiefV4.commands
                     Boolean isValid = checkValidAndPlayConfirmation(commandSet, supressConfirmationMessage);
                     if (isValid)
                     {
-                        if (macro.name.EndsWith(MacroManager.R3E_STRAT_IDENTIFIER))
+                        if (isR3e && macro.name.EndsWith(MacroManager.R3E_STRAT_IDENTIFIER))
                         {
                             // we've changed strategy, so nuke the last-added-fuel amount
                             MacroManager.clearState();
+                        }
+                        else if (isPCars2 && macro.name.StartsWith(MacroManager.PCARS2_STRAT_IDENTIFIER))
+                        {
+                            MacroManager.activePCars2Strategy = macro.name;
                         }
                         ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
                         executableCommandMacroThread = new Thread(() =>
@@ -166,14 +172,24 @@ namespace CrewChiefV4.commands
                                                 int count = 0;
                                                 if (macro.name == MacroManager.AUTO_FUEL_IDENTIFIER)
                                                 {
-                                                    int additionalPresses = CrewChief.gameDefinition == GameDefinition.raceRoom ? 3 : 0;
                                                     // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
                                                     // and increase to add the fuel
 
                                                     // first reset the fuelling
                                                     if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
                                                     {
-                                                        int resetCount = MacroManager.lastFuelAmountAddedToThisStrat + additionalPresses;                                                        
+                                                        int resetCount = 0;
+                                                        if (isPCars2)
+                                                        {
+                                                            if (MacroManager.pcars2LastFuelAmountAddedByStrat.ContainsKey(MacroManager.activePCars2Strategy))
+                                                            {
+                                                                resetCount = MacroManager.pcars2LastFuelAmountAddedByStrat[MacroManager.activePCars2Strategy];
+                                                            }
+                                                        }
+                                                        else if (isR3e)
+                                                        {
+                                                            resetCount = MacroManager.r3eLastFuelAmountAddedToThisStrat + 3;
+                                                        }
                                                         for (int i = 0; i < resetCount; i++)
                                                         {
                                                             if (MacroManager.stopped)
@@ -187,8 +203,16 @@ namespace CrewChiefV4.commands
                                                     }
                                                     else
                                                     {
-                                                        count = eventToCall.resolveMacroKeyPressCount(macro.name) + additionalPresses;
-                                                        MacroManager.lastFuelAmountAddedToThisStrat = count;
+                                                        count = eventToCall.resolveMacroKeyPressCount(macro.name);
+                                                        if (isPCars2)
+                                                        {
+                                                            MacroManager.pcars2LastFuelAmountAddedByStrat[MacroManager.activePCars2Strategy] = count;
+                                                        }
+                                                        else if (isR3e)
+                                                        {
+                                                            MacroManager.r3eLastFuelAmountAddedToThisStrat = count;
+                                                            count = count + 3;
+                                                        }
                                                     }
                                                 }
                                                 else

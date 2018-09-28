@@ -24,13 +24,17 @@ namespace CrewChiefV4.commands
         // another magic case - in R3E we can't track which strategy we're on because the menu wraps and we don't 
         // know how many there are anyway. So as soon as we change to a different strat, reset the fuel-added counter.
         public static readonly String R3E_STRAT_IDENTIFIER = "pit preset";
+        // for pcars2 we can try to track this by strategy:
+        public static readonly String PCARS2_STRAT_IDENTIFIER = "select race strategy";
 
         public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
 
         public static Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
         public static Boolean enableAutoTriggering = UserSettings.GetUserSettings().getBoolean("allow_macros_to_trigger_automatically");
 
-        public static int lastFuelAmountAddedToThisStrat = 0;
+        public static String activePCars2Strategy = "default";
+        public static Dictionary<String, int> pcars2LastFuelAmountAddedByStrat = new Dictionary<String, int>();
+        public static int r3eLastFuelAmountAddedToThisStrat = 0;
 
         public static Boolean stopped = false;
 
@@ -45,7 +49,9 @@ namespace CrewChiefV4.commands
 
         public static void clearState()
         {
-            MacroManager.lastFuelAmountAddedToThisStrat = 0;
+            MacroManager.r3eLastFuelAmountAddedToThisStrat = 0;
+            MacroManager.pcars2LastFuelAmountAddedByStrat.Clear();
+            MacroManager.activePCars2Strategy = "default";
         }
 
         // This is called immediately after initialising the speech recogniser in MainWindow
