@@ -13,18 +13,7 @@ namespace CrewChiefV4.commands
     // wrapper that actually runs the macro
     public class ExecutableCommandMacro
     {
-        // a magic string...
-        private static readonly String MULTIPLE_IDENTIFIER = "Multiple";
-
-        // another magic string...
-        private static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
-
-        private Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
-
         private static Object mutex = new Object();
-
-        Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
-        Boolean enableAutoTriggering = UserSettings.GetUserSettings().getBoolean("allow_macros_to_trigger_automatically");
 
         AudioPlayer audioPlayer;
         Macro macro;
@@ -37,7 +26,7 @@ namespace CrewChiefV4.commands
             this.audioPlayer = audioPlayer;
             this.macro = macro;
             this.assignmentsByGame = assignmentsByGame;
-            this.allowAutomaticTriggering = allowAutomaticTriggering && enableAutoTriggering;
+            this.allowAutomaticTriggering = allowAutomaticTriggering && MacroManager.enableAutoTriggering;
             if (allowAutomaticTriggering)
             {
                 Console.WriteLine("Macro \"" + macro.name + "\" can be triggered automatically");
@@ -50,7 +39,7 @@ namespace CrewChiefV4.commands
 
         bool BringGameWindowToFront(String processName, String[] alternateProcessNames, IntPtr currentForgroundWindow)
         {
-            if (!bringGameWindowToFrontForMacros)
+            if (!MacroManager.bringGameWindowToFrontForMacros)
             {
                 return false;
             }
@@ -86,6 +75,51 @@ namespace CrewChiefV4.commands
             execute(false);
         }
 
+        private Boolean checkValidAndPlayConfirmation(CommandSet commandSet, Boolean supressConfirmationMessage)
+        {
+            Boolean isValid = true;
+            String macroConfirmationMessage = macro.confirmationMessage != null && macro.confirmationMessage.Length > 0 && !supressConfirmationMessage ? 
+                macro.confirmationMessage : null;
+            String commandConfirmationMessage = commandSet.confirmationMessage != null && commandSet.confirmationMessage.Length > 0 && !supressConfirmationMessage ? 
+                commandSet.confirmationMessage : null;
+
+            // special case for 'request pit' macro - check we've not already requested a stop, and we might want to play the pitstop strategy estimate
+            if (macro.name == MacroManager.REQUEST_PIT_IDENTIFIER)
+            {
+                if ((CrewChief.gameDefinition == GameDefinition.pCars2 || CrewChief.gameDefinition == GameDefinition.rfactor2_64bit) &&
+                     CrewChief.currentGameState != null && CrewChief.currentGameState.PitData.HasRequestedPitStop)
+                {
+                    // we've already requested a stop, so change the confirm message to 'yeah yeah, we know'
+                    macroConfirmationMessage = MacroManager.folderPitAlreadyRequested;
+                    isValid = false;
+                }
+                if (isValid && MacroManager.enablePitExitPositionEstimates)
+                {
+                    Strategy.playPitPositionEstimates = true;
+                }
+            }
+            // special case for 'cancel pit request' macro - check we've actually requested a stop
+            else if (macro.name == MacroManager.CANCEL_REQUEST_PIT_IDENTIFIER)
+            {
+                if ((CrewChief.gameDefinition == GameDefinition.pCars2 || CrewChief.gameDefinition == GameDefinition.rfactor2_64bit) &&
+                     CrewChief.currentGameState != null && !CrewChief.currentGameState.PitData.HasRequestedPitStop)
+                {
+                    // we don't have a stop requested, so change the confirm message to 'what? we weren't waiting anyway'
+                    macroConfirmationMessage = MacroManager.folderPitNotRequested;
+                    isValid = false;
+                } 
+            }
+            if (macroConfirmationMessage != null)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(macroConfirmationMessage, 0, null));
+            }
+            else if (commandConfirmationMessage != null)
+            {
+                audioPlayer.playMessageImmediately(new QueuedMessage(commandConfirmationMessage, 0, null));
+            }
+            return isValid;
+        }
+
         public void execute(Boolean supressConfirmationMessage)
         {
             // blocking...
@@ -95,73 +129,100 @@ namespace CrewChiefV4.commands
                 if (CrewChief.gameDefinition.gameEnum.ToString().Equals(commandSet.gameDefinition) &&
                     assignmentsByGame.ContainsKey(commandSet.gameDefinition))
                 {
-                    if (macro.confirmationMessage != null && macro.confirmationMessage.Length > 0 && !supressConfirmationMessage)
+                    Boolean isValid = checkValidAndPlayConfirmation(commandSet, supressConfirmationMessage);
+                    if (isValid)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(macro.confirmationMessage, 0, null));
-                    }
-                    else if (commandSet.confirmationMessage != null && commandSet.confirmationMessage.Length > 0 && !supressConfirmationMessage)
-                    {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(commandSet.confirmationMessage, 0, null));
-                    }
-                    // special case for 'request pit' macro - we might want to play the pitstop strategy estimate
-                    if (macro.name == REQUEST_PIT_IDENTIFIER && enablePitExitPositionEstimates)
-                    {
-                        Strategy.playPitPositionEstimates = true;
-                    }
-                    ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
-                    executableCommandMacroThread = new Thread(() =>
-                    {
-                        // only allow macros to excute one at a time
-                        lock (ExecutableCommandMacro.mutex)
+                        if (macro.name.EndsWith(MacroManager.R3E_STRAT_IDENTIFIER))
                         {
-                            IntPtr currentForgroundWindow = GetForegroundWindow();
-                            bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
-
-                            foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
+                            // we've changed strategy, so nuke the last-added-fuel amount
+                            MacroManager.clearState();
+                        }
+                        ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
+                        executableCommandMacroThread = new Thread(() =>
+                        {
+                            // only allow macros to excute one at a time
+                            lock (ExecutableCommandMacro.mutex)
                             {
-                                if (MacroManager.stopped)
+                                IntPtr currentForgroundWindow = GetForegroundWindow();
+                                bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
+
+                                foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
                                 {
-                                    break;
-                                }
-                                if (actionItem.pauseMillis > 0)
-                                {                                   
-                                    Thread.Sleep(actionItem.pauseMillis);
-                                }
-                                else
-                                {
-                                    if (actionItem.actionText.StartsWith(MULTIPLE_IDENTIFIER))
+                                    if (MacroManager.stopped)
                                     {
-                                        AbstractEvent eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
-                                        if (eventToCall != null)
-                                        {
-                                            int count = eventToCall.resolveMacroKeyPressCount(macro.name);
-                                            for (int i = 0; i < count; i++)
-                                            {
-                                                if (MacroManager.stopped)
-                                                {
-                                                    break;
-                                                }
-                                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                                Thread.Sleep(commandSet.waitBetweenEachCommand);
-                                            }
-                                        }
+                                        break;
+                                    }
+                                    if (actionItem.pauseMillis > 0)
+                                    {
+                                        Thread.Sleep(actionItem.pauseMillis);
                                     }
                                     else
                                     {
-                                        KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                        Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                        if (actionItem.actionText.StartsWith(MacroManager.MULTIPLE_IDENTIFIER))
+                                        {
+                                            AbstractEvent eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
+                                            if (eventToCall != null)
+                                            {
+                                                int count = 0;
+                                                if (macro.name == MacroManager.AUTO_FUEL_IDENTIFIER)
+                                                {
+                                                    int additionalPresses = CrewChief.gameDefinition == GameDefinition.raceRoom ? 3 : 0;
+                                                    // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
+                                                    // and increase to add the fuel
+
+                                                    // first reset the fuelling
+                                                    if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
+                                                    {
+                                                        int resetCount = MacroManager.lastFuelAmountAddedToThisStrat + additionalPresses;                                                        
+                                                        for (int i = 0; i < resetCount; i++)
+                                                        {
+                                                            if (MacroManager.stopped)
+                                                            {
+                                                                break;
+                                                            }
+                                                            // play these quickly
+                                                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, 10);
+                                                            Thread.Sleep(40);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        count = eventToCall.resolveMacroKeyPressCount(macro.name) + additionalPresses;
+                                                        MacroManager.lastFuelAmountAddedToThisStrat = count;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    count = eventToCall.resolveMacroKeyPressCount(macro.name);
+                                                }
+                                                for (int i = 0; i < count; i++)
+                                                {
+                                                    if (MacroManager.stopped)
+                                                    {
+                                                        break;
+                                                    }
+                                                    KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                                    Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                                }
+                                            }                                            
+                                        }
+                                        else
+                                        {
+                                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                            Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                        }
                                     }
                                 }
+                                if (hasChangedForgroundWindow)
+                                {
+                                    SetForegroundWindow(currentForgroundWindow);
+                                }
                             }
-                            if (hasChangedForgroundWindow)
-                            {
-                                SetForegroundWindow(currentForgroundWindow);
-                            }
-                        }
-                    });
-                    executableCommandMacroThread.Name = "CommandMacro.executableCommandMacroThread";
-                    ThreadManager.RegisterTemporaryThread(executableCommandMacroThread);
-                    executableCommandMacroThread.Start();
+                        });
+                        executableCommandMacroThread.Name = "CommandMacro.executableCommandMacroThread";
+                        ThreadManager.RegisterTemporaryThread(executableCommandMacroThread);
+                        executableCommandMacroThread.Start();
+                    }
                     break;
                 }
             }            

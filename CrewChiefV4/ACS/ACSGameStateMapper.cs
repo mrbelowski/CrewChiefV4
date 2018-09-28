@@ -957,6 +957,7 @@ namespace CrewChiefV4.assetto
                 }
                 lapCountAtSector1End = -1;
                 currentGameState.SessionData.IsNewSession = true;
+                CrewChiefV4.commands.MacroManager.clearState();
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;

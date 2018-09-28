@@ -10,6 +10,28 @@ namespace CrewChiefV4.commands
 {
     class MacroManager
     {
+        // messages used when a pit request or cancel pit request isn't relevant (pcars2 and rf2 only):
+        public static String folderPitAlreadyRequested = "mandatory_pitstops/pitstop_already_requested";
+        public static String folderPitNotRequested = "mandatory_pitstops/pitstop_not_requested";
+
+        // these are the macro names used to idenify certain macros which have special hard-coded behaviours. Not idea...
+        public static readonly String MULTIPLE_IDENTIFIER = "Multiple";
+        public static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
+        public static readonly String CANCEL_REQUEST_PIT_IDENTIFIER = "cancel pit request";
+        public static readonly String AUTO_FUEL_IDENTIFIER = "auto fuel";
+        public static readonly String MULTIPLE_DECREASE_IDENTIFIER = "Decrease";
+        public static readonly String MULTIPLE_LEFT_IDENTIFIER = "Left";
+        // another magic case - in R3E we can't track which strategy we're on because the menu wraps and we don't 
+        // know how many there are anyway. So as soon as we change to a different strat, reset the fuel-added counter.
+        public static readonly String R3E_STRAT_IDENTIFIER = "pit preset";
+
+        public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
+
+        public static Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
+        public static Boolean enableAutoTriggering = UserSettings.GetUserSettings().getBoolean("allow_macros_to_trigger_automatically");
+
+        public static int lastFuelAmountAddedToThisStrat = 0;
+
         public static Boolean stopped = false;
 
         // make all the macros available so the events can press buttons as they see fit:
@@ -19,6 +41,11 @@ namespace CrewChiefV4.commands
         {
             stopped = true;
             KeyPresser.releasePressedKey();
+        }
+
+        public static void clearState()
+        {
+            MacroManager.lastFuelAmountAddedToThisStrat = 0;
         }
 
         // This is called immediately after initialising the speech recogniser in MainWindow

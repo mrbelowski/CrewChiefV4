@@ -494,6 +494,7 @@ namespace CrewChiefV4.PCars
                     Console.WriteLine("SessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining + " lastSessionTimeRemaining = " + lastSessionTimeRemaining);
                 }
                 currentGameState.SessionData.IsNewSession = true;
+                CrewChiefV4.commands.MacroManager.clearState();
                 currentGameState.SessionData.SessionNumberOfLaps = numberOfLapsInSession;
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
                 currentGameState.SessionData.SessionStartTime = currentGameState.Now;

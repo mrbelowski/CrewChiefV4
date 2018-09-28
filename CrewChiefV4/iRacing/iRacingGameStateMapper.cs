@@ -138,6 +138,7 @@ namespace CrewChiefV4.iRacing
             {
                 CarData.clearCachedIRacingClassData();
                 currentGameState.SessionData.IsNewSession = true;
+                CrewChiefV4.commands.MacroManager.clearState();
                 Console.WriteLine("New session, trigger data:");
                 Console.WriteLine("SessionType = " + currentGameState.SessionData.SessionType);
                 Console.WriteLine("lastSessionPhase = " + lastSessionPhase);
