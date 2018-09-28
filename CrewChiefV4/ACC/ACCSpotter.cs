@@ -62,7 +62,7 @@ namespace CrewChiefV4.ACC
         protected override float[] getWorldPositionOfDriverAtPosition(Object currentStateObj, int position)
         {
             ACCSharedMemoryData latestRawData = (ACCSharedMemoryData)currentStateObj;
-            foreach (Driver vehicleInfo in latestRawData.opponentDrivers)
+            foreach (Driver vehicleInfo in latestRawData.drivers)
             {
                 if (vehicleInfo.realTimePosition == position)
                 {
@@ -128,9 +128,9 @@ namespace CrewChiefV4.ACC
             playerVelocityData[1] = (currentPlayerData.location.x - previousPlayerData.location.x) / timeDiffSeconds;
             playerVelocityData[2] = (currentPlayerData.location.y - previousPlayerData.location.y) / timeDiffSeconds;
                                              
-            for (int i = 1; i < currentState.opponentDriverCount; i++)
+            for (int i = 1; i < currentState.driverCount; i++)
             {
-                Driver vehicle = currentState.opponentDrivers[i];
+                Driver vehicle = currentState.drivers[i];
                 currentOpponentPositions.Add(new float[] { vehicle.location.x, vehicle.location.y });
             }
             float playerRadRotation = (float)ConvertToRadians(currentState.playerDriver.rotation.yaw);

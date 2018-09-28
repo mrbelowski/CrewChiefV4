@@ -29,8 +29,7 @@ namespace CrewChiefV4.ACC
         }
         public ACCGameStateMapper()
         {
-            //Console.WriteLine("OffsetOf currentSessionIndex " + Marshal.OffsetOf(typeof(CrewChiefV4.ACC.Data.SessionData), "currentSessionIndex").ToString("d"));
-            Console.WriteLine("sizeOf Driver " + Marshal.SizeOf(typeof(CrewChiefV4.ACC.Data.Driver)).ToString("X"));
+
         }
 
         public override void versionCheck(Object memoryMappedFileStruct)
@@ -72,7 +71,8 @@ namespace CrewChiefV4.ACC
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
                 PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
-                Console.WriteLine("currentSessionPhase " + data.sessionData.currentSessionPhase);
+                Console.WriteLine("previousRaceSessionPhase " + previousRaceSessionPhase );
+                Console.WriteLine("currentRaceSessionPhase " + data.sessionData.currentSessionPhase);
             }
             
             //Console.WriteLine("tyre temp" + wrapper.physicsData.tyreTempM[0]);
@@ -96,10 +96,11 @@ namespace CrewChiefV4.ACC
             currentGameState.SessionData.SessionTimeRemaining = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.physicsTime)).TotalSeconds;
             
             currentGameState.SessionData.SessionHasFixedTime = true;
-
+            Driver playerDriver = data.playerDriver;
+            currentGameState.SessionData.NumCarsOverall = data.driverCount;
             //this still needs fixing
-            if (currentSessionType != SessionType.Unavailable && (previousSessionType != currentSessionType ||
-                (previousRaceSessionPhase == RaceSessionPhase.StartingUI && data.sessionData.currentSessionPhase == RaceSessionPhase.PreFormationTime)))
+            if (currentSessionType != SessionType.Unavailable && 
+                (previousRaceSessionPhase == RaceSessionPhase.StartingUI && data.sessionData.currentSessionPhase == RaceSessionPhase.PreFormationTime && currentSessionType == SessionType.Race))
             {
                 currentGameState.SessionData.IsNewSession = true;
                 PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
@@ -107,6 +108,7 @@ namespace CrewChiefV4.ACC
                 Console.WriteLine("SessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining);
                 Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 Console.WriteLine("SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
+                currentGameState.SessionData.NumCarsOverallAtStartOfSession = data.driverCount;
                 //Console.WriteLine("currentSessionPhase = " + currentGameState.SessionData.SessionPhase);
                 //Console.WriteLine("currentSessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 //Console.WriteLine("NumCarsAtStartOfSession = " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);

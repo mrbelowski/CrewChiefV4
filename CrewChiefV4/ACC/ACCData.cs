@@ -377,7 +377,7 @@ namespace CrewChiefV4.ACC
             public int lapCount;
             public int totalTime;
 	        public int currentDelta;
-	        public uint currentSector;
+            public uint currentSector;          //0 based index, when formation lap starts in last sector this value will be track sector count +1!
             public int currentlaptime;
             public float trottle;
             public float brake;
@@ -398,11 +398,11 @@ namespace CrewChiefV4.ACC
         [Serializable]
         public struct ACCSessionData
         {
-            public float physicsTime;
-            public float sessionStartTimeStamp;
+            public float physicsTime;           //total time session has been running
+            public float sessionStartTimeStamp; //this gets set on session change
             public float receivedServerTime;
-            public float serverTimeOffset;
-            public float sessionStartTime;
+            public float serverTimeOffset;      //Not 100 sure what this one does but i assume we will have to use it when online
+            public float sessionStartTime;      
             public float sessionEndTime;
             public int sessionDuration;
             public UInt32 pitWindowOpenAtTime;
@@ -430,10 +430,10 @@ namespace CrewChiefV4.ACC
             public Track track;
             public byte isReady;
             public float update;            
-            public Driver playerDriver;
+            public Driver playerDriver;         
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-            public Driver[]opponentDrivers;
-	        public int opponentDriverCount;
+            public Driver[]drivers;             //Array of total drivers connected including player
+	        public int driverCount;
             public Marshals marshals;
 
         }        

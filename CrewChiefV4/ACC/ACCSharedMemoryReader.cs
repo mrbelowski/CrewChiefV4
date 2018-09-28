@@ -45,7 +45,7 @@ namespace CrewChiefV4.ACC
             {
                 foreach (ACCStructWrapper wrapper in dataToDump)
                 {
-                    wrapper.data.opponentDrivers = getPopulatedDriverDataArray(wrapper.data.opponentDrivers);
+                    wrapper.data.drivers = getPopulatedDriverDataArray(wrapper.data.drivers);
                     wrapper.data.marshals.marshals = getPopulatedMarshalDataArray(wrapper.data.marshals.marshals);
                 }
                 SerializeObject(dataToDump.ToArray<ACCStructWrapper>(), filenameToDump);
