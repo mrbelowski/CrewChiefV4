@@ -992,6 +992,7 @@ namespace CrewChiefV4
             if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
+                // TODO_THREADS: disable/elements all other elements, not just start button.
                 startApplicationButton.Enabled = false;
                 doStartAppStuff();
 
