@@ -30,6 +30,10 @@
 			"key": "KEY_D"
 		},
 		{
+		    "action": "Multiple Pit Menu Decrease",
+			"key": "KEY_A"
+		},
+		{
 		    "action": "Multiple Pit Menu Increase",
 			"key": "KEY_D"
 		},
@@ -63,12 +67,17 @@
 		    "action": "ICM Menu Right",
 			"key": "KEY_D"
 		},
-		{
-		    "action": "Multiple ICM Menu Right",
-			"key": "KEY_D"
-		},{
+        {
+            "action": "Multiple ICM Menu Left",
+            "key": "KEY_A"
+        },
+        {
+            "action": "Multiple ICM Menu Right",
+            "key": "KEY_D"
+        },
+        {
 		    "action": "Pit Request Toggle",
-			"key": "KEY_Q"
+		    "key": "KEY_Q"
 		}
 		]
 	},
