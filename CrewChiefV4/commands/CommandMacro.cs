@@ -86,11 +86,20 @@ namespace CrewChiefV4.commands
             // special case for 'request pit' macro - check we've not already requested a stop, and we might want to play the pitstop strategy estimate
             if (macro.name == MacroManager.REQUEST_PIT_IDENTIFIER)
             {
+                // if there's a confirmation message set up here, suppress the PitStops event from triggering the same message when the pit request changes in the gamestate
+                PitStops.playedRequestPitOnThisLap = macroConfirmationMessage != null || commandConfirmationMessage != null;
                 if ((CrewChief.gameDefinition == GameDefinition.pCars2 || CrewChief.gameDefinition == GameDefinition.rfactor2_64bit) &&
                      CrewChief.currentGameState != null && CrewChief.currentGameState.PitData.HasRequestedPitStop)
                 {
                     // we've already requested a stop, so change the confirm message to 'yeah yeah, we know'
-                    macroConfirmationMessage = MacroManager.folderPitAlreadyRequested;
+                    if (macroConfirmationMessage != null)
+                    {
+                        macroConfirmationMessage = PitStops.folderPitAlreadyRequested;
+                    }
+                    else if (commandConfirmationMessage != null)
+                    {
+                        commandConfirmationMessage = PitStops.folderPitAlreadyRequested;
+                    }
                     isValid = false;
                 }
                 if (isValid && MacroManager.enablePitExitPositionEstimates)
@@ -101,11 +110,20 @@ namespace CrewChiefV4.commands
             // special case for 'cancel pit request' macro - check we've actually requested a stop
             else if (macro.name == MacroManager.CANCEL_REQUEST_PIT_IDENTIFIER)
             {
+                // if there's a confirmation message set up here, suppress the PitStops event from triggering the same message when the pit request changes in the gamestate
+                PitStops.playedPitRequestCancelledOnThisLap = macroConfirmationMessage != null || commandConfirmationMessage != null;
                 if ((CrewChief.gameDefinition == GameDefinition.pCars2 || CrewChief.gameDefinition == GameDefinition.rfactor2_64bit) &&
                      CrewChief.currentGameState != null && !CrewChief.currentGameState.PitData.HasRequestedPitStop)
                 {
                     // we don't have a stop requested, so change the confirm message to 'what? we weren't waiting anyway'
-                    macroConfirmationMessage = MacroManager.folderPitNotRequested;
+                    if (macroConfirmationMessage != null)
+                    {
+                        macroConfirmationMessage = PitStops.folderPitNotRequested;
+                    }
+                    else if (commandConfirmationMessage != null)
+                    {
+                        commandConfirmationMessage = PitStops.folderPitNotRequested;
+                    }
                     isValid = false;
                 } 
             }

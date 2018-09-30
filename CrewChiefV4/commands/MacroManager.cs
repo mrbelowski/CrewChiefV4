@@ -10,10 +10,6 @@ namespace CrewChiefV4.commands
 {
     class MacroManager
     {
-        // messages used when a pit request or cancel pit request isn't relevant (pcars2 and rf2 only):
-        public static String folderPitAlreadyRequested = "mandatory_pit_stops/pitstop_already_requested";
-        public static String folderPitNotRequested = "mandatory_pit_stops/pitstop_not_requested";
-
         // these are the macro names used to idenify certain macros which have special hard-coded behaviours. Not idea...
         public static readonly String MULTIPLE_IDENTIFIER = "Multiple";
         public static readonly String REQUEST_PIT_IDENTIFIER = "request pit";

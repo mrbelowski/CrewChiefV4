@@ -157,6 +157,7 @@
         "name": "request pit",
         "description": "requests a pitstop",
         "voiceTriggers": [ "request pit", "box this lap", "in this lap" ],
+        "confirmationMessage": "mandatory_pit_stops/pit_stop_requested",
         "buttonTriggers": [
         {
             "description": "wheel button X - button trigger not yet implemented",
@@ -174,8 +175,7 @@
             "gameDefinition": "RACE_ROOM",
             "actionSequence": [ "Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle" ],
             "keyPressTime": 10,
-            "waitBetweenEachCommand": 200,
-            "confirmationMessage": "mandatory_pit_stops/pit_stop_requested"
+            "waitBetweenEachCommand": 200
         },
         {
             "description": "pcars2 version, keyPressTime longer",
@@ -190,6 +190,7 @@
 		"description": "cancels a pit request, if one is set - applies only to pCars2",
 		"voiceTriggers": [ "cancel request pit" ],
 		"buttonTriggers": [],
+		"confirmationMessage": "mandatory_pit_stops/pit_request_cancelled",
 		"commandSets": [
 		{
 			"description": "pcars2 version, keyPressTime longer",

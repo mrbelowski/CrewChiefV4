@@ -65,6 +65,10 @@ namespace CrewChiefV4.Events
         private String folderPitStopRequestReceived = "mandatory_pit_stops/pit_stop_requested";
         private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
 
+        // messages used when a pit request or cancel pit request isn't relevant (pcars2 only):
+        public static String folderPitAlreadyRequested = "mandatory_pit_stops/pitstop_already_requested";
+        public static String folderPitNotRequested = "mandatory_pit_stops/pitstop_not_requested";
+
         private String folderMetres = "mandatory_pit_stops/metres";
         private String folderBoxPositionIntro = "mandatory_pit_stops/box_in";
 
@@ -131,6 +135,8 @@ namespace CrewChiefV4.Events
         private Boolean pitStallOccupied = false;
 
         private Boolean warnedAboutOccupiedPitOnThisLap = false;
+        public static Boolean playedRequestPitOnThisLap = false;
+        public static Boolean playedPitRequestCancelledOnThisLap = false;
 
         private float previousDistanceToBox = -1;
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
@@ -190,6 +196,8 @@ namespace CrewChiefV4.Events
             played100MetreWarning = false;
             played50MetreWarning = false;
             playedLimiterLineToPitBoxDistanceWarning = false;
+            playedRequestPitOnThisLap = false;
+            playedPitRequestCancelledOnThisLap = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -225,6 +233,8 @@ namespace CrewChiefV4.Events
             if (currentGameState.SessionData.IsNewLap)
             {
                 warnedAboutOccupiedPitOnThisLap = false;
+                playedRequestPitOnThisLap = false;
+                playedPitRequestCancelledOnThisLap = false;
             }
             // AMS (RF1) uses the pit window calculations to make 'box now' calls for scheduled stops, but we don't want 
             // the pit window opening / closing warnings.
@@ -697,9 +707,11 @@ namespace CrewChiefV4.Events
                     }
                     if (!previousGameState.PitData.HasRequestedPitStop
                         && currentGameState.PitData.HasRequestedPitStop
+                        && !playedRequestPitOnThisLap
                         && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                     {
                         timeOfPitRequestOrCancel = currentGameState.Now;
+                        playedRequestPitOnThisLap = true;
                         // respond immediately to this request
                         audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                     }
@@ -707,19 +719,23 @@ namespace CrewChiefV4.Events
                     // - the pit crew may or may not be ready for you when this happens. It's just one of the many mysteries of pCars2.
                     if (CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2 && CrewChief.gameDefinition.gameEnum != GameEnum.PCARS2_NETWORK
                         && !currentGameState.PitData.InPitlane && !previousGameState.PitData.InPitlane  // Make sure we're not in pits.  More checks might be needed.
+                        && !playedPitRequestCancelledOnThisLap
                         && previousGameState.PitData.HasRequestedPitStop
                         && !currentGameState.PitData.HasRequestedPitStop
                         && (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                     {
                         timeOfPitRequestOrCancel = currentGameState.Now;
+                        playedPitRequestCancelledOnThisLap = true;
                         audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this), 10);
                     }
                 }
                 else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
+                    !playedRequestPitOnThisLap &&
                     !previousGameState.PitData.HasRequestedPitStop && currentGameState.PitData.HasRequestedPitStop && 
                       (currentGameState.Now - timeOfPitRequestOrCancel).TotalSeconds > minSecondsBetweenPitRequestCancel)
                 {
                     timeOfPitRequestOrCancel = currentGameState.Now;
+                    playedRequestPitOnThisLap = true;
                     // respond immediately to this request
                     audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
                 }
