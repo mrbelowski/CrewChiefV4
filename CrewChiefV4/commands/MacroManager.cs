@@ -15,6 +15,7 @@ namespace CrewChiefV4.commands
         public static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
         public static readonly String CANCEL_REQUEST_PIT_IDENTIFIER = "cancel pit request";
         public static readonly String AUTO_FUEL_IDENTIFIER = "auto fuel";
+        public static readonly String MANUAL_FUEL_IDENTIFIER = "manual fuel";
         public static readonly String MULTIPLE_DECREASE_IDENTIFIER = "Decrease";
         public static readonly String MULTIPLE_LEFT_IDENTIFIER = "Left";
         // another magic case - in R3E we can't track which strategy we're on because the menu wraps and we don't 
@@ -40,7 +41,7 @@ namespace CrewChiefV4.commands
             stopped = true;
             KeyPresser.releasePressedKey();
         }
-        
+
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {
@@ -98,6 +99,17 @@ namespace CrewChiefV4.commands
                                     {
                                         voiceTriggeredMacros.Add(voiceTrigger, commandMacro);
                                     }
+                                }
+                            }
+                            else if (macro.integerVariableVoiceTrigger != null && macro.integerVariableVoiceTrigger.Length > 0)
+                            {
+                                if (voiceTriggeredMacros.ContainsKey(macro.integerVariableVoiceTrigger))
+                                {
+                                    Console.WriteLine("Voice trigger " + macro.integerVariableVoiceTrigger + " has already been allocated to a different command");
+                                }
+                                else
+                                {
+                                    voiceTriggeredMacros.Add(macro.integerVariableVoiceTrigger, commandMacro);
                                 }
                             }
                         }

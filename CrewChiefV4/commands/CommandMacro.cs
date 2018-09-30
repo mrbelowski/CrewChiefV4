@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace CrewChiefV4.commands
@@ -16,7 +17,7 @@ namespace CrewChiefV4.commands
         private static Object mutex = new Object();
 
         AudioPlayer audioPlayer;
-        Macro macro;
+        public Macro macro;
         Dictionary<String, KeyBinding[]> assignmentsByGame;
         public Boolean allowAutomaticTriggering;
         private Thread executableCommandMacroThread = null;
@@ -70,9 +71,9 @@ namespace CrewChiefV4.commands
             return false;
         }
 
-        public void execute()
+        public void execute(String recognitionResult)
         {           
-            execute(false);
+            execute(recognitionResult, false);
         }
 
         private Boolean checkValidAndPlayConfirmation(CommandSet commandSet, Boolean supressConfirmationMessage)
@@ -138,11 +139,16 @@ namespace CrewChiefV4.commands
             return isValid;
         }
 
-        public void execute(Boolean supressConfirmationMessage)
+        public void execute(String recognitionResult, Boolean supressConfirmationMessage)
         {
             // blocking...
             Boolean isPCars2 = CrewChief.gameDefinition == GameDefinition.pCars2;
             Boolean isR3e = CrewChief.gameDefinition == GameDefinition.raceRoom;
+            int intAmount = 0;
+            if (macro.integerVariableVoiceTrigger != null && macro.integerVariableVoiceTrigger.Length > 0)
+            {
+                intAmount = macro.extractInt(recognitionResult, macro.startPhrase, macro.endPhrase);
+            }
             foreach (CommandSet commandSet in macro.commandSets)
             {
                 // only execute for the requested game - is this check sensible?
@@ -175,68 +181,78 @@ namespace CrewChiefV4.commands
                                     {
                                         if (actionItem.actionText.StartsWith(MacroManager.MULTIPLE_IDENTIFIER))
                                         {
-                                            AbstractEvent eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
-                                            if (eventToCall != null)
+                                            AbstractEvent eventToCall = null;
+                                            if (commandSet.resolveMultipleCountWithEvent != null)
                                             {
-                                                int count = 0;
-                                                if (macro.name == MacroManager.AUTO_FUEL_IDENTIFIER)
-                                                {
-                                                    // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
-                                                    // and increase to add the fuel
+                                                eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
+                                            }
+                                            int count = 0;
+                                            if (macro.name == MacroManager.AUTO_FUEL_IDENTIFIER || macro.name == MacroManager.MANUAL_FUEL_IDENTIFIER)
+                                            {
+                                                // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
+                                                // and increase to add the fuel
 
-                                                    // first reset the fuelling
-                                                    if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
+                                                // first reset the fuelling
+                                                if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
+                                                {
+                                                    int resetCount = 0;
+                                                    if (isPCars2)
                                                     {
-                                                        int resetCount = 0;
-                                                        if (isPCars2)
-                                                        {
-                                                            resetCount = MacroManager.MAX_FUEL_RESET_COUNT;
-                                                        }
-                                                        else if (isR3e)
-                                                        {
-                                                            resetCount = MacroManager.MAX_FUEL_RESET_COUNT + 3;
-                                                        }
-                                                        for (int i = 0; i < resetCount; i++)
-                                                        {
-                                                            if (MacroManager.stopped)
-                                                            {
-                                                                break;
-                                                            }
-                                                            // play these quickly
-                                                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, 10);
-                                                            Thread.Sleep(10);
-                                                        }
+                                                        resetCount = MacroManager.MAX_FUEL_RESET_COUNT;
                                                     }
-                                                    else
+                                                    else if (isR3e)
                                                     {
-                                                        count = eventToCall.resolveMacroKeyPressCount(macro.name);
-                                                        if (isR3e)
+                                                        resetCount = MacroManager.MAX_FUEL_RESET_COUNT + 3;
+                                                    }
+                                                    for (int i = 0; i < resetCount; i++)
+                                                    {
+                                                        if (MacroManager.stopped)
                                                         {
-                                                            count = count + 3;
+                                                            break;
                                                         }
+                                                        // play these quickly
+                                                        KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, 10);
+                                                        Thread.Sleep(10);
+                                                    }
+                                                }
+                                                else if (macro.name == MacroManager.MANUAL_FUEL_IDENTIFIER)
+                                                {
+                                                    // not 'left' or 'decrease', so assume we're increasing here
+                                                    count = intAmount;
+                                                    if (isR3e)
+                                                    {
+                                                        count = count + 3;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    count = eventToCall.resolveMacroKeyPressCount(macro.name);
-                                                }
-                                                for (int i = 0; i < count; i++)
-                                                {
-                                                    if (MacroManager.stopped)
+                                                    count = eventToCall != null ? eventToCall.resolveMacroKeyPressCount(macro.name) : 0;
+                                                    if (isR3e)
                                                     {
-                                                        break;
+                                                        count = count + 3;
                                                     }
-                                                    KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                                    Thread.Sleep(commandSet.waitBetweenEachCommand);
                                                 }
-                                            }                                            
+                                            }
+                                            else
+                                            {
+                                                count = eventToCall.resolveMacroKeyPressCount(macro.name);
+                                            }
+                                            for (int i = 0; i < count; i++)
+                                            {
+                                                if (MacroManager.stopped)
+                                                {
+                                                    break;
+                                                }
+                                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                                Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                            }
                                         }
                                         else
                                         {
                                             KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
                                             Thread.Sleep(commandSet.waitBetweenEachCommand);
                                         }
-                                    }
+                                    }                                    
                                 }
                                 if (hasChangedForgroundWindow)
                                 {
@@ -283,6 +299,51 @@ namespace CrewChiefV4.commands
 		public String[] voiceTriggers { get; set; }
         public ButtonTrigger[] buttonTriggers { get; set; }
         public CommandSet[] commandSets { get; set; }
+
+        private String _integerVariableVoiceTrigger;
+        public String integerVariableVoiceTrigger
+        {
+            get { return _integerVariableVoiceTrigger; }
+            set
+            {
+                this._integerVariableVoiceTrigger = value;
+                parseIntRangeAndPhrase();
+            }
+        }
+        public Tuple<int, int> intRange;
+        public String startPhrase;
+        public String endPhrase;
+
+        public String getIntegerVariableVoiceTrigger()
+        {
+            return this._integerVariableVoiceTrigger;
+        }
+
+        public int extractInt(String recognisedVoiceCommand, String start, String end)
+        {
+            foreach (KeyValuePair<String[], int> entry in SpeechRecogniser.numberToNumber)
+            {
+                foreach (String numberStr in entry.Key)
+                {
+                    if (recognisedVoiceCommand.Contains(start + numberStr + end))
+                    {
+                        return entry.Value;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private void parseIntRangeAndPhrase()
+        {
+            int start = this._integerVariableVoiceTrigger.IndexOf("{") + 1;
+            int end = this._integerVariableVoiceTrigger.IndexOf("}", start);
+            String[] range = this._integerVariableVoiceTrigger.Substring(start, end - start).Split(',');
+            this.intRange = new Tuple<int, int>(int.Parse(range[0]), int.Parse(range[1]));
+
+            this.startPhrase = this._integerVariableVoiceTrigger.Substring(0, this._integerVariableVoiceTrigger.IndexOf("{"));
+            this.endPhrase = this._integerVariableVoiceTrigger.Substring(this._integerVariableVoiceTrigger.IndexOf("}") + 1);
+        }
     }
 
     public class CommandSet

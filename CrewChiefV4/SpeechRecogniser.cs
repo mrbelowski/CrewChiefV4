@@ -292,6 +292,14 @@ namespace CrewChiefV4
             }
         }
 
+        private Tuple<int, int> parseIntRange(String command)
+        {
+            int start = command.IndexOf("{") + 1;
+            int end = command.IndexOf("}", start);
+            String[] range = command.Substring(start, end - start).Split(',');
+            return new Tuple<int, int>(int.Parse(range[0]), int.Parse(range[1]));
+        }
+        
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -312,15 +320,41 @@ namespace CrewChiefV4
                 return;
             }
             Choices macroChoices = new Choices();
-            foreach (String triggerPhrase in voiceTriggeredMacros.Keys)
+            foreach (KeyValuePair<String, ExecutableCommandMacro> entry in voiceTriggeredMacros)
             {
-                // validate?
-                if (!macroLookup.ContainsKey(triggerPhrase))
+                String triggerPhrase = entry.Key;
+                ExecutableCommandMacro executableCommandMacro = entry.Value;
+                if (executableCommandMacro.macro.getIntegerVariableVoiceTrigger() != null)
                 {
-                    macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
+                    try
+                    {
+                        foreach (KeyValuePair<String[], int> numberEntry in numberToNumber)
+                        {
+                            if (numberEntry.Value >= executableCommandMacro.macro.intRange.Item1 && numberEntry.Value <= executableCommandMacro.macro.intRange.Item2)
+                            {
+                                String thisPhrase = executableCommandMacro.macro.startPhrase + numberEntry.Key[0] + executableCommandMacro.macro.endPhrase;
+                                if (!macroLookup.ContainsKey(thisPhrase))
+                                {
+                                    macroLookup.Add(thisPhrase, voiceTriggeredMacros[triggerPhrase]);
+                                }
+                                macroChoices.Add(thisPhrase);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Unable to parse range from voice command " + triggerPhrase + ", " + e.StackTrace);
+                    }
                 }
-                macroChoices.Add(triggerPhrase);
-
+                else
+                {
+                    // validate?
+                    if (!macroLookup.ContainsKey(triggerPhrase))
+                    {
+                        macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
+                    }
+                    macroChoices.Add(triggerPhrase);
+                }
             }
             GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
             macroGrammarBuilder.Culture = cultureInfo;
@@ -1275,7 +1309,7 @@ namespace CrewChiefV4
                         if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
                         {
                             this.lastRecognisedText = e.Result.Text;
-                            macroLookup[e.Result.Text].execute();
+                            macroLookup[e.Result.Text].execute(e.Result.Text);
                         }
                         else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
                         {
