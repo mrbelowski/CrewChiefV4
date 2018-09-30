@@ -276,7 +276,6 @@ namespace CrewChiefV4.rFactor1
             // Do not use previous game state if this is the new session.
             if (currentGameState.SessionData.IsNewSession) 
             {
-                CrewChiefV4.commands.MacroManager.clearState();
                 previousGameState = null; 
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
 

@@ -28,28 +28,19 @@ namespace CrewChiefV4.commands
         public static Boolean bringGameWindowToFrontForMacros = UserSettings.GetUserSettings().getBoolean("bring_game_window_to_front_for_macros");
         public static Boolean enableAutoTriggering = UserSettings.GetUserSettings().getBoolean("allow_macros_to_trigger_automatically");
 
-        public static String activePCars2Strategy = "default";
-        public static Dictionary<String, int> pcars2LastFuelAmountAddedByStrat = new Dictionary<String, int>();
-        public static int r3eLastFuelAmountAddedToThisStrat = 0;
-
         public static Boolean stopped = false;
 
         // make all the macros available so the events can press buttons as they see fit:
         public static Dictionary<string, ExecutableCommandMacro> macros = new Dictionary<string, ExecutableCommandMacro>();
+
+        public static int MAX_FUEL_RESET_COUNT = 150;
 
         public static void stop()
         {
             stopped = true;
             KeyPresser.releasePressedKey();
         }
-
-        public static void clearState()
-        {
-            MacroManager.r3eLastFuelAmountAddedToThisStrat = 0;
-            MacroManager.pcars2LastFuelAmountAddedByStrat.Clear();
-            MacroManager.activePCars2Strategy = "default";
-        }
-
+        
         // This is called immediately after initialising the speech recogniser in MainWindow
         public static void initialise(AudioPlayer audioPlayer, SpeechRecogniser speechRecogniser)
         {

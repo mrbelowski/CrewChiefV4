@@ -496,7 +496,6 @@ namespace CrewChiefV4.rFactor2
                 || csd.SessionIteration != psd.SessionIteration)
             {
                 csd.IsNewSession = true;
-                CrewChiefV4.commands.MacroManager.clearState();
             }
             // Else, if any difference between current and previous phases suggests it is a new session
             else if ((psd.SessionPhase == SessionPhase.Checkered
@@ -510,7 +509,6 @@ namespace CrewChiefV4.rFactor2
                         || csd.SessionPhase == SessionPhase.Countdown))
             {
                 csd.IsNewSession = true;
-                CrewChiefV4.commands.MacroManager.clearState();
             }
 
             if (csd.IsNewSession)

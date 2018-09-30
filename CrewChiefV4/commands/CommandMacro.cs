@@ -152,15 +152,6 @@ namespace CrewChiefV4.commands
                     Boolean isValid = checkValidAndPlayConfirmation(commandSet, supressConfirmationMessage);
                     if (isValid)
                     {
-                        if (isR3e && macro.name.EndsWith(MacroManager.R3E_STRAT_IDENTIFIER))
-                        {
-                            // we've changed strategy, so nuke the last-added-fuel amount
-                            MacroManager.clearState();
-                        }
-                        else if (isPCars2 && macro.name.StartsWith(MacroManager.PCARS2_STRAT_IDENTIFIER))
-                        {
-                            MacroManager.activePCars2Strategy = macro.name;
-                        }
                         ThreadManager.UnregisterTemporaryThread(executableCommandMacroThread);
                         executableCommandMacroThread = new Thread(() =>
                         {
@@ -199,14 +190,11 @@ namespace CrewChiefV4.commands
                                                         int resetCount = 0;
                                                         if (isPCars2)
                                                         {
-                                                            if (MacroManager.pcars2LastFuelAmountAddedByStrat.ContainsKey(MacroManager.activePCars2Strategy))
-                                                            {
-                                                                resetCount = MacroManager.pcars2LastFuelAmountAddedByStrat[MacroManager.activePCars2Strategy];
-                                                            }
+                                                            resetCount = MacroManager.MAX_FUEL_RESET_COUNT;
                                                         }
                                                         else if (isR3e)
                                                         {
-                                                            resetCount = MacroManager.r3eLastFuelAmountAddedToThisStrat + 3;
+                                                            resetCount = MacroManager.MAX_FUEL_RESET_COUNT + 3;
                                                         }
                                                         for (int i = 0; i < resetCount; i++)
                                                         {
@@ -216,19 +204,14 @@ namespace CrewChiefV4.commands
                                                             }
                                                             // play these quickly
                                                             KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, 10);
-                                                            Thread.Sleep(40);
+                                                            Thread.Sleep(10);
                                                         }
                                                     }
                                                     else
                                                     {
                                                         count = eventToCall.resolveMacroKeyPressCount(macro.name);
-                                                        if (isPCars2)
+                                                        if (isR3e)
                                                         {
-                                                            MacroManager.pcars2LastFuelAmountAddedByStrat[MacroManager.activePCars2Strategy] = count;
-                                                        }
-                                                        else if (isR3e)
-                                                        {
-                                                            MacroManager.r3eLastFuelAmountAddedToThisStrat = count;
                                                             count = count + 3;
                                                         }
                                                     }

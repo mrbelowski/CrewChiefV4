@@ -224,7 +224,6 @@ namespace CrewChiefV4.RaceRoom
                 lastSessionRunningTime > currentGameState.SessionData.SessionRunningTime)
             {
                 currentGameState.SessionData.IsNewSession = true;
-                CrewChiefV4.commands.MacroManager.clearState();
                 chequeredFlagShownInThisSession = false;
                 // if this is a new prac / qual session, we might have just joined a multiclass session so we need to keep
                 // updating the car class until it settles.
