@@ -638,9 +638,8 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("Warning: Timed out waiting for spotter thread to stop to stop");
                     }
+                    Console.WriteLine("Spotter thread stopped");
                 }
-
-                Console.WriteLine("Spotter thread stopped");
 
                 spotterThread = null;
             }
