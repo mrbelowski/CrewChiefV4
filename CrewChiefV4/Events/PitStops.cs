@@ -66,8 +66,8 @@ namespace CrewChiefV4.Events
         private String folderPitStopRequestCancelled = "mandatory_pit_stops/pit_request_cancelled";
 
         // messages used when a pit request or cancel pit request isn't relevant (pcars2 only):
-        public static String folderPitAlreadyRequested = "mandatory_pit_stops/pitstop_already_requested";
-        public static String folderPitNotRequested = "mandatory_pit_stops/pitstop_not_requested";
+        public static String folderPitAlreadyRequested = "mandatory_pit_stops/pit_stop_already_requested";
+        public static String folderPitNotRequested = "mandatory_pit_stops/pit_stop_not_requested";
 
         private String folderMetres = "mandatory_pit_stops/metres";
         private String folderBoxPositionIntro = "mandatory_pit_stops/box_in";
