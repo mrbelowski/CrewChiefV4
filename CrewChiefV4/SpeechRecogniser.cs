@@ -324,26 +324,19 @@ namespace CrewChiefV4
             {
                 String triggerPhrase = entry.Key;
                 ExecutableCommandMacro executableCommandMacro = entry.Value;
-                if (executableCommandMacro.macro.getIntegerVariableVoiceTrigger() != null)
+                if (executableCommandMacro.macro.intRange != null)
                 {
-                    try
+                    foreach (KeyValuePair<String[], int> numberEntry in numberToNumber)
                     {
-                        foreach (KeyValuePair<String[], int> numberEntry in numberToNumber)
+                        if (numberEntry.Value >= executableCommandMacro.macro.intRange.Item1 && numberEntry.Value <= executableCommandMacro.macro.intRange.Item2)
                         {
-                            if (numberEntry.Value >= executableCommandMacro.macro.intRange.Item1 && numberEntry.Value <= executableCommandMacro.macro.intRange.Item2)
+                            String thisPhrase = executableCommandMacro.macro.startPhrase + numberEntry.Key[0] + executableCommandMacro.macro.endPhrase;
+                            if (!macroLookup.ContainsKey(thisPhrase))
                             {
-                                String thisPhrase = executableCommandMacro.macro.startPhrase + numberEntry.Key[0] + executableCommandMacro.macro.endPhrase;
-                                if (!macroLookup.ContainsKey(thisPhrase))
-                                {
-                                    macroLookup.Add(thisPhrase, voiceTriggeredMacros[triggerPhrase]);
-                                }
-                                macroChoices.Add(thisPhrase);
+                                macroLookup.Add(thisPhrase, voiceTriggeredMacros[triggerPhrase]);
                             }
+                            macroChoices.Add(thisPhrase);
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Unable to parse range from voice command " + triggerPhrase + ", " + e.StackTrace);
                     }
                 }
                 else

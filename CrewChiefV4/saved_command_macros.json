@@ -202,7 +202,7 @@
 	},
 	{
 		"name": "auto fuel",
-		"description": "in R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
+        "description": "*There's some app logic specific to this macro - the app recognises the 'auto fuel' name. Be very careful if you modify this*. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
 		"confirmationMessage": "acknowledge/fuel_to_end",
 		"voiceTriggers": [ "fuel to the end", "fuel to the end of the race" ],
 		"buttonTriggers": [],
@@ -228,13 +228,13 @@
 	},
 	{
 		"name": "manual fuel",
-		"description": "in R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
-		"confirmationMessage": "TODOq",
-        "integerVariableVoiceTrigger": "fuel, add {0,150} litres",
+		"description": "*There's some app logic specific to this macro - the app recognises the 'manual fuel' name. Be very careful if you modify this*. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
+		"confirmationMessage": "acknowledge/ok",
+        "integerVariableVoiceTrigger": "add fuel {0,150} litres",
 		"buttonTriggers": [],
 		"commandSets": [
 		{
-			"description": "TODO",
+			"description": "navigates to the fuel amount, de-selects it, presses decrease 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command",
 			"gameDefinition": "RACE_ROOM",
 			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "Multiple Pit Menu Decrease", "Multiple Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
 			"keyPressTime": 10,
@@ -242,7 +242,7 @@
 			"allowAutomaticTriggering": false
 		},
 		{
-			"description": "TODO",
+			"description": "navigates to the fuel amount, de-selects it, presses left (decrease) 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command",
 			"gameDefinition": "PCARS2",
 			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "Multiple ICM Menu Left", "Multiple ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
 			"keyPressTime": 30,

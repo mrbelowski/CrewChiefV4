@@ -144,10 +144,10 @@ namespace CrewChiefV4.commands
             // blocking...
             Boolean isPCars2 = CrewChief.gameDefinition == GameDefinition.pCars2;
             Boolean isR3e = CrewChief.gameDefinition == GameDefinition.raceRoom;
-            int intAmount = 0;
+            int multiplePressCountFromVoiceCommand = 0;
             if (macro.integerVariableVoiceTrigger != null && macro.integerVariableVoiceTrigger.Length > 0)
             {
-                intAmount = macro.extractInt(recognitionResult, macro.startPhrase, macro.endPhrase);
+                multiplePressCountFromVoiceCommand = macro.extractInt(recognitionResult, macro.startPhrase, macro.endPhrase);
             }
             foreach (CommandSet commandSet in macro.commandSets)
             {
@@ -192,7 +192,7 @@ namespace CrewChiefV4.commands
                                                 // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
                                                 // and increase to add the fuel
 
-                                                // first reset the fuelling
+                                                // first reset the fuelling - this is the same for the auto and manual fuel macros:
                                                 if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
                                                 {
                                                     int resetCount = 0;
@@ -217,8 +217,8 @@ namespace CrewChiefV4.commands
                                                 }
                                                 else if (macro.name == MacroManager.MANUAL_FUEL_IDENTIFIER)
                                                 {
-                                                    // not 'left' or 'decrease', so assume we're increasing here
-                                                    count = intAmount;
+                                                    // not 'left' or 'decrease', so assume we're increasing here. For manual fuel, use the parsed voice command
+                                                    count = multiplePressCountFromVoiceCommand;
                                                     if (isR3e)
                                                     {
                                                         count = count + 3;
@@ -226,6 +226,7 @@ namespace CrewChiefV4.commands
                                                 }
                                                 else
                                                 {
+                                                    // for auto fuel use the event:
                                                     count = eventToCall != null ? eventToCall.resolveMacroKeyPressCount(macro.name) : 0;
                                                     if (isR3e)
                                                     {
@@ -235,7 +236,7 @@ namespace CrewChiefV4.commands
                                             }
                                             else
                                             {
-                                                count = eventToCall.resolveMacroKeyPressCount(macro.name);
+                                                count = eventToCall == null ? multiplePressCountFromVoiceCommand : eventToCall.resolveMacroKeyPressCount(macro.name);
                                             }
                                             for (int i = 0; i < count; i++)
                                             {
@@ -336,13 +337,31 @@ namespace CrewChiefV4.commands
 
         private void parseIntRangeAndPhrase()
         {
-            int start = this._integerVariableVoiceTrigger.IndexOf("{") + 1;
-            int end = this._integerVariableVoiceTrigger.IndexOf("}", start);
-            String[] range = this._integerVariableVoiceTrigger.Substring(start, end - start).Split(',');
-            this.intRange = new Tuple<int, int>(int.Parse(range[0]), int.Parse(range[1]));
-
-            this.startPhrase = this._integerVariableVoiceTrigger.Substring(0, this._integerVariableVoiceTrigger.IndexOf("{"));
-            this.endPhrase = this._integerVariableVoiceTrigger.Substring(this._integerVariableVoiceTrigger.IndexOf("}") + 1);
+            try
+            {
+                Boolean success = false;
+                int start = this._integerVariableVoiceTrigger.IndexOf("{") + 1;
+                int end = this._integerVariableVoiceTrigger.IndexOf("}", start);
+                if (start != -1 && end > -1)
+                {
+                    String[] range = this._integerVariableVoiceTrigger.Substring(start, end - start).Split(',');
+                    if (range.Length == 2)
+                    {
+                        this.startPhrase = this._integerVariableVoiceTrigger.Substring(0, this._integerVariableVoiceTrigger.IndexOf("{"));
+                        this.endPhrase = this._integerVariableVoiceTrigger.Substring(this._integerVariableVoiceTrigger.IndexOf("}") + 1);
+                        this.intRange = new Tuple<int, int>(int.Parse(range[0]), int.Parse(range[1]));
+                        success = true;
+                    }
+                }
+                if (!success)
+                {
+                    Console.WriteLine("Failed to parse range and phrase from voice trigger " + this._integerVariableVoiceTrigger + " in macro " + this.name);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error parsing range and phrase from voice trigger " + this._integerVariableVoiceTrigger + " in macro " + this.name + ", " + e.StackTrace);
+            }
         }
     }
 
