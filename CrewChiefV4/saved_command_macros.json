@@ -188,7 +188,7 @@
     {
 		"name": "cancel pit request",
 		"description": "cancels a pit request, if one is set - applies only to pCars2",
-		"voiceTriggers": [ "cancel request pit" ],
+		"voiceTriggers": [ "cancel request pit", "cancel pit stop", "cancel pit request" ],
 		"buttonTriggers": [],
 		"confirmationMessage": "mandatory_pit_stops/pit_request_cancelled",
 		"commandSets": [
