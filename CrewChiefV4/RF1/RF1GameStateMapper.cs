@@ -1040,12 +1040,12 @@ namespace CrewChiefV4.rFactor1
                 rFactor1Constant.rfSurfaceType rl_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType;
                 rFactor1Constant.rfSurfaceType rr_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType;
 
-                // assume kerb is racing surface here - any wheel on a racing surface is OK
+                // assume kerb is racing surface here - only off track if all wheels are on grass or gravel
                 currentGameState.PenaltiesData.IsOffRacingSurface =
-                    fl_surface != rFactor1Constant.rfSurfaceType.dry && fl_surface != rFactor1Constant.rfSurfaceType.wet && fl_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    fr_surface != rFactor1Constant.rfSurfaceType.dry && fr_surface != rFactor1Constant.rfSurfaceType.wet && fr_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    rl_surface != rFactor1Constant.rfSurfaceType.dry && rl_surface != rFactor1Constant.rfSurfaceType.wet && rl_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    rr_surface != rFactor1Constant.rfSurfaceType.dry && rr_surface != rFactor1Constant.rfSurfaceType.wet && rr_surface != rFactor1Constant.rfSurfaceType.kerb;
+                    (fl_surface == rFactor1Constant.rfSurfaceType.grass || fl_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (fr_surface == rFactor1Constant.rfSurfaceType.grass || fr_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (rl_surface == rFactor1Constant.rfSurfaceType.grass || rl_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (rr_surface == rFactor1Constant.rfSurfaceType.grass || rr_surface == rFactor1Constant.rfSurfaceType.gravel);
 
                 if (previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface)
                 {
