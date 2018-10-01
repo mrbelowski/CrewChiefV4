@@ -143,7 +143,7 @@
 	"macros": [{
 			"name": "say sorry",
 			"description": "opens chat, types 'sorry, my bad', presses enter",
-			"voiceTriggers": ["chat say sorry"],
+			"voiceTriggers": ["chat, say sorry"],
 			"commandSets": [{
 					"description": "r3e version",
 					"gameDefinition": "RACE_ROOM",
@@ -159,10 +159,11 @@
 					"waitBetweenEachCommand": 200
 				}
 			]
-		}, {
+		},
+		{
 			"name": "say good pass",
 			"description": "opens chat, types 'good pass', presses enter",
-			"voiceTriggers": ["chat say sorry"],
+			"voiceTriggers": ["chat, say good pass"],
 			"commandSets": [{
 					"description": "r3e version",
 					"gameDefinition": "RACE_ROOM",
@@ -253,7 +254,7 @@
 			"name": "manual fuel",
 			"description": "Note the {0,150} - this means recognise all numbers between 0 and 150. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
 			"confirmationMessage": "acknowledge/ok",
-			"integerVariableVoiceTrigger": "add fuel {0,150} litres",
+			"integerVariableVoiceTrigger": "add fuel, {0,150} litres",
 			"buttonTriggers": [],
 			"commandSets": [{
 					"description": "navigates to the fuel amount, de-selects it, presses decrease 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command. {MULTIPLE,X} is press (X) times. {MULTIPLE,VOICE_TRIGGER} is press (number recognised from voice command) times. {MULTIPLE,Fuel} means the Fuel event resolves the amount (in code)",
