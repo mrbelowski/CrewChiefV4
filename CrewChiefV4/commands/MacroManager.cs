@@ -11,13 +11,11 @@ namespace CrewChiefV4.commands
     class MacroManager
     {
         // these are the macro names used to idenify certain macros which have special hard-coded behaviours. Not idea...
-        public static readonly String MULTIPLE_IDENTIFIER = "Multiple";
         public static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
         public static readonly String CANCEL_REQUEST_PIT_IDENTIFIER = "cancel pit request";
-        public static readonly String AUTO_FUEL_IDENTIFIER = "auto fuel";
-        public static readonly String MANUAL_FUEL_IDENTIFIER = "manual fuel";
-        public static readonly String MULTIPLE_DECREASE_IDENTIFIER = "Decrease";
-        public static readonly String MULTIPLE_LEFT_IDENTIFIER = "Left";
+
+        public static readonly String MULTIPLE_PRESS_IDENTIFIER = "MULTIPLE";
+        public static readonly String MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER = "VOICE_TRIGGER";
 
         public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
 

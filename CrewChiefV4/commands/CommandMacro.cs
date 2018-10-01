@@ -179,73 +179,36 @@ namespace CrewChiefV4.commands
                                     }
                                     else
                                     {
-                                        if (actionItem.actionText.StartsWith(MacroManager.MULTIPLE_IDENTIFIER))
+                                        if (MacroManager.MULTIPLE_PRESS_IDENTIFIER.Equals(actionItem.extendedType))
                                         {
-                                            AbstractEvent eventToCall = null;
-                                            if (commandSet.resolveMultipleCountWithEvent != null)
-                                            {
-                                                eventToCall = CrewChief.getEvent(commandSet.resolveMultipleCountWithEvent);
-                                            }
                                             int count = 0;
-                                            if (macro.name == MacroManager.AUTO_FUEL_IDENTIFIER || macro.name == MacroManager.MANUAL_FUEL_IDENTIFIER)
+                                            if (actionItem.resolvedByEvent != null)
                                             {
-                                                // special case for fuelling. There are 2 multiple presses - decrease, to get the menu to the start,
-                                                // and increase to add the fuel
-
-                                                // first reset the fuelling - this is the same for the auto and manual fuel macros:
-                                                if (actionItem.actionText.EndsWith(MacroManager.MULTIPLE_LEFT_IDENTIFIER) || actionItem.actionText.EndsWith(MacroManager.MULTIPLE_DECREASE_IDENTIFIER))
+                                                if (MacroManager.MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER.Equals(actionItem.resolvedByEvent))
                                                 {
-                                                    int resetCount = 0;
-                                                    if (isPCars2)
-                                                    {
-                                                        resetCount = MacroManager.MAX_FUEL_RESET_COUNT;
-                                                    }
-                                                    else if (isR3e)
-                                                    {
-                                                        resetCount = MacroManager.MAX_FUEL_RESET_COUNT + 3;
-                                                    }
-                                                    for (int i = 0; i < resetCount; i++)
-                                                    {
-                                                        if (MacroManager.stopped)
-                                                        {
-                                                            break;
-                                                        }
-                                                        // play these quickly
-                                                        KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, 10);
-                                                        Thread.Sleep(10);
-                                                    }
-                                                }
-                                                else if (macro.name == MacroManager.MANUAL_FUEL_IDENTIFIER)
-                                                {
-                                                    // not 'left' or 'decrease', so assume we're increasing here. For manual fuel, use the parsed voice command
                                                     count = multiplePressCountFromVoiceCommand;
-                                                    if (isR3e)
-                                                    {
-                                                        count = count + 3;
-                                                    }
                                                 }
                                                 else
                                                 {
-                                                    // for auto fuel use the event:
-                                                    count = eventToCall != null ? eventToCall.resolveMacroKeyPressCount(macro.name) : 0;
-                                                    if (isR3e)
-                                                    {
-                                                        count = count + 3;
-                                                    }
+                                                    count = CrewChief.getEvent(actionItem.resolvedByEvent).resolveMacroKeyPressCount(macro.name);
                                                 }
                                             }
                                             else
                                             {
-                                                count = eventToCall == null ? multiplePressCountFromVoiceCommand : eventToCall.resolveMacroKeyPressCount(macro.name);
+                                                count = actionItem.pressCount;
                                             }
-                                            for (int i = 0; i < count; i++)
+                                            // completely arbitrary sanity check on resolved count. We don't want the app trying to press 'right' MaxInt times
+                                            if (count > 0 && count < 300)
                                             {
-                                                if (MacroManager.stopped)
+                                                for (int i = 0; i < count; i++)
                                                 {
-                                                    break;
+                                                    if (MacroManager.stopped)
+                                                    {
+                                                        break;
+                                                    }
+                                                    KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
+                                                    Thread.Sleep(commandSet.waitBetweenEachCommand);
                                                 }
-                                                KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                                Thread.Sleep(commandSet.waitBetweenEachCommand);
                                             }
                                         }
                                         else
@@ -373,7 +336,6 @@ namespace CrewChiefV4.commands
 		public int keyPressTime { get; set; }
         public int waitBetweenEachCommand { get; set; }
         public Boolean allowAutomaticTriggering { get; set; }
-        public String resolveMultipleCountWithEvent { get; set; }
         public String confirmationMessage { get; set; }
 
         private List<ActionItem> actionItems = null;
@@ -407,6 +369,9 @@ namespace CrewChiefV4.commands
         public int pauseMillis = -1;
         public KeyPresser.KeyCode keyCode;
         public String actionText;
+        public String extendedType;
+        public String resolvedByEvent;
+        public int pressCount;
         public ActionItem(String action, KeyBinding[] keyBindings)
         {
             this.actionText = action;
@@ -417,6 +382,28 @@ namespace CrewChiefV4.commands
             }
             else
             {
+                if (action.StartsWith("{"))
+                {
+                    int start = action.IndexOf("{") + 1;
+                    int end = action.IndexOf("}", start);
+                    if (start != -1 && end > -1)
+                    {
+                        String[] typeAndParam = action.Substring(start, end - start).Split(',');
+                        if (typeAndParam.Length == 2)
+                        {
+                            extendedType = typeAndParam[0];
+                            if (typeAndParam[1].All(char.IsDigit))
+                            {
+                                pressCount = int.Parse(typeAndParam[1]);
+                            }
+                            else
+                            {
+                                resolvedByEvent = typeAndParam[1];
+                            }
+                        }
+                    }
+                    action = action.Substring(action.IndexOf("}") + 1);
+                }
                 try
                 {
                     foreach (KeyBinding keyBinding in keyBindings)
