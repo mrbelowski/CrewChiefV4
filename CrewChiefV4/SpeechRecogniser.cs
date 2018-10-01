@@ -291,14 +291,6 @@ namespace CrewChiefV4
                 }
             }
         }
-
-        private Tuple<int, int> parseIntRange(String command)
-        {
-            int start = command.IndexOf("{") + 1;
-            int end = command.IndexOf("}", start);
-            String[] range = command.Substring(start, end - start).Split(',');
-            return new Tuple<int, int>(int.Parse(range[0]), int.Parse(range[1]));
-        }
         
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
