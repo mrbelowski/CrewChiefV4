@@ -69,7 +69,6 @@ namespace CrewChiefV4.assetto
 
         public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
-
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
                 dataReadFromFileIndex = 0;
