@@ -259,7 +259,7 @@ namespace CrewChiefV4
         // - Root threads to stop
         // - Temporary threads to stop
         //
-        // Upon exit, enables Start/Stop button.
+        // Upon exit, enables Start/Stop button and calls MainWindow.uiSyncAppStop to update UI controls.
         //
         public static bool WaitForRootAndTemporaryThreadsStop(CrewChief cc)
         {
@@ -321,6 +321,7 @@ namespace CrewChiefV4
                     if (MainWindow.instance != null)
                     {
                         ThreadManager.UnregisterRootThreads();
+                        MainWindow.instance.uiSyncAppStop();
                         MainWindow.instance.startApplicationButton.Enabled = true;
                     }
                 }

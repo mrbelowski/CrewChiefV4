@@ -681,6 +681,7 @@ namespace CrewChiefV4
 
 
             notificationTrayIcon.ContextMenuStrip = cms;
+            notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");
         }
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
@@ -992,8 +993,6 @@ namespace CrewChiefV4
             if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
                 GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
             {
-                // TODO_THREADS: disable/elements all other elements, not just start button.
-                startApplicationButton.Enabled = false;
                 doStartAppStuff();
 
                 // Will wait for threads to start, possible file load and enable the button.
@@ -1347,7 +1346,6 @@ namespace CrewChiefV4
 
         private void startApplicationButton_Click(object sender, EventArgs e)
         {
-            startApplicationButton.Enabled = false;
             doStartAppStuff();
 
             if (IsAppRunning)
@@ -1360,31 +1358,57 @@ namespace CrewChiefV4
             }
         }
 
+        private void uiSyncAppStart()
+        {
+            this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+            this.assignButtonToAction.Enabled = false;
+            this.deleteAssigmentButton.Enabled = false;
+            this.groupBox1.Enabled = false;
+            this.propertiesButton.Enabled = false;
+            this.scanControllersButton.Enabled = false;
+            this.personalisationBox.Enabled = false;
+            this.chiefNameBox.Enabled = false;
+            this.spotterNameBox.Enabled = false;
+            this.recordSession.Enabled = false;
+            this.gameDefinitionList.Enabled = false;
+            this.contextMenuPreferencesItem.Enabled = false;
+            this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
+        }
+
+        public void uiSyncAppStop()
+        {
+            this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
+                this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
+
+            this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
+            this.propertiesButton.Enabled = true;
+            this.groupBox1.Enabled = true;
+            this.scanControllersButton.Enabled = true;
+            this.personalisationBox.Enabled = true;
+            this.chiefNameBox.Enabled = true;
+            this.spotterNameBox.Enabled = true;
+            this.recordSession.Enabled = true;
+            this.gameDefinitionList.Enabled = true;
+            this.contextMenuPreferencesItem.Enabled = true;
+            this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");
+        }
+
         private void doStartAppStuff()
         {
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
             {
+                startApplicationButton.Enabled = false;
+                uiSyncAppStart();
                 Console.WriteLine("Pausing console scrolling");
                 MainWindow.autoScrollConsole = false;
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
                 {
-                    crewChief.setGameDefinition(gameDefinition);                
-
+                    crewChief.setGameDefinition(gameDefinition);
                     MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
                     CarData.loadCarClassData();
                     TrackData.loadTrackLandmarksData();
-                    this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
-                    this.assignButtonToAction.Enabled = false;
-                    this.deleteAssigmentButton.Enabled = false;
-                    this.groupBox1.Enabled = false;
-                    this.propertiesButton.Enabled = false;
-                    this.scanControllersButton.Enabled = false;
-                    this.personalisationBox.Enabled = false;
-                    this.chiefNameBox.Enabled = false;
-                    this.spotterNameBox.Enabled = false;
-                    this.recordSession.Enabled = false;
                     ThreadStart crewChiefWork = runApp;
                     Thread crewChiefThread = new Thread(crewChiefWork);
                     crewChiefThread.Name = "MainWindow.runApp";
@@ -1440,6 +1464,7 @@ namespace CrewChiefV4
             }
             else
             {
+                startApplicationButton.Enabled = false;
                 Console.WriteLine("Resuming console scrolling");
                 MainWindow.autoScrollConsole = true;
                 MacroManager.stop();
@@ -1454,30 +1479,13 @@ namespace CrewChiefV4
                     }
                     catch (Exception) { }
                 }
-                this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
-                    this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
-                this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
                 Console.WriteLine("Application stopped");
-                this.propertiesButton.Enabled = true;
-                this.groupBox1.Enabled = true;
-                this.scanControllersButton.Enabled = true;
-                this.personalisationBox.Enabled = true;
-                this.chiefNameBox.Enabled = true;
-                this.spotterNameBox.Enabled = true;
-                this.recordSession.Enabled = true;
                 DriverTrainingService.completeRecordingPaceNotes();
                 DriverTrainingService.stopPlayingPaceNotes();
             }
-
-            this.gameDefinitionList.Enabled = !this._IsAppRunning;
-            this.contextMenuPreferencesItem.Enabled = !this._IsAppRunning;
-
-            if (this._IsAppRunning)
-                this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
-            else
-                this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");  // Or idling, smoking, any good jokes?
         }
+
 
         // called from the close callback on the main form
         private void stopApp(object sender, FormClosedEventArgs e)
@@ -1488,8 +1496,13 @@ namespace CrewChiefV4
                 formClosed = true;
             }
 
+            // Shutdown long running threads:
+            
             // SoundCache spawns a Thread to lazy-load the sound data. Cancel this:
             SoundCache.cancelLazyLoading = true;
+            
+            // Make sure we quit button assignment listener.
+            controllerConfiguration.listenForAssignment = false;
 
             stopApp();
         }
@@ -1588,7 +1601,6 @@ namespace CrewChiefV4
                     isAssigningButton = true;
                     this.assignButtonToAction.Text = Configuration.getUIString("waiting_for_button_click_to_cancel");
                     ThreadStart assignButtonWork = assignButton;
-                    // TODO_THREADS: This might be controller thread, review
                     ThreadManager.UnregisterTemporaryThread(assignButtonThread);
                     assignButtonThread = new Thread(assignButtonWork);
                     assignButtonThread.Name = "MainWindow.assignButtonThread";
@@ -1653,13 +1665,21 @@ namespace CrewChiefV4
                     {
                         runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                     }
-                }                
+                }
             }
             else
             {
                 isAssigningButton = false;
             }
-            this.assignButtonToAction.Text = Configuration.getUIString("assign");            
+
+            // Check if form is shut down while we're listening.
+            lock (MainWindow.instanceLock)
+            {
+                if (MainWindow.instance != null)
+                {
+                    this.assignButtonToAction.Text = Configuration.getUIString("assign");
+                }
+            }
         }
 
         private void deleteAssignmentButtonClicked(object sender, EventArgs e)
