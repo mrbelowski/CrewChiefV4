@@ -18,11 +18,6 @@ namespace CrewChiefV4.commands
         public static readonly String MANUAL_FUEL_IDENTIFIER = "manual fuel";
         public static readonly String MULTIPLE_DECREASE_IDENTIFIER = "Decrease";
         public static readonly String MULTIPLE_LEFT_IDENTIFIER = "Left";
-        // another magic case - in R3E we can't track which strategy we're on because the menu wraps and we don't 
-        // know how many there are anyway. So as soon as we change to a different strat, reset the fuel-added counter.
-        public static readonly String R3E_STRAT_IDENTIFIER = "pit preset";
-        // for pcars2 we can try to track this by strategy:
-        public static readonly String PCARS2_STRAT_IDENTIFIER = "select race strategy";
 
         public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
 
