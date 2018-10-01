@@ -142,7 +142,6 @@ namespace CrewChiefV4.commands
         public void execute(String recognitionResult, Boolean supressConfirmationMessage)
         {
             // blocking...
-            Boolean isPCars2 = CrewChief.gameDefinition == GameDefinition.pCars2;
             Boolean isR3e = CrewChief.gameDefinition == GameDefinition.raceRoom;
             int multiplePressCountFromVoiceCommand = 0;
             if (macro.integerVariableVoiceTrigger != null && macro.integerVariableVoiceTrigger.Length > 0)
@@ -191,6 +190,11 @@ namespace CrewChiefV4.commands
                                                 else
                                                 {
                                                     count = CrewChief.getEvent(actionItem.resolvedByEvent).resolveMacroKeyPressCount(macro.name);
+                                                }
+                                                // hack for R3E: fuel menu needs 3 presses to get it from the start to 0
+                                                if (isR3e && macro.name.Contains("fuel"))
+                                                {
+                                                    count = count + 3;
                                                 }
                                             }
                                             else
