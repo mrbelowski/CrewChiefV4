@@ -10,11 +10,12 @@ namespace CrewChiefV4.commands
 {
     class MacroManager
     {
-        // these are the macro names used to idenify certain macros which have special hard-coded behaviours. Not idea...
+        // these are the macro names used to identify certain macros which have special hard-coded behaviours. Not ideal...
         public static readonly String REQUEST_PIT_IDENTIFIER = "request pit";
         public static readonly String CANCEL_REQUEST_PIT_IDENTIFIER = "cancel pit request";
 
         public static readonly String MULTIPLE_PRESS_IDENTIFIER = "MULTIPLE";
+        public static readonly String FREE_TEXT_IDENTIFIER = "FREE_TEXT";
         public static readonly String MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER = "VOICE_TRIGGER";
 
         public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
@@ -67,10 +68,16 @@ namespace CrewChiefV4.commands
                         {
                             if (commandSet.gameDefinition.Equals(CrewChief.gameDefinition.gameEnum.ToString(), StringComparison.InvariantCultureIgnoreCase))
                             {
-                                hasCommandForCurrentGame = true;
-                                allowAutomaticTriggering = commandSet.allowAutomaticTriggering;
                                 // this does the conversion from key characters to key enums and stores the result to save us doing it every time
-                                commandSet.getActionItems(false, assignmentsByGame[commandSet.gameDefinition]);
+                                if (!commandSet.loadActionItems(assignmentsByGame[commandSet.gameDefinition]))
+                                {
+                                    Console.WriteLine("Macro \"" + macro.name + "\" failed to load - some actionItems didn't parse succesfully");
+                                }
+                                else
+                                {
+                                    allowAutomaticTriggering = commandSet.allowAutomaticTriggering;
+                                    hasCommandForCurrentGame = true;
+                                }
                                 break;
                             }
                         }

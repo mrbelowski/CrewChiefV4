@@ -30,6 +30,10 @@
 				{
 					"action": "Pit Request Toggle",
 					"key": "KEY_R"
+				},
+				{
+					"action": "Real-time Chat",
+					"key": "KEY_C"
 				}
 			]
 		},
@@ -59,6 +63,10 @@
 				{
 					"action": "Pit Request Toggle",
 					"key": "KEY_Q"
+				},
+				{
+					"action": "In-game Chat Box",
+					"key": "KEY_T"
 				}
 			]
 		},
@@ -133,6 +141,45 @@
 		}
 	],
 	"macros": [{
+			"name": "say sorry",
+			"description": "opens chat, types 'sorry, my bad', presses enter",
+			"voiceTriggers": ["chat say sorry"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Real-time Chat", "{FREE_TEXT}sorry, my bad", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["In-game Chat Box", "{FREE_TEXT}sorry, my bad", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		}, {
+			"name": "say good pass",
+			"description": "opens chat, types 'good pass', presses enter",
+			"voiceTriggers": ["chat say sorry"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Real-time Chat", "{FREE_TEXT}good pass", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["In-game Chat Box", "{FREE_TEXT}good pass", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
 			"name": "request pit",
 			"description": "requests a pitstop",
 			"voiceTriggers": ["request pit", "box this lap", "in this lap"],

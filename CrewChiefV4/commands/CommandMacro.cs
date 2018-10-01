@@ -167,7 +167,7 @@ namespace CrewChiefV4.commands
                                 IntPtr currentForgroundWindow = GetForegroundWindow();
                                 bool hasChangedForgroundWindow = BringGameWindowToFront(CrewChief.gameDefinition.processName, CrewChief.gameDefinition.alternativeProcessNames, currentForgroundWindow);
 
-                                foreach (ActionItem actionItem in commandSet.getActionItems(true, assignmentsByGame[commandSet.gameDefinition]))
+                                foreach (ActionItem actionItem in commandSet.getActionItems())
                                 {
                                     if (MacroManager.stopped)
                                     {
@@ -179,9 +179,9 @@ namespace CrewChiefV4.commands
                                     }
                                     else
                                     {
+                                        int count;
                                         if (MacroManager.MULTIPLE_PRESS_IDENTIFIER.Equals(actionItem.extendedType))
                                         {
-                                            int count = 0;
                                             if (actionItem.resolvedByEvent != null)
                                             {
                                                 if (MacroManager.MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER.Equals(actionItem.resolvedByEvent))
@@ -197,25 +197,12 @@ namespace CrewChiefV4.commands
                                             {
                                                 count = actionItem.pressCount;
                                             }
-                                            // completely arbitrary sanity check on resolved count. We don't want the app trying to press 'right' MaxInt times
-                                            if (count > 0 && count < 300)
-                                            {
-                                                for (int i = 0; i < count; i++)
-                                                {
-                                                    if (MacroManager.stopped)
-                                                    {
-                                                        break;
-                                                    }
-                                                    KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                                    Thread.Sleep(commandSet.waitBetweenEachCommand);
-                                                }
-                                            }
                                         }
                                         else
                                         {
-                                            KeyPresser.SendScanCodeKeyPress(actionItem.keyCode, commandSet.keyPressTime);
-                                            Thread.Sleep(commandSet.waitBetweenEachCommand);
+                                            count = 1;
                                         }
+                                        sendKeys(count, actionItem, commandSet.keyPressTime, commandSet.waitBetweenEachCommand);
                                     }                                    
                                 }
                                 if (hasChangedForgroundWindow)
@@ -231,6 +218,30 @@ namespace CrewChiefV4.commands
                     break;
                 }
             }            
+        }
+
+        private void sendKeys(int count, ActionItem actionItem, int keyPressTime, int waitBetweenKeys)
+        {
+            // completely arbitrary sanity check on resolved count. We don't want the app trying to press 'right' MaxInt times
+            if (actionItem.keyCodes.Length * count > 300)
+            {
+                Console.WriteLine("Macro item " + actionItem.actionText + " has > 300 key presses and will be ignored");
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    if (MacroManager.stopped)
+                    {
+                        break;
+                    }
+                    foreach (KeyPresser.KeyCode keyCode in actionItem.keyCodes)
+                    {
+                        KeyPresser.SendScanCodeKeyPress(keyCode, keyPressTime);
+                        Thread.Sleep(waitBetweenKeys);
+                    }
+                }
+            }
         }
     }
 
@@ -340,25 +351,28 @@ namespace CrewChiefV4.commands
 
         private List<ActionItem> actionItems = null;
 
-        public List<ActionItem> getActionItems(Boolean writeToConsole, KeyBinding[] keyBindings)
+        public Boolean loadActionItems(KeyBinding[] keyBindings)
         {
-            if (this.actionItems == null)
+            this.actionItems = new List<ActionItem>();
+            foreach (String action in actionSequence)
             {
-                this.actionItems = new List<ActionItem>();
-                foreach (String action in actionSequence)
+                ActionItem actionItem = new ActionItem(action, keyBindings);
+                if (actionItem.parsedSuccessfully)
                 {
-                    ActionItem actionItem = new ActionItem(action, keyBindings);
-                    if (actionItem.parsedSuccessfully)
-                    {
-                        this.actionItems.Add(actionItem);
-                    }
+                    this.actionItems.Add(actionItem);
+                }
+                else
+                {
+                    return false;
                 }
             }
-            if (writeToConsole)
-            {
-                Console.WriteLine("Sending actions " + String.Join(", ", actionSequence));
-                Console.WriteLine("Pressing keys " + String.Join(", ", actionItems));
-            }
+            return true;
+        }
+
+        public List<ActionItem> getActionItems()
+        {
+            Console.WriteLine("Sending actions " + String.Join(", ", actionSequence));
+            Console.WriteLine("Pressing keys " + String.Join(", ", actionItems));
             return actionItems;
         }
     }
@@ -367,11 +381,13 @@ namespace CrewChiefV4.commands
     {
         public Boolean parsedSuccessfully = false;
         public int pauseMillis = -1;
-        public KeyPresser.KeyCode keyCode;
+        public KeyPresser.KeyCode[] keyCodes;
         public String actionText;
         public String extendedType;
         public String resolvedByEvent;
+        public Boolean allowFreeText;
         public int pressCount;
+
         public ActionItem(String action, KeyBinding[] keyBindings)
         {
             this.actionText = action;
@@ -389,7 +405,12 @@ namespace CrewChiefV4.commands
                     if (start != -1 && end > -1)
                     {
                         String[] typeAndParam = action.Substring(start, end - start).Split(',');
-                        if (typeAndParam.Length == 2)
+                        if (typeAndParam.Length == 1 && MacroManager.FREE_TEXT_IDENTIFIER.Equals(typeAndParam[0]))
+                        {
+                            extendedType = typeAndParam[0];
+                            allowFreeText = true;
+                        }
+                        else if (typeAndParam.Length == 2)
                         {
                             extendedType = typeAndParam[0];
                             if (typeAndParam[1].All(char.IsDigit))
@@ -406,13 +427,45 @@ namespace CrewChiefV4.commands
                 }
                 try
                 {
+                    // first assume we have a single key binding
+                    this.keyCodes = new KeyPresser.KeyCode[1];
                     foreach (KeyBinding keyBinding in keyBindings)
                     {
                         if (String.Equals(keyBinding.action, action, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            keyCode = (KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true);
-                            parsedSuccessfully = true;
+                            // keyCode = (KeyPresser.KeyCode)Enum.Parse(typeof(KeyPresser.KeyCode), keyBinding.key, true);
+                            parsedSuccessfully = parseKeycode(keyBinding.key, false, out this.keyCodes[0]);
                             break;
+                        }
+                    }
+                    if (!parsedSuccessfully)
+                    {
+                        // try and get it directly without going through the key bindings
+                        parsedSuccessfully = parseKeycode(action, false, out this.keyCodes[0]);
+                    }
+                    if (!parsedSuccessfully)
+                    {
+                        if (allowFreeText)
+                        {
+                            // finally, try to parse each letter
+                            this.keyCodes = new KeyPresser.KeyCode[action.Length];
+                            for (int i = 0; i < action.Length; i++)
+                            {
+                                parsedSuccessfully = parseKeycode(action[i].ToString(), true, out keyCodes[i]);
+                                if (!parsedSuccessfully)
+                                {
+                                    Console.WriteLine("Unable to convert character " + action[i] + " to a key press");
+                                    break;
+                                }
+                            }
+                            if (parsedSuccessfully)
+                            {
+                                Console.WriteLine("Free text action macro, text = \"" + action + "\" key presses to send = " + String.Join(", ", keyCodes));
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("actionItem = \"" + action + "\" not recognised");
                         }
                     }
                 }
@@ -421,6 +474,43 @@ namespace CrewChiefV4.commands
                     Console.WriteLine("Action " + action + " not recognised");
                 }
             }
+        }
+
+        private Boolean parseKeycode(String keyString, Boolean freeText, out KeyPresser.KeyCode keyCode)
+        {
+            // some character literal replacements, only applicable to free text macros:
+            if (freeText)
+            {
+                if (",".Equals(keyString))
+                {
+                    keyCode = KeyPresser.KeyCode.OEM_COMMA;
+                    return true;
+                }
+                if (" ".Equals(keyString))
+                {
+                    keyCode = KeyPresser.KeyCode.SPACE_BAR;
+                    return true;
+                }
+                if (".".Equals(keyString))
+                {
+                    keyCode = KeyPresser.KeyCode.OEM_PERIOD;
+                    return true;
+                }
+                if ("-".Equals(keyString))
+                {
+                    keyCode = KeyPresser.KeyCode.OEM_MINUS;
+                    return true;
+                }
+            }
+            if (Enum.TryParse(keyString, true, out keyCode))
+            {
+                return true;
+            }
+            if (Enum.TryParse("KEY_" + keyString, true, out keyCode))
+            {
+                return true;
+            }
+            return false;
         }
 
         public override String ToString()
@@ -433,7 +523,7 @@ namespace CrewChiefV4.commands
                 }
                 else
                 {
-                    return keyCode.ToString();
+                    return String.Join(",", keyCodes);
                 }
             }
             else
