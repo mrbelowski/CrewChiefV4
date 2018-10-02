@@ -843,7 +843,6 @@ namespace CrewChiefV4.Audio
                         if (!isImmediateMessages && playedEventCount > 0 && pauseBetweenMessages > 0)
                         {
                             Console.WriteLine("Pausing before " + eventName);
-                            // TODO_THREADS: verify math
                             Utilities.InterruptedSleep((int)Math.Round(pauseBetweenMessages * 1000.0f) /*totalWaitMillis*/, 10 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
                         }
                         //  now double check this is still valid
@@ -1129,8 +1128,10 @@ namespace CrewChiefV4.Audio
             playDelayedImmediateMessageThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                // TODO_THREADS: interrupt
-                Thread.Sleep(queuedMessage.secondsDelay * 1000);
+                if (queuedMessage.secondsDelay > 0)
+                {
+                    Utilities.InterruptedSleep(queuedMessage.secondsDelay * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                }
                 playMessageImmediately(queuedMessage);
             });
             playDelayedImmediateMessageThread.Name = "AudioPlayer.playDelayedImmediateMessageThread";
@@ -1443,7 +1444,10 @@ namespace CrewChiefV4.Audio
                 pauseQueueThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(seconds * 1000); // TODO_THREADS:
+                    if (seconds > 0)
+                    {
+                        Utilities.InterruptedSleep(seconds * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                    }
                     regularQueuePaused = false;
                     // wake the monitor thread as soon as the pause has expired
                     this.monitorQueueWakeUpEvent.Set();
