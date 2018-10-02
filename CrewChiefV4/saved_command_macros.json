@@ -1,616 +1,665 @@
 {
-    "description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
-    "assignments": [
-	{
-	    "description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below. WAIT_1000 as an action makes the macro pause for (in this example) 1000 milliseconds (1 second). Use this to allow the player to see what item is about to be selected. Actions starting with the word 'Multiple' are a bit special - the app will press this key many times, depending on the action (this is a WIP and is currently only used for R3E auto fuel selection)",
-	    "gameDefinition": "RACE_ROOM",
-		"keyBindings" : [
-		{
-		    "action": "Pit Menu Toggle",
-			"key": "KEY_Q"
+	"description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
+	"assignments": [{
+			"description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below.",
+			"gameDefinition": "RACE_ROOM",
+			"keyBindings": [{
+					"action": "Pit Menu Toggle",
+					"key": "KEY_Q"
+				},
+				{
+					"action": "Pit Menu Select",
+					"key": "KEY_E"
+				},
+				{
+					"action": "Pit Menu Up",
+					"key": "KEY_W"
+				},
+				{
+					"action": "Pit Menu Down",
+					"key": "KEY_S"
+				},
+				{
+					"action": "Pit Menu Decrease",
+					"key": "KEY_A"
+				},
+				{
+					"action": "Pit Menu Increase",
+					"key": "KEY_D"
+				},
+				{
+					"action": "Pit Request Toggle",
+					"key": "KEY_R"
+				},
+				{
+					"action": "Real-time Chat",
+					"key": "KEY_C"
+				}
+			]
 		},
 		{
-		    "action": "Pit Menu Select",
-			"key": "KEY_E"
+			"description": "Project Cars 2 command mappings - these are the key assignments in the Controller menu -> Game",
+			"gameDefinition": "PCARS2",
+			"keyBindings": [{
+					"action": "Car Management",
+					"key": "KEY_E"
+				},
+				{
+					"action": "ICM Menu Up",
+					"key": "KEY_W"
+				},
+				{
+					"action": "ICM Menu Down",
+					"key": "KEY_S"
+				},
+				{
+					"action": "ICM Menu Left",
+					"key": "KEY_A"
+				},
+				{
+					"action": "ICM Menu Right",
+					"key": "KEY_D"
+				},
+				{
+					"action": "Pit Request Toggle",
+					"key": "KEY_Q"
+				},
+				{
+					"action": "In-game Chat Box",
+					"key": "KEY_T"
+				}
+			]
 		},
 		{
-		    "action": "Pit Menu Up",
-			"key": "KEY_W"
-		},
-		{
-		    "action": "Pit Menu Down",
-			"key": "KEY_S"
-		},
-		{
-		    "action": "Pit Menu Decrease",
-			"key": "KEY_A"
-		},
-		{
-		    "action": "Pit Menu Increase",
-			"key": "KEY_D"
-		},
-		{
-		    "action": "Multiple Pit Menu Increase",
-			"key": "KEY_D"
-		},
-		{
-		    "action": "Pit Request Toggle",
-			"key": "KEY_R"
+			"description": "iRacing command mappings - these are the key assignments in the Options -> Controls",
+			"gameDefinition": "IRACING",
+			"keyBindings": [{
+					"action": "Lap Timing Black Box",
+					"key": "F1"
+				},
+				{
+					"action": "Standings Black Box",
+					"key": "F2"
+				},
+				{
+					"action": "Relative Black Box",
+					"key": "F3"
+				},
+				{
+					"action": "Fuel Black Box",
+					"key": "F4"
+				},
+				{
+					"action": "Tires Black Box",
+					"key": "F5"
+				},
+				{
+					"action": "Tire Info Black Box",
+					"key": "F6"
+				},
+				{
+					"action": "Pit-stop Adjustments Black Box",
+					"key": "F7"
+				},
+				{
+					"action": "In-car Adjustments Black Box",
+					"key": "F8"
+				},
+				{
+					"action": "Mirror Adjustments Black Box",
+					"key": "F9"
+				},
+				{
+					"action": "Radio Adjustments Black Box",
+					"key": "F10"
+				},
+				{
+					"action": "Select Next Control",
+					"key": "UP"
+				},
+				{
+					"action": "Select Previous Control",
+					"key": "DOWN"
+				},
+				{
+					"action": "Increment Selected Control",
+					"key": "RIGHT"
+				},
+				{
+					"action": "Decrement Selected Control",
+					"key": "LEFT"
+				},
+				{
+					"action": "Toggle Selected Control",
+					"key": "SPACE_BAR"
+				},
+				{
+					"action": "Get Out Of Car",
+					"key": "ESC"
+				}
+			]
 		}
-		]
-	},
-	{
-	    "description": "Project Cars 2 command mappings - these are the key assignments in the Controller menu -> Game",
-	    "gameDefinition": "PCARS2",
-		"keyBindings" : [
-		{
-		    "action": "Car Management",
-			"key": "KEY_E"
+	],
+	"macros": [{
+			"name": "say sorry",
+			"description": "opens chat, types 'sorry, my bad', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported.",
+			"voiceTriggers": ["chat, say sorry"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Real-time Chat", "{FREE_TEXT}sorry, my bad", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["In-game Chat Box", "{FREE_TEXT}sorry, my bad", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				}
+			]
 		},
 		{
-		    "action": "ICM Menu Up",
-			"key": "KEY_W"
+			"name": "say good pass",
+			"description": "opens chat, types 'good pass', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported",
+			"voiceTriggers": ["chat, say good pass"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Real-time Chat", "{FREE_TEXT}good pass", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["In-game Chat Box", "{FREE_TEXT}good pass", "ENTER"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				}
+			]
 		},
 		{
-		    "action": "ICM Menu Down",
-			"key": "KEY_S"
+			"name": "request pit",
+			"description": "requests a pitstop",
+			"voiceTriggers": ["request pit", "box this lap", "in this lap"],
+			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested",
+			"buttonTriggers": [{
+					"description": "wheel button X - button trigger not yet implemented",
+					"deviceId": "12345456",
+					"buttonIndex": "1"
+				},
+				{
+					"description": "keyboard key z - key trigger not yet implemented",
+					"deviceId": "1",
+					"buttonIndex": "99"
+				}
+			],
+			"commandSets": [{
+					"description": "r3e version, keyPressTime quite short because of low key-repeat-delay. The action sequence item {WAIT,5000} tells the app to wait 5000 milliseconds before moving to the next command",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Request Toggle", "{WAIT,5000}", "Pit Menu Toggle"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version, keyPressTime longer",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["Pit Request Toggle"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
 		},
 		{
-		    "action": "ICM Menu Left",
-			"key": "KEY_A"
+			"name": "cancel pit request",
+			"description": "cancels a pit request, if one is set - applies only to pCars2",
+			"voiceTriggers": ["cancel request pit", "cancel pit stop", "cancel pit request"],
+			"buttonTriggers": [],
+			"confirmationMessage": "mandatory_pit_stops/pit_request_cancelled",
+			"commandSets": [{
+				"description": "pcars2 version, keyPressTime longer",
+				"gameDefinition": "PCARS2",
+				"actionSequence": ["Pit Request Toggle"],
+				"keyPressTime": 50,
+				"waitBetweenEachCommand": 200
+			}]
 		},
 		{
-		    "action": "ICM Menu Right",
-			"key": "KEY_D"
+			"name": "auto fuel",
+			"description": "In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets). An item with {MULTIPLE,7} tells the app to repeat that key press 7 times. An item starting {MULTIPLE,Fuel} tells the app to ask the Fuel event for the right number of times to press this key",
+			"confirmationMessage": "acknowledge/fuel_to_end",
+			"voiceTriggers": ["fuel to the end", "fuel to the end of the race"],
+			"buttonTriggers": [],
+			"commandSets": [{
+					"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by ensuring the cursor is at the top of the menu, then it goes to the fuel row and presses 'decrease' a many times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,153}Pit Menu Decrease", "{MULTIPLE,Fuel}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 20,
+					"allowAutomaticTriggering": false
+				},
+				{
+					"description": "This is an attempt to automate the fuel process for pCARS2 using the app's current fuel estimate. Navigates to the adjust stratgey option, then fuel, then reduces the amount to 0 and then adds however many litres the app calculated",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,3}ICM Menu Up", "{MULTIPLE,2}ICM Menu Down", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Down", "{MULTIPLE,150}ICM Menu Left", "{MULTIPLE,Fuel}ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 20,
+					"allowAutomaticTriggering": false
+				}
+			]
 		},
 		{
-		    "action": "Multiple ICM Menu Right",
-			"key": "KEY_D"
-		},{
-		    "action": "Pit Request Toggle",
-			"key": "KEY_Q"
+			"name": "manual fuel",
+			"description": "Note the {0,150} - this means recognise all numbers between 0 and 150. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets). An item with {MULTIPLE,7} tells the app to repeat that key press 7 times. An item starting {MULTIPLE,VOICE_TRIGGER} tells the app to repeat this key using the number recognised from the voice command",
+			"confirmationMessage": "acknowledge/ok",
+			"integerVariableVoiceTrigger": "add fuel, {0,150} litres",
+			"buttonTriggers": [],
+			"commandSets": [{
+					"description": "navigates to the fuel amount, de-selects it, presses decrease 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command. {MULTIPLE,X} is press (X) times. {MULTIPLE,VOICE_TRIGGER} is press (number recognised from voice command) times. {MULTIPLE,Fuel} means the Fuel event resolves the amount (in code)",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,150}Pit Menu Decrease", "{MULTIPLE,VOICE_TRIGGER}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 20,
+					"allowAutomaticTriggering": false
+				},
+				{
+					"description": "navigates to the fuel amount, de-selects it, presses left (decrease) 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,3}ICM Menu Up", "{MULTIPLE,2}ICM Menu Down", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Down", "{MULTIPLE,150}ICM Menu Left", "{MULTIPLE,VOICE_TRIGGER}ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 20,
+					"allowAutomaticTriggering": false
+				}
+			]
+		},
+		{
+			"name": "next pit preset",
+			"description": "selects next pitstop preset, r3e only",
+			"voiceTriggers": ["next strategy", "next pit preset"],
+			"buttonTriggers": [],
+			"commandSets": [{
+				"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
+				"gameDefinition": "RACE_ROOM",
+				"actionSequence": ["Pit Menu Toggle", "Pit Menu Increase", "{WAIT,3000}", "Pit Menu Toggle"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "previous pit preset",
+			"description": "selects previous pitstop preset, r3e only",
+			"voiceTriggers": ["previous strategy", "previous pit preset"],
+			"buttonTriggers": [],
+			"commandSets": [{
+				"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
+				"gameDefinition": "RACE_ROOM",
+				"actionSequence": ["Pit Menu Toggle", "Pit Menu Decrease", "{WAIT,3000}", "Pit Menu Toggle"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "select race strategy 1",
+			"description": "selects strategy 1 from the pCARS2 ICM",
+			"voiceTriggers": ["strategy one", "strat one"],
+			"buttonTriggers": [],
+			"confirmationMessage": "acknowledge/pit_strategy_1",
+			"commandSets": [{
+				"description": "pcars2 select strat 1",
+				"gameDefinition": "PCARS2",
+
+				"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+				"keyPressTime": 50,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "select race strategy 2",
+			"description": "selects strategy 2 from the pCARS2 ICM",
+			"voiceTriggers": ["strategy two", "strat two"],
+			"buttonTriggers": [],
+			"confirmationMessage": "acknowledge/pit_strategy_2",
+			"commandSets": [{
+				"description": "pcars2 select strat 2",
+				"gameDefinition": "PCARS2",
+				"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+				"keyPressTime": 50,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "select race strategy 3",
+			"description": "selects strategy 3 from the pCARS2 ICM",
+			"voiceTriggers": ["strategy three", "strat three"],
+			"buttonTriggers": [],
+			"confirmationMessage": "acknowledge/pit_strategy_3",
+			"commandSets": [{
+				"description": "pcars2 select strat 3",
+				"gameDefinition": "PCARS2",
+				"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+				"keyPressTime": 50,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "select race strategy 4",
+			"description": "selects strategy 4 from the pCARS2 ICM",
+			"voiceTriggers": ["strategy four", "strat four"],
+			"buttonTriggers": [],
+			"confirmationMessage": "acknowledge/pit_strategy_4",
+			"commandSets": [{
+				"description": "pcars2 select strat 4",
+				"gameDefinition": "PCARS2",
+				"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "{MULTIPLE,5}ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
+				"keyPressTime": 50,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "open / close pit menu",
+			"description": "open or close the pit menu - fallback for manual navigation",
+			"voiceTriggers": ["toggle pit menu", "pit menu toggle"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Toggle"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["Car Management"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
+			"name": "pit menu select",
+			"description": "pit menu select - fallback for manual navigation",
+			"voiceTriggers": ["pit menu select"],
+			"commandSets": [{
+				"description": "r3e version",
+				"gameDefinition": "RACE_ROOM",
+				"actionSequence": ["Pit Menu Select"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "pit menu up",
+			"description": "pit menu up - fallback for manual navigation",
+			"voiceTriggers": ["pit menu up"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Up"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["ICM Menu Up"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
+			"name": "pit menu down",
+			"description": "pit menu down - fallback for manual navigation",
+			"voiceTriggers": ["pit menu down"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Down"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["ICM Menu Down"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
+			"name": "pit menu left",
+			"description": "pit menu left - fallback for manual navigation",
+			"voiceTriggers": ["pit menu left"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Decrease"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["ICM Menu Left"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
+			"name": "pit menu right",
+			"description": "pit menu right - fallback for manual navigation",
+			"voiceTriggers": ["pit menu right"],
+			"commandSets": [{
+					"description": "r3e version",
+					"gameDefinition": "RACE_ROOM",
+					"actionSequence": ["Pit Menu Increase"],
+					"keyPressTime": 10,
+					"waitBetweenEachCommand": 200
+				},
+				{
+					"description": "pcars2 version",
+					"gameDefinition": "PCARS2",
+					"actionSequence": ["ICM Menu Right"],
+					"keyPressTime": 50,
+					"waitBetweenEachCommand": 200
+				}
+			]
+		},
+		{
+			"name": "Lap Timing Black Box",
+			"description": "Displays Lap Timing Black Box",
+			"voiceTriggers": ["black box lap time"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Lap Timing Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Standings Black Box",
+			"description": "Displays Standings Black Box",
+			"voiceTriggers": ["black box standings"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Standings Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Relative Black Box",
+			"description": "Displays Relative Black Box",
+			"voiceTriggers": ["black box relative"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Relative Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Fuel Black Box",
+			"description": "Displays Fuel Black Box",
+			"voiceTriggers": ["black box fuel"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Fuel Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Tires Black Box",
+			"description": "Displays Tires Black Box",
+			"voiceTriggers": ["black box tires"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Tires Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Tire Info Black Box",
+			"description": "Displays Tire Info Black Box",
+			"voiceTriggers": ["black box tire info"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Tire Info Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Pit-stop Adjustments Black Box",
+			"description": "Displays Pit-stop Adjustments Black Box",
+			"voiceTriggers": ["black box pit stop"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Pit-stop Adjustments Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "In-car Adjustments Black Box",
+			"description": "Displays In-car Adjustments Black Box",
+			"voiceTriggers": ["black box car"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["In-car Adjustments Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Mirror Adjustments Black Box",
+			"description": "Displays Mirror Adjustments Black Box",
+			"voiceTriggers": ["black box mirror"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Mirror Adjustments Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Radio Adjustments Black Box",
+			"description": "Displays Radio Adjustments Black Box",
+			"voiceTriggers": ["black box radio"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Radio Adjustments Black Box"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Select Next Control",
+			"description": "Selects The Next Control",
+			"voiceTriggers": ["menu next"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Select Next Control"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Select Previous Control",
+			"description": "Selects The Previous Control",
+			"voiceTriggers": ["menu previous"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Select Previous Control"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Increment Selected Control",
+			"description": "Increase Value Of Selected Control",
+			"voiceTriggers": ["menu increase"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Increment Selected Control"],
+				"keyPressTime": 30,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Decrement Selected Control",
+			"description": "Decrease Value Of Selected Control",
+			"voiceTriggers": ["menu decrease"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Decrement Selected Control"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Toggle Selected Control",
+			"description": "Toggles The Selected Control",
+			"voiceTriggers": ["menu toggle"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Toggle Selected Control"],
+				"keyPressTime": 10,
+				"waitBetweenEachCommand": 200
+			}]
+		},
+		{
+			"name": "Get Out Of Car",
+			"description": "Presses ESC key for 2 sec.",
+			"voiceTriggers": ["get out"],
+			"commandSets": [{
+				"description": "iRacing only",
+				"gameDefinition": "IRACING",
+				"actionSequence": ["Get Out Of Car"],
+				"keyPressTime": 2000,
+				"waitBetweenEachCommand": 200
+			}]
 		}
-		]
-	},
-	{
-	    "description": "iRacing command mappings - these are the key assignments in the Options -> Controls",
-	    "gameDefinition": "IRACING",
-		"keyBindings" : [
-		{
-		    "action": "Lap Timing Black Box",
-			"key": "F1"
-		},
-		{
-		    "action": "Standings Black Box",
-			"key": "F2"
-		},
-		{
-		    "action": "Relative Black Box",
-			"key": "F3"
-		},
-		{
-		    "action": "Fuel Black Box",
-			"key": "F4"
-		},
-		{
-		    "action": "Tires Black Box",
-			"key": "F5"
-		},
-		{
-		    "action": "Tire Info Black Box",
-			"key": "F6"
-		},
-		{
-		    "action": "Pit-stop Adjustments Black Box",
-			"key": "F7"
-		},
-		{
-		    "action": "In-car Adjustments Black Box",
-			"key": "F8"
-		},
-		{
-		    "action": "Mirror Adjustments Black Box",
-			"key": "F9"
-		},
-		{
-		    "action": "Radio Adjustments Black Box",
-			"key": "F10"
-		},
-		{
-		    "action": "Select Next Control",
-			"key": "UP"
-		},
-		{
-		    "action": "Select Previous Control",
-			"key": "DOWN"
-		},
-		{
-		    "action": "Increment Selected Control",
-			"key": "RIGHT"
-		},
-		{
-		    "action": "Decrement Selected Control",
-			"key": "LEFT"
-		},
-        {
-            "action": "Toggle Selected Control",
-            "key": "SPACE_BAR"
-        }
-        ,
-		{
-            "action": "Get Out Of Car",
-			"key": "ESC"
-		}
-		]
-	}],
-	"macros": [ 
-	{
-		"name": "request pit",
-		"description": "requests a pitstop",
-		"voiceTriggers": [ "request pit", "box this lap", "in this lap" ],
-		"buttonTriggers": [ 
-		{
-			"description": "wheel button X - button trigger not yet implemented",
-			"deviceId": "12345456",
-			"buttonIndex": "1"
-		},
-		{
-			"description": "keyboard key z - key trigger not yet implemented",
-			"deviceId": "1",
-			"buttonIndex": "99"
-		}],
-		"commandSets": [
-		{
-			"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200,
-			"confirmationMessage": "mandatory_pit_stops/pit_stop_requested"
-		},
-		{
-			"description": "pcars2 version, keyPressTime longer",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Pit Request Toggle" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-    {
-		"name": " auto fuel",
-		"description": "this macro requires the pit menu to be in a specific state before it's called - we must have no refuelling selected (for R3E the fuel is not green and the fuel amount must be one of the built in options, for pCARS2 the amount must be 0 litres)",
-		"confirmationMessage": "acknowledge/fuel_to_end",
-		"voiceTriggers": [ "fuel to the end", "fuel to the end of the race" ],
-		"buttonTriggers": [],
-		"commandSets": [
-		{
-			"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by ensuring the cursor is at the top of the menu, then it goes to the fuel row and presses 'decrease' a few times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Decrease", "Pit Menu Increase", "Pit Menu Increase", "Pit Menu Increase", "Multiple Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 100,
-			"allowAutomaticTriggering": false,
-			"resolveMultipleCountWithEvent": "Fuel"
-		},
-		{
-			"description": "This is an attempt to automate the fuel process for pCARS2 using the app's current fuel estimate. Navigates to the adjust stratgey option, then fuel, then adds however many litres the app calculated. Note that in order for this to work, the existing strategy must be set to zero litres",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "Multiple ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 100,
-			"allowAutomaticTriggering": false,
-			"resolveMultipleCountWithEvent": "Fuel"
-		}]
-	},
-	{
-		"name": "next pit preset",
-		"description": "selects next pitstop preset, r3e only",
-		"voiceTriggers": [ "next strategy", "next pit preset" ],
-		"buttonTriggers": [],
-		"commandSets": [
-		{
-			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Increase", "WAIT_3000", "Pit Menu Toggle" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "previous pit preset",
-		"description": "selects previous pitstop preset, r3e only",
-		"voiceTriggers": [ "previous strategy", "previous pit preset" ],
-		"buttonTriggers": [],
-		"commandSets": [
-		{
-			"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle", "Pit Menu Decrease", "WAIT_3000", "Pit Menu Toggle" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "select race strategy 1",
-		"description": "selects strategy 1 from the pCARS2 ICM",
-		"voiceTriggers": [ "strategy one", "strat one" ],
-		"buttonTriggers": [],
-		"confirmationMessage": "acknowledge/pit_strategy_1",
-		"commandSets": [
-		{
-			"description": "pcars2 select strat 1",
-			"gameDefinition": "PCARS2",
-			
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "select race strategy 2",
-		"description": "selects strategy 2 from the pCARS2 ICM",
-		"voiceTriggers": [ "strategy two", "strat two" ],
-		"buttonTriggers": [],
-		"confirmationMessage": "acknowledge/pit_strategy_2",
-		"commandSets": [
-		{
-			"description": "pcars2 select strat 2",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "select race strategy 3",
-		"description": "selects strategy 3 from the pCARS2 ICM",
-		"voiceTriggers": [ "strategy three", "strat three" ],
-		"buttonTriggers": [],
-		"confirmationMessage": "acknowledge/pit_strategy_3",
-		"commandSets": [
-		{
-			"description": "pcars2 select strat 3",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [  "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "select race strategy 4",
-		"description": "selects strategy 4 from the pCARS2 ICM",
-		"voiceTriggers": [ "strategy four", "strat four" ],
-		"buttonTriggers": [],
-		"confirmationMessage": "acknowledge/pit_strategy_4",
-		"commandSets": [
-		{
-			"description": "pcars2 select strat 4",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Down", "ICM Menu Right", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Down", "ICM Menu Right", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Up", "ICM Menu Right", "ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "open / close pit menu",
-		"description": "open or close the pit menu - fallback for manual navigation",
-		"voiceTriggers": [ "toggle pit menu", "pit menu toggle" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Toggle" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		},
-		{
-			"description": "pcars2 version",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "Car Management" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "pit menu select",
-		"description": "pit menu select - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu select" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Select" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "pit menu up",
-		"description": "pit menu up - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu up" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Up" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		},
-		{
-			"description": "pcars2 version",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "ICM Menu Up" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "pit menu down",
-		"description": "pit menu down - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu down" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Down" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		},
-		{
-			"description": "pcars2 version",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "ICM Menu Down" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "pit menu left",
-		"description": "pit menu left - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu left" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Decrease" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		},
-		{
-			"description": "pcars2 version",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "ICM Menu Left" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "pit menu right",
-		"description": "pit menu right - fallback for manual navigation",
-		"voiceTriggers": [ "pit menu right" ],
-		"commandSets": [
-		{
-			"description": "r3e version",
-			"gameDefinition": "RACE_ROOM",
-			"actionSequence": [ "Pit Menu Increase" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		},
-		{
-			"description": "pcars2 version",
-			"gameDefinition": "PCARS2",
-			"actionSequence": [ "ICM Menu Right" ],
-			"keyPressTime": 50,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Lap Timing Black Box",
-		"description": "Displays Lap Timing Black Box",
-		"voiceTriggers": [ "black box lap time" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Lap Timing Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Standings Black Box",
-		"description": "Displays Standings Black Box",
-		"voiceTriggers": [ "black box standings" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Standings Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Relative Black Box",
-		"description": "Displays Relative Black Box",
-		"voiceTriggers": [ "black box relative" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Relative Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Fuel Black Box",
-		"description": "Displays Fuel Black Box",
-		"voiceTriggers": [ "black box fuel" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Fuel Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Tires Black Box",
-		"description": "Displays Tires Black Box",
-		"voiceTriggers": [ "black box tires" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Tires Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Tire Info Black Box",
-		"description": "Displays Tire Info Black Box",
-		"voiceTriggers": [ "black box tire info" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Tire Info Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Pit-stop Adjustments Black Box",
-		"description": "Displays Pit-stop Adjustments Black Box",
-		"voiceTriggers": [ "black box pit stop" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Pit-stop Adjustments Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "In-car Adjustments Black Box",
-		"description": "Displays In-car Adjustments Black Box",
-		"voiceTriggers": [ "black box car" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "In-car Adjustments Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Mirror Adjustments Black Box",
-		"description": "Displays Mirror Adjustments Black Box",
-		"voiceTriggers": [ "black box mirror" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Mirror Adjustments Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Radio Adjustments Black Box",
-		"description": "Displays Radio Adjustments Black Box",
-		"voiceTriggers": [ "black box radio" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Radio Adjustments Black Box" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Select Next Control",
-		"description": "Selects The Next Control",
-		"voiceTriggers": [ "menu next" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Select Next Control" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Select Previous Control",
-		"description": "Selects The Previous Control",
-		"voiceTriggers": [ "menu previous" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Select Previous Control" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Increment Selected Control",
-		"description": "Increase Value Of Selected Control",
-		"voiceTriggers": [ "menu increase" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Increment Selected Control" ],
-			"keyPressTime": 30,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-	{
-		"name": "Decrement Selected Control",
-		"description": "Decrease Value Of Selected Control",
-		"voiceTriggers": [ "menu decrease" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Decrement Selected Control" ],
-			"keyPressTime": 10,
-			"waitBetweenEachCommand": 200
-		}]
-	},
-    {
-        "name": "Toggle Selected Control",
-        "description": "Toggles The Selected Control",
-        "voiceTriggers": [ "menu toggle" ],
-        "commandSets": [
-            {
-                "description": "iRacing only",
-                "gameDefinition": "IRACING",
-                "actionSequence": [ "Toggle Selected Control" ],
-                "keyPressTime": 10,
-                "waitBetweenEachCommand": 200
-            }
-        ]
-    },
-	{
-		"name": "Get Out Of Car",
-		"description": "Presses ESC key for 2 sec.",
-		"voiceTriggers": [ "get out" ],
-		"commandSets": [
-		{
-			"description": "iRacing only",
-			"gameDefinition": "IRACING",
-			"actionSequence": [ "Get Out Of Car" ],
-			"keyPressTime": 2000,
-			"waitBetweenEachCommand": 200
-		}]
-	}]
+	]
 }
