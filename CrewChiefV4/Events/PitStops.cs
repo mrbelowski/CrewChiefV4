@@ -10,7 +10,11 @@ namespace CrewChiefV4.Events
 {
     class PitStops : AbstractEvent
     {
+        private static float metresToFeet = 3.28084f;
+
         private Boolean pitBoxPositionCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown");
+        private Boolean pitBoxTimeCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_time_countdown");
+        private Boolean pitBoxPositionCountdownInFeet = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown_in_feet");
 
         public static String folderMandatoryPitStopsPitWindowOpensOnLap = "mandatory_pit_stops/pit_window_opens_on_lap";
         public static String folderMandatoryPitStopsPitWindowOpensAfter = "mandatory_pit_stops/pit_window_opens_after";
@@ -70,11 +74,15 @@ namespace CrewChiefV4.Events
         public static String folderPitNotRequested = "mandatory_pit_stops/pit_stop_not_requested";
 
         private String folderMetres = "mandatory_pit_stops/metres";
+        private String folderFeet = "mandatory_pit_stops/feet";
         private String folderBoxPositionIntro = "mandatory_pit_stops/box_in";
+        private String folderBoxNow = "mandatory_pit_stops/box_now";
 
         // separate sounds for "100 metres" and "50 metres" for a nicer pit countdown
         private String folderOneHundredMetreWarning = "mandatory_pit_stops/one_hundred_metres";
+        private String folderThreeHundredFeetWarning = "mandatory_pit_stops/three_hundred_feet";
         private String folderFiftyMetreWarning = "mandatory_pit_stops/fifty_metres";
+        private String folderOneHundredFeetWarning = "mandatory_pit_stops/one_hundred_feet";
 
         private int pitWindowOpenLap;
 
@@ -140,8 +148,13 @@ namespace CrewChiefV4.Events
 
         private float previousDistanceToBox = -1;
         private Boolean playedLimiterLineToPitBoxDistanceWarning = false;
-        private Boolean played100MetreWarning = false;
-        private Boolean played50MetreWarning = false;
+        private Boolean played100MetreOr300FeetWarning = false;
+        private Boolean played50MetreOr100FeetWarning = false;
+
+        private float estimatedPitSpeed = 20;
+
+        // box in 5, 4, 3, 2, 1, BOX
+        private float[] pitCountdownTriggerPoints = new float[6];
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -193,11 +206,13 @@ namespace CrewChiefV4.Events
             pitStallOccupied = false;
             warnedAboutOccupiedPitOnThisLap = false;
             previousDistanceToBox = -1;
-            played100MetreWarning = false;
-            played50MetreWarning = false;
+            played100MetreOr300FeetWarning = false;
+            played50MetreOr100FeetWarning = false;
             playedLimiterLineToPitBoxDistanceWarning = false;
             playedRequestPitOnThisLap = false;
             playedPitRequestCancelledOnThisLap = false;
+            estimatedPitSpeed = 20;
+            pitCountdownTriggerPoints = new float[5];
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -219,6 +234,31 @@ namespace CrewChiefV4.Events
             }
 
             return true;
+        }
+
+        private void getPitCountdownTriggerPoints(float pitlaneSpeed, float pitBoxPositionEstimate, float trackLength)
+        {
+            float secondsBetweenEachCall = 1.5f;
+            if (pitBoxPositionEstimate > 0) {
+                // we want the 0 (or 'BOX!') call to come at, say 10metres
+                float gap = 10;
+                for (int i = pitCountdownTriggerPoints.Length - 1; i >= 0; i--)
+                {
+                    float countdownPoint = pitBoxPositionEstimate - gap;
+                    // special case for the first item because it's preceeded by 'box in' - 
+                    // assume this takes about 0.5 seconds to say
+                    if (i == 0)
+                    {
+                        countdownPoint = countdownPoint - (pitlaneSpeed / 2f);
+                    }
+                    if (countdownPoint < 0)
+                    {
+                        countdownPoint = trackLength + countdownPoint;
+                    }
+                    pitCountdownTriggerPoints[i] = countdownPoint;
+                    gap = gap + (pitlaneSpeed * secondsBetweenEachCall);
+                }
+            }
         }
 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -244,7 +284,7 @@ namespace CrewChiefV4.Events
                 enableWindowWarnings = false;
             }
 
-            if (previousGameState != null && pitBoxPositionCountdown && 
+            if (previousGameState != null && (pitBoxPositionCountdown || pitBoxTimeCountdown) && 
                 currentGameState.PositionAndMotionData.CarSpeed > 2 &&
                 currentGameState.PitData.PitBoxPositionEstimate > 0 && 
                 !currentGameState.PenaltiesData.HasDriveThrough)
@@ -265,47 +305,94 @@ namespace CrewChiefV4.Events
                 if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     // just entered the pitlane
-                    previousDistanceToBox = 0;
-                    played100MetreWarning = false;
-                    played50MetreWarning = false;
-                    if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
+                    estimatedPitSpeed = currentGameState.PositionAndMotionData.CarSpeed;
+                    if (pitBoxTimeCountdown)
                     {
-                        int distanceToBoxInt = (int)distanceToBox;
-                        int distanceToBoxRounded;
-                        if (distanceToBoxInt % 10 == 0)
-                            distanceToBoxRounded = distanceToBoxInt;
-                        else
-                            distanceToBoxRounded = (10 - distanceToBoxInt % 10) + distanceToBoxInt;
-
-                        List<MessageFragment> messageContents = new List<MessageFragment>();
-                        messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
-                        messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
-                        messageContents.Add(MessageFragment.Text(folderMetres));
-                        QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, this);
-                        firstPitCountdown.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
-                        audioPlayer.playMessage(firstPitCountdown, 10);
-
+                        getPitCountdownTriggerPoints(estimatedPitSpeed, currentGameState.PositionAndMotionData.CarSpeed, currentGameState.SessionData.TrackDefinition.trackLength);
                     }
-                    playedLimiterLineToPitBoxDistanceWarning = true;
+                    previousDistanceToBox = 0;
+                    played100MetreOr300FeetWarning = false;
+                    played50MetreOr100FeetWarning = false;
+                    if (pitBoxPositionCountdown)
+                    {
+                        // here we assume that being >150 metres from the box means the time countdown won't interfere
+                        if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
+                        {
+                            int distanceToBoxInt = (int)(distanceToBox * (pitBoxPositionCountdownInFeet ? metresToFeet : 1));
+                            int distanceToBoxRounded;
+                            if (distanceToBoxInt % 10 == 0)
+                                distanceToBoxRounded = distanceToBoxInt;
+                            else
+                                distanceToBoxRounded = (10 - distanceToBoxInt % 10) + distanceToBoxInt;
+
+                            List<MessageFragment> messageContents = new List<MessageFragment>();
+                            messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
+                            messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
+                            messageContents.Add(MessageFragment.Text(pitBoxPositionCountdownInFeet ? folderFeet : folderMetres));
+                            QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, this);
+                            firstPitCountdown.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+                            audioPlayer.playMessage(firstPitCountdown, 10);
+                        }
+                        playedLimiterLineToPitBoxDistanceWarning = true;
+                    }
                 }
                 else if (previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
                 {
-                    if (!played100MetreWarning && distanceToBox < 100 && previousDistanceToBox > 95)
+                    if (pitBoxTimeCountdown)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderOneHundredMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                        for (int i = 0; i < pitCountdownTriggerPoints.Length; i++)
+                        {
+                            if (distanceToBox < pitCountdownTriggerPoints[i] && previousDistanceToBox > pitCountdownTriggerPoints[i] - 2)
+                            {
+                                if (i == 0)
+                                {
+                                    // box in 5...
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                        MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - 1), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                }
+                                else if (i == pitCountdownTriggerPoints.Length - 1)
+                                {
+                                    // BOX
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                        MessageContents(folderBoxNow), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                }
+                                else
+                                {
+                                    // 4, 3, 2, 1
+                                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                        MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                }
+                            }
+                        }
                         previousDistanceToBox = distanceToBox;
-                        played100MetreWarning = true;
                     }
-                    // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
-                    else if (!played50MetreWarning && distanceToBox < 50 && previousDistanceToBox > 45)
+                    else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFiftyMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
-                        previousDistanceToBox = distanceToBox;
-                        played50MetreWarning = true;
-                    }
-                    else if (previousDistanceToBox > -1)
-                    {
-                        previousDistanceToBox = distanceToBox;
+                        float distanceUpperFor100MetreOr300FeetWarning = pitBoxPositionCountdownInFeet ? 300 / metresToFeet : 100;
+                        float distanceLowerFor100MetreOr300FeetWarning = distanceUpperFor100MetreOr300FeetWarning - 5;
+
+                        float distanceUpperFor50MetreOr100FeetWarning = pitBoxPositionCountdownInFeet ? 100 / metresToFeet : 50;
+                        float distanceLowerFor50MetreOr100FeetWarning = distanceUpperFor50MetreOr100FeetWarning - 5;
+
+                        if (!played100MetreOr300FeetWarning && distanceToBox < distanceUpperFor100MetreOr300FeetWarning && previousDistanceToBox > distanceLowerFor100MetreOr300FeetWarning)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(
+                                pitBoxPositionCountdownInFeet ? folderThreeHundredFeetWarning : folderOneHundredMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                            previousDistanceToBox = distanceToBox;
+                            played100MetreOr300FeetWarning = true;
+                        }
+                        // VL: I see some tracks with pit stall as close as 35 meters to the entrance.  Shall we add "less than 30 meters" message if nothing played before?
+                        else if (!played50MetreOr100FeetWarning && distanceToBox < distanceUpperFor50MetreOr100FeetWarning && previousDistanceToBox > distanceLowerFor50MetreOr100FeetWarning)
+                        {
+                            audioPlayer.playMessageImmediately(new QueuedMessage(
+                                 pitBoxPositionCountdownInFeet ? folderOneHundredFeetWarning : folderFiftyMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                            previousDistanceToBox = distanceToBox;
+                            played50MetreOr100FeetWarning = true;
+                        }
+                        else if (previousDistanceToBox > -1)
+                        {
+                            previousDistanceToBox = distanceToBox;
+                        }
                     }
                 }
             }
