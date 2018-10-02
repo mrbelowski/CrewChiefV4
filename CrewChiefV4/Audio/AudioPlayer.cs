@@ -1453,6 +1453,11 @@ namespace CrewChiefV4.Audio
             }
         }
 
+        public void unpauseQueue()
+        {
+            regularQueuePaused = false;
+        }
+
         public static Boolean canReadName(String rawName)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(rawName), "rawName should never be an empty string, this is a bug.");

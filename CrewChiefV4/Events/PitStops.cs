@@ -310,6 +310,7 @@ namespace CrewChiefV4.Events
                 }
                 if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
+                    //CrewChief.playbackIntervalMilliseconds = 100;
                     // just entered the pitlane
                     pitEntryTime = currentGameState.Now;
 
@@ -344,7 +345,7 @@ namespace CrewChiefV4.Events
                 {
                     if (pitBoxTimeCountdownEnabled)
                     {
-                        if (playPitDistanceCountdown && (currentGameState.Now - pitEntryDistancePlayedTime).TotalSeconds > 2)
+                        if (playPitDistanceCountdown && (currentGameState.Now - pitEntryDistancePlayedTime).TotalSeconds > 3)
                         {
                             for (int i = nextPitDistanceIndex; i < pitCountdownTriggerPoints.Length; i++)
                             {
@@ -353,26 +354,28 @@ namespace CrewChiefV4.Events
                                     nextPitDistanceIndex = i + 1;
                                     if (i < pitCountdownTriggerPoints.Length - 2 && !playedBoxIn)
                                     {
+                                        audioPlayer.pauseQueue(10);
                                         // box in 5...
                                         Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)));
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playSpotterMessage(new QueuedMessage("pit_time_countdown",
+                                            MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), 0, null), true);
                                         playedBoxIn = true;
                                     }
                                     else if (i == pitCountdownTriggerPoints.Length - 1 && playPitDistanceCountdown)
                                     {
                                         // BOX
                                         Console.WriteLine("BOX IN NOW");
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(folderBoxNow), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playSpotterMessage(new QueuedMessage("pit_time_countdown",
+                                            MessageContents(folderBoxNow), 0, null), false);
                                         playPitDistanceCountdown = false;
+                                        audioPlayer.unpauseQueue();
                                     }
                                     else if (playedBoxIn)
                                     {
                                         // 4, 3, 2, 1
                                         Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)));
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(pitCountdownTriggerPoints.Length - (i + 2)), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playSpotterMessage(new QueuedMessage("pit_time_countdown",
+                                            MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null), true);
                                     }
                                     break;
                                 }
