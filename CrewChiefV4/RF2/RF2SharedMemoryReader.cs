@@ -421,7 +421,7 @@ namespace CrewChiefV4.rFactor2
                     {
                         extended = this.extended,
                         telemetry = this.telemetry,
-                        rules = this.rules,
+                        rules = this.rules,  // TODO_RF2:  we probably don't need rules buffer if reading for spotter.
                         scoring = this.scoring,
                         ticksWhenRead = DateTime.UtcNow.Ticks
                     };
@@ -528,17 +528,12 @@ namespace CrewChiefV4.rFactor2
 
         private void DisconnectInternal()
         {
-            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
-            // TODO_THREADS: locking might be no longer needed here.
-            lock (this)
-            {
-                this.initialised = false;
+            this.initialised = false;
 
-                this.telemetryBuffer.Disconnect();
-                this.scoringBuffer.Disconnect();
-                this.rulesBuffer.Disconnect();
-                this.extendedBuffer.Disconnect();
-            }
+            this.telemetryBuffer.Disconnect();
+            this.scoringBuffer.Disconnect();
+            this.rulesBuffer.Disconnect();
+            this.extendedBuffer.Disconnect();
         }
 
         public override void Dispose()
