@@ -155,11 +155,11 @@ namespace CrewChiefV4.Events
 
         // box in 5, 4, 3, 2, 1, BOX
         private float[] pitCountdownTriggerPoints = new float[6];
-        private Boolean playPitDistanceCountdown = false;
         private Boolean playedBoxIn = false;
         private int nextPitDistanceIndex = 0;
         private DateTime pitEntryDistancePlayedTime = DateTime.MinValue;
         private DateTime pitEntryTime = DateTime.MinValue;
+        private Boolean getPitCountdownTimingPoints = false;
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -218,11 +218,11 @@ namespace CrewChiefV4.Events
             playedPitRequestCancelledOnThisLap = false;
             estimatedPitSpeed = 20;
             pitCountdownTriggerPoints = new float[6];
-            playPitDistanceCountdown = false;
             playedBoxIn = false;
             pitEntryDistancePlayedTime = DateTime.MinValue;
             pitEntryTime = DateTime.MinValue;
             nextPitDistanceIndex = 0;
+            getPitCountdownTimingPoints = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -256,7 +256,6 @@ namespace CrewChiefV4.Events
                 pitCountdownTriggerPoints[i] = distance;
                 distance = distance + (pitlaneSpeed * secondsBetweenEachCall);
             }
-            playPitDistanceCountdown = true;
             playedBoxIn = false;
             nextPitDistanceIndex = 0;
         }
@@ -293,19 +292,17 @@ namespace CrewChiefV4.Events
                 {
                     playedLimiterLineToPitBoxDistanceWarning = false;
                 }
-                float distanceToBox;
-                if (currentGameState.PitData.PitBoxPositionEstimate > currentGameState.PositionAndMotionData.DistanceRoundTrack)
+
+                float distanceToBox = currentGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack;
+                if (distanceToBox < 0)
                 {
-                    distanceToBox = currentGameState.PitData.PitBoxPositionEstimate - currentGameState.PositionAndMotionData.DistanceRoundTrack;
-                }
-                else
-                {
-                    distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength - currentGameState.PositionAndMotionData.DistanceRoundTrack + currentGameState.PitData.PitBoxPositionEstimate;
+                    distanceToBox = currentGameState.SessionData.TrackDefinition.trackLength + distanceToBox;
                 }
                 if (!previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane)
                 {
                     // just entered the pitlane
                     pitEntryTime = currentGameState.Now;
+                    getPitCountdownTimingPoints = pitBoxPositionCountdownEnabled;
 
                     previousDistanceToBox = 0;
                     played100MetreOr300FeetWarning = false;
@@ -336,51 +333,58 @@ namespace CrewChiefV4.Events
                 }
                 else if (previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
                 {
+                    
                     if (pitBoxTimeCountdownEnabled)
                     {
-                        if (playPitDistanceCountdown && (currentGameState.Now - pitEntryDistancePlayedTime).TotalSeconds > 3)
+                        // first get the timing point positions
+                        if (getPitCountdownTimingPoints)
                         {
-                            // the first item takes longer to play because it's preceeded by "box in.."
-                            float pointAdjustment = playedBoxIn ? 0 : currentGameState.PositionAndMotionData.CarSpeed;
-                            for (int i = nextPitDistanceIndex; i < pitCountdownTriggerPoints.Length; i++)
+                            if ((currentGameState.Now - pitEntryTime).TotalSeconds > 0.5 && (currentGameState.Now - pitEntryTime).TotalSeconds < 1)
                             {
-                                if (distanceToBox < pitCountdownTriggerPoints[i] + pointAdjustment && previousDistanceToBox > pitCountdownTriggerPoints[i] + pointAdjustment - 2)
-                                {
-                                    nextPitDistanceIndex = i + 1;
-                                    if (i < pitCountdownTriggerPoints.Length - 2 && !playedBoxIn)
-                                    {
-                                        audioPlayer.pauseQueue(10);
-                                        // box in 5...
-                                        Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)));
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
-                                        playedBoxIn = true;
-                                    }
-                                    else if (i == pitCountdownTriggerPoints.Length - 1 && playPitDistanceCountdown)
-                                    {
-                                        // BOX
-                                        Console.WriteLine("BOX IN NOW");
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(folderBoxNow), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) });
-                                        playPitDistanceCountdown = false;
-                                        audioPlayer.unpauseQueue();
-                                    }
-                                    else if (playedBoxIn)
-                                    {
-                                        // 4, 3, 2, 1
-                                        Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)));
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                            MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
-                                    }
-                                    break;
-                                }
+                                getPitCountdownTriggerPoints(estimatedPitSpeed);
+                                getPitCountdownTimingPoints = false;
                             }
-                            previousDistanceToBox = distanceToBox;
                         }
-                        else if ((currentGameState.Now - pitEntryTime).TotalSeconds > 0.5 && (currentGameState.Now - pitEntryTime).TotalSeconds < 1)
+                        else
                         {
-                            // create the countdown estimates after we've settled onto the limiter
-                            getPitCountdownTriggerPoints(estimatedPitSpeed);
+                            if ((currentGameState.Now - pitEntryDistancePlayedTime).TotalSeconds > 3)
+                            {
+                                // the first item takes longer to play because it's preceeded by "box in.."
+                                float pointAdjustment = playedBoxIn ? 0 : currentGameState.PositionAndMotionData.CarSpeed;
+                                for (int i = nextPitDistanceIndex; i < pitCountdownTriggerPoints.Length; i++)
+                                {
+                                    if (distanceToBox < pitCountdownTriggerPoints[i] + pointAdjustment && distanceToBox > pitCountdownTriggerPoints[i] + pointAdjustment - 2)
+                                    {
+                                        nextPitDistanceIndex = i + 1;
+                                        if (i < pitCountdownTriggerPoints.Length - 2 && !playedBoxIn)
+                                        {
+                                            audioPlayer.pauseQueue(10);
+                                            // box in 5...
+                                            Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                                MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
+                                            playedBoxIn = true;
+                                        }
+                                        else if (i == pitCountdownTriggerPoints.Length - 1)
+                                        {
+                                            // BOX
+                                            Console.WriteLine("BOX IN NOW at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                                MessageContents(folderBoxNow), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) });
+                                            audioPlayer.unpauseQueue();
+                                        }
+                                        else if (playedBoxIn)
+                                        {
+                                            // 4, 3, 2, 1
+                                            Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
+                                                MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
+                                        }
+                                        break;
+                                    }
+                                }
+                                previousDistanceToBox = distanceToBox;
+                            }
                         }
                     }
                     else
