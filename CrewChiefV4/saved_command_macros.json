@@ -1,7 +1,7 @@
 {
 	"description": "This is the default command macro configuration. You can modify this file directly if you want, but it'll be overwritten when the app is updated. Make a copy in your Documents folder in a subfolder called CrewChiefV4 and modify the copy - the app will load this file from Documents/CrewChiefV4/ if it can find it, and will then fall back to the one in the installation folder. All text in 'description' elements will be ignored. These elements are only to provide a place to put comments.",
 	"assignments": [{
-			"description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below. WAIT_1000 as an action makes the macro pause for (in this example) 1000 milliseconds (1 second). Use this to allow the player to see what item is about to be selected. Actions starting with the word 'Multiple' are a bit special - the app will press this key many times, depending on the action (this is a WIP and is currently only used for R3E auto fuel selection)",
+			"description": "Race Room command mappings - these are the key assignments in the Controller menu -> Primary. The key is what key to press, the action maps a elements in the actionSequence list in the commandSets below.",
 			"gameDefinition": "RACE_ROOM",
 			"keyBindings": [{
 					"action": "Pit Menu Toggle",
@@ -142,7 +142,7 @@
 	],
 	"macros": [{
 			"name": "say sorry",
-			"description": "opens chat, types 'sorry, my bad', presses enter",
+			"description": "opens chat, types 'sorry, my bad', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported.
 			"voiceTriggers": ["chat, say sorry"],
 			"commandSets": [{
 					"description": "r3e version",
@@ -162,7 +162,7 @@
 		},
 		{
 			"name": "say good pass",
-			"description": "opens chat, types 'good pass', presses enter",
+			"description": "opens chat, types 'good pass', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported",
 			"voiceTriggers": ["chat, say good pass"],
 			"commandSets": [{
 					"description": "r3e version",
@@ -197,9 +197,9 @@
 				}
 			],
 			"commandSets": [{
-					"description": "r3e version, keyPressTime quite short because of low key-repeat-delay",
+					"description": "r3e version, keyPressTime quite short because of low key-repeat-delay. The action sequence item {WAIT,5000} tells the app to wait 5000 milliseconds before moving to the next command",
 					"gameDefinition": "RACE_ROOM",
-					"actionSequence": ["Pit Request Toggle", "WAIT_5000", "Pit Menu Toggle"],
+					"actionSequence": ["Pit Request Toggle", "{WAIT,5000}", "Pit Menu Toggle"],
 					"keyPressTime": 10,
 					"waitBetweenEachCommand": 200
 				},
@@ -228,14 +228,14 @@
 		},
 		{
 			"name": "auto fuel",
-			"description": "In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
+			"description": "In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets). An item with {MULTIPLE,7} tells the app to repeat that key press 7 times. An item starting {MULTIPLE,Fuel} tells the app to ask the Fuel event for the right number of times to press this key",
 			"confirmationMessage": "acknowledge/fuel_to_end",
 			"voiceTriggers": ["fuel to the end", "fuel to the end of the race"],
 			"buttonTriggers": [],
 			"commandSets": [{
 					"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by ensuring the cursor is at the top of the menu, then it goes to the fuel row and presses 'decrease' a many times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
 					"gameDefinition": "RACE_ROOM",
-					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,153}Pit Menu Decrease", "{MULTIPLE,Fuel}Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
+					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,153}Pit Menu Decrease", "{MULTIPLE,Fuel}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
 					"keyPressTime": 10,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
@@ -252,14 +252,14 @@
 		},
 		{
 			"name": "manual fuel",
-			"description": "Note the {0,150} - this means recognise all numbers between 0 and 150. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets)",
+			"description": "Note the {0,150} - this means recognise all numbers between 0 and 150. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets). An item with {MULTIPLE,7} tells the app to repeat that key press 7 times. An item starting {MULTIPLE,VOICE_TRIGGER} tells the app to repeat this key using the number recognised from the voice command",
 			"confirmationMessage": "acknowledge/ok",
 			"integerVariableVoiceTrigger": "add fuel, {0,150} litres",
 			"buttonTriggers": [],
 			"commandSets": [{
 					"description": "navigates to the fuel amount, de-selects it, presses decrease 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command. {MULTIPLE,X} is press (X) times. {MULTIPLE,VOICE_TRIGGER} is press (number recognised from voice command) times. {MULTIPLE,Fuel} means the Fuel event resolves the amount (in code)",
 					"gameDefinition": "RACE_ROOM",
-					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,150}Pit Menu Decrease", "{MULTIPLE,VOICE_TRIGGER}Pit Menu Increase", "Pit Menu Select", "WAIT_5000", "Pit Menu Toggle"],
+					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,150}Pit Menu Decrease", "{MULTIPLE,VOICE_TRIGGER}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
 					"keyPressTime": 10,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
@@ -282,7 +282,7 @@
 			"commandSets": [{
 				"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 				"gameDefinition": "RACE_ROOM",
-				"actionSequence": ["Pit Menu Toggle", "Pit Menu Increase", "WAIT_3000", "Pit Menu Toggle"],
+				"actionSequence": ["Pit Menu Toggle", "Pit Menu Increase", "{WAIT,3000}", "Pit Menu Toggle"],
 				"keyPressTime": 10,
 				"waitBetweenEachCommand": 200
 			}]
@@ -295,7 +295,7 @@
 			"commandSets": [{
 				"description": "r3e version - pcars indexes the strategies (see 'select strategy 1' etc)",
 				"gameDefinition": "RACE_ROOM",
-				"actionSequence": ["Pit Menu Toggle", "Pit Menu Decrease", "WAIT_3000", "Pit Menu Toggle"],
+				"actionSequence": ["Pit Menu Toggle", "Pit Menu Decrease", "{WAIT,3000}", "Pit Menu Toggle"],
 				"keyPressTime": 10,
 				"waitBetweenEachCommand": 200
 			}]

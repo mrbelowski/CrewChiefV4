@@ -172,24 +172,24 @@ namespace CrewChiefV4.commands
                                     {
                                         break;
                                     }
-                                    if (actionItem.pauseMillis > 0)
+                                    if (MacroManager.WAIT_IDENTIFIER.Equals(actionItem.extendedType))
                                     {
-                                        Thread.Sleep(actionItem.pauseMillis);
+                                        Thread.Sleep(actionItem.extendedTypeNumericParam);
                                     }
                                     else
                                     {
                                         int count;
                                         if (MacroManager.MULTIPLE_PRESS_IDENTIFIER.Equals(actionItem.extendedType))
                                         {
-                                            if (actionItem.resolvedByEvent != null)
+                                            if (actionItem.extendedTypeTextParam != null)
                                             {
-                                                if (MacroManager.MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER.Equals(actionItem.resolvedByEvent))
+                                                if (MacroManager.MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER.Equals(actionItem.extendedTypeTextParam))
                                                 {
                                                     count = multiplePressCountFromVoiceCommand;
                                                 }
                                                 else
                                                 {
-                                                    count = CrewChief.getEvent(actionItem.resolvedByEvent).resolveMacroKeyPressCount(macro.name);
+                                                    count = CrewChief.getEvent(actionItem.extendedTypeTextParam).resolveMacroKeyPressCount(macro.name);
                                                 }
                                                 // hack for R3E: fuel menu needs 3 presses to get it from the start to 0
                                                 if (isR3e && macro.name.Contains("fuel"))
@@ -199,7 +199,7 @@ namespace CrewChiefV4.commands
                                             }
                                             else
                                             {
-                                                count = actionItem.pressCount;
+                                                count = actionItem.extendedTypeNumericParam;
                                             }
                                         }
                                         else
@@ -384,51 +384,45 @@ namespace CrewChiefV4.commands
     public class ActionItem
     {
         public Boolean parsedSuccessfully = false;
-        public int pauseMillis = -1;
         public KeyPresser.KeyCode[] keyCodes;
         public String actionText;
         public String extendedType;
-        public String resolvedByEvent;
+        public String extendedTypeTextParam;
         public Boolean allowFreeText;
-        public int pressCount;
+        public int extendedTypeNumericParam;
 
         public ActionItem(String action, KeyBinding[] keyBindings)
         {
             this.actionText = action;
-            if (action.StartsWith("WAIT_"))
+            if (action.StartsWith("{"))
             {
-                pauseMillis = int.Parse(action.Substring(5));
-                parsedSuccessfully = pauseMillis > 0;
-            }
-            else
-            {
-                if (action.StartsWith("{"))
+                int start = action.IndexOf("{") + 1;
+                int end = action.IndexOf("}", start);
+                if (start != -1 && end > -1)
                 {
-                    int start = action.IndexOf("{") + 1;
-                    int end = action.IndexOf("}", start);
-                    if (start != -1 && end > -1)
+                    String[] typeAndParam = action.Substring(start, end - start).Split(',');
+                    if (typeAndParam.Length == 1 && MacroManager.FREE_TEXT_IDENTIFIER.Equals(typeAndParam[0]))
                     {
-                        String[] typeAndParam = action.Substring(start, end - start).Split(',');
-                        if (typeAndParam.Length == 1 && MacroManager.FREE_TEXT_IDENTIFIER.Equals(typeAndParam[0]))
+                        extendedType = typeAndParam[0];
+                        allowFreeText = true;
+                    }
+                    else if (typeAndParam.Length == 2)
+                    {
+                        extendedType = typeAndParam[0];
+                        if (typeAndParam[1].All(char.IsDigit))
                         {
-                            extendedType = typeAndParam[0];
-                            allowFreeText = true;
+                            extendedTypeNumericParam = int.Parse(typeAndParam[1]);
                         }
-                        else if (typeAndParam.Length == 2)
+                        else
                         {
-                            extendedType = typeAndParam[0];
-                            if (typeAndParam[1].All(char.IsDigit))
-                            {
-                                pressCount = int.Parse(typeAndParam[1]);
-                            }
-                            else
-                            {
-                                resolvedByEvent = typeAndParam[1];
-                            }
+                            extendedTypeTextParam = typeAndParam[1];
                         }
                     }
-                    action = action.Substring(action.IndexOf("}") + 1);
                 }
+                action = action.Substring(action.IndexOf("}") + 1);
+            }
+            if (action.Length > 0)
+            {
                 try
                 {
                     // first assume we have a single key binding
@@ -478,6 +472,10 @@ namespace CrewChiefV4.commands
                     Console.WriteLine("Action " + action + " not recognised");
                 }
             }
+            else
+            {
+                parsedSuccessfully = extendedType != null;
+            }
         }
 
         private Boolean parseKeycode(String keyString, Boolean freeText, out KeyPresser.KeyCode keyCode)
@@ -521,9 +519,16 @@ namespace CrewChiefV4.commands
         {
             if (parsedSuccessfully)
             {
-                if (pauseMillis > 0)
+                if (extendedType != null)
                 {
-                    return "Pause " + pauseMillis + " milliseconds";
+                    String additionalInfo = "";
+                    if (extendedTypeNumericParam > 0) {
+                        additionalInfo = ": " + extendedTypeNumericParam;
+                    }
+                    else if (extendedTypeTextParam != null) {
+                        additionalInfo = ": " + extendedTypeTextParam;
+                    }
+                    return extendedType + additionalInfo;
                 }
                 else
                 {

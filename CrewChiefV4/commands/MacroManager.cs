@@ -17,6 +17,7 @@ namespace CrewChiefV4.commands
         public static readonly String MULTIPLE_PRESS_IDENTIFIER = "MULTIPLE";
         public static readonly String FREE_TEXT_IDENTIFIER = "FREE_TEXT";
         public static readonly String MULTIPLE_PRESS_FROM_VOICE_TRIGGER_IDENTIFIER = "VOICE_TRIGGER";
+        public static readonly String WAIT_IDENTIFIER = "WAIT";
 
         public static Boolean enablePitExitPositionEstimates = UserSettings.GetUserSettings().getBoolean("enable_pit_exit_position_estimates");
 
