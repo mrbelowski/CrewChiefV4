@@ -155,6 +155,7 @@ namespace CrewChiefV4.Events
 
         // box in 5, 4, 3, 2, 1, BOX
         private float[] pitCountdownTriggerPoints = new float[6];
+        private Boolean pitCountdownTriggerPointsSet = false;
 
         private DateTime timeStartedAppoachingPitsCheck = DateTime.MaxValue;
 
@@ -212,7 +213,8 @@ namespace CrewChiefV4.Events
             playedRequestPitOnThisLap = false;
             playedPitRequestCancelledOnThisLap = false;
             estimatedPitSpeed = 20;
-            pitCountdownTriggerPoints = new float[5];
+            pitCountdownTriggerPoints = new float[6];
+            pitCountdownTriggerPointsSet = false;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -258,6 +260,7 @@ namespace CrewChiefV4.Events
                     pitCountdownTriggerPoints[i] = countdownPoint;
                     gap = gap + (pitlaneSpeed * secondsBetweenEachCall);
                 }
+                pitCountdownTriggerPointsSet = true;
             }
         }
 
@@ -338,7 +341,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane && previousDistanceToBox > -1)
                 {
-                    if (pitBoxTimeCountdown)
+                    if (pitBoxTimeCountdown && pitCountdownTriggerPointsSet)
                     {
                         for (int i = 0; i < pitCountdownTriggerPoints.Length; i++)
                         {
@@ -362,6 +365,7 @@ namespace CrewChiefV4.Events
                                     audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
                                         MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
                                 }
+                                break;
                             }
                         }
                         previousDistanceToBox = distanceToBox;
