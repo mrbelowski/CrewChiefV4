@@ -142,7 +142,7 @@
 	],
 	"macros": [{
 			"name": "say sorry",
-			"description": "opens chat, types 'sorry, my bad', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported.
+			"description": "opens chat, types 'sorry, my bad', presses enter. An action sequence item starting with {FREE_TEXT} tells the app to press each of the following keys in sequence. Numbers, letters, commas and full-stops only are supported.",
 			"voiceTriggers": ["chat, say sorry"],
 			"commandSets": [{
 					"description": "r3e version",

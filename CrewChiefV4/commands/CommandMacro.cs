@@ -394,7 +394,15 @@ namespace CrewChiefV4.commands
         public ActionItem(String action, KeyBinding[] keyBindings)
         {
             this.actionText = action;
-            if (action.StartsWith("{"))
+            if (actionText.StartsWith("Multiple "))
+            {
+                Console.WriteLine("Please change action item \"" + action + "\" to \"{MULTIPLE," + action.Substring(action.IndexOf(" ") + 1) + "}\"");
+            }
+            else if (actionText.StartsWith("WAIT_"))
+            {
+                Console.WriteLine("Please change action item \"" + action + "\" to \"{WAIT," + action.Substring(action.IndexOf("_") + 1) + "}\"");
+            }
+            else if (action.StartsWith("{"))
             {
                 int start = action.IndexOf("{") + 1;
                 int end = action.IndexOf("}", start);
