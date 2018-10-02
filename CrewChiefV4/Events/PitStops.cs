@@ -341,7 +341,7 @@ namespace CrewChiefV4.Events
                         if (playPitDistanceCountdown && (currentGameState.Now - pitEntryDistancePlayedTime).TotalSeconds > 3)
                         {
                             // the first item takes longer to play because it's preceeded by "box in.."
-                            float pointAdjustment = playedBoxIn ? 0 : currentGameState.PositionAndMotionData.CarSpeed / 2f;
+                            float pointAdjustment = playedBoxIn ? 0 : currentGameState.PositionAndMotionData.CarSpeed;
                             for (int i = nextPitDistanceIndex; i < pitCountdownTriggerPoints.Length; i++)
                             {
                                 if (distanceToBox < pitCountdownTriggerPoints[i] + pointAdjustment && previousDistanceToBox > pitCountdownTriggerPoints[i] + pointAdjustment - 2)
