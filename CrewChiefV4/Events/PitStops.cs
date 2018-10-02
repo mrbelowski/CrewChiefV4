@@ -379,7 +379,7 @@ namespace CrewChiefV4.Events
                             }
                             previousDistanceToBox = distanceToBox;
                         }
-                        else if ((currentGameState.Now - pitEntryTime).TotalSeconds > 0.5)
+                        else if ((currentGameState.Now - pitEntryTime).TotalSeconds > 0.5 && (currentGameState.Now - pitEntryTime).TotalSeconds < 1)
                         {
                             // create the countdown estimates after we've settled onto the limiter
                             getPitCountdownTriggerPoints(estimatedPitSpeed);
