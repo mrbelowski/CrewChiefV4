@@ -15,6 +15,7 @@ namespace CrewChiefV4.Audio
     {
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
+        public static Boolean recordVarietyData = UserSettings.GetUserSettings().getBoolean("record_sound_variety_data");
         public static Boolean dumpListOfUnvocalizedNames = UserSettings.GetUserSettings().getBoolean("save_list_of_unvocalized_names");
         private double minSecondsBetweenPersonalisedMessages = (double)UserSettings.GetUserSettings().getInt("min_time_between_personalised_messages");
         public static Boolean eagerLoadSoundFiles = UserSettings.GetUserSettings().getBoolean("load_sound_files_on_startup");
@@ -55,8 +56,75 @@ namespace CrewChiefV4.Audio
 
         public static Boolean cancelLazyLoading = false;
 
+        private static Dictionary<String, Tuple<int, int>> varietyData = new Dictionary<string, Tuple<int, int>>();
+
+        private static void loadExistingVarietyData()
+        {
+            if (SoundCache.recordVarietyData)
+            {
+                string path = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "sounds-variety-data.txt");
+                StringBuilder fileString = new StringBuilder();
+                StreamReader file = null;
+                try
+                {
+                    file = new StreamReader(path);
+                    String line;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (!line.Trim().StartsWith("#"))
+                        {
+                            // split the lin
+                            String[] lineData = line.Split(',');
+                            varietyData[lineData[0]] = new Tuple<int, int>(int.Parse(lineData[1]), int.Parse(lineData[2]));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error reading file " + path + ": " + e.Message);
+                }
+                finally
+                {
+                    if (file != null)
+                    {
+                        file.Close();
+                    }
+                }
+            }
+        }
+
+        public static void saveVarietyData()
+        {
+            if (SoundCache.recordVarietyData)
+            {
+                string path = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "sounds-variety-data.txt");
+                StringBuilder fileString = new StringBuilder();
+                TextWriter tw = new StreamWriter(path, false);
+                foreach (KeyValuePair<String, Tuple<int, int>> entry in varietyData)
+                {
+                    tw.WriteLine(entry.Key + "," + entry.Value.Item1 + "," + entry.Value.Item2);
+                }
+                tw.Close();
+            }
+        }
+
+        public static void addUseToVarietyData(String soundPath, int soundsInThisSet)
+        {
+            if (varietyData.ContainsKey(soundPath))
+            {
+                varietyData[soundPath] = new Tuple<int, int>(varietyData[soundPath].Item1, varietyData[soundPath].Item2 + 1);
+            }
+            else
+            {
+                varietyData.Add(soundPath, new Tuple<int, int>(soundsInThisSet, 1));
+            }
+        }
+
         public SoundCache(DirectoryInfo soundsFolder, DirectoryInfo sharedSoundsFolder, String[] eventTypesToKeepCached, Boolean useSwearyMessages, Boolean allowCaching, String selectedPersonalisation)
         {
+            loadExistingVarietyData();
             // ensure the static state is nuked before we start updating it
             SoundCache.dynamicLoadedSounds.Clear();
             SoundCache.soundSets.Clear();
@@ -946,6 +1014,10 @@ namespace CrewChiefV4.Audio
             if (!initialised)
             {
                 initialise();
+            }
+            if (SoundCache.recordVarietyData)
+            {
+                SoundCache.addUseToVarietyData(this.soundFolder.FullName, this.soundsCount);
             }
             if (!AudioPlayer.rantWaitingToPlay && preferPersonalised && singleSoundsWithPrefixOrSuffix.Count > 0)
             {

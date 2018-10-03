@@ -3502,5 +3502,17 @@ namespace CrewChiefV4.Properties {
                 this["pcars2_spotter_car_length"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool record_sound_variety_data {
+            get {
+                return ((bool)(this["record_sound_variety_data"]));
+            }
+            set {
+                this["record_sound_variety_data"] = value;
+            }
+        }
     }
 }
