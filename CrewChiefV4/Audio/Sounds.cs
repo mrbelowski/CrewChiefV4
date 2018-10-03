@@ -122,13 +122,18 @@ namespace CrewChiefV4.Audio
 
         public static void addUseToVarietyData(String soundPath, int soundsInThisSet)
         {
-            if (varietyData.ContainsKey(soundPath))
+            String[] pathFragments = soundPath.Split('\\');
+            if (pathFragments.Length > 1)
             {
-                varietyData[soundPath] = new Tuple<int, int>(varietyData[soundPath].Item1, varietyData[soundPath].Item2 + 1);
-            }
-            else
-            {
-                varietyData.Add(soundPath, new Tuple<int, int>(soundsInThisSet, 1));
+                String interestingSoundPath = pathFragments[pathFragments.Length - 2] + "/" + pathFragments[pathFragments.Length - 1];
+                if (varietyData.ContainsKey(interestingSoundPath))
+                {
+                    varietyData[interestingSoundPath] = new Tuple<int, int>(varietyData[interestingSoundPath].Item1, varietyData[interestingSoundPath].Item2 + 1);
+                }
+                else
+                {
+                    varietyData.Add(interestingSoundPath, new Tuple<int, int>(soundsInThisSet, 1));
+                }
             }
         }
 
