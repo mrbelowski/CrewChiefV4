@@ -1156,9 +1156,6 @@ namespace CrewChiefV4.Audio
                     // if we timeout here it means the channel was left open, so close it
                     closeRadioInternalChannel();
                 }
-                // if the monitor is signalled it means we closed the channel properly so don't need to do any work
-                // remove from the thread manager
-                ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
             });
             hangingChannelCloseThread.Name = "AudioPlayer.hangingChannelCloseThread";
             hangingChannelCloseThread.Start();
