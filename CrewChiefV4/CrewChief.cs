@@ -1120,6 +1120,7 @@ namespace CrewChiefV4
                     audioPlayer.stopMonitor();
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
+                SoundCache.saveVarietyData();
 
                 stopSpotterThread();
 
