@@ -1169,3 +1169,7 @@ disable_behavior_altering_voice_commands_category = AUDIO_VOICE_AND_CONTROLLERS
 slow_class_car_warnings_in_race_only = Slow car class warnings in race only
 slow_class_car_warnings_in_race_only_help = Only play 'slow car ahead' multiclass warnings in race sessions
 slow_class_car_warnings_in_race_only_category = PIT_STOPS_AND_MULTICLASS
+
+record_sound_variety_data = Record sound variety data
+record_sound_variety_data_help = Log the number of times each sound is played and the number of versions of this sound. For sound pack developers
+record_sound_variety_data_category = AUDIO_VOICE_AND_CONTROLLERS

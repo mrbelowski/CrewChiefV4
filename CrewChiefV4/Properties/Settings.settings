@@ -872,5 +872,8 @@
     <Setting Name="pcars2_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
+    <Setting Name="record_sound_variety_data" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
