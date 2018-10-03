@@ -3506,6 +3506,30 @@ namespace CrewChiefV4.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool pit_box_time_countdown {
+            get {
+                return ((bool)(this["pit_box_time_countdown"]));
+            }
+            set {
+                this["pit_box_time_countdown"] = value;
+            }
+        }
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool pit_box_position_countdown_in_feet {
+            get {
+                return ((bool)(this["pit_box_position_countdown_in_feet"]));
+            }
+            set {
+                this["pit_box_position_countdown_in_feet"] = value;
+            }
+        }
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool record_sound_variety_data {
             get {
                 return ((bool)(this["record_sound_variety_data"]));
