@@ -122,10 +122,12 @@ namespace CrewChiefV4.Audio
 
         public static void addUseToVarietyData(String soundPath, int soundsInThisSet)
         {
+            // want the last 4 folders from the full sound path:
             String[] pathFragments = soundPath.Split('\\');
-            if (pathFragments.Length > 2)
+            if (pathFragments.Length > 3)
             {
-                String interestingSoundPath = pathFragments[pathFragments.Length - 3] + "/" + pathFragments[pathFragments.Length - 2] + "/" + pathFragments[pathFragments.Length - 1];
+                String interestingSoundPath = pathFragments[pathFragments.Length - 4] + "/" + pathFragments[pathFragments.Length - 3] + 
+                    "/" + pathFragments[pathFragments.Length - 2] + "/" + pathFragments[pathFragments.Length - 1];
                 if (varietyData.ContainsKey(interestingSoundPath))
                 {
                     varietyData[interestingSoundPath] = new Tuple<int, int>(varietyData[interestingSoundPath].Item1, varietyData[interestingSoundPath].Item2 + 1);
