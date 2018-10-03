@@ -90,11 +90,11 @@ namespace CrewChiefV4.ACC
             SessionPhase currentSessioPhase = mapToSessionPhase(data.sessionData.currentSessionPhase, currentSessionType);
             currentGameState.SessionData.SessionPhase = currentSessioPhase;
 
-            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;
-            currentGameState.SessionData.SessionTotalRunTime = (float)data.sessionData.sessionDuration;
+            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;           
             currentGameState.SessionData.SessionTimeRemaining = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.physicsTime)).TotalSeconds;
-            
+            currentGameState.SessionData.SessionTotalRunTime = (float)data.sessionData.sessionDuration;
             currentGameState.SessionData.SessionHasFixedTime = true;
+            
             Driver playerDriver = data.playerDriver;
             currentGameState.SessionData.NumCarsOverall = data.driverCount;
             //this still needs fixing
@@ -108,7 +108,8 @@ namespace CrewChiefV4.ACC
                 Console.WriteLine("SessionTotalRunTime = " + currentGameState.SessionData.SessionTotalRunTime);
                 Console.WriteLine("SessionRunningTime = " + currentGameState.SessionData.SessionRunningTime);
                 currentGameState.SessionData.NumCarsOverallAtStartOfSession = data.driverCount;
-
+                currentGameState.SessionData.OverallPosition = playerDriver.position;
+                //currentGameState.SessionData.SessionStartClassPosition;
                 currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(data.track.name, 0, data.track.length);
                 if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
                 {
@@ -125,14 +126,8 @@ namespace CrewChiefV4.ACC
                 }
                 TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(data.track.name, currentGameState.SessionData.TrackDefinition.trackLength);
                 currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
-                if (tdc.isDefinedInTracklandmarksData)
-                {
-                    currentGameState.SessionData.TrackDefinition.isOval = tdc.isOval;
-                }
-                else
-                {
-                    currentGameState.SessionData.TrackDefinition.isOval = false;
-                }
+                currentGameState.SessionData.TrackDefinition.isOval = false;
+
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
                 GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
                 currentGameState.OpponentData.Clear();
@@ -143,7 +138,10 @@ namespace CrewChiefV4.ACC
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionHasFixedTime = true;
 
-                currentGameState.PitData.InPitlane = playerDriver.trackLocation == CarLocation.ECarLocation__Track;
+                currentGameState.SessionData.SessionTotalRunTime = (float)data.sessionData.sessionDuration;
+
+
+                currentGameState.PitData.InPitlane = playerDriver.trackLocation != CarLocation.ECarLocation__Track;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerDriver.distanceRoundTrack * currentGameState.SessionData.TrackDefinition.trackLength);
 
                 //TODO update car classes shuold be easy as they will all be GT3 :D
@@ -153,7 +151,7 @@ namespace CrewChiefV4.ACC
 
 
                 currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
-                currentGameState.SessionData.SectorNumber = (int)playerDriver.currentSector + 1;
+                currentGameState.SessionData.SectorNumber = (int)playerDriver.currentSector + 1; // this is incorrect doing formation lap!
 
                 for(int i = 1; i < data.driverCount; i++)
                 {
@@ -169,9 +167,150 @@ namespace CrewChiefV4.ACC
             {
                 if (previousSessionPhase != currentGameState.SessionData.SessionPhase)
                 {
+                    Console.WriteLine("New session phase, was " + previousSessionPhase + " now " + currentGameState.SessionData.SessionPhase);
+                    if (previousGameState != null && previousGameState.SessionData.TrackDefinition == null)
+                    {
+                        Console.WriteLine("New session phase without new session initialized previously.");
+                    }
 
+                    if (currentGameState.SessionData.SessionPhase == SessionPhase.Green && previousSessionPhase != SessionPhase.Finished)
+                    {
+                        currentGameState.SessionData.JustGoneGreen = true;
+                        // just gone green, so get the session data
+                        currentGameState.SessionData.SessionHasFixedTime = true;
+                        currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
+
+                        currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(data.track.name, 0, data.track.length);
+                        if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
+                        {
+                            if (previousGameState.SessionData.TrackDefinition.name.Equals(currentGameState.SessionData.TrackDefinition.name))
+                            {
+                                if (previousGameState.hardPartsOnTrackData.hardPartsMapped)
+                                {
+                                    currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap = previousGameState.hardPartsOnTrackData.processedHardPartsForBestLap;
+                                    currentGameState.hardPartsOnTrackData.isAlreadyBraking = previousGameState.hardPartsOnTrackData.isAlreadyBraking;
+                                    currentGameState.hardPartsOnTrackData.hardPartStart = previousGameState.hardPartsOnTrackData.hardPartStart;
+                                    currentGameState.hardPartsOnTrackData.hardPartsMapped = previousGameState.hardPartsOnTrackData.hardPartsMapped;
+                                }
+                            }
+                        }
+                        TrackDataContainer tdc = TrackData.TRACK_LANDMARKS_DATA.getTrackDataForTrackName(data.track.name, currentGameState.SessionData.TrackDefinition.trackLength);
+                        currentGameState.SessionData.TrackDefinition.trackLandmarks = tdc.trackLandmarks;
+                          currentGameState.SessionData.TrackDefinition.isOval = false;
+
+                        currentGameState.SessionData.TrackDefinition.setGapPoints();
+                        GlobalBehaviourSettings.UpdateFromTrackDefinition(currentGameState.SessionData.TrackDefinition);
+
+                        currentGameState.carClass = CarData.getCarClassFromEnum(CarData.CarClassEnum.GT3);
+                        GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
+                        currentGameState.SessionData.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.Now);
+                        Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
+
+                        if (previousGameState != null)
+                        {
+                            currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;
+                            currentGameState.OpponentData = previousGameState.OpponentData;
+                            currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
+                            currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
+                            currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
+                            currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
+                        }
+                        currentGameState.SessionData.SessionStartTime = currentGameState.Now;
+                        //currentGameState.SessionData.CompletedLaps = shared.Driver.CurrentResults.LapsComplete;
+
+                        Console.WriteLine("Just gone green, session details...");
+
+                        Console.WriteLine("SessionType " + currentGameState.SessionData.SessionType);
+                        Console.WriteLine("SessionPhase " + currentGameState.SessionData.SessionPhase);
+                        Console.WriteLine("HasMandatoryPitStop " + currentGameState.PitData.HasMandatoryPitStop);
+                        Console.WriteLine("NumCarsAtStartOfSession " + currentGameState.SessionData.NumCarsOverallAtStartOfSession);
+                        Console.WriteLine("SessionNumberOfLaps " + currentGameState.SessionData.SessionNumberOfLaps);
+                        Console.WriteLine("SessionRunTime " + currentGameState.SessionData.SessionTotalRunTime);
+                        Console.WriteLine("SessionStartTime " + currentGameState.SessionData.SessionStartTime);
+                        String trackName = currentGameState.SessionData.TrackDefinition == null ? "unknown" : currentGameState.SessionData.TrackDefinition.name;
+                        Console.WriteLine("TrackName " + trackName + " Track Reported Length " + currentGameState.SessionData.TrackDefinition.trackLength);
+
+                    }
+                }
+                if (!currentGameState.SessionData.JustGoneGreen && previousGameState != null)
+                {
+                    //Console.WriteLine("regular update, session type = " + currentGameState.SessionData.SessionType + " phase = " + currentGameState.SessionData.SessionPhase);
+
+                    currentGameState.SessionData.SessionStartTime = previousGameState.SessionData.SessionStartTime;
+                    currentGameState.SessionData.SessionTotalRunTime = previousGameState.SessionData.SessionTotalRunTime;
+                    currentGameState.SessionData.SessionNumberOfLaps = previousGameState.SessionData.SessionNumberOfLaps;
+                    currentGameState.SessionData.SessionHasFixedTime = previousGameState.SessionData.SessionHasFixedTime;
+                    currentGameState.SessionData.HasExtraLap = previousGameState.SessionData.HasExtraLap;
+                    currentGameState.SessionData.NumCarsOverallAtStartOfSession = previousGameState.SessionData.NumCarsOverallAtStartOfSession;
+                    currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession;
+                    currentGameState.SessionData.EventIndex = previousGameState.SessionData.EventIndex;
+                    currentGameState.SessionData.SessionIteration = previousGameState.SessionData.SessionIteration;
+                    currentGameState.SessionData.PositionAtStartOfCurrentLap = previousGameState.SessionData.PositionAtStartOfCurrentLap;
+                    currentGameState.SessionData.SessionStartClassPosition = previousGameState.SessionData.SessionStartClassPosition;
+                    currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = previousGameState.SessionData.ClassPositionAtStartOfCurrentLap;
+
+                    currentGameState.PitData.PitWindowStart = previousGameState.PitData.PitWindowStart;
+                    currentGameState.PitData.PitWindowEnd = previousGameState.PitData.PitWindowEnd;
+                    currentGameState.PitData.HasMandatoryPitStop = previousGameState.PitData.HasMandatoryPitStop;
+                    currentGameState.PitData.HasMandatoryTyreChange = previousGameState.PitData.HasMandatoryTyreChange;
+                    currentGameState.PitData.MandatoryTyreChangeRequiredTyreType = previousGameState.PitData.MandatoryTyreChangeRequiredTyreType;
+                    currentGameState.PitData.IsRefuellingAllowed = previousGameState.PitData.IsRefuellingAllowed;
+                    currentGameState.PitData.MaxPermittedDistanceOnCurrentTyre = previousGameState.PitData.MaxPermittedDistanceOnCurrentTyre;
+                    currentGameState.PitData.MinPermittedDistanceOnCurrentTyre = previousGameState.PitData.MinPermittedDistanceOnCurrentTyre;
+                    currentGameState.PitData.OnInLap = previousGameState.PitData.OnInLap;
+                    currentGameState.PitData.OnOutLap = previousGameState.PitData.OnOutLap;
+                    currentGameState.PitData.NumPitStops = previousGameState.PitData.NumPitStops;
+                    currentGameState.PitData.PitBoxPositionEstimate = previousGameState.PitData.PitBoxPositionEstimate;
+                    currentGameState.PitData.IsTeamRacing = previousGameState.PitData.IsTeamRacing;
+
+                    currentGameState.SessionData.TrackDefinition = previousGameState.SessionData.TrackDefinition;
+                    currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
+                    currentGameState.SessionData.PlayerLapTimeSessionBest = previousGameState.SessionData.PlayerLapTimeSessionBest;
+                    currentGameState.SessionData.PlayerLapTimeSessionBestPrevious = previousGameState.SessionData.PlayerLapTimeSessionBestPrevious;
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = previousGameState.SessionData.OpponentsLapTimeSessionBestOverall;
+                    currentGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass = previousGameState.SessionData.OpponentsLapTimeSessionBestPlayerClass;
+                    currentGameState.carClass = previousGameState.carClass;
+                    currentGameState.SessionData.PlayerClassSessionBestLapTimeByTyre = previousGameState.SessionData.PlayerClassSessionBestLapTimeByTyre;
+                    currentGameState.SessionData.PlayerBestLapTimeByTyre = previousGameState.SessionData.PlayerBestLapTimeByTyre;
+                    currentGameState.SessionData.DriverRawName = previousGameState.SessionData.DriverRawName;
+                    currentGameState.SessionData.SessionTimesAtEndOfSectors = previousGameState.SessionData.SessionTimesAtEndOfSectors;
+                    currentGameState.SessionData.LapTimePreviousEstimateForInvalidLap = previousGameState.SessionData.LapTimePreviousEstimateForInvalidLap;
+                    currentGameState.SessionData.OverallSessionBestLapTime = previousGameState.SessionData.OverallSessionBestLapTime;
+                    currentGameState.SessionData.PlayerClassSessionBestLapTime = previousGameState.SessionData.PlayerClassSessionBestLapTime;
+                    currentGameState.SessionData.GameTimeAtLastPositionFrontChange = previousGameState.SessionData.GameTimeAtLastPositionFrontChange;
+                    currentGameState.SessionData.GameTimeAtLastPositionBehindChange = previousGameState.SessionData.GameTimeAtLastPositionBehindChange;
+                    currentGameState.SessionData.LastSector1Time = previousGameState.SessionData.LastSector1Time;
+                    currentGameState.SessionData.LastSector2Time = previousGameState.SessionData.LastSector2Time;
+                    currentGameState.SessionData.LastSector3Time = previousGameState.SessionData.LastSector3Time;
+                    currentGameState.SessionData.PlayerBestSector1Time = previousGameState.SessionData.PlayerBestSector1Time;
+                    currentGameState.SessionData.PlayerBestSector2Time = previousGameState.SessionData.PlayerBestSector2Time;
+                    currentGameState.SessionData.PlayerBestSector3Time = previousGameState.SessionData.PlayerBestSector3Time;
+                    currentGameState.SessionData.PlayerBestLapSector1Time = previousGameState.SessionData.PlayerBestLapSector1Time;
+                    currentGameState.SessionData.PlayerBestLapSector2Time = previousGameState.SessionData.PlayerBestLapSector2Time;
+                    currentGameState.SessionData.PlayerBestLapSector3Time = previousGameState.SessionData.PlayerBestLapSector3Time;
+                    currentGameState.SessionData.LapTimePrevious = previousGameState.SessionData.LapTimePrevious;
+                    currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
+                    currentGameState.SessionData.trackLandmarksTiming = previousGameState.SessionData.trackLandmarksTiming;
+                    currentGameState.SessionData.CompletedLaps = previousGameState.SessionData.CompletedLaps;
+                    currentGameState.FlagData.useImprovisedIncidentCalling = previousGameState.FlagData.useImprovisedIncidentCalling;
+                    currentGameState.OpponentData = previousGameState.OpponentData;
+                    currentGameState.SessionData.SectorNumber = previousGameState.SessionData.SectorNumber;
+                    currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
+
+                    currentGameState.Conditions.samples = previousGameState.Conditions.samples;
+                    currentGameState.PenaltiesData.CutTrackWarnings = previousGameState.PenaltiesData.CutTrackWarnings;
+                    currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
+                    currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
+                    currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+
+                    currentGameState.TimingData = previousGameState.TimingData;
                 }
             }
+            if(playerDriver.isCarOutOfTrack == 1)
+            {
+                Console.WriteLine("player car out of track");
+            }
+            currentGameState.SessionData.OverallPosition = playerDriver.realTimePosition;
             previousRaceSessionPhase = data.sessionData.currentSessionPhase;
             //currentGameState.SessionData.SessionPhase = SessionPhase.Green;
             return currentGameState;
@@ -226,7 +365,7 @@ namespace CrewChiefV4.ACC
                 case SessionType.Practice:
                 case SessionType.HotLap:
                 case SessionType.Qualify:
-                        return SessionPhase.Green;
+                    return SessionPhase.Green;
                 case SessionType.Race:
                     {
                         switch(currentRaceSessionPhase)

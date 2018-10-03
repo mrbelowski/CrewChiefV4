@@ -365,7 +365,7 @@ namespace CrewChiefV4.ACC
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
 	        public String name;
-	        public int nation;
+            public Nationality nation;
 	        public Vec3 location;
 	        public Rotation rotation;
             public float distanceRoundTrack;
@@ -388,7 +388,8 @@ namespace CrewChiefV4.ACC
             public byte isBetweenSafetyCarLines;
             public byte isSessionOver;
             public byte isDisqualified;
-            public byte isRetired;   
+            public byte isRetired;
+            public byte isCarOutOfTrack;
             public UInt16 driverIndex;
             public byte formationLapCounter;
             public CarLocation trackLocation;	
