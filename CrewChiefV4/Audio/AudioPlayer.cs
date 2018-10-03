@@ -582,7 +582,8 @@ namespace CrewChiefV4.Audio
             while (monitorRunning)
             {
                 int waitTimeout = -1;
-                if (channelOpen && (!holdChannelOpen || DateTime.UtcNow > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                DateTime now = CrewChief.currentGameState == null ? DateTime.UtcNow : CrewChief.currentGameState.Now;
+                if (channelOpen && (!holdChannelOpen || now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -1190,7 +1191,7 @@ namespace CrewChiefV4.Audio
             return null;
         }
 
-        public void playMessageImmediately(QueuedMessage queuedMessage)
+        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean keepChannelOpen = false)
         {
             if (queuedMessage.canBePlayed)
             {
@@ -1206,7 +1207,11 @@ namespace CrewChiefV4.Audio
                         lastImmediateMessageName = queuedMessage.messageName;
                         lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
-                        this.holdChannelOpen = false;
+                        this.holdChannelOpen = keepChannelOpen;
+                        if (this.holdChannelOpen)
+                        {
+                            startHangingChannelCloseThread();
+                        }
 
                         // here we assume the message is a voice command response, which is the most common use case 
                         // for non-spotter immediate messages
@@ -1448,6 +1453,11 @@ namespace CrewChiefV4.Audio
                 ThreadManager.RegisterTemporaryThread(pauseQueueThread);
                 pauseQueueThread.Start();
             }
+        }
+
+        public void unpauseQueue()
+        {
+            regularQueuePaused = false;
         }
 
         public static Boolean canReadName(String rawName)

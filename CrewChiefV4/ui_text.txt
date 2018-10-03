@@ -1053,10 +1053,20 @@ force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 force_min_window_size_category = UI_STARTUP_AND_PATHS
 
-pit_box_position_countdown = Pit box countdown
+pit_box_position_countdown = Pit box distance countdown
 pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
 pit_box_position_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_time_countdown = Pit box time countdown
+pit_box_time_countdown_help = Play time to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
+pit_box_time_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_position_countdown_in_feet = Pit box distance countdown in feet
+pit_box_position_countdown_in_feet_help = Play pit distance countdown in feet
+pit_box_position_countdown_in_feet_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_position_countdown_in_feet_category = PIT_STOPS_AND_MULTICLASS
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
