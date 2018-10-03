@@ -383,6 +383,10 @@ namespace CrewChiefV4.Events
                 {
                     maxBrakeDamage = DamageLevel.TRIVIAL;
                 }
+                else
+                {
+                    maxBrakeDamage = DamageLevel.NONE;
+                }
             
                 if (currentGameState.CarDamageData.SuspensionDamageStatus.hasValueAtLevel(DamageLevel.DESTROYED))
                 {
@@ -400,6 +404,10 @@ namespace CrewChiefV4.Events
                 else if (currentGameState.CarDamageData.SuspensionDamageStatus.hasValueAtLevel(DamageLevel.TRIVIAL))
                 {
                     maxSuspensionDamage = DamageLevel.TRIVIAL;
+                }
+                else
+                {
+                    maxSuspensionDamage = DamageLevel.NONE;
                 }
                 isMissingWheel = !currentGameState.PitData.InPitlane && (!currentGameState.TyreData.LeftFrontAttached || !currentGameState.TyreData.RightFrontAttached ||
                         !currentGameState.TyreData.LeftRearAttached || !currentGameState.TyreData.RightRearAttached);
