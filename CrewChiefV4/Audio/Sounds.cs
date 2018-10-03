@@ -78,7 +78,7 @@ namespace CrewChiefV4.Audio
                     {
                         if (!line.Trim().StartsWith("#"))
                         {
-                            // split the lin
+                            // split the line. Sound path, files count, played count, variety score
                             String[] lineData = line.Split(',');
                             varietyData[lineData[0]] = new Tuple<int, int>(int.Parse(lineData[1]), int.Parse(lineData[2]));
                         }
@@ -106,9 +106,15 @@ namespace CrewChiefV4.Audio
                     Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "sounds-variety-data.txt");
                 StringBuilder fileString = new StringBuilder();
                 TextWriter tw = new StreamWriter(path, false);
+                List<SoundVarietyDataPoint> data = new List<SoundVarietyDataPoint>();
                 foreach (KeyValuePair<String, Tuple<int, int>> entry in varietyData)
                 {
-                    tw.WriteLine(entry.Key + "," + entry.Value.Item1 + "," + entry.Value.Item2);
+                    data.Add(new SoundVarietyDataPoint(entry.Key, entry.Value.Item1, entry.Value.Item2));
+                }
+                data.Sort();
+                foreach (SoundVarietyDataPoint dataPoint in data)
+                {
+                    tw.WriteLine(dataPoint.soundName + "," + dataPoint.numSounds + "," + dataPoint.timesPlayed + "," + dataPoint.score);
                 }
                 tw.Close();
             }
@@ -1655,6 +1661,29 @@ namespace CrewChiefV4.Audio
                 }
             }
             return outputStream.ToArray();
+        }
+    }
+
+    public class SoundVarietyDataPoint : IComparable<SoundVarietyDataPoint>
+    {
+        public String soundName;
+        public int numSounds;
+        public int timesPlayed;
+        public float score;
+        public SoundVarietyDataPoint(String soundName, int numSounds, int timesPlayed)
+        {
+            this.soundName = soundName;
+            this.numSounds = numSounds;
+            this.timesPlayed = timesPlayed;
+            this.score = (float)numSounds / (float)timesPlayed;
+        }
+
+        // sort worst-first
+        public int CompareTo(SoundVarietyDataPoint that)
+        {
+            if (this.score < that.score) return -1;
+            if (this.score == that.score) return 0;
+            return 1;
         }
     }
 }
