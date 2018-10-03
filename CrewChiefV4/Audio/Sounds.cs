@@ -74,7 +74,7 @@ namespace CrewChiefV4.Audio
                     {
                         if (!line.Trim().StartsWith("#"))
                         {
-                            // split the lin
+                            // split the line. Sound path, files count, played count, variety score
                             String[] lineData = line.Split(',');
                             varietyData[lineData[0]] = new Tuple<int, int>(int.Parse(lineData[1]), int.Parse(lineData[2]));
                         }
@@ -102,9 +102,15 @@ namespace CrewChiefV4.Audio
                     Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "sounds-variety-data.txt");
                 StringBuilder fileString = new StringBuilder();
                 TextWriter tw = new StreamWriter(path, false);
+                List<SoundVarietyDataPoint> data = new List<SoundVarietyDataPoint>();
                 foreach (KeyValuePair<String, Tuple<int, int>> entry in varietyData)
                 {
-                    tw.WriteLine(entry.Key + "," + entry.Value.Item1 + "," + entry.Value.Item2);
+                    data.Add(new SoundVarietyDataPoint(entry.Key, entry.Value.Item1, entry.Value.Item2));
+                }
+                data.Sort();
+                foreach (SoundVarietyDataPoint dataPoint in data)
+                {
+                    tw.WriteLine(dataPoint.soundName + "," + dataPoint.numSounds + "," + dataPoint.timesPlayed + "," + dataPoint.score);
                 }
                 tw.Close();
             }
@@ -112,13 +118,20 @@ namespace CrewChiefV4.Audio
 
         public static void addUseToVarietyData(String soundPath, int soundsInThisSet)
         {
-            if (varietyData.ContainsKey(soundPath))
+            // want the last 4 folders from the full sound path:
+            String[] pathFragments = soundPath.Split('\\');
+            if (pathFragments.Length > 3)
             {
-                varietyData[soundPath] = new Tuple<int, int>(varietyData[soundPath].Item1, varietyData[soundPath].Item2 + 1);
-            }
-            else
-            {
-                varietyData.Add(soundPath, new Tuple<int, int>(soundsInThisSet, 1));
+                String interestingSoundPath = pathFragments[pathFragments.Length - 4] + "/" + pathFragments[pathFragments.Length - 3] + 
+                    "/" + pathFragments[pathFragments.Length - 2] + "/" + pathFragments[pathFragments.Length - 1];
+                if (varietyData.ContainsKey(interestingSoundPath))
+                {
+                    varietyData[interestingSoundPath] = new Tuple<int, int>(varietyData[interestingSoundPath].Item1, varietyData[interestingSoundPath].Item2 + 1);
+                }
+                else
+                {
+                    varietyData.Add(interestingSoundPath, new Tuple<int, int>(soundsInThisSet, 1));
+                }
             }
         }
 
@@ -1641,6 +1654,29 @@ namespace CrewChiefV4.Audio
                 }
             }
             return outputStream.ToArray();
+        }
+    }
+
+    public class SoundVarietyDataPoint : IComparable<SoundVarietyDataPoint>
+    {
+        public String soundName;
+        public int numSounds;
+        public int timesPlayed;
+        public float score;
+        public SoundVarietyDataPoint(String soundName, int numSounds, int timesPlayed)
+        {
+            this.soundName = soundName;
+            this.numSounds = numSounds;
+            this.timesPlayed = timesPlayed;
+            this.score = (float)numSounds / (float)timesPlayed;
+        }
+
+        // sort worst-first
+        public int CompareTo(SoundVarietyDataPoint that)
+        {
+            if (this.score < that.score) return -1;
+            if (this.score == that.score) return 0;
+            return 1;
         }
     }
 }
