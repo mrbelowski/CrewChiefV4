@@ -312,6 +312,9 @@ namespace CrewChiefV4
             // 
             // messagesVolumeSlider
             // 
+            this.messagesVolumeSlider.Minimum = 0;
+            this.messagesVolumeSlider.Maximum = 100;
+            this.messagesVolumeSlider.TickFrequency = 10;
             this.messagesVolumeSlider.Location = new System.Drawing.Point(327, 28);
             this.messagesVolumeSlider.Name = "messagesVolumeSlider";
             this.messagesVolumeSlider.Size = new System.Drawing.Size(176, 45);
@@ -329,6 +332,9 @@ namespace CrewChiefV4
             // 
             // backgroundVolumeSlider
             // 
+            this.backgroundVolumeSlider.Minimum = 0;
+            this.backgroundVolumeSlider.Maximum = 100;
+            this.backgroundVolumeSlider.TickFrequency = 10;
             this.backgroundVolumeSlider.Location = new System.Drawing.Point(558, 28);
             this.backgroundVolumeSlider.Name = "backgroundVolumeSlider";
             this.backgroundVolumeSlider.Size = new System.Drawing.Size(184, 45);
