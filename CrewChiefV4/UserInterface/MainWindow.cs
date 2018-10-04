@@ -379,12 +379,12 @@ namespace CrewChiefV4
                 currentVolume = messagesVolume;
             }
             setMessagesVolume(currentVolume, false);
-            messagesVolumeSlider.Value = (int)(currentVolume * 10f);
+            messagesVolumeSlider.Value = (int)(currentVolume * 100f);
         }
 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)messagesVolumeSlider.Value / 10;
+            float volFloat = (float)messagesVolumeSlider.Value / 100;
             setMessagesVolume(volFloat, false);
             currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
@@ -405,7 +405,7 @@ namespace CrewChiefV4
 
         private void backgroundVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)backgroundVolumeSlider.Value / 10;
+            float volFloat = (float)backgroundVolumeSlider.Value / 100;
             UserSettings.GetUserSettings().setProperty("background_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -902,7 +902,7 @@ namespace CrewChiefV4
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
             updateMessagesVolume(messagesVolume);
-            backgroundVolumeSlider.Value = (int)(backgroundVolume * 10f);
+            backgroundVolumeSlider.Value = (int)(backgroundVolume * 100f);
 
             Console.WriteLine("Loading controller settings");
             getControllers();
@@ -1269,7 +1269,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Increasing volume");
-                            updateMessagesVolume(currentVolume + 0.1f);
+                            updateMessagesVolume(currentVolume + 0.05f);
                         }
                         nextPollWait = 200;
                     }
@@ -1286,7 +1286,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Decreasing volume");
-                            updateMessagesVolume(currentVolume - 0.1f);
+                            updateMessagesVolume(currentVolume - 0.05f);
                         }
                         nextPollWait = 200;
                     }
