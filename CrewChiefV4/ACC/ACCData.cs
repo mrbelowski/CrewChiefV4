@@ -377,7 +377,7 @@ namespace CrewChiefV4.ACC
             public int lapCount;
             public int totalTime;
 	        public int currentDelta;
-            public uint currentSector;          //0 based index, when formation lap starts in last sector this value will be track sector count +1!
+            public uint currentSector;          //0 based index, when formation lap starts in last sector this value will be tracksector count
             public int currentlaptime;
             public float trottle;
             public float brake;
