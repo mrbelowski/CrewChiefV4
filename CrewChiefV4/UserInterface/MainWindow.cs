@@ -1099,7 +1099,7 @@ namespace CrewChiefV4
                                 ThreadManager.UnregisterTemporaryThread(youWotThread);
                                 youWotThread = new Thread(() =>
                                 {
-                                    Thread.Sleep(2000);
+                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => crewChief.running /*keepWaitingPredicate*/);
                                     if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
                                     {
                                         crewChief.youWot(false);
@@ -2033,6 +2033,8 @@ namespace CrewChiefV4
 
         private void startDownload(DownloadType downloadType)
         {
+            // TODO_THREADS: I think this might have to be reworked allow CancelAsync on shutdown. 
+            //' Part of todo will probably be keeping wc alive, and disposing in callbacks or shutdown.
             using (WebClient wc = new WebClient())
             {
                 if (downloadType == DownloadType.SOUND_PACK)
@@ -2045,7 +2047,6 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName);
                     }
                     catch (Exception) { }
-                    // TODO_THREADS: CancelAsync on shutdown?
                     wc.DownloadFileAsync(new Uri(soundPackDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName);
                 }
                 else if (downloadType == DownloadType.DRIVER_NAMES)

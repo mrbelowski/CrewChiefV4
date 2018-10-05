@@ -1,39 +1,46 @@
 ﻿/*
- * This class' responsibility is to provide some corrdination between starting/stopping threads in CC.  Here's proposal for strategy of
+ * This class' responsibility is to provide corrdination around creation and destruction of threads in CC.  Here's proposal for strategy of
  * dealing with threads in CC, aka "Architecture":
- *  TODO_THREADS: update for temp and resource threads
- * 1. each root thread (the one we start from MainWindow/UI thread) has to be registered with ThreadManager and named
  * 
- * 1.1: FUTURE: each temporary Thread should also be registered
+ * If any of the threads creates a thread, ideally it has to wait for a child thread to exit when parent thread exits.  Another alternative is
+ * strict locking of shared resources.  However, waiting and locking is not always practical.  ThreadManager class is intended to
+ * help Start/Stop/Shutdown of CC to be predictable and clean by allowing threads to be registered and waited on at Start/Stop/Shutdown.
+ * This avoids unpredictable crashes/exceptions while accessing resources no longer available.
  * 
- * 2. if any of the root thread creates a long lived thread, it has to wait for it to exit when root thread exits.
+ * 1. There are three categories of threads in CC:
  * 
- * 3. each thread should release/dispose it's resources on exit, unless it is too complicated/unpractical (See GlobalResources class)
+ *      - Root threads: generally started from UI thread on Start button click, and stopped on Stop button click.
+ *        Each root thread has to be named and registered with ThreadManager.RegisterRootThread.
  * 
- * 4. global shared resources will be released after form close (and all root threads stopped, if they stop within agreed time, otherwise - undefined behavior).
+ *      - Temporary threads: various short-lived/helper threads.  For example, wait for speech, or waiting for something to happen.
+ *        Generally, started by Root threads or their children.
+ *        
+ *        If a parent thread does not wait for a temporary thread on termination, temporary thread has to named and be registered
+ *        with ThreadManager.RegisterTemporaryThread.  Additionally, when a new instance of temporary thread is created,
+ *        ThreadManager.UnregisterTemporaryThread has to be called on previous one.  See existing code on how to do this.
  * 
- * 5. access to main window should be synchronized with lock.  Be extra careful, if you are marshalling to the main thread, do a Post, not Send, so that lock is not held
- *    Failing to follow above might cause deadlocks.
- * 
- * 6. For Sleeps consider using Utilities.InterruptedSleep to avoid long shutdown delays.
- * 
- * 7. Work worker threads that pump some data, don't just use Sleep, use Events to wake them up.
- * 
- * Future: unsolved problems
- *  - Download threasds
- *  - File dump in main run thread
+ *      - Resource threads: sound loading, caching, downloading etc.  Those threads are generally independent threads that can run without
+ *        CC root threads running.  Each resource thread has to be named and registered with ThreadManager.RegisterResourceThread.
  *
+ * 3. Each thread should release/dispose it's resources on exit, unless it is too complicated/unpractical (See GlobalResources class)
+ * 
+ * 4. Global shared resources will be released after form close (and all threads stopped, if they stop within agreed time,
+ *    otherwise - undefined behavior).
+ * 
+ * 5. Access to the main window should be synchronized with MainWindow.instanceLock.  Be extra careful, if you are marshalling to the main thread,
+ *    do a Post, not Send, so that lock is not held.  Failing to follow above might cause deadlocks.
+ * 
+ * 6. For Sleeps longer than 2 seconds, consider using Utilities.InterruptedSleep to avoid Shutdown/Stop delays.
+ * 
+ * 7. For worker threads that pump some data, don't just use Sleep, use Events to wake them up.
+ * 
  * Official website: thecrewchief.org 
  * License: MIT
  */
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace CrewChiefV4
 {
