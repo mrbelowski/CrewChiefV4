@@ -101,6 +101,8 @@ namespace CrewChiefV4
         private Thread assignButtonThread = null;
         public bool formClosed = false;
 
+        public static bool soundTestMode = false;
+
         public void killChief()
         {
             crewChief.stop();
@@ -399,12 +401,12 @@ namespace CrewChiefV4
                 currentVolume = messagesVolume;
             }
             setMessagesVolume(currentVolume, false);
-            messagesVolumeSlider.Value = (int)(currentVolume * 10f);
+            messagesVolumeSlider.Value = (int)(currentVolume * 100f);
         }
 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)messagesVolumeSlider.Value / 10;
+            float volFloat = (float)messagesVolumeSlider.Value / 100;
             setMessagesVolume(volFloat, false);
             currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
@@ -425,7 +427,7 @@ namespace CrewChiefV4
 
         private void backgroundVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)backgroundVolumeSlider.Value / 10;
+            float volFloat = (float)backgroundVolumeSlider.Value / 100;
             UserSettings.GetUserSettings().setProperty("background_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -745,18 +747,11 @@ namespace CrewChiefV4
             this.playbackInterval.Visible = CrewChief.Debugging;
            
             String[] commandLineArgs = Environment.GetCommandLineArgs();
-            if (commandLineArgs != null)
+            if (MainWindow.soundTestMode)
             {
-                foreach (String arg in commandLineArgs)
-                {
-                    if (arg.Equals("SOUND_TEST"))
-                    {
-                        Console.WriteLine("Sound-test enabled");
-                        this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
-                        this.buttonSmokeTest.Visible = true;
-                        this.smokeTestTextBox.Visible = true;
-                    }
-                }
+                Console.WriteLine("Sound-test enabled");
+                this.buttonSmokeTest.Visible = true;
+                this.smokeTestTextBox.Visible = true;
             }
             if (CrewChief.Debugging)
             {
@@ -923,7 +918,7 @@ namespace CrewChiefV4
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
             updateMessagesVolume(messagesVolume);
-            backgroundVolumeSlider.Value = (int)(backgroundVolume * 10f);
+            backgroundVolumeSlider.Value = (int)(backgroundVolume * 100f);
 
             Console.WriteLine("Loading controller settings");
             getControllers();
@@ -1301,7 +1296,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Increasing volume");
-                            updateMessagesVolume(currentVolume + 0.1f);
+                            updateMessagesVolume(currentVolume + 0.05f);
                         }
                         nextPollWait = 200;
                     }
@@ -1318,7 +1313,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Decreasing volume");
-                            updateMessagesVolume(currentVolume - 0.1f);
+                            updateMessagesVolume(currentVolume - 0.05f);
                         }
                         nextPollWait = 200;
                     }

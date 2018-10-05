@@ -217,18 +217,17 @@ Raceroom
 
 default key bindings:
 "Pit Menu Toggle":		q
-"Pit Menu Select": 		e
-"Pit Menu Up": 		w
+"Pit Menu Select":		e
+"Pit Menu Up":			w
 "Pit Menu Down":		s
 "Pit Menu Decrease":	a
 "Pit Menu Increase":	d
 "Pit Request Toggle":	r
+"Real-time Chat":		c
 
 Ensure that there's a least one Pitstop Preset defined (from the in-game pit menu).
 
 You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again after a few seconds' delay (so you can see what's selected).
-
-If you get a drive through or stop-go penalty, the app will automatically open the pit menu and select 'serve penalty', and close it again. When you then enter the pitlane it'll automatically confirm that action. So you don't need to do anything to serve a drive through other than enter the pitlane (at the right speed of course).
 
 You can also cycle pit presets with the voice commands "next strategy", "next pit preset", "previous strategy", "previous pit preset".
 
@@ -238,36 +237,38 @@ If you want to manually navigate the pit menu with voice commands, use "pit menu
 PCars2
 
 default key bindings:
-"Car Management":	e
-"ICM Menu Up":	w
-"ICM Menu Down":	s
-"ICM Menu Left":	a
-"ICM Menu Right":	d
+"Car Management":		e
+"ICM Menu Up":			w
+"ICM Menu Down":		s
+"ICM Menu Left":		a
+"ICM Menu Right":		d
+"Pit Request Toggle":	q
+"In-game Chat Box":		t
 
 You can request a pit stop by saying "pit request", "in this lap" or "box this lap". This will open the pit menu, select 'pit request' and close it again.
 
-You can select strategies with the voice commands "strategy one" / "strat one", up to "strategy four" / "strat four".
+In pCars 2, you can select strategies with the voice commands "strategy one" / "strat one", up to "strategy four" / "strat four". In R3E you can cycle through pit presets with "next strategy" / "next pit preset" and "previous strategy", "previous pit preset".
 
 If you want to manually navigate the pit menu with voice commands, use "pit menu toggle", "pit menu up", "pit menu down", "pit menu left" and "pit menu right".
 
 iRacing
 
 default key bindings:
-"Lap Timing Black Box": F1
-"Standings Black Box":  F2 
-"Relative Black Box":   F3
-"Fuel Black Box":       F4
-"Tires Black Box":      F5
-"Tire Info Black Box"   F6
-"Pit-stop Adjustments Black Box" :  F7
-"In-car Adjustments Black Box":     F8
-"Mirror Adjustments Black Box":     F9
-"Radio Adjustments Black Box":      F10
-"Select Next Control":              UP
-"Select Previous Control":          DOWN
-"Increment Selected Control":       RIGHT
-"Decrement Selected Control":       LEFT
-"Toggle Selected Control":          SPACE_BAR
+"Lap Timing Black Box":				F1
+"Standings Black Box":				F2 
+"Relative Black Box":				F3
+"Fuel Black Box":					F4
+"Tires Black Box":					F5
+"Tire Info Black Box":				F6
+"Pit-stop Adjustments Black Box":	F7
+"In-car Adjustments Black Box":		F8
+"Mirror Adjustments Black Box":		F9
+"Radio Adjustments Black Box":		F10
+"Select Next Control":				UP
+"Select Previous Control":			DOWN
+"Increment Selected Control":		RIGHT
+"Decrement Selected Control":		LEFT
+"Toggle Selected Control":			SPACE_BAR
 
 You can change the black boxes by saying one of the following commands: "black box lap time", "black box standings", "black box relative",
 "black box fuel", "black box tires", "black box tire info", "black box pit stop", "black box car", "black box mirror" or "black box radio"
@@ -277,15 +278,22 @@ You can navigate the by saying one of the following commands: "menu next", "menu
 
 Advanced command macros
 --------------
-As you can see from the previous section, key press macros are complicated and a bit dumb - the app has no idea what state the pit menu is in so it has to make lots of assumptions. I've added another macro that can request the correct amount of fuel to finish the current race, triggered with the voice command "fuel to the end" or "fuel to the end of the race". It works by calculating the recent fuel consumption and working out how many more litres are needed to finish. It then presses a few keys to move the pit menu to the refuel amount and presses the 'increase' key the correct number of times.
+As you can see from the previous section, key press macros are complicated and a bit dumb - the app has no idea what state the pit menu is in so it has to either make lots of assumptions or work quite hard to put the menu into a known state. 
 
-This will only work if the pit menu is in the correct state to begin with. Otherwise the app will be pressing lots of keys and potentially selecting lots of unwanted stuff in the pit menu. So be careful here.
+There are 2 macros for adding fuel. In both cases, for them to work in R3E the selected pit preset must have fuel *selected* (i.e. highlighted green). One uses the logic of the app's 'Fuel' event to calculate how much fuel is needed to finish the race ("fuel to the end" voice command), the other uses the amount of fuel requested in the voice command ("add fuel, 100 litres" or whatever). These macros opens the pit menu, navigate to the fuel option and attempt to reset it to zero litres. Because they can't know how much fuel might already be set on this menu they have to press the 'decrease' button lots (150) times. This ensure it's at zero before they then add the calculated or requested amount of fuel.
 
-For this to work in Raceroom, the app requires that the game is configured to use metric measurements (gallons are silly). The default pit preset must be configured with one of the preset fuel amounts added ("safe" / "normal" / "risky"). It's essential that the fuel option is green (selected) in this strategy (otherwise the app won't be able to set a fuel amount). 
+*Note that these will only work correctly if you use Litres as your unit*.
 
-For this to work in pCARS2, the app requires that the game is configured to use metric measurements (gallons are silly). The selected pit preset must have no fuel added (0 litres).
+Another point to note here is that these fuelling macros press 'decrease' 150 times quite quickly to ensure the fuel amount is zero before they start increasing it. When things are configured correctly it works well, but it's a lot of key presses and if something goes wrong the end result may be undesirable.
 
-Note that once you've executed this macro, the in-game pit menu will have a fuel amount selected that's some number of litres. This means the menu will be in a state where the macro can't be run again. In Raceroom this is easy enough to remedy - you just need to select the default pit preset again. In pCARS2 there's no sensible workaround.
+The macro feature can also be used to automate chat messages. There are examples for pCars2 and R3E. Again, these just send sequences of key presses.
+
+There are a few special key press commands in save_commands_macros.json to help ease the pain of wiring these things up. The "actionSequence" element is the list of key presses. These usually refer to action items in the keyBindings section at the top of the file. However, they can also be plain keys - e.g. [..., "a", "b", "c", ...].
+
+ - To send a fixed number of multiple key presses use "{MULTIPLE,153}Pit Menu Decrease" (presses the Pit Menu Decrease key 153 times).
+ - To send a number of multiplekey presses based on some app logic, use "{MULTIPLE,Fuel}ICM Menu Right" (presses ICM Menu Right however many times the Fuel event told it to). This requires specific application code to work but i'm happy to take requests :).
+ - To send a number of multiple presses based on the voice command that triggered the macro, the voice command needs to use a special format with the number range to recognise in curly braces - e.g. "add fuel, {1,150} litres" (recognises "add fuel 0 litres" up to "add fuel 150 litres", in steps of 1). Use "{MULTIPLE,VOICE_TRIGGER}Pit Menu Increase" to press (in this example) Pit Menu Increase the number of times recognised in the voice command.
+ - To send a sequence of key presses from some free text, use "{FREE_TEXT}sorry, my bad". Each of the keys after {FREE_TEXT} will be pressed in sequence. Only letters, commas, hypens and full-stops are supported. This is to make chat macros more straightforward (e.g. ["Real-time Chat", "{FREE_TEXT}good pass", "ENTER"]).
 
 Hopefully the game devs will make these menus or the actions they trigger easier to use for 3rd party apps. But until they do, these complicated automated interactions are always going to be flaky.
 
