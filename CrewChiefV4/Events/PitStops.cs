@@ -16,6 +16,8 @@ namespace CrewChiefV4.Events
         private Boolean pitBoxTimeCountdownEnabled = UserSettings.GetUserSettings().getBoolean("pit_box_time_countdown");
         private Boolean pitBoxPositionCountdownInFeet = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown_in_feet");
 
+        private int pitCountdownEndDistance = UserSettings.GetUserSettings().getInt("pit_box_time_countdown_end_position");
+
         public static String folderMandatoryPitStopsPitWindowOpensOnLap = "mandatory_pit_stops/pit_window_opens_on_lap";
         public static String folderMandatoryPitStopsPitWindowOpensAfter = "mandatory_pit_stops/pit_window_opens_after";
 
@@ -249,8 +251,8 @@ namespace CrewChiefV4.Events
         private void getPitCountdownTriggerPoints(float pitlaneSpeed)
         {
             float secondsBetweenEachCall = 1.5f;
-            // we want the 0 (or 'BOX!') call to come at, say 10metres, so the last element is at 10 metres from the box
-            float distance = 10;
+            // we want the 0 (or 'BOX!') call to come at, say 20metres, so the last element is at 20 metres from the box
+            float distance = pitCountdownEndDistance;
             for (int i = pitCountdownTriggerPoints.Length - 1; i >= 0; i--)
             {
                 pitCountdownTriggerPoints[i] = distance;

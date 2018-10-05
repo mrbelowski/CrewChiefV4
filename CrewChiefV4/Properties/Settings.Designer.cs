@@ -3514,8 +3514,8 @@ namespace CrewChiefV4.Properties {
                 this["pit_box_time_countdown"] = value;
             }
         }
-		
-		[global::System.Configuration.UserScopedSettingAttribute()]
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool pit_box_position_countdown_in_feet {
@@ -3526,8 +3526,8 @@ namespace CrewChiefV4.Properties {
                 this["pit_box_position_countdown_in_feet"] = value;
             }
         }
-		
-		[global::System.Configuration.UserScopedSettingAttribute()]
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool record_sound_variety_data {
@@ -3536,6 +3536,18 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["record_sound_variety_data"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int pit_box_time_countdown_end_position {
+            get {
+                return ((int)(this["pit_box_time_countdown_end_position"]));
+            }
+            set {
+                this["pit_box_time_countdown_end_position"] = value;
             }
         }
     }
