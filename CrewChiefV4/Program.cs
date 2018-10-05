@@ -60,6 +60,10 @@ namespace CrewChiefV4
                     {
                         allowMultipleInst = true;
                     }
+                    if (commandLineArg.Equals("SOUND_TEST"))
+                    {
+                        MainWindow.soundTestMode = true;
+                    }
                 }
                 if (!allowMultipleInst)
                 {

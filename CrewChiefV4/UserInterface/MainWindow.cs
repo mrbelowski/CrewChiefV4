@@ -98,6 +98,8 @@ namespace CrewChiefV4
 
         public static bool autoScrollConsole = true;
 
+        public static bool soundTestMode = false;
+
         public void killChief()
         {
             crewChief.stop();
@@ -724,18 +726,11 @@ namespace CrewChiefV4
             this.playbackInterval.Visible = CrewChief.Debugging;
            
             String[] commandLineArgs = Environment.GetCommandLineArgs();
-            if (commandLineArgs != null)
+            if (MainWindow.soundTestMode)
             {
-                foreach (String arg in commandLineArgs)
-                {
-                    if (arg.Equals("SOUND_TEST"))
-                    {
-                        Console.WriteLine("Sound-test enabled");
-                        this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
-                        this.buttonSmokeTest.Visible = true;
-                        this.smokeTestTextBox.Visible = true;
-                    }
-                }
+                Console.WriteLine("Sound-test enabled");
+                this.buttonSmokeTest.Visible = true;
+                this.smokeTestTextBox.Visible = true;
             }
             if (CrewChief.Debugging)
             {

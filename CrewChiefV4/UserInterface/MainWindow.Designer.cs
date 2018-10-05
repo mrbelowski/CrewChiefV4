@@ -93,7 +93,7 @@ namespace CrewChiefV4
             this.SuspendLayout();
 
             this.consoleTextBoxBackgroundPanel.Location = new System.Drawing.Point(41, 215);
-            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(MainWindow.soundTestMode ? 793 : 1093, 285);
             this.consoleTextBoxBackgroundPanel.BorderStyle = BorderStyle.FixedSingle;
             // 
             // consoleTextBox
@@ -103,7 +103,7 @@ namespace CrewChiefV4
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "textBox1";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBox.Size = new System.Drawing.Size(MainWindow.soundTestMode ? 793 : 1093, 285);
             this.consoleTextBox.TabIndex = 200;
             this.consoleTextBox.BorderStyle = BorderStyle.None;
             this.consoleTextBox.Dock = DockStyle.Fill;
