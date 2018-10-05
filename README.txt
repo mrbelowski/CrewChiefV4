@@ -208,16 +208,16 @@ the 32bit speech recognition installers can be downloaded here   : https://drive
 
 Donations
 ---------
-I made this because I wanted to make it and I enjoy making stuff. Working with the various quirks, errors and omissions in the shared data which the games provide hasn't been much fun, but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
-If you use it and like it and it becomes a regular and positive part of your sim racing, I'd be grateful if you would consider making a small donation. If only to stop my wife from complaining at me.
+We built and maintain this because we want to, we enjoy making stuff, and contributing to the Sim Racing community is awesome. Working with the various quirks, errors and omissions in the shared data which the games provide isn't much fun but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
+If you use it and like it and it becomes a regular and positive part of your sim racing, we'd be grateful if you would consider making a small donation. If only to stop our wives from complaining at us.
 
-My paypal address is jim.britton@yahoo.co.uk
+The Crew Chief paypal address is jim.britton@yahoo.co.uk
 
 Or you can use this to donate directly:
 
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LW33XFXP4DPZE
 
-Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, I'm always on the lookout for bug reports and feature suggestions.
+Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, we're always on the lookout for bug reports and feature suggestions.
 
 One final point. If the app says "Jim is faster than you", let him through :)
 
