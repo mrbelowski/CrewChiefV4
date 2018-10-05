@@ -689,7 +689,6 @@ namespace CrewChiefV4
                         }
                         if (!gotAssignment)
                         {
-                            // TODO_THREADS: test
                             Thread.Sleep(20);
                         }
                     }

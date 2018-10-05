@@ -406,6 +406,10 @@ namespace CrewChiefV4
 
         public void youWot(Boolean detectedSomeSpeech)
         {
+            if (!running)
+            {
+                return;
+            }
             if (detectedSomeSpeech)
             {
                 Console.WriteLine("Detected speech input but nothing was recognised");
@@ -801,7 +805,7 @@ namespace CrewChiefV4
                             {
                                 MainWindow.autoScrollConsole = true;
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
-                                Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 50 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                 try
                                 {
                                     audioPlayer.purgeQueues();
@@ -909,8 +913,7 @@ namespace CrewChiefV4
 
                                 if (loadDataFromFile)
                                 {
-                                    // TODO_THREADS: review all InterruptedSleeps before merge.
-                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 100 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                 }
                             }
                             float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;
