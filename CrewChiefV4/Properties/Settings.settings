@@ -882,7 +882,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="pit_box_time_countdown_end_position" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">20</Value>
+      <Value Profile="(Default)">30</Value>
     </Setting>
   </Settings>
 </SettingsFile>
