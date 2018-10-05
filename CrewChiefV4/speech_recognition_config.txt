@@ -124,7 +124,7 @@ WHAT_CLASS_IS_CAR_BEHIND = what class is the car behind:what class is the guy be
 
 MORE_INFO = clarify:tell me more:more information:more info
 
-I_AM_OK = yeah:yes:fine:I'm OK:I'm fine:yes I'm fine:shut up:yeah I'm fine
+I_AM_OK = yeah:yes:fine:I'm OK:I'm fine:yes I'm fine:yeah I'm fine
 
 PLAY_POST_PIT_POSITION_ESTIMATE = where will i be after a stop:estimate pit exit positions:what will happen if i pit
 PRACTICE_PIT_STOP = time this stop:practice pitstop:time this pitstop:pitstop benchmark
