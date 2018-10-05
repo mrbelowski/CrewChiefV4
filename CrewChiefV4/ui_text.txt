@@ -1063,6 +1063,11 @@ pit_box_time_countdown_help = Play time to box as you approach (R3E, rF2 and iRa
 pit_box_time_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
 pit_box_time_countdown_category = PIT_STOPS_AND_MULTICLASS
 
+pit_box_time_countdown_end_position = Pit box time countdown end point (metres)
+pit_box_time_countdown_end_position_help = End pit box time countdown this many metres from the box
+pit_box_time_countdown_end_position_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_end_position_category = PIT_STOPS_AND_MULTICLASS
+
 pit_box_position_countdown_in_feet = Pit box distance countdown in feet
 pit_box_position_countdown_in_feet_help = Play pit distance countdown in feet
 pit_box_position_countdown_in_feet_filter = IRACING;RACE_ROOM;RF2_64BIT
