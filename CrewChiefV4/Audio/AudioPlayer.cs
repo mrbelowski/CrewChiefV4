@@ -1166,7 +1166,6 @@ namespace CrewChiefV4.Audio
         private void stopHangingChannelCloseThread()
         {
             hangingChannelCloseWakeUpEvent.Set();
-            ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
         }
 
         public SoundType getPriortyOfFirstWaitingImmediateMessage()
