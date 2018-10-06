@@ -407,6 +407,8 @@ namespace CrewChiefV4.iRacing
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.TimingData = previousGameState.TimingData;
+
+                    currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
                 }
             }
 
