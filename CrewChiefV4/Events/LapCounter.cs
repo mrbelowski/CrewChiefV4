@@ -89,9 +89,7 @@ namespace CrewChiefV4.Events
         private static Boolean useFahrenheit = UserSettings.GetUserSettings().getBoolean("use_fahrenheit");
 
         private DateTime nextManualFormationOvertakeWarning = DateTime.MinValue;
-        private int currentPosition = -1;
-        private float currentSessionTotalRunTime = -1.0f;
-
+        
         // special case for LapCounter - needs access to the CrewChief class to interrogate the spotter
         private CrewChief crewChief;
 
@@ -206,42 +204,30 @@ namespace CrewChiefV4.Events
                         currentGameState.PitData.PitWindowStart), 0, this));
                 }
             }
-            if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
+            if (currentGameState.SessionData.ClassPosition == 1)
             {
-                if (currentGameState.SessionData.ClassPosition == 1)
+                Console.WriteLine("Pre-start message for pole");
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
                 {
-                    Console.WriteLine("Pre-start message for pole");
-                    if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                    {
-                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));
-                    }
-                    else
-                    {
-                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderPole), 0, this));
-                    }
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro, Position.folderPole), 0, this));
                 }
                 else
                 {
-                    Console.WriteLine("Pre-start message for P " + currentGameState.SessionData.ClassPosition);
-                    if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                    {
-                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro,
-                            Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
-                    }
-                    else
-                    {
-                        possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
-                    }
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderPole), 0, this));
                 }
             }
             else
             {
-                // In rF2 there's a delay for position to get updated (usually by the end of a gridwalk).
-                Console.WriteLine("Pre-start message for position (delay evaluated)");
-
-                DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] {
-                    currentGameState.SessionData.ClassPosition }, this);
-                possibleMessages.Add(new QueuedMessage("position", delayedMessageEvent, 1 /*secondsDelay*/, null));
+                Console.WriteLine("Pre-start message for P " + currentGameState.SessionData.ClassPosition);
+                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
+                {
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Position.folderDriverPositionIntro,
+                        Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
+                }
+                else
+                {
+                    possibleMessages.Add(new QueuedMessage("position", MessageContents(Pause(200), Position.folderStub + currentGameState.SessionData.ClassPosition), 0, this));
+                }
             }
             if (currentGameState.SessionData.SessionNumberOfLaps > 0) {
                 // check how long the race is
@@ -261,33 +247,21 @@ namespace CrewChiefV4.Events
                 }
             }
             else if (CrewChief.gameDefinition.gameEnum != GameEnum.RF1 && /* session time in gridwalk phase isn't usable in rf1 */
-                currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800) 
+                currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionTotalRunTime > 0 && currentGameState.SessionData.SessionTotalRunTime < 1800 &&
+                !(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT && currentGameState.FrozenOrderData.Phase == FrozenOrderPhase.FastRolling))   // No time available in rF2s fast rolling.
             {
-                if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT)
+                int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
+                if (currentGameState.SessionData.ClassPosition > 3 && minutes < 20 && minutes > 1)
                 {
-                    int minutes = (int)currentGameState.SessionData.SessionTotalRunTime / 60;
-                    if (currentGameState.SessionData.ClassPosition > 3 && minutes < 20 && minutes > 1)
-                    {
-                        Console.WriteLine("Pre-start message for race time + get on with it");
-                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
-                    }
-                    //dont play pre-start message for race time unless its more then 2 minuts
-                    else
-                    {
-                        Console.WriteLine("Pre-start message for race time");
-                        possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, Battery.folderMinutes), 0, this));
-                    }
+                    Console.WriteLine("Pre-start message for race time " + minutes + " minutes + get on with it");
+                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), 0, this));
                 }
+                //dont play pre-start message for race time unless its more then 2 minuts
                 else
                 {
-                    // In rF2 there's a delay for timed session total running time to get updated (usually by the end of a gridwalk).
-                    Console.WriteLine("Pre-start message for race time (delay evaluated)");
-
-                    DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getSessionTotalRunningTimeTimeMessages", new Object[] {
-                        currentGameState.SessionData.SessionTotalRunTime }, this);
-                    possibleMessages.Add(new QueuedMessage("race_time", delayedMessageEvent, 1 /*secondsDelay*/, null));
+                    Console.WriteLine("Pre-start message for race time:" + minutes + " minutes");
+                    possibleMessages.Add(new QueuedMessage("race_time", MessageContents(minutes, Battery.folderMinutes), 0, this));
                 }
-
             }
             // now pick a random selection
             if (possibleMessages.Count > 0)
@@ -306,65 +280,8 @@ namespace CrewChiefV4.Events
             }
         }
 
-        public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)
-        {
-            if (this.currentPosition != positionWhenQueued)
-            {
-                Console.WriteLine("Pre-start delay-evaluated pos updated from: " + positionWhenQueued + " to: " + this.currentPosition);
-            }
-
-            if (this.currentPosition == 1)
-            {
-                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                {
-                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Position.folderDriverPositionIntro, Position.folderPole), null);;
-                }
-                else
-                {
-                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Pause(200), Position.folderPole), null);;
-                }
-            }
-            else
-            {
-                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                {
-                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(Position.folderDriverPositionIntro, Position.folderStub + this.currentPosition), null);;
-                }
-                else
-                {
-                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(Position.folderStub + this.currentPosition), null); ;
-                }
-            }
-        }
-
-        public Tuple<List<MessageFragment>, List<MessageFragment>> getSessionTotalRunningTimeTimeMessages(float sessionTotalRunningTimeWnenQueued)
-        {
-            if (this.currentSessionTotalRunTime != sessionTotalRunningTimeWnenQueued)
-            {
-                Console.WriteLine("Pre-start delay-evaluated session running time updated from: " + sessionTotalRunningTimeWnenQueued.ToString("0.00") + " to: " + this.currentSessionTotalRunTime.ToString("0.00"));
-            }
-
-            int minutes = (int)this.currentSessionTotalRunTime / 60;
-            if (this.currentPosition > 3 && minutes < 20 && minutes > 1)
-            {
-                Console.WriteLine("Pre-start message for race time + get on with it");
-                return new Tuple<List<MessageFragment>,List<MessageFragment>> (MessageContents(minutes, folderMinutesYouNeedToGetOnWithIt), null);
-            }
-            //dont play pre-start message for race time unless its more then 2 minuts
-            else
-            {
-                Console.WriteLine("Pre-start message for race time");
-                return new Tuple<List<MessageFragment>,List<MessageFragment>> (MessageContents(minutes, Battery.folderMinutes), null);
-            }
-        }
-
-
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
         {
-            // Hack for delayed variables during rF2 session startup.
-            this.currentPosition = currentGameState.SessionData.ClassPosition;
-            this.currentSessionTotalRunTime = currentGameState.SessionData.SessionTotalRunTime;
-
             if (GameStateData.useManualFormationLap)
             {
                 // when the session is first cleared, this will be true if we're using manual formation laps:
@@ -474,10 +391,11 @@ namespace CrewChiefV4.Events
                         preLightsMessageCount = 2 + Utilities.random.Next(6);
                     }
                     if (!playedPreLightsMessage && currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionPhase == SessionPhase.Gridwalk &&
-                        (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM))
+                        (playPreLightsInRaceroom || CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM) &&
+                        CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT) // Not much correct info is available during rF2's Gridwalk.
                     {
                         playPreLightsMessage(currentGameState, preLightsMessageCount);
-                        if (CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)  // In rF2, Gridwalk/Countown phase is long enough to not purge messages.
+                        if (CrewChief.gameDefinition.gameEnum != GameEnum.IRACING)
                         {
                             purgePreLightsMessages = true;
                         }
@@ -486,14 +404,17 @@ namespace CrewChiefV4.Events
                     // R3E's gridWalk phase isn't useable here - the data during this phase are bollocks
                     if (!playedGetReady && currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.SessionPhase == SessionPhase.Countdown ||
                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RACE_ROOM) ||
-                        // play 'get ready' message when entering sector 3 of formation lap in Automobilista and RF2
+                        // play 'get ready' message when entering sector 3 of formation lap in Automobilista
+                        (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && CrewChief.gameDefinition.gameEnum == GameEnum.RF1 &&
+                        currentGameState.SessionData.SectorNumber == 3 && currentGameState.FrozenOrderData.Phase != FrozenOrderPhase.Rolling) ||
+                        // play 'get ready' message when entering sector 3 of formation lap in Rolling start of rF2
                         (currentGameState.SessionData.SessionPhase == SessionPhase.Formation && (CrewChief.gameDefinition.gameEnum == GameEnum.RF1 || CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT) &&
-                        currentGameState.SessionData.SectorNumber == 3)))
+                        currentGameState.SessionData.SectorNumber == 3 && (currentGameState.FrozenOrderData.Phase == FrozenOrderPhase.Rolling || currentGameState.FrozenOrderData.Phase == FrozenOrderPhase.FastRolling))))
                     {
                         // If we've not yet played the pre-lights messages, just play one of them here, but not for RaceRoom as the lights will already have started
                         if (!playedPreLightsMessage && CrewChief.gameDefinition.gameEnum != GameEnum.RACE_ROOM)
                         {
-                            playPreLightsMessage(currentGameState, 1);
+                            playPreLightsMessage(currentGameState, CrewChief.gameDefinition.gameEnum != GameEnum.RF2_64BIT ? 1 : 2);
                             purgePreLightsMessages = false;
                         }
                         if (purgePreLightsMessages)
