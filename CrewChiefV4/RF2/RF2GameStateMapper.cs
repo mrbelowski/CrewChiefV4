@@ -637,6 +637,7 @@ namespace CrewChiefV4.rFactor2
 
                 csd.formattedPlayerLapTimes = psd.formattedPlayerLapTimes;
                 cgs.TimingData = pgs.TimingData;
+                csd.JustGoneGreenTime = psd.JustGoneGreenTime;
             }
 
             csd.SessionStartTime = csd.IsNewSession ? cgs.Now : psd.SessionStartTime;

@@ -819,6 +819,7 @@ namespace CrewChiefV4.GameState
 
         // used for race sessions that have just started
         public Boolean JustGoneGreen;
+        public DateTime JustGoneGreenTime = DateTime.MaxValue;
 
         public Boolean IsNewSession;
 
