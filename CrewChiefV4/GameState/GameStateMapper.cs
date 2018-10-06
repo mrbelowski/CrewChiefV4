@@ -12,11 +12,6 @@ namespace CrewChiefV4.GameState
         // in race sessions, delay position changes to allow things to settle. This is game-dependent
         private Dictionary<string, PendingRacePositionChange> PendingRacePositionChanges = new Dictionary<string, PendingRacePositionChange>();
         private TimeSpan PositionChangeLag = TimeSpan.FromMilliseconds(1000);
-
-        // rolling start race start position data needs to be reset when we cross the line immediately after the green in RF2
-        protected DateTime rf2RollingStartPositionCheckExpiry = DateTime.MinValue;
-        protected Boolean rf2CheckRollingStartPosition = false;
-
         class PendingRacePositionChange
         {
             public int newPosition;
@@ -49,8 +44,7 @@ namespace CrewChiefV4.GameState
         {
             Boolean singleClass = GameStateData.NumberOfClasses == 1 || CrewChief.forceSingleClass;
             // always set the session start class position and lap start class position:
-            if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession ||
-                rf2RollingStartJustCrossedLine(currentGameState.SessionData.IsNewLap, currentGameState.Now))
+            if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {
                 // NOTE: on new session, ClassPosition in rF2 is not correct.  It is updated with a bit of a delay.
                 // Since this code triggers on JustGoneGreen as well, this is corrected at that point, but I am not yet sure
@@ -290,23 +284,6 @@ namespace CrewChiefV4.GameState
                 PendingRacePositionChanges.Add(driverName, new PendingRacePositionChange(newPosition, now + PositionChangeLag));
                 return oldPosition;
             }
-        }
-
-        // check if we're crossing the start line < 5s after an RF2 rolling start
-        private Boolean rf2RollingStartJustCrossedLine(Boolean isNewLap, DateTime now)
-        {
-            Boolean justCrossLineAfterRF2RollingStart = false;
-            if (rf2CheckRollingStartPosition && isNewLap)
-            {
-                // only interested in new laps immediately after the green
-                if (now < rf2RollingStartPositionCheckExpiry)
-                {
-                    justCrossLineAfterRF2RollingStart = true;
-                }
-                rf2RollingStartPositionCheckExpiry = DateTime.MinValue;
-                rf2CheckRollingStartPosition = false;
-            }
-            return justCrossLineAfterRF2RollingStart;
         }
     }
 }

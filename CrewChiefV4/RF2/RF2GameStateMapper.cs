@@ -1769,20 +1769,7 @@ namespace CrewChiefV4.rFactor2
                 && csd.SessionPhase == SessionPhase.Green
                 && (pgs.SessionData.SessionPhase == SessionPhase.Formation
                     || pgs.SessionData.SessionPhase == SessionPhase.Countdown))
-            {
                 csd.JustGoneGreen = true;
-                // if we've gone green after the formation lap, the race start position may be incorrect until we cross the line
-                if (pgs.SessionData.SessionPhase == SessionPhase.Formation)
-                {
-                    rf2CheckRollingStartPosition = true;
-                    rf2RollingStartPositionCheckExpiry = cgs.Now.AddSeconds(5);
-                }
-                else
-                {
-                    rf2CheckRollingStartPosition = false;
-                    rf2RollingStartPositionCheckExpiry = DateTime.MinValue;
-                }
-            }
 
             // Map difficult track parts.
             if (csd.IsNewLap)
