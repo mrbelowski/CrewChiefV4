@@ -1187,6 +1187,8 @@ namespace CrewChiefV4.assetto
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
 
                     currentGameState.TimingData = previousGameState.TimingData;
+
+                    currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
                 }
 
                 //------------------- Variable session data ---------------------------
