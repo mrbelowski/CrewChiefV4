@@ -239,6 +239,7 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
                 currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
                 currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
+                currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
             }
             if (currentGameState.FlagData.isFullCourseYellow)
             {
