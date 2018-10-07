@@ -1148,6 +1148,13 @@ namespace CrewChiefV4.Audio
         {
             // ensure an existing thread is stopped properly - can one be created while another is waiting on the monitor?
             hangingChannelCloseWakeUpEvent.Set();
+            if (hangingChannelCloseThread != null)
+            {
+                if (!hangingChannelCloseThread.Join(3000))
+                {
+                    Console.WriteLine("Warning: Timed out waiting for thread: " + hangingChannelCloseThread.Name);
+                }
+            }
             ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
             // reset the wait monitor after the .Set call
             hangingChannelCloseWakeUpEvent.Reset();
