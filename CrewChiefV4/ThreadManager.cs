@@ -133,6 +133,7 @@ namespace CrewChiefV4
             }
         }
 
+        // It might be valuable to make this function optionally wait on thread.
         public static void UnregisterTemporaryThread(Thread t)
         {
             if (t == null)
@@ -142,6 +143,7 @@ namespace CrewChiefV4
             {
                 if (ThreadManager.temporaryThreads.Contains(t))
                 {
+                    // This is not necessarily a problem, but this message is here to make thread author think about spammy threads.
                     var warningMsg = "WARNING - Temporary thread is still alive upon unregistering, we might need to investigate here.";
                     Debug.Assert(!t.IsAlive, warningMsg);
 
