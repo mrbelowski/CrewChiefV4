@@ -2033,8 +2033,11 @@ namespace CrewChiefV4
 
         private void startDownload(DownloadType downloadType)
         {
-            // TODO_THREADS: I think this might have to be reworked allow CancelAsync on shutdown. 
-            //' Part of todo will probably be keeping wc alive, and disposing in callbacks or shutdown.
+            // Strictly speaking, it is not ok to dispose object before Async calls are complete.  However, due to
+            // legacy reasons, Dispose on WebClient does not interfere with Async call completion.  Correct pattern
+            // is to CancelAsync on form close, and dispose in callbacks or on form close. But code as is works too,
+            // by luck, so just add a formClosed check in callbacks.  That's safe, because they're invoked on the UI
+            // thread.
             using (WebClient wc = new WebClient())
             {
                 if (downloadType == DownloadType.SOUND_PACK)
@@ -2078,6 +2081,10 @@ namespace CrewChiefV4
 
         void soundpack_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -2089,6 +2096,10 @@ namespace CrewChiefV4
 
         void drivernames_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -2099,6 +2110,10 @@ namespace CrewChiefV4
         }
         void personalisations_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -2110,6 +2125,10 @@ namespace CrewChiefV4
 
         void soundpack_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_sound_pack");
@@ -2189,6 +2208,10 @@ namespace CrewChiefV4
 
         void drivernames_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_driver_names");
@@ -2264,6 +2287,10 @@ namespace CrewChiefV4
 
         void personalisations_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_personalisations");
