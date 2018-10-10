@@ -40,7 +40,7 @@ namespace CrewChiefV4.Audio
         public static int prefixesAndSuffixesCount = 0;
 
         private Boolean purging = false;
-        
+        private Thread expireCachedSoundsThread = null;
         public static String OPTIONAL_PREFIX_IDENTIFIER = "op_prefix";
         public static String OPTIONAL_SUFFIX_IDENTIFIER = "op_suffix";
         public static String REQUIRED_PREFIX_IDENTIFIER = "rq_prefix";
@@ -55,10 +55,6 @@ namespace CrewChiefV4.Audio
         public static Boolean hasSuitableTTSVoice = false;
 
         public static Boolean cancelLazyLoading = false;
-        private Thread cacheSoundsThread = null;
-        private static Thread loadDriverNameSoundsThread = null;
-        private Thread expireCachedSoundsThread = null;
-        private Thread stopAndUnloadAllThread = null;
 
         private static Dictionary<String, Tuple<int, int>> varietyData = new Dictionary<string, Tuple<int, int>>();
 
@@ -253,13 +249,11 @@ namespace CrewChiefV4.Audio
                     // now spawn a Thread to load the sound files (and in some cases soundPlayers) in the background:
                     if (allowCaching && eagerLoadSoundFiles)
                     {
-                        ThreadManager.UnregisterTemporaryThread(cacheSoundsThread);
-                        cacheSoundsThread = new Thread(() =>
+                        var cacheSoundsThread = new Thread(() =>
                         {
                             DateTime start = DateTime.UtcNow;
                             Thread.CurrentThread.IsBackground = true;
                             // load the permanently cached sounds first, then the rest
-                            // TODO_THREADS: allow early terminate.
                             foreach (SoundSet soundSet in soundSets.Values)
                             {
                                 if (SoundCache.cancelLazyLoading)
@@ -295,7 +289,7 @@ namespace CrewChiefV4.Audio
                             }
                         });
                         cacheSoundsThread.Name = "SoundCache.cacheSoundsThread";
-                        ThreadManager.RegisterTemporaryThread(cacheSoundsThread);
+                        ThreadManager.RegisterResourceThread(cacheSoundsThread);
                         cacheSoundsThread.Start();
                     }
                 }
@@ -304,7 +298,7 @@ namespace CrewChiefV4.Audio
                     // The folder of driver names is processed on the main thread and objects are created to hold the sounds, 
                     // but the sound files are lazy-loaded on session start, along with the corresponding SoundPlayer objects.
                     prepareDriverNamesWithoutLoading(soundFolder);
-                }                
+                }
             }
             if (AudioPlayer.playWithNAudio)
             {
@@ -339,12 +333,12 @@ namespace CrewChiefV4.Audio
 
         public static void loadDriverNameSounds(List<String> names)
         {
-            ThreadManager.UnregisterTemporaryThread(loadDriverNameSoundsThread);
-            loadDriverNameSoundsThread = new Thread(() =>
+            var loadDriverNameSoundsThread = new Thread(() =>
             {
                 int loadedCount = 0;
                 DateTime start = DateTime.UtcNow;
-                // TODO_THREADS: allow early terminate
+                // No need to early terminate this thread on form close, because it only loads driver names in 
+                // a session, which isn't 1000's.
                 foreach (String name in names)
                 {
                     loadedCount++;
@@ -363,7 +357,7 @@ namespace CrewChiefV4.Audio
                 }
             });
             loadDriverNameSoundsThread.Name = "SoundCache.loadDriverNameSoundsThread";
-            ThreadManager.RegisterTemporaryThread(loadDriverNameSoundsThread);
+            ThreadManager.RegisterResourceThread(loadDriverNameSoundsThread);
             loadDriverNameSoundsThread.Start();
         }
 
@@ -573,7 +567,7 @@ namespace CrewChiefV4.Audio
                     {
                         soundToPurge = SoundCache.dynamicLoadedSounds.First;
                     }
-                    // TODO_THREADS: allow cancellation
+                    // No need to support cancellation of this thread, as it is not slow enough and we can wait for it.
                     while (soundToPurge != null && purgeCount <= soundPlayerPurgeBlockSize)
                     {
                         String soundToPurgeValue = soundToPurge.Value;
@@ -610,41 +604,33 @@ namespace CrewChiefV4.Audio
 
         public void StopAndUnloadAll()
         {
-            ThreadManager.UnregisterTemporaryThread(stopAndUnloadAllThread);
-            stopAndUnloadAllThread = new Thread(() =>
+            if (synthesizer != null)
             {
-                if (synthesizer != null)
+                try
                 {
-                    try
-                    {
-                        synthesizer.Dispose();
-                        synthesizer = null;
-                    }
-                    catch (Exception) { }
+                    synthesizer.Dispose();
+                    synthesizer = null;
                 }
-                // TODO_THREADS: allow cancellation.
-                foreach (SoundSet soundSet in soundSets.Values)
+                catch (Exception) { }
+            }
+            foreach (SoundSet soundSet in soundSets.Values)
+            {
+                try
                 {
-                    try
-                    {
-                        soundSet.StopAll();
-                        soundSet.UnLoadAll();
-                    }
-                    catch (Exception) { }
+                    soundSet.StopAll();
+                    soundSet.UnLoadAll();
                 }
-                foreach (SingleSound singleSound in singleSounds.Values)
+                catch (Exception) { }
+            }
+            foreach (SingleSound singleSound in singleSounds.Values)
+            {
+                try
                 {
-                    try
-                    {
-                        singleSound.Stop();
-                        singleSound.UnLoad();
-                    }
-                    catch (Exception) { }
+                    singleSound.Stop();
+                    singleSound.UnLoad();
                 }
-            });
-            stopAndUnloadAllThread.Name = "SoundCache.stopAndUnloadAllThread";
-            ThreadManager.RegisterTemporaryThread(stopAndUnloadAllThread);
-            stopAndUnloadAllThread.Start();
+                catch (Exception) { }
+            }
         }
 
         public void StopAll()

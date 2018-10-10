@@ -526,6 +526,8 @@ namespace CrewChiefV4.RaceRoom
                     currentGameState.SessionData.PlayerLapData = previousGameState.SessionData.PlayerLapData;
 
                     currentGameState.TimingData = previousGameState.TimingData;
+
+                    currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
                 }
             }
 

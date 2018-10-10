@@ -695,7 +695,9 @@ namespace CrewChiefV4.PCars
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.TimingData = previousGameState.TimingData;
-                }                
+
+                    currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
+                }
             }
 
             currentGameState.ControlData.ThrottlePedal = shared.mThrottle;
