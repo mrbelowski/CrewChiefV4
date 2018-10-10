@@ -183,7 +183,7 @@ namespace CrewChiefV4
         //
         // Upon exit, enables Start/Stop button.
         //
-        public static bool WaitForRootThreadsStart(CrewChief cc)
+        private static bool WaitForRootThreadsStart(CrewChief cc)
         {
             try
             {
@@ -270,7 +270,7 @@ namespace CrewChiefV4
         //
         // Upon exit, enables Start/Stop button and calls MainWindow.uiSyncAppStop to update UI controls.
         //
-        public static bool WaitForRootAndTemporaryThreadsStop(CrewChief cc)
+        private static bool WaitForRootAndTemporaryThreadsStop(CrewChief cc)
         {
             try
             {

@@ -110,6 +110,20 @@ namespace CrewChiefV4
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            // Run immediately if requested.
+            // Note that it is not safe to run immidiately from the constructor, becasue form handle
+            // is created on a message pump, at undefined moment, which prevents Invoke from
+            // working while constructor is running.
+            Debug.Assert(this.IsHandleCreated);
+            if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
+                GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
+            {
+                doStartAppStuff();
+
+                // Will wait for threads to start, possible file load and enable the button.
+                ThreadManager.DoWatchStartup(crewChief);
+            }
+
             if (forceMinWindowSize)
             {
                 this.MinimumSize = new System.Drawing.Size(1160, 730);
@@ -222,7 +236,10 @@ namespace CrewChiefV4
                                     willNeedAnotherSoundPackDownload = soundPackUpdateData.willRequireAnotherUpdate;
                                     downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
                                         "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
-                                    downloadSoundPackButton.Enabled = true;
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadSoundPackButton.Enabled = true;
+                                    }
                                     downloadSoundPackButton.BackColor = Color.LightGreen;
                                     newSoundPackAvailable = true;
                                 }
@@ -257,7 +274,10 @@ namespace CrewChiefV4
                                     willNeedAnotherPersonalisationsDownload = personalisationPackUpdateData.willRequireAnotherUpdate;
                                     downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
                                         "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
-                                    downloadPersonalisationsButton.Enabled = true;
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadPersonalisationsButton.Enabled = true;
+                                    }
                                     downloadPersonalisationsButton.BackColor = Color.LightGreen;
                                     newPersonalisationsAvailable = true;
                                 }
@@ -292,7 +312,10 @@ namespace CrewChiefV4
                                     willNeedAnotherDrivernamesDownload = drivernamesPackUpdateData.willRequireAnotherUpdate;
                                     downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
                                         "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
-                                    downloadDriverNamesButton.Enabled = true;
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadDriverNamesButton.Enabled = true;
+                                    }
                                     downloadDriverNamesButton.BackColor = Color.LightGreen;
                                     newDriverNamesAvailable = true;
                                 }
@@ -984,15 +1007,6 @@ namespace CrewChiefV4
             updateActions();
             this.assignButtonToAction.Enabled = false;
             this.deleteAssigmentButton.Enabled = false;
-
-            if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
-                GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
-            {
-                doStartAppStuff();
-
-                // Will wait for threads to start, possible file load and enable the button.
-                ThreadManager.DoWatchStartup(crewChief);
-            }
 
             this.ResumeLayout();
 
@@ -2446,7 +2460,10 @@ namespace CrewChiefV4
                 {
                     downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
                 }
-                downloadDriverNamesButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadDriverNamesButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
@@ -2475,7 +2492,10 @@ namespace CrewChiefV4
                 {
                     downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
                 }
-                downloadSoundPackButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadSoundPackButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
@@ -2505,7 +2525,10 @@ namespace CrewChiefV4
                 {
                     downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
                 }
-                downloadPersonalisationsButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadPersonalisationsButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
