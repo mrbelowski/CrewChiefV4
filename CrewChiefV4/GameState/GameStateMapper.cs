@@ -55,6 +55,10 @@ namespace CrewChiefV4.GameState
                     currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = currentGameState.SessionData.NumCarsOverallAtStartOfSession;
                 }
             }
+            if (currentGameState.SessionData.JustGoneGreen)
+            {
+                currentGameState.SessionData.JustGoneGreenTime = currentGameState.Now;
+            }
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = currentGameState.SessionData.ClassPosition;

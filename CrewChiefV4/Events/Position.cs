@@ -369,7 +369,9 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race &&
                     enableRaceStartMessages && !playedRaceStartMessage &&
-                    currentGameState.SessionData.CompletedLaps == 0 && currentGameState.SessionData.LapTimeCurrent > startMessageTime && !currentGameState.FlagData.isLocalYellow)
+                    currentGameState.SessionData.CompletedLaps == 0 &&
+                    (currentGameState.SessionData.JustGoneGreenTime != DateTime.MaxValue && currentGameState.Now > currentGameState.SessionData.JustGoneGreenTime.AddSeconds(startMessageTime)) &&
+                    !currentGameState.FlagData.isLocalYellow)
                 {
                     playedRaceStartMessage = true;
                     Console.WriteLine("Race start message... isLast = " + isLast +

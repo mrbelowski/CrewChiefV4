@@ -691,7 +691,6 @@ namespace CrewChiefV4
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

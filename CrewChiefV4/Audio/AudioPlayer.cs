@@ -432,7 +432,7 @@ namespace CrewChiefV4.Audio
                 // spawn a Thread to monitor the queue
                 Debug.Assert(monitorQueueThread == null);
 
-                // This thread is managed by the Chief Run thread.
+                // This thread is managed by the Chief Run thread directly.
                 monitorQueueThread = new Thread(monitorQueue);
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
@@ -844,7 +844,7 @@ namespace CrewChiefV4.Audio
                         if (!isImmediateMessages && playedEventCount > 0 && pauseBetweenMessages > 0)
                         {
                             Console.WriteLine("Pausing before " + eventName);
-                            Thread.Sleep(TimeSpan.FromSeconds(pauseBetweenMessages));
+                            Utilities.InterruptedSleep((int)Math.Round(pauseBetweenMessages * 1000.0f) /*totalWaitMillis*/, 10 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
                         }
                         //  now double check this is still valid
                         if (!isImmediateMessages)
@@ -1129,8 +1129,10 @@ namespace CrewChiefV4.Audio
             playDelayedImmediateMessageThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                // TODO_THREADS: interrupt
-                Thread.Sleep(queuedMessage.secondsDelay * 1000);
+                if (queuedMessage.secondsDelay > 0)
+                {
+                    Utilities.InterruptedSleep(queuedMessage.secondsDelay * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                }
                 playMessageImmediately(queuedMessage);
             });
             playDelayedImmediateMessageThread.Name = "AudioPlayer.playDelayedImmediateMessageThread";
@@ -1146,6 +1148,13 @@ namespace CrewChiefV4.Audio
         {
             // ensure an existing thread is stopped properly - can one be created while another is waiting on the monitor?
             hangingChannelCloseWakeUpEvent.Set();
+            if (hangingChannelCloseThread != null)
+            {
+                if (!hangingChannelCloseThread.Join(3000))
+                {
+                    Console.WriteLine("Warning: Timed out waiting for thread: " + hangingChannelCloseThread.Name);
+                }
+            }
             ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
             // reset the wait monitor after the .Set call
             hangingChannelCloseWakeUpEvent.Reset();
@@ -1443,7 +1452,10 @@ namespace CrewChiefV4.Audio
                 pauseQueueThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(seconds * 1000); // TODO_THREADS:
+                    if (seconds > 0)
+                    {
+                        Utilities.InterruptedSleep(seconds * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                    }
                     regularQueuePaused = false;
                     // wake the monitor thread as soon as the pause has expired
                     this.monitorQueueWakeUpEvent.Set();
