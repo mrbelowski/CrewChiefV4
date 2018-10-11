@@ -169,7 +169,7 @@ namespace CrewChiefV4.ACC
 		    EDriverCategory__EDriverCategory_MAX = 4
 	    };
 
-	    public enum  Nationality  : byte
+	    public enum  Nationality  : short
 	    {
 		    ENationality__Any = 0,
 		    ENationality__Italy = 1,
