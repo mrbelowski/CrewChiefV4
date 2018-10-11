@@ -22,17 +22,17 @@
  *      - Resource threads: sound loading, caching, downloading etc.  Those threads are generally independent threads that can run without
  *        CC root threads running.  Each resource thread has to be named and registered with ThreadManager.RegisterResourceThread.
  *
- * 3. Each thread should release/dispose it's resources on exit, unless it is too complicated/unpractical (See GlobalResources class)
+ * 2. Each thread should release/dispose it's resources on exit, unless it is too complicated/unpractical (See GlobalResources class)
  * 
- * 4. Global shared resources will be released after form close (and all threads stopped, if they stop within agreed time,
+ * 3. Global shared resources will be released after form close (and all threads stopped, if they stop within agreed time,
  *    otherwise - undefined behavior).
  * 
- * 5. Access to the main window should be synchronized with MainWindow.instanceLock.  Be extra careful, if you are marshalling to the main thread,
+ * 4. Access to the main window should be synchronized with MainWindow.instanceLock.  Be extra careful, if you are marshalling to the main thread,
  *    do a Post, not Send, so that lock is not held.  Failing to follow above might cause deadlocks.
  * 
- * 6. For Sleeps longer than 2 seconds, consider using Utilities.InterruptedSleep to avoid Shutdown/Stop delays.
+ * 5. For Sleeps longer than 2 seconds, consider using Utilities.InterruptedSleep to avoid Shutdown/Stop delays.
  * 
- * 7. For worker threads that pump some data, don't just use Sleep, use Events to wake them up.
+ * 6. For worker threads that pump some data, don't just use Sleep, use Events to wake them up.
  * 
  * Official website: thecrewchief.org 
  * License: MIT
