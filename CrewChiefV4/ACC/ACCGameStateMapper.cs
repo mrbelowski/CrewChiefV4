@@ -70,6 +70,7 @@ namespace CrewChiefV4.ACC
             if (!previousRaceSessionPhase.Equals(data.sessionData.currentSessionPhase))            
             {
                 PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
+                PrintProperties<CrewChiefV4.ACC.Data.ACCSharedMemoryData>(data);
                 Console.WriteLine("previousRaceSessionPhase " + previousRaceSessionPhase );
                 Console.WriteLine("currentRaceSessionPhase " + data.sessionData.currentSessionPhase);
             }
@@ -306,7 +307,8 @@ namespace CrewChiefV4.ACC
                     currentGameState.TimingData = previousGameState.TimingData;
                 }
             }
-            if(playerDriver.isCarOutOfTrack == 1)
+            if(playerDriver.isCarOutOfTrack == 1 && playerDriver.trackLocation != CarLocation.ECarLocation__PitLane && 
+                playerDriver.trackLocation != CarLocation.ECarLocation__PitEntry && playerDriver.trackLocation != CarLocation.ECarLocation__PitLane)
             {
                 Console.WriteLine("player car out of track");
             }
