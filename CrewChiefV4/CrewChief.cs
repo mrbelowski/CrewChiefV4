@@ -406,6 +406,10 @@ namespace CrewChiefV4
 
         public void youWot(Boolean detectedSomeSpeech)
         {
+            if (!running)
+            {
+                return;
+            }
             if (detectedSomeSpeech)
             {
                 Console.WriteLine("Detected speech input but nothing was recognised");
@@ -616,7 +620,10 @@ namespace CrewChiefV4
                 currentSpotterState = null;
                 spotterIsRunning = true;
                 ThreadStart work = spotterWork;
+
+                // Thread owned and managed by CrewChief.Run thread.
                 spotterThread = new Thread(work);
+
                 runSpotterThread = true;
                 spotterThread.Start();
             }
@@ -635,9 +642,8 @@ namespace CrewChiefV4
                     {
                         Console.WriteLine("Warning: Timed out waiting for spotter thread to stop to stop");
                     }
+                    Console.WriteLine("Spotter thread stopped");
                 }
-
-                Console.WriteLine("Spotter thread stopped");
 
                 spotterThread = null;
             }
@@ -799,7 +805,7 @@ namespace CrewChiefV4
                             {
                                 MainWindow.autoScrollConsole = true;
                                 Console.WriteLine("Reached the end of the data file, sleeping to clear queued messages");
-                                Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 50 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                 try
                                 {
                                     audioPlayer.purgeQueues();
@@ -907,8 +913,7 @@ namespace CrewChiefV4
 
                                 if (loadDataFromFile)
                                 {
-                                    // TODO_THREADS: review all sleeps.
-                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 100 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
+                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => running /*keepWaitingPredicate*/);
                                 }
                             }
                             float prevTime = previousGameState == null ? 0 : previousGameState.SessionData.SessionRunningTime;
@@ -1118,6 +1123,7 @@ namespace CrewChiefV4
                     audioPlayer.stopMonitor();
                     audioPlayer.disablePearlsOfWisdom = false;
                 }
+                SoundCache.saveVarietyData();
 
                 stopSpotterThread();
 

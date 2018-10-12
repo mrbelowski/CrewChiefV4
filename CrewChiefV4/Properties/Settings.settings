@@ -883,6 +883,17 @@
     </Setting>
     <Setting Name="acc_spotter_car_length" Type="System.Single" Scope="User">
       <Value Profile="(Default)">4.5</Value>
+    <Setting Name="pit_box_time_countdown" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="pit_box_position_countdown_in_feet" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="record_sound_variety_data" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="pit_box_time_countdown_end_position" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">30</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -93,7 +93,7 @@ namespace CrewChiefV4
             this.SuspendLayout();
 
             this.consoleTextBoxBackgroundPanel.Location = new System.Drawing.Point(41, 215);
-            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBoxBackgroundPanel.Size = new System.Drawing.Size(MainWindow.soundTestMode ? 793 : 1093, 285);
             this.consoleTextBoxBackgroundPanel.BorderStyle = BorderStyle.FixedSingle;
             // 
             // consoleTextBox
@@ -103,7 +103,7 @@ namespace CrewChiefV4
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "textBox1";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.Size = new System.Drawing.Size(1093, 285);
+            this.consoleTextBox.Size = new System.Drawing.Size(MainWindow.soundTestMode ? 793 : 1093, 285);
             this.consoleTextBox.TabIndex = 200;
             this.consoleTextBox.BorderStyle = BorderStyle.None;
             this.consoleTextBox.Dock = DockStyle.Fill;
@@ -312,6 +312,9 @@ namespace CrewChiefV4
             // 
             // messagesVolumeSlider
             // 
+            this.messagesVolumeSlider.Minimum = 0;
+            this.messagesVolumeSlider.Maximum = 100;
+            this.messagesVolumeSlider.TickFrequency = 10;
             this.messagesVolumeSlider.Location = new System.Drawing.Point(327, 28);
             this.messagesVolumeSlider.Name = "messagesVolumeSlider";
             this.messagesVolumeSlider.Size = new System.Drawing.Size(176, 45);
@@ -329,6 +332,9 @@ namespace CrewChiefV4
             // 
             // backgroundVolumeSlider
             // 
+            this.backgroundVolumeSlider.Minimum = 0;
+            this.backgroundVolumeSlider.Maximum = 100;
+            this.backgroundVolumeSlider.TickFrequency = 10;
             this.backgroundVolumeSlider.Location = new System.Drawing.Point(558, 28);
             this.backgroundVolumeSlider.Name = "backgroundVolumeSlider";
             this.backgroundVolumeSlider.Size = new System.Drawing.Size(184, 45);
@@ -685,7 +691,6 @@ namespace CrewChiefV4
             ((System.ComponentModel.ISupportInitialize)(this.backgroundVolumeSlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

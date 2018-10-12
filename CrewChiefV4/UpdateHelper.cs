@@ -39,6 +39,13 @@ namespace CrewChiefV4
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
+                    lock (MainWindow.instanceLock)
+                    {
+                        if (MainWindow.instance == null)
+                        {
+                            return;
+                        }
+                    }
                     if (line.Trim().Length > 0 && !line.StartsWith("#"))
                     {
                         try

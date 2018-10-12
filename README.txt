@@ -208,22 +208,24 @@ the 32bit speech recognition installers can be downloaded here   : https://drive
 
 Donations
 ---------
-I made this because I wanted to make it and I enjoy making stuff. Working with the various quirks, errors and omissions in the shared data which the games provide hasn't been much fun, but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
-If you use it and like it and it becomes a regular and positive part of your sim racing, I'd be grateful if you would consider making a small donation. If only to stop my wife from complaining at me.
+We built and maintain this because we want to, we enjoy making stuff, and contributing to the Sim Racing community is awesome. Working with the various quirks, errors and omissions in the shared data which the games provide isn't much fun but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
+If you use it and like it and it becomes a regular and positive part of your sim racing, we'd be grateful if you would consider making a small donation. If only to stop our wives from complaining at us.
 
-My paypal address is jim.britton@yahoo.co.uk
+The Crew Chief paypal address is jim.britton@yahoo.co.uk
 
 Or you can use this to donate directly:
 
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LW33XFXP4DPZE
 
-Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, I'm always on the lookout for bug reports and feature suggestions.
+Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, we're always on the lookout for bug reports and feature suggestions.
 
 One final point. If the app says "Jim is faster than you", let him through :)
 
 
 Changelog
 ---------
+Version 4.9.5.5: Macro overhaul - more flexible system which should be easier to work with. Includes example chat macros and an 'add fuel, XXX litres' macro (where XXX is 0 - 150) (R3E and pCars2 only). See the 'Advanced command macros' section of the help.txt file or http://thecrewchief.org/showthread.php?263-Command-key-press-macros&p=2378&viewfull=1#post2378 for more info; fixed some shutdown delays that can happen when closing the app without pressing 'stop' first; fixed radio channel sometimes being left open after a spotter call; fixed brake and suspension damage not being reset after repairs; added option to play pit box distance messages in feet ('Pit box distance countdown in feet'); added option to play a 5-4-3-2-1 style pit box count down ('Pit box time countdown' property, disabled by default). Reaches zero 30 metres from the pit stall by default (configurable with 'Pit box time countdown end point (metres)' property) - note that this may be inaccurate if the pit box is close to the start line due to the way lap distances work when in the pit lane, especially on tracks where the pitlane is significantly longer or shorter than the racing surface; make volume control sliders more fine grained to allow better control over volume; RF1 / AMS: revised cut track logic - should reduce cut track warnings; pCars2 - 'request pit' macro now checks the pit request state from the game and responds accordingly; pCars2 - added "cancel pit request" macro; internal bug fixes
+
 Version 4.9.5.3: Internal overhaul for better performance and stability. Fixes some threading / resource issues that could cause instability on shutdown, changes to how the internal event processing works to make it faster and less resource-hungry, removed 'disable immediate messages' option as this is no longer needed, reduced CPU overhead in lots of other places; fixed app crash when failing to initialise nAudio background sounds player; pCars2 - added 'pCars 2 spotter car length' property, default 5 metres (app was using whatever had been set in the pCars1 version of this property)
 
 Version 4.9.5.2: Fix laps-to-go calculation - it's now based on the number of laps completed by the overall leader so should be correct when you've been lapped; allow for changing conditions when determining the player's pace and best lap time - comparisons are only made to laps completed in broadly similar conditions and best lap set in the current conditions is used when working out things like expected laps remaining and required fuel loads; fixed rounding errors in fuel calculations that could accumulate to substantial amounts; use overall fuel consumption when determining how much fuel to add, rather than recent fuel consumption (the app sometimes under-fuelled if the player was fuel saving in the laps before his pit stop); R3E - fixed some missing state transitions; pCars2 - use updated RainDensity data for more fine-grained rain calls; some performance improvements

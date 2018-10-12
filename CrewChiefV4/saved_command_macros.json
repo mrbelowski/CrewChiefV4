@@ -236,7 +236,7 @@
 					"description": "This is an attempt to automate the fuel process for R3E using the app's current fuel estimate. Starts by ensuring the cursor is at the top of the menu, then it goes to the fuel row and presses 'decrease' a many times to ensure the fuel menu is on 'safe', then presses 'increase' 3 times, putting the fuel amount on 0L. Then it presses 'increase' the correct number of times for the fuel required, then presses 'select' to activate refuelling, then waits a bit before closing the pit menu.",
 					"gameDefinition": "RACE_ROOM",
 					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,153}Pit Menu Decrease", "{MULTIPLE,Fuel}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
-					"keyPressTime": 10,
+					"keyPressTime": 20,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
 				},
@@ -244,7 +244,7 @@
 					"description": "This is an attempt to automate the fuel process for pCARS2 using the app's current fuel estimate. Navigates to the adjust stratgey option, then fuel, then reduces the amount to 0 and then adds however many litres the app calculated",
 					"gameDefinition": "PCARS2",
 					"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,3}ICM Menu Up", "{MULTIPLE,2}ICM Menu Down", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Down", "{MULTIPLE,150}ICM Menu Left", "{MULTIPLE,Fuel}ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
-					"keyPressTime": 10,
+					"keyPressTime": 20,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
 				}
@@ -253,14 +253,14 @@
 		{
 			"name": "manual fuel",
 			"description": "Note the {0,150} - this means recognise all numbers between 0 and 150. In R3E, this macro requires the pit menu fuel item be selected (green). It can be set to any amount (or any of the presets). An item with {MULTIPLE,7} tells the app to repeat that key press 7 times. An item starting {MULTIPLE,VOICE_TRIGGER} tells the app to repeat this key using the number recognised from the voice command",
-			"confirmationMessage": "acknowledge/ok",
+			"confirmationMessage": "acknowledge/OK",
 			"integerVariableVoiceTrigger": "add fuel, {0,150} litres",
 			"buttonTriggers": [],
 			"commandSets": [{
 					"description": "navigates to the fuel amount, de-selects it, presses decrease 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command. {MULTIPLE,X} is press (X) times. {MULTIPLE,VOICE_TRIGGER} is press (number recognised from voice command) times. {MULTIPLE,Fuel} means the Fuel event resolves the amount (in code)",
 					"gameDefinition": "RACE_ROOM",
 					"actionSequence": ["Pit Menu Toggle", "{MULTIPLE,7}Pit Menu Up", "Pit Menu Down", "Pit Menu Select", "{MULTIPLE,150}Pit Menu Decrease", "{MULTIPLE,VOICE_TRIGGER}Pit Menu Increase", "Pit Menu Select", "{WAIT,5000}", "Pit Menu Toggle"],
-					"keyPressTime": 10,
+					"keyPressTime": 20,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
 				},
@@ -268,7 +268,7 @@
 					"description": "navigates to the fuel amount, de-selects it, presses left (decrease) 150 times to ensure it's at zero, then adds the number of litres parsed from the voice command",
 					"gameDefinition": "PCARS2",
 					"actionSequence": ["Car Management", "ICM Menu Up", "ICM Menu Right", "{MULTIPLE,3}ICM Menu Up", "{MULTIPLE,2}ICM Menu Down", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Down", "{MULTIPLE,150}ICM Menu Left", "{MULTIPLE,VOICE_TRIGGER}ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "{MULTIPLE,2}ICM Menu Up", "ICM Menu Right", "ICM Menu Down", "ICM Menu Right"],
-					"keyPressTime": 10,
+					"keyPressTime": 20,
 					"waitBetweenEachCommand": 20,
 					"allowAutomaticTriggering": false
 				}

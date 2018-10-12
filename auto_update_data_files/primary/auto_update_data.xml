@@ -2,8 +2,8 @@
 <!-- this is the 'primary' auto update data - the app will check this one first. All downloads from this source
 will be pulled from the thecrewchief.org ftp server. -->
 <item>
-<title>Crew Chief 4.9.5.3 updated 24 September 2018</title>
-<version>4.9.5.3</version>
+<title>Crew Chief 4.9.5.5 updated 06 October 2018</title>
+<version>4.9.5.5</version>
 <!-- indirect link via a download script which tracks the number of downloads (just the number, not IP addresses or anything else) -->
 <url>http://thecrewchief.org/downloads.php</url>
 <changelog>http://thecrewchief.org/downloads/change_log_for_auto_updated.html</changelog>
@@ -17,12 +17,13 @@ will be pulled from the thecrewchief.org ftp server. -->
 
 <!-- current implementation where all the sound pack update information is in this document -->
 <sounds language="en">
-	<voice-messages latest-version="156">
+	<voice-messages latest-version="157">
 		<update-pack url="http://crewchief.isnais.de/base_sound_pack.zip" updates-from-version="-1"/>
 		<update-pack url="http://crewchief.isnais.de/update_sound_pack.zip" updates-from-version="0"/>
 		<update-pack url="http://crewchief.isnais.de/update_2_sound_pack.zip" updates-from-version="122"/>
 		<update-pack url="http://crewchief.isnais.de/update_3_sound_pack.zip" updates-from-version="146"/>
 		<update-pack url="http://crewchief.isnais.de/update_4_sound_pack.zip" updates-from-version="151"/>
+		<update-pack url="http://crewchief.isnais.de/update_5_sound_pack.zip" updates-from-version="156"/>
 	</voice-messages>
 	<driver-names latest-version="133">
 		<update-pack url="http://crewchief.isnais.de/base_driver_names.zip" updates-from-version="-1"/>

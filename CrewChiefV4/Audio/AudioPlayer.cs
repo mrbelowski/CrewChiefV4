@@ -432,7 +432,7 @@ namespace CrewChiefV4.Audio
                 // spawn a Thread to monitor the queue
                 Debug.Assert(monitorQueueThread == null);
 
-                // This thread is managed by the Chief Run thread.
+                // This thread is managed by the Chief Run thread directly.
                 monitorQueueThread = new Thread(monitorQueue);
                 monitorQueueThread.Name = "AudioPlayer.monitorQueueThread";
                 monitorQueueThread.Start();
@@ -582,7 +582,8 @@ namespace CrewChiefV4.Audio
             while (monitorRunning)
             {
                 int waitTimeout = -1;
-                if (channelOpen && (!holdChannelOpen || DateTime.UtcNow > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                DateTime now = CrewChief.currentGameState == null ? DateTime.UtcNow : CrewChief.currentGameState.Now;
+                if (channelOpen && (!holdChannelOpen || now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -843,7 +844,7 @@ namespace CrewChiefV4.Audio
                         if (!isImmediateMessages && playedEventCount > 0 && pauseBetweenMessages > 0)
                         {
                             Console.WriteLine("Pausing before " + eventName);
-                            Thread.Sleep(TimeSpan.FromSeconds(pauseBetweenMessages));
+                            Utilities.InterruptedSleep((int)Math.Round(pauseBetweenMessages * 1000.0f) /*totalWaitMillis*/, 10 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
                         }
                         //  now double check this is still valid
                         if (!isImmediateMessages)
@@ -1128,8 +1129,10 @@ namespace CrewChiefV4.Audio
             playDelayedImmediateMessageThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                // TODO_THREADS: interrupt
-                Thread.Sleep(queuedMessage.secondsDelay * 1000);
+                if (queuedMessage.secondsDelay > 0)
+                {
+                    Utilities.InterruptedSleep(queuedMessage.secondsDelay * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                }
                 playMessageImmediately(queuedMessage);
             });
             playDelayedImmediateMessageThread.Name = "AudioPlayer.playDelayedImmediateMessageThread";
@@ -1145,6 +1148,13 @@ namespace CrewChiefV4.Audio
         {
             // ensure an existing thread is stopped properly - can one be created while another is waiting on the monitor?
             hangingChannelCloseWakeUpEvent.Set();
+            if (hangingChannelCloseThread != null)
+            {
+                if (!hangingChannelCloseThread.Join(3000))
+                {
+                    Console.WriteLine("Warning: Timed out waiting for thread: " + hangingChannelCloseThread.Name);
+                }
+            }
             ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
             // reset the wait monitor after the .Set call
             hangingChannelCloseWakeUpEvent.Reset();
@@ -1156,9 +1166,6 @@ namespace CrewChiefV4.Audio
                     // if we timeout here it means the channel was left open, so close it
                     closeRadioInternalChannel();
                 }
-                // if the monitor is signalled it means we closed the channel properly so don't need to do any work
-                // remove from the thread manager
-                ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
             });
             hangingChannelCloseThread.Name = "AudioPlayer.hangingChannelCloseThread";
             hangingChannelCloseThread.Start();
@@ -1168,7 +1175,6 @@ namespace CrewChiefV4.Audio
         private void stopHangingChannelCloseThread()
         {
             hangingChannelCloseWakeUpEvent.Set();
-            ThreadManager.UnregisterTemporaryThread(hangingChannelCloseThread);
         }
 
         public SoundType getPriortyOfFirstWaitingImmediateMessage()
@@ -1193,7 +1199,7 @@ namespace CrewChiefV4.Audio
             return null;
         }
 
-        public void playMessageImmediately(QueuedMessage queuedMessage)
+        public void playMessageImmediately(QueuedMessage queuedMessage, Boolean keepChannelOpen = false)
         {
             if (queuedMessage.canBePlayed)
             {
@@ -1209,7 +1215,11 @@ namespace CrewChiefV4.Audio
                         lastImmediateMessageName = queuedMessage.messageName;
                         lastImmediateMessageTime = GameStateData.CurrentTime;
                         this.useShortBeepWhenOpeningChannel = false;
-                        this.holdChannelOpen = false;
+                        this.holdChannelOpen = keepChannelOpen;
+                        if (this.holdChannelOpen)
+                        {
+                            startHangingChannelCloseThread();
+                        }
 
                         // here we assume the message is a voice command response, which is the most common use case 
                         // for non-spotter immediate messages
@@ -1442,7 +1452,10 @@ namespace CrewChiefV4.Audio
                 pauseQueueThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
-                    Thread.Sleep(seconds * 1000); // TODO_THREADS:
+                    if (seconds > 0)
+                    {
+                        Utilities.InterruptedSleep(seconds * 1000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => monitorRunning /*keepWaitingPredicate*/);
+                    }
                     regularQueuePaused = false;
                     // wake the monitor thread as soon as the pause has expired
                     this.monitorQueueWakeUpEvent.Set();
@@ -1451,6 +1464,11 @@ namespace CrewChiefV4.Audio
                 ThreadManager.RegisterTemporaryThread(pauseQueueThread);
                 pauseQueueThread.Start();
             }
+        }
+
+        public void unpauseQueue()
+        {
+            regularQueuePaused = false;
         }
 
         public static Boolean canReadName(String rawName)

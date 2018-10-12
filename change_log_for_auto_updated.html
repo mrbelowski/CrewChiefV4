@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html>
 <body>
+<h2>Version 4.9.5.5</h2>
+<ul>
+	<li>Macro overhaul - more flexible system which should be easier to work with. Includes example chat macros and an 'add fuel, XXX litres' macro (where XXX is 0 - 150) (R3E and pCars2 only). See the 'Advanced command macros' section of the help.txt file or http://thecrewchief.org/showthread.php?263-Command-key-press-macros&p=2378&viewfull=1#post2378 for more info</li>
+	<li>Fixed some shutdown delays that can happen when closing the app without pressing 'stop' first</li>
+	<li>Fixed radio channel sometimes being left open after a spotter call</li>
+	<li>Fixed brake and suspension damage not being reset after repairs</li>
+	<li>Added option to play pit box distance messages in feet ('Pit box distance countdown in feet')</li>
+	<li>Added option to play a 5-4-3-2-1 style pit box count down ('Pit box time countdown' property, disabled by default). Reaches zero 30 metres from the pit stall by default (configurable with 'Pit box time countdown end point (metres)' property) - note that this may be inaccurate if the pit box is close to the start line due to the way lap distances work when in the pit lane, especially on tracks where the pitlane is significantly longer or shorter than the racing surface</li>
+	<li>Make volume control sliders more fine grained to allow better control over volume</li>
+	<li>RF1 / AMS: revised cut track logic - should reduce cut track warnings</li>
+	<li>pCars2 - 'request pit' macro now checks the pit request state from the game and responds accordingly</li>
+	<li>pCars2 - added "cancel pit request" macro</li>
+	<li>Various bug fixes</li>
+</ul>
 <h2>Version 4.9.5.3</h2>
 <ul>
 	<li>Internal overhaul for better performance and stability. Fixes some threading / resource issues that could cause instability on shutdown, changes to how the internal event processing works to make it faster and less resource-hungry, removed 'disable immediate messages' option as this is no longer needed, reduced CPU overhead in lots of other places</li>

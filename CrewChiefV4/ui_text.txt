@@ -1059,10 +1059,25 @@ force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 force_min_window_size_category = UI_STARTUP_AND_PATHS
 
-pit_box_position_countdown = Pit box countdown
+pit_box_position_countdown = Pit box distance countdown
 pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
 pit_box_position_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_time_countdown = Pit box time countdown
+pit_box_time_countdown_help = Play time to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
+pit_box_time_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_time_countdown_end_position = Pit box time countdown end point (metres)
+pit_box_time_countdown_end_position_help = End pit box time countdown this many metres from the box
+pit_box_time_countdown_end_position_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_end_position_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_position_countdown_in_feet = Pit box distance countdown in feet
+pit_box_position_countdown_in_feet_help = Play pit distance countdown in feet
+pit_box_position_countdown_in_feet_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_position_countdown_in_feet_category = PIT_STOPS_AND_MULTICLASS
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
@@ -1175,3 +1190,7 @@ disable_behavior_altering_voice_commands_category = AUDIO_VOICE_AND_CONTROLLERS
 slow_class_car_warnings_in_race_only = Slow car class warnings in race only
 slow_class_car_warnings_in_race_only_help = Only play 'slow car ahead' multiclass warnings in race sessions
 slow_class_car_warnings_in_race_only_category = PIT_STOPS_AND_MULTICLASS
+
+record_sound_variety_data = Record sound variety data
+record_sound_variety_data_help = Log the number of times each sound is played and the number of versions of this sound. For sound pack developers
+record_sound_variety_data_category = AUDIO_VOICE_AND_CONTROLLERS

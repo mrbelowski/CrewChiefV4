@@ -687,6 +687,10 @@ namespace CrewChiefV4
                                 gotAssignment = true;
                             }
                         }
+                        if (!gotAssignment)
+                        {
+                            Thread.Sleep(20);
+                        }
                     }
                     if (!gotAssignment)
                     {
