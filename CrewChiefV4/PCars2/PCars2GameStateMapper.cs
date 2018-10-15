@@ -33,8 +33,9 @@ namespace CrewChiefV4.PCars2
         // 3 or 4 wheels on any of these terrains triggers a possible cut warning
         private HashSet<eTerrainMaterials> illegalSurfaces = new HashSet<eTerrainMaterials>(
             new eTerrainMaterials[]{ eTerrainMaterials.TERRAIN_GRASSY_BERMS, eTerrainMaterials.TERRAIN_GRASS, eTerrainMaterials.TERRAIN_LONG_GRASS,
-                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, eTerrainMaterials.TERRAIN_RUNOFF_ROAD, eTerrainMaterials.TERRAIN_ILLEGAL_STRIP,
-                                     eTerrainMaterials.TERRAIN_PAINT_CONCRETE_ILLEGAL, eTerrainMaterials.TERRAIN_DRY_VERGE, eTerrainMaterials.TERRAIN_GRASSCRETE });
+                                     eTerrainMaterials.TERRAIN_SLOPE_GRASS, /*eTerrainMaterials.TERRAIN_RUNOFF_ROAD some road surfaces are marked as this, even in the middle of the track,*/ 
+                                     eTerrainMaterials.TERRAIN_ILLEGAL_STRIP, eTerrainMaterials.TERRAIN_PAINT_CONCRETE_ILLEGAL,
+                                     eTerrainMaterials.TERRAIN_DRY_VERGE, eTerrainMaterials.TERRAIN_GRASSCRETE });
 
         // 2 wheels on one of these terrains, while 2 wheels are on an illegal material, will log a warning to the console
         private HashSet<eTerrainMaterials> marginalSurfaces = new HashSet<eTerrainMaterials>(
