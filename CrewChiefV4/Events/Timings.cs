@@ -111,10 +111,13 @@ namespace CrewChiefV4.Events
         // really important that these messages don't 'spam'
         private TimeSpan minTimeBetweenAttackOrDefendByDriver = TimeSpan.FromMinutes(3);
 
+        private DateTime timeWeStartedBeingHeldUp = DateTime.MinValue;
+        private String carHoldingUsUp = null;
+
         public Timings(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
-            closeAheadMinSectorWait = 13 - gapAheadReportFrequency;
+            closeAheadMinSectorWait = 11 - gapAheadReportFrequency;
             closeAheadMaxSectorWait = closeAheadMinSectorWait + 5;
             gapAheadMinSectorWait = 13 - gapAheadReportFrequency;
             gapAheadMaxSectorWait = gapAheadMinSectorWait + 5;
@@ -177,6 +180,9 @@ namespace CrewChiefV4.Events
             isLeading = false;
             isRace = false;
             playedGapBehindForThisLap = false;
+
+            timeWeStartedBeingHeldUp = DateTime.MinValue;
+            carHoldingUsUp = null;
         }
 
         // adds 0, 1, or 2 to the sectors to wait. This means there's a 2 in 3 chance that a gap report
@@ -326,7 +332,16 @@ namespace CrewChiefV4.Events
                     {
                         if (gapInFrontStatus == GapStatus.CLOSE)
                         {
-                            if (!GlobalBehaviourSettings.useOvalLogic && sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport && !currentGameState.FlagData.isLocalYellow)
+                            String carFront = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
+                            if (carFront != this.carHoldingUsUp)
+                            {
+                                this.carHoldingUsUp = carFront;
+                                this.timeWeStartedBeingHeldUp = currentGameState.Now;
+                            }
+                            else if (!GlobalBehaviourSettings.useOvalLogic && 
+                                sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport && 
+                                !currentGameState.FlagData.isLocalYellow &&
+                                (currentGameState.Now - timeWeStartedBeingHeldUp).Seconds > 60 /* don't grumble about being held up until we've been close behind this car for one minute */)
                             {
                                 sectorsSinceLastCloseCarAheadReport = 0;
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
