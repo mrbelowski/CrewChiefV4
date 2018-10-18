@@ -73,14 +73,17 @@ namespace CrewChiefV4.Events
                 {
                     if (SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(driverToTest.DriverRawName)))
                     {
-                        audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index,
-                                        MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
+                        audioPlayer.playMessage(new QueuedMessage("gap_in_front" + index, 0,
+                                        messageFragments: MessageContents(Timings.folderTheGapTo, driverToTest, Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
-                        audioPlayer.playMessage(new QueuedMessage("leader_pitting" + index,
-                            MessageContents(Opponents.folderTheLeader, driverToTest, Opponents.folderIsPitting), 0, this));
-                        audioPlayer.playMessage(new QueuedMessage("new_fastest_lap" + index, MessageContents(Opponents.folderNewFastestLapFor, driverToTest,
-                                            TimeSpan.FromSeconds(Utilities.random.NextDouble() * 100)), 0, this));
+                                        alternateMessageFragments: MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        abstractEvent: this));
+                        audioPlayer.playMessage(new QueuedMessage("leader_pitting" + index, 0,
+                                        messageFragments: MessageContents(Opponents.folderTheLeader, driverToTest, Opponents.folderIsPitting), 
+                                        abstractEvent: this));
+                        audioPlayer.playMessage(new QueuedMessage("new_fastest_lap" + index, 0,
+                                        messageFragments: MessageContents(Opponents.folderNewFastestLapFor, driverToTest, TimeSpan.FromSeconds(Utilities.random.NextDouble() * 100)),
+                                        abstractEvent: this));
                         index++;
                     }
                     else
@@ -111,13 +114,14 @@ namespace CrewChiefV4.Events
 
             if (AudioPlayer.folderChiefRadioCheck != null)
             {
-                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST, MessageContents(AudioPlayer.folderChiefRadioCheck), 0, null), false);
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST, 0, messageFragments: MessageContents(AudioPlayer.folderChiefRadioCheck)), false);
             }
             if (NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck != null
                 && !String.Equals(UserSettings.GetUserSettings().getString("spotter_name"), UserSettings.GetUserSettings().getString("chief_name"), StringComparison.InvariantCultureIgnoreCase))  // Don't play this if spotter and chief are the same person.
             {
                 Thread.Sleep(800);
-                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck), 0, null), false);
+                audioPlayer.playSpotterMessage(new QueuedMessage(SMOKE_TEST_SPOTTER, 0,
+                    messageFragments: MessageContents(NoisyCartesianCoordinateSpotter.folderSpotterRadioCheck)), false);
             }
 
             PlaybackModerator.SetTracing(true /*enabled*/);
@@ -152,19 +156,22 @@ namespace CrewChiefV4.Events
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("int" + i, MessageContents(Utilities.random.Next(3100)), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("int" + i, 0, messageFragments: MessageContents(Utilities.random.Next(3100)), abstractEvent: this));
                     }
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(4000) + ((float)Utilities.random.Next(9) / 10f))), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, 0,
+                            messageFragments: MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(4000) + ((float)Utilities.random.Next(9) / 10f))), abstractEvent: this));
                     }
                     for (int i = 0; i < 10; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(60) + ((float)Utilities.random.Next(9) / 10f))), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, 0,
+                            messageFragments: MessageContents(TimeSpan.FromSeconds(Utilities.random.Next(60) + ((float)Utilities.random.Next(9) / 10f))), abstractEvent: this));
                     }
                     for (int i = 0; i < 5; i++)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("time" + i, MessageContents(TimeSpan.FromSeconds(Utilities.random.NextDouble())), 0, this));
+                        audioPlayer.playMessage(new QueuedMessage("time" + i, 0,
+                            messageFragments: MessageContents(TimeSpan.FromSeconds(Utilities.random.NextDouble())), abstractEvent: this));
                     }
                     break;
                 }
@@ -235,7 +242,8 @@ namespace CrewChiefV4.Events
                 {                    
                     String [] nextNessage = new String [foldersOrStuff.Length - iter];
                     Array.Copy(foldersOrStuff, iter, nextNessage, 0, foldersOrStuff.Length - iter);
-                    audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(messageName, 0, messageFragments: fragments, abstractEvent: this, 
+                        metadata: new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0)));
                     messageNumber++;
                     return soundTestPlay(nextNessage, messageNumber);
                 }
@@ -296,7 +304,8 @@ namespace CrewChiefV4.Events
                 }
 
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(messageName, fragments, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+            audioPlayer.playMessageImmediately(new QueuedMessage(messageName, 0, messageFragments: fragments, abstractEvent: this,
+                metadata: new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0)));
             return true;
         }
 
@@ -315,39 +324,42 @@ namespace CrewChiefV4.Events
                                         TimeSpan.FromSeconds((float)random.NextDouble() * 10)),
                                         MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)random.NextDouble() * 10)), 0, this));*/
 
-            audioPlayer.playMessage(new QueuedMessage("position/bad_start", 0, this));
+            audioPlayer.playMessage(new QueuedMessage("position/bad_start", 0, abstractEvent: this));
 
             Thread.Sleep(5000);
-            inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0, null);
+            inTheMiddleMessage = new QueuedMessage("spotter/in_the_middle", 0);
             inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             return; 
-            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
+            inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0);
             inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front2",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front2", 0,
+                                        messageFragments:  MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
+                                        alternateMessageFragments: MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        abstractEvent: this));
 
             
 
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front4",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front4", 0,
+                                        messageFragments: MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
+                                        alternateMessageFragments: MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        abstractEvent: this));
             Thread.Sleep(8000);
             inTheMiddleMessage = new QueuedMessage("spotter/car_right", 0, null);
             inTheMiddleMessage.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 20000;
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             Thread.Sleep(2000);
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front3",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front3", 0, 
+                                        messageFragments: MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
+                                        alternateMessageFragments: MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        abstractEvent: this));
 
 
             Thread.Sleep(4000);
@@ -356,10 +368,11 @@ namespace CrewChiefV4.Events
             audioPlayer.playSpotterMessage(inTheMiddleMessage, true);
 
             Thread.Sleep(5000);
-            audioPlayer.playMessage(new QueuedMessage("gap_in_front4",
-                                        MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
+            audioPlayer.playMessage(new QueuedMessage("gap_in_front4", 0,
+                                        messageFragments: MessageContents(Timings.folderTheGapTo, makeTempDriver("7908jimmy6^&^", new List<string>()), Timings.folderAheadIsIncreasing,
                                         TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
-                                        MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)), 0, this));
+                                        alternateMessageFragments: MessageContents(Timings.folderGapInFrontIncreasing, TimeSpan.FromSeconds((float)Utilities.random.NextDouble() * 10)),
+                                        abstractEvent: this));
         }
 
         private void messageInterruptTest()
@@ -375,7 +388,7 @@ namespace CrewChiefV4.Events
             fragments.Add(MessageFragment.Opponent(makeTempDriver("bakus", rawDriverNames)));
             fragments.Add(MessageFragment.Text(Strategy.folderAnd));
             fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
-            audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            audioPlayer.playMessage(new QueuedMessage("check", 0, messageFragments: fragments, abstractEvent: this));
             fragments = new List<MessageFragment>();
             fragments.Add(MessageFragment.Text(Strategy.folderClearTrackOnPitExit));
             fragments.Add(MessageFragment.Text(Strategy.folderWeShouldEmergeInPosition));
@@ -384,7 +397,7 @@ namespace CrewChiefV4.Events
             fragments.Add(MessageFragment.Opponent(makeTempDriver("bakus", rawDriverNames)));
             fragments.Add(MessageFragment.Text(Strategy.folderAnd));
             fragments.Add(MessageFragment.Opponent(makeTempDriver("fillingham", rawDriverNames)));
-            audioPlayer.playMessage(new QueuedMessage("check", fragments, 0, this));
+            audioPlayer.playMessage(new QueuedMessage("check", 0, messageFragments: fragments, abstractEvent: this));
             Thread.Sleep(2500);
             audioPlayer.playMessageImmediately(new QueuedMessage(NoisyCartesianCoordinateSpotter.folderEnableSpotter, 0, null));
 

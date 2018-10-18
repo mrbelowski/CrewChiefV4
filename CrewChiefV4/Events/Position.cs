@@ -462,7 +462,7 @@ namespace CrewChiefV4.Events
                             CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
                         DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
                             currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent, delaySeconds, null), pearlType, pearlLikelihood, 10);
+                        audioPlayer.playMessage(new QueuedMessage("position", delayedMessageEvent:delayedMessageEvent, delaySeconds:delaySeconds), pearlType, pearlLikelihood, 10);
                         lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }

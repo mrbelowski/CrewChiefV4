@@ -123,9 +123,7 @@ namespace CrewChiefV4.Audio
         public String selectedPersonalisation = NO_PERSONALISATION_SELECTED;
 
         private SynchronizationContext mainThreadContext = null;
-
-        private int messageId = 0;
-
+        
         public static String defaultChiefId = "Jim (default)";
         public static List<String> availableChiefVoices = new List<String>();
         public static String folderChiefRadioCheck = null;
@@ -608,7 +606,7 @@ namespace CrewChiefV4.Audio
                     }
                     waitTimeout = 10;
                 }
-                else if (!regularQueuePaused && queuedClips.Count > 0)
+                else if (!regularQueuePaused && queuedClips.Count > 0 && !holdChannelOpen /* don't allow regular messages to play if we're holding the channel open*/)
                 {
                     try
                     {
@@ -1088,7 +1086,7 @@ namespace CrewChiefV4.Audio
             return channelOpen;
         }
 
-        public void playMessage(QueuedMessage queuedMessage, int priority = SoundMetadata.DEFAULT_PRIORITY)
+        public void playMessage(QueuedMessage queuedMessage)
         {
             if (GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.NONE))
             {
@@ -1096,7 +1094,7 @@ namespace CrewChiefV4.Audio
             } 
             else
             {
-                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0, priority);
+                playMessage(queuedMessage, PearlsOfWisdom.PearlType.NONE, 0);
             }
         }
 
@@ -1113,7 +1111,7 @@ namespace CrewChiefV4.Audio
                     messageContents.AddRange(messagesToPlayBeforeRanting);
                 }
                 messageContents.Add(MessageFragment.Text(folderRants));
-                QueuedMessage rant = new QueuedMessage(messageIdentifier, messageContents, 0, null);
+                QueuedMessage rant = new QueuedMessage(messageIdentifier, 0, messageFragments: messageContents);
                 rant.isRant = true;
                 playMessage(rant, PearlsOfWisdom.PearlType.NONE, 0);
                 return true;
@@ -1203,6 +1201,10 @@ namespace CrewChiefV4.Audio
         {
             if (queuedMessage.canBePlayed)
             {
+                if (queuedMessage.metadata.type == SoundType.AUTO)
+                {
+                    queuedMessage.metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
+                }
                 lock (immediateClips)
                 {
                     if (immediateClips.Contains(queuedMessage.messageName))
@@ -1244,6 +1246,10 @@ namespace CrewChiefV4.Audio
         {
             if (queuedMessage.canBePlayed)
             {
+                if (queuedMessage.metadata.type == SoundType.AUTO)
+                {
+                    queuedMessage.metadata.type = SoundType.SPOTTER;
+                }
                 lock (immediateClips)
                 {
                     if (immediateClips.Contains(queuedMessage.messageName))
@@ -1286,10 +1292,14 @@ namespace CrewChiefV4.Audio
             return index;
         }
 
-        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability, int priority = SoundMetadata.DEFAULT_PRIORITY)
+        public void playMessage(QueuedMessage queuedMessage, PearlsOfWisdom.PearlType pearlType, double pearlMessageProbability)
         {
             if (queuedMessage.canBePlayed)
             {
+                if (queuedMessage.metadata.type == SoundType.AUTO)
+                {
+                    queuedMessage.metadata.type = SoundType.REGULAR_MESSAGE;
+                }
                 lock (queuedClips)
                 {
                     if (queuedClips.Contains(queuedMessage.messageName))
@@ -1299,8 +1309,6 @@ namespace CrewChiefV4.Audio
                     }
                     else
                     {
-                        // default 'regular' message priority is 0, which is lowest
-                        populateSoundMetadata(queuedMessage, SoundType.REGULAR_MESSAGE, priority);
                         DateTime now = CrewChief.currentGameState == null ? DateTime.UtcNow : CrewChief.currentGameState.Now;
                         if (PlaybackModerator.MessageCanBeQueued(queuedMessage, queuedClips.Count, now))
                         {
@@ -1488,15 +1496,6 @@ namespace CrewChiefV4.Audio
                 queuedMessage.metadata = new SoundMetadata(defaultSoundType, defaultPriority);
             }
             queuedMessage.metadata.messageId = getMessageId();
-        }
-
-        private int getMessageId()
-        {
-            lock (this)
-            {
-                this.messageId++;
-                return this.messageId;
-            }
         }
     }
 }
