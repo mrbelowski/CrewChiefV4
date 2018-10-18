@@ -189,7 +189,7 @@ namespace CrewChiefV4.Events
         {
             if (requestedExplicitly)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("no_more_information", MessageContents(AudioPlayer.folderNoMoreData), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoMoreData, 0));
             }
             // otherwise do nothing
         }
