@@ -1223,9 +1223,6 @@ namespace CrewChiefV4.Audio
                             startHangingChannelCloseThread();
                         }
 
-                        // here we assume the message is a voice command response, which is the most common use case 
-                        // for non-spotter immediate messages
-                        populateSoundMetadata(queuedMessage, SoundType.VOICE_COMMAND_RESPONSE, 5);
                         // sanity check...
                         if (queuedMessage.metadata.type == SoundType.REGULAR_MESSAGE)
                         {
@@ -1266,7 +1263,6 @@ namespace CrewChiefV4.Audio
                             startHangingChannelCloseThread();
                         }
                         // default spotter priority is 10
-                        populateSoundMetadata(queuedMessage, SoundType.SPOTTER, 10);
                         immediateClips.Insert(getInsertionIndex(immediateClips, queuedMessage), queuedMessage.messageName, queuedMessage);
 
                         // wake up the monitor thread immediately
@@ -1431,7 +1427,7 @@ namespace CrewChiefV4.Audio
             if (lastMessagePlayed != null)
             {
                 // clear the validation, expiry and other data
-                lastMessagePlayed.prepareToBeRepeated(getMessageId());
+                lastMessagePlayed.prepareToBeRepeated();
                 playMessageImmediately(lastMessagePlayed);
             }
         }
@@ -1485,17 +1481,6 @@ namespace CrewChiefV4.Audio
 
             return !string.IsNullOrWhiteSpace(rawName) && CrewChief.enableDriverNames &&
                 ((SoundCache.hasSuitableTTSVoice && ttsOption != TTS_OPTION.NEVER) || SoundCache.availableDriverNames.Contains(DriverNameHelper.getUsableDriverName(rawName)));
-        }
-
-        // defaultSoundType is only used if we've not already added metadata
-        // defaultPriority is only used if we've not already added metadata
-        private void populateSoundMetadata(QueuedMessage queuedMessage, SoundType defaultSoundType, int defaultPriority)
-        {
-            if (queuedMessage.metadata == null)
-            {
-                queuedMessage.metadata = new SoundMetadata(defaultSoundType, defaultPriority);
-            }
-            queuedMessage.metadata.messageId = getMessageId();
         }
     }
 }

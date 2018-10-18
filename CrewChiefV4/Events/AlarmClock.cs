@@ -178,13 +178,13 @@ namespace CrewChiefV4.Events
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("alarm", 0,
                             messageFragments: MessageContents(notifyYouAt, hour, NumberReader.folderOh, minutes, isPastMidDay ? folderPM : folderAM),
-                            metadata: new SoundMetadata(SoundType.CRITICAL_MESSAGE, 0)));
+                            type: SoundType.CRITICAL_MESSAGE, priority: 0));
                     }
                     else
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage("alarm", 0,
                             messageFragments: MessageContents(notifyYouAt, hour, minutes, isPastMidDay ? folderPM : folderAM),
-                            metadata: new SoundMetadata(SoundType.CRITICAL_MESSAGE, 0)));
+                            type: SoundType.CRITICAL_MESSAGE, priority: 0));
                     }
                 }
             }

@@ -220,14 +220,14 @@ namespace CrewChiefV4
         }
 
         // called when we repeat this message - clears all the validation and sets the type to voice-command
-        public void prepareToBeRepeated(int newMessageId)
+        public void prepareToBeRepeated()
         {
             if (metadata == null)
             {
                 metadata = new SoundMetadata();
             }
             messageName = "REPEAT_" + messageName;
-            metadata.messageId = newMessageId;
+            metadata.messageId = getMessageId();
             metadata.priority = 5;
             metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
             dueTime = 0;

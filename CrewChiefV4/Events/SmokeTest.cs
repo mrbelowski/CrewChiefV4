@@ -243,7 +243,7 @@ namespace CrewChiefV4.Events
                     String [] nextNessage = new String [foldersOrStuff.Length - iter];
                     Array.Copy(foldersOrStuff, iter, nextNessage, 0, foldersOrStuff.Length - iter);
                     audioPlayer.playMessageImmediately(new QueuedMessage(messageName, 0, messageFragments: fragments, abstractEvent: this, 
-                        metadata: new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0)));
+                        type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                     messageNumber++;
                     return soundTestPlay(nextNessage, messageNumber);
                 }
@@ -305,7 +305,7 @@ namespace CrewChiefV4.Events
 
             }
             audioPlayer.playMessageImmediately(new QueuedMessage(messageName, 0, messageFragments: fragments, abstractEvent: this,
-                metadata: new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0)));
+                type: SoundType.IMPORTANT_MESSAGE, priority: 0));
             return true;
         }
 

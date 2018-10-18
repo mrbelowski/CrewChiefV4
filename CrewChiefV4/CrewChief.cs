@@ -570,8 +570,8 @@ namespace CrewChiefV4
             }
             if (AudioPlayer.soundPackLanguage == "it")
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                    AbstractEvent.MessageContents(hour, NumberReaderIt2.folderAnd, now.Minute), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 0,
+                    messageFragments: AbstractEvent.MessageContents(hour, NumberReaderIt2.folderAnd, now.Minute)));
             }
             else
             {
@@ -588,19 +588,19 @@ namespace CrewChiefV4
                 {
                     if (minute == 0)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                           AbstractEvent.MessageContents(hour, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 0,
+                           messageFragments: AbstractEvent.MessageContents(hour, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM)));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                            AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 0,
+                            messageFragments: AbstractEvent.MessageContents(hour, NumberReader.folderOh, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM)));
                     }
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("current_time",
-                        AbstractEvent.MessageContents(hour, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("current_time", 0,
+                        messageFragments: AbstractEvent.MessageContents(hour, now.Minute, isPastMidDay ? AlarmClock.folderPM : AlarmClock.folderAM)));
                 }
             }
         }

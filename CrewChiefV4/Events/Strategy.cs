@@ -1086,16 +1086,16 @@ namespace CrewChiefV4.Events
             {
                 if (pitPositionEstimatesRequested)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", fragments, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", 0, messageFragments: fragments));
                 }
                 else
                 {
-                    audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", fragments, 0, this), 10);
+                    audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", 0, messageFragments: fragments, abstractEvent: this, priority: 10));
                 }
             }
             else if (pitPositionEstimatesRequested)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
         }
 
