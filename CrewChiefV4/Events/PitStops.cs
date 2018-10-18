@@ -325,9 +325,9 @@ namespace CrewChiefV4.Events
                             messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                             messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                             messageContents.Add(MessageFragment.Text(pitBoxPositionCountdownInFeet ? folderFeet : folderMetres));
-                            QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", messageContents, 0, this);
+                            QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", 1, messageFragments: messageContents, abstractEvent: this, priority: 10);
                             firstPitCountdown.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
-                            audioPlayer.playMessage(firstPitCountdown, 10);
+                            audioPlayer.playMessage(firstPitCountdown);
                             pitEntryDistancePlayedTime = currentGameState.Now;
                         }
                         playedLimiterLineToPitBoxDistanceWarning = true;
@@ -363,24 +363,24 @@ namespace CrewChiefV4.Events
                                             audioPlayer.pauseQueue(10);
                                             // box in 5...
                                             Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                                MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
+                                                messageFragments: MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                             playedBoxIn = true;
                                         }
                                         else if (i == pitCountdownTriggerPoints.Length - 1)
                                         {
                                             // BOX
                                             Console.WriteLine("BOX IN NOW at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                                MessageContents(folderBoxNow), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) });
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
+                                                messageFragments: MessageContents(folderBoxNow), type: SoundType.CRITICAL_MESSAGE, priority: 10));
                                             audioPlayer.unpauseQueue();
                                         }
                                         else if (playedBoxIn)
                                         {
                                             // 4, 3, 2, 1
                                             Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown",
-                                                MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 10) }, true);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
+                                                messageFragments: MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                         }
                                         break;
                                     }
@@ -436,7 +436,7 @@ namespace CrewChiefV4.Events
                     // in S1 but have exited pits, and we're expecting the limit to have been turned off
                     timeOfDisengageCheck = DateTime.MaxValue;
                     timeOfLastLimiterWarning = currentGameState.Now;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDisengageLimiter, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderDisengageLimiter, 2, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                 }
                 else if (previousGameState != null)
                 {
@@ -445,7 +445,7 @@ namespace CrewChiefV4.Events
                         if (currentGameState.PitData.limiterStatus == 0 && currentGameState.PositionAndMotionData.CarSpeed > 1)
                         {
                             // just entered the pit lane with no limiter active
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderEngageLimiter, 1, abstractEvent: this, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                             timeOfLastLimiterWarning = currentGameState.Now;
                         }
                     }
@@ -470,7 +470,7 @@ namespace CrewChiefV4.Events
                 && previousGameState.PositionAndMotionData.CarSpeed > 2.0f && currentGameState.PositionAndMotionData.CarSpeed > 2.0f  // Guard against tow, teleport, returning to ISI game's Monitor and other bullshit
                 && currentGameState.SessionData.SessionRunningTime > 30.0f)  // Sanity check !inPts -> inPits flip on session start.
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 2, abstractEvent: this, type: SoundType.CRITICAL_MESSAGE, priority: 15));
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PitData.HasMandatoryPitStop &&
                 (currentGameState.SessionData.SessionPhase == SessionPhase.Green || currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow))
@@ -526,6 +526,7 @@ namespace CrewChiefV4.Events
                         if (currentGameState.PitData.PitWindow != PitWindow.StopInProgress && 
                             currentGameState.PitData.PitWindow != PitWindow.Completed && !currentGameState.PitData.InPitlane) 
                         {
+                            int delay = Utilities.random.Next(0, 20);
                             if (maxDistanceOnCurrentTyre > 0 && currentGameState.SessionData.CompletedLaps == maxDistanceOnCurrentTyre && playPitThisLap)
                             {
                                 playBoxNowMessage = true;
@@ -533,26 +534,26 @@ namespace CrewChiefV4.Events
                                 mandatoryStopBoxThisLap = true;
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 10), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 20), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 20), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                             }
                             else if (minDistanceOnCurrentTyre > 0 && currentGameState.SessionData.CompletedLaps == minDistanceOnCurrentTyre)
                             {
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitPrimes, Utilities.random.Next(0, 20), this), 5);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitPrimes, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 5));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitOptions, Utilities.random.Next(0, 20), this), 5);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsCanNowFitOptions, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 5));
                                 }
                             }
                         }
@@ -563,7 +564,8 @@ namespace CrewChiefV4.Events
                             // so we play it 1 lap before the window opens
                             if (enableWindowWarnings)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpening, Utilities.random.Next(0, 20), this), 10);
+                                int delay = Utilities.random.Next(0, 20);
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpening, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                             }
                         }
                         else if (pitWindowOpenLap > 0 && currentGameState.SessionData.CompletedLaps == pitWindowOpenLap)
@@ -572,14 +574,15 @@ namespace CrewChiefV4.Events
                             if (enableWindowWarnings)
                             {
                                 audioPlayer.setBackgroundSound(AudioPlayer.dtmPitWindowOpenBackground);
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen, 0, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen, 0, abstractEvent: this, priority: 10));
                             }
                         }
                         else if (pitWindowClosedLap > 0 && currentGameState.SessionData.CompletedLaps == pitWindowClosedLap - 1)
                         {
+                            int delay = Utilities.random.Next(0, 20);
                             if (enableWindowWarnings)
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosing, Utilities.random.Next(0, 20), this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosing, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                             }
                             if (currentGameState.PitData.PitWindow != PitWindow.Completed && !currentGameState.PitData.InPitlane &&
                                 currentGameState.PitData.PitWindow != PitWindow.StopInProgress)
@@ -587,15 +590,15 @@ namespace CrewChiefV4.Events
                                 playBoxNowMessage = true;
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 10), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 10), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 10), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                             }
                         }
@@ -610,7 +613,7 @@ namespace CrewChiefV4.Events
                             if (enableWindowWarnings)
                             {
                                 audioPlayer.setBackgroundSound(AudioPlayer.dtmPitWindowClosedBackground);
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosed, 0, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosed, 0, abstractEvent: this, priority: 10));
                             }
                         }
                     }
@@ -631,7 +634,7 @@ namespace CrewChiefV4.Events
                                 mandatoryStopBoxThisLap = true;
                                 if (enableWindowWarnings)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLapTooLate, 0, this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLapTooLate, 0, abstractEvent: this, priority: 10));
                                 }
                             }
                             else if (playPitThisLap && currentGameState.SessionData.PlayerLapTimeSessionBest + 10 < timeLeftToPit &&
@@ -641,17 +644,18 @@ namespace CrewChiefV4.Events
                                 playBoxNowMessage = true;
                                 playPitThisLap = false;
                                 mandatoryStopBoxThisLap = true;
+                                int delay = Utilities.random.Next(0, 20);
                                 if (mandatoryTyreChangeTyreType == TyreType.Prime)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, Utilities.random.Next(0, 20), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitPrimesThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else if (mandatoryTyreChangeTyreType == TyreType.Option)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, Utilities.random.Next(0, 20), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsFitOptionsThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, Utilities.random.Next(0, 20), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitThisLap, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                 }
                             }
                         }
@@ -665,7 +669,7 @@ namespace CrewChiefV4.Events
                         play2minOpenWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen, 0, abstractEvent: this, priority: 10));
                         }
                     }
                     else if (play1minOpenWarning && currentGameState.SessionData.SessionTimeRemaining > 0 &&
@@ -675,7 +679,7 @@ namespace CrewChiefV4.Events
                         play2minOpenWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen1Min, 0, this), 3);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen1Min, 20, abstractEvent: this, priority: 3));
                         }
                     }
                     else if (play2minOpenWarning && currentGameState.SessionData.SessionTimeRemaining > 0 &&
@@ -684,7 +688,7 @@ namespace CrewChiefV4.Events
                         play2minOpenWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen2Min, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowOpen2Min, 30, abstractEvent: this, priority: 10));
                         }
                     }
                     else if (pitWindowClosedTime > 0 && playClosedNow && currentGameState.SessionData.SessionTimeRemaining > 0 &&
@@ -702,7 +706,7 @@ namespace CrewChiefV4.Events
                         }
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosed, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowClosed, 0, abstractEvent: this, priority: 10));
                         }
                     }
                     else if (pitWindowClosedTime > 0 && play1minCloseWarning && currentGameState.SessionData.SessionTimeRemaining > 0 &&
@@ -712,7 +716,7 @@ namespace CrewChiefV4.Events
                         play2minCloseWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowCloses1min, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowCloses1min, 20, abstractEvent: this, priority: 10));
                         }
                     }
                     else if (pitWindowClosedTime > 0 && play2minCloseWarning && currentGameState.SessionData.SessionTimeRemaining > 0 &&
@@ -721,7 +725,7 @@ namespace CrewChiefV4.Events
                         play2minCloseWarning = false;
                         if (enableWindowWarnings)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowCloses2min, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitWindowCloses2min, 30, abstractEvent: this, priority: 10));
                         }
                     }
 
@@ -732,7 +736,7 @@ namespace CrewChiefV4.Events
                         playBoxNowMessage = false;
                         // pit entry is right at sector 3 timing line, play message part way through sector 2 to give us time to pit
                         int messageDelay = currentGameState.SessionData.PlayerBestSector2Time > 0 ? (int)(currentGameState.SessionData.PlayerBestSector2Time * 0.7) : 15;
-                        audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, messageDelay, this), 10);
+                        audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 10));
                     }
 
                     if (playBoxNowMessage && currentGameState.SessionData.SectorNumber == 3)
@@ -743,15 +747,17 @@ namespace CrewChiefV4.Events
                         {                            
                             if (mandatoryTyreChangeTyreType == TyreType.Prime)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("box_now_for_primes", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), 3, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage("box_now_for_primes", 9, secondsDelay: 3,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsPrimeTyres), abstractEvent: this, priority: 10));
                             }
                             else if (mandatoryTyreChangeTyreType == TyreType.Option)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("box_now_for_options", MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), 3, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage("box_now_for_options", 9, secondsDelay: 3, 
+                                    messageFragments: MessageContents(folderMandatoryPitStopsPitNow, folderMandatoryPitStopsOptionTyres), abstractEvent: this, priority: 10));
                             }
                             else
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, 3, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderMandatoryPitStopsPitNow, 9, secondsDelay: 3, abstractEvent: this, priority: 10));
                             }
                         }
                     }
@@ -772,7 +778,7 @@ namespace CrewChiefV4.Events
                         timeStartedAppoachingPitsCheck = DateTime.MaxValue;
                         timeSpeedInPitsWarning = currentGameState.Now;
 
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderWatchYourPitSpeed, 2, abstractEvent: this, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                     }
                     if (!previousGameState.PitData.IsApproachingPitlane
                         && currentGameState.PitData.IsApproachingPitlane && timeStartedAppoachingPitsCheck == DateTime.MaxValue)
@@ -782,9 +788,10 @@ namespace CrewChiefV4.Events
                     // different logic for PCars2 pit-crew-ready checks
                     if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK)
                     {
+                        int delay = Utilities.random.Next(1, 3);
                         if (!previousGameState.PitData.PitStallOccupied && currentGameState.PitData.PitStallOccupied)
                         {
-                            audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                             warnedAboutOccupiedPitOnThisLap = true;
                         }
                         if (currentGameState.SessionData.SectorNumber == 3 &&
@@ -795,25 +802,26 @@ namespace CrewChiefV4.Events
                             {
                                 if (!warnedAboutOccupiedPitOnThisLap)
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, Utilities.random.Next(1, 3), this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage(folderPitStallOccupied, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                                     warnedAboutOccupiedPitOnThisLap = true;
                                 }
                             }
                             else
                             {
-                                audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                             }
                         }
                     }
                     else if (!previousGameState.PitData.IsPitCrewReady
                         && currentGameState.PitData.IsPitCrewReady)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, Utilities.random.Next(1, 3), this), 10);
+                        int delay = Utilities.random.Next(1, 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                     }
                     if (!previousGameState.PitData.IsPitCrewDone
                         && currentGameState.PitData.IsPitCrewDone)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 0, this) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderStopCompleteGo, 1, abstractEvent: this, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                     }
                     if (!previousGameState.PitData.HasRequestedPitStop
                         && currentGameState.PitData.HasRequestedPitStop
@@ -823,7 +831,7 @@ namespace CrewChiefV4.Events
                         timeOfPitRequestOrCancel = currentGameState.Now;
                         playedRequestPitOnThisLap = true;
                         // respond immediately to this request
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0));
                     }
                     // don't play pit request cancelled in pCars2 because the request often cancels itself for no reason at all (other than pcars2 being a mess)
                     // - the pit crew may or may not be ready for you when this happens. It's just one of the many mysteries of pCars2.
@@ -836,7 +844,8 @@ namespace CrewChiefV4.Events
                     {
                         timeOfPitRequestOrCancel = currentGameState.Now;
                         playedPitRequestCancelledOnThisLap = true;
-                        audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, Utilities.random.Next(1, 3), this), 10);
+                        int delay = Utilities.random.Next(1, 3);
+                        audioPlayer.playMessage(new QueuedMessage(folderPitStopRequestCancelled, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                     }
                 }
                 else if ((CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2 || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2_NETWORK) &&
@@ -847,7 +856,7 @@ namespace CrewChiefV4.Events
                     timeOfPitRequestOrCancel = currentGameState.Now;
                     playedRequestPitOnThisLap = true;
                     // respond immediately to this request
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStopRequestReceived, 2, abstractEvent: this));
                 }
             }            
         }
@@ -872,7 +881,7 @@ namespace CrewChiefV4.Events
                 {
                     if (mandatoryStopMissed)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0));
                     }
                     else if (hasMandatoryPitStop && !mandatoryStopCompleted)
                     {
@@ -880,19 +889,19 @@ namespace CrewChiefV4.Events
                         {
                             if (pitWindowOpenLap > 0)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_lap",
-                                    MessageContents(folderMandatoryPitStopsPitWindowOpensOnLap, pitWindowOpenLap), 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_lap", 0,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsPitWindowOpensOnLap, pitWindowOpenLap)));
                             }
                             else if (pitWindowOpenTime > 0)
                             {
-                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time",
-                                    MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open_time", 0,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsPitWindowOpensAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES))));
                             }
                         }
                         else
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open", 
-                                MessageContents(folderMandatoryPitStopsPitWindowOpen, pitWindowOpenLap), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_window_open",  0,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsPitWindowOpen, pitWindowOpenLap)));
                         }
                     }
                 }
@@ -901,30 +910,30 @@ namespace CrewChiefV4.Events
             {
                 if (!hasMandatoryPitStop || mandatoryStopCompleted || !enableWindowWarnings)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0));
                 }
                 else if (mandatoryStopMissed)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderMandatoryPitStopsMissedStop, 0));
                 }
                 else if (mandatoryStopBoxThisLap)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxThisLap",
-                        MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxThisLap", 0,
+                                    messageFragments: MessageContents(AudioPlayer.folderYes, folderMandatoryPitStopsPitThisLap)));
                 }
                 else if (pitWindowOpenLap > 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxOnLap",
-                        MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxOnLap", 0,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsYesStopOnLap, pitWindowOpenLap)));
                 }
                 else if (pitWindowOpenTime > 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter",
-                        MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES)), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("yesBoxAfter", 0,
+                                    messageFragments: MessageContents(folderMandatoryPitStopsYesStopAfter, TimeSpanWrapper.FromMinutes(pitWindowOpenTime, Precision.MINUTES))));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
             }
         }

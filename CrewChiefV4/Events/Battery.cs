@@ -377,7 +377,7 @@ namespace CrewChiefV4.Events
                         && !this.playedBatteryLowWarning)
                     {
                         this.playedBatteryLowWarning = true;
-                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this), 6);
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", 20, messageFragments: MessageContents(Battery.folderLowBattery), abstractEvent: this, priority: 6));
                     }
                     else if (((this.averageUsagePerLap > 0.0f  // If avg usage per lap available, calculate threshold dynamically.
                             && this.windowedAverageChargeLeft < (this.averageUsagePerLap * Battery.BatteryCriticaLapsFactor))
@@ -385,7 +385,7 @@ namespace CrewChiefV4.Events
                         && !this.playedBatteryCriticalWarning)
                     {
                         this.playedBatteryCriticalWarning = true;
-                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderCriticalBattery), 0, this), 10);
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/level", 0, messageFragments: MessageContents(Battery.folderCriticalBattery), abstractEvent: this, priority: 10));
                     }
                 }
 
@@ -436,44 +436,44 @@ namespace CrewChiefV4.Events
                             {
                                 if (currentGameState.PitData.IsElectricVehicleSwapAllowed)
                                 {
-                                    this.audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 3);
-                                    this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderWeEstimate, estBattLapsLeft, Battery.folderLapsRemaining), 0, this), 3);
+                                    this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0,
+                                        MessageContents(RaceTime.folderHalfWayHome, Battery.folderWeEstimate, estBattLapsLeft, Battery.folderLapsRemaining), abstractEvent: this, priority: 3));
                                 }
                                 else
-                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, this), 8);
+                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, abstractEvent: this, priority: 8));
                             }
                             else
-                                this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this), 3);
+                                this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, abstractEvent: this, priority: 3));
                         }
                         else if (currentGameState.SessionData.SessionLapsRemaining > 3 && estBattLapsLeft == 4 && !this.playedFourLapsRemaining)
                         {
                             this.playedFourLapsRemaining = true;
                             Console.WriteLine("4 laps of battery charge left, " + battStatusMsg);
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, this), 5);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFourLapsEstimate, 0, abstractEvent: this, priority: 5));
                         }
                         else if (currentGameState.SessionData.SessionLapsRemaining > 2 && estBattLapsLeft == 3 && !this.playedThreeLapsRemaining)
                         {
                             this.playedThreeLapsRemaining = true;
                             Console.WriteLine("3 laps of battery charge left, " + battStatusMsg);
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, this), 7);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderThreeLapsEstimate, 0, abstractEvent: this, priority: 7));
                         }
                         else if (currentGameState.SessionData.SessionLapsRemaining > 1 && estBattLapsLeft == 2 && !this.playedTwoLapsRemaining)
                         {
                             this.playedTwoLapsRemaining = true;
                             Console.WriteLine("2 laps of battery charge left, " + battStatusMsg);
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, this), 10);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoLapsEstimate, 0, abstractEvent: this, priority: 10));
                         }
                         else if (currentGameState.SessionData.SessionLapsRemaining > 0 && estBattLapsLeft == 1)
                         {
                             Console.WriteLine("1 lap of battery charge left, " + battStatusMsg);
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, this), 10);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderOneLapEstimate, 0, abstractEvent: this, priority: 10));
 
                             // If we've not played the pit-now message, play it with a bit of a delay - should probably wait for sector3 here
                             // but i'd have to move some stuff around and I'm an idle fucker
                             if (!this.playedPitForBatteryNow && currentGameState.SessionData.SessionLapsRemaining > 1)
                             {
                                 this.playedPitForBatteryNow = true;
-                                this.audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 10, this), 10);
+                                this.audioPlayer.playMessage(new QueuedMessage(PitStops.folderMandatoryPitStopsPitThisLap, 0, secondsDelay: 10, abstractEvent: this, priority: 10));
                             }
                         }
                     }
@@ -508,15 +508,14 @@ namespace CrewChiefV4.Events
                                     if (currentGameState.PitData.IsElectricVehicleSwapAllowed)
                                     {
                                         var minutesLeft = (int)Math.Floor(prevLapStats.AverageBatteryPercentageLeft / this.averageUsagePerMinute);
-                                        this.audioPlayer.playMessage(new QueuedMessage(RaceTime.folderHalfWayHome, 0, this), 3);
-                                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(
-                                            Battery.folderWeEstimate, minutesLeft, Battery.folderMinutesRemaining), 0, this), 3);
+                                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0, messageFragments: MessageContents(
+                                            RaceTime.folderHalfWayHome, Battery.folderWeEstimate, minutesLeft, Battery.folderMinutesRemaining), abstractEvent: this, priority: 3));
                                     }
                                     else
-                                        this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, this), 8);
+                                        this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceLowBattery, 0, abstractEvent: this, priority: 8));
                                 }
                                 else
-                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, this), 3);
+                                    this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfDistanceGoodBattery, 0, abstractEvent: this, priority: 3));
                             }
                         }
 
@@ -537,12 +536,13 @@ namespace CrewChiefV4.Events
                             }
                             if (currentGameState.SessionData.SessionTimeRemaining > cutoffForVehicleSwapCall)
                             {
-                                this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",
-                                    MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), 0, this), 10);
+                                this.audioPlayer.playMessage(new QueuedMessage("pit_for_vehicle_swap_now",0, 
+                                    messageFragments: MessageContents(Battery.folderAboutToRunOut, PitStops.folderMandatoryPitStopsPitThisLap), abstractEvent: this, priority: 10));
                             }
                             else
                             {
-                                this.audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_battery", MessageContents(Battery.folderAboutToRunOut), 0, this), 10);
+                                this.audioPlayer.playMessage(new QueuedMessage("about_to_run_out_of_battery", 0,
+                                    messageFragments: MessageContents(Battery.folderAboutToRunOut), abstractEvent: this, priority: 10));
                             }
                         }
                         if (estBattMinsLeft <= 2.0f && estBattMinsLeft > 1.8f && !this.playedTwoMinutesRemaining)
@@ -552,7 +552,7 @@ namespace CrewChiefV4.Events
                             this.playedTwoMinutesRemaining = true;
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoMinutesBattery, 0, this), 10);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTwoMinutesBattery, 0, abstractEvent: this, priority: 10));
                         }
                         else if (estBattMinsLeft <= 5.0f && estBattMinsLeft > 4.8f && !this.playedFiveMinutesRemaining)
                         {
@@ -560,14 +560,14 @@ namespace CrewChiefV4.Events
 
                             this.playedFiveMinutesRemaining = true;
                             this.playedTenMinutesRemaining = true;
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, this), 8);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderFiveMinutesBattery, 0, abstractEvent: this, priority: 8));
                         }
                         else if (estBattMinsLeft <= 10.0f && estBattMinsLeft > 9.8f && !this.playedTenMinutesRemaining)
                         {
                             Console.WriteLine("Less than 10 mins of battery charge left, " + battStatusMsg);
 
                             this.playedTenMinutesRemaining = true;
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, this), 5);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderTenMinutesBattery, 0, abstractEvent: this, priority: 5));
                         }
                         else if (!this.playedHalfBatteryChargeWarning && this.windowedAverageChargeLeft / this.initialBatteryChargePercentage <= 0.55f &&
                             this.windowedAverageChargeLeft / this.initialBatteryChargePercentage >= 0.45f)
@@ -576,7 +576,7 @@ namespace CrewChiefV4.Events
 
                             // warning message for battery left - these play as soon previous lap average charge drops below 1/2.
                             this.playedHalfBatteryChargeWarning = true;
-                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, this), 3);
+                            this.audioPlayer.playMessage(new QueuedMessage(Battery.folderHalfChargeWarning, 0, abstractEvent: this, priority: 3));
                         }
                     }  // if Timed or fixed lap race
 
@@ -587,16 +587,19 @@ namespace CrewChiefV4.Events
                         && !this.playedBatteryCriticalWarning)
                     {
                         var bu = this.EvaluateBatteryUse();
+                        int delay = Utilities.random.Next(0, 11);
                         if (bu == Battery.BatteryUseTrend.Increasing
                             && this.lastReportedTrend != Battery.BatteryUseTrend.Increasing)
                         {
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), Utilities.random.Next(0, 11), this), 3);
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", delay + 20, secondsDelay: delay,
+                                messageFragments: MessageContents(Battery.folderUseIncreasing), abstractEvent: this, priority: 3));
                             this.lastReportedTrend = Battery.BatteryUseTrend.Increasing;
                         }
                         else if (bu == Battery.BatteryUseTrend.Decreasing
                             && this.lastReportedTrend != Battery.BatteryUseTrend.Decreasing)
                         {
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), Utilities.random.Next(0, 11), this), 3);
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/trend", delay, secondsDelay: delay,
+                                messageFragments: MessageContents(Battery.folderUseDecreasing), abstractEvent: this, priority: 3));
                             this.lastReportedTrend = Battery.BatteryUseTrend.Decreasing;
                         }
                         else if (bu == Battery.BatteryUseTrend.Stable)
@@ -768,9 +771,9 @@ namespace CrewChiefV4.Events
                         messageFragments.Add(MessageFragment.Text(Battery.folderPercentOfYourBattery));
 
                         if (useImmediateQueue)
-                            this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, null));
+                            this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", 0, messageFragments: messageFragments));
                         else
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, this), 1);
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/prev_lap_use", 0, messageFragments: messageFragments, abstractEvent: this, priority: 1));
                     }
                     else
                     {
@@ -780,9 +783,9 @@ namespace CrewChiefV4.Events
                         messageFragments.Add(MessageFragment.Text(Battery.folderPercentOfYourBattery));
 
                         if (useImmediateQueue)
-                            this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, null));
+                            this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/prev_lap_use", 0, messageFragments: messageFragments));
                         else
-                            this.audioPlayer.playMessage(new QueuedMessage("Battery/prev_lap_use", messageFragments, 0, this), 1);
+                            this.audioPlayer.playMessage(new QueuedMessage("Battery/prev_lap_use", 0, messageFragments: messageFragments, abstractEvent: this, priority: 1));
 
                     }
                 }
@@ -807,7 +810,7 @@ namespace CrewChiefV4.Events
             {
                 haveData = true;
                 batteryRunningLow = false;
-                this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(Battery.folderPlentyOfBattery, 0));
             }
             else if ((this.averageUsagePerLap > 0.0f  // If avg usage per lap available, calculate threshold dynamically.
                     && this.windowedAverageChargeLeft > (this.averageUsagePerLap * Battery.BatteryLowLapsFactor))
@@ -820,9 +823,9 @@ namespace CrewChiefV4.Events
                 messageFragments.Add(MessageFragment.Text(Battery.folderPercentRemaining));
 
                 if (useImmediateQueue)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", 0, messageFragments: messageFragments));
                 else
-                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", messageFragments, 0, null), 5);
+                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", 0, messageFragments: messageFragments, priority: 5));
             }
             else if ((this.averageUsagePerLap > 0.0f  // If avg usage per lap available, calculate threshold dynamically.
                     && this.windowedAverageChargeLeft > (this.averageUsagePerLap * Battery.BatteryCriticaLapsFactor))
@@ -830,9 +833,9 @@ namespace CrewChiefV4.Events
             {
                 haveData = true;
                 if (useImmediateQueue)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", 0, messageFragments: MessageContents(Battery.folderLowBattery)));
                 else
-                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", MessageContents(Battery.folderLowBattery), 0, this), 5);
+                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", 0, messageFragments: MessageContents(Battery.folderLowBattery), abstractEvent: this, priority: 5));
             }
             else if (this.windowedAverageChargeLeft > 0)
             {
@@ -842,9 +845,9 @@ namespace CrewChiefV4.Events
                 messageFragments.Add(MessageFragment.Text(Battery.folderAboutToRunOut));
                 
                 if (useImmediateQueue)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", messageFragments, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/level", 0, messageFragments: messageFragments));
                 else
-                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", messageFragments, 0, null), 5);
+                    this.audioPlayer.playMessage(new QueuedMessage("Battery/level", 0, messageFragments: messageFragments, abstractEvent: this, priority: 5));
             }
 
             if (batteryRunningLow || !this.batteryUseActive)
@@ -866,9 +869,9 @@ namespace CrewChiefV4.Events
                 }
                 else if (lapsOfBatteryChargeLeft <= 1)
                     if (useImmediateQueue)
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null));
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", 0, messageFragments: MessageContents(Battery.folderAboutToRunOut)));
                     else
-                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null), 5);
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0, messageFragments: MessageContents(Battery.folderAboutToRunOut), abstractEvent: this, priority: 5));
                 else
                 {
                     var messageFragments = new List<MessageFragment>();
@@ -876,9 +879,9 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Integer(lapsOfBatteryChargeLeft, false));
                     messageFragments.Add(MessageFragment.Text(outroSound));
                     if (useImmediateQueue)
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", 0, messageFragments: messageFragments));
                     else
-                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", messageFragments, 0, null), 5);
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0, messageFragments: messageFragments, priority: 5));
                 }
             }
             else if (this.averageUsagePerMinute > 0.0f) // Timed race.
@@ -897,9 +900,9 @@ namespace CrewChiefV4.Events
                 }
                 else if (minutesOfBatteryChargeLeft <= 1)
                     if (useImmediateQueue)
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null));
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", 0, messageFragments: MessageContents(Battery.folderAboutToRunOut)));
                     else
-                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", MessageContents(Battery.folderAboutToRunOut), 0, null), 10);
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0, messageFragments: MessageContents(Battery.folderAboutToRunOut), abstractEvent: this, priority: 10));
                 else
                 {
                     var messageFragments = new List<MessageFragment>();
@@ -907,9 +910,9 @@ namespace CrewChiefV4.Events
                     messageFragments.Add(MessageFragment.Integer(minutesOfBatteryChargeLeft, false));
                     messageFragments.Add(MessageFragment.Text(outroSound));
                     if (useImmediateQueue)
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", 0, messageFragments: messageFragments));
                     else
-                        this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/estimate", messageFragments, 0, null));
+                        this.audioPlayer.playMessage(new QueuedMessage("Battery/estimate", 0, messageFragments: messageFragments, abstractEvent: this, priority: 10));
                 }
             }
 
@@ -948,11 +951,11 @@ namespace CrewChiefV4.Events
             // Report usage trend:
             var bu = this.EvaluateBatteryUse();
             if (bu == BatteryUseTrend.Decreasing)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseDecreasing), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", 0, messageFragments: MessageContents(Battery.folderUseDecreasing)));
             else if (bu == BatteryUseTrend.Increasing)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseIncreasing), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", 0, messageFragments: MessageContents(Battery.folderUseIncreasing)));
             else if (bu == BatteryUseTrend.Stable)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", MessageContents(Battery.folderUseStable), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/trend", 0, messageFragments: MessageContents(Battery.folderUseStable)));
 
             var midRaceReached = false;
             var batteryAdvice = BatteryAdvice.Unknown;
@@ -1044,13 +1047,17 @@ namespace CrewChiefV4.Events
             }
 
             if (batteryAdvice == BatteryAdvice.BatteryUseSpotOn)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderShouldMakeEnd : Battery.folderShouldMakeHalfDistance), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", 0, 
+                    messageFragments: MessageContents(midRaceReached ? Battery.folderShouldMakeEnd : Battery.folderShouldMakeHalfDistance)));
             else if (batteryAdvice == BatteryAdvice.IncreaseBatteryUse)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderIncreaseUseEasilyMakeEnd : Battery.folderIncreaseUseEasilyMakeHalfDistance), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", 0,
+                    messageFragments: MessageContents(midRaceReached ? Battery.folderIncreaseUseEasilyMakeEnd : Battery.folderIncreaseUseEasilyMakeHalfDistance)));
             else if (batteryAdvice == BatteryAdvice.ReduceBatteryUse)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderReduceUseToMakeEnd : Battery.folderReduceUseHalfDistance), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", 0, 
+                    messageFragments: MessageContents(midRaceReached ? Battery.folderReduceUseToMakeEnd : Battery.folderReduceUseHalfDistance)));
             else if (batteryAdvice == BatteryAdvice.WontMakeItWithoutPitting)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", MessageContents(midRaceReached ? Battery.folderWontMakeEndWoPit : Battery.folderWontMakeHalfDistanceWoPit), 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage("Battery/advice", 0,
+                    messageFragments: MessageContents(midRaceReached ? Battery.folderWontMakeEndWoPit : Battery.folderWontMakeHalfDistanceWoPit)));
         }
     }
 }
