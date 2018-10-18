@@ -283,18 +283,19 @@ namespace CrewChiefV4.Events
                                     String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
                                     if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners",
-                                            MessageContents(folderYouAreBeingCaughtByThe, classWithRunnersSuffix), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners", 5,
+                                            messageFragments: MessageContents(folderYouAreBeingCaughtByThe, classWithRunnersSuffix), abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners",
-                                            MessageContents(folderYouAreBeingCaughtByThe, classWithoutRunnersSuffix, folderRunners), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("being_caught_by_known_car_class_runners", 5,
+                                            messageFragments: MessageContents(folderYouAreBeingCaughtByThe, classWithoutRunnersSuffix, folderRunners), abstractEvent: this,
+                                            type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreBeingCaughtByFasterCars, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreBeingCaughtByFasterCars, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                             }
                             else if (otherClassWarningData.numFasterCars > 1)
@@ -305,20 +306,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarsRacingForPosition)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsFightingBehindIncludingClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindIncludingClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarsRacingForPosition)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehindFighting, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehind, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarsBehind, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
                                 // cars in the group are racing the player for position. Do we need to fix this in the OtherCarClassWarningData data?
@@ -331,20 +332,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPositionIsClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindIsClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.fasterCarIsRacingPlayerForPosition)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehindRacingPlayerForPosition, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehind, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderFasterCarBehind, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                             }
                             if (otherClassWarningData.numSlowerCars > 1)
@@ -365,38 +366,39 @@ namespace CrewChiefV4.Events
                                         String classWithoutRunnersSuffix = folderClassStub + classNameToRead;
                                         if (SoundCache.availableSounds.Contains(classWithRunnersSuffix))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners",
-                                                MessageContents(folderYouAreCatchingThe, classWithRunnersSuffix), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners", 5,
+                                               messageFragments: MessageContents(folderYouAreCatchingThe, classWithRunnersSuffix), abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners",
-                                                MessageContents(folderYouAreCatchingThe, classWithoutRunnersSuffix, folderRunners), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("catching_known_car_class_runners", 5,
+                                               messageFragments: MessageContents(folderYouAreCatchingThe, classWithoutRunnersSuffix, folderRunners), abstractEvent: this,
+                                               type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         }                                        
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreCatchingSlowerCars, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderYouAreCatchingSlowerCars, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarsIncludeClassLeader)
                                 {
                                     if (otherClassWarningData.slowerCarsRacingForPosition)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsFightingAheadIncludingClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadIncludingClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarsRacingForPosition)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadFighting, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAheadFighting, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race || !disableSlowerCarWarningsInPracAndQual)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarsAhead, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 caughtSlowerClassInThisSession = true;
                                 // don't bother with 'no blue flag' warning here - this only really makes sense if all the 
@@ -410,20 +412,20 @@ namespace CrewChiefV4.Events
                                 {
                                     if (otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPositionIsClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadClassLeader, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadClassLeader, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                     }
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race && otherClassWarningData.slowerCarIsRacingPlayerForPosition)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAheadRacingPlayerForPosition, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 else if (currentGameState.SessionData.SessionType == SessionType.Race || !disableSlowerCarWarningsInPracAndQual)
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAhead, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSlowerCarAhead, 5, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                 }
                                 caughtSlowerClassInThisSession = true;
                             }
