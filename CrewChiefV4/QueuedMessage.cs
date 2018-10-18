@@ -248,18 +248,6 @@ namespace CrewChiefV4
                 return "";
             }
         }
-        
-        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData)
-        {
-            this.messageName = compoundMessageIdentifier + messageName;
-            this.delayedMessageEvent = delayedMessageEvent;
-            this.delayMessageResolution = true;
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.secondsDelay = secondsDelay;
-            this.delayMessageResolution = true;
-            this.abstractEvent = abstractEvent;
-            this.validationData = validationData;
-        }
 
         public Boolean isMessageStillValid(String eventSubType, GameStateData currentGameState)
         {
