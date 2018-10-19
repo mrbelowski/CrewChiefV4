@@ -101,11 +101,13 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionRunningTime > 30 && isOpponentApproachingPitExit(currentGameState))
                 {
                     // we've exited into clean air
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTrafficBehindExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTrafficBehindExitingPits, 1, abstractEvent: this,
+                        type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPushExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPushExitingPits, 1, abstractEvent: this,
+                        type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                 }
                 // now try and report the current brake and tyre temp status
                 try
@@ -129,16 +131,18 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionNumberOfLaps > 0)
                     {
                         // special case for iracing - AFAIK no other games have number-of-laps in qual sessions
-                        audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro,
-                            currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps), 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 2, 
+                            messageFragments: MessageContents(folderQualExitIntro, currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps),
+                            abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                     }
                     else if (currentGameState.SessionData.SessionHasFixedTime)
                     {
                         int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
                         if (minutesLeft > 1)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes), 0,
-                                this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                            audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 2,
+                                messageFragments: MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes),
+                                abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                         }
                     }
                 }
@@ -150,7 +154,7 @@ namespace CrewChiefV4.Events
                 isApproachingStartLine(currentGameState.SessionData.TrackDefinition, previousGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.PositionAndMotionData.DistanceRoundTrack) &&
                 isOpponentLeavingPits(currentGameState))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderOpponentExitingPits, 0, this) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderOpponentExitingPits, 2, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
             }
         }
 
@@ -239,19 +243,19 @@ namespace CrewChiefV4.Events
                     // going flat out, we're going to catch the guy ahead us before the end
                     if (currentGameState.SessionData.ClassPosition == 2)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 0, this), 5);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetWin, 10, abstractEvent: this, priority: 5));
                     }
                     else if (currentGameState.SessionData.ClassPosition == 3)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 0, this), 5);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetSecond, 10, abstractEvent: this, priority: 5));
                     }
                     else if (currentGameState.SessionData.ClassPosition == 4)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 0, this), 5);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToGetThird, 10, abstractEvent: this, priority: 5));
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderPushToImprove, 0, this), 5);
+                        audioPlayer.playMessage(new QueuedMessage(folderPushToImprove, 10, abstractEvent: this, priority: 5));
                     }
                     return true;
                 }
@@ -265,7 +269,7 @@ namespace CrewChiefV4.Events
                     // even with us going flat out, the guy behind is going to catch us before the end
                     Console.WriteLine("Might lose this position. Player best lap = " + currentGameState.SessionData.PlayerLapTimeSessionBest.ToString("0.000") + " laps left = " + numLapsLeft +
                         " opponent best lap = " + opponentBehindBestLap.ToString("0.000") + " time delta = " + currentGameState.SessionData.TimeDeltaBehind.ToString("0.000"));
-                    audioPlayer.playMessage(new QueuedMessage(folderPushToHoldPosition, 0, this), 3);
+                    audioPlayer.playMessage(new QueuedMessage(folderPushToHoldPosition, 10, abstractEvent: this, priority: 3));
                     return true;
                 }
             }

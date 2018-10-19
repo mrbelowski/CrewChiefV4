@@ -239,8 +239,9 @@ namespace CrewChiefV4.Events
                             Object opponentIdentifier = getOpponentIdentifierForTyreChange(opponentData, currentGameState.SessionData.ClassPosition);
                             if (opponentIdentifier != null)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), MessageContents(opponentIdentifier,
-                                    folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)), 0, this), 5);
+                                audioPlayer.playMessage(new QueuedMessage("opponent_tyre_change_" + opponentIdentifier.ToString(), 20,
+                                    messageFragments: MessageContents(opponentIdentifier, folderIsNowOn, TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres)),
+                                    abstractEvent: this, priority: 5));
                             }
                         }
 
@@ -270,8 +271,9 @@ namespace CrewChiefV4.Events
                                 if ((currentGameState.SessionData.SessionType == SessionType.Race && frequencyOfOpponentRaceLapTimes > 0) ||
                                     (currentGameState.SessionData.SessionType != SessionType.Race && frequencyOfOpponentPracticeAndQualLapTimes > 0))
                                 {
-                                    audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", MessageContents(folderNewFastestLapFor, opponentData,
-                                                TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 3);
+                                    audioPlayer.playMessage(new QueuedMessage("new_fastest_lap", 5,
+                                        messageFragments: MessageContents(folderNewFastestLapFor, opponentData, 
+                                        TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), abstractEvent: this, priority: 3));
                                 }
                             }
                             else if ((currentGameState.SessionData.SessionType == SessionType.Race &&
@@ -286,24 +288,27 @@ namespace CrewChiefV4.Events
                                 {
                                     // he's leading, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Leader fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                    audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", MessageContents(folderLeaderHasJustDoneA,
-                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 3);
+                                    audioPlayer.playMessage(new QueuedMessage("leader_good_laptime", 5,
+                                         messageFragments: MessageContents(folderLeaderHasJustDoneA, TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)),
+                                        abstractEvent: this, priority: 3));
                                 }
                                 else if (currentGameState.SessionData.ClassPosition > 1 && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition - 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                                 {
                                     // he's ahead of us, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Car ahead fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                    audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", MessageContents(folderTheCarAheadHasJustDoneA,
-                                           TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 0);
+                                    audioPlayer.playMessage(new QueuedMessage("car_ahead_good_laptime", 5,
+                                        messageFragments: MessageContents(folderTheCarAheadHasJustDoneA, TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)),
+                                        abstractEvent: this, priority: 0));
                                 }
                                 else if (!currentGameState.isLast() && opponentData.ClassPosition == currentGameState.SessionData.ClassPosition + 1 &&
                                     (currentGameState.SessionData.SessionType == SessionType.Race || Utilities.random.Next(10) < frequencyOfOpponentPracticeAndQualLapTimes))
                                 {
                                     // he's behind us, and has recorded 3 or more laps, and this one's his fastest
                                     Console.WriteLine("Car behind fast lap - this lap time = " + opponentData.LastLapTime + " session best = " + currentFastestLap);
-                                    audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", MessageContents(folderTheCarBehindHasJustDoneA,
-                                            TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)), 0, this), 0);
+                                    audioPlayer.playMessage(new QueuedMessage("car_behind_good_laptime", 5,
+                                        messageFragments: MessageContents(folderTheCarBehindHasJustDoneA, TimeSpanWrapper.FromSeconds(opponentData.LastLapTime, Precision.AUTO_LAPTIMES)),
+                                        abstractEvent: this, priority: 0));
                                 }
                             }
                         }
@@ -335,7 +340,8 @@ namespace CrewChiefV4.Events
                             }
                             if (AudioPlayer.canReadName(retiredDriver))
                             {
-                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(retiredDriver), folderHasJustRetired), 0, this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("retirement", 10,
+                                    messageFragments: MessageContents(DriverNameHelper.getUsableDriverName(retiredDriver), folderHasJustRetired), abstractEvent: this, priority: 0));
                             }
                         }
                     }
@@ -346,7 +352,8 @@ namespace CrewChiefV4.Events
                             announcedRetirementsAndDQs.Add(dqDriver);
                             if (AudioPlayer.canReadName(dqDriver))
                             {
-                                audioPlayer.playMessage(new QueuedMessage("retirement", MessageContents(DriverNameHelper.getUsableDriverName(dqDriver), folderHasJustBeenDisqualified), 0, this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("retirement", 10,
+                                    messageFragments: MessageContents(DriverNameHelper.getUsableDriverName(dqDriver), folderHasJustBeenDisqualified), abstractEvent: this, priority: 0));
                             }
                         }
                     }
@@ -368,9 +375,11 @@ namespace CrewChiefV4.Events
                                         (!onlyAnnounceOpponentAfter.TryGetValue(opponentName, out announceAfterTime) || currentGameState.Now > announceAfterTime))
                                     {
                                         Console.WriteLine("New car ahead: " + opponentName);
-                                        audioPlayer.playMessage(new QueuedMessage("new_car_ahead", MessageContents(folderNextCarIs, opponentData),
-                                            Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3), this,
-                                            new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } }), 7);
+                                        int delay = Utilities.random.Next(Position.maxSecondsToWaitBeforeReportingPass + 1, Position.maxSecondsToWaitBeforeReportingPass + 3);
+                                        audioPlayer.playMessage(new QueuedMessage("new_car_ahead", delay + 2, secondsDelay: delay,
+                                            messageFragments: MessageContents(folderNextCarIs, opponentData), abstractEvent: this,
+                                            validationData: new Dictionary<string, object> { { validationDriverAheadKey, opponentData.DriverRawName } },
+                                            priority: 7));
                                         nextCarAheadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(30));
                                         onlyAnnounceOpponentAfter[opponentName] = currentGameState.Now.Add(waitBeforeAnnouncingSameOpponentAhead);
                                         lastNextCarAheadOpponentName = opponentName;
@@ -389,8 +398,9 @@ namespace CrewChiefV4.Events
                                     currentGameState.Now > nextLeadChangeMessage && leader.CanUseName && AudioPlayer.canReadName(name))
                                 {
                                     Console.WriteLine("Lead change, current leader is " + name + " laps completed = " + currentGameState.SessionData.CompletedLaps);
-                                    audioPlayer.playMessage(new QueuedMessage("new_leader", MessageContents(leader, folderIsNowLeading), 2, this,
-                                        new Dictionary<string, object> { { validationNewLeaderKey, name } }), 3);
+                                    audioPlayer.playMessage(new QueuedMessage("new_leader", 4, secondsDelay:2,
+                                        messageFragments: MessageContents(leader, folderIsNowLeading), abstractEvent: this,
+                                        validationData: new Dictionary<string, object> { { validationNewLeaderKey, name } }, priority: 3));
                                     nextLeadChangeMessage = currentGameState.Now.Add(TimeSpan.FromSeconds(60));
                                     lastLeaderAnnounced = name;
                                 }
@@ -404,8 +414,10 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
                     !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
-                        folderIsPitting), MessageContents(folderLeaderIsPitting), 0, this), 3);
+                    audioPlayer.playMessage(new QueuedMessage("leader_is_pitting", 10,
+                        messageFragments: MessageContents(folderTheLeader, currentGameState.PitData.OpponentForLeaderPitting,
+                        folderIsPitting), 
+                        alternateMessageFragments: MessageContents(folderLeaderIsPitting), abstractEvent: this, priority: 3));
                     announcedPitters.Add(currentGameState.PitData.OpponentForLeaderPitting.DriverRawName);
                 }
 
@@ -413,8 +425,10 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
                     !Strategy.opponentsWhoWillExitCloseInFront.Contains(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
-                        folderAheadIsPitting), MessageContents(folderCarAheadIsPitting), 0, this), 3);
+                    audioPlayer.playMessage(new QueuedMessage("car_in_front_is_pitting", 10,
+                        messageFragments: MessageContents(currentGameState.PitData.OpponentForCarAheadPitting,
+                        folderAheadIsPitting), 
+                        alternateMessageFragments: MessageContents(folderCarAheadIsPitting), abstractEvent: this, priority: 3));
                     announcedPitters.Add(currentGameState.PitData.OpponentForCarAheadPitting.DriverRawName);
                 }
 
@@ -422,8 +436,10 @@ namespace CrewChiefV4.Events
                     currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && currentGameState.SessionData.SessionPhase != SessionPhase.Formation &&
                     !Strategy.opponentsWhoWillExitCloseBehind.Contains(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
-                        folderBehindIsPitting), MessageContents(folderCarBehindIsPitting), 0, this), 3);
+                    audioPlayer.playMessage(new QueuedMessage("car_behind_is_pitting", 10,
+                        messageFragments: MessageContents(currentGameState.PitData.OpponentForCarBehindPitting,
+                        folderBehindIsPitting),
+                        alternateMessageFragments: MessageContents(folderCarBehindIsPitting), abstractEvent: this, priority: 3));
                     announcedPitters.Add(currentGameState.PitData.OpponentForCarBehindPitting.DriverRawName);
                 }
                 if (Strategy.opponentFrontToWatchForPitting != null && !announcedPitters.Contains(Strategy.opponentFrontToWatchForPitting))
@@ -434,8 +450,10 @@ namespace CrewChiefV4.Events
                         {
                             if (entry.Value.InPits)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
-                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this), 3);
+                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", 10,
+                                    messageFragments: MessageContents(entry.Value, 
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting),
+                                    abstractEvent: this, priority: 3));
                                 Strategy.opponentFrontToWatchForPitting = null;
                                 break;
                             }
@@ -450,8 +468,10 @@ namespace CrewChiefV4.Events
                         {
                             if (entry.Value.InPits)
                             {
-                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", MessageContents(entry.Value,
-                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting), 0, this), 3);
+                                audioPlayer.playMessage(new QueuedMessage("car_is_pitting", 10,
+                                    messageFragments: MessageContents(entry.Value,
+                                    currentGameState.SessionData.ClassPosition > entry.Value.ClassPosition ? folderAheadIsPitting : folderBehindIsPitting),
+                                    abstractEvent: this, priority: 3));
                                 Strategy.opponentBehindToWatchForPitting = null;
                                 break;
                             }
@@ -613,8 +633,8 @@ namespace CrewChiefV4.Events
                         if (lastLap != -1)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(lastLap, Precision.AUTO_LAPTIMES)), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentLastLap", 0, 
+                                messageFragments: MessageContents(TimeSpanWrapper.FromSeconds(lastLap, Precision.AUTO_LAPTIMES))));
 
                         }
                     }
@@ -624,8 +644,8 @@ namespace CrewChiefV4.Events
                         if (bestLap != -1)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", MessageContents(
-                                TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES)), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentBestLap", 0, 
+                                messageFragments:  MessageContents(TimeSpanWrapper.FromSeconds(bestLap, Precision.AUTO_LAPTIMES))));
 
                         }
                     }
@@ -669,7 +689,7 @@ namespace CrewChiefV4.Events
                             if (gotData)
                             {
                                 messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2));
-                                QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", messageFragments, 0, null);
+                                QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", 0, messageFragments: messageFragments);
                                 audioPlayer.playDelayedImmediateMessage(licenceLevelMessage);
                             }
                         }
@@ -680,7 +700,7 @@ namespace CrewChiefV4.Events
                         if (rating != -1)
                         {
                             gotData = true;
-                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentiRating", MessageContents(rating), 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentiRating", 0, messageFragments:  MessageContents(rating)));
                         }
                     }
                 }
@@ -707,11 +727,13 @@ namespace CrewChiefV4.Events
                                 {
                                     if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(folderOpponentPositionIntro, Position.folderStub + position), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", 0, 
+                                            messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position)));
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", MessageContents(Position.folderStub + position), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentPosition", 0, 
+                                            messageFragments: MessageContents(Position.folderStub + position)));
                                     }
                                     gotData = true;
                                 }
@@ -725,18 +747,18 @@ namespace CrewChiefV4.Events
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                                messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapBehind)));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                               MessageContents(Position.folderStub + position, Pause(200), folderOneLapBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                               messageFragments: MessageContents(Position.folderStub + position, Pause(200), folderOneLapBehind)));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(folderOneLapBehind), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, messageFragments: MessageContents(folderOneLapBehind)));
                                     }
                                 }
                                 else if (lapDifference > 1)
@@ -745,19 +767,20 @@ namespace CrewChiefV4.Events
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                                messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200),
+                                                    lapDifference, Position.folderLapsBehind)));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                               MessageContents(Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, 
+                                               messageFragments: MessageContents(Position.folderStub + position, Pause(200), lapDifference, Position.folderLapsBehind)));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(lapDifference, Position.folderLapsBehind), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                            messageFragments: MessageContents(lapDifference, Position.folderLapsBehind)));
                                     }
                                 }
                                 else if (lapDifference == -1)
@@ -766,18 +789,19 @@ namespace CrewChiefV4.Events
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapAhead), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, 
+                                                messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), folderOneLapAhead)));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(Position.folderStub + position, Pause(200), folderOneLapAhead), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, 
+                                                messageFragments: MessageContents(Position.folderStub + position, Pause(200), folderOneLapAhead)));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", MessageContents(folderOneLapAhead), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, 
+                                            messageFragments: MessageContents(folderOneLapAhead)));
                                     }
                                 }
                                 else if (lapDifference < -1)
@@ -786,19 +810,20 @@ namespace CrewChiefV4.Events
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                                messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position, 
+                                                    Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead)));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(Position.folderStub + position, Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                                messageFragments: MessageContents(Position.folderStub + position, Pause(200), Math.Abs(lapDifference), Position.folderLapsAhead)));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(Math.Abs(lapDifference), Position.folderLapsAhead), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                            messageFragments: MessageContents(Math.Abs(lapDifference), Position.folderLapsAhead)));
                                     }
                                 }
                                 else
@@ -813,19 +838,18 @@ namespace CrewChiefV4.Events
                                     {
                                         if (SoundCache.availableSounds.Contains(folderOpponentPositionIntro))
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                                MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, 
+                                                messageFragments: MessageContents(folderOpponentPositionIntro, Position.folderStub + position, Pause(200), delta, aheadOrBehind)));
                                         }
                                         else
                                         {
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                               MessageContents(Position.folderStub + position, Pause(200), delta, aheadOrBehind), 0, null));
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0,
+                                               messageFragments: MessageContents(Position.folderStub + position, Pause(200), delta, aheadOrBehind)));
                                         }
                                     }
                                     else
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta",
-                                            MessageContents(delta, aheadOrBehind), 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage("opponentTimeDelta", 0, messageFragments: MessageContents(delta, aheadOrBehind)));
                                     }
                                 }
                             }
@@ -846,14 +870,14 @@ namespace CrewChiefV4.Events
                         QueuedMessage queuedMessage;
                         if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
-                            queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
-                                    Position.folderStub + opponent.ClassPosition), 0, null);
+                            queuedMessage = new QueuedMessage("opponentNameAndPosition", 0, 
+                                messageFragments: MessageContents(opponent, Position.folderStub + opponent.ClassPosition));
                         }
                         else
                         {
-                            queuedMessage = new QueuedMessage("opponentNameAndPosition", MessageContents(opponent,
-                                    Position.folderStub + opponent.ClassPosition),
-                                    MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName), 0, null);
+                            queuedMessage = new QueuedMessage("opponentNameAndPosition", 0, 
+                                messageFragments: MessageContents(opponent, Position.folderStub + opponent.ClassPosition),
+                                alternateMessageFragments: MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName));
                         }
                         if (queuedMessage.canBePlayed)
                         {
@@ -871,14 +895,14 @@ namespace CrewChiefV4.Events
                         QueuedMessage queuedMessage;
                         if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
-                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
-                                    Position.folderStub + opponent.ClassPosition), 0, null);
+                            queuedMessage = new QueuedMessage("opponentName", 0,
+                                messageFragments: MessageContents(opponent, Position.folderStub + opponent.ClassPosition));
                         }
                         else
                         {
-                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent,
-                                    Position.folderStub + opponent.ClassPosition),
-                                    MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName), 0, null);
+                            queuedMessage = new QueuedMessage("opponentName", 0,
+                                messageFragments: MessageContents(opponent, Position.folderStub + opponent.ClassPosition),
+                                alternateMessageFragments: MessageContents(Position.folderStub + opponent.ClassPosition, folderCantPronounceName));
                         }
 
                         if (queuedMessage.canBePlayed)
@@ -893,7 +917,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.isLast())
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0));
 
                         gotData = true;
                     }
@@ -905,11 +929,12 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage;
                             if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent));
                             }
                             else
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0,
+                                    messageFragments: MessageContents(opponent), alternateMessageFragments: MessageContents(folderCantPronounceName));
                             }
 
                             if (queuedMessage.canBePlayed)
@@ -937,11 +962,12 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage;
                             if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent));
                             }
                             else
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent), 
+                                    alternateMessageFragments: MessageContents(folderCantPronounceName));
                             }
 
                             if (queuedMessage.canBePlayed)
@@ -961,11 +987,12 @@ namespace CrewChiefV4.Events
                         QueuedMessage queuedMessage;
                         if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                         {
-                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                            queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent));
                         }
                         else
                         {
-                            queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                            queuedMessage = new QueuedMessage("opponentName",0, messageFragments: MessageContents(opponent),
+                                alternateMessageFragments: MessageContents(folderCantPronounceName));
                         }
                         if (queuedMessage.canBePlayed)
                         {
@@ -992,11 +1019,12 @@ namespace CrewChiefV4.Events
                             QueuedMessage queuedMessage;
                             if (AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER)
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent));
                             }
                             else
                             {
-                                queuedMessage = new QueuedMessage("opponentName", MessageContents(opponent), MessageContents(folderCantPronounceName), 0, null);
+                                queuedMessage = new QueuedMessage("opponentName", 0, messageFragments: MessageContents(opponent),
+                                    alternateMessageFragments: MessageContents(folderCantPronounceName));
                             }
                             if (queuedMessage.canBePlayed)
                             {

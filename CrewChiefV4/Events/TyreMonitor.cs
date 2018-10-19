@@ -584,23 +584,28 @@ namespace CrewChiefV4.Events
                                 // not moaned about this for a while, so moan away
                                 cornerLockWarningsPlayed[currentCornerName] = currentGameState.Now;
                                 Console.WriteLine("Locking " + cornerLocking + " into " + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark);
+                                int delay = Utilities.random.Next(4, 8);
                                 switch (cornerLocking)
                                 {
                                     case WheelsLockedEnum.FRONTS:
-                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking", delay + 10, secondsDelay: delay,
+                                            messageFragments: MessageContents(folderLockingFrontsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), 
+                                            abstractEvent: this, priority: 0));
                                         break;
                                     case WheelsLockedEnum.LEFT_FRONT:
-                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking", delay + 10, secondsDelay: delay,
+                                            messageFragments: MessageContents(folderLockingLeftFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark),
+                                            abstractEvent: this, priority: 0));
                                         break;
                                     case WheelsLockedEnum.RIGHT_FRONT:
-                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking", delay + 10, secondsDelay: delay,
+                                            messageFragments: MessageContents(folderLockingRightFrontForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark),
+                                            abstractEvent: this, priority: 0));
                                         break;
                                     case WheelsLockedEnum.REARS:
-                                        audioPlayer.playMessage(new QueuedMessage("corner_locking",
-                                            MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark), Utilities.random.Next(4, 8), this), 0);
+                                        audioPlayer.playMessage(new QueuedMessage("corner_locking", delay + 10, secondsDelay: delay,
+                                            messageFragments: MessageContents(folderLockingRearsForCornerWarning, "corners/" + currentGameState.SessionData.trackLandmarksTiming.atMidPointOfLandmark),
+                                            abstractEvent: this, priority: 0));
                                         break;
                                     default:
                                         break;
@@ -634,52 +639,53 @@ namespace CrewChiefV4.Events
                             float rightFrontCornerSpecificWheelSpinTime = timeRightFrontIsSpinningForLap - rightFrontExitStartWheelSpinTime;
                             float leftRearCornerSpecificWheelSpinTime = timeLeftRearIsSpinningForLap - leftRearExitStartWheelSpinTime;
                             float rightRearCornerSpecificWheelSpinTime = timeRightRearIsSpinningForLap - rightRearExitStartWheelSpinTime;
+                            int delay = Utilities.random.Next(4, 8);
                             if (!currentGameState.carClass.allMembersAreRWD && 
                                 leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning fronts out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningFrontsForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (!currentGameState.carClass.allMembersAreFWD &&
                                 leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold && rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning rears out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningRearsForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (!currentGameState.carClass.allMembersAreRWD && 
                                 leftFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left front out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningLeftFrontForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (!currentGameState.carClass.allMembersAreRWD && 
                                 rightFrontCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right front out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningRightFrontForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (!currentGameState.carClass.allMembersAreFWD &&
                                 leftRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning left rear out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningLeftRearForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                             else if (!currentGameState.carClass.allMembersAreFWD &&
                                 rightRearCornerSpecificWheelSpinTime > cornerExitSpinningThreshold)
                             {
                                 Console.WriteLine("Spinning right rear out of " + currentCornerName);
-                                audioPlayer.playMessage(new QueuedMessage("corner_spinning",
-                                    MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), Utilities.random.Next(4, 8), this), 0);
+                                audioPlayer.playMessage(new QueuedMessage("corner_spinning", delay + 10, secondsDelay: delay,
+                                    messageFragments: MessageContents(folderSpinningRightRearForCornerWarning, "corners/" + currentCornerName), abstractEvent: this, priority: 0));
                                 cornerSpinningWarningsPlayed[currentCornerName] = currentGameState.Now;
                             }
                         }
@@ -879,12 +885,12 @@ namespace CrewChiefV4.Events
             {
                 if (playImmediately)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", messageContents, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
                     Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
-                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", messageContents, Utilities.random.Next(0, 10), this), 5);
+                    audioPlayer.playMessage(new QueuedMessage("tyre_temps", 0, messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
                 }
             }
             lastTyreTempMessage = messageContents;
@@ -933,11 +939,11 @@ namespace CrewChiefV4.Events
             {
                 if (playImmediately)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", messageContents, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
                 {
-                    audioPlayer.playMessage(new QueuedMessage("brake_temps", messageContents, Utilities.random.Next(0, 10), this), 5);
+                    audioPlayer.playMessage(new QueuedMessage("brake_temps", 0, messageFragments: messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
                 }
             }
             lastBrakeTempMessage = messageContents;
@@ -964,17 +970,17 @@ namespace CrewChiefV4.Events
                     audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
                     int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
-                    audioPlayer.playDelayedImmediateMessage(new QueuedMessage("tyre_condition", messageContents, secondsDelay, null));
+                    audioPlayer.playDelayedImmediateMessage(new QueuedMessage("tyre_condition", 0, messageFragments: messageContents, secondsDelay: secondsDelay));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", messageContents, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_condition", 0, messageFragments: messageContents));
                 }
             }
             else if (playEvenIfUnchanged || 
                 (lastTyreConditionMessage != null && !messagesHaveSameContent(lastTyreConditionMessage, messageContents) && !wearIsGood))
             {
-                audioPlayer.playMessage(new QueuedMessage("tyre_condition", messageContents, Utilities.random.Next(0, 10), this), 5);
+                audioPlayer.playMessage(new QueuedMessage("tyre_condition", 0, messageFragments: messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
             }
             lastTyreConditionMessage = messageContents;
         }
@@ -989,14 +995,14 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("minutes_on_current_tyres", MessageContents(folderMinutesOnCurrentTyresIntro, 
-                        minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0,  null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("minutes_on_current_tyres", 0, 
+                        messageFragments: MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro)));
                 }
             }
             else if (minutesRemainingOnTheseTyres > 1 && minutesRemainingOnTheseTyres <= 4 + (timeInSession - timeElapsed) / 60)
             {
-                 audioPlayer.playMessage(new QueuedMessage("minutes_on_current_tyres", MessageContents(folderMinutesOnCurrentTyresIntro, 
-                     minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), 0, this), 5);                
+                 audioPlayer.playMessage(new QueuedMessage("minutes_on_current_tyres", 0, 
+                     messageFragments: MessageContents(folderMinutesOnCurrentTyresIntro, minutesRemainingOnTheseTyres, folderMinutesOnCurrentTyresOutro), abstractEvent: this, priority: 5));                
             }
         }
 
@@ -1010,14 +1016,14 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("laps_on_current_tyres", MessageContents(folderLapsOnCurrentTyresIntro,
-                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("laps_on_current_tyres", 0,
+                        messageFragments: MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro)));
                 }
             }
             else if (lapsRemainingOnTheseTyres > 1 && lapsRemainingOnTheseTyres <= 2 + lapsInSession - completedLaps)
             {
-                audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", MessageContents(folderLapsOnCurrentTyresIntro, 
-                        lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), 0, this), 5);              
+                audioPlayer.playMessage(new QueuedMessage("laps_on_current_tyres", 0, 
+                    messageFragments: MessageContents(folderLapsOnCurrentTyresIntro, lapsRemainingOnTheseTyres, folderLapsOnCurrentTyresOutro), abstractEvent: this, priority: 5));              
             }
         }
 
@@ -1148,12 +1154,13 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontTyreTemp == 0 && rightFrontTyreTemp == 0 && leftRearTyreTemp == 0 && rightRearTyreTemp == 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
             else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), 
-                    folderRightFront, convertTemp(rightFrontTyreTemp), folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit()), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", 0, 
+                    messageFragments:  MessageContents(folderLeftFront, convertTemp(leftFrontTyreTemp), folderRightFront, convertTemp(rightFrontTyreTemp),
+                                                       folderLeftRear, convertTemp(leftRearTyreTemp), folderRightRear, convertTemp(rightRearTyreTemp), getTempUnit())));
             }
             
         }
@@ -1162,12 +1169,13 @@ namespace CrewChiefV4.Events
         {
             if (leftFrontBrakeTemp == 0 && rightFrontBrakeTemp == 0 && leftRearBrakeTemp == 0 && rightRearBrakeTemp == 0)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
             else
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), 
-                    folderRightFront, convertTemp(rightFrontBrakeTemp, 10), folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit()), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", 0,
+                    messageFragments: MessageContents(folderLeftFront, convertTemp(leftFrontBrakeTemp, 10), folderRightFront, convertTemp(rightFrontBrakeTemp, 10), 
+                                                      folderLeftRear, convertTemp(leftRearBrakeTemp, 10), folderRightRear, convertTemp(rightRearBrakeTemp, 10), getTempUnit())));
             }
             
         }
@@ -1182,7 +1190,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                        
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));                        
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_TYRE_TEMPS))
@@ -1197,7 +1205,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_MY_BRAKE_TEMPS))
@@ -1213,7 +1221,7 @@ namespace CrewChiefV4.Events
                 }
                 else if (!forStatusReport)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));                    
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES))
@@ -1221,10 +1229,10 @@ namespace CrewChiefV4.Events
                 List<TyrePerformanceContainer> tyrePerformances = getRelativeTyrePerformance();
                 foreach (TyrePerformanceContainer tyrePeformance in tyrePerformances) 
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_comparison_" + tyrePeformance.type1 + "-" + tyrePeformance.type2, 
-                        MessageContents(getFolderForTyreType(tyrePeformance.type1), folderAreAbout, 
+                    audioPlayer.playMessageImmediately(new QueuedMessage("tyre_comparison_" + tyrePeformance.type1 + "-" + tyrePeformance.type2, 0, 
+                        messageFragments: MessageContents(getFolderForTyreType(tyrePeformance.type1), folderAreAbout, 
                                         TimeSpanWrapper.FromSeconds(tyrePeformance.bestLapDelta, Precision.AUTO_GAPS),
-                                        folderFasterThan, getFolderForTyreType(tyrePeformance.type2)), 0, null));
+                                        folderFasterThan, getFolderForTyreType(tyrePeformance.type2))));
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.CAR_STATUS) ||
@@ -1727,13 +1735,13 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left front locking, some right front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just left front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftFrontForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1743,20 +1751,20 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right front locking, some left front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingFrontsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just right front locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightFrontForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
                 else if (isFWD && timeBothRearsAreLockedForLap > totalLockupThresholdForNextLap)
                 {
                     warnedOnLockingForLap = true;
-                    audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                    audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                     playedMessage = true;
                 }
                 else if (!isFWD && timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap)
@@ -1765,13 +1773,13 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of left rear locking, some right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingLeftRearForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1781,13 +1789,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsLockedForLap > totalLockupThresholdForNextLap / 2)
                     {
                         // lots of right rear locking, some left rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRearsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just right rear locking
-                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderLockingRightRearForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1807,13 +1815,13 @@ namespace CrewChiefV4.Events
                     if (timeRightFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left front spinning, some right front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just left front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftFrontForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1823,13 +1831,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftFrontIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right front spinning, some left front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningFrontsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just right front spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightFrontForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1839,13 +1847,13 @@ namespace CrewChiefV4.Events
                     if (timeRightRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of left rear spinning, some right rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just left rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningLeftRearForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }
@@ -1855,13 +1863,13 @@ namespace CrewChiefV4.Events
                     if (timeLeftRearIsSpinningForLap > totalWheelspinThresholdForNextLap / 2)
                     {
                         // lots of right rear spinning, some left rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRearsForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                     else
                     {
                         // just right rear spinning
-                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage(folderSpinningRightRearForLapWarning, messageDelay + 6, secondsDelay: messageDelay, abstractEvent: this, priority: 0));
                         playedMessage = true;
                     }
                 }

@@ -44,7 +44,8 @@ namespace CrewChiefV4.GameState
         public static float spotterVehicleLength = defaultSpotterVehicleLength;
         public static float spotterVehicleWidth = defaultSpotterVehicleWidth;
 
-        public static Boolean spotterEnabled = UserSettings.GetUserSettings().getBoolean("enable_spotter");
+        public static Boolean spotterEnabledInitialState = UserSettings.GetUserSettings().getBoolean("enable_spotter");
+        public static Boolean spotterEnabled = spotterEnabledInitialState;
 
         public static readonly List<MessageTypes> defaultEnabledMessageTypes = new List<MessageTypes> { 
             MessageTypes.TYRE_TEMPS, MessageTypes.TYRE_WEAR, MessageTypes.BRAKE_TEMPS, MessageTypes.BRAKE_DAMAGE, MessageTypes.FUEL, MessageTypes.LOCKING_AND_SPINNING };
@@ -127,7 +128,8 @@ namespace CrewChiefV4.GameState
         public static void UpdateFromTrackDefinition(TrackDefinition trackDefinition)
         {
             useOvalLogic = trackDefinition.isOval;
-            spotterEnabled = useOvalLogic || !realisticMode;
+            // this is called when we start a session, so update the spotter enabled flag based on the initial state
+            spotterEnabled = spotterEnabledInitialState && (useOvalLogic || !realisticMode);
             if (useOvalLogic)
             {
                 Console.WriteLine("Track is marked as oval");

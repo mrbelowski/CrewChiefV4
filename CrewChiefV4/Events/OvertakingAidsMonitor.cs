@@ -64,7 +64,8 @@ namespace CrewChiefV4.Events
                 {
                     if (drsAvailableOnThisLap && !hasUsedDrsOnThisLap)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("missed_available_drs", MessageContents(folderDontForgetDRS), 0, this), 0);
+                        audioPlayer.playMessage(new QueuedMessage("missed_available_drs", 3, 
+                            messageFragments: MessageContents(folderDontForgetDRS), abstractEvent: this, priority: 0));
                     }
                     drsAvailableOnThisLap = currentGameState.OvertakingAids.DrsAvailable;
                     hasUsedDrsOnThisLap = false;
@@ -87,7 +88,8 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, true /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", MessageContents(folderASecondOffDRSRange), 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage("drs_a_second_out_of_range", 3,
+                                messageFragments: MessageContents(folderASecondOffDRSRange), abstractEvent: this, priority: 10));
                             playedGetCloserForDRSOnThisLap = true;
                         }
                     }
@@ -96,7 +98,8 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, true /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("drs_a_few_tenths_out_of_range", MessageContents(folderAFewTenthsOffDRSRange), 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage("drs_a_few_tenths_out_of_range", 3,
+                                messageFragments:  MessageContents(folderAFewTenthsOffDRSRange), abstractEvent: this, priority: 10));
                             playedGetCloserForDRSOnThisLap = true;
                         }
                     }
@@ -111,7 +114,7 @@ namespace CrewChiefV4.Events
                     {
                         if (ImmediateOpponentIsValidForDRSMessage(currentGameState, false /*inFront*/))
                         {
-                            audioPlayer.playMessage(new QueuedMessage("opponent_has_drs", MessageContents(folderGuyBehindHasDRS), 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderGuyBehindHasDRS, 3, abstractEvent: this, priority: 10));
                         }
                     }
                 }
@@ -123,26 +126,28 @@ namespace CrewChiefV4.Events
                 if (previousGameState.OvertakingAids.PushToPassEngaged && !currentGameState.OvertakingAids.PushToPassEngaged &&
                     currentGameState.OvertakingAids.PushToPassActivationsRemaining == 0)
                 {
-                    audioPlayer.playMessage(new QueuedMessage("no_push_to_pass_remaining", MessageContents(folderNoActivationsRemaining), 0, this), 5);
+                    audioPlayer.playMessage(new QueuedMessage(folderNoActivationsRemaining, 10, abstractEvent: this, priority: 5));
                     pushToPassActivationsRemaining = 0;
                 }
                 else if (previousGameState.OvertakingAids.PushToPassWaitTimeLeft > 0 && currentGameState.OvertakingAids.PushToPassWaitTimeLeft == 0)
                 {
                     if (currentGameState.OvertakingAids.PushToPassActivationsRemaining == 1)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("one_push_to_pass_remaining", MessageContents(
-                            folderPushToPassNowAvailable, folderOneActivationRemaining), 0, this), 7);
+                        audioPlayer.playMessage(new QueuedMessage("one_push_to_pass_remaining", 10, 
+                            messageFragments: MessageContents(folderPushToPassNowAvailable, folderOneActivationRemaining), abstractEvent: this, priority: 7));
                         pushToPassActivationsRemaining = 1;
                     }
                     else if (currentGameState.OvertakingAids.PushToPassActivationsRemaining > 0)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("push_to_pass_remaining", MessageContents(folderPushToPassNowAvailable,
-                            currentGameState.OvertakingAids.PushToPassActivationsRemaining, folderActivationsRemaining), 0, this), 2);
+                        audioPlayer.playMessage(new QueuedMessage("push_to_pass_remaining", 5, 
+                            messageFragments: MessageContents(folderPushToPassNowAvailable, currentGameState.OvertakingAids.PushToPassActivationsRemaining, folderActivationsRemaining), 
+                            abstractEvent: this, priority: 2));
                         pushToPassActivationsRemaining = currentGameState.OvertakingAids.PushToPassActivationsRemaining;
                     }
                     else
                     {
-                        audioPlayer.playMessage(new QueuedMessage("no_push_to_pass_remaining", MessageContents(folderNoActivationsRemaining), 0, this), 5);
+                        audioPlayer.playMessage(new QueuedMessage("no_push_to_pass_remaining", 10,
+                            messageFragments: MessageContents(folderNoActivationsRemaining), abstractEvent: this, priority: 5));
                         pushToPassActivationsRemaining = 0;
                     }
                 }
