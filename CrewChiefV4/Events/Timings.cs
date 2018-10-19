@@ -665,9 +665,11 @@ namespace CrewChiefV4.Events
             {
                 return GapStatus.NONE;
             }
-            else if (gaps[0].timeDelta < 0.5 && gaps[1].timeDelta < 0.5)
+            else if ((gaps[0].timeDelta < 0.5 && gaps[1].timeDelta < 0.5) ||
+                     (gaps.Count > 2 && gaps[0].timeDelta < 0.7 && gaps[1].timeDelta < 0.7 && gaps[2].timeDelta < 0.7) ||
+                     (gaps.Count > 3 && gaps[0].timeDelta < 0.8 && gaps[1].timeDelta < 0.8 && gaps[2].timeDelta < 0.8 && gaps[3].timeDelta < 0.8))
             {
-                // this car has been close for 2 sectors
+                // this car has been very close for 2 sectors, pretty close for 3 or fairly close for 4 sectors
                 return GapStatus.CLOSE;
             }
             else if ((lastReportedGap == -1 || Math.Round(gaps[0].timeDelta, 1) > Math.Round(lastReportedGap)) &&
