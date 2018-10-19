@@ -130,6 +130,7 @@ namespace CrewChiefV4
         private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         private static readonly String compoundMessageIdentifier = "COMPOUND_";
+        private static readonly String delayedMessageIdentifier = "DELAYED_";
 
         public SoundMetadata metadata = null;  // null => a generic 'regular message' meta data object will be created automatically
                                                // for regular queue messages, and a 'high importance' metadata object create for immediate-queue messages
@@ -186,7 +187,12 @@ namespace CrewChiefV4
             this.delayedMessageEvent = delayedMessageEvent;
             this.delayMessageResolution = delayedMessageEvent != null;
 
-            if (messageFragments == null)
+            // for delayed message events, we collect up the message folder when the message when the message is about to be played, not here
+            if (delayedMessageEvent != null)
+            {
+                this.messageName = delayedMessageIdentifier + messageName;
+            }
+            else if (messageFragments == null)
             {
                 this.messageName = messageName;
                 List<MessageFragment> singleMessageFragement = new List<MessageFragment>();
