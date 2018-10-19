@@ -49,6 +49,10 @@ namespace CrewChiefV4.ACC
         {
             return (float)TimeSpan.FromMilliseconds(time).TotalSeconds;
         }
+        public float mapToFloatTime(float time)
+        {
+            return (float)TimeSpan.FromMilliseconds(time).TotalSeconds;
+        }
         public override GameStateData mapToGameStateData(Object structWrapper, GameStateData previousGameState)
         {
             ACCSharedMemoryReader.ACCStructWrapper wrapper = (ACCSharedMemoryReader.ACCStructWrapper)structWrapper;            
@@ -88,13 +92,18 @@ namespace CrewChiefV4.ACC
 
             }
             //test commit
-            SessionType currentSessionType = mapToSessionType(data.sessionData.currentSessionType);
+            SessionType currentSessionType = mapToSessionType(data.sessionData.currentSessionType, data.driverCount == 1 && data.sessionData.isOnline == 0);
             currentGameState.SessionData.SessionType = currentSessionType;
             SessionPhase currentSessioPhase = mapToSessionPhase(data.sessionData.currentSessionPhase, currentSessionType);
             currentGameState.SessionData.SessionPhase = currentSessioPhase;
 
-            currentGameState.SessionData.SessionRunningTime = (float)TimeSpan.FromMilliseconds((data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp)).TotalSeconds;           
-            currentGameState.SessionData.SessionTimeRemaining = (float)TimeSpan.FromMilliseconds((data.sessionData.sessionEndTime - data.sessionData.physicsTime)).TotalSeconds;
+            currentGameState.SessionData.SessionRunningTime = mapToFloatTime(data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp);
+            currentGameState.SessionData.SessionTimeRemaining = mapToFloatTime(data.sessionData.sessionEndTime - data.sessionData.physicsTime);
+            if (currentSessionType == SessionType.LonePractice)
+            {
+                currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
+                currentGameState.SessionData.SessionRunningTime = mapToFloatTime(data.sessionData.physicsTime);
+            }
             currentGameState.SessionData.SessionTotalRunTime = (float)data.sessionData.sessionDuration;
             currentGameState.SessionData.SessionHasFixedTime = true;
             
@@ -104,7 +113,7 @@ namespace CrewChiefV4.ACC
             //this still needs fixing
             if (currentSessionType != SessionType.Unavailable &&
                 (previousRaceSessionPhase == RaceSessionPhase.StartingUI && data.sessionData.currentSessionPhase == RaceSessionPhase.PreFormationTime && currentSessionType == SessionType.Race)
-                || previousSessionId != data.sessionData.currentSessionIndex /*|| previousSessionStartTimeStamp != data.sessionData.sessionStartTimeStamp*/)
+                || previousSessionId != data.sessionData.currentSessionIndex)
             {
                 currentGameState.SessionData.IsNewSession = true;
                 //PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
@@ -334,9 +343,7 @@ namespace CrewChiefV4.ACC
             currentGameState.SessionData.IsNewSector = previousGameState != null && previousGameState.SessionData.SectorNumber != currentGameState.SessionData.SectorNumber;
             currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(playerDriver.currentlaptime);
             if (currentGameState.SessionData.IsNewLap || currentGameState.SessionData.IsNewSector)
-            {
-                
-
+            {               
                 if(currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
@@ -351,7 +358,7 @@ namespace CrewChiefV4.ACC
                 }
             }
 
-            if (currentGameState.SessionData.IsNewLap)
+            if ((previousGameState != null && currentGameState.SessionData.SectorNumber == 1 && currentGameState.SessionData.IsNewSector && currentGameState.SessionData.CompletedLaps == 0) || currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, playerDriver.trackLocation != CarLocation.ECarLocation__Track, currentGameState.SessionData.SessionRunningTime);
@@ -360,6 +367,7 @@ namespace CrewChiefV4.ACC
             //currentGameState.SessionData.SessionPhase = SessionPhase.Green;
             currentGameState.sortClassPositions();
             currentGameState.setPracOrQualiDeltas();
+
             return currentGameState;
         }
 
@@ -382,13 +390,20 @@ namespace CrewChiefV4.ACC
             opponentData.CurrentSectorNumber = (int)driver.currentSector + 1;
             return opponentData;
         }
-        private SessionType mapToSessionType(RaceSessionType sessionType)
+        private SessionType mapToSessionType(RaceSessionType sessionType, Boolean isLonePractice)
         {
             switch (sessionType)
             {
                 case RaceSessionType.FreePractice1:
                 case RaceSessionType.FreePractice2:
-                    return SessionType.Practice;
+                    if (isLonePractice)
+                    {
+                        return SessionType.LonePractice;
+                    }
+                    else
+                    {
+                        return SessionType.Practice;
+                    }
                 case RaceSessionType.Hotstint:
                 case RaceSessionType.Hotlap:
                     return SessionType.HotLap;
@@ -410,6 +425,17 @@ namespace CrewChiefV4.ACC
             switch(currentSessionType)
             {
                 case SessionType.Practice:
+                case SessionType.LonePractice:
+                    { 
+                        if (currentRaceSessionPhase != RaceSessionPhase.StartingUI || currentRaceSessionPhase != RaceSessionPhase.RaceSessionPhase_Max)
+                        {
+                           return SessionPhase.Green;
+                        }
+                        else
+                        {
+                            return SessionPhase.Unavailable;
+                        }
+                    }
                 case SessionType.HotLap:
                 case SessionType.Qualify:
                     return SessionPhase.Green;
@@ -418,7 +444,7 @@ namespace CrewChiefV4.ACC
                         switch(currentRaceSessionPhase)
                         {
                             case RaceSessionPhase.StartingUI:
-                                return SessionPhase.Garage;
+                                return SessionPhase.Unavailable;
                             case RaceSessionPhase.PreFormationTime:
                             case RaceSessionPhase.FormationTime: //here we are in our car on the grid waition to roll
                                 return SessionPhase.Gridwalk;

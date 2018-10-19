@@ -432,7 +432,8 @@ namespace CrewChiefV4.ACC
             public RaceSessionType currentSessionType;
             public RaceSessionPhase currentSessionPhase;
             public byte mandatoryPitStopCount;
-            public byte pitlaneSpeedLimitKmh;    
+            public byte pitlaneSpeedLimitKmh;
+            public byte isOnline;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 8)]
