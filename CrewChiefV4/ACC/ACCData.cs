@@ -270,18 +270,18 @@ namespace CrewChiefV4.ACC
         // i think this one is supposed to be a bitfield but IDA cant always tell the differance 
 	    public enum LapStateFlags : short
 	    {
-		    HasCut = 0x0000,
-            IsInvalidLap = 0x0001,
-            HasPenalty = 0x0002,
-            IsOutLap = 0x0003,
-            IsInLap = 0x0004,
-            IsFormationLap = 0x0005,
-            IsSafetyCarOnTrack = 0x0006,
-            IsFullCourseYellow = 0x0007,
-            IsRetired = 0x0008,
-            IsDisqualified = 0x0009,
-            IsOnPitWorkingZone = 0x0010,
-            DriverSwap = 0x0011,
+		    HasCut = 0x0001,
+            IsInvalidLap = 0x0002,
+            HasPenalty = 0x0004,
+            IsOutLap = 0x0008,
+            IsInLap = 0x0010,
+            IsFormationLap = 0x0020,
+            IsSafetyCarOnTrack = 0x0040,
+            IsFullCourseYellow = 0x0080,
+            IsRetired = 0x0100,
+            IsDisqualified = 0x0200,
+            IsOnPitWorkingZone = 0x0400,
+            DriverSwap = 0x0800,
 	    };
 
 	    public enum PitStopRepairType : byte
