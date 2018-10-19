@@ -267,21 +267,21 @@ namespace CrewChiefV4.ACC
 		    ERaceEventType__D_1H = 3,
 		    ERaceEventType__ERaceEventType_MAX = 4
 	    };
-
-	    public enum LapStateFlags : byte
+        // i think this one is supposed to be a bitfield but IDA cant always tell the differance 
+	    public enum LapStateFlags : short
 	    {
-		    HasCut = 0x0,
-		    IsInvalidLap = 1,
-		    HasPenalty = 2,
-		    IsOutLap = 3,
-		    IsInLap = 4,
-		    IsFormationLap = 5,
-		    IsSafetyCarOnTrack = 6,
-		    IsFullCourseYellow = 7,
-		    IsRetired = 8,
-		    IsDisqualified = 9,
-		    IsOnPitWorkingZone = 10,
-		    DriverSwap = 11,
+		    HasCut = 0x0000,
+            IsInvalidLap = 0x0001,
+            HasPenalty = 0x0002,
+            IsOutLap = 0x0003,
+            IsInLap = 0x0004,
+            IsFormationLap = 0x0005,
+            IsSafetyCarOnTrack = 0x0006,
+            IsFullCourseYellow = 0x0007,
+            IsRetired = 0x0008,
+            IsDisqualified = 0x0009,
+            IsOnPitWorkingZone = 0x0010,
+            DriverSwap = 0x0011,
 	    };
 
 	    public enum PitStopRepairType : byte
@@ -358,7 +358,17 @@ namespace CrewChiefV4.ACC
             public WeatherStatus weatherState;
             
         }
-
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+        [Serializable]
+        public struct Lap 
+	    {
+            public UInt16 driverIndex;
+            public float timeStamp;
+            public int lapTime;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+            public int[] sectorTimes;
+		    public LapStateFlags lapStates;
+	    };
         [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
         [Serializable]
         public struct Driver
@@ -377,8 +387,10 @@ namespace CrewChiefV4.ACC
             public int lapCount;
             public int totalTime;
 	        public int currentDelta;
-            public uint currentSector;          //0 based index, when formation lap starts in last sector this value will be tracksector count
+            public int currentSector;          //0 based index, when formation lap starts in last sector this value will be tracksector count
             public int currentlaptime;
+            public int lastLapTime;
+            public LapStateFlags lapStates;
             public float trottle;
             public float brake;
             public float clutch;
