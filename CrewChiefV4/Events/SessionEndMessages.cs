@@ -177,7 +177,7 @@ namespace CrewChiefV4.Events
             {
                 if (sessionType == SessionType.Qualify && position == 1)
                 {
-                    audioPlayer.playMessage(new QueuedMessage(folderEndOfSessionPole, 0, null));
+                    audioPlayer.playMessage(new QueuedMessage(folderEndOfSessionPole, 0));
                 }
                 else
                 {

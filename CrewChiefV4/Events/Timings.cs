@@ -766,7 +766,7 @@ namespace CrewChiefV4.Events
                 {
                     if (isLeading && isRace)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0));
                         haveData = true;
                     }
                     else
@@ -781,7 +781,7 @@ namespace CrewChiefV4.Events
                 {
                     if (isLast && isRace)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLast, 0));
                         haveData = true;
                     }
                     else
@@ -793,7 +793,7 @@ namespace CrewChiefV4.Events
                 }
                 if (!haveData)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
             }
         }

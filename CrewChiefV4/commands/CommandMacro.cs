@@ -130,11 +130,11 @@ namespace CrewChiefV4.commands
             }
             if (macroConfirmationMessage != null)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(macroConfirmationMessage, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(macroConfirmationMessage, 0));
             }
             else if (commandConfirmationMessage != null)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(commandConfirmationMessage, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(commandConfirmationMessage, 0));
             }
             return isValid;
         }

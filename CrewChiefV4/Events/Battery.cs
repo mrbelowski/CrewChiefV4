@@ -684,7 +684,7 @@ namespace CrewChiefV4.Events
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
                 if (allowNoDataMessage)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
 
                 return;
             }
@@ -699,14 +699,14 @@ namespace CrewChiefV4.Events
                 reportedUse = this.reportBatteryUse(allowNoDataMessage);
 
             if (!reportedUse && !reportedRemaining && allowNoDataMessage)
-                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
         }
 
         public override void respond(String voiceMessage)
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
-                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
 
                 return;
             }
@@ -723,7 +723,7 @@ namespace CrewChiefV4.Events
         {
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
-                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
 
                 return;
             }
@@ -933,7 +933,7 @@ namespace CrewChiefV4.Events
             if (!GlobalBehaviourSettings.enabledMessageTypes.Contains(MessageTypes.BATTERY))
             {
                 if (allowNoDataMessage && requestedExplicitly)
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
 
                 return;
             }

@@ -1119,7 +1119,7 @@ namespace CrewChiefV4.Events
         public void respondPracticeStop()
         {
             isTimingPracticeStop = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0));
         }
 
         public void respondRace()
@@ -1127,7 +1127,7 @@ namespace CrewChiefV4.Events
             if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
             {
                 Console.WriteLine("No data for pit estimate");
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
             else
             {
