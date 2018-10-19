@@ -603,7 +603,7 @@ namespace CrewChiefV4.Events
                 {
                     gotData = true;
                     // TODO: mismatched tyre types...
-                    audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(currentGameState.TyreData.FrontLeftTyreType), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(currentGameState.TyreData.FrontLeftTyreType), 0));
                 }
                 else if (voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRE_IS) || voiceMessage.StartsWith(SpeechRecogniser.WHAT_TYRES_IS))
                 {
@@ -617,7 +617,7 @@ namespace CrewChiefV4.Events
                             if (opponentData != null)
                             {
                                 gotData = true;
-                                audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0, null));
+                                audioPlayer.playMessageImmediately(new QueuedMessage(TyreMonitor.getFolderForTyreType(opponentData.CurrentTyres), 0));
                             }
                         }
                     }
@@ -950,7 +950,7 @@ namespace CrewChiefV4.Events
                 {
                     if (currentGameState.SessionData.ClassPosition == 1)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderLeading, 0));
 
                         gotData = true;
                     }
@@ -1010,7 +1010,7 @@ namespace CrewChiefV4.Events
                         OpponentData opponent = null;
                         if (opponentKey == positionIsPlayerKey)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderWeAre, 0));
 
                             gotData = true;
                         }
@@ -1038,7 +1038,7 @@ namespace CrewChiefV4.Events
             }
             if (!gotData)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
 
             }
         }

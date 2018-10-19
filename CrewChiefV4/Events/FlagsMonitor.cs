@@ -637,7 +637,7 @@ namespace CrewChiefV4.Events
                             if (CrewChief.yellowFlagMessagesEnabled)
                             {
                                 audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowStartUS : folderFCYellowStartEU, 0,
-                                    null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                    abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                             }
                             // start working out who's gone off
                             if (enableOpponentCrashMessages)
@@ -709,7 +709,7 @@ namespace CrewChiefV4.Events
                     if (CrewChief.yellowFlagMessagesEnabled)
                     {
                         audioPlayer.playMessageImmediately(new QueuedMessage(GlobalBehaviourSettings.useAmericanTerms ? folderFCYellowPrepareForGreenUS : folderFCYellowPrepareForGreenEU, 0,
-                            null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                            abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                     }
                 }
                 else if ((currentGameState.FlagData.fcyPhase == FullCourseYellowPhase.PENDING ||
@@ -807,7 +807,7 @@ namespace CrewChiefV4.Events
                                     hasWarnedOfUpcomingIncident = true;
                                     if (CrewChief.yellowFlagMessagesEnabled && !currentGameState.PitData.InPitlane)
                                     {
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0, null));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderLocalYellowAhead, 0));
                                     }
                                 }
                             }

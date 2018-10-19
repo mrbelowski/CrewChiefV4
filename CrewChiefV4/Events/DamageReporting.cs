@@ -125,15 +125,15 @@ namespace CrewChiefV4.Events
             driverIsOKRequestCount = 0;
             if (responseType == DriverOKResponseType.CLEARLY_OK)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOK, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
             }
             else if (responseType == DriverOKResponseType.NOT_UNDERSTOOD)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKAnySpeech, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
             }
             else if (responseType == DriverOKResponseType.NO_SPEECH)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAcknowledgeDriverIsOKNoSpeech, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
             }
         }
         
@@ -244,13 +244,13 @@ namespace CrewChiefV4.Events
                     timeWhenAskedIfDriverIsOK = currentGameState.Now;
                     if (driverIsOKRequestCount == 1)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKSecondTry, 0, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                         driverIsOKRequestCount = 2;
                     }
                     else if (driverIsOKRequestCount == 2)
                     {
                         // no response after 3 requests, he's dead, jim.
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKThirdTry, 0, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                         cancelWaitingForDriverIsOK(DriverOKResponseType.NONE);
                     }
                 }
@@ -500,20 +500,20 @@ namespace CrewChiefV4.Events
                     {
                         if (includeNoDamage)
                         {
-                            damageMessage = new QueuedMessage(folderNoAeroDamage, 0, null);
+                            damageMessage = new QueuedMessage(folderNoAeroDamage, 0);
                         }
                     }
                     else if (aeroDamage == DamageLevel.MAJOR || aeroDamage == DamageLevel.DESTROYED)
                     {
-                        damageMessage = new QueuedMessage(folderSevereAeroDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderSevereAeroDamage, 0);
                     }
                     else if (aeroDamage == DamageLevel.MINOR)
                     {
-                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorAeroDamage : folderMinorAeroDamageGeneral, 0, null);
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorAeroDamage : folderMinorAeroDamageGeneral, 0);
                     }
                     else if (aeroDamage == DamageLevel.TRIVIAL)
                     {
-                        damageMessage = new QueuedMessage(includeNoDamage ? folderJustAScratch : folderJustAScratchGeneral, 0, null);
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderJustAScratch : folderJustAScratchGeneral, 0);
                     }
                     break;
                 case Component.BRAKES:
@@ -521,20 +521,20 @@ namespace CrewChiefV4.Events
                     {
                         if (includeNoDamage)
                         {
-                            damageMessage = new QueuedMessage(folderNoBrakeDamage, 0, null);
+                            damageMessage = new QueuedMessage(folderNoBrakeDamage, 0);
                         }
                     }
                     else if (maxBrakeDamage == DamageLevel.DESTROYED)
                     {
-                        damageMessage = new QueuedMessage(folderBustedBrakes, 0, null);
+                        damageMessage = new QueuedMessage(folderBustedBrakes, 0);
                     }
                     else if (maxBrakeDamage == DamageLevel.MAJOR)
                     {
-                        damageMessage = new QueuedMessage(folderSevereBrakeDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderSevereBrakeDamage, 0);
                     }
                     else if (maxBrakeDamage == DamageLevel.MINOR)
                     {
-                        damageMessage = new QueuedMessage(folderMinorBrakeDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderMinorBrakeDamage, 0);
                     }
                     break;
                 case Component.ENGINE:
@@ -542,45 +542,45 @@ namespace CrewChiefV4.Events
                     {
                         if (includeNoDamage)
                         {
-                            damageMessage = new QueuedMessage(folderNoEngineDamage, 0, null);
+                            damageMessage = new QueuedMessage(folderNoEngineDamage, 0);
                         }
                     }
                     else if (engineDamage == DamageLevel.DESTROYED)
                     {
-                        damageMessage = new QueuedMessage(folderBustedEngine, 0, null);
+                        damageMessage = new QueuedMessage(folderBustedEngine, 0);
                     }
                     else if (engineDamage == DamageLevel.MAJOR)
                     {
-                        damageMessage = new QueuedMessage(folderSevereEngineDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderSevereEngineDamage, 0);
                     }
                     else if (engineDamage == DamageLevel.MINOR)
                     {
-                        damageMessage = new QueuedMessage(folderMinorEngineDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderMinorEngineDamage, 0);
                     }
                     break;
                 case Component.SUSPENSION:
                     if (isMissingWheel)
                     {
-                        damageMessage = new QueuedMessage(folderMissingWheel, 0, null);                        
+                        damageMessage = new QueuedMessage(folderMissingWheel, 0);                        
                     }
                     if ((maxSuspensionDamage == DamageLevel.NONE || maxSuspensionDamage == DamageLevel.TRIVIAL) && !isMissingWheel)
                     {
                         if (includeNoDamage)
                         {
-                            damageMessage = new QueuedMessage(folderNoSuspensionDamage, 0, null);
+                            damageMessage = new QueuedMessage(folderNoSuspensionDamage, 0);
                         }
                     }
                     else if (maxSuspensionDamage == DamageLevel.DESTROYED)
                     {
-                        damageMessage = new QueuedMessage(folderBustedSuspension, 0, null);                        
+                        damageMessage = new QueuedMessage(folderBustedSuspension, 0);                        
                     }
                     else if (maxSuspensionDamage == DamageLevel.MAJOR)
                     {
-                        damageMessage = new QueuedMessage(folderSevereSuspensionDamage, 0, null);                        
+                        damageMessage = new QueuedMessage(folderSevereSuspensionDamage, 0);                        
                     }
                     else if (maxSuspensionDamage == DamageLevel.MINOR && !isMissingWheel)
                     {
-                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorSuspensionDamage : folderMinorSuspensionDamageGeneral, 0, null);                        
+                        damageMessage = new QueuedMessage(includeNoDamage ? folderMinorSuspensionDamage : folderMinorSuspensionDamageGeneral, 0);                        
                     }
                     break;
                 case Component.TRANNY:
@@ -588,20 +588,20 @@ namespace CrewChiefV4.Events
                     {
                         if (includeNoDamage)
                         {
-                            damageMessage = new QueuedMessage(folderNoTransmissionDamage, 0, null);
+                            damageMessage = new QueuedMessage(folderNoTransmissionDamage, 0);
                         }
                     }
                     else if (trannyDamage == DamageLevel.DESTROYED)
                     {
-                        damageMessage = new QueuedMessage(folderBustedTransmission, 0, null);
+                        damageMessage = new QueuedMessage(folderBustedTransmission, 0);
                     }
                     else if (trannyDamage == DamageLevel.MAJOR)
                     {
-                        damageMessage = new QueuedMessage(folderSevereTransmissionDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderSevereTransmissionDamage, 0);
                     }
                     else if (trannyDamage == DamageLevel.MINOR)
                     {
-                        damageMessage = new QueuedMessage(folderMinorTransmissionDamage, 0, null);
+                        damageMessage = new QueuedMessage(folderMinorTransmissionDamage, 0);
                     }
                     break;
                 default:
@@ -618,16 +618,16 @@ namespace CrewChiefV4.Events
                 switch (lastReportedPunctureCorner)
                 {
                     case CornerData.Corners.FRONT_LEFT:
-                        damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0, null));
+                        damageMessages.Add(new QueuedMessage(folderLeftFrontPuncture, 0));
                         break;
                     case CornerData.Corners.FRONT_RIGHT:
-                        damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0, null));
+                        damageMessages.Add(new QueuedMessage(folderRightFrontPuncture, 0));
                         break;
                     case CornerData.Corners.REAR_LEFT:
-                        damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0, null));
+                        damageMessages.Add(new QueuedMessage(folderLeftRearPuncture, 0));
                         break;
                     case CornerData.Corners.REAR_RIGHT:
-                        damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0, null));
+                        damageMessages.Add(new QueuedMessage(folderRightRearPuncture, 0));
                         break;
                 }
                 QueuedMessage aero = getDamageMessage(Component.AERO, false);
@@ -658,7 +658,7 @@ namespace CrewChiefV4.Events
                 if (damageMessages.Count == 0)
                 {
                     // no damage
-                    damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0, null));
+                    damageMessages.Add(new QueuedMessage(folderNoDamageOnAnyComponent, 0));
                 }
                 foreach (QueuedMessage message in damageMessages)
                 {
@@ -703,7 +703,7 @@ namespace CrewChiefV4.Events
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0));
                         int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                         audioPlayer.pauseQueue(secondsDelay);
                         damageMessage.dueTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + (1000 * secondsDelay);
@@ -716,7 +716,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
             }
         }
@@ -946,7 +946,7 @@ namespace CrewChiefV4.Events
                 now.Subtract(timeOfDangerousAcceleration) < TimeSpan.FromSeconds(5))
             {
                 audioPlayer.purgeQueues();
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderAreYouOKFirstTry, 0, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                 // only kick off the 'waiting for response' stuff sometimes
                 if (MainWindow.voiceOption != MainWindow.VoiceOptionEnum.DISABLED)
                 {

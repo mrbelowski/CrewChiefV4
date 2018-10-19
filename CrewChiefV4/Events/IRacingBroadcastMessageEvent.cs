@@ -152,7 +152,7 @@ namespace CrewChiefV4.Events
                 {
                     playedIncidentsWarning = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderYouHave, incidentsCount, folderincidentPoints,
-                        Pause(200), folderincidentPointslimit, maxIncidentCount), 0, null));
+                        Pause(200), folderincidentPointslimit, maxIncidentCount), 0));
                     
                 }
                 else if (incidentsCount >= maxIncidentCount - 1 && !playedLastIncidentsLeftWarning)
@@ -182,7 +182,7 @@ namespace CrewChiefV4.Events
                 }
                 if (amount == 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0));
                     return;
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
@@ -222,11 +222,11 @@ namespace CrewChiefV4.Events
 
                 if (litresNeeded == float.MaxValue)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 else if (litresNeeded <= 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0));
                 }
                 else if(litresNeeded > 0)
                 {
@@ -469,7 +469,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                         return;
                     }
                     messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2));
@@ -487,7 +487,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     return;
                 }
             }

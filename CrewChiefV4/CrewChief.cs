@@ -217,7 +217,7 @@ namespace CrewChiefV4
             {
                 currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeEnableDelayInHardParts, 0));
         }
 
         public void disableDelayMessagesInHardParts()
@@ -231,7 +231,7 @@ namespace CrewChiefV4
             {
                 currentGameState.SessionData.TrackDefinition.setGapPoints();
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowledgeDisableDelayInHardParts, 0));
         }
 
         public void toggleReadOpponentDeltasMode()
@@ -252,7 +252,7 @@ namespace CrewChiefV4
             {
                 readOpponentDeltasForEveryLap = true;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasEnabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasEnabled, 0));
         }
 
         public void disableDeltasMode()
@@ -261,7 +261,7 @@ namespace CrewChiefV4
             {
                 readOpponentDeltasForEveryLap = false;
             }
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDeltasDisabled, 0));
         }
 
         public void toggleEnableYellowFlagsMode()
@@ -279,13 +279,13 @@ namespace CrewChiefV4
         public void enableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowEnabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowEnabled, 0));
         }
 
         public void disableYellowFlagMessages()
         {
             yellowFlagMessagesEnabled = false;
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowDisabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderYellowDisabled, 0));
         }
 
         public void toggleManualFormationLapMode()
@@ -314,7 +314,7 @@ namespace CrewChiefV4
                 GameStateData.onManualFormationLap = true;
             }
             Console.WriteLine("Manual formation lap mode is ACTIVE");
-            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeEnabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeEnabled, 0));
         }
 
         public void disableManualFormationLapMode()
@@ -325,7 +325,7 @@ namespace CrewChiefV4
                 GameStateData.onManualFormationLap = false;
             }
             Console.WriteLine("Manual formation lap mode is DISABLED");
-            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeDisabled, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(LapCounter.folderManualFormationLapModeDisabled, 0));
         }
 
         public void reportFuelStatus()
@@ -366,7 +366,7 @@ namespace CrewChiefV4
         {
             if (currentGameState != null)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 currentGameState.readLandmarksForThisLap = true;
             }
         }
@@ -401,7 +401,7 @@ namespace CrewChiefV4
 
         public void respondToRadioCheck()
         {
-            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderRadioCheckResponse, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderRadioCheckResponse, 0));
         }
 
         public void youWot(Boolean detectedSomeSpeech)
@@ -427,7 +427,7 @@ namespace CrewChiefV4
             else
             {
                 // TODO: separate responses for no input detected, and input not understood?
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0));
             }
         }
 
@@ -436,7 +436,7 @@ namespace CrewChiefV4
             if (DriverTrainingService.isPlayingPaceNotes)
             {
                 DriverTrainingService.stopPlayingPaceNotes();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
             }
             else
             {
@@ -447,7 +447,7 @@ namespace CrewChiefV4
                         if (DriverTrainingService.loadPaceNotes(CrewChief.gameDefinition.gameEnum,
                                 CrewChief.currentGameState.SessionData.TrackDefinition.name, CrewChief.currentGameState.carClass.carClassEnum))
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         }
                     }
                 }

@@ -89,7 +89,7 @@ namespace CrewChiefV4.Events
                 if (alarm.enabled && (DateTime.Now > alarm.alarmTime && DateTime.Now < alarm.alarmTime + TimeSpan.FromSeconds(60)))
                 {
                     alarm.enabled = false;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AlarmClock.wakeUp, 0, null) { metadata = new SoundMetadata(SoundType.CRITICAL_MESSAGE, 15) });
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AlarmClock.wakeUp, 0, type: SoundType.CRITICAL_MESSAGE, priority: 15));
                 }
             }
         }
