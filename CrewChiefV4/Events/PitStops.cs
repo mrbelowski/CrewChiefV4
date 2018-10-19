@@ -362,25 +362,27 @@ namespace CrewChiefV4.Events
                                         {
                                             audioPlayer.pauseQueue(10);
                                             // box in 5...
-                                            Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
-                                                messageFragments: MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
+                                            int num = pitCountdownTriggerPoints.Length - (i + 1);
+                                            Console.WriteLine("BOX IN " + num + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_" + num, 1,
+                                                messageFragments: MessageContents(folderBoxPositionIntro, num), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                             playedBoxIn = true;
                                         }
                                         else if (i == pitCountdownTriggerPoints.Length - 1)
                                         {
                                             // BOX
                                             Console.WriteLine("BOX IN NOW at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_end", 1,
                                                 messageFragments: MessageContents(folderBoxNow), type: SoundType.CRITICAL_MESSAGE, priority: 10));
                                             audioPlayer.unpauseQueue();
                                         }
                                         else if (playedBoxIn)
                                         {
                                             // 4, 3, 2, 1
-                                            Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
-                                                messageFragments: MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
+                                            int num = pitCountdownTriggerPoints.Length - (i + 1);
+                                            Console.WriteLine("BOX IN ... " + num + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_" + num, 1,
+                                                messageFragments: MessageContents(num), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                         }
                                         break;
                                     }

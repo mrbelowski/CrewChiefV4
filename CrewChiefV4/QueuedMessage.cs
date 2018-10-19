@@ -163,14 +163,16 @@ namespace CrewChiefV4
 
         public Boolean isRant = false;
 
-        private int messageId = 0;
+        public int messageId = 0;
+
+        private static int messageIdCounter = 0;
 
         private int getMessageId()
         {
             lock (this)
             {
-                this.messageId++;
-                return this.messageId;
+                QueuedMessage.messageIdCounter++;
+                return QueuedMessage.messageIdCounter;
             }
         }
 
