@@ -404,7 +404,8 @@ namespace CrewChiefV4.ACC
             public byte isCarOutOfTrack;
             public UInt16 driverIndex;
             public byte formationLapCounter;
-            public CarLocation trackLocation;	
+            public CarLocation trackLocation;
+            public byte pitLimiterOn;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 8)]
