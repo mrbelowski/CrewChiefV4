@@ -165,13 +165,13 @@ namespace CrewChiefV4.Events
                     lastStatusMessage = currentEngineStatus;
                     if (!fromStatusRequest)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0));
                     }
                 }
                 else if(currentEngineStatus.HasFlag(EngineStatus.HOT_OIL)  && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
                 {
                     lastStatusMessage = currentEngineStatus;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0));
                 }
                 else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                 {
@@ -179,7 +179,7 @@ namespace CrewChiefV4.Events
                     if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                     {
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0));
                     }
                 }
                 else if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
@@ -188,13 +188,13 @@ namespace CrewChiefV4.Events
                     if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                     {
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0));
                     }
                 }
             }
             if (!gotData && !fromStatusRequest)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));                
             }
         }
 

@@ -311,8 +311,9 @@ namespace CrewChiefV4.Events
                     played50MetreOr100FeetWarning = false;
                     if (pitBoxPositionCountdownEnabled)
                     {
-                        // here we assume that being >150 metres from the box means the time countdown won't interfere
-                        if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
+                        // here we assume that being >250 metres from the box means the time countdown won't interfere enough to make it 
+                        // unless - note that <250 metres will result in a truncated countdown starting at 3 or 4
+                        if (distanceToBox > 250 && !playedLimiterLineToPitBoxDistanceWarning)
                         {
                             int distanceToBoxInt = (int)(distanceToBox * (pitBoxPositionCountdownInFeet ? metresToFeet : 1));
                             int distanceToBoxRounded;
@@ -325,8 +326,7 @@ namespace CrewChiefV4.Events
                             messageContents.Add(MessageFragment.Text(folderBoxPositionIntro));
                             messageContents.Add(MessageFragment.Integer(distanceToBoxRounded, false));   // explicity disable short hundreds here, forcing the full "one hundred" sound
                             messageContents.Add(MessageFragment.Text(pitBoxPositionCountdownInFeet ? folderFeet : folderMetres));
-                            QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", 1, messageFragments: messageContents, abstractEvent: this, priority: 10);
-                            firstPitCountdown.expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 2000;
+                            QueuedMessage firstPitCountdown = new QueuedMessage("pit_entry_to_box_distance_warning", 2, messageFragments: messageContents, abstractEvent: this, priority: 10);
                             audioPlayer.playMessage(firstPitCountdown);
                             pitEntryDistancePlayedTime = currentGameState.Now;
                         }
@@ -357,30 +357,35 @@ namespace CrewChiefV4.Events
                                 {
                                     if (distanceToBox < pitCountdownTriggerPoints[i] + pointAdjustment && distanceToBox > pitCountdownTriggerPoints[i] + pointAdjustment - 2)
                                     {
+                                        // ensure an unplayed distance message isn't still hanging around in the queue                                        
+                                        int purgeCount = audioPlayer.purgeQueues();
+                                        Console.WriteLine("removed " + purgeCount + " messages from the queues before triggering pit countdown");
                                         nextPitDistanceIndex = i + 1;
                                         if (i < pitCountdownTriggerPoints.Length - 2 && !playedBoxIn)
                                         {
                                             audioPlayer.pauseQueue(10);
                                             // box in 5...
-                                            Console.WriteLine("BOX IN " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
-                                                messageFragments: MessageContents(folderBoxPositionIntro, pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
+                                            int num = pitCountdownTriggerPoints.Length - (i + 1);
+                                            Console.WriteLine("BOX IN " + num + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_" + num, 1,
+                                                messageFragments: MessageContents(folderBoxPositionIntro, num), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                             playedBoxIn = true;
                                         }
                                         else if (i == pitCountdownTriggerPoints.Length - 1)
                                         {
                                             // BOX
                                             Console.WriteLine("BOX IN NOW at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_end", 1,
                                                 messageFragments: MessageContents(folderBoxNow), type: SoundType.CRITICAL_MESSAGE, priority: 10));
                                             audioPlayer.unpauseQueue();
                                         }
                                         else if (playedBoxIn)
                                         {
                                             // 4, 3, 2, 1
-                                            Console.WriteLine("BOX IN ... " + (pitCountdownTriggerPoints.Length - (i + 1)) + " at " + distanceToBox);
-                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown", 1,
-                                                messageFragments: MessageContents(pitCountdownTriggerPoints.Length - (i + 1)), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
+                                            int num = pitCountdownTriggerPoints.Length - (i + 1);
+                                            Console.WriteLine("BOX IN ... " + num + " at " + distanceToBox);
+                                            audioPlayer.playMessageImmediately(new QueuedMessage("pit_time_countdown_" + num, 1,
+                                                messageFragments: MessageContents(num), type: SoundType.CRITICAL_MESSAGE, priority: 10), true);
                                         }
                                         break;
                                     }
@@ -400,7 +405,7 @@ namespace CrewChiefV4.Events
                         if (!played100MetreOr300FeetWarning && distanceToBox < distanceUpperFor100MetreOr300FeetWarning && previousDistanceToBox > distanceLowerFor100MetreOr300FeetWarning)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(
-                                pitBoxPositionCountdownInFeet ? folderThreeHundredFeetWarning : folderOneHundredMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                pitBoxPositionCountdownInFeet ? folderThreeHundredFeetWarning : folderOneHundredMetreWarning, 0, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                             previousDistanceToBox = distanceToBox;
                             played100MetreOr300FeetWarning = true;
                         }
@@ -408,7 +413,7 @@ namespace CrewChiefV4.Events
                         else if (!played50MetreOr100FeetWarning && distanceToBox < distanceUpperFor50MetreOr100FeetWarning && previousDistanceToBox > distanceLowerFor50MetreOr100FeetWarning)
                         {
                             audioPlayer.playMessageImmediately(new QueuedMessage(
-                                 pitBoxPositionCountdownInFeet ? folderOneHundredFeetWarning : folderFiftyMetreWarning, 0, null) { metadata = new SoundMetadata(SoundType.IMPORTANT_MESSAGE, 0) });
+                                 pitBoxPositionCountdownInFeet ? folderOneHundredFeetWarning : folderFiftyMetreWarning, 0, abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE,priority: 0));
                             previousDistanceToBox = distanceToBox;
                             played50MetreOr100FeetWarning = true;
                         }
@@ -867,11 +872,11 @@ namespace CrewChiefV4.Events
             {
                 if (this.pitStallOccupied)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStallOccupied, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPitStallOccupied, 0));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNo, 0));
                 }
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.SESSION_STATUS) ||

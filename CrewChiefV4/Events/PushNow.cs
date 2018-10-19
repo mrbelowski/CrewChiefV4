@@ -101,12 +101,12 @@ namespace CrewChiefV4.Events
                 if (currentGameState.SessionData.SessionRunningTime > 30 && isOpponentApproachingPitExit(currentGameState))
                 {
                     // we've exited into clean air
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTrafficBehindExitingPits, 1, abstractEvent: this,
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderTrafficBehindExitingPits, 3, abstractEvent: this,
                         type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPushExitingPits, 1, abstractEvent: this,
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPushExitingPits, 3, abstractEvent: this,
                         type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                 }
                 // now try and report the current brake and tyre temp status
@@ -131,7 +131,7 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionNumberOfLaps > 0)
                     {
                         // special case for iracing - AFAIK no other games have number-of-laps in qual sessions
-                        audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 2, 
+                        audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 5, 
                             messageFragments: MessageContents(folderQualExitIntro, currentGameState.SessionData.SessionNumberOfLaps, folderQualExitOutroLaps),
                             abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                     }
@@ -140,7 +140,7 @@ namespace CrewChiefV4.Events
                         int minutesLeft = (int)Math.Floor(currentGameState.SessionData.SessionTimeRemaining / 60f);
                         if (minutesLeft > 1)
                         {
-                            audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 2,
+                            audioPlayer.playMessageImmediately(new QueuedMessage("qual_pit_exit", 5,
                                 messageFragments: MessageContents(folderQualExitIntro, minutesLeft, folderQualExitOutroMinutes),
                                 abstractEvent: this, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                         }

@@ -512,11 +512,11 @@ namespace CrewChiefV4.Events
         {            
             if (isLast)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLast, 0));
             }
             else if (currentPosition == 1)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0, null));                    
+                audioPlayer.playMessageImmediately(new QueuedMessage(folderLeading, 0));                    
             }
             else if (currentPosition > 0)
             {
@@ -527,13 +527,13 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStub + currentPosition, 0));
                 }    
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_MY_POSITION))
             {
                 // only play 'no data' if we asked for position directly
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                    
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));                    
             }
         }
     }

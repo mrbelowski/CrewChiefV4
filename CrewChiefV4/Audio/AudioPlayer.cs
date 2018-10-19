@@ -645,13 +645,13 @@ namespace CrewChiefV4.Audio
 
         public void enableKeepQuietMode()
         {
-            playMessageImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0, null));
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeEnableKeepQuiet, 0));
             keepQuiet = true;
         }
 
         public void disableKeepQuietMode()
         {
-            playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0, null));
+            playMessageImmediately(new QueuedMessage(folderAcknowlegeDisableKeepQuiet, 0));
             keepQuiet = false;
         }
 
@@ -1243,10 +1243,9 @@ namespace CrewChiefV4.Audio
         {
             if (queuedMessage.canBePlayed)
             {
-                if (queuedMessage.metadata.type == SoundType.AUTO)
-                {
-                    queuedMessage.metadata.type = SoundType.SPOTTER;
-                }
+                // always override the type here
+                queuedMessage.metadata.type = SoundType.SPOTTER;
+                queuedMessage.metadata.priority = 20;
                 lock (immediateClips)
                 {
                     if (immediateClips.Contains(queuedMessage.messageName))

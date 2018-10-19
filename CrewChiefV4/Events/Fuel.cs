@@ -916,7 +916,7 @@ namespace CrewChiefV4.Events
                     // play this immediately or play "stand by", and queue it to be played in a few seconds
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0));
                         int secondsDelay = Math.Max(5, Utilities.random.Next(7));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelEstimateMessage.secondsDelay = secondsDelay;
@@ -975,7 +975,7 @@ namespace CrewChiefV4.Events
                 if (!fuelUseActive && allowNowDataMessage)
                 {
                     haveData = true;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPlentyOfFuel, 0));
                     return haveData;
                 }
                 if(fuelReportsInGallon)
@@ -1047,7 +1047,7 @@ namespace CrewChiefV4.Events
             {
                 if (allowNoDataMessage)
                 {
-                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    this.audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 return;
             }
@@ -1107,7 +1107,7 @@ namespace CrewChiefV4.Events
                     {
                         // we expect to have sufficient fuel, but it'll be tight. LitresToEnd * -1 is how much we expect
                         // to have left over
-                        fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0, null);                        
+                        fuelMessage = new QueuedMessage(folderFuelShouldBeOK, 0);                        
                     }
                     else if (litresToEnd > 0)
                     {
@@ -1115,7 +1115,7 @@ namespace CrewChiefV4.Events
                         if (litresToEnd < minRemainingFuelToBeSafe && isSufficientTimeToSaveFuel)
                         {
                             // unlikely to make it, we'll have to fuel save
-                            fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0, null);
+                            fuelMessage = new QueuedMessage(folderFuelWillBeTight, 0);
                         }
                         else if (!isCloseToRaceEnd)
                         {
@@ -1152,7 +1152,7 @@ namespace CrewChiefV4.Events
             }
             if (!reportedConsumption && !reportedRemaining && !reportedLitresNeeded && allowNoDataMessage)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
         }
 
@@ -1271,7 +1271,7 @@ namespace CrewChiefV4.Events
                     }
                     if (delayResponses && Utilities.random.Next(10) >= 2 && SoundCache.availableSounds.Contains(AudioPlayer.folderStandBy))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0));
                         int secondsDelay = Math.Max(5, Utilities.random.Next(7));
                         audioPlayer.pauseQueue(secondsDelay);
                         fuelMessage.secondsDelay = secondsDelay;
@@ -1299,28 +1299,28 @@ namespace CrewChiefV4.Events
                 }
                 if (unit == 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0));
                     return;
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAP) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LAPS))
                 {
                     if (!reportFuelConsumptionForLaps(unit))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     } 
                 }
                 else if(SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTE) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.MINUTES))
                 {
                     if (!reportFuelConsumptionForTime(0, unit))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     } 
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOUR) || SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOURS))
                 {
                     if (!reportFuelConsumptionForTime(unit, 0))
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     }
                 }
             }

@@ -967,7 +967,7 @@ namespace CrewChiefV4.Events
                 // might be a "stand by..." response
                 if (allowDelayedResponse && Utilities.random.Next(10) >= 2)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderStandBy, 0));
                     int secondsDelay = Math.Max(5, Utilities.random.Next(11));
                     audioPlayer.pauseQueue(secondsDelay);
                     audioPlayer.playDelayedImmediateMessage(new QueuedMessage("tyre_condition", 0, messageFragments: messageContents, secondsDelay: secondsDelay));
@@ -991,7 +991,7 @@ namespace CrewChiefV4.Events
             {
                 if (minutesRemainingOnTheseTyres <= 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0));
                 }
                 else
                 {
@@ -1012,7 +1012,7 @@ namespace CrewChiefV4.Events
             {
                 if (lapsRemainingOnTheseTyres <= 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderKnackeredAllRound, 0));
                 }
                 else
                 {
@@ -1256,15 +1256,15 @@ namespace CrewChiefV4.Events
                 Tuple<CornerData.Corners, float> maxWearPercent = getMaxWearPercent();
                 if (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 else if (maxWearPercent.Item2 < 1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderGoodWear, 0));
                 }
                 else if (maxWearPercent.Item2 < 5) 
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 else 
                 {
@@ -1282,7 +1282,7 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     }
                 }
             }

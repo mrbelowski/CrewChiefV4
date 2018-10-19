@@ -983,7 +983,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 
             }
@@ -1006,7 +1006,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 
             }
@@ -1070,7 +1070,7 @@ namespace CrewChiefV4.Events
             {
                 if (currentGameState == null)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
                 else
                 {
@@ -1124,7 +1124,7 @@ namespace CrewChiefV4.Events
                                 case LastLapRating.BEST_OVERALL:
                                 case LastLapRating.BEST_IN_CLASS:
                                 case LastLapRating.SETTING_CURRENT_PACE:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0, null));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderSettingCurrentRacePace, 0));
                                     break;
                                 case LastLapRating.PERSONAL_BEST_CLOSE_TO_OVERALL_LEADER:
                                 case LastLapRating.PERSONAL_BEST_CLOSE_TO_CLASS_LEADER:
@@ -1186,7 +1186,7 @@ namespace CrewChiefV4.Events
                             switch (lastLapSelfRating)
                             {
                                 case LastLapRating.PERSONAL_BEST:
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0, null));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(folderPersonalBest, 0));
                                     break;
                                 case LastLapRating.CLOSE_TO_PERSONAL_BEST:
                                     if (timeToFindFolder == null || timeToFindFolder != folderNeedToFindMoreThanASecond)
@@ -1277,10 +1277,10 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0));
                                 }
                             }
-                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0, null));
+                            audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0));
                         }
                         else
                         {
@@ -1293,7 +1293,7 @@ namespace CrewChiefV4.Events
                                 }
                                 else
                                 {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0, null));
+                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0));
                                 }
                             }
                             audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap", 0,
