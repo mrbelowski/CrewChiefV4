@@ -148,12 +148,14 @@ namespace CrewChiefV4
 
         public int secondsDelay;
 
+        private long creationTime;
+
         // some snapshot of pertentent data at the point of creation, 
         // which can be validated before it actually gets played. E.g.
         // e.g. {SessionData.Position = 1}
         public Dictionary<String, Object> validationData = null;
 
-        public long expiryTime = (DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond) + 4000;
+        public long expiryTime = 0;
 
         // if any of the sound clips in this message are missing, this will be set to false when the constructors
         // get the message folders to use
@@ -178,9 +180,10 @@ namespace CrewChiefV4
             int priority = SoundMetadata.DEFAULT_PRIORITY, SoundType type = SoundType.AUTO)
         {
             this.messageId = getMessageId();
-            this.validationData = validationData;            
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.expiryTime = expiresAfter == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (expiresAfter * 1000);
+            this.validationData = validationData;
+            this.creationTime = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
+            this.dueTime = secondsDelay == 0 ? 0 : this.creationTime + (secondsDelay * 1000) + updateInterval;
+            this.expiryTime = expiresAfter == 0 ? 0 : this.creationTime + (expiresAfter * 1000);
             this.secondsDelay = secondsDelay;
             this.abstractEvent = abstractEvent;
             this.metadata = new SoundMetadata(type, priority);
@@ -202,7 +205,6 @@ namespace CrewChiefV4
             else
             {
                 this.messageName = compoundMessageIdentifier + messageName;
-                this.messageFolders = getMessageFolders(messageFragments, false);
                 Boolean hasAlternative = alternateMessageFragments != null;
                 this.messageFolders = getMessageFolders(messageFragments, hasAlternative);
                 if (!canBePlayed && hasAlternative)
@@ -223,6 +225,11 @@ namespace CrewChiefV4
         public QueuedMessage(AbstractEvent abstractEvent)
         {
             this.abstractEvent = abstractEvent;
+        }
+
+        public long getAge()
+        {
+            return (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) - this.creationTime;
         }
 
         // called when we repeat this message - clears all the validation and sets the type to voice-command

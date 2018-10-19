@@ -699,7 +699,7 @@ namespace CrewChiefV4.Audio
                             }
                             else if (messageHasExpired)
                             {
-                                Console.WriteLine("Clip " + key + " has expired");
+                                Console.WriteLine("Clip " + key + " has expired after being queued for " + queuedMessage.getAge() + " milliseconds");
                             }
                             else if (queueTooLongForMessage)
                             {
