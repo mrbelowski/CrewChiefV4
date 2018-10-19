@@ -318,6 +318,7 @@ namespace CrewChiefV4.ACC
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
 
                     currentGameState.TimingData = previousGameState.TimingData;
+                    currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
                 }
             }
 
@@ -347,7 +348,7 @@ namespace CrewChiefV4.ACC
                 if(currentGameState.SessionData.IsNewLap)
                 {
                     currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        mapToFloatTime(playerDriver.lastLapTime), true, playerDriver.trackLocation != CarLocation.ECarLocation__Track, false, data.track.weatherState.roadTemperature, data.track.weatherState.ambientTemperature,
+                        mapToFloatTime(playerDriver.lastLap.lapTime), true, playerDriver.trackLocation != CarLocation.ECarLocation__Track, false, data.track.weatherState.roadTemperature, data.track.weatherState.ambientTemperature,
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 }
                 else if ((currentGameState.SessionData.SectorNumber == 2 || currentGameState.SessionData.SectorNumber == 3))
