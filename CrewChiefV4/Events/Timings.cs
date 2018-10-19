@@ -199,13 +199,19 @@ namespace CrewChiefV4.Events
             return sectorsTillNextReport;
         }
 
+        // validates all the gap messages, rejects if our position has changed or we're along side another car
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<string, object> validationData)
         {
             if (base.isMessageStillValid(eventSubType, currentGameState, validationData))
             {
                 object timingValidationDataValue = null;
-                if (validationData != null && validationData.TryGetValue("position", out timingValidationDataValue) && (int)timingValidationDataValue != currentGameState.SessionData.ClassPosition)
+                if (validationData != null && validationData.TryGetValue("position", out timingValidationDataValue) &&
+                    ((int)timingValidationDataValue != currentGameState.SessionData.ClassPosition ||
+                    currentGameState.SessionData.TimeDeltaFront * currentGameState.PositionAndMotionData.CarSpeed < 3 ||
+                    currentGameState.SessionData.TimeDeltaBehind * currentGameState.PositionAndMotionData.CarSpeed < 3))
                 {
+                    // if our race position has changed since we queued the message, assume we've actually passed this car or been passed.
+                    // if our gap ahead or behind is < 1 car length, assume we're in the process of passing or being passed
                     return false;
                 }
                 return true;
