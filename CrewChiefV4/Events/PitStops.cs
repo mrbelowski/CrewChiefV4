@@ -311,8 +311,9 @@ namespace CrewChiefV4.Events
                     played50MetreOr100FeetWarning = false;
                     if (pitBoxPositionCountdownEnabled)
                     {
-                        // here we assume that being >150 metres from the box means the time countdown won't interfere
-                        if (distanceToBox > 150 && !playedLimiterLineToPitBoxDistanceWarning)
+                        // here we assume that being >250 metres from the box means the time countdown won't interfere enough to make it 
+                        // unless - note that <250 metres will result in a truncated countdown starting at 3 or 4
+                        if (distanceToBox > 250 && !playedLimiterLineToPitBoxDistanceWarning)
                         {
                             int distanceToBoxInt = (int)(distanceToBox * (pitBoxPositionCountdownInFeet ? metresToFeet : 1));
                             int distanceToBoxRounded;
