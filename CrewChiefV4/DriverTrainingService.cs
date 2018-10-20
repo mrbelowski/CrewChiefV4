@@ -12,7 +12,6 @@ namespace CrewChiefV4
 {
     class DriverTrainingService
     {
-        private static long expireUnplayedMessagesAfter = 500;  // milliseconds
         private static int combineEntriesCloserThan = 20; // if a new entry's lap distance is within 20 metres of an existing entry's lap distance, combine them
         public static Boolean isPlayingPaceNotes = false;
         public static Boolean isRecordingPaceNotes = false;

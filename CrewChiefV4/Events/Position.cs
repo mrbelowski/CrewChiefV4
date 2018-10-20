@@ -20,8 +20,6 @@ namespace CrewChiefV4.Events
         public static String folderBehind = "position/behind";
         public static String folderLapsAhead = "position/laps_ahead";
         public static String folderLapsBehind = "position/laps_behind";
-        private static String folderOneLapAhead = "position/one_lap_ahead";
-        private static String folderOneLapBehind = "position/one_lap_down";
         private static String folderOvertaking = "position/overtaking";
         private static String folderBeingOvertaken = "position/being_overtaken";
 
