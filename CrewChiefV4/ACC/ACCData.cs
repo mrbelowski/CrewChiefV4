@@ -268,7 +268,9 @@ namespace CrewChiefV4.ACC
 		    ERaceEventType__ERaceEventType_MAX = 4
 	    };
         // i think this one is supposed to be a bitfield but IDA cant always tell the differance 
-	    public enum LapStateFlags : short
+        [Flags]
+        [Serializable]
+        public enum LapStateFlags : short
 	    {
 		    HasCut = 0x0001,
             IsInvalidLap = 0x0002,
@@ -367,7 +369,7 @@ namespace CrewChiefV4.ACC
             public int lapTime;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
             public int[] sectorTimes;
-		    public LapStateFlags lapStates;
+            public LapStateFlags lapStates;
 	    };
         [StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Ansi)]
         [Serializable]
@@ -387,7 +389,7 @@ namespace CrewChiefV4.ACC
             public int lapCount;
             public int totalTime;
 	        public int currentDelta;
-            public int currentSector;          //0 based index, when formation lap starts in last sector this value will be tracksector count
+            public int currentSector;          //0 based index, when formation lap starts in last sector this value will be tracksector count 
             public int currentlaptime;
             public Lap currentLap;
             public Lap lastLap;

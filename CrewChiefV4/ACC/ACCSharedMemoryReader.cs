@@ -20,10 +20,10 @@ namespace CrewChiefV4.ACC
         private byte[] sharedMemoryCrewChiefReadBuffer;
         private GCHandle handleCrewChief;
 
-        private MemoryMappedFile memoryMappedPhysicsFile;
+        /*private MemoryMappedFile memoryMappedPhysicsFile;
         private int sharedmemoryPhysicssize;
         private byte[] sharedMemoryPhysicsReadBuffer;
-        private GCHandle handlePhysics;
+        private GCHandle handlePhysics;*/
 
         private Boolean initialised = false;
         private List<ACCStructWrapper> dataToDump;
@@ -35,7 +35,7 @@ namespace CrewChiefV4.ACC
         {
             public long ticksWhenRead;
             public ACCSharedMemoryData data;
-            public SPageFilePhysics physicsData;
+            //public SPageFilePhysics physicsData;
 
 
         }
@@ -96,9 +96,9 @@ namespace CrewChiefV4.ACC
                         sharedmemoryCrewChiefsize = Marshal.SizeOf(typeof(ACCSharedMemoryData));
                         sharedMemoryCrewChiefReadBuffer = new byte[sharedmemoryCrewChiefsize];
                         
-                        memoryMappedPhysicsFile = MemoryMappedFile.OpenExisting(ACCConstant.SharedMemoryNamePhysics);
+                       /* memoryMappedPhysicsFile = MemoryMappedFile.OpenExisting(ACCConstant.SharedMemoryNamePhysics);
                         sharedmemoryPhysicssize = Marshal.SizeOf(typeof(SPageFilePhysics));
-                        sharedMemoryPhysicsReadBuffer = new byte[sharedmemoryPhysicssize];
+                        sharedMemoryPhysicsReadBuffer = new byte[sharedmemoryPhysicssize];*/
                         initialised = true;
                         Console.WriteLine("Initialised Assetto Corsa Competizione shared memory");
                     }
@@ -119,7 +119,7 @@ namespace CrewChiefV4.ACC
             lock (this)
             {
                 ACCSharedMemoryData accShared = new ACCSharedMemoryData();
-                SPageFilePhysics physicsData = new SPageFilePhysics();
+                //SPageFilePhysics physicsData = new SPageFilePhysics();
                 if (!initialised)
                 {
                     if (!InitialiseInternal())
@@ -129,14 +129,14 @@ namespace CrewChiefV4.ACC
                 }
                 try
                 {
-                    using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
+                    /*using (var sharedMemoryStreamView = memoryMappedPhysicsFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
                         sharedMemoryPhysicsReadBuffer = _SharedMemoryStream.ReadBytes(sharedmemoryPhysicssize);
                         handlePhysics = GCHandle.Alloc(sharedMemoryPhysicsReadBuffer, GCHandleType.Pinned);
                         physicsData = (SPageFilePhysics)Marshal.PtrToStructure(handlePhysics.AddrOfPinnedObject(), typeof(SPageFilePhysics));
                         handlePhysics.Free();
-                    }
+                    }*/
                     using (var sharedMemoryStreamView = memoryMappedCrewChiefFile.CreateViewStream())
                     {
                         BinaryReader _SharedMemoryStream = new BinaryReader(sharedMemoryStreamView);
@@ -149,7 +149,7 @@ namespace CrewChiefV4.ACC
                     ACCStructWrapper structWrapper = new ACCStructWrapper();
                     structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = accShared;
-                    structWrapper.physicsData = physicsData;
+                    //structWrapper.physicsData = physicsData;
 
                     if (!forSpotter && dumpToFile && dataToDump != null)
                     {
@@ -203,7 +203,7 @@ namespace CrewChiefV4.ACC
                 }
                 catch (Exception) { }
             }
-            if (memoryMappedPhysicsFile != null)
+            /*if (memoryMappedPhysicsFile != null)
             {
                 try
                 {
@@ -211,7 +211,7 @@ namespace CrewChiefV4.ACC
                     memoryMappedPhysicsFile = null;
                 }
                 catch (Exception) { }
-            }
+            }*/
             initialised = false;
         }
     }

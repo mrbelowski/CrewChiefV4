@@ -114,6 +114,7 @@ namespace CrewChiefV4.ACC
                 || (previousSessionId != data.sessionData.currentSessionIndex)))
             {
                 currentGameState.SessionData.IsNewSession = true;
+                currentGameState.SessionData.SessionId = data.sessionData.currentSessionIndex;
                 //PrintProperties<CrewChiefV4.ACC.Data.ACCSessionData>(data.sessionData);
                 //Console.WriteLine("New session, trigger data:");
                 Console.WriteLine("SessionTimeRemaining = " + currentGameState.SessionData.SessionTimeRemaining);
@@ -150,13 +151,11 @@ namespace CrewChiefV4.ACC
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionHasFixedTime = true;
 
-                //currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
-                /*if (currentSessionType == SessionType.LonePractice)
+                
+                if (currentSessionType != SessionType.LonePractice)
                 {
-                    currentGameState.SessionData.SessionHasFixedTime = false;
-                    currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
-                    currentGameState.SessionData.SessionTotalRunTime = float.PositiveInfinity;
-                }*/
+                    currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
+                }
 
                 currentGameState.PitData.InPitlane = playerDriver.trackLocation != CarLocation.ECarLocation__Track;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerDriver.distanceRoundTrack * currentGameState.SessionData.TrackDefinition.trackLength);
@@ -195,14 +194,10 @@ namespace CrewChiefV4.ACC
                         currentGameState.SessionData.JustGoneGreen = true;
                         // just gone green, so get the session data
                         currentGameState.SessionData.SessionHasFixedTime = true;
-                        /*currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
-                        if (currentSessionType == SessionType.LonePractice)
-                        {                            
-                            currentGameState.SessionData.SessionHasFixedTime = false;
-                            currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
-                            currentGameState.SessionData.SessionTotalRunTime = float.PositiveInfinity;
-                        }*/
-
+                        if (currentSessionType != SessionType.LonePractice)
+                        {
+                            currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
+                        }
 
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(data.track.name, 0, data.track.length);
                         if (previousGameState != null && previousGameState.SessionData.TrackDefinition != null)
@@ -337,7 +332,9 @@ namespace CrewChiefV4.ACC
             {
                 Console.WriteLine("player car out of track");
             }*/
-            currentGameState.SessionData.SessionId = data.sessionData.currentSessionIndex;
+            currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerDriver.distanceRoundTrack * currentGameState.SessionData.TrackDefinition.trackLength);
+            currentGameState.PositionAndMotionData.CarSpeed = playerDriver.speedMS;
+
             currentGameState.SessionData.OverallPosition = playerDriver.realTimePosition;
             previousRaceSessionPhase = data.sessionData.currentSessionPhase;
 
@@ -351,6 +348,7 @@ namespace CrewChiefV4.ACC
             {
                 currentGameState.SessionData.SectorNumber = playerDriver.currentSector + 1;
             }
+            //Console.WriteLine("currentGameState.SessionData.SectorNumber = " + currentGameState.SessionData.SectorNumber);
             currentGameState.SessionData.IsNewSector = previousGameState != null && previousGameState.SessionData.SectorNumber != currentGameState.SessionData.SectorNumber;
             currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(playerDriver.currentlaptime);
             if (currentGameState.SessionData.IsNewLap || currentGameState.SessionData.IsNewSector)
@@ -373,12 +371,14 @@ namespace CrewChiefV4.ACC
             {
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1,
                     currentGameState.SessionData.OverallPosition, playerDriver.trackLocation != CarLocation.ECarLocation__Track, currentGameState.SessionData.SessionRunningTime);
+                currentGameState.SessionData.IsNewLap = true;
             }
+            
+            
+            
             currentGameState.PitData.InPitlane = playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__PitLane);
             currentGameState.PitData.IsApproachingPitlane =  playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__PitEntry);
-
-            currentGameState.PitData.limiterStatus = playerDriver.pitLimiterOn;
-
+            currentGameState.PitData.limiterStatus = playerDriver.pitLimiterOn;            
             if (currentGameState.PitData.InPitlane)
             {
                 if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.SessionRunningTime > 10 &&
@@ -397,19 +397,18 @@ namespace CrewChiefV4.ACC
                 currentGameState.PitData.OnInLap = false;
                 currentGameState.PitData.OnOutLap = true;
             }
-            if (currentGameState.SessionData.IsNewLap && playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__PitExit))
+            if (currentGameState.SessionData.IsNewLap && playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__Track))
             {
                 // starting a new lap while not in the pitlane so clear the in / out lap flags
                 currentGameState.PitData.OnInLap = false;
                 currentGameState.PitData.OnOutLap = false;
             }
-
             if (previousGameState != null && currentGameState.PitData.OnOutLap && previousGameState.PitData.InPitlane && !currentGameState.PitData.InPitlane)
             {
                 currentGameState.PitData.IsAtPitExit = true;
             }
+            currentGameState.SessionData.DeltaTime.SetNextDeltaPoint(currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CompletedLaps, playerDriver.speedMS, currentGameState.Now);
 
-            //currentGameState.SessionData.SessionPhase = SessionPhase.Green;
             currentGameState.sortClassPositions();
             currentGameState.setPracOrQualiDeltas();
 

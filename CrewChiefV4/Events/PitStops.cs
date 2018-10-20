@@ -435,7 +435,7 @@ namespace CrewChiefV4.Events
             }
             if (currentGameState.PitData.limiterStatus != -1 && currentGameState.Now > timeOfLastLimiterWarning + TimeSpan.FromSeconds(30))
             {
-                if (currentGameState.SessionData.SectorNumber == 1 && 
+                if ((previousGameState != null && previousGameState.PitData.IsAtPitExit && !currentGameState.PitData.IsAtPitExit) || (currentGameState.SessionData.SectorNumber == 1) && 
                     currentGameState.Now > timeOfDisengageCheck && !currentGameState.PitData.InPitlane && currentGameState.PitData.limiterStatus == 1)
                 {
                     // in S1 but have exited pits, and we're expecting the limit to have been turned off
@@ -460,10 +460,13 @@ namespace CrewChiefV4.Events
                         // just left the pitlane with the limiter active - wait 2 seconds then warn
                         timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
                     }
-                    else if (currentGameState.PitData.IsAtPitExit && currentGameState.PitData.limiterStatus == 1 && CrewChief.gameDefinition.gameEnum == GameEnum.IRACING)
+                    else if (currentGameState.PitData.IsAtPitExit && currentGameState.PitData.limiterStatus == 1 && (CrewChief.gameDefinition.gameEnum == GameEnum.IRACING || CrewChief.gameDefinition.gameEnum == GameEnum.ACC))
                     {
-                        // TODO: this needs a bit more investigation. We have 2 separate blocks here because the time delay may need to be different for iRacing. 
+                        // TODO: this needs a bit more investigation. We have 2 separate blocks here because the time delay may need to be different for iRacing.
                         // I know this looks like a fucking retarded if-else statement but I don't care. It's all Morten's fault anyway. Just like the AccessViolationErrors
+                        
+                        // In iRacing we cant be sure our pit exit is in sector 1 that why we cant use currentGameState.SessionData.SectorNumber to id if we are at pit entry or pit exit.
+                        // also to add to this, in ACC sector wont change from sector 3 until we have started our first timed lap.
                         timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
                     }
                 }
