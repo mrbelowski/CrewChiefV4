@@ -40,8 +40,6 @@ namespace CrewChiefV4.Events
 
         private String folderQuickerThanSecondPlace = "lap_times/quicker_than_second_place";
 
-        private String folderQuickestOverall = "lap_times/quickest_overall";
-
         private String folderPaceOK = "lap_times/pace_ok";
         private String folderPaceBad = "lap_times/pace_bad";
         private String folderNeedToFindOneMoreTenth = "lap_times/need_to_find_one_more_tenth";
@@ -507,21 +505,6 @@ namespace CrewChiefV4.Events
                                     if (previousGameState != null && previousGameState.SessionData.ClassPosition > 1)
                                     {
                                         newGapToSecond = true;
-                                        if (currentGameState.SessionData.SessionType == SessionType.Qualify)
-                                        {
-                                            audioPlayer.playMessage(new QueuedMessage(Position.folderPole, 0, abstractEvent: this, priority: 10));
-                                        }
-                                        else if (currentGameState.SessionData.SessionType == SessionType.Practice)
-                                        {
-                                            if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                                            {
-                                                audioPlayer.playMessage(new QueuedMessage("position", 0, messageFragments: MessageContents(Position.folderDriverPositionIntro, Position.folderStub + 1), abstractEvent: this, priority: 5));
-                                            }
-                                            else
-                                            {
-                                                audioPlayer.playMessage(new QueuedMessage(Position.folderStub + 1, 0, abstractEvent: this, priority: 3));
-                                            }
-                                        }
                                     }
                                     if (deltaPlayerLastToSessionBestInClass < lastGapToSecondWhenLeadingPracOrQual)
                                     {
@@ -1250,14 +1233,6 @@ namespace CrewChiefV4.Events
                     {
                         if (deltaPlayerLastToSessionBestInClass <= TimeSpan.Zero)
                         {
-                            if (sessionType == SessionType.Qualify && currentPosition == 1)
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderPole, 0));
-                            }
-                            else
-                            {
-                                audioPlayer.playMessageImmediately(new QueuedMessage(folderQuickestOverall, 0));
-                            }
                             TimeSpan gapBehind = deltaPlayerLastToSessionBestInClass.Negate();
                             if (gapBehind.Seconds > 0 || gapBehind.Milliseconds > 50)
                             {
@@ -1268,34 +1243,10 @@ namespace CrewChiefV4.Events
                         }
                         else if (deltaPlayerLastToSessionBestInClass.Seconds == 0 && deltaPlayerLastToSessionBestInClass.Milliseconds < 50)
                         {
-                            if (currentPosition > 1)
-                            {
-                                // should always trigger
-                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                                {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", 0, messageFragments: MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition)));
-                                }
-                                else
-                                {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0));
-                                }
-                            }
                             audioPlayer.playMessageImmediately(new QueuedMessage(folderLessThanATenthOffThePace, 0));
                         }
                         else
                         {
-                            if (currentPosition > 1)
-                            {
-                                // should always trigger
-                                if (SoundCache.availableSounds.Contains(Position.folderDriverPositionIntro))
-                                {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage("position", 0, messageFragments: MessageContents(Position.folderDriverPositionIntro, Position.folderStub + currentPosition)));
-                                }
-                                else
-                                {
-                                    audioPlayer.playMessageImmediately(new QueuedMessage(Position.folderStub + currentPosition, 0));
-                                }
-                            }
                             audioPlayer.playMessageImmediately(new QueuedMessage("lapTimeNotRaceGap", 0,
                                 messageFragments: MessageContents(new TimeSpanWrapper(deltaPlayerLastToSessionBestInClass, Precision.AUTO_GAPS), folderGapOutroOffPace)));
                         }

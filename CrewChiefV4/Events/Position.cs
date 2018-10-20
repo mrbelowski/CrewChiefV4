@@ -13,16 +13,17 @@ namespace CrewChiefV4.Events
 
         public static String folderLeading = "position/leading";
         public static String folderPole = "position/pole";
+        private static String folderQuickestOverall = "lap_times/quickest_overall"; // this has been moved from the LapTimes event
         public static String folderStub = "position/p";
         public static String folderLast = "position/last";
         public static String folderAhead = "position/ahead";
         public static String folderBehind = "position/behind";
         public static String folderLapsAhead = "position/laps_ahead";
-        public static String folderLapsBehind = "position/laps_behind"; 
-        public static String folderOneLapAhead = "position/one_lap_ahead";
-        public static String folderOneLapBehind = "position/one_lap_down";
-        public static String folderOvertaking = "position/overtaking";
-        public static String folderBeingOvertaken = "position/being_overtaken";
+        public static String folderLapsBehind = "position/laps_behind";
+        private static String folderOneLapAhead = "position/one_lap_ahead";
+        private static String folderOneLapBehind = "position/one_lap_down";
+        private static String folderOvertaking = "position/overtaking";
+        private static String folderBeingOvertaken = "position/being_overtaken";
 
         private TimeSpan minTimeToWaitBeforeReportingPass = TimeSpan.FromSeconds(3);
         public static int maxSecondsToWaitBeforeReportingPass = 6;
@@ -422,8 +423,7 @@ namespace CrewChiefV4.Events
                 }
                 else
                 {
-                    if (currentGameState.SessionData.CompletedLaps > lapNumberAtLastMessage + 3
-                            || previousPosition != currentGameState.SessionData.ClassPosition)
+                    if (previousPosition != currentGameState.SessionData.ClassPosition)
                     {
                         PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
                         float pearlLikelihood = 0.2f;
@@ -481,9 +481,20 @@ namespace CrewChiefV4.Events
             {
                 audioPlayer.suspendPearlsOfWisdom();
             }
-            if (this.currentPosition == 1 && this.sessionType == SessionType.Race)
+            if (this.currentPosition == 1)
             {
-                return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderLeading), null);
+                if (this.sessionType == SessionType.Race)
+                {
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderLeading), null);
+                }
+                else if (this.sessionType == SessionType.Qualify)
+                {
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderPole), null);
+                }
+                else
+                {
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderQuickestOverall), null);                    
+                }
             }
             else if (this.isLast)
             {
@@ -491,16 +502,16 @@ namespace CrewChiefV4.Events
                     CrewChief.currentGameState.SessionData.LapTimePrevious > CrewChief.currentGameState.SessionData.PlayerLapTimeSessionBest &&
                     CrewChief.currentGameState.SessionData.ClassPosition > 3)
                 {
-                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderConsistentlyLast), null);
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderConsistentlyLast), null);
                 }
                 else
                 {
-                    return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderLast), null);
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderLast), null);
                 }
             }
             else if (SoundCache.availableSounds.Contains(folderDriverPositionIntro))
             {
-                return new Tuple<List<MessageFragment>,List<MessageFragment>>(MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition), null);
+                return new Tuple<List<MessageFragment>, List<MessageFragment>>(MessageContents(folderDriverPositionIntro, folderStub + this.currentPosition), null);
             }
             else
             {
