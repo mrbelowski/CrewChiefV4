@@ -435,7 +435,8 @@ namespace CrewChiefV4.Events
                                             validationData: validationData, priority: 5));
 
                                         DateTime lastTimeDriverNameUsed = DateTime.MinValue;
-                                        if (!trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                        if (currentGameState.SessionData.TimeDeltaFront < 4 &&
+                                            !trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
                                             lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
                                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
@@ -564,7 +565,8 @@ namespace CrewChiefV4.Events
                                             validationData: validationData, priority: 10));
 
                                         DateTime lastTimeDriverNameUsed = DateTime.MinValue;
-                                        if (!trackLandmarkDefendDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
+                                        if (currentGameState.SessionData.TimeDeltaBehind < 3 &&
+                                            !trackLandmarkDefendDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
                                             lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
                                             CrewChiefV4.GameState.TrackLandmarksTiming.LandmarkAndDeltaType landmarkAndDeltaType =
