@@ -99,10 +99,11 @@ namespace CrewChiefV4.ACC
 
             currentGameState.SessionData.SessionRunningTime = mapToFloatTime(data.sessionData.physicsTime - data.sessionData.sessionStartTimeStamp);
             currentGameState.SessionData.SessionTimeRemaining = mapToFloatTime(data.sessionData.sessionEndTime - data.sessionData.physicsTime);
+            float defaultSessionTotalRunTime = 3630.0f;
             if (currentSessionType == SessionType.LonePractice)
-            {
-                currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
-                currentGameState.SessionData.SessionRunningTime = mapToFloatTime(data.sessionData.physicsTime);
+            {                
+                currentGameState.SessionData.SessionTotalRunTime = defaultSessionTotalRunTime;
+                currentGameState.SessionData.SessionTimeRemaining = defaultSessionTotalRunTime - currentGameState.SessionData.SessionRunningTime;
             }                      
             Driver playerDriver = data.playerDriver;
             currentGameState.SessionData.NumCarsOverall = data.driverCount;
@@ -148,13 +149,14 @@ namespace CrewChiefV4.ACC
                 currentGameState.SessionData.LeaderHasFinishedRace = false;
                 currentGameState.PitData.IsRefuellingAllowed = true;
                 currentGameState.SessionData.SessionHasFixedTime = true;
-                currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
-                if (currentSessionType == SessionType.LonePractice)
-                {                    
+
+                //currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
+                /*if (currentSessionType == SessionType.LonePractice)
+                {
                     currentGameState.SessionData.SessionHasFixedTime = false;
-                }
-
-
+                    currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
+                    currentGameState.SessionData.SessionTotalRunTime = float.PositiveInfinity;
+                }*/
 
                 currentGameState.PitData.InPitlane = playerDriver.trackLocation != CarLocation.ECarLocation__Track;
                 currentGameState.PositionAndMotionData.DistanceRoundTrack = Math.Abs(playerDriver.distanceRoundTrack * currentGameState.SessionData.TrackDefinition.trackLength);
@@ -193,11 +195,13 @@ namespace CrewChiefV4.ACC
                         currentGameState.SessionData.JustGoneGreen = true;
                         // just gone green, so get the session data
                         currentGameState.SessionData.SessionHasFixedTime = true;
-                        currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
+                        /*currentGameState.SessionData.SessionTotalRunTime = data.sessionData.sessionDuration;
                         if (currentSessionType == SessionType.LonePractice)
                         {                            
                             currentGameState.SessionData.SessionHasFixedTime = false;
-                        }
+                            currentGameState.SessionData.SessionTimeRemaining = float.PositiveInfinity;
+                            currentGameState.SessionData.SessionTotalRunTime = float.PositiveInfinity;
+                        }*/
 
 
                         currentGameState.SessionData.TrackDefinition = TrackData.getTrackDefinition(data.track.name, 0, data.track.length);
@@ -323,7 +327,6 @@ namespace CrewChiefV4.ACC
                     currentGameState.retriedDriverNames = previousGameState.retriedDriverNames;
                     currentGameState.disqualifiedDriverNames = previousGameState.disqualifiedDriverNames;
                     currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
-
                     currentGameState.TimingData = previousGameState.TimingData;
                     currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
                 }
