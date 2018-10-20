@@ -376,9 +376,7 @@ namespace CrewChiefV4.ACC
                     currentGameState.SessionData.OverallPosition, playerDriver.trackLocation != CarLocation.ECarLocation__Track, currentGameState.SessionData.SessionRunningTime);
                 currentGameState.SessionData.IsNewLap = true;
             }
-            
-            
-            
+                                   
             currentGameState.PitData.InPitlane = playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__PitLane);
             currentGameState.PitData.IsApproachingPitlane =  playerDriver.trackLocation.HasFlag(CarLocation.ECarLocation__PitEntry);
             currentGameState.PitData.limiterStatus = playerDriver.pitLimiterOn;            
@@ -414,6 +412,23 @@ namespace CrewChiefV4.ACC
 
             currentGameState.sortClassPositions();
             currentGameState.setPracOrQualiDeltas();
+
+            currentGameState.ControlData.BrakePedal = playerDriver.brake;
+            currentGameState.ControlData.ThrottlePedal = playerDriver.trottle;
+
+            if (currentGameState.SessionData.IsNewLap)
+            {
+                if (currentGameState.hardPartsOnTrackData.updateHardPartsForNewLap(currentGameState.SessionData.LapTimePrevious))
+                {
+                    currentGameState.SessionData.TrackDefinition.adjustGapPoints(currentGameState.hardPartsOnTrackData.processedHardPartsForBestLap);
+                }
+            }
+            else if (!currentGameState.PitData.OnOutLap && !currentGameState.SessionData.TrackDefinition.isOval &&
+                !(currentGameState.SessionData.SessionType == SessionType.Race && (currentGameState.SessionData.CompletedLaps < 1 )))
+            {
+                currentGameState.hardPartsOnTrackData.mapHardPartsOnTrack(currentGameState.ControlData.BrakePedal, currentGameState.ControlData.ThrottlePedal,
+                    currentGameState.PositionAndMotionData.DistanceRoundTrack, currentGameState.SessionData.CurrentLapIsValid, currentGameState.SessionData.TrackDefinition.trackLength);
+            }
 
             return currentGameState;
         }
