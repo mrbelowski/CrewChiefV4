@@ -347,7 +347,7 @@ namespace CrewChiefV4.Events
                             else if (!GlobalBehaviourSettings.useOvalLogic && 
                                 sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport && 
                                 !currentGameState.FlagData.isLocalYellow &&
-                                (currentGameState.Now - timeWeStartedBeingHeldUp).Seconds > 60 /* don't grumble about being held up until we've been close behind this car for one minute */)
+                                (currentGameState.Now - timeWeStartedBeingHeldUp).TotalSeconds > 60 /* don't grumble about being held up until we've been close behind this car for one minute */)
                             {
                                 sectorsSinceLastCloseCarAheadReport = 0;
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
