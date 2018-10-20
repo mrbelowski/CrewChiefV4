@@ -42,8 +42,6 @@ namespace CrewChiefV4.Events
 
         private SessionType sessionType;
 
-        private int lapNumberAtLastMessage;
-
         private int numberOfLapsInLastPlace;
 
         private Boolean playedRaceStartMessage;
@@ -92,6 +90,10 @@ namespace CrewChiefV4.Events
 
         private string opponentKeyForCarThatJustPassedUs;
 
+        private Boolean canPlayPositionReminder = true;
+        private int lapForPositionReminder = Utilities.random.Next(2, 5);
+        private int sectorForPositionReminder = Utilities.random.Next(1, 4);
+
         public Position(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -123,7 +125,6 @@ namespace CrewChiefV4.Events
             currentPosition = 0;
             sessionType = SessionType.Unavailable;
             previousPosition = 0;
-            lapNumberAtLastMessage = 0;
             numberOfLapsInLastPlace = 0;
             playedRaceStartMessage = false;
             startMessageTime = Utilities.random.Next(30, 50);
@@ -138,6 +139,12 @@ namespace CrewChiefV4.Events
             lastOvertakeMessageTime = DateTime.MinValue;
             lastOffTrackSessionTime = -1.0f;
             lastYellowFlagTime = -1.0f;
+
+            // prime the position reminder stuff so it'll play the position a few laps after the race start
+            // even if we've not changed positions. Note that this is reset if we do change positions
+            canPlayPositionReminder = true;
+            lapForPositionReminder = Utilities.random.Next(2, 5);
+            sectorForPositionReminder = Utilities.random.Next(1, 4);
         }
 
         public override bool isMessageStillValid(string eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -400,71 +407,88 @@ namespace CrewChiefV4.Events
                     }
                 }
             }
-            if (enablePositionMessages && currentGameState.SessionData.IsNewLap && 
-                currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && !currentGameState.PitData.InPitlane)
+            if (enablePositionMessages && currentGameState.SessionData.SessionPhase != SessionPhase.Countdown && !currentGameState.PitData.InPitlane)
             {
-                if (currentGameState.SessionData.CompletedLaps > 0)
+                if (canPlayPositionReminder && currentGameState.SessionData.IsNewSector &&
+                    currentGameState.SessionData.CompletedLaps == lapForPositionReminder && currentGameState.SessionData.SectorNumber == sectorForPositionReminder)
                 {
-                    playedRaceStartMessage = true;
+                    playCurrentPositionMessage(PearlsOfWisdom.PearlType.NONE, 0f);
+                    canPlayPositionReminder = false;
                 }
-                if (isLast)
+                if (currentGameState.SessionData.IsNewLap)
                 {
-                    numberOfLapsInLastPlace++;
-                }
-                else
-                {
-                    numberOfLapsInLastPlace = 0;
-                }
-                if (previousPosition == 0 && currentGameState.SessionData.ClassPosition > 0)
-                {
-                    previousPosition = currentGameState.SessionData.ClassPosition;
-                }
-                else
-                {
-                    if (previousPosition != currentGameState.SessionData.ClassPosition)
+                    if (currentGameState.SessionData.CompletedLaps > 0)
                     {
-                        PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
-                        float pearlLikelihood = 0.2f;
-                        if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition > 0)
+                        playedRaceStartMessage = true;
+                    }
+                    if (isLast)
+                    {
+                        numberOfLapsInLastPlace++;
+                    }
+                    else
+                    {
+                        numberOfLapsInLastPlace = 0;
+                    }
+                    if (previousPosition == 0 && currentGameState.SessionData.ClassPosition > 0)
+                    {
+                        previousPosition = currentGameState.SessionData.ClassPosition;
+                    }
+                    else
+                    {
+                        if (previousPosition != currentGameState.SessionData.ClassPosition)
                         {
-                            if (!isLast && (previousPosition > currentGameState.SessionData.ClassPosition + 5 ||
-                                (previousPosition > currentGameState.SessionData.ClassPosition && currentGameState.SessionData.ClassPosition <= 5)))
+                            if (currentGameState.SessionData.CompletedLaps > 1)
                             {
-                                pearlType = PearlsOfWisdom.PearlType.GOOD;
-                                pearlLikelihood = 0.8f;
+                                canPlayPositionReminder = true;
+                                lapForPositionReminder = currentGameState.SessionData.CompletedLaps + Utilities.random.Next(3, 6);
+                                sectorForPositionReminder = Utilities.random.Next(1, 4);
                             }
-                            else if (!isLast && previousPosition < currentGameState.SessionData.ClassPosition &&
-                                currentGameState.SessionData.ClassPosition > 5 && !previousGameState.PitData.OnOutLap &&
-                                !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane && 
-                                currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
+                            PearlsOfWisdom.PearlType pearlType = PearlsOfWisdom.PearlType.NONE;
+                            float pearlLikelihood = 0.2f;
+                            if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.SessionData.ClassPosition > 0)
                             {
-                                // don't play bad-pearl if the lap just completed was an out lap or are in the pit
+                                if (!isLast && (previousPosition > currentGameState.SessionData.ClassPosition + 5 ||
+                                    (previousPosition > currentGameState.SessionData.ClassPosition && currentGameState.SessionData.ClassPosition <= 5)))
+                                {
+                                    pearlType = PearlsOfWisdom.PearlType.GOOD;
+                                    pearlLikelihood = 0.8f;
+                                }
+                                else if (!isLast && previousPosition < currentGameState.SessionData.ClassPosition &&
+                                    currentGameState.SessionData.ClassPosition > 5 && !previousGameState.PitData.OnOutLap &&
+                                    !currentGameState.PitData.OnOutLap && !currentGameState.PitData.InPitlane &&
+                                    currentGameState.SessionData.LapTimePrevious > currentGameState.SessionData.PlayerLapTimeSessionBest)
+                                {
+                                    // don't play bad-pearl if the lap just completed was an out lap or are in the pit
 
-                                // note that we don't play a pearl for being last - there's a special set of 
-                                // insults reserved for this
-                                pearlType = PearlsOfWisdom.PearlType.BAD;
-                                pearlLikelihood = 0.5f;
+                                    // note that we don't play a pearl for being last - there's a special set of 
+                                    // insults reserved for this
+                                    pearlType = PearlsOfWisdom.PearlType.BAD;
+                                    pearlLikelihood = 0.5f;
+                                }
+                                else if (!isLast)
+                                {
+                                    pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
+                                }
                             }
-                            else if (!isLast)
-                            {
-                                pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
-                            }
+                            playCurrentPositionMessage(pearlType, pearlLikelihood);
                         }
-                        // read the position message. This is may be part of a long message queue so it can be a few seconds before it triggers.
-                        // Because of this, we use a delayed message event - when the message reaches the top of the queue it uses the latest 
-                        // position, rather than the position when it was inserted into the queue.
-
-                        // For RF2 use a non-zero delay here because the position data isn't always updated in a timely fashion at the start of a new lap.
-                        int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT ||
-                            CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
-                        DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { 
-                            currentPosition }, this);
-                        audioPlayer.playMessage(new QueuedMessage("position", 10, delayedMessageEvent:delayedMessageEvent, secondsDelay: delaySeconds, priority: 10), pearlType, pearlLikelihood);
-                        lapNumberAtLastMessage = currentGameState.SessionData.CompletedLaps;
                     }
                 }
             }
+        }
+
+        // read the position message. This is may be part of a long message queue so it can be a few seconds before it triggers.
+        // Because of this, we use a delayed message event - when the message reaches the top of the queue it uses the latest 
+        // position, rather than the position when it was inserted into the queue.
+
+        // For RF2 use a non-zero delay here because the position data isn't always updated in a timely fashion at the start of a new lap.
+        private void playCurrentPositionMessage(PearlsOfWisdom.PearlType pearlType, float pearlLikelihood)
+        {
+            int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
+                                CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT ||
+                                CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
+            DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { currentPosition }, this);
+            audioPlayer.playMessage(new QueuedMessage("position", 10, delayedMessageEvent: delayedMessageEvent, secondsDelay: delaySeconds, priority: 10), pearlType, pearlLikelihood);
         }
 
         public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)
