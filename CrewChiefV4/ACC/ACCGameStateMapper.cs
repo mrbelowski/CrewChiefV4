@@ -348,7 +348,6 @@ namespace CrewChiefV4.ACC
             {
                 currentGameState.SessionData.SectorNumber = playerDriver.currentSector + 1;
             }
-            //Console.WriteLine("currentGameState.SessionData.SectorNumber = " + currentGameState.SessionData.SectorNumber);
             currentGameState.SessionData.IsNewSector = previousGameState != null && previousGameState.SessionData.SectorNumber != currentGameState.SessionData.SectorNumber;
             currentGameState.SessionData.LapTimeCurrent = mapToFloatTime(playerDriver.currentlaptime);
             if (currentGameState.SessionData.IsNewLap || currentGameState.SessionData.IsNewSector)
@@ -359,10 +358,14 @@ namespace CrewChiefV4.ACC
                         mapToFloatTime(playerDriver.lastLap.lapTime), true, playerDriver.trackLocation != CarLocation.ECarLocation__Track, false, data.track.weatherState.roadTemperature, data.track.weatherState.ambientTemperature,
                         currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 }
-                else if ((currentGameState.SessionData.SectorNumber == 2 || currentGameState.SessionData.SectorNumber == 3))
+                else if (currentGameState.SessionData.SectorNumber == 2 || currentGameState.SessionData.SectorNumber == 3)
                 {
-                    //this one needs changing as game supply a sector time stamp i just need to look into how its using it.
-                    currentGameState.SessionData.playerAddCumulativeSectorData(currentGameState.SessionData.SectorNumber - 1, currentGameState.SessionData.OverallPosition, currentGameState.SessionData.LapTimeCurrent,
+                    float lastSectorTime = mapToFloatTime(playerDriver.currentLap.sectorTimes[0]);
+                    if(currentGameState.SessionData.SectorNumber == 3)
+                    {
+                        lastSectorTime += mapToFloatTime(playerDriver.currentLap.sectorTimes[1]);
+                    }
+                    currentGameState.SessionData.playerAddCumulativeSectorData(currentGameState.SessionData.SectorNumber - 1, currentGameState.SessionData.OverallPosition, lastSectorTime,
                         currentGameState.SessionData.SessionRunningTime, true, false, data.track.weatherState.roadTemperature, data.track.weatherState.ambientTemperature);
                 }
             }
