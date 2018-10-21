@@ -864,10 +864,13 @@ namespace CrewChiefV4.Events
 
         public void reportCurrentTyreTempStatus(Boolean playImmediately)
         {
+            // for FWD classes we don't care about rear tyres
+            Boolean includeRears = playImmediately || !CrewChief.currentGameState.carClass.allMembersAreFWD;
+
             List<MessageFragment> messageContents = new List<MessageFragment>();
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COLD), TyreTemp.COLD, messageContents, CrewChief.currentGameState.carClass);
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.HOT), TyreTemp.HOT, messageContents, CrewChief.currentGameState.carClass);
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COOKING), TyreTemp.COOKING, messageContents, CrewChief.currentGameState.carClass);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COLD), TyreTemp.COLD, messageContents, includeRears);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.HOT), TyreTemp.HOT, messageContents, includeRears);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COOKING), TyreTemp.COOKING, messageContents, includeRears);
 
             if (messageContents.Count == 0)
             {
@@ -898,24 +901,26 @@ namespace CrewChiefV4.Events
 
         public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
         {
+            // for FWD classes we don't care about rear tyres
+            Boolean includeRears = playImmediately || !CrewChief.currentGameState.carClass.allMembersAreFWD;
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (peak)
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, CrewChief.currentGameState.carClass);
+                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, includeRears);
                 }
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, CrewChief.currentGameState.carClass);
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, CrewChief.currentGameState.carClass);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, includeRears);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, includeRears);
             }
             else
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, CrewChief.currentGameState.carClass);
+                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, includeRears);
                 }
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, CrewChief.currentGameState.carClass);
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, CrewChief.currentGameState.carClass);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, includeRears);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, includeRears);
             }
             if (messageContents.Count == 0)
             {
@@ -1287,7 +1292,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addTyreTempWarningMessages(CornerData.Corners corners, TyreTemp tyreTemp, List<MessageFragment> messageContents, CarData.CarClass carClass)
+        private void addTyreTempWarningMessages(CornerData.Corners corners, TyreTemp tyreTemp, List<MessageFragment> messageContents, Boolean includeRears)
         {
             switch (corners)
             {
@@ -1324,19 +1329,22 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REARS:
-                    switch (tyreTemp)
+                    if (includeRears)
                     {
-                        case TyreTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdRearTyres));
-                            break;
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotRearTyres));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingRearTyres));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.COLD:
+                                messageContents.Add(MessageFragment.Text(folderColdRearTyres));
+                                break;
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotRearTyres));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingRearTyres));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case CornerData.Corners.LEFTS:
@@ -1404,32 +1412,38 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REAR_LEFT:
-                    if (!GlobalBehaviourSettings.useOvalLogic)
+                    if (includeRears)
                     {
-                        switch (tyreTemp)
+                        if (!GlobalBehaviourSettings.useOvalLogic)
                         {
-                            case TyreTemp.HOT:
-                                messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
-                                break;
-                            case TyreTemp.COOKING:
-                                messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
-                                break;
-                            default:
-                                break;
+                            switch (tyreTemp)
+                            {
+                                case TyreTemp.HOT:
+                                    messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
+                                    break;
+                                case TyreTemp.COOKING:
+                                    messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                     break;
                 case CornerData.Corners.REAR_RIGHT:
-                    switch (tyreTemp)
+                    if (includeRears)
                     {
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotRightRearTyre));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingRightRearTyre));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotRightRearTyre));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingRightRearTyre));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
             }
@@ -1586,7 +1600,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, CarData.CarClass carClass)
+        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, Boolean includeRears)
         {
             switch (corners)
             {
@@ -1594,7 +1608,7 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            if (!ignoreColdBrakesForClasses.Contains(carClass.carClassEnum))
+                            if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
                             {
                                 messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
                             }
@@ -1613,7 +1627,7 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            if (!ignoreColdBrakesForClasses.Contains(carClass.carClassEnum))
+                            if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
                             {
                                 messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
                             }
@@ -1629,13 +1643,12 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REARS:
-                    // for FWD cars we don't care about rear brake temps
-                    if (!carClass.allMembersAreFWD)
+                    if (includeRears)
                     {
                         switch (brakeTemp)
                         {
                             case BrakeTemp.COLD:
-                                if (!ignoreColdBrakesForClasses.Contains(carClass.carClassEnum))
+                                if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
                                 {
                                     messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
                                 }
