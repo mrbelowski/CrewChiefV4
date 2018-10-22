@@ -162,7 +162,7 @@ namespace CrewChiefV4.Events
         // check at start of which sector (1=s/f line)
         private int checkBrakesAtSector = 3;
         private float lastBrakeTempCheckSessionTime = -1.0f;
-        private const float SecondsBetweenBrakeTempCheck = 120.0f;
+        private float secondsBetweenBrakeTempCheck = 120.0f;
 
         private Boolean reportedTyreWearForCurrentPitEntry;
 
@@ -364,7 +364,7 @@ namespace CrewChiefV4.Events
             warnedOnLockingForLap = false;
             warnedOnWheelspinForLap = false;
             nextLockingAndSpinningCheck = DateTime.MinValue;
-
+            secondsBetweenBrakeTempCheck = 120.0f;
             leftFrontTyreTemp = 0;
             rightFrontTyreTemp = 0;
             leftRearTyreTemp = 0;
@@ -735,19 +735,21 @@ namespace CrewChiefV4.Events
                 currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
             {
                 reportCurrentTyreTempStatus(false);
+                lastTyreTempCheckLap = completedLaps;
             }
 
             if (!currentGameState.SessionData.LeaderHasFinishedRace &&
                     ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks) ||
                     ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks))) &&
-                    (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
+                    (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > secondsBetweenBrakeTempCheck)))
             {
                 if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
                 {
                     if (enableBrakeTempWarnings && !GlobalBehaviourSettings.useOvalLogic)
                     {
-                        lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
                         reportBrakeTempStatus(false, true);
+                        lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
+                        lastBrakeTempCheckLap = completedLaps;
                     }
                 }
                 peakBrakeTempForLap = 0;
@@ -973,6 +975,7 @@ namespace CrewChiefV4.Events
                     if (isBouncing(brakeTempMessagesPlayed, 3))
                     {
                         lapsBetweenBrakeTempChecks++;
+                        secondsBetweenBrakeTempCheck += 120f;
                         Console.WriteLine("This brake temp message has already been played recently, increasing check interval");
                     }
                 }
