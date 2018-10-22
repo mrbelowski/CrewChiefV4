@@ -186,9 +186,14 @@ namespace CrewChiefV4.Events
         private CornerData currentBrakeTempStatus;
         private CornerData peakBrakeTempStatus;
 
-        private List<MessageFragment> lastTyreTempMessage = null;
-
-        private List<MessageFragment> lastBrakeTempMessage = null;
+        private int lapsBetweenBrakeTempChecks = 1;
+        private int lastBrakeTempCheckLap = 0;
+        private int lapsBetweenTyreTempChecks = 1;
+        private int lastTyreTempCheckLap = 0;
+        private Boolean tyreTempsAreBouncing = false;
+        private Boolean brakeTempsAreBouncing = false;
+        private List<List<MessageFragment>> tyreTempMessagesPlayed = new List<List<MessageFragment>>();
+        private List<List<MessageFragment>> brakeTempMessagesPlayed = new List<List<MessageFragment>>();
         
         private List<MessageFragment> lastTyreConditionMessage = null;
 
@@ -335,8 +340,14 @@ namespace CrewChiefV4.Events
             currentTyreTempStatus = new CornerData();
             currentBrakeTempStatus = new CornerData();
             peakBrakeTempStatus = new CornerData();
-            lastTyreTempMessage = null;
-            lastBrakeTempMessage = null;
+            tyreTempMessagesPlayed.Clear();
+            brakeTempMessagesPlayed.Clear();
+            lapsBetweenBrakeTempChecks = 1;
+            lastBrakeTempCheckLap = 0;
+            lapsBetweenTyreTempChecks = 1;
+            lastTyreTempCheckLap = 0;
+            tyreTempsAreBouncing = false;
+            brakeTempsAreBouncing = false;
             lastTyreConditionMessage = null;
             peakBrakeTempForLap = 0;
             timeLeftFrontIsLockedForLap = 0;
@@ -720,14 +731,15 @@ namespace CrewChiefV4.Events
             if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                 !currentGameState.PitData.InPitlane &&
                 currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
+                completedLaps >= lastTyreTempCheckLap + lapsBetweenTyreTempChecks &&
                 currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
             {
                 reportCurrentTyreTempStatus(false);
             }
-                
+
             if (!currentGameState.SessionData.LeaderHasFinishedRace &&
-                    ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
-                    ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))) &&
+                    ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks) ||
+                    ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks))) &&
                     (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
             {
                 if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
@@ -886,17 +898,24 @@ namespace CrewChiefV4.Events
             }
             if (messageContents.Count > 0)
             {
+                List<MessageFragment> lastTyreTempMessage = tyreTempMessagesPlayed.Count > 0 ? tyreTempMessagesPlayed.Last() : null;
                 if (playImmediately)
                 {
+                    tyreTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
+                    tyreTempMessagesPlayed.Add(messageContents);
                     Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
                     audioPlayer.playMessage(new QueuedMessage("tyre_temps", 0, messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
+                    if (isBouncing(tyreTempMessagesPlayed, 3))
+                    {
+                        lapsBetweenTyreTempChecks++;
+                        Console.WriteLine("This tyre temp message has already been played recently, increasing check interval");
+                    }
                 }
             }
-            lastTyreTempMessage = messageContents;
         }
 
         public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
@@ -941,16 +960,47 @@ namespace CrewChiefV4.Events
 
             if (messageContents.Count > 0)
             {
+                List<MessageFragment> lastBrakeTempMessage = brakeTempMessagesPlayed.Count > 0 ? brakeTempMessagesPlayed.Last() : null;
                 if (playImmediately)
                 {
+                    brakeTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
                 {
+                    brakeTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessage(new QueuedMessage("brake_temps", 0, messageFragments: messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
+                    if (isBouncing(brakeTempMessagesPlayed, 3))
+                    {
+                        lapsBetweenBrakeTempChecks++;
+                        Console.WriteLine("This brake temp message has already been played recently, increasing check interval");
+                    }
                 }
             }
-            lastBrakeTempMessage = messageContents;
+        }
+
+        // check if this set of messages has already been played recently (in the last messagesToCheck times).
+        private Boolean isBouncing(List<List<MessageFragment>> messages, int messagesToCheck)
+        {
+            if (messages.Count > 2)
+            {
+                int messagesChecked = 0;
+                List<MessageFragment> thisSet = messages.Last();
+                for (int i = messages.Count - 2; i >= 0; i--)
+                {
+                    List<MessageFragment> earlierSet = messages[i];
+                    if (messagesHaveSameContent(thisSet, earlierSet))
+                    {
+                        return true;
+                    }
+                    messagesChecked++;
+                    if (messagesChecked >= messagesToCheck)
+                    {
+                        break;
+                    }
+                }
+            }
+            return false;
         }
 
         private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged, Boolean allowDelayedResponse, Boolean tyreStatusRequestOnly)
