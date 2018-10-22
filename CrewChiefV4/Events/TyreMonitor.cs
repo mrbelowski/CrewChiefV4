@@ -190,8 +190,6 @@ namespace CrewChiefV4.Events
         private int lastBrakeTempCheckLap = 0;
         private int lapsBetweenTyreTempChecks = 1;
         private int lastTyreTempCheckLap = 0;
-        private Boolean tyreTempsAreBouncing = false;
-        private Boolean brakeTempsAreBouncing = false;
         private List<List<MessageFragment>> tyreTempMessagesPlayed = new List<List<MessageFragment>>();
         private List<List<MessageFragment>> brakeTempMessagesPlayed = new List<List<MessageFragment>>();
         
@@ -346,8 +344,6 @@ namespace CrewChiefV4.Events
             lastBrakeTempCheckLap = 0;
             lapsBetweenTyreTempChecks = 1;
             lastTyreTempCheckLap = 0;
-            tyreTempsAreBouncing = false;
-            brakeTempsAreBouncing = false;
             lastTyreConditionMessage = null;
             peakBrakeTempForLap = 0;
             timeLeftFrontIsLockedForLap = 0;
