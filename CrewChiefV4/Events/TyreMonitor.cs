@@ -162,7 +162,7 @@ namespace CrewChiefV4.Events
         // check at start of which sector (1=s/f line)
         private int checkBrakesAtSector = 3;
         private float lastBrakeTempCheckSessionTime = -1.0f;
-        private const float SecondsBetweenBrakeTempCheck = 120.0f;
+        private float secondsBetweenBrakeTempCheck = 120.0f;
 
         private Boolean reportedTyreWearForCurrentPitEntry;
 
@@ -186,9 +186,12 @@ namespace CrewChiefV4.Events
         private CornerData currentBrakeTempStatus;
         private CornerData peakBrakeTempStatus;
 
-        private List<MessageFragment> lastTyreTempMessage = null;
-
-        private List<MessageFragment> lastBrakeTempMessage = null;
+        private int lapsBetweenBrakeTempChecks = 1;
+        private int lastBrakeTempCheckLap = 0;
+        private int lapsBetweenTyreTempChecks = 1;
+        private int lastTyreTempCheckLap = 0;
+        private List<List<MessageFragment>> tyreTempMessagesPlayed = new List<List<MessageFragment>>();
+        private List<List<MessageFragment>> brakeTempMessagesPlayed = new List<List<MessageFragment>>();
         
         private List<MessageFragment> lastTyreConditionMessage = null;
 
@@ -335,8 +338,12 @@ namespace CrewChiefV4.Events
             currentTyreTempStatus = new CornerData();
             currentBrakeTempStatus = new CornerData();
             peakBrakeTempStatus = new CornerData();
-            lastTyreTempMessage = null;
-            lastBrakeTempMessage = null;
+            tyreTempMessagesPlayed.Clear();
+            brakeTempMessagesPlayed.Clear();
+            lapsBetweenBrakeTempChecks = 1;
+            lastBrakeTempCheckLap = 0;
+            lapsBetweenTyreTempChecks = 1;
+            lastTyreTempCheckLap = 0;
             lastTyreConditionMessage = null;
             peakBrakeTempForLap = 0;
             timeLeftFrontIsLockedForLap = 0;
@@ -353,7 +360,7 @@ namespace CrewChiefV4.Events
             warnedOnLockingForLap = false;
             warnedOnWheelspinForLap = false;
             nextLockingAndSpinningCheck = DateTime.MinValue;
-
+            secondsBetweenBrakeTempCheck = 120.0f;
             leftFrontTyreTemp = 0;
             rightFrontTyreTemp = 0;
             leftRearTyreTemp = 0;
@@ -720,22 +727,25 @@ namespace CrewChiefV4.Events
             if (enableTyreTempWarnings && !currentGameState.SessionData.LeaderHasFinishedRace &&
                 !currentGameState.PitData.InPitlane &&
                 currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage &&
+                completedLaps >= lastTyreTempCheckLap + lapsBetweenTyreTempChecks &&
                 currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == thisLapTyreTempReportSector)
             {
                 reportCurrentTyreTempStatus(false);
+                lastTyreTempCheckLap = completedLaps;
             }
-                
+
             if (!currentGameState.SessionData.LeaderHasFinishedRace &&
-                    ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap) ||
-                    ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector))) &&
-                    (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > TyreMonitor.SecondsBetweenBrakeTempCheck)))
+                    ((checkBrakesAtSector == 1 && currentGameState.SessionData.IsNewLap && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks) ||
+                    ((currentGameState.SessionData.IsNewSector && currentGameState.SessionData.SectorNumber == checkBrakesAtSector && completedLaps >= lastBrakeTempCheckLap + lapsBetweenBrakeTempChecks))) &&
+                    (lastBrakeTempCheckSessionTime == -1.0f || ((currentGameState.SessionData.SessionRunningTime - lastBrakeTempCheckSessionTime) > secondsBetweenBrakeTempCheck)))
             {
                 if (!currentGameState.PitData.InPitlane && currentGameState.SessionData.CompletedLaps >= lapsIntoSessionBeforeTempMessage)
                 {
                     if (enableBrakeTempWarnings && !GlobalBehaviourSettings.useOvalLogic)
                     {
-                        lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
                         reportBrakeTempStatus(false, true);
+                        lastBrakeTempCheckSessionTime = currentGameState.SessionData.SessionRunningTime;
+                        lastBrakeTempCheckLap = completedLaps;
                     }
                 }
                 peakBrakeTempForLap = 0;
@@ -864,10 +874,13 @@ namespace CrewChiefV4.Events
 
         public void reportCurrentTyreTempStatus(Boolean playImmediately)
         {
+            // for FWD classes we don't care about rear tyres
+            Boolean includeRears = playImmediately || !CrewChief.currentGameState.carClass.allMembersAreFWD;
+
             List<MessageFragment> messageContents = new List<MessageFragment>();
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COLD), TyreTemp.COLD, messageContents);
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.HOT), TyreTemp.HOT, messageContents);
-            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COOKING), TyreTemp.COOKING, messageContents);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COLD), TyreTemp.COLD, messageContents, includeRears);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.HOT), TyreTemp.HOT, messageContents, includeRears);
+            addTyreTempWarningMessages(currentTyreTempStatus.getCornersForStatus(TyreTemp.COOKING), TyreTemp.COOKING, messageContents, includeRears);
 
             if (messageContents.Count == 0)
             {
@@ -883,40 +896,48 @@ namespace CrewChiefV4.Events
             }
             if (messageContents.Count > 0)
             {
+                List<MessageFragment> lastTyreTempMessage = tyreTempMessagesPlayed.Count > 0 ? tyreTempMessagesPlayed.Last() : null;
                 if (playImmediately)
                 {
+                    tyreTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessageImmediately(new QueuedMessage("tyre_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastTyreTempMessage == null || !messagesHaveSameContent(lastTyreTempMessage, messageContents))
                 {
+                    tyreTempMessagesPlayed.Add(messageContents);
                     Console.WriteLine("Tyre temp warning, temps : "+ String.Join(", ", messageContents));
                     audioPlayer.playMessage(new QueuedMessage("tyre_temps", 0, messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
+                    if (isBouncing(tyreTempMessagesPlayed, 3))
+                    {
+                        lapsBetweenTyreTempChecks++;
+                        Console.WriteLine("This tyre temp message has already been played recently, increasing check interval");
+                    }
                 }
             }
-            lastTyreTempMessage = messageContents;
         }
 
         public void reportBrakeTempStatus(Boolean playImmediately, Boolean peak)
         {
-            CarData.CarClassEnum carClassEnum = CrewChief.currentGameState.carClass.carClassEnum;
+            // for FWD classes we don't care about rear tyres
+            Boolean includeRears = playImmediately || !CrewChief.currentGameState.carClass.allMembersAreFWD;
             List<MessageFragment> messageContents = new List<MessageFragment>();
             if (peak)
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
+                    addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, includeRears);
                 }
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
-                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, includeRears);
+                addBrakeTempWarningMessages(peakBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, includeRears);
             }
             else
             {
                 if (!GlobalBehaviourSettings.useOvalLogic)
                 {
-                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, carClassEnum);
+                    addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COLD), BrakeTemp.COLD, messageContents, includeRears);
                 }
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, carClassEnum);
-                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, carClassEnum);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.HOT), BrakeTemp.HOT, messageContents, includeRears);
+                addBrakeTempWarningMessages(currentBrakeTempStatus.getCornersForStatus(BrakeTemp.COOKING), BrakeTemp.COOKING, messageContents, includeRears);
             }
             if (messageContents.Count == 0)
             {
@@ -937,16 +958,48 @@ namespace CrewChiefV4.Events
 
             if (messageContents.Count > 0)
             {
+                List<MessageFragment> lastBrakeTempMessage = brakeTempMessagesPlayed.Count > 0 ? brakeTempMessagesPlayed.Last() : null;
                 if (playImmediately)
                 {
+                    brakeTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessageImmediately(new QueuedMessage("brake_temps", 0, messageFragments: messageContents));
                 }
                 else if (lastBrakeTempMessage == null || !messagesHaveSameContent(lastBrakeTempMessage, messageContents))
                 {
+                    brakeTempMessagesPlayed.Add(messageContents);
                     audioPlayer.playMessage(new QueuedMessage("brake_temps", 0, messageFragments: messageContents, secondsDelay: Utilities.random.Next(0, 10), abstractEvent: this, priority: 5));
+                    if (isBouncing(brakeTempMessagesPlayed, 3))
+                    {
+                        lapsBetweenBrakeTempChecks++;
+                        secondsBetweenBrakeTempCheck += 120f;
+                        Console.WriteLine("This brake temp message has already been played recently, increasing check interval");
+                    }
                 }
             }
-            lastBrakeTempMessage = messageContents;
+        }
+
+        // check if this set of messages has already been played recently (in the last messagesToCheck times).
+        private Boolean isBouncing(List<List<MessageFragment>> messages, int messagesToCheck)
+        {
+            if (messages.Count > 2)
+            {
+                int messagesChecked = 0;
+                List<MessageFragment> thisSet = messages.Last();
+                for (int i = messages.Count - 2; i >= 0; i--)
+                {
+                    List<MessageFragment> earlierSet = messages[i];
+                    if (messagesHaveSameContent(thisSet, earlierSet))
+                    {
+                        return true;
+                    }
+                    messagesChecked++;
+                    if (messagesChecked >= messagesToCheck)
+                    {
+                        break;
+                    }
+                }
+            }
+            return false;
         }
 
         private void reportCurrentTyreConditionStatus(Boolean playImmediately, Boolean playEvenIfUnchanged, Boolean allowDelayedResponse, Boolean tyreStatusRequestOnly)
@@ -1288,7 +1341,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addTyreTempWarningMessages(CornerData.Corners corners, TyreTemp tyreTemp, List<MessageFragment> messageContents)
+        private void addTyreTempWarningMessages(CornerData.Corners corners, TyreTemp tyreTemp, List<MessageFragment> messageContents, Boolean includeRears)
         {
             switch (corners)
             {
@@ -1325,19 +1378,22 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REARS:
-                    switch (tyreTemp)
+                    if (includeRears)
                     {
-                        case TyreTemp.COLD:
-                            messageContents.Add(MessageFragment.Text(folderColdRearTyres));
-                            break;
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotRearTyres));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingRearTyres));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.COLD:
+                                messageContents.Add(MessageFragment.Text(folderColdRearTyres));
+                                break;
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotRearTyres));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingRearTyres));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case CornerData.Corners.LEFTS:
@@ -1405,32 +1461,38 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REAR_LEFT:
-                    if (!GlobalBehaviourSettings.useOvalLogic)
+                    if (includeRears)
                     {
-                        switch (tyreTemp)
+                        if (!GlobalBehaviourSettings.useOvalLogic)
                         {
-                            case TyreTemp.HOT:
-                                messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
-                                break;
-                            case TyreTemp.COOKING:
-                                messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
-                                break;
-                            default:
-                                break;
+                            switch (tyreTemp)
+                            {
+                                case TyreTemp.HOT:
+                                    messageContents.Add(MessageFragment.Text(folderHotLeftRearTyre));
+                                    break;
+                                case TyreTemp.COOKING:
+                                    messageContents.Add(MessageFragment.Text(folderCookingLeftRearTyre));
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                     break;
                 case CornerData.Corners.REAR_RIGHT:
-                    switch (tyreTemp)
+                    if (includeRears)
                     {
-                        case TyreTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotRightRearTyre));
-                            break;
-                        case TyreTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingRightRearTyre));
-                            break;
-                        default:
-                            break;
+                        switch (tyreTemp)
+                        {
+                            case TyreTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotRightRearTyre));
+                                break;
+                            case TyreTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingRightRearTyre));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
             }
@@ -1587,7 +1649,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, CarData.CarClassEnum carClassEnum)
+        private void addBrakeTempWarningMessages(CornerData.Corners corners, BrakeTemp brakeTemp, List<MessageFragment> messageContents, Boolean includeRears)
         {
             switch (corners)
             {
@@ -1595,7 +1657,7 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
                             {
                                 messageContents.Add(MessageFragment.Text(folderColdBrakesAllRound));
                             }
@@ -1614,7 +1676,7 @@ namespace CrewChiefV4.Events
                     switch (brakeTemp)
                     {
                         case BrakeTemp.COLD:
-                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
+                            if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
                             {
                                 messageContents.Add(MessageFragment.Text(folderColdFrontBrakes));
                             }
@@ -1630,22 +1692,25 @@ namespace CrewChiefV4.Events
                     }
                     break;
                 case CornerData.Corners.REARS:
-                    switch (brakeTemp)
+                    if (includeRears)
                     {
-                        case BrakeTemp.COLD:
-                            if (!ignoreColdBrakesForClasses.Contains(carClassEnum))
-                            {
-                                messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
-                            }
-                            break;
-                        case BrakeTemp.HOT:
-                            messageContents.Add(MessageFragment.Text(folderHotRearBrakes));
-                            break;
-                        case BrakeTemp.COOKING:
-                            messageContents.Add(MessageFragment.Text(folderCookingRearBrakes));
-                            break;
-                        default:
-                            break;
+                        switch (brakeTemp)
+                        {
+                            case BrakeTemp.COLD:
+                                if (!ignoreColdBrakesForClasses.Contains(CrewChief.currentGameState.carClass.carClassEnum))
+                                {
+                                    messageContents.Add(MessageFragment.Text(folderColdRearBrakes));
+                                }
+                                break;
+                            case BrakeTemp.HOT:
+                                messageContents.Add(MessageFragment.Text(folderHotRearBrakes));
+                                break;
+                            case BrakeTemp.COOKING:
+                                messageContents.Add(MessageFragment.Text(folderCookingRearBrakes));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 default:
