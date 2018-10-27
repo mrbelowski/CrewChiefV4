@@ -183,6 +183,11 @@ namespace CrewChiefV4.Events
 
         private Boolean sessionHasHadFCY = false;
 
+        // used in prac and qual when we start a run which is likely to be a qual simulation
+        // TODO: should probably make this available to other events as there may be other behaviours
+        // to be adjusted when we're on a low fuel run
+        private Boolean onLowFuelRun = false;
+
         public Fuel(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -224,6 +229,8 @@ namespace CrewChiefV4.Events
 
             historicAverageUsagePerLap.Clear();
             historicAverageUsagePerMinute.Clear();
+
+            onLowFuelRun = false;
         }
 
         // fuel not implemented for HotLap/LonePractice modes
@@ -305,6 +312,25 @@ namespace CrewChiefV4.Events
                     lapsCompletedSinceFuelReset = 0;
                     historicAverageUsagePerLap.Clear();
                     historicAverageUsagePerMinute.Clear();
+                    // set the onLowFuelRun if we're in prac / qual
+                    onLowFuelRun = false;
+                    if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
+                        averageUsagePerLap > 0)
+                    {
+                        float lapsForLowFuelRun = 4f;
+                        if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                        {
+                            lapsForLowFuelRun = 3f;
+                        }
+                        else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                        {
+                            lapsForLowFuelRun = 2f;
+                        }
+                        if (initialFuelLevel / averageUsagePerLap <= lapsForLowFuelRun)
+                        {
+                            onLowFuelRun = true;
+                        }
+                    }
                     // if this is the first time we've initialised the fuel stats (start of session), get the half way point of this session
                     if (!initialised)
                     {
@@ -444,9 +470,9 @@ namespace CrewChiefV4.Events
                     }
 
                     // warnings for particular fuel levels
-                    if (enableFuelMessages)
+                    if (enableFuelMessages && !onLowFuelRun)
                     {
-                        if(fuelReportsInGallon)
+                        if (fuelReportsInGallon)
                         {
                             if (convertLitersToGallons(currentFuel) <= 1 && !played2LitreWarning)
                             {
@@ -593,6 +619,7 @@ namespace CrewChiefV4.Events
                                 playedHalfTimeFuelEstimate = true;
                                 if (currentGameState.SessionData.SessionType == SessionType.Race)
                                 {
+                                    float slackAmount = averageUsagePerLap > 0 ? averageUsagePerLap : 2f;
                                     // need a bit of slack in this estimate:
                                     float fuelToEnd = averageUsagePerMinute * (halfTime + benchmarkLaptime) / 60;
                                     if (fuelToEnd > currentGameState.FuelData.FuelLeft)
@@ -608,7 +635,7 @@ namespace CrewChiefV4.Events
                                             audioPlayer.playMessage(new QueuedMessage(folderHalfDistanceLowFuel, 0, abstractEvent: this, priority: 7));
                                         }
                                     }
-                                    else if (currentGameState.FuelData.FuelLeft - fuelToEnd <= 2)
+                                    else if (currentGameState.FuelData.FuelLeft - fuelToEnd <= slackAmount)
                                     {
                                         audioPlayer.playMessage(new QueuedMessage("Fuel/estimate", 0,
                                             messageFragments: MessageContents(RaceTime.folderHalfWayHome, folderFuelWillBeTight), abstractEvent: this, priority: 7));
