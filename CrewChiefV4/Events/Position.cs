@@ -387,11 +387,11 @@ namespace CrewChiefV4.Events
                             !currentGameState.PenaltiesData.HasDriveThrough && !currentGameState.PenaltiesData.HasStopAndGo &&
                             !hasrFactorPenaltyPending)
                     {
-                        if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 4)
+                        if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 5)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderTerribleStart, 10, abstractEvent: this, priority: 5));
                         }
-                        else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 1)
+                        else if (currentGameState.SessionData.ClassPosition > currentGameState.SessionData.SessionStartClassPosition + 3)
                         {
                             audioPlayer.playMessage(new QueuedMessage(folderBadStart, 10, abstractEvent: this, priority: 5));
                         }
