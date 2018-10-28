@@ -581,7 +581,7 @@ namespace CrewChiefV4.Audio
             {
                 int waitTimeout = -1;
                 DateTime now = CrewChief.currentGameState == null ? DateTime.UtcNow : CrewChief.currentGameState.Now;
-                if (channelOpen && (!holdChannelOpen || now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
+                if (channelOpen && !SoundCache.IS_PLAYING && (!holdChannelOpen || now > timeOfLastMessageEnd + maxTimeToHoldEmptyChannelOpen))
                 {
                     if (!queueHasDueMessages(queuedClips, false) && !queueHasDueMessages(immediateClips, true))
                     {
@@ -1159,7 +1159,7 @@ namespace CrewChiefV4.Audio
             hangingChannelCloseThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                if (!hangingChannelCloseWakeUpEvent.WaitOne(6000))
+                if (!hangingChannelCloseWakeUpEvent.WaitOne(6000) && !SoundCache.IS_PLAYING)
                 {
                     // if we timeout here it means the channel was left open, so close it
                     closeRadioInternalChannel();
