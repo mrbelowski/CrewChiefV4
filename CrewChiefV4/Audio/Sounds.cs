@@ -13,6 +13,11 @@ namespace CrewChiefV4.Audio
 {
     public class SoundCache
     {
+        // guard against other Threads closing the radio channel while a message set is being played.
+        // Note this doesn't prevent interruptions (which allow the message fragments loop to complete while
+        // not playing all the messages) - this guards against the channel being closed during a Pause operation
+        public static Boolean IS_PLAYING = false;
+
         public static String TTS_IDENTIFIER = "TTS_IDENTIFIER";
         private Boolean useAlternateBeeps = UserSettings.GetUserSettings().getBoolean("use_alternate_beeps");
         public static Boolean recordVarietyData = UserSettings.GetUserSettings().getBoolean("record_sound_variety_data");
@@ -520,6 +525,7 @@ namespace CrewChiefV4.Audio
                     singleSoundsToPlay.Add(suffix.getSingleSound(false));
                     lastPersonalisedMessageTime = GameStateData.CurrentTime;
                 }
+                SoundCache.IS_PLAYING = true;
                 foreach (SingleSound singleSound in singleSoundsToPlay)
                 {
                     if (singleSound.isPause)
@@ -531,6 +537,7 @@ namespace CrewChiefV4.Audio
                         singleSound.Play(soundMetadata);
                     }
                 }
+                SoundCache.IS_PLAYING = false;
             }
         }
 
