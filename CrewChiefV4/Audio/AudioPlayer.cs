@@ -71,7 +71,8 @@ namespace CrewChiefV4.Audio
         private Boolean keepQuiet = false;
         private Boolean channelOpen = false;
 
-        private Boolean holdChannelOpen = false;
+        // hack... this is set to 'false' on session end to ensure a pending spotter message doesn't clog the audio player
+        public Boolean holdChannelOpen = false;
         private Boolean useShortBeepWhenOpeningChannel = false;
 
         private TimeSpan maxTimeToHoldEmptyChannelOpen = TimeSpan.FromSeconds(UserSettings.GetUserSettings().getInt("spotter_hold_repeat_frequency") + 1);
