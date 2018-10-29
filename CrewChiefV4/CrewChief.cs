@@ -907,6 +907,7 @@ namespace CrewChiefV4
                                         previousGameState.SessionData.NumCarsInPlayerClassAtStartOfSession, previousGameState.SessionData.CompletedLaps,
                                         currentGameState.SessionData.IsDisqualified, currentGameState.SessionData.IsDNF, currentGameState.Now);
                                 }
+                                audioPlayer.holdChannelOpen = false;    // clear the 'hold open' state here before waking the monitor
                                 audioPlayer.wakeMonitorThreadForRegularMessages(currentGameState.Now);
                                 sessionFinished = true;
                                 audioPlayer.disablePearlsOfWisdom = false;
