@@ -293,6 +293,11 @@ namespace CrewChiefV4.Events
             }
             if (!currentGameState.PitData.InPitlane && enableGapMessages && !currentGameState.FlagData.currentLapIsFCY && !isNearRaceEnd(currentGameState))
             {
+                // as soon as there's a position change in front, reset the being-held-up-by value
+                if (!currentGameState.SessionData.IsRacingSameCarInFront)
+                {
+                    this.carHoldingUsUp = null;
+                }
                 if (isRace && !CrewChief.readOpponentDeltasForEveryLap &&
                     IsNewSectorOrGapPoint(previousGameState, currentGameState))
                 {
@@ -338,16 +343,16 @@ namespace CrewChiefV4.Events
                     {
                         if (gapInFrontStatus == GapStatus.CLOSE)
                         {
-                            String carFront = currentGameState.getOpponentKeyInFront(currentGameState.carClass);
-                            if (carFront != this.carHoldingUsUp)
+                            OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
+                            if (opponent.DriverRawName != this.carHoldingUsUp)
                             {
-                                this.carHoldingUsUp = carFront;
+                                this.carHoldingUsUp = opponent.DriverRawName;
                                 this.timeWeStartedBeingHeldUp = currentGameState.Now;
                             }
                             else if (!GlobalBehaviourSettings.useOvalLogic && 
                                 sectorsSinceLastCloseCarAheadReport >= sectorsUntilNextCloseCarAheadReport && 
                                 !currentGameState.FlagData.isLocalYellow &&
-                                (currentGameState.Now - timeWeStartedBeingHeldUp).TotalSeconds > 60 /* don't grumble about being held up until we've been close behind this car for one minute */)
+                                (currentGameState.Now - timeWeStartedBeingHeldUp).TotalSeconds > 60 /* don't grumble about being held up until we've been behind this car for one minute */)
                             {
                                 sectorsSinceLastCloseCarAheadReport = 0;
                                 // only prefer mid-lap gap reports if we're on a track with no ad-hoc gapPoints
@@ -360,9 +365,9 @@ namespace CrewChiefV4.Events
                                     sectorsUntilNextCloseCarAheadReport = adjustForMidLapPreference(currentGameState.SessionData.SectorNumber,
                                         Utilities.random.Next(closeAheadMinSectorWait, closeAheadMaxSectorWait));
                                 }
+                                Console.WriteLine("Being held up by " + opponent.DriverRawName);
                                 Dictionary<string, object> validationData = new Dictionary<string, object> { { "position", currentGameState.SessionData.ClassPosition } };
                                 audioPlayer.playMessage(new QueuedMessage(folderBeingHeldUp, 3, abstractEvent: this, validationData: validationData, priority: 10));
-                                OpponentData opponent = currentGameState.getOpponentAtClassPosition(currentGameState.SessionData.ClassPosition - 1, currentGameState.carClass);
                                 if (opponent != null)
                                 {
                                     DateTime lastTimeDriverNameUsed = DateTime.MinValue;
@@ -435,7 +440,7 @@ namespace CrewChiefV4.Events
                                             validationData: validationData, priority: 5));
 
                                         DateTime lastTimeDriverNameUsed = DateTime.MinValue;
-                                        if (currentGameState.SessionData.TimeDeltaFront < 4 &&
+                                        if (currentGameState.SessionData.TimeDeltaFront < 6 &&
                                             !trackLandmarkAttackDriverNamesUsed.TryGetValue(opponent.DriverRawName, out lastTimeDriverNameUsed) ||
                                             lastTimeDriverNameUsed + minTimeBetweenAttackOrDefendByDriver < currentGameState.Now)
                                         {
