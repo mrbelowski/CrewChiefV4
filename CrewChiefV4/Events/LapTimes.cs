@@ -617,7 +617,7 @@ namespace CrewChiefV4.Events
                                 }
 
                                 if (!GlobalBehaviourSettings.useOvalLogic && currentGameState.SessionData.ClassPosition == ClassPositionAtStartOfCurrentLap &&
-                                    raceSectorReportsAtLapEnd && frequencyOfRaceSectorDeltaReports > Utilities.random.NextDouble() * 10)
+                                    raceSectorReportsAtLapEnd && frequencyOfRaceSectorDeltaReports > Utilities.random.NextDouble() * 15)
                                 {
                                     double r = Utilities.random.NextDouble();
                                     SectorReportOption reportOption = SectorReportOption.ALL;
@@ -689,7 +689,7 @@ namespace CrewChiefV4.Events
                      (currentGameState.SessionData.SessionType != SessionType.Race && practiceAndQualSectorReportsAtEachSector)))
                 {
                     double r = Utilities.random.NextDouble() * 10;
-                    Boolean canPlayForRace = frequencyOfRaceSectorDeltaReports > r;
+                    Boolean canPlayForRace = frequencyOfRaceSectorDeltaReports > r * 1.5;
                     Boolean canPlayForPracAndQual = frequencyOfPracticeAndQualSectorDeltaReports > r;
 
                     // only report sector time if this is a valid lap
