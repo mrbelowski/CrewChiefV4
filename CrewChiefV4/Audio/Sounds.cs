@@ -131,7 +131,7 @@ namespace CrewChiefV4.Audio
                     "/" + pathFragments[pathFragments.Length - 2] + "/" + pathFragments[pathFragments.Length - 1];
                 if (varietyData.ContainsKey(interestingSoundPath))
                 {
-                    varietyData[interestingSoundPath] = new Tuple<int, int>(varietyData[interestingSoundPath].Item1, varietyData[interestingSoundPath].Item2 + 1);
+                    varietyData[interestingSoundPath] = new Tuple<int, int>(soundsInThisSet, varietyData[interestingSoundPath].Item2 + 1);
                 }
                 else
                 {
