@@ -46,6 +46,10 @@ namespace CrewChiefV4
         private static float maxWarmUltraSoftTyreTempPeak = 95;
         private static float maxHotUltraSoftTyreTempPeak = 107;
 
+        private static float maxColdHyperSoftTyreTempPeak = 60;
+        private static float maxWarmHyperSoftTyreTempPeak = 94;
+        private static float maxHotHyperSoftTyreTempPeak = 105;
+
         private static float maxColdWetTyreTempPeak = 40;
         private static float maxWarmWetTyreTempPeak = 80;
         private static float maxHotWetTyreTempPeak = 105;
@@ -164,6 +168,13 @@ namespace CrewChiefV4
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmRoadTyreTempPeak, maxHotRoadTyreTempPeak));
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotRoadTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.Road, roadTyreTempsThresholds);
+
+            List<CornerData.EnumWithThresholds> hyperSoftTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdUltraSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdHyperSoftTyreTempPeak, maxWarmHyperSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmHyperSoftTyreTempPeak, maxHotHyperSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotHyperSoftTyreTempPeak, 10000));
+            tyreTempThresholds.Add(TyreType.Hyper_Soft, hyperSoftTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ultraSoftTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             ultraSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdUltraSoftTyreTempPeak));
