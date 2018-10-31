@@ -51,6 +51,7 @@ namespace CrewChiefV4
                             var process = System.Diagnostics.Process.GetCurrentProcess();
                             // Set Core 
                             process.ProcessorAffinity = pArg;
+                            Console.WriteLine("Set process core affinity to " + commandLineArg);
                         }
                         catch (Exception)
                         {

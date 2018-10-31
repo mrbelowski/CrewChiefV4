@@ -2218,8 +2218,10 @@ namespace CrewChiefV4.rFactor2
                     tyreType = TyreType.Super_Soft;
                 else if (frontCompound.Contains("ULTRA"))
                     tyreType = TyreType.Ultra_Soft;
-
-                tyreType = TyreType.Soft;
+                else if (frontCompound.Contains("HYPER"))
+                    tyreType = TyreType.Hyper_Soft; // TODO: add recording for hyper soft
+                else
+                    tyreType = TyreType.Soft;
             }
             else if (frontCompound.Contains("WET"))
                 tyreType = TyreType.Wet;
