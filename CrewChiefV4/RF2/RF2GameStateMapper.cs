@@ -2219,7 +2219,7 @@ namespace CrewChiefV4.rFactor2
                 else if (frontCompound.Contains("ULTRA"))
                     tyreType = TyreType.Ultra_Soft;
                 else if (frontCompound.Contains("HYPER"))
-                    tyreType = TyreType.Hyper_Soft; // TODO: add recording for hyper soft
+                    tyreType = TyreType.Hyper_Soft;
                 else
                     tyreType = TyreType.Soft;
             }
