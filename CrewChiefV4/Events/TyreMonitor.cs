@@ -146,6 +146,7 @@ namespace CrewChiefV4.Events
         public static String folderSoftTyres = "tyre_monitor/softs";
         public static String folderSuperSoftTyres = "tyre_monitor/super_softs";
         public static String folderUltraSoftTyres = "tyre_monitor/ultra_softs";
+        public static String folderHyperSoftTyres = "tyre_monitor/hyper_softs";
         public static String folderPrimaryTyres = "tyre_monitor/primaries";
         public static String folderAlternateTyres = "tyre_monitor/alternates";
         public static String folderPrimeTyres = "tyre_monitor/primes";
@@ -294,6 +295,8 @@ namespace CrewChiefV4.Events
         {
             switch (tyreType)
             {
+                case TyreType.Hyper_Soft:
+                    return folderHyperSoftTyres;
                 case TyreType.Ultra_Soft:
                     return folderUltraSoftTyres;
                 case TyreType.Super_Soft:
