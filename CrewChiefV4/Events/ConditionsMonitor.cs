@@ -298,7 +298,7 @@ namespace CrewChiefV4.Events
                                 switch (currentRainLevel)
                                 {
                                     case RainLevel.DRIZZLE:
-                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderDrizzleIncreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderDrizzleIncreasing : folderDrizzleDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.LIGHT:
                                         audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
