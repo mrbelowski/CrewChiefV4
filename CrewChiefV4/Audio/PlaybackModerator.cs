@@ -1,5 +1,4 @@
-﻿using CrewChiefV4.GameState;
-/*
+﻿/*
  * The idea behind PlaybackModerator class is to allow us to adjust playback after all the high level logic is evaluated,
  * messages resolved, duplicates removed etc.  It is plugged into SingleSound play and couple of other low level places.
  * Currently, the only two things it does is injects fake beep-out/in between Spotter and Chief messages and decides which 
@@ -9,6 +8,7 @@
  * Official website: thecrewchief.org 
  * License: MIT
  */
+using CrewChiefV4.GameState;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -68,7 +68,7 @@ namespace CrewChiefV4.Audio
         {
             var interruptSetting = UserSettings.GetUserSettings().getString("interrupt_setting_listprop");
             MinPriorityForInterrupt interruptSettingEnum;
-            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum)) ;
+            if (Enum.TryParse(interruptSetting, out interruptSettingEnum) && Enum.IsDefined(typeof(MinPriorityForInterrupt), interruptSettingEnum))
             {
                 switch (interruptSettingEnum)
                 {
@@ -94,6 +94,12 @@ namespace CrewChiefV4.Audio
             {Verbosity.LOW, 10},
             {Verbosity.SILENT, 20}
         };
+
+        private static CrewChief crewChief = null;
+        public static void SetCrewChief(CrewChief cc)
+        {
+            PlaybackModerator.crewChief = cc;
+        }
 
         public static void ClearVerbosityData()
         {
@@ -136,7 +142,7 @@ namespace CrewChiefV4.Audio
                     else if (inTraffic || hasCarClose)
                         PlaybackModerator.verbosity = Verbosity.MED;
                     else if (currentGameState.SessionData.CompletedLaps == 0
-                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.CompletedLaps + 1 >= currentGameState.SessionData.SessionNumberOfLaps)
+                        || (!currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionLapsRemaining < 2)
                         || (currentGameState.SessionData.SessionHasFixedTime && currentGameState.SessionData.SessionRunningTime + 120 >= currentGameState.SessionData.SessionTotalRunTime))
                         PlaybackModerator.verbosity = Verbosity.MED;
                 }
@@ -251,6 +257,7 @@ namespace CrewChiefV4.Audio
 
             PlaybackModerator.audioPlayer = audioPlayer;
         }
+
         private static void Trace(string msg)
         {
             if (!PlaybackModerator.enableTracing)
@@ -276,6 +283,12 @@ namespace CrewChiefV4.Audio
 
         public static bool ShouldPlaySound(SingleSound singleSound, SoundMetadata soundMetadata)
         {
+            if (PlaybackModerator.crewChief != null && !PlaybackModerator.crewChief.running)
+            {
+                PlaybackModerator.Trace(string.Format("Sound {0} rejected because main thread is shutting down", singleSound.fullPath));
+                return false;
+            }
+
             int messageId = soundMetadata == null ? 0 : soundMetadata.messageId;
             if (PlaybackModerator.lastBlockedMessageId == messageId)
             {
@@ -297,7 +310,7 @@ namespace CrewChiefV4.Audio
 
             if (PlaybackModerator.minPriorityForInterrupt != SoundType.OTHER && PlaybackModerator.CanInterrupt(soundMetadata))
             {
-                var mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getMinTypeInImmediateQueue();
+                SoundType mostImportantTypeInImmediateQueue = PlaybackModerator.audioPlayer.getPriortyOfFirstWaitingImmediateMessage();
                 if (mostImportantTypeInImmediateQueue <= PlaybackModerator.minPriorityForInterrupt)
                 {
                     PlaybackModerator.Trace(string.Format("Blocking queued messasge {0} because at least 1 {1} message is waiting",
@@ -421,16 +434,14 @@ namespace CrewChiefV4.Audio
 
         private static bool PrevFirstKeyWasSpotter()
         {
-            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevFirstKey)
-                && (PlaybackModerator.prevFirstKey.Contains("spotter") || PlaybackModerator.prevFirstKey.Contains("radio_check_"));
+                && (PlaybackModerator.prevFirstKey.Contains("spotter"));
         }
 
         private static bool PrevLastKeyWasSpotter()
         {
-            // The spotter 'radio check' is radio_check_SpotterName, so also check for this:
             return !string.IsNullOrWhiteSpace(PlaybackModerator.prevLastKey)
-                && (PlaybackModerator.prevLastKey.Contains("spotter") || PlaybackModerator.prevLastKey.Contains("radio_check_"));
+                && (PlaybackModerator.prevLastKey.Contains("spotter"));
         }
     }
 }

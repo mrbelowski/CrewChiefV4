@@ -130,6 +130,7 @@ namespace CrewChiefV4
         private static readonly NumberReader numberReader = NumberReaderFactory.GetNumberReader();
 
         private static readonly String compoundMessageIdentifier = "COMPOUND_";
+        private static readonly String delayedMessageIdentifier = "DELAYED_";
 
         public SoundMetadata metadata = null;  // null => a generic 'regular message' meta data object will be created automatically
                                                // for regular queue messages, and a 'high importance' metadata object create for immediate-queue messages
@@ -147,6 +148,8 @@ namespace CrewChiefV4
 
         public int secondsDelay;
 
+        private long creationTime;
+
         // some snapshot of pertentent data at the point of creation, 
         // which can be validated before it actually gets played. E.g.
         // e.g. {SessionData.Position = 1}
@@ -160,90 +163,86 @@ namespace CrewChiefV4
 
         public Boolean isRant = false;
 
+        public int messageId = 0;
+
+        private static int messageIdCounter = 0;
+
+        private int getMessageId()
+        {
+            lock (this)
+            {
+                QueuedMessage.messageIdCounter++;
+                return QueuedMessage.messageIdCounter;
+            }
+        }
+
+        public QueuedMessage(String messageName, int expiresAfter, List<MessageFragment> messageFragments = null, 
+            List<MessageFragment> alternateMessageFragments = null, DelayedMessageEvent delayedMessageEvent = null,
+            int secondsDelay = 0, AbstractEvent abstractEvent = null, Dictionary<String, Object> validationData = null,
+            int priority = SoundMetadata.DEFAULT_PRIORITY, SoundType type = SoundType.AUTO)
+        {
+            this.messageId = getMessageId();
+            this.validationData = validationData;
+            this.creationTime = GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond;
+            this.dueTime = secondsDelay == 0 ? 0 : this.creationTime + (secondsDelay * 1000) + updateInterval;
+            this.expiryTime = expiresAfter == 0 ? 0 : this.creationTime + (expiresAfter * 1000);
+            this.secondsDelay = secondsDelay;
+            this.abstractEvent = abstractEvent;
+            this.metadata = new SoundMetadata(type, priority);
+            this.delayedMessageEvent = delayedMessageEvent;
+            this.delayMessageResolution = delayedMessageEvent != null;
+
+            // for delayed message events, we collect up the message folder when the message when the message is about to be played, not here
+            if (delayedMessageEvent != null)
+            {
+                this.messageName = delayedMessageIdentifier + messageName;
+            }
+            else if (messageFragments == null)
+            {
+                this.messageName = messageName;
+                List<MessageFragment> singleMessageFragement = new List<MessageFragment>();
+                singleMessageFragement.Add(MessageFragment.Text(messageName));
+                this.messageFolders = getMessageFolders(singleMessageFragement, false);
+            }
+            else
+            {
+                this.messageName = compoundMessageIdentifier + messageName;
+                Boolean hasAlternative = alternateMessageFragments != null;
+                this.messageFolders = getMessageFolders(messageFragments, hasAlternative);
+                if (!canBePlayed && hasAlternative)
+                {
+                    Console.WriteLine("Using secondary messages for event " + messageName);
+                    canBePlayed = true;
+                    this.messageFolders = getMessageFolders(alternateMessageFragments, false);
+                    if (!canBePlayed)
+                    {
+                        Console.WriteLine("Primary and secondary messages for event " +
+                            messageName + " can't be played");
+                    }
+                }
+            }
+        }
+
         // used for creating a pearl of wisdom message where we need to copy the dueTime from the original
         public QueuedMessage(AbstractEvent abstractEvent)
         {
             this.abstractEvent = abstractEvent;
         }
 
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent,
-            Dictionary<String, Object> validationData)
-            : this(messageName, messageFragments, secondsDelay, abstractEvent)
+        public long getAge()
         {
-            this.validationData = validationData;
+            return (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) - this.creationTime;
         }
-
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, int secondsDelay, AbstractEvent abstractEvent)
-        {
-            this.messageName = compoundMessageIdentifier + messageName;
-            this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.secondsDelay = secondsDelay;
-            this.abstractEvent = abstractEvent;
-        }
-
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, List<MessageFragment> alternateMessageFragments,
-            int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData) : 
-            this(messageName, messageFragments, alternateMessageFragments, secondsDelay, abstractEvent)
-        {
-            this.validationData = validationData;
-        }
-        /**
-         * Queues a message with multiple fragments, with an alternate version if the first version can't be played.
-         * Use this when a compound message includes a driver name which may or may not be in the set that are have associated
-         * sound files. If there's no sound file for this driver name, the alternate message will be played
-         */
-        public QueuedMessage(String messageName, List<MessageFragment> messageFragments, List<MessageFragment> alternateMessageFragments, 
-            int secondsDelay, AbstractEvent abstractEvent)
-        {
-            this.messageName = compoundMessageIdentifier + messageName;
-            this.messageFolders = getMessageFolders(messageFragments, true);
-            if (!canBePlayed)
-            {
-                Console.WriteLine("Using secondary messages for event " + messageName);
-                canBePlayed = true;
-                this.messageFolders = getMessageFolders(alternateMessageFragments, false);
-                if (!canBePlayed)
-                {
-                    Console.WriteLine("Primary and secondary messages for event " +
-                        messageName + " can't be played");
-                }
-            }
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.secondsDelay = secondsDelay;
-            this.abstractEvent = abstractEvent;
-        }
-
-        public QueuedMessage(String message, int secondsDelay, AbstractEvent abstractEvent, 
-            Dictionary<String, Object> validationData) : this (message, secondsDelay, abstractEvent)
-        {
-            this.validationData = validationData;
-        }
-
-        public QueuedMessage(String message, int secondsDelay, AbstractEvent abstractEvent)
-        {
-            this.messageName = message;
-            List<MessageFragment> messageFragments = new List<MessageFragment>();
-            messageFragments.Add(MessageFragment.Text(message));
-            this.messageFolders = getMessageFolders(messageFragments, false);
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.secondsDelay = secondsDelay;
-            this.abstractEvent = abstractEvent;
-        }
-
-        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent) :
-            this(messageName, delayedMessageEvent, secondsDelay, abstractEvent, null)
-        { }
 
         // called when we repeat this message - clears all the validation and sets the type to voice-command
-        public void prepareToBeRepeated(int newMessageId)
+        public void prepareToBeRepeated()
         {
             if (metadata == null)
             {
                 metadata = new SoundMetadata();
             }
             messageName = "REPEAT_" + messageName;
-            metadata.messageId = newMessageId;
+            metadata.messageId = getMessageId();
             metadata.priority = 5;
             metadata.type = SoundType.VOICE_COMMAND_RESPONSE;
             dueTime = 0;
@@ -263,18 +262,6 @@ namespace CrewChiefV4
             {
                 return "";
             }
-        }
-        
-        public QueuedMessage(String messageName, DelayedMessageEvent delayedMessageEvent, int secondsDelay, AbstractEvent abstractEvent, Dictionary<String, Object> validationData)
-        {
-            this.messageName = compoundMessageIdentifier + messageName;
-            this.delayedMessageEvent = delayedMessageEvent;
-            this.delayMessageResolution = true;
-            this.dueTime = secondsDelay == 0 ? 0 : (GameStateData.CurrentTime.Ticks / TimeSpan.TicksPerMillisecond) + (secondsDelay * 1000) + updateInterval;
-            this.secondsDelay = secondsDelay;
-            this.delayMessageResolution = true;
-            this.abstractEvent = abstractEvent;
-            this.validationData = validationData;
         }
 
         public Boolean isMessageStillValid(String eventSubType, GameStateData currentGameState)
@@ -317,6 +304,9 @@ namespace CrewChiefV4
                     canBePlayed = false;
                     break;
                 }
+                // if this fragment is not the last message fragment, then some languages (Italian only at the time of writing)
+                // require a different inflection to the final part of a time / number sound.
+                Boolean useMoreInflection = i < messageFragments.Count - 1;
                 switch (messageFragment.type)
                 {
                     case FragmentType.Text:
@@ -331,10 +321,7 @@ namespace CrewChiefV4
                             canBePlayed = false;
                         }
                         break;
-                    case FragmentType.Time:
-                        // if this time fragment is not the last message fragment, then some languages (Italian only at the time of writing)
-                        // require a different inflection to their tenths sounds
-                        Boolean useMoreInflection = i < messageFragments.Count - 1;
+                    case FragmentType.Time:                        
                         if (numberReader != null)
                         {
                             List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
@@ -393,7 +380,7 @@ namespace CrewChiefV4
                     case FragmentType.Integer:                        
                         if (numberReader != null)
                         {
-                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds);
+                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds, useMoreInflection);
                             if (integerFolders.Count() == 0)
                             {
                                 Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for number " + messageFragment.integer);

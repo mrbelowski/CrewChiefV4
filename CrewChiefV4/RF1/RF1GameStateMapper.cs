@@ -165,7 +165,6 @@ namespace CrewChiefV4.rFactor1
 
             // --------------------------------
             // flags data
-            // TODO: should RF1 ever drop back to the improvised incident calling?
             currentGameState.FlagData.useImprovisedIncidentCalling = false;
 
             currentGameState.FlagData.isFullCourseYellow = currentGameState.SessionData.SessionPhase == SessionPhase.FullCourseYellow
@@ -239,6 +238,8 @@ namespace CrewChiefV4.rFactor1
                 currentGameState.FlagData.currentLapIsFCY = previousGameState.FlagData.currentLapIsFCY;
                 currentGameState.FlagData.previousLapWasFCY = previousGameState.FlagData.previousLapWasFCY;
                 currentGameState.hardPartsOnTrackData = previousGameState.hardPartsOnTrackData;
+                currentGameState.SessionData.formattedPlayerLapTimes = previousGameState.SessionData.formattedPlayerLapTimes;
+                currentGameState.SessionData.JustGoneGreenTime = previousGameState.SessionData.JustGoneGreenTime;
             }
             if (currentGameState.FlagData.isFullCourseYellow)
             {
@@ -361,6 +362,7 @@ namespace CrewChiefV4.rFactor1
 
                 currentGameState.SessionData.DeltaTime = previousGameState.SessionData.DeltaTime;
                 currentGameState.Conditions.samples = previousGameState.Conditions.samples;
+                currentGameState.TimingData = previousGameState.TimingData;
             }
             float lastSectorTime = -1;
             switch (currentGameState.SessionData.SectorNumber)
@@ -388,7 +390,8 @@ namespace CrewChiefV4.rFactor1
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.playerCompleteLapWithProvidedLapTime(currentGameState.SessionData.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                        lastSectorTime, lastSectorTime > 0, player.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3);
+                        lastSectorTime, lastSectorTime > 0, player.inPits == 1, false, shared.trackTemp, shared.ambientTemp, 
+                        currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData);
                 currentGameState.SessionData.playerStartNewLap(currentGameState.SessionData.CompletedLaps + 1, currentGameState.SessionData.OverallPosition, player.inPits == 1 || player.lapDist < 0, currentGameState.SessionData.SessionRunningTime);
             }
             else if (currentGameState.SessionData.IsNewSector)
@@ -416,13 +419,7 @@ namespace CrewChiefV4.rFactor1
                         break;
                 }
             }
-            if (previousGameState != null)
-            {
-                foreach (String lt in previousGameState.SessionData.formattedPlayerLapTimes)
-                {
-                    currentGameState.SessionData.formattedPlayerLapTimes.Add(lt);
-                }
-            }
+
             currentGameState.SessionData.LeaderHasFinishedRace = leader.finishStatus == (int)rFactor1Constant.rfFinishStatus.finished;
             currentGameState.SessionData.LeaderSectorNumber = leader.sector == 0 ? 3 : leader.sector;
             currentGameState.SessionData.TimeDeltaFront = Math.Abs(player.timeBehindNext);
@@ -598,14 +595,12 @@ namespace CrewChiefV4.rFactor1
             // some simple locking / spinning checks
             if (currentGameState.PositionAndMotionData.CarSpeed > 7.0f)
             {
-                // TODO: fix this properly - decrease the minRotatingSpeed from 2*pi to pi just to hide the problem
                 float minRotatingSpeed = (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.maxTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsLocked = Math.Abs(shared.wheel[0].rotation) < minRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsLocked = Math.Abs(shared.wheel[1].rotation) < minRotatingSpeed;
                 currentGameState.TyreData.LeftRearIsLocked = Math.Abs(shared.wheel[2].rotation) < minRotatingSpeed;
                 currentGameState.TyreData.RightRearIsLocked = Math.Abs(shared.wheel[3].rotation) < minRotatingSpeed;
 
-                // TODO: fix this properly - increase the maxRotatingSpeed from 2*pi to 3*pi just to hide the problem
                 float maxRotatingSpeed = 3 * (float)Math.PI * currentGameState.PositionAndMotionData.CarSpeed / currentGameState.carClass.minTyreCircumference;
                 currentGameState.TyreData.LeftFrontIsSpinning = Math.Abs(shared.wheel[0].rotation) > maxRotatingSpeed;
                 currentGameState.TyreData.RightFrontIsSpinning = Math.Abs(shared.wheel[1].rotation) > maxRotatingSpeed;
@@ -817,7 +812,7 @@ namespace CrewChiefV4.rFactor1
                 }
                 else
                 {
-                    opponent.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.Now);
+                    opponent.DeltaTime = new DeltaTime(currentGameState.SessionData.TrackDefinition.trackLength, opponent.DistanceRoundTrack, DateTime.UtcNow);
                 }
                 opponent.DeltaTime.SetNextDeltaPoint(opponent.DistanceRoundTrack, opponent.CompletedLaps, opponent.Speed, currentGameState.Now);
 
@@ -862,8 +857,9 @@ namespace CrewChiefV4.rFactor1
                 if (opponent.IsNewLap)
                 {
                     opponent.CompleteLapWithProvidedLapTime(opponent.OverallPosition, currentGameState.SessionData.SessionRunningTime,
-                            lastSectorTime, lastSectorTime > 0, vehicle.inPits == 1, false, shared.trackTemp, shared.ambientTemp, currentGameState.SessionData.SessionHasFixedTime, 
-                            currentGameState.SessionData.SessionTimeRemaining, 3);
+                            lastSectorTime, lastSectorTime > 0, vehicle.inPits == 1, false, shared.trackTemp, shared.ambientTemp, 
+                            currentGameState.SessionData.SessionHasFixedTime, currentGameState.SessionData.SessionTimeRemaining, 3, currentGameState.TimingData, 
+                            CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass));
                     opponent.StartNewLap(opponent.CompletedLaps + 1, opponent.OverallPosition, vehicle.inPits == 1 || opponent.DistanceRoundTrack < 0, currentGameState.SessionData.SessionRunningTime, false, shared.trackTemp, shared.ambientTemp);
                 }
                 else if (isNewSector)
@@ -1045,12 +1041,12 @@ namespace CrewChiefV4.rFactor1
                 rFactor1Constant.rfSurfaceType rl_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearLeft].surfaceType;
                 rFactor1Constant.rfSurfaceType rr_surface = (rFactor1Constant.rfSurfaceType)shared.wheel[(int)rFactor1Constant.rfWheelIndex.rearRight].surfaceType;
 
-                // assume kerb is racing surface here - any wheel on a racing surface is OK
+                // assume kerb is racing surface here - only off track if all wheels are on grass or gravel
                 currentGameState.PenaltiesData.IsOffRacingSurface =
-                    fl_surface != rFactor1Constant.rfSurfaceType.dry && fl_surface != rFactor1Constant.rfSurfaceType.wet && fl_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    fr_surface != rFactor1Constant.rfSurfaceType.dry && fr_surface != rFactor1Constant.rfSurfaceType.wet && fr_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    rl_surface != rFactor1Constant.rfSurfaceType.dry && rl_surface != rFactor1Constant.rfSurfaceType.wet && rl_surface != rFactor1Constant.rfSurfaceType.kerb &&
-                    rr_surface != rFactor1Constant.rfSurfaceType.dry && rr_surface != rFactor1Constant.rfSurfaceType.wet && rr_surface != rFactor1Constant.rfSurfaceType.kerb;
+                    (fl_surface == rFactor1Constant.rfSurfaceType.grass || fl_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (fr_surface == rFactor1Constant.rfSurfaceType.grass || fr_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (rl_surface == rFactor1Constant.rfSurfaceType.grass || rl_surface == rFactor1Constant.rfSurfaceType.gravel) &&
+                    (rr_surface == rFactor1Constant.rfSurfaceType.grass || rr_surface == rFactor1Constant.rfSurfaceType.gravel);
 
                 if (previousGameState != null && !previousGameState.PenaltiesData.IsOffRacingSurface && currentGameState.PenaltiesData.IsOffRacingSurface)
                 {

@@ -55,6 +55,10 @@ namespace CrewChiefV4.GameState
                     currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = currentGameState.SessionData.NumCarsOverallAtStartOfSession;
                 }
             }
+            if (currentGameState.SessionData.JustGoneGreen)
+            {
+                currentGameState.SessionData.JustGoneGreenTime = currentGameState.Now;
+            }
             if (currentGameState.SessionData.IsNewLap)
             {
                 currentGameState.SessionData.ClassPositionAtStartOfCurrentLap = currentGameState.SessionData.ClassPosition;
@@ -64,11 +68,16 @@ namespace CrewChiefV4.GameState
             
             // sort out all the class position stuff
             int numCarsInPlayerClass = 1;
+            int leaderLapsCompleted = currentGameState.SessionData.CompletedLaps;
             foreach (OpponentData opponent in currentGameState.OpponentData.Values)
             {
                 if (!opponent.IsActive)
                 {
                     continue;
+                }
+                if (opponent.OverallPosition == 1)
+                {
+                    leaderLapsCompleted = opponent.CompletedLaps;
                 }
                 if (singleClass || CarData.IsCarClassEqual(opponent.CarClass, currentGameState.carClass))
                 {
@@ -167,6 +176,12 @@ namespace CrewChiefV4.GameState
                     }
                 }
             }
+            if (!currentGameState.SessionData.SessionHasFixedTime)
+            {
+                // work out the laps remaining
+                currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - leaderLapsCompleted;
+            }
+            
             if (currentGameState.SessionData.JustGoneGreen || currentGameState.SessionData.IsNewSession)
             {
                 currentGameState.SessionData.NumCarsInPlayerClassAtStartOfSession = numCarsInPlayerClass;
@@ -211,6 +226,17 @@ namespace CrewChiefV4.GameState
             if (!currentGameState.SessionData.IsRacingSameCarBehind)
             {
                 currentGameState.SessionData.GameTimeAtLastPositionBehindChange = currentGameState.SessionData.SessionRunningTime;
+            }
+        }
+
+
+        // so far, only the laps remaining is populated for non-race sessions. This is a bit of an edge case anyway - non-race sessions
+        // with fixed number of laps is an American thing really.
+        public virtual void populateDerivedNonRaceSessionData(GameStateData currentGameState)
+        {
+            if (!currentGameState.SessionData.SessionHasFixedTime)
+            {
+                currentGameState.SessionData.SessionLapsRemaining = currentGameState.SessionData.SessionNumberOfLaps - currentGameState.SessionData.CompletedLaps;
             }
         }
 

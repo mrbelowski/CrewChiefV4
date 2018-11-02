@@ -14,9 +14,6 @@
     <Setting Name="use_sweary_messages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="disable_immediate_messages" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="enable_spotter" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -207,7 +204,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="frequency_of_race_sector_delta_reports" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="frequency_of_opponent_race_lap_times" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
@@ -597,7 +594,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="pcars_enable_rain_prediction" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="READ_CORNER_NAMES_FOR_LAP_button_index" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">-1</Value>
@@ -782,9 +779,6 @@
     <Setting Name="iracing_fast_parsing" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="enable_tight_fuel_calc" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="add_additional_fuel" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
@@ -850,9 +844,45 @@
     </Setting>
     <Setting Name="alarm_clock_times" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
-    </setting>
+    </Setting>
     <Setting Name="chief_name" Type="System.String" Scope="User">
       <Value Profile="(Default)">Jim (default)</Value>
+    </Setting>
+    <Setting Name="disable_behavior_altering_voice_commands" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="slow_class_car_warnings_in_race_only" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="f1_2018_launch_exe" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="f1_2018_launch_params" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="launch_f1_2018" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="f1_2018_udp_data_port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20777</Value>
+    </Setting>
+    <Setting Name="f1_2018_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="pcars2_spotter_car_length" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="pit_box_time_countdown" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="pit_box_position_countdown_in_feet" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="record_sound_variety_data" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="pit_box_time_countdown_end_position" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">30</Value>
     </Setting>
   </Settings>
 </SettingsFile>

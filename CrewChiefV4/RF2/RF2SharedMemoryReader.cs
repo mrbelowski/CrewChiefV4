@@ -321,7 +321,7 @@ namespace CrewChiefV4.rFactor2
             this.dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if (this.dataReadFromFile == null || filename != this.lastReadFileName)
             {
@@ -331,6 +331,7 @@ namespace CrewChiefV4.rFactor2
                 dataReadFromFile = DeSerializeObject<RF2StructWrapper[]>(filePathResolved);
 
                 this.lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > this.dataReadFromFileIndex)
             {
@@ -379,7 +380,7 @@ namespace CrewChiefV4.rFactor2
                         this.DisconnectInternal();
                     }
                 }
-                return initialised;
+                return this.initialised;
             }
         }
 
@@ -393,7 +394,7 @@ namespace CrewChiefV4.rFactor2
         {
             lock (this)
             {
-                if (!initialised)
+                if (!this.initialised)
                 {
                     if (!this.InitialiseInternal())
                     {
@@ -420,9 +421,9 @@ namespace CrewChiefV4.rFactor2
                     {
                         extended = this.extended,
                         telemetry = this.telemetry,
-                        rules = this.rules,
+                        rules = this.rules,  // TODO_RF2:  we probably don't need rules buffer if reading for spotter.
                         scoring = this.scoring,
-                        ticksWhenRead = DateTime.Now.Ticks
+                        ticksWhenRead = DateTime.UtcNow.Ticks
                     };
 
                     if (!forSpotter && dumpToFile && this.dataToDump != null)
@@ -527,16 +528,12 @@ namespace CrewChiefV4.rFactor2
 
         private void DisconnectInternal()
         {
-            // This needs to be synchronized, because disconnection happens from CrewChief.Run and MainWindow.Dispose.
-            lock (this)
-            {
-                this.initialised = false;
+            this.initialised = false;
 
-                this.telemetryBuffer.Disconnect();
-                this.scoringBuffer.Disconnect();
-                this.rulesBuffer.Disconnect();
-                this.extendedBuffer.Disconnect();
-            }
+            this.telemetryBuffer.Disconnect();
+            this.scoringBuffer.Disconnect();
+            this.rulesBuffer.Disconnect();
+            this.extendedBuffer.Disconnect();
         }
 
         public override void Dispose()

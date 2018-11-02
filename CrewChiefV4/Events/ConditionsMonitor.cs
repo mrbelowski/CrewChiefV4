@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
+using CrewChiefV4.NumberProcessing;
 
 namespace CrewChiefV4.Events
 {
@@ -15,15 +16,15 @@ namespace CrewChiefV4.Events
             get { return new List<SessionPhase> { SessionPhase.Green, SessionPhase.Checkered, SessionPhase.FullCourseYellow }; }
         }
 
-        private static float drizzleMin = 0.02f;
-        private static float drizzleMax = 0.1f;
-        private static float lightRainMax = 0.25f;
-        private static float midRainMax = 0.5f;
+        private static float drizzleMin = 0.01f;
+        private static float drizzleMax = 0.15f;
+        private static float lightRainMax = 0.3f;
+        private static float midRainMax = 0.6f;
         private static float heavyRainMax = 0.75f;
 
-        private enum RainLevel
+        public enum RainLevel
         {
-            NONE, LIGHT, DRIZZLE, MID, HEAVY, STORM
+            NONE, DRIZZLE, LIGHT, MID, HEAVY, STORM
         }
 
         private Boolean enableTrackAndAirTempReports = UserSettings.GetUserSettings().getBoolean("enable_track_and_air_temp_reports");
@@ -85,12 +86,17 @@ namespace CrewChiefV4.Events
         private Conditions.ConditionsSample currentConditions;
         private Conditions.ConditionsSample conditionsAtStartOfThisLap;
 
+        private float rainDensityAtLastCheck = -1;
 
         // PCars2 only
         private DateTime timeWhenCloudIncreased = DateTime.MinValue;
         private DateTime timeWhenRainExpected = DateTime.MinValue;
         private Boolean waitingForRainEstimate = false;
 
+        // units here are 'rain quantity per second', where rain quantity is 0 -> 1, direct from the pcars2 or rf2 game data.
+        // The number is always positive (it's the absolute change)
+        private static float maxRainChangeRate = -1;
+        
         public ConditionsMonitor(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -109,6 +115,8 @@ namespace CrewChiefV4.Events
             timeWhenCloudIncreased = DateTime.MinValue;
             timeWhenRainExpected = DateTime.MinValue;
             waitingForRainEstimate = false;
+            rainDensityAtLastCheck = -1;
+            maxRainChangeRate = -1;
         }
                 
         override protected void triggerInternal(GameStateData previousGameState, GameStateData currentGameState)
@@ -140,6 +148,7 @@ namespace CrewChiefV4.Events
                     Boolean canReportTrackChange = enableTrackAndAirTempReports &&
                         currentGameState.Now > lastTrackTempReport.Add(TrackTemperatureReportMaxFrequency);
                     Boolean reportedCombinedTemps = false;
+                    TimeSpan rainReportFrequency = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars;
                     if (canReportAirChange || canReportTrackChange)
                     {
                         if (trackTempToUse > trackTempAtLastReport + minTrackTempDeltaToReport && currentConditions.AmbientTemperature > airTempAtLastReport + minAirTempDeltaToReport)
@@ -149,9 +158,9 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
+                            audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", 10, messageFragments: MessageContents
                                 (folderAirAndTrackTempIncreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), abstractEvent: this, priority: 0));
                             reportedCombinedTemps = true;
                         }
                         else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport && currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
@@ -161,9 +170,9 @@ namespace CrewChiefV4.Events
                             lastAirTempReport = currentGameState.Now;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", MessageContents
+                            audioPlayer.playMessage(new QueuedMessage("airAndTrackTemp", 10, messageFragments: MessageContents
                                 (folderAirAndTrackTempDecreasing, folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature),
-                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
+                                folderTrackTempIsNow, convertTemp(trackTempToUse), getTempUnit()), abstractEvent: this, priority: 0));
                             reportedCombinedTemps = true;
                         }
                     }
@@ -174,16 +183,16 @@ namespace CrewChiefV4.Events
                             airTempAtLastReport = currentConditions.AmbientTemperature;
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("airTemp", MessageContents
-                                (folderAirTempIncreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this), 0);
+                            audioPlayer.playMessage(new QueuedMessage("airTemp", 10, messageFragments: MessageContents
+                                (folderAirTempIncreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), abstractEvent: this, priority: 0));
                         }
                         else if (currentConditions.AmbientTemperature < airTempAtLastReport - minAirTempDeltaToReport)
                         {
                             airTempAtLastReport = currentConditions.AmbientTemperature;
                             lastAirTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("airTemp", MessageContents
-                                (folderAirTempDecreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, this), 0);
+                            audioPlayer.playMessage(new QueuedMessage("airTemp", 10, messageFragments: MessageContents
+                                (folderAirTempDecreasing, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), abstractEvent: this, priority: 0));
                         }
                     }
                     if (!reportedCombinedTemps && canReportTrackChange)
@@ -193,16 +202,16 @@ namespace CrewChiefV4.Events
                             trackTempAtLastReport = trackTempToUse;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempIncreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
+                            audioPlayer.playMessage(new QueuedMessage("trackTemp", 10, messageFragments: MessageContents
+                                (folderTrackTempIncreasing, convertTemp(trackTempToUse), getTempUnit()), abstractEvent: this, priority: 0));
                         }
                         else if (trackTempToUse < trackTempAtLastReport - minTrackTempDeltaToReport)
                         {
                             trackTempAtLastReport = trackTempToUse;
                             lastTrackTempReport = currentGameState.Now;
                             // do the reporting
-                            audioPlayer.playMessage(new QueuedMessage("trackTemp", MessageContents
-                                (folderTrackTempDecreasing, convertTemp(trackTempToUse), getTempUnit()), 0, this), 0);
+                            audioPlayer.playMessage(new QueuedMessage("trackTemp", 10, messageFragments: MessageContents
+                                (folderTrackTempDecreasing, convertTemp(trackTempToUse), getTempUnit()), abstractEvent: this, priority: 0));
                         }
                     }
                     //pcars2 test warning
@@ -235,14 +244,10 @@ namespace CrewChiefV4.Events
                                     Console.WriteLine("It is now " + currentGameState.Now + ", we expect rain at game time " + when);
                                     int minutes = (int)Math.Round(millisTillRain / 60000);
 
-                                    // if this comes out to 1 minute, make it 2 so it sounds less shit
-                                    if (minutes == 1)
+                                    if (minutes > 2)
                                     {
-                                        minutes++;
-                                    }
-                                    if (minutes > 1)
-                                    {
-                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", MessageContents(folderExpectRain, minutes, NumberReader.folderMinutes), 0, this), 5);
+                                        audioPlayer.playMessage(new QueuedMessage("expecting_rain", 10, messageFragments: MessageContents(folderExpectRain,
+                                            new TimeSpanWrapper(TimeSpan.FromMinutes(minutes), Precision.MINUTES)), abstractEvent: this));
                                     }
                                 }
                             }
@@ -254,26 +259,37 @@ namespace CrewChiefV4.Events
                             }
                         }
                     }
-                    if (currentGameState.Now > lastRainReport.Add(CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ? RainReportMaxFrequencyRF2 : RainReportMaxFrequencyPCars))
+                    if (currentGameState.Now > lastRainReport.Add(rainReportFrequency))
                     {
                         // for PCars mRainDensity value is 0 or 1
-                        if (CrewChief.isPCars())
+                        if (CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_32BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_64BIT ||
+                            CrewChief.gameDefinition.gameEnum == GameEnum.PCARS_NETWORK)
                         {
                             if (currentGameState.RainDensity == 0 && rainAtLastReport == 1)
                             {
                                 rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
-                                audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 2);
+                                audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 10, abstractEvent: this, priority: 2));
                             }
                             else if (currentConditions.RainDensity == 1 && rainAtLastReport == 0)
                             {
                                 rainAtLastReport = currentGameState.RainDensity;
                                 lastRainReport = currentGameState.Now;
-                                audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 0, this), 5);
+                                audioPlayer.playMessage(new QueuedMessage(folderSeeingSomeRain, 10, abstractEvent: this, priority: 5));
                             }
                         }
-                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT)
+                        else if (CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT || CrewChief.gameDefinition.gameEnum == GameEnum.PCARS2)
                         {
+                            if (rainDensityAtLastCheck != -1 && rainDensityAtLastCheck != currentConditions.RainDensity)
+                            {
+                                float rainChangeRate = (float) (Math.Abs(rainDensityAtLastCheck - currentConditions.RainDensity) / rainReportFrequency.TotalSeconds);
+                                if (rainChangeRate > ConditionsMonitor.maxRainChangeRate)
+                                {
+                                    ConditionsMonitor.maxRainChangeRate = rainChangeRate;
+                                }
+                            }
+                            rainDensityAtLastCheck = currentConditions.RainDensity;
                             RainLevel currentRainLevel = getRainLevel(currentConditions.RainDensity);
                             RainLevel lastReportedRainLevel = getRainLevel(rainAtLastReport);                            
                             if (currentRainLevel != lastReportedRainLevel)
@@ -282,22 +298,22 @@ namespace CrewChiefV4.Events
                                 switch (currentRainLevel)
                                 {
                                     case RainLevel.DRIZZLE:
-                                        audioPlayer.playMessage(new QueuedMessage(folderDrizzleIncreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderDrizzleIncreasing : folderDrizzleDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.LIGHT:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainLightIncreasing : folderRainLightDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.MID:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainMidIncreasing : folderRainMidDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.HEAVY:
-                                        audioPlayer.playMessage(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(increasing ? folderRainHeavyIncreasing : folderRainHeavyDecreasing, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.STORM:
-                                        audioPlayer.playMessage(new QueuedMessage(folderRainMax, 0, this), 3);
+                                        audioPlayer.playMessageImmediately(new QueuedMessage(folderRainMax, 0, type: SoundType.IMPORTANT_MESSAGE, priority: 0));
                                         break;
                                     case RainLevel.NONE:
-                                        audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 0, this), 3);
+                                        audioPlayer.playMessage(new QueuedMessage(folderStoppedRaining, 10, abstractEvent: this, priority: 3));
                                         break;
                                 }
                                 lastRainReport = currentGameState.Now;
@@ -309,7 +325,7 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private RainLevel getRainLevel(float amount)
+        public static RainLevel getRainLevel(float amount)
         {
             if (amount > drizzleMin && amount <= drizzleMax)
             {
@@ -337,23 +353,35 @@ namespace CrewChiefV4.Events
             }
         }
 
+        public static TimeSpan getTrackConditionsChangeDelay()
+        {
+            // maxRainChangeRate is in rain-points-per-second, so *60 gives us rain-points-per-minute.
+            if (ConditionsMonitor.maxRainChangeRate == -1)
+            {
+                return TimeSpan.FromMinutes(2); // complete guesswork - this applies to pcars1 rain changes, and any other changes that
+                                                // don't involve rain (i.e. the delay between ambient temp changes and track condition changes)
+            }
+            // numbers i pulled out of my botty.
+            return TimeSpan.FromMinutes(0.3 / (ConditionsMonitor.maxRainChangeRate * 60));
+        }
+
         public override void respond(string voiceMessage)
         {
             if (currentConditions == null)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
             else
             {
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_AIR_TEMP))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("airTemp",
-                        MessageContents(folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature), getTempUnit()), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("airTemp", 0,
+                        messageFragments: MessageContents(folderAirTempIsNow, convertTemp(currentConditions.AmbientTemperature), getTempUnit())));
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_TRACK_TEMP))
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("trackTemp",
-                        MessageContents(folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit()), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("trackTemp", 0,
+                        messageFragments: MessageContents(folderTrackTempIsNow, convertTemp(currentConditions.TrackTemperature), getTempUnit())));
                 }
             }
         }

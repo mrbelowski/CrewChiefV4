@@ -19,11 +19,11 @@ namespace CrewChiefV4.PCars2
 
         private Boolean enableSpotterInTimetrial = UserSettings.GetUserSettings().getBoolean("enable_spotter_in_timetrial");
 
-        // how long is a car? we use 3.5 meters by default here. Too long and we'll get 'hold your line' messages
+        // how long is a car? we use 5 meters by default here. Too long and we'll get 'hold your line' messages
         // when we're clearly directly behind the car
-        private float carLength = UserSettings.GetUserSettings().getFloat("pcars_spotter_car_length");
-        
-        private DateTime timeToStartSpotting = DateTime.Now;
+        private float carLength = UserSettings.GetUserSettings().getFloat("pcars2_spotter_car_length");
+
+        private DateTime timeToStartSpotting = DateTime.UtcNow;
 
         private Dictionary<String, List<float>> previousOpponentSpeeds = new Dictionary<String, List<float>>();
 
@@ -35,6 +35,8 @@ namespace CrewChiefV4.PCars2
         private string currentPlayerCarClassID = "#not_set#";
 
         private HashSet<uint> positionsFilledForThisTick = new HashSet<uint>();
+
+        private DateTime nextCarClassCheckDue = DateTime.MinValue;
 
         public PCars2Spotterv2(AudioPlayer audioPlayer, Boolean initialEnabledState)
         {
@@ -53,7 +55,7 @@ namespace CrewChiefV4.PCars2
 
         public override void clearState()
         {
-            timeToStartSpotting = DateTime.Now;
+            timeToStartSpotting = DateTime.UtcNow;
             internalSpotter.clearState();
         }
 
@@ -139,7 +141,7 @@ namespace CrewChiefV4.PCars2
                     return;
                 }
                 pCars2APIParticipantStruct playerData = currentState.mParticipantData[playerIndex];
-                if (currentGameState != null)
+                if (currentGameState != null && currentGameState.Now > nextCarClassCheckDue)
                 {
                     var carClass = currentGameState.carClass;
                     if (carClass != null && !String.Equals(currentPlayerCarClassID, carClass.getClassIdentifier()))
@@ -148,6 +150,7 @@ namespace CrewChiefV4.PCars2
                         this.internalSpotter.setCarDimensions(GlobalBehaviourSettings.spotterVehicleLength, GlobalBehaviourSettings.spotterVehicleWidth);
                         this.currentPlayerCarClassID = carClass.getClassIdentifier();
                     }
+                    nextCarClassCheckDue = currentGameState.Now.AddSeconds(5);
                 }
                 float[] currentPlayerPosition = new float[] { playerData.mWorldPosition[0], playerData.mWorldPosition[2] };
 

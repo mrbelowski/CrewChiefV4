@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -50,6 +51,7 @@ namespace CrewChiefV4
                             var process = System.Diagnostics.Process.GetCurrentProcess();
                             // Set Core 
                             process.ProcessorAffinity = pArg;
+                            Console.WriteLine("Set process core affinity to " + commandLineArg);
                         }
                         catch (Exception)
                         {
@@ -59,6 +61,10 @@ namespace CrewChiefV4
                     if (commandLineArg.Equals("multi"))
                     {
                         allowMultipleInst = true;
+                    }
+                    if (commandLineArg.Equals("SOUND_TEST"))
+                    {
+                        MainWindow.soundTestMode = true;
                     }
                 }
                 if (!allowMultipleInst)
@@ -80,6 +86,26 @@ namespace CrewChiefV4
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindow());
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            ThreadManager.WaitForRootThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Root threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            ThreadManager.WaitForTemporaryThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Temporary threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            ThreadManager.WaitForResourceThreadsShutdown();
+            watch.Stop();
+            Debug.WriteLine("Resource threads took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms to shutdown");
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            GlobalResources.Dispose();
+            watch.Stop();
+            Debug.WriteLine("Resource Disposal took: " + watch.ElapsedTicks * 1000 / System.Diagnostics.Stopwatch.Frequency + "ms");
         }
     }
 }

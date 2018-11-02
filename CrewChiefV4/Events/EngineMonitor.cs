@@ -79,7 +79,7 @@ namespace CrewChiefV4.Events
                     currentGameState.PositionAndMotionData.CarSpeed < 5)
                 {
                     // Play stalled warning straight away
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 0, this));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderStalled, 3));
                     // don't re-check stalled warning for a couple of minutes.
                     nextStalledCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     // move the oil and fuel pressure checks out a bit to allow it to settle
@@ -91,13 +91,13 @@ namespace CrewChiefV4.Events
                     // don't check oil or fuel pressure if we're stalled
                     if (currentGameState.EngineData.EngineOilPressureWarning && currentGameState.Now > nextOilPressureCheck)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 0, this), 10);
+                        audioPlayer.playMessage(new QueuedMessage(folderLowOilPressure, 7, abstractEvent:this, priority: 10));
                         // don't re-check oil pressure for a couple of minutes
                         nextOilPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     }
                     if (currentGameState.EngineData.EngineFuelPressureWarning && currentGameState.Now > nextFuelPressureCheck)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 0, this), 10);
+                        audioPlayer.playMessage(new QueuedMessage(folderLowFuelPressure, 7, abstractEvent: this, priority: 10));
                         // don't re-check fuel pressure for a couple of minutes
                         nextFuelPressureCheck = currentGameState.Now.Add(TimeSpan.FromMinutes(2));
                     }
@@ -113,18 +113,18 @@ namespace CrewChiefV4.Events
                 // check temperatures every minute:
                 if (currentGameState.SessionData.SessionRunningTime > gameTimeAtLastStatusCheck + statusMonitorWindowLength)
                 {
-                    EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp);
+                    EngineStatus currentEngineStatus = engineData.getEngineStatusFromAverage(maxSafeWaterTemp, maxSafeOilTemp, currentGameState.EngineData.EngineWaterTemp);
                     if (currentEngineStatus != lastStatusMessage)
                     {
                         if (currentEngineStatus.HasFlag(EngineStatus.ALL_CLEAR))
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderAllClear, 0, this), 5);
+                            audioPlayer.playMessage(new QueuedMessage(folderAllClear, 10, abstractEvent: this, priority: 5));
                         }
                         else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL) && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
                         {
                             lastStatusMessage = currentEngineStatus;
-                            audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 0, this), 10);
+                            audioPlayer.playMessage(new QueuedMessage(folderHotOilAndWater, 10, abstractEvent: this, priority: 10));
                         }
                         if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                         {
@@ -132,7 +132,7 @@ namespace CrewChiefV4.Events
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                             {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderHotOil, 0, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderHotOil, 10, abstractEvent: this, priority: 10));
                             }
                         }
                         if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
@@ -141,7 +141,7 @@ namespace CrewChiefV4.Events
                             if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                             {
                                 lastStatusMessage = currentEngineStatus;
-                                audioPlayer.playMessage(new QueuedMessage(folderHotWater, 0, this), 10);
+                                audioPlayer.playMessage(new QueuedMessage(folderHotWater, 10, abstractEvent: this, priority: 10));
                             }
                         }
                     }
@@ -165,13 +165,13 @@ namespace CrewChiefV4.Events
                     lastStatusMessage = currentEngineStatus;
                     if (!fromStatusRequest)
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderAllClear, 0));
                     }
                 }
                 else if(currentEngineStatus.HasFlag(EngineStatus.HOT_OIL)  && currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
                 {
                     lastStatusMessage = currentEngineStatus;
-                    audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOilAndWater, 0));
                 }
                 else if (currentEngineStatus.HasFlag(EngineStatus.HOT_OIL))
                 {
@@ -179,7 +179,7 @@ namespace CrewChiefV4.Events
                     if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                     {
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotOil, 0));
                     }
                 }
                 else if (currentEngineStatus.HasFlag(EngineStatus.HOT_WATER))
@@ -188,13 +188,13 @@ namespace CrewChiefV4.Events
                     if (!lastStatusMessage.HasFlag(EngineStatus.HOT_OIL) && !lastStatusMessage.HasFlag(EngineStatus.HOT_WATER))
                     {
                         lastStatusMessage = currentEngineStatus;
-                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderHotWater, 0));
                     }
                 }
             }
             if (!gotData && !fromStatusRequest)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));                
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));                
             }
         }
 
@@ -240,9 +240,8 @@ namespace CrewChiefV4.Events
                 this.currentWaterTempWarning = engineWaterTempWarning;
                 this.currentEngineStalled = engineStalled;
             }
-            public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp)
+            public EngineStatus getEngineStatusFromAverage(float maxSafeWaterTemp, float maxSafeOilTemp, float currentWaterTemp /*only used for logging*/)
             {
-                // TODO: detect a sudden drop in oil pressure without triggering false positives caused by stalling the engine
                 EngineStatus engineStatusFlags = EngineStatus.NONE;
                 if (samples > 10 && maxSafeOilTemp > 0 && maxSafeWaterTemp > 0)
                 {
@@ -252,10 +251,12 @@ namespace CrewChiefV4.Events
                     
                     if (averageWaterTemp > maxSafeWaterTemp)
                     {
+                        Console.WriteLine(String.Format("Water temp {0} is above safe threshold of {1} for car class", averageWaterTemp, maxSafeWaterTemp));
                         engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
                     }
                     if (averageOilTemp > maxSafeOilTemp)
                     {
+                        Console.WriteLine(String.Format("Oil temp {0} is above safe threshold of {1} for car class", averageOilTemp, maxSafeOilTemp));
                         engineStatusFlags = engineStatusFlags | EngineStatus.HOT_OIL;
                     }
                 }
@@ -269,6 +270,7 @@ namespace CrewChiefV4.Events
                 }
                 if (currentWaterTempWarning)
                 {
+                    Console.WriteLine(String.Format("Received water temp warning from game, current water temp is {0}", currentWaterTemp));
                     engineStatusFlags = engineStatusFlags | EngineStatus.HOT_WATER;
                 }
                 if (currentEngineStalled)

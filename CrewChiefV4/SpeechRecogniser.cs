@@ -21,10 +21,12 @@ namespace CrewChiefV4
         public static Dictionary<string, Tuple<string, int>> speechRecognitionDevices = new Dictionary<string, Tuple<string, int>>();
         public static int initialSpeechInputDeviceIndex = 0;
         private Boolean useNAudio = UserSettings.GetUserSettings().getBoolean("use_naudio_for_speech_recognition");
+        private Boolean disableBehaviorAlteringVoiceCommands = UserSettings.GetUserSettings().getBoolean("disable_behavior_altering_voice_commands");
         private RingBufferStream.RingBufferStream buffer;
         private NAudio.Wave.WaveInEvent waveIn;
-        private bool keepRecording = true;
-        //
+
+        private Thread nAudioAlwaysOnListenerThread = null;
+        private bool nAudioAlwaysOnkeepRecording = false;
 
         private String localeCountryPropertySetting = UserSettings.GetUserSettings().getString("speech_recognition_country");
 
@@ -250,6 +252,7 @@ namespace CrewChiefV4
         private String keyWord = UserSettings.GetUserSettings().getString("trigger_word_for_always_on_sre");
 
         private EventWaitHandle triggerTimeoutWaitHandle = new EventWaitHandle(false, EventResetMode.ManualReset);
+        private Thread restartWaitTimeoutThreadReference = null;
 
         static SpeechRecogniser () 
         {
@@ -288,7 +291,7 @@ namespace CrewChiefV4
                 }
             }
         }
-
+        
         // load voice commands for triggering keyboard macros. The String key of the input Dictionary is the
         // command list key in speech_recognition_config.txt. When one of these phrases is heard the map value
         // CommandMacro is executed.
@@ -309,15 +312,34 @@ namespace CrewChiefV4
                 return;
             }
             Choices macroChoices = new Choices();
-            foreach (String triggerPhrase in voiceTriggeredMacros.Keys)
+            foreach (KeyValuePair<String, ExecutableCommandMacro> entry in voiceTriggeredMacros)
             {
-                // validate?
-                if (!macroLookup.ContainsKey(triggerPhrase))
+                String triggerPhrase = entry.Key;
+                ExecutableCommandMacro executableCommandMacro = entry.Value;
+                if (executableCommandMacro.macro.intRange != null)
                 {
-                    macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
+                    foreach (KeyValuePair<String[], int> numberEntry in numberToNumber)
+                    {
+                        if (numberEntry.Value >= executableCommandMacro.macro.intRange.Item1 && numberEntry.Value <= executableCommandMacro.macro.intRange.Item2)
+                        {
+                            String thisPhrase = executableCommandMacro.macro.startPhrase + numberEntry.Key[0] + executableCommandMacro.macro.endPhrase;
+                            if (!macroLookup.ContainsKey(thisPhrase))
+                            {
+                                macroLookup.Add(thisPhrase, voiceTriggeredMacros[triggerPhrase]);
+                            }
+                            macroChoices.Add(thisPhrase);
+                        }
+                    }
                 }
-                macroChoices.Add(triggerPhrase);
-
+                else
+                {
+                    // validate?
+                    if (!macroLookup.ContainsKey(triggerPhrase))
+                    {
+                        macroLookup.Add(triggerPhrase, voiceTriggeredMacros[triggerPhrase]);
+                    }
+                    macroChoices.Add(triggerPhrase);
+                }
             }
             GrammarBuilder macroGrammarBuilder = new GrammarBuilder();
             macroGrammarBuilder.Culture = cultureInfo;
@@ -392,6 +414,11 @@ namespace CrewChiefV4
         // default audio input device
         public void stop()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             try
             {
                 if (sre != null)
@@ -410,7 +437,7 @@ namespace CrewChiefV4
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("Error resetting recogniser");
             }
@@ -418,6 +445,11 @@ namespace CrewChiefV4
 
         public void Dispose()
         {
+            if (!initialised)
+            {
+                return;
+            }
+            
             if (waveIn != null)
             {
                 try
@@ -430,10 +462,21 @@ namespace CrewChiefV4
             {
                 try
                 {
+                    // VL: there's a bug with recognizeAsyncCancel racing with Dispose.  Current workaround is a bit of Sleep.
+                    // See GlobalResources.Dispose
                     sre.Dispose();
                 }
                 catch (Exception) { }
                 sre = null;
+            }
+            if (triggerSre != null)
+            {
+                try
+                {
+                    triggerSre.Dispose();
+                }
+                catch (Exception) { }
+                triggerSre = null;
             }
             initialised = false;
         }
@@ -477,6 +520,12 @@ namespace CrewChiefV4
 
         private Boolean initWithLocale()
         {
+            Debug.Assert(!initialised);
+            if (initialised)
+            {
+                return false;
+            }
+
             String overrideCountry = null;
             if(localeCountryPropertySetting != null && localeCountryPropertySetting.Length == 2)
             {
@@ -581,6 +630,8 @@ namespace CrewChiefV4
 
         private void validateAndAdd(String[] speechPhrases, Choices choices)
         {
+            Debug.Assert(!initialised);  // Unless, we plan to add stuff dynamically, this should be false.
+
             if (speechPhrases != null && speechPhrases.Count() > 0)
             {
                 Boolean valid = true;
@@ -722,25 +773,29 @@ namespace CrewChiefV4
                 validateAndAdd(START_PACE_NOTES_PLAYBACK, staticSpeechChoices);
                 validateAndAdd(STOP_PACE_NOTES_PLAYBACK, staticSpeechChoices);
 
-                validateAndAdd(KEEP_QUIET, staticSpeechChoices);
-                validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
-                validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
-                validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
-                validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
-                validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
+                if (!disableBehaviorAlteringVoiceCommands)
+                {
+                    validateAndAdd(KEEP_QUIET, staticSpeechChoices);
+                    validateAndAdd(KEEP_ME_INFORMED, staticSpeechChoices);
+                    validateAndAdd(TELL_ME_THE_GAPS, staticSpeechChoices);
+                    validateAndAdd(DONT_TELL_ME_THE_GAPS, staticSpeechChoices);
+                    validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                    validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
+                    validateAndAdd(ENABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
+                    validateAndAdd(DISABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
+                    validateAndAdd(TALK_TO_ME_ANYWHERE, staticSpeechChoices);
+                    validateAndAdd(DONT_TALK_IN_THE_CORNERS, staticSpeechChoices);
+                    validateAndAdd(SPOT, staticSpeechChoices);
+                    validateAndAdd(DONT_SPOT, staticSpeechChoices);
+                }
+
                 validateAndAdd(WHATS_THE_FASTEST_LAP_TIME, staticSpeechChoices);
-                validateAndAdd(ENABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
-                validateAndAdd(DISABLE_YELLOW_FLAG_MESSAGES, staticSpeechChoices);
-                validateAndAdd(ENABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
-                validateAndAdd(DISABLE_MANUAL_FORMATION_LAP, staticSpeechChoices);
 
                 validateAndAdd(WHERE_AM_I_FASTER, staticSpeechChoices);
                 validateAndAdd(WHERE_AM_I_SLOWER, staticSpeechChoices);
 
                 validateAndAdd(HOW_LONGS_LEFT, staticSpeechChoices);
                 validateAndAdd(WHATS_THE_TIME, staticSpeechChoices);
-                validateAndAdd(SPOT, staticSpeechChoices);
-                validateAndAdd(DONT_SPOT, staticSpeechChoices);
                 validateAndAdd(REPEAT_LAST_MESSAGE, staticSpeechChoices);
                 validateAndAdd(HAVE_I_SERVED_MY_PENALTY, staticSpeechChoices);
                 validateAndAdd(DO_I_HAVE_A_PENALTY, staticSpeechChoices);
@@ -821,8 +876,6 @@ namespace CrewChiefV4
                         }
                     }
                     addCompoundChoices(SET_ALARM_CLOCK, false, this.hourChoices, minuteArray.ToArray(), true);
-                    
-                    
                 }
 
             }
@@ -1030,21 +1083,30 @@ namespace CrewChiefV4
                 Console.WriteLine("Unable to add iRacing pit stop commands to speech recognition engine - " + e.Message);
             }
         }
-        public static Boolean ResultContains(String result, String[] alternatives)
+        public static Boolean ResultContains(String result, String[] alternatives, Boolean logMatch = true)
         {
             result = result.ToLower();
             foreach (String alternative in alternatives)
             {
                 if (result == alternative.ToLower())
                 {
+                    if (logMatch)
+                    {
+                        Console.WriteLine("matching entire response " + result);
+                    }
                     return true;
                 }
             }
             // no result with == so try contains
             foreach (String alternative in alternatives)
             {
-                if (result.Contains(alternative.ToLower()))
+                String alternativeLower = alternative.ToLower();
+                if (result.Contains(alternativeLower))
                 {
+                    if (logMatch)
+                    {
+                        Console.WriteLine("matching partial response " + alternativeLower);
+                    }
                     return true;
                 }
             }
@@ -1053,6 +1115,11 @@ namespace CrewChiefV4
 
         private Boolean switchFromRegularToTriggerRecogniser()
         {
+            if (!initialised)
+            {
+                return false;
+            }
+
             int attempts = 0;
             Boolean success = false;
             while (!success && attempts < 3)
@@ -1060,6 +1127,9 @@ namespace CrewChiefV4
                 attempts++;
                 try
                 {
+                    // the cancel call takes some time to complete but returns immediately, so wait a bit before switching inputs
+                    sre.RecognizeAsyncCancel();
+                    Thread.Sleep(5);
                     sre.SetInputToNull();
                     triggerSre.SetInputToDefaultAudioDevice();
                     triggerSre.RecognizeAsync(RecognizeMode.Multiple);
@@ -1068,14 +1138,30 @@ namespace CrewChiefV4
                 }
                 catch (Exception)
                 {
-                    Thread.Sleep(100);                    
+                    Thread.Sleep(100);
                 }
+            }
+            if (success)
+            {
+                if (attempts > 1)
+                {
+                    Console.WriteLine("Took " + attempts + " attempts to switch from regular to trigger SRE");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to switch SRE after " + attempts + " attempts");
             }
             return success;
         }
 
         private Boolean switchFromTriggerToRegularRecogniser()
         {
+            if (!initialised)
+            {
+                return false;
+            }
+
             int attempts = 0;
             Boolean success = false;
             while (!success && attempts < 3)
@@ -1083,7 +1169,9 @@ namespace CrewChiefV4
                 attempts++;
                 try
                 {
-                    triggerSre.RecognizeAsyncCancel();                    
+                    // the cancel call takes some time to complete but returns immediately, so wait a bit before switching inputs
+                    triggerSre.RecognizeAsyncCancel();
+                    Thread.Sleep(5);
                     triggerSre.SetInputToNull();
                     sre.SetInputToDefaultAudioDevice();
                     success = true;
@@ -1095,8 +1183,16 @@ namespace CrewChiefV4
             }
             if (success)
             {
+                if (attempts > 1)
+                {
+                    Console.WriteLine("Took " + attempts + " attempts to switch from trigger to regular SRE");
+                }
                 crewChief.audioPlayer.playStartListeningBeep();
                 recognizeAsync();
+            }
+            else
+            {
+                Console.WriteLine("Failed to switch SRE after " + attempts + " attempts");
             }
             return success;
         }
@@ -1104,7 +1200,8 @@ namespace CrewChiefV4
         private void restartWaitTimeoutThread(int timeout)
         {
             triggerTimeoutWaitHandle.Set();
-            new Thread(() =>
+            ThreadManager.UnregisterTemporaryThread(restartWaitTimeoutThreadReference);
+            restartWaitTimeoutThreadReference = new Thread(() =>
             {
                 triggerTimeoutWaitHandle.Reset();
                 Thread.CurrentThread.IsBackground = true;
@@ -1121,15 +1218,22 @@ namespace CrewChiefV4
                     {
                         // no result
                         Console.WriteLine("Gave up waiting for voice command, now waiting for trigger word " + keyWord);
-                        sre.RecognizeAsyncCancel();
                         switchFromRegularToTriggerRecogniser();
                     }
                 }
-            }).Start();
+            });
+            restartWaitTimeoutThreadReference.Name = "SpeachRecognizer.restartWaitTimeoutThreadReference";
+            ThreadManager.RegisterTemporaryThread(restartWaitTimeoutThreadReference);
+            restartWaitTimeoutThreadReference.Start();
         }
 
         void trigger_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (e.Result.Confidence > minimum_trigger_voice_recognition_confidence)
             {
                 Console.WriteLine("Heard keyword " + keyWord + ", waiting for command confidence " + e.Result.Confidence);
@@ -1144,6 +1248,11 @@ namespace CrewChiefV4
 
         void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             // cancel the thread that's waiting for a speech recognised timeout:
             triggerTimeoutWaitHandle.Set();
             SpeechRecogniser.waitingForSpeech = false;
@@ -1156,7 +1265,7 @@ namespace CrewChiefV4
                 if (DamageReporting.waitingForDriverIsOKResponse)
                 {
                     DamageReporting damageReportingEvent = (DamageReporting)CrewChief.getEvent("DamageReporting");
-                    if (e.Result.Confidence > minimum_voice_recognition_confidence && ResultContains(e.Result.Text, I_AM_OK))
+                    if (e.Result.Confidence > minimum_voice_recognition_confidence && ResultContains(e.Result.Text, I_AM_OK, false))
                     {
                         damageReportingEvent.cancelWaitingForDriverIsOK(DamageReporting.DriverOKResponseType.CLEARLY_OK);
                     }
@@ -1185,18 +1294,18 @@ namespace CrewChiefV4
                         if (macroGrammar == e.Result.Grammar && macroLookup.ContainsKey(e.Result.Text))
                         {
                             this.lastRecognisedText = e.Result.Text;
-                            macroLookup[e.Result.Text].execute();
+                            macroLookup[e.Result.Text].execute(e.Result.Text);
                         }
                         else if (iracingPitstopGrammarList.Contains(e.Result.Grammar))
                         {
                             this.lastRecognisedText = e.Result.Text;
                             CrewChief.getEvent("IRacingBroadcastMessageEvent").respond(e.Result.Text);
                         }
-                        else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE))
+                        else if (ResultContains(e.Result.Text, REPEAT_LAST_MESSAGE, false))
                         {
                             crewChief.audioPlayer.repeatLastMessage();
                         }
-                        else if (ResultContains(e.Result.Text, MORE_INFO) && this.lastRecognisedText != null && !use_verbose_responses)
+                        else if (ResultContains(e.Result.Text, MORE_INFO, false) && this.lastRecognisedText != null && !use_verbose_responses)
                         {
                             AbstractEvent abstractEvent = getEventForSpeech(this.lastRecognisedText);
                             if (abstractEvent != null)
@@ -1260,8 +1369,6 @@ namespace CrewChiefV4
             }
             else if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
             {
-                sre.RecognizeAsyncStop();
-                Thread.Sleep(500);
                 if (!youWot)
                 {
                     Console.WriteLine("Waiting for trigger word " + keyWord);
@@ -1269,19 +1376,14 @@ namespace CrewChiefV4
                 }
                 else
                 {
-                    Console.WriteLine("Restarting speech recognition");
-                    if (youWot)
-                    {
-                        // wait a little longer here as the "I didn't catch that" takes a second or two to say
-                        restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
-                    }
-                    recognizeAsync();
+                    // wait a little longer here as the "I didn't catch that" takes a second or two to say
+                    restartWaitTimeoutThread(trigger_word_listen_timeout + 2000);
                     waitingForSpeech = true;
                 }
             }
             else
             {
-                // in toggle mode, we're now waiting-for-speech until we get another result or the button is released
+                // in hold-button mode, we're now waiting-for-speech until we get another result or the button is released
                 if (SpeechRecogniser.keepRecognisingInHoldMode)
                 {
                     Console.WriteLine("Waiting for more speech");
@@ -1292,24 +1394,44 @@ namespace CrewChiefV4
 
         public void stopTriggerRecogniser()
         {
-            triggerSre.RecognizeAsyncCancel();
+            if (!initialised)
+            {
+                return;
+            }
+
+            if (triggerSre != null)
+            {
+                triggerSre.RecognizeAsyncCancel();
+            }
         }
 
         public void startContinuousListening()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             if (voiceOptionEnum == MainWindow.VoiceOptionEnum.TRIGGER_WORD)
-            {                
-                triggerSre.UnloadAllGrammars();
-                GrammarBuilder gb = new GrammarBuilder();
-                Choices c = new Choices();
-                c.Add(keyWord);
-                gb.Culture = cultureInfo;
-                gb.Append(c);
-                triggerSre.LoadGrammar(new Grammar(gb));
-                sre.SetInputToNull();
-                triggerSre.SetInputToDefaultAudioDevice();
-                triggerSre.RecognizeAsync(RecognizeMode.Multiple);
-                Console.WriteLine("waiting for trigger word " + keyWord);
+            {   
+                try
+                {
+                    triggerSre.UnloadAllGrammars();
+                    GrammarBuilder gb = new GrammarBuilder();
+                    Choices c = new Choices();
+                    c.Add(keyWord);
+                    gb.Culture = cultureInfo;
+                    gb.Append(c);
+                    triggerSre.LoadGrammar(new Grammar(gb));
+                    sre.SetInputToNull();
+                    triggerSre.SetInputToDefaultAudioDevice();
+                    triggerSre.RecognizeAsync(RecognizeMode.Multiple);
+                    Console.WriteLine("waiting for trigger word " + keyWord);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(100);
+                }
             }
             else
             {
@@ -1319,6 +1441,11 @@ namespace CrewChiefV4
 
         public void recognizeAsync()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             Console.WriteLine("Opened channel - waiting for speech");
             SpeechRecogniser.waitingForSpeech = true;
             SpeechRecogniser.gotRecognitionResult = false;
@@ -1334,13 +1461,20 @@ namespace CrewChiefV4
                     }
                     else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
                     {
-                        keepRecording = true;
-                        (new Thread(() =>
+                        nAudioAlwaysOnkeepRecording = true;
+                        Debug.Assert(nAudioAlwaysOnListenerThread == null, "nAudio AlwaysOn Listener Thread wasn't shut down correctly.");
+
+                        // This thread is manually synchronized in recongizeAsyncCancel
+                        nAudioAlwaysOnListenerThread = new Thread(() =>
                         {
                             waveIn.StartRecording();
-                            while (keepRecording)
+                            while (nAudioAlwaysOnkeepRecording
+                                && crewChief.running)  // Exit as soon as we begin shutting down.
                             {
-                                Thread.Sleep(5000); // fill the 5s ringbuffer, then process
+                                if (!Utilities.InterruptedSleep(5000 /*totalWaitMillis*/, 1000 /*waitWindowMillis*/, () => nAudioAlwaysOnkeepRecording && crewChief.running /*keepWaitingPredicate*/))
+                                {
+                                    break;
+                                }
                                 Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo safi =
                                     new Microsoft.Speech.AudioFormat.SpeechAudioFormatInfo(
                                         waveIn.WaveFormat.SampleRate, Microsoft.Speech.AudioFormat.AudioBitsPerSample.Sixteen, Microsoft.Speech.AudioFormat.AudioChannel.Mono);
@@ -1355,7 +1489,11 @@ namespace CrewChiefV4
                                 }
                             }
                             StopNAudioWaveIn();
-                        })).Start();
+                        });
+
+                        nAudioAlwaysOnListenerThread.Name = "SpeechRecogniser.nAudioAlwaysOnListenerThread";
+                        nAudioAlwaysOnListenerThread.Start();
+
                     }
                 }
                 else
@@ -1380,6 +1518,11 @@ namespace CrewChiefV4
 
         public void recognizeAsyncCancel()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             Console.WriteLine("Cancelling wait for speech");
             SpeechRecogniser.waitingForSpeech = false;
             if (useNAudio)
@@ -1402,8 +1545,25 @@ namespace CrewChiefV4
                 }
                 else if (MainWindow.voiceOption == MainWindow.VoiceOptionEnum.ALWAYS_ON)
                 {
-                    keepRecording = false;
+                    nAudioAlwaysOnkeepRecording = false;
                     sre.RecognizeAsyncCancel();
+
+                    // Wait for nAudioAlwaysOnListenerThread thread to exit.
+                    if (nAudioAlwaysOnListenerThread != null)
+                    {
+                        if (nAudioAlwaysOnListenerThread.IsAlive)
+                        {
+                            Console.WriteLine("Waiting for nAudio Always On listener to stop...");
+                            if (!nAudioAlwaysOnListenerThread.Join(5000))
+                            {
+                                var errMsg = "Warning: Timed out waiting for nAudio Always On listener to stop";
+                                Console.WriteLine(errMsg);
+                                Debug.WriteLine(errMsg);
+                            }
+                        }
+                        nAudioAlwaysOnListenerThread = null;
+                        Console.WriteLine("nAudio Always On listener stopped");
+                    }
                 }
             }
             else
@@ -1415,6 +1575,11 @@ namespace CrewChiefV4
 
         private void StopNAudioWaveIn()
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             int retries = 0;
             Boolean stopped = false;
             while (!stopped && retries < 3)
@@ -1434,14 +1599,21 @@ namespace CrewChiefV4
 
         public void changeInputDevice(int dev)
         {
-            if (initialised)
+            if (!initialised)
             {
-                waveIn.DeviceNumber = dev;
+                return;
             }
+
+            waveIn.DeviceNumber = dev;
         }
 
         private void waveIn_DataAvailable(object sender, NAudio.Wave.WaveInEventArgs e)
         {
+            if (!initialised)
+            {
+                return;
+            }
+
             lock (buffer)
             {
                 buffer.Write(e.Buffer, (int)buffer.Position, e.BytesRecorded);
@@ -1450,195 +1622,201 @@ namespace CrewChiefV4
 
         private AbstractEvent getEventForSpeech(String recognisedSpeech)
         {
-            if (ResultContains(recognisedSpeech, RADIO_CHECK))
+            if (!initialised)
+            {
+                return null;
+            }
+
+            if (ResultContains(recognisedSpeech, RADIO_CHECK, false))
             {
                 crewChief.respondToRadioCheck();
             }
-            else if (ResultContains(recognisedSpeech, DONT_SPOT))
+            else if (ResultContains(recognisedSpeech, DONT_SPOT, false))
             {
                 crewChief.disableSpotter();
             }
-            else if (ResultContains(recognisedSpeech, SPOT))
+            else if (ResultContains(recognisedSpeech, SPOT, false))
             {
                 crewChief.enableSpotter();
             }
-            else if (ResultContains(recognisedSpeech, KEEP_QUIET))
+            else if (ResultContains(recognisedSpeech, KEEP_QUIET, false))
             {
                 crewChief.enableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, PLAY_CORNER_NAMES))
+            else if (ResultContains(recognisedSpeech, PLAY_CORNER_NAMES, false))
             {
                 crewChief.playCornerNamesForCurrentLap();
             }
-            else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS))
+            else if (ResultContains(recognisedSpeech, DONT_TELL_ME_THE_GAPS, false))
             {
                 crewChief.disableDeltasMode();
             }
-            else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS))
+            else if (ResultContains(recognisedSpeech, TELL_ME_THE_GAPS, false))
             {
                 crewChief.enableDeltasMode();
             }
-            else if (ResultContains(recognisedSpeech, ENABLE_YELLOW_FLAG_MESSAGES))
+            else if (ResultContains(recognisedSpeech, ENABLE_YELLOW_FLAG_MESSAGES, false))
             {
                 crewChief.enableYellowFlagMessages();
             }
-            else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES))
+            else if (ResultContains(recognisedSpeech, DISABLE_YELLOW_FLAG_MESSAGES, false))
             {
                 crewChief.disableYellowFlagMessages();
             }
-            else if (ResultContains(recognisedSpeech, ENABLE_MANUAL_FORMATION_LAP))
+            else if (ResultContains(recognisedSpeech, ENABLE_MANUAL_FORMATION_LAP, false))
             {
                 crewChief.enableManualFormationLapMode();
             }
-            else if (ResultContains(recognisedSpeech, DISABLE_MANUAL_FORMATION_LAP))
+            else if (ResultContains(recognisedSpeech, DISABLE_MANUAL_FORMATION_LAP, false))
             {
                 crewChief.disableManualFormationLapMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_THE_TIME))
+            else if (ResultContains(recognisedSpeech, WHATS_THE_TIME, false))
             {
                 crewChief.reportCurrentTime();
             }
-            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE))
+            else if (ResultContains(recognisedSpeech, TALK_TO_ME_ANYWHERE, false))
             {
                 crewChief.disableDelayMessagesInHardParts();
             }
-            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS))
+            else if (ResultContains(recognisedSpeech, DONT_TALK_IN_THE_CORNERS, false))
             {
                 crewChief.enableDelayMessagesInHardParts();
             }
-            else if (ResultContains(recognisedSpeech, HOWS_MY_AERO) ||
-               ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION) ||
-               ResultContains(recognisedSpeech, HOWS_MY_ENGINE) ||
-               ResultContains(recognisedSpeech, HOWS_MY_SUSPENSION) ||
-               ResultContains(recognisedSpeech, HOWS_MY_BRAKES))
+            else if (ResultContains(recognisedSpeech, HOWS_MY_AERO, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_TRANSMISSION, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_ENGINE, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_SUSPENSION, false) ||
+               ResultContains(recognisedSpeech, HOWS_MY_BRAKES, false))
             {
                 return CrewChief.getEvent("DamageReporting");
             }
-            else if (ResultContains(recognisedSpeech, KEEP_ME_INFORMED))
+            else if (ResultContains(recognisedSpeech, KEEP_ME_INFORMED, false))
             {
                 crewChief.disableKeepQuietMode();
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL)
-                || ResultContains(recognisedSpeech, HOWS_MY_FUEL)
-                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE)
-                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR)
-                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_FUEL_LEVEL, false)
+                || ResultContains(recognisedSpeech, HOWS_MY_FUEL, false)
+                || ResultContains(recognisedSpeech, WHATS_MY_FUEL_USAGE, false)
+                || ResultContains(recognisedSpeech, CALCULATE_FUEL_FOR, false)
+                || ResultContains(recognisedSpeech, HOW_MUCH_FUEL_TO_END_OF_RACE, false))
             {
                 return CrewChief.getEvent("Fuel");
             }
-            else if (// TODO: other battery queries
-                ResultContains(recognisedSpeech, HOWS_MY_BATTERY))
+            else if (
+                ResultContains(recognisedSpeech, HOWS_MY_BATTERY, false))
             {
                 return CrewChief.getEvent("Battery");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT) ||
-                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND) ||
-                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER) ||
-                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_GAP_IN_FRONT, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_GAP_BEHIND, false) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_FASTER, false) ||
+                ResultContains(recognisedSpeech, WHERE_AM_I_SLOWER, false))
             {
                 return CrewChief.getEvent("Timings");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_MY_POSITION))
+            else if (ResultContains(recognisedSpeech, WHATS_MY_POSITION, false))
             {
                 return CrewChief.getEvent("Position");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME) ||
-                ResultContains(recognisedSpeech, HOWS_MY_PACE) ||
-                ResultContains(recognisedSpeech, HOWS_MY_SELF_PACE) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES) ||
-                ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME))
+            else if (ResultContains(recognisedSpeech, WHAT_WAS_MY_LAST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_BEST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, WHATS_THE_FASTEST_LAP_TIME, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_PACE, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_SELF_PACE, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_SECTOR_TIMES, false) ||
+                ResultContains(recognisedSpeech, WHATS_MY_LAST_SECTOR_TIME, false))
             {
                 return CrewChief.getEvent("LapTimes");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_ARE_MY_TYRE_TEMPS) ||
-                ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS) ||
-                ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR) ||
-                ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS) ||
-                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES) ||
-                ResultContains(recognisedSpeech, HOW_LONG_WILL_THESE_TYRES_LAST))
+            else if (ResultContains(recognisedSpeech, WHAT_ARE_MY_TYRE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_TYRE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, HOWS_MY_TYRE_WEAR, false) ||
+                ResultContains(recognisedSpeech, HOW_ARE_MY_BRAKE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_MY_BRAKE_TEMPS, false) ||
+                ResultContains(recognisedSpeech, WHAT_ARE_THE_RELATIVE_TYRE_PERFORMANCES, false) ||
+                ResultContains(recognisedSpeech, HOW_LONG_WILL_THESE_TYRES_LAST, false))
             {
                 return CrewChief.getEvent("TyreMonitor");
             }
-            else if (ResultContains(recognisedSpeech, HOW_LONGS_LEFT))
+            else if (ResultContains(recognisedSpeech, HOW_LONGS_LEFT, false))
             {
                 return CrewChief.getEvent("RaceTime");
             }
-            else if (ResultContains(recognisedSpeech, DO_I_STILL_HAVE_A_PENALTY) ||
-                ResultContains(recognisedSpeech, DO_I_HAVE_A_PENALTY) ||
-                ResultContains(recognisedSpeech, HAVE_I_SERVED_MY_PENALTY))
+            else if (ResultContains(recognisedSpeech, DO_I_STILL_HAVE_A_PENALTY, false) ||
+                ResultContains(recognisedSpeech, DO_I_HAVE_A_PENALTY, false) ||
+                ResultContains(recognisedSpeech, HAVE_I_SERVED_MY_PENALTY, false))
             {
                 return CrewChief.getEvent("Penalties");
             }
-            else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP) ||
-                ResultContains(recognisedSpeech, IS_MY_PIT_BOX_OCCUPIED))
+            else if (ResultContains(recognisedSpeech, DO_I_HAVE_A_MANDATORY_PIT_STOP, false) ||
+                ResultContains(recognisedSpeech, IS_MY_PIT_BOX_OCCUPIED, false))
             {
                 return CrewChief.getEvent("PitStops");
             }
-            else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS))
+            else if (ResultContains(recognisedSpeech, HOW_ARE_MY_ENGINE_TEMPS, false))
             {
                 return CrewChief.getEvent("EngineMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHATS_THE_AIR_TEMP) ||
-               ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP))
+            else if (ResultContains(recognisedSpeech, WHATS_THE_AIR_TEMP, false) ||
+               ResultContains(recognisedSpeech, WHATS_THE_TRACK_TEMP, false))
             {
                 return CrewChief.getEvent("ConditionsMonitor");
             }
-            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON) ||
-                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK) ||
-                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE) ||
-                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK) ||
-                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE) ||
-                ResultContains(recognisedSpeech, WHOS_LEADING))
+            else if (ResultContains(recognisedSpeech, WHAT_TYRES_AM_I_ON, false) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_ON_TRACK, false) ||
+                ResultContains(recognisedSpeech, WHOS_IN_FRONT_IN_THE_RACE, false) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_ON_TRACK, false) ||
+                ResultContains(recognisedSpeech, WHOS_BEHIND_IN_THE_RACE, false) ||
+                ResultContains(recognisedSpeech, WHOS_LEADING, false))
             {
                 return CrewChief.getEvent("Opponents");
             }
             // multiple events for status reporting:
-            else if (ResultContains(recognisedSpeech, DAMAGE_REPORT))
+            else if (ResultContains(recognisedSpeech, DAMAGE_REPORT, false))
             {
                 CrewChief.getDamageReport();
             }
-            else if (ResultContains(recognisedSpeech, CAR_STATUS))
+            else if (ResultContains(recognisedSpeech, CAR_STATUS, false))
             {
                 CrewChief.getCarStatus();
             }
-            else if (ResultContains(recognisedSpeech, STATUS))
+            else if (ResultContains(recognisedSpeech, STATUS, false))
             {
                 CrewChief.getStatus();
             }
-            else if (ResultContains(recognisedSpeech, SESSION_STATUS))
+            else if (ResultContains(recognisedSpeech, SESSION_STATUS, false))
             {
                 CrewChief.getSessionStatus();
             }
-            else if (ResultContains(recognisedSpeech, START_PACE_NOTES_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, START_PACE_NOTES_PLAYBACK, false))
             {
                 if (!DriverTrainingService.isPlayingPaceNotes)
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, STOP_PACE_NOTES_PLAYBACK))
+            else if (ResultContains(recognisedSpeech, STOP_PACE_NOTES_PLAYBACK, false))
             {
                 if (DriverTrainingService.isPlayingPaceNotes)
                 {
                     crewChief.togglePaceNotesPlayback();
                 }
             }
-            else if (ResultContains(recognisedSpeech, IS_CAR_AHEAD_MY_CLASS) ||
-                ResultContains(recognisedSpeech, IS_CAR_BEHIND_MY_CLASS) ||
-                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_AHEAD) ||
-                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND))
+            else if (ResultContains(recognisedSpeech, IS_CAR_AHEAD_MY_CLASS, false) ||
+                ResultContains(recognisedSpeech, IS_CAR_BEHIND_MY_CLASS, false) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_AHEAD, false) ||
+                ResultContains(recognisedSpeech, WHAT_CLASS_IS_CAR_BEHIND, false))
             {
                 return CrewChief.getEvent("MulticlassWarnings");
             }
-            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP) ||
-                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE))
+            else if (ResultContains(recognisedSpeech, PRACTICE_PIT_STOP, false) ||
+                ResultContains(recognisedSpeech, PLAY_POST_PIT_POSITION_ESTIMATE, false))
             {
                 return CrewChief.getEvent("Strategy");
             }
-            else if (alarmClockVoiceRecognitionEnabled && ResultContains(recognisedSpeech, SET_ALARM_CLOCK) || ResultContains(recognisedSpeech, CLEAR_ALARM_CLOCK))
+            else if (alarmClockVoiceRecognitionEnabled && 
+                (ResultContains(recognisedSpeech, SET_ALARM_CLOCK, false) || ResultContains(recognisedSpeech, CLEAR_ALARM_CLOCK, false)))
             {
                 return crewChief.alarmClock;
             }
