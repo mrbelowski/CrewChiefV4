@@ -40,6 +40,7 @@ assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
 rfactor2_64_bit = rFactor 2 (64 bit)
 iracing = iRacing
+f1_2018 = F1 2018 (spotter only)
 please_choose_a_game_option = Please choose a game option
 no_game_selected = No game selected
 
@@ -152,14 +153,14 @@ install_plugin_popup_text = Crew Chief needs additional files to be installed or
 install_plugin_popup_title = Plugin Needed
 install_plugin_select_directory_start = Please select 
 install_plugin_select_directory_end = installation directory
-install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancle to Return
+install_plugin_popup_enable_text = Crew Chief can automatically enable the plugin for you, if you select Cancel you will have to enable it manually in the game ui. Click OK to enable or Cancel to Return
 install_plugin_popup_enable_title = Enable Plugin
 
 install_speechplatform_popup_title = Missing dependency
-install_speechplatform_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Press OK to get redirected to the download location, Or Cancle to return
+install_speechplatform_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Press OK to get redirected to the download location, Or Cancel to return
 install_any_speechlanguage_popup_text = It appears that your system is missing a dependency for speech recogniser to work. Please download and install one of the following MSSpeech_SR_en-GB_TELE.msi, MSSpeech_SR_en-US_TELE.msi,MSSpeech_SR_en-AU_TELE.msi, MSSpeech_SR_en-CA_TELE.msi or MSSpeech_SR_en-IN_TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
 install_single_speechlanguage_popup_text_start = It appears that your system is missing a dependency for speech recogniser to work. Please download and install MSSpeech_SR_
-install_single_speechlanguage_popup_text_end = _TELE.msi. Press OK to get redirected to the download location, Or Cancle to return
+install_single_speechlanguage_popup_text_end = _TELE.msi. Press OK to get redirected to the download location, Or Cancel to return
 
 properties_form = Crew Chief Configuration Properties
 exit_without_saving = E&xit without Saving
@@ -256,6 +257,11 @@ rf2_install_path = rF2 install path
 rf2_install_path_help = rF2 installation path for plugin installation and updating
 rf2_install_path_filter = RF2_64BIT
 rf2_install_path_category = UI_STARTUP_AND_PATHS
+
+f1_2018_install_path = F1 2018 install path
+f1_2018_install_path_help = F1 2018 installation path
+f1_2018_install_path_filter = F1_2018
+f1_2018_install_path_category = UI_STARTUP_AND_PATHS
 
 override_default_sound_pack_location = Override default Sound Pack location
 override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
@@ -401,6 +407,11 @@ udp_data_port_help = pCARS network data UDP port (should usually be 5606)
 udp_data_port_filter = PCARS_NETWORK
 udp_data_port_category = UI_STARTUP_AND_PATHS
 
+f1_2018_udp_data_port = F1 2018 UDP port
+f1_2018_udp_data_port_help = F1 2018 network data UDP port (should usually be 20777)
+f1_2018_udp_data_port_filter = F1_2018
+f1_2018_udp_data_port_category = UI_STARTUP_AND_PATHS
+
 acs_spotter_car_length = ACS Spotter default car length
 acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
 acs_spotter_car_length_category = SPOTTER
@@ -413,6 +424,10 @@ pcars_spotter_car_length = pCARS Spotter default car length
 pcars_spotter_car_length_filter = PCARS_64BIT;PCARS_32BIT;PCARS_NETWORK
 pcars_spotter_car_length_category = SPOTTER
 
+pcars2_spotter_car_length = pCARS2 Spotter default car length
+pcars2_spotter_car_length_filter = PCARS2
+pcars2_spotter_car_length_category = SPOTTER
+
 r3e_spotter_car_length = R3E Spotter default car length
 r3e_spotter_car_length_filter = RACE_ROOM
 r3e_spotter_car_length_category = SPOTTER
@@ -424,6 +439,10 @@ rf1_spotter_car_length_category = SPOTTER
 rf2_spotter_car_length = rF2 Spotter default car length
 rf2_spotter_car_length_filter = RF2_64BIT
 rf2_spotter_car_length_category = SPOTTER
+
+f1_2018_spotter_car_length = F1 2018 Spotter default car length
+f1_2018_spotter_car_length_filter = F1_2018
+f1_2018_spotter_car_length_category = SPOTTER
 
 spotter_gap_for_clear = Spotter gap for clear
 spotter_gap_for_clear_category = SPOTTER;MESSAGE_FREQUENCES
@@ -477,10 +496,6 @@ spotter_overlap_delay_category = SPOTTER
 custom_device_guid = Custom device GUID
 custom_device_guid_help = Manually set a controller GUID if the app doesn't display your controller in the devices list
 custom_device_guid_category = AUDIO_VOICE_AND_CONTROLLERS
-
-disable_immediate_messages = Disable immediate messages
-disable_immediate_messages_help = Disables all Spotter messages and all voice recognition responses. Might allow the app to run in non-interactive mode on slow systems
-disable_immediate_messages_category = AUDIO_VOICE_AND_CONTROLLERS;SPOTTER
 
 max_safe_oil_temp_over_baseline_help = Baseline oil temp is taken after a few minutes. If the oil temp goes more than this value over the baseline a warning message is played. Reduce this to make the 'high oil temp' warning more sensitive
 max_safe_oil_temp_over_baseline_category = FUEL_TEMPS_AND_DAMAGES
@@ -543,6 +558,11 @@ ftruck_launch_params_help = This is used to tell Steam what app to run - Formula
 ftruck_launch_params_filter = RF1
 ftruck_launch_params_category = UI_STARTUP_AND_PATHS
 
+f1_2018_launch_params = F1 2018 launch params
+f1_2018_launch_params_help = This is used to tell Steam what app to run - F1 2018's Steam app ID is ??????. If you specified a path f1_2018.exe you can leave this blank
+f1_2018_launch_params_filter = F1_2018
+f1_2018_launch_params_category = UI_STARTUP_AND_PATHS
+
 r3e_launch_exe = R3E launch exe
 r3e_launch_exe_help = This is the location of Steam.exe or the direct path to RRRE.exe. Use forward slashes to separate paths.
 r3e_launch_exe_filter = RACE_ROOM
@@ -593,6 +613,11 @@ pcars64_launch_exe_help = This is the location of Steam.exe or the direct path t
 pcars64_launch_exe_filter = PCARS_64BIT
 pcars64_launch_exe_category = UI_STARTUP_AND_PATHS
 
+f1_2018_launch_exe = F1 2018 launch exe
+f1_2018_launch_exe_help = This is the location of Steam.exe or the direct path to f1_2018.exe. Use forward slashes to separate paths.
+f1_2018_launch_exe_filter = F1_2018
+f1_2018_launch_exe_category = UI_STARTUP_AND_PATHS
+
 launch_rfactor1 = Launch rFactor 1
 launch_rfactor1_help = If this is true the application will attempt to launch rFactor when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 launch_rfactor1_filter = RF1
@@ -607,6 +632,11 @@ launch_gsc = Launch GSC
 launch_gsc_help = If this is true the application will attempt to launch Stock Car Extreme when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
 launch_gsc_filter = RF1
 launch_gsc_category = UI_STARTUP_AND_PATHS
+
+launch_f1_2018 = Launch F1 2018
+launch_f1_2018_help = If this is true the application will attempt to launch F1 2018 when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
+launch_f1_2018_filter = F1_2018
+launch_f1_2018_category = UI_STARTUP_AND_PATHS
 
 launch_ams = Launch AMS
 launch_ams_help = If this is true the application will attempt to launch Automobilista when CrewChief starts (when you click 'Start application' or the app auto starts CrewChief if you set run_immediately to true)
@@ -1023,10 +1053,25 @@ force_min_window_size = Force minimum window size
 force_min_window_size_help = Don't allow the app's window size to resized below the minimum size
 force_min_window_size_category = UI_STARTUP_AND_PATHS
 
-pit_box_position_countdown = Pit box countdown
+pit_box_position_countdown = Pit box distance countdown
 pit_box_position_countdown_help = Play distance in metres to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
 pit_box_position_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
 pit_box_position_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_time_countdown = Pit box time countdown
+pit_box_time_countdown_help = Play time to box as you approach (R3E, rF2 and iRacing only).  Note:  In rF2, disabled for oval tracks.  May not work with some other tracks too.
+pit_box_time_countdown_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_time_countdown_end_position = Pit box time countdown end point (metres)
+pit_box_time_countdown_end_position_help = End pit box time countdown this many metres from the box
+pit_box_time_countdown_end_position_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_time_countdown_end_position_category = PIT_STOPS_AND_MULTICLASS
+
+pit_box_position_countdown_in_feet = Pit box distance countdown in feet
+pit_box_position_countdown_in_feet_help = Play pit distance countdown in feet
+pit_box_position_countdown_in_feet_filter = IRACING;RACE_ROOM;RF2_64BIT
+pit_box_position_countdown_in_feet_category = PIT_STOPS_AND_MULTICLASS
 
 enable_multiclass_messages = Enable multi-class messages
 enable_multiclass_messages_help = Play warnings when slower or faster class cars are approaching
@@ -1058,12 +1103,8 @@ enable_iracing_pit_stop_commands_help = If you do not use iRacing pit stop comma
 enable_iracing_pit_stop_commands_filter = IRACING
 enable_iracing_pit_stop_commands_category = AUDIO_VOICE_AND_CONTROLLERS;PIT_STOPS_AND_MULTICLASS
 
-enable_tight_fuel_calc = Enable tight fuel calculations
-enable_tight_fuel_calc_help = Enable this if you don't want the app to add additional fuel when asking for how much fuel is needed to end the race
-enable_tight_fuel_calc_category = FUEL_TEMPS_AND_DAMAGES
-
-add_additional_fuel = Additional fuel to add to finish the race
-add_additional_fuel_help = The amount of extra fuel (liters or gallons) you want the app to add when "Use tight fuel calculations" is enabled
+add_additional_fuel = Additional fuel to add to finish the race (number of laps worth)
+add_additional_fuel_help = Amount of extra fuel to add as a reserve (in laps or fractions of a lap) when working out how much is needed to finish a race (e.g. 0.7 means 0.7 laps' worth)
 add_additional_fuel_category = FUEL_TEMPS_AND_DAMAGES
 
 iracing_invalidate_cut_track_laps = iRacing Invalidate cut track Laps
@@ -1135,3 +1176,15 @@ enable_alarm_clock_voice_recognition_category = AUDIO_VOICE_AND_CONTROLLERS;TIMI
 alarm_clock_times = Alarm time(s)
 alarm_clock_times_help = Set the time(s) you want the alarm to go off. Format eg. 5:11PM 5:11AM 17:11, if you want to have more then one alarm seperate times with ";" eg. 5:11PM;5:11AM
 alarm_clock_times_category = AUDIO_VOICE_AND_CONTROLLERS;TIMINGS
+
+disable_behavior_altering_voice_commands = Disable behavior voice commands
+disable_behavior_altering_voice_commands_help = When checked, will disable all voice commands that affect CC behavior, for example: "Spot", "Don't spot", "Keep quiet" etc.
+disable_behavior_altering_voice_commands_category = AUDIO_VOICE_AND_CONTROLLERS
+
+slow_class_car_warnings_in_race_only = Slow car class warnings in race only
+slow_class_car_warnings_in_race_only_help = Only play 'slow car ahead' multiclass warnings in race sessions
+slow_class_car_warnings_in_race_only_category = PIT_STOPS_AND_MULTICLASS
+
+record_sound_variety_data = Record sound variety data
+record_sound_variety_data_help = Log the number of times each sound is played and the number of versions of this sound. For sound pack developers
+record_sound_variety_data_category = AUDIO_VOICE_AND_CONTROLLERS

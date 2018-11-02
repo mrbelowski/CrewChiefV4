@@ -12,7 +12,7 @@ namespace CrewChiefV4.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -68,18 +68,6 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["use_sweary_messages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool disable_immediate_messages {
-            get {
-                return ((bool)(this["disable_immediate_messages"]));
-            }
-            set {
-                this["disable_immediate_messages"] = value;
             }
         }
         
@@ -841,7 +829,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int frequency_of_race_sector_delta_reports {
             get {
                 return ((int)(this["frequency_of_race_sector_delta_reports"]));
@@ -2401,7 +2389,7 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool pcars_enable_rain_prediction {
             get {
                 return ((bool)(this["pcars_enable_rain_prediction"]));
@@ -3145,18 +3133,6 @@ namespace CrewChiefV4.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool enable_tight_fuel_calc {
-            get {
-                return ((bool)(this["enable_tight_fuel_calc"]));
-            }
-            set {
-                this["enable_tight_fuel_calc"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public float add_additional_fuel {
             get {
@@ -3418,7 +3394,7 @@ namespace CrewChiefV4.Properties {
                 this["alarm_clock_times"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Jim (default)")]
@@ -3428,6 +3404,150 @@ namespace CrewChiefV4.Properties {
             }
             set {
                 this["chief_name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool disable_behavior_altering_voice_commands {
+            get {
+                return ((bool)(this["disable_behavior_altering_voice_commands"]));
+            }
+            set {
+                this["disable_behavior_altering_voice_commands"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool slow_class_car_warnings_in_race_only {
+            get {
+                return ((bool)(this["slow_class_car_warnings_in_race_only"]));
+            }
+            set {
+                this["slow_class_car_warnings_in_race_only"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2018_launch_exe {
+            get {
+                return ((string)(this["f1_2018_launch_exe"]));
+            }
+            set {
+                this["f1_2018_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string f1_2018_launch_params {
+            get {
+                return ((string)(this["f1_2018_launch_params"]));
+            }
+            set {
+                this["f1_2018_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_f1_2018 {
+            get {
+                return ((bool)(this["launch_f1_2018"]));
+            }
+            set {
+                this["launch_f1_2018"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20777")]
+        public int f1_2018_udp_data_port {
+            get {
+                return ((int)(this["f1_2018_udp_data_port"]));
+            }
+            set {
+                this["f1_2018_udp_data_port"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public float f1_2018_spotter_car_length {
+            get {
+                return ((float)(this["f1_2018_spotter_car_length"]));
+            }
+            set {
+                this["f1_2018_spotter_car_length"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public float pcars2_spotter_car_length {
+            get {
+                return ((float)(this["pcars2_spotter_car_length"]));
+            }
+            set {
+                this["pcars2_spotter_car_length"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool pit_box_time_countdown {
+            get {
+                return ((bool)(this["pit_box_time_countdown"]));
+            }
+            set {
+                this["pit_box_time_countdown"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool pit_box_position_countdown_in_feet {
+            get {
+                return ((bool)(this["pit_box_position_countdown_in_feet"]));
+            }
+            set {
+                this["pit_box_position_countdown_in_feet"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool record_sound_variety_data {
+            get {
+                return ((bool)(this["record_sound_variety_data"]));
+            }
+            set {
+                this["record_sound_variety_data"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int pit_box_time_countdown_end_position {
+            get {
+                return ((int)(this["pit_box_time_countdown_end_position"]));
+            }
+            set {
+                this["pit_box_time_countdown_end_position"] = value;
             }
         }
     }

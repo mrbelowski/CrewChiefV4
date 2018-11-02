@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace CrewChiefV4
 {
@@ -208,6 +209,22 @@ namespace CrewChiefV4
             Console.WriteLine(
                 "==================================================================" + Environment.NewLine
             );
+        }
+
+        internal static bool InterruptedSleep(int totalWaitMillis, int waitWindowMillis, Func<bool> keepWaitingPredicate)
+        {
+            Debug.Assert(totalWaitMillis > 0 && waitWindowMillis > 0);
+            var waitSoFar = 0;
+            while (waitSoFar < totalWaitMillis)
+            {
+                if (!keepWaitingPredicate())
+                    return false;
+
+                Thread.Sleep(waitWindowMillis);
+                waitSoFar += waitWindowMillis;
+            }
+
+            return true;
         }
     }
 }

@@ -209,10 +209,9 @@ namespace CrewChiefV4.Events
                     // only notify about this if we're in a practice session
                     if (currentGameState.SessionData.SessionType == SessionType.Practice)
                     {
-                        audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
-                            MessageContents(folderPitStopCostsUsAbout,
-                            TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
-                            0, this), 10);
+                        audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 0,
+                            messageFragments: MessageContents(folderPitStopCostsUsAbout, TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
+                            abstractEvent: this, priority: 10));
                     }
                     waitingForValidDataForBenchmark = false;
                 }
@@ -273,10 +272,10 @@ namespace CrewChiefV4.Events
                                 waitingForValidDataForBenchmark = false;
                                 setTimeLossFromBenchmark(currentGameState);
                                 Console.WriteLine("Practice pitstop has cost us " + playerTimeLostForStop + " seconds");
-                                audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate",
-                                    MessageContents(folderPitStopCostsUsAbout,
+                                audioPlayer.playMessage(new QueuedMessage("pit_stop_cost_estimate", 0,
+                                    messageFragments: MessageContents(folderPitStopCostsUsAbout,
                                     TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
-                                    0, this), 10);
+                                    abstractEvent: this, priority: 10));
                             }
                             else
                             {
@@ -313,8 +312,9 @@ namespace CrewChiefV4.Events
                                 {
                                     // this guy has just entered the pit and we predict he'll exit just in front of us
                                     Console.WriteLine("Opponent " + entry.Value.DriverRawName + " will exit the pit close in front of us");
-                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_in_front", MessageContents(entry.Value,
-                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustInFront), 0, this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_in_front", 10,
+                                        messageFragments: MessageContents(entry.Value, folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustInFront),
+                                        abstractEvent: this, priority: 10));
 
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
@@ -325,8 +325,9 @@ namespace CrewChiefV4.Events
                                 {
                                     // this guy has just entered the pit and we predict he'll exit just behind us
                                     Console.WriteLine("Opponent " + entry.Value.DriverRawName + " will exit the pit close behind us");
-                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", MessageContents(entry.Value,
-                                        folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustBehind), 0, this), 10);
+                                    audioPlayer.playMessage(new QueuedMessage("opponent_exiting_behind", 10,
+                                        messageFragments: MessageContents(entry.Value, folderIsPittingFromPosition, entry.Value.ClassPosition, folderHeWillComeOutJustBehind),
+                                        abstractEvent: this, priority: 10));
                                     // only allow one of these every 10 seconds. When an opponent crosses the start line he's 
                                     // removed from this set anyway
                                     nextOpponentPitExitWarningDue = currentGameState.Now.AddSeconds(10);
@@ -520,8 +521,7 @@ namespace CrewChiefV4.Events
                                     bestLastAndFirstSectorTime = entry.Value.bestSector2Time + entry.Value.bestSector1Time;
                                 }
                                 
-                                // TODO: these game-time values aren't always set - each mapper will need to be updated to ensure they're set
-                                // Also note that these are zero-indexed - we want the game time at the end of sector2 on the previous lap and s1 on this lap
+                                // note that these are zero-indexed - we want the game time at the end of sector2 on the previous lap and s1 on this lap
                                 float lastLapPenultimateSectorEndTime = entry.Value.getLastLapData().GameTimeAtSectorEnd[sectorCount == 3 ? 1 : 0];
                                 float thisLapS1EndTime = entry.Value.getCurrentLapData().GameTimeAtSectorEnd[0];
                                 // only insert data here if we have sane times
@@ -731,7 +731,6 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        // he'll be behind (TODO: work out which way the delta-points lag will bias this)
                         opponentsBehind.Add(new OpponentPositionAtPlayerPitExit(absDelta, isPlayerClass, opponentCarClassId, opponent));
                     }                    
                 }
@@ -1087,16 +1086,16 @@ namespace CrewChiefV4.Events
             {
                 if (pitPositionEstimatesRequested)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", fragments, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("pit_stop_position_prediction", 0, messageFragments: fragments));
                 }
                 else
                 {
-                    audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", fragments, 0, this), 10);
+                    audioPlayer.playMessage(new QueuedMessage("pit_stop_position_prediction", 0, messageFragments: fragments, abstractEvent: this, priority: 10));
                 }
             }
             else if (pitPositionEstimatesRequested)
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
         }
 
@@ -1120,7 +1119,7 @@ namespace CrewChiefV4.Events
         public void respondPracticeStop()
         {
             isTimingPracticeStop = true;
-            audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0, null));
+            audioPlayer.playMessageImmediately(new QueuedMessage(folderTimePitstopAcknowledge, 0));
         }
 
         public void respondRace()
@@ -1128,7 +1127,7 @@ namespace CrewChiefV4.Events
             if (CrewChief.currentGameState == null || CrewChief.currentGameState.SessionData.TrackDefinition == null)
             {
                 Console.WriteLine("No data for pit estimate");
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
             }
             else
             {

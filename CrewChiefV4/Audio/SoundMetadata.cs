@@ -15,6 +15,7 @@ namespace CrewChiefV4.Audio
         VOICE_COMMAND_RESPONSE, 
         IMPORTANT_MESSAGE,
         REGULAR_MESSAGE,
+        AUTO,        // allow the context (spotter, immediate, regular) to determine the type
         OTHER           // used only for beeps (do we need this?)
     }
 

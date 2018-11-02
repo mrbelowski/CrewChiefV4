@@ -132,9 +132,31 @@
     <Compile Include="Events\Opponents.cs" />
     <Compile Include="Events\FlagsMonitor.cs" />
     <Compile Include="Events\Spotter.cs" />
+    <Compile Include="F1_2018\F12018GameStateMapper.cs" />
+    <Compile Include="F1_2018\F12018Spotter.cs" />
+    <Compile Include="F1_2018\F12018StructWrapper.cs" />
+    <Compile Include="F1_2018\F12018UDPreader.cs" />
+    <Compile Include="F1_2018\longtomjr\enums.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\CarMotionData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\CarSetupData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\CarStatusData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\CarTelemetryData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\LapData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\MarshalZone.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketHeader.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketCarSetupData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketCarStatusData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketCarTelemetryData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketEventData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketLapData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketMotionData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketParticipantsData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\PacketStructs\PacketSessionData.cs" />
+    <Compile Include="F1_2018\longtomjr\Structs\ParticipantData.cs" />
     <Compile Include="GameDefinition.cs" />
     <Compile Include="GameStateReaderFactory.cs" />
     <Compile Include="GameState\GlobalBehaviourSettings.cs" />
+    <Compile Include="GlobalResources.cs" />
     <Compile Include="iRacing\Bitfields\CameraState.cs" />
     <Compile Include="iRacing\Bitfields\EngineWarning.cs" />
     <Compile Include="iRacing\Bitfields\PitServiceFlag.cs" />
@@ -157,13 +179,15 @@
     <Compile Include="iRacing\Parser.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="iRacing\Sector.cs" />
     <Compile Include="iRacing\SessionData.cs" />
     <Compile Include="iRacing\Sim.cs" />
     <Compile Include="iRacing\Track.cs" />
     <Compile Include="NumberReaderIt2.cs" />
+    <Compile Include="ThreadManager.cs" />
     <Compile Include="UserInterface\PropertyFilter.cs" />
-    <Compile Include="UserInterface\ListPropertyControl.cs" />
+    <Compile Include="UserInterface\ListPropertyControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="UserInterface\ListPropertyControl.Designer.cs">
       <DependentUpon>ListPropertyControl.cs</DependentUpon>
     </Compile>

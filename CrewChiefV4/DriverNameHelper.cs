@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrewChiefV4.Audio;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -360,6 +361,7 @@ namespace CrewChiefV4
             HashSet<String> existingNamesInFile = getNamesAlreadyInFile(getUnvocalizedDriverNamesFileLocation());
             existingNamesInFile.UnionWith(unvocalizedNames);
             List<String> namesToAdd = new List<String>(existingNamesInFile);
+            namesToAdd.RemoveAll(alreadyRecorded => SoundCache.availableDriverNames.Contains(alreadyRecorded));
             namesToAdd.Sort();
             TextWriter tw = new StreamWriter(getUnvocalizedDriverNamesFileLocation(), false);
             foreach (String name in namesToAdd)

@@ -52,7 +52,7 @@ namespace CrewChiefV4.Events
         private int strenghtOfField = -1; 
         private Boolean hasLimitedIncidents = false;
         private float fuelCapacity = -1;
-        
+        private float currentFuel = -1;
         private Tuple<String, float> licenseLevel = new Tuple<string, float>("invalid", -1);
 
         public IRacingBroadcastMessageEvent(AudioPlayer audioPlayer)
@@ -68,6 +68,7 @@ namespace CrewChiefV4.Events
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
             this.fuelCapacity = -1;
+            this.currentFuel = -1;
         }
 
         public override void clearState()
@@ -81,6 +82,8 @@ namespace CrewChiefV4.Events
             this.iRating = -1;
             this.hasLimitedIncidents = false;
             this.licenseLevel = new Tuple<string, float>("invalid", -1);
+            this.fuelCapacity = -1;
+            this.currentFuel = -1;
         }
 
         public override List<SessionPhase> applicableSessionPhases
@@ -106,6 +109,7 @@ namespace CrewChiefV4.Events
             iRating = currentGameState.SessionData.iRating;
             strenghtOfField = currentGameState.SessionData.StrengthOfField;
             fuelCapacity = currentGameState.FuelData.FuelCapacity;
+            currentFuel = currentGameState.FuelData.FuelLeft;
             if(autoFuelToEnd)
             {
                 if(previousGameState != null && !previousGameState.PitData.InPitlane && currentGameState.PitData.InPitlane
@@ -113,28 +117,29 @@ namespace CrewChiefV4.Events
                     && !previousGameState.PitData.IsInGarage && !currentGameState.PitData.JumpedToPits)
                 {
                     Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
-                    int litresNeeded = fuelEvent.getLitresToEndOfRace();
+                    float litresNeeded = fuelEvent.getLitresToEndOfRace(true);
 
-                    if (litresNeeded == -1)
+                    if (litresNeeded == float.MaxValue)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     }
-                    else if (litresNeeded == 0)
+                    else if (litresNeeded <= 0)
                     {
-                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
+                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderPlentyOfFuel, 0));
                     }
                     else if (litresNeeded > 0)
                     {
-                        AddFuel(litresNeeded);
-                        Console.WriteLine("Auto refuel to the end of the race, adding " + litresNeeded + " liters of fuel");                        
-                        if (litresNeeded > (int)fuelCapacity)
+                        int roundedLitresNeeded = (int)Math.Ceiling(litresNeeded);
+                        AddFuel(roundedLitresNeeded);
+                        Console.WriteLine("Auto refuel to the end of the race, adding " + roundedLitresNeeded + " liters of fuel");
+                        if (roundedLitresNeeded > fuelCapacity - currentFuel)
                         {
                             // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
-                            audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
+                            audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 0, secondsDelay: 4, abstractEvent: this));
                         }
                         else
                         {
-                            audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
+                            audioPlayer.playMessage(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0));
                         }
                     }
                 }
@@ -147,7 +152,7 @@ namespace CrewChiefV4.Events
                 {
                     playedIncidentsWarning = true;
                     audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderYouHave, incidentsCount, folderincidentPoints,
-                        Pause(200), folderincidentPointslimit, maxIncidentCount), 0, null));
+                        Pause(200), folderincidentPointslimit, maxIncidentCount), 0));
                     
                 }
                 else if (incidentsCount >= maxIncidentCount - 1 && !playedLastIncidentsLeftWarning)
@@ -177,20 +182,20 @@ namespace CrewChiefV4.Events
                 }
                 if (amount == 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0));
                     return;
                 }
                 if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.LITERS))
                 {
                     AddFuel(amount);
-                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
-                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel", 0,
+                        messageFragments: MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres)));
                 }
                 else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.GALLONS))
                 {
                     AddFuel(convertGallonsToLitres(amount));
-                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
-                        MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel", 0,
+                        messageFragments: MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons)));
                 }
                 else
                 {
@@ -198,14 +203,14 @@ namespace CrewChiefV4.Events
                     if (!Fuel.fuelReportsInGallon)
                     {
                         AddFuel(amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
-                            MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel", 0,
+                            messageFragments: MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderLitre : Fuel.folderLitres)));
                     }
                     else
                     {
                         AddFuel(convertGallonsToLitres(amount));
-                        audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel",
-                            MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons), 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage("iracing_add_fuel", 0,
+                            messageFragments: MessageContents(AudioPlayer.folderAcknowlegeOK, amount, amount == 1 ? Fuel.folderGallon : Fuel.folderGallons)));
                     }
                 }
                 return;
@@ -213,27 +218,28 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FUEL_TO_THE_END))
             {
                 Fuel fuelEvent = (Fuel)CrewChief.getEvent("Fuel");
-                int litresNeeded = fuelEvent.getLitresToEndOfRace();
+                float litresNeeded = fuelEvent.getLitresToEndOfRace(true);
 
-                if (litresNeeded == -1)
+                if (litresNeeded == float.MaxValue)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                 }
-                else if (litresNeeded == 0)
+                else if (litresNeeded <= 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(Fuel.folderPlentyOfFuel, 0));
                 }
                 else if(litresNeeded > 0)
                 {
-                    AddFuel(litresNeeded);
-                    if (litresNeeded > (int)fuelCapacity)
+                    int roundedLitresNeeded = (int)Math.Ceiling(litresNeeded);
+                    AddFuel(roundedLitresNeeded);
+                    if (roundedLitresNeeded > fuelCapacity - currentFuel) 
                     {
                         // if we have a known fuel capacity and this is less than the calculated amount of fuel we need, warn about it.
-                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 4, this));
+                        audioPlayer.playMessage(new QueuedMessage(Fuel.folderWillNeedToStopAgain, 0, secondsDelay: 4, abstractEvent: this));
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderFuelToEnd, 0));
                     }                    
                     return;
                 }
@@ -242,43 +248,43 @@ namespace CrewChiefV4.Events
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_TEAROFF))
             {
                 Tearoff();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_FAST_REPAIR))
             {
                 FastRepair();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_ALL))
             {
                 ClearAll();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_TYRES))
             {
                 ClearTires();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_WIND_SCREEN))
             {
                 ClearTearoff();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_FAST_REPAIR))
             {
                 ClearFastRepair();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CLEAR_FUEL))
             {
                 ClearFuel();
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_TYRE_PRESSURE) ||
@@ -301,7 +307,7 @@ namespace CrewChiefV4.Events
                 }
                 if (amount == 0)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderDidntUnderstand, 0));
                     return;
                 }
                 else
@@ -316,31 +322,31 @@ namespace CrewChiefV4.Events
                         ChangeTire(PitCommandModeTypes.RF, amount);
                         ChangeTire(PitCommandModeTypes.LR, amount);
                         ChangeTire(PitCommandModeTypes.RR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         return;
                     }
                     else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE_PRESSURE))
                     {
                         ChangeTire(PitCommandModeTypes.LF, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         return;
                     }
                     else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE_PRESSURE))
                     {
                         ChangeTire(PitCommandModeTypes.RF, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         return;
                     }
                     else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE_PRESSURE))
                     {
                         ChangeTire(PitCommandModeTypes.LR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         return;
                     }
                     else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE_PRESSURE))
                     {
                         ChangeTire(PitCommandModeTypes.RR, amount);
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                         return;
                     }
                 }
@@ -351,31 +357,31 @@ namespace CrewChiefV4.Events
                 ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
                 ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
                 ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_LEFT_TYRE))
             {
                 ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_FRONT_RIGHT_TYRE))
             {
                 ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_LEFT_TYRE))
             {
                 ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_REAR_RIGHT_TYRE))
             {
                 ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_LEFT_SIDE_TYRES))
@@ -383,7 +389,7 @@ namespace CrewChiefV4.Events
                 ClearTires();
                 ChangeTire(PitCommandModeTypes.LF, lastColdFLPressure);
                 ChangeTire(PitCommandModeTypes.LR, lastColdRLPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.PIT_STOP_CHANGE_RIGHT_SIDE_TYRES))
@@ -391,24 +397,24 @@ namespace CrewChiefV4.Events
                 ClearTires();
                 ChangeTire(PitCommandModeTypes.RF, lastColdFRPressure);
                 ChangeTire(PitCommandModeTypes.RR, lastColdRRPressure);
-                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderAcknowlegeOK, 0));
                 return;
             }
 
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.HOW_MANY_INCIDENT_POINTS))
             {
-                audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", MessageContents(folderYouHave, incidentsCount, folderincidents), 0, null));
+                audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/incidents", 0, messageFragments: MessageContents(folderYouHave, incidentsCount, folderincidents)));
                 return;
             }
             else if (SpeechRecogniser.ResultContains(voiceMessage, SpeechRecogniser.WHATS_THE_INCIDENT_LIMIT))
             {
                 if (hasLimitedIncidents)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderincidentlimit, maxIncidentCount), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", 0, messageFragments: MessageContents(folderincidentlimit, maxIncidentCount)));
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", MessageContents(folderUnlimited), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("Incidents/limit", 0, messageFragments: MessageContents(folderUnlimited)));
                 }
                 return;
             }
@@ -416,12 +422,12 @@ namespace CrewChiefV4.Events
             {
                 if(iRating != -1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", MessageContents(iRating), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", 0, messageFragments: MessageContents(iRating)));
                     return;
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     return;
                 }
             }
@@ -429,7 +435,7 @@ namespace CrewChiefV4.Events
             {
                 if (licenseLevel.Item2 == -1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     return;
                 }
                 if (licenseLevel.Item2 != -1)
@@ -463,11 +469,11 @@ namespace CrewChiefV4.Events
                     }
                     else
                     {
-                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                         return;
                     }
                     messageFragments.AddRange(MessageContents(wholeandfractional.Item1, NumberReader.folderPoint, wholeandfractional.Item2));
-                    QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", messageFragments, 0, null);
+                    QueuedMessage licenceLevelMessage = new QueuedMessage("License/license", 0, messageFragments: messageFragments);
                     audioPlayer.playDelayedImmediateMessage(licenceLevelMessage);
                 }
                 return;
@@ -476,12 +482,12 @@ namespace CrewChiefV4.Events
             {
                 if (strenghtOfField != -1)
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", MessageContents(strenghtOfField), 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage("license/irating", 0, messageFragments: MessageContents(strenghtOfField)));
                     return;
                 }
                 else
                 {
-                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0, null));
+                    audioPlayer.playMessageImmediately(new QueuedMessage(AudioPlayer.folderNoData, 0));
                     return;
                 }
             }

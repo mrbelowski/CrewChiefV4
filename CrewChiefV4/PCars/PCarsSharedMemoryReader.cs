@@ -5,6 +5,7 @@ using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrewChiefV4.PCars
@@ -39,7 +40,7 @@ namespace CrewChiefV4.PCars
             dataReadFromFileIndex = 0;
         }
 
-        public override Object ReadGameDataFromFile(String filename)
+        public override Object ReadGameDataFromFile(String filename, int pauseBeforeStart)
         {
             if (dataReadFromFile == null || filename != lastReadFileName)
             {
@@ -47,6 +48,7 @@ namespace CrewChiefV4.PCars
                 var filePathResolved = Utilities.ResolveDataFile(this.dataFilesPath, filename);
                 dataReadFromFile = DeSerializeObject<PCarsStructWrapper[]>(filePathResolved);
                 lastReadFileName = filename;
+                Thread.Sleep(pauseBeforeStart);
             }
             if (dataReadFromFile != null && dataReadFromFile.Length > dataReadFromFileIndex)
             {
@@ -116,7 +118,7 @@ namespace CrewChiefV4.PCars
                         }
                     }
                     PCarsStructWrapper structWrapper = new PCarsStructWrapper();
-                    structWrapper.ticksWhenRead = DateTime.Now.Ticks;
+                    structWrapper.ticksWhenRead = DateTime.UtcNow.Ticks;
                     structWrapper.data = _pcarsapistruct;
                     if (!forSpotter && dumpToFile && dataToDump != null && _pcarsapistruct.mTrackLocation != null &&
                         _pcarsapistruct.mTrackLocation.Length > 0)
@@ -139,9 +141,11 @@ namespace CrewChiefV4.PCars
                 try
                 {
                     memoryMappedFile.Dispose();
+                    memoryMappedFile = null;
                 }
                 catch (Exception) { }
             }
+            initialised = false;
         }
     }
 }

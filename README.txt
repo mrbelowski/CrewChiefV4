@@ -1,8 +1,8 @@
 CrewChief version 4.9
 
-Written by Jim Britton (main app, voice acting, Raceroom and PCars implementations), Morten Roslev (Assetto Corsa and iRacing implementation), Vytautas Leonavičius (rFactor2 implementation), Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
+Written by Jim Britton, Morten Roslev, Vytautas Leonavičius, Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
 
-Additional material from Scoops (fantastic track layout mapping work). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden, Lee Taylor and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
+Additional material from Scoops (fantastic track layout mapping work) and Longtomjr (F1 2018 UDP data format structs). Fantastic alternate spotter sounds by Geoffrey Lessel, Matt Orr (aka EmptyBox), Clare Britton, Mike Schreiner, Phil Linden, Lee Taylor and Micha (last name?). Also a thank you to Nick Thissen for his work on iRacingSdkWrapper.
 
 The source code for Crew Chief is available here: https://github.com/mrbelowski/CrewChiefV4
 
@@ -84,6 +84,8 @@ I've not finished implementing this but currently the app understands and respon
 "where will I be after a stop?" / "Estimate pit exit positions" / "What will happen if I pit?": play estimate of traffic and race positions on pit exit, if you were to pit on this lap
 "don't talk in the [corners / braking zones]" / "no messages in the [corners / braking zones]": delay non-critical messages if the player is in a challenging section of the track
 "talk to me anywhere" / "messages at any point": disable message delay in challenging parts of the track
+"set alarm to [hour] [minutes] [optional am/pm]" / "alarm me at [hour] [minutes] [optional am/pm]": sets the alarm clock at the given time, supports both 12 and 24 hour format
+"clear alarm clock" / "clear alarms": clears all the alarms set
 
 "pitstop add [X liters]" (adds X amount of fuel next pitstop, this option is iRacing only)
 "pitstop tearoff / pitstop windscreen" (enable next pitstop, this option is iRacing only)
@@ -206,22 +208,38 @@ the 32bit speech recognition installers can be downloaded here   : https://drive
 
 Donations
 ---------
-I made this because I wanted to make it and I enjoy making stuff. Working with the various quirks, errors and omissions in the shared data which the games provide hasn't been much fun, but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
-If you use it and like it and it becomes a regular and positive part of your sim racing, I'd be grateful if you would consider making a small donation. If only to stop my wife from complaining at me.
+We built and maintain this because we want to, we enjoy making stuff, and contributing to the Sim Racing community is awesome. Working with the various quirks, errors and omissions in the shared data which the games provide isn't much fun but it's all part of the challenge. Having said that, there are many many hours of hard work invested in this.
+If you use it and like it and it becomes a regular and positive part of your sim racing, we'd be grateful if you would consider making a small donation. If only to stop our wives from complaining at us.
 
-My paypal address is jim.britton@yahoo.co.uk
+The Crew Chief paypal address is jim.britton@yahoo.co.uk
 
 Or you can use this to donate directly:
 
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LW33XFXP4DPZE
 
-Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, I'm always on the lookout for bug reports and feature suggestions.
+Would be great to recoup some of the investment in making this, but the most important thing is that the app is used 'in anger' and enjoyed as part of the sim racing experience. To this end, we're always on the lookout for bug reports and feature suggestions.
 
 One final point. If the app says "Jim is faster than you", let him through :)
 
 
 Changelog
 ---------
+Version 4.9.5.7: Fixed RF2 tyre type mapping and added Hyper-Soft tyre; use correct 'drizzling' sounds; added spotter 'Florian' (in latest sound pack update)
+
+Version 4.9.5.6: Don't allow some messages to be inserted into the space between spotter messages; some work to prevent stale messages being played (e.g. after a delay caused by the spotter); don't play fuel warnings when on a low-fuel run in qualifying or practice; prevent some position messages being played twice; reduce repetition of some messages; ignore rear tyre and brake temperatures in FWD classes; more internal threading fixes; a few other tweaks and fixes
+
+Version 4.9.5.5: Macro overhaul - more flexible system which should be easier to work with. Includes example chat macros and an 'add fuel, XXX litres' macro (where XXX is 0 - 150) (R3E and pCars2 only). See the 'Advanced command macros' section of the help.txt file or http://thecrewchief.org/showthread.php?263-Command-key-press-macros&p=2378&viewfull=1#post2378 for more info; fixed some shutdown delays that can happen when closing the app without pressing 'stop' first; fixed radio channel sometimes being left open after a spotter call; fixed brake and suspension damage not being reset after repairs; added option to play pit box distance messages in feet ('Pit box distance countdown in feet'); added option to play a 5-4-3-2-1 style pit box count down ('Pit box time countdown' property, disabled by default). Reaches zero 30 metres from the pit stall by default (configurable with 'Pit box time countdown end point (metres)' property) - note that this may be inaccurate if the pit box is close to the start line due to the way lap distances work when in the pit lane, especially on tracks where the pitlane is significantly longer or shorter than the racing surface; make volume control sliders more fine grained to allow better control over volume; RF1 / AMS: revised cut track logic - should reduce cut track warnings; pCars2 - 'request pit' macro now checks the pit request state from the game and responds accordingly; pCars2 - added "cancel pit request" macro; internal bug fixes
+
+Version 4.9.5.3: Internal overhaul for better performance and stability. Fixes some threading / resource issues that could cause instability on shutdown, changes to how the internal event processing works to make it faster and less resource-hungry, removed 'disable immediate messages' option as this is no longer needed, reduced CPU overhead in lots of other places; fixed app crash when failing to initialise nAudio background sounds player; pCars2 - added 'pCars 2 spotter car length' property, default 5 metres (app was using whatever had been set in the pCars1 version of this property)
+
+Version 4.9.5.2: Fix laps-to-go calculation - it's now based on the number of laps completed by the overall leader so should be correct when you've been lapped; allow for changing conditions when determining the player's pace and best lap time - comparisons are only made to laps completed in broadly similar conditions and best lap set in the current conditions is used when working out things like expected laps remaining and required fuel loads; fixed rounding errors in fuel calculations that could accumulate to substantial amounts; use overall fuel consumption when determining how much fuel to add, rather than recent fuel consumption (the app sometimes under-fuelled if the player was fuel saving in the laps before his pit stop); R3E - fixed some missing state transitions; pCars2 - use updated RainDensity data for more fine-grained rain calls; some performance improvements
+
+Version 4.9.5.1: Added support for F1 2018 *spotter only*. This uses the UDP data stream sent by the game - the app listens on the default port 20777 (can be changed with the 'F1 2018 UDP Port' property). This is an early implementation so expect some bugs - please report them. Again, it's only the spotter - the app doesn't interpret any of the other game data so it won't give other calls or be able to answer any questions. I may add full support later, but as the crew chief built into the game is actually pretty good this isn't a high priority; RF2 - updated plugin to latest version.
+
+Version 4.9.5.0: Some fuel calculation fixes; reduced likelihood of yellow flag warnings for cars that have already quit to pits; added fuel-window messge in races which have no mandatory stop but will need a single fuel stop; some internal fixes; iRacing - fixed issues with opening lap data
+
+Version 4.9.4.9: Added alarm clock function - say 'set alarm at twenty oh five', for example or preset it in properties "Alarm time(s). "Enable alarm clock voice commands" must be enabled before the alarm clock voice commands works; alternate sound pack internal rework; mark abandoned laps as invalid; more ghost detection improvements; R3E - removed 'confirm penalty' macro as this is no longer needed and can cause issues; reworked fuel-to-end reserve calculation - you can now specify a number of laps worth of additional fuel to add as a reserve when fuelling to the end of the race. The 'Additional fuel to add to finish the race (number of laps worth)' property can be a whole or fractional number of laps; various bug fixes
+
 Version 4.9.4.6: Enable some of the multiclass warnings in qualifying and practice sessions; allow the wait timeout for Trigger Word speech recognition mode to be set ('Trigger word wait timeout', default 5 seconds). The app will wait this many milliseconds for a command after hearing the trigger word before giving up; fixed some broken personalisations from the last update (a few of the personalised messages weren't loading); iRacing - better 'oval' detection (should prevent the app using oval spotter sounds on some road courses); iRacing - allow 'add fuel' voice commands without a unit (e.g. "pitstop add 12") - will use whatever fuel unit the app is configured to read fuel amounts in
 
 Version 4.9.4.5: Added 'Trigger word' voice recognition mode. With this enabled voice recognition works a bit like 'OK Google' or Alexa - the app listens for a special keyword or phrase (configurable in the 'Speech recogniser trigger word' property, default value 'Chief'). When it hears the keyword it starts listening for a regular voice command for a few seconds. This doesn't work with nAudio input; some corner name mapping fixes; changed default interrupting behaviour so only spotter messages interrupt the Chief; only consider rear wheels as locked if both are locked at the same time in common FWD cars like WTCC and WTCR (prevents the app warning about locking the unloaded inside rear on turn-in); when requesting fuel estimates for a given time or lap count, the app now reads back the time / lap count you requested along with the fuel estimate (e.g. "for 25 minutes, we estimate you'll need about 30 litres"); R3E: reworked hotlap single practice mode detection - should prevent spotter playing in these game modes; various internal fixes

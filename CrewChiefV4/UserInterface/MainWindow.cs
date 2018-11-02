@@ -49,6 +49,7 @@ namespace CrewChiefV4
         private Boolean newDriverNamesAvailable = false;
         private Boolean newPersonalisationsAvailable = false;
 
+        // Shared with worker thread.  This should be disposed after root threads stopped, in GlobalResources.Dispose.
         private ControllerConfiguration controllerConfiguration;
 
         private CrewChief crewChief;
@@ -88,10 +89,19 @@ namespace CrewChiefV4
         private ToolStripMenuItem contextMenuGamesMenu;
         private ToolStripItem contextMenuPreferencesItem;
 
+        // instance 
         public static MainWindow instance = null;
+        public static object instanceLock = new object();
 
         // True, while we are in a constructor.
         private bool constructingWindow = false;
+
+        public static bool autoScrollConsole = true;
+        private Thread youWotThread = null;
+        private Thread assignButtonThread = null;
+        public bool formClosed = false;
+
+        public static bool soundTestMode = false;
 
         public void killChief()
         {
@@ -100,6 +110,20 @@ namespace CrewChiefV4
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            // Run immediately if requested.
+            // Note that it is not safe to run immidiately from the constructor, becasue form handle
+            // is created on a message pump, at undefined moment, which prevents Invoke from
+            // working while constructor is running.
+            Debug.Assert(this.IsHandleCreated);
+            if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
+                GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
+            {
+                doStartAppStuff();
+
+                // Will wait for threads to start, possible file load and enable the button.
+                ThreadManager.DoWatchStartup(crewChief);
+            }
+
             if (forceMinWindowSize)
             {
                 this.MinimumSize = new System.Drawing.Size(1160, 730);
@@ -116,209 +140,235 @@ namespace CrewChiefV4
             if (!CrewChief.Debugging ||
                 SoundPackVersionsHelper.currentSoundPackVersion <= 0 || SoundPackVersionsHelper.currentPersonalisationsVersion <= 0 || SoundPackVersionsHelper.currentDriverNamesVersion <=0)
             {
-                new Thread(() =>
+                var checkForUpdatesThread = new Thread(() =>
                 {
-                    Console.WriteLine("Checking for updates");
-                    String firstUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL2 : autoUpdateXMLURL1;
-                    String secondUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL1 : autoUpdateXMLURL2;
-
-                    Thread.CurrentThread.IsBackground = true;
-                    // now the sound packs
-                    downloadSoundPackButton.Text = Configuration.getUIString("checking_sound_pack_version");
-                    downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
-                    downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
-
-                    String[] commandLineArgs = Environment.GetCommandLineArgs();
-                    Boolean skipUpdates = false;
-                    if (commandLineArgs != null)
-                    {
-                        foreach (String arg in commandLineArgs)
-                        {
-                            if ("SKIP_UPDATES".Equals(arg))
-                            {
-                                Console.WriteLine("Skipping application update check. To enable this check, run the app *without* the SKIP_UPDATES command line argument");
-                                skipUpdates = true;
-                                break;
-                            }
-                        }
-                    }
-                    Boolean gotUpdateData = false;
                     try
                     {
-                        if (!skipUpdates)
+                        Console.WriteLine("Checking for updates");
+                        String firstUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL2 : autoUpdateXMLURL1;
+                        String secondUpdate = preferAlternativeDownloadSite ? autoUpdateXMLURL1 : autoUpdateXMLURL2;
+
+                        Thread.CurrentThread.IsBackground = true;
+                        // now the sound packs
+                        downloadSoundPackButton.Text = Configuration.getUIString("checking_sound_pack_version");
+                        downloadDriverNamesButton.Text = Configuration.getUIString("checking_driver_names_version");
+                        downloadPersonalisationsButton.Text = Configuration.getUIString("checking_personalisations_version");
+
+                        String[] commandLineArgs = Environment.GetCommandLineArgs();
+                        Boolean skipUpdates = false;
+                        if (commandLineArgs != null)
                         {
-                            AutoUpdater.Start(firstUpdate);
+                            foreach (String arg in commandLineArgs)
+                            {
+                                if ("SKIP_UPDATES".Equals(arg))
+                                {
+                                    Console.WriteLine("Skipping application update check. To enable this check, run the app *without* the SKIP_UPDATES command line argument");
+                                    skipUpdates = true;
+                                    break;
+                                }
+                            }
                         }
-                        string xml = new WebClient().DownloadString(firstUpdate);
-                        gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
-                    }
-                    catch (Exception) { }
-                    if (gotUpdateData)
-                    {
-                        Console.WriteLine("Got update data from primary URL: " + firstUpdate.Substring(0, 24));
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unable to get update data with primary URL, trying secondary");
+                        Boolean gotUpdateData = false;
                         try
                         {
                             if (!skipUpdates)
                             {
-                                AutoUpdater.Start(secondUpdate);
+                                AutoUpdater.Start(firstUpdate);
                             }
-                            string xml = new WebClient().DownloadString(secondUpdate);
+                            string xml = new WebClient().DownloadString(firstUpdate);
                             gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                         }
                         catch (Exception) { }
-                    }
-                   
-                    if (gotUpdateData)
-                    {
-                        downloadSoundPackButton.Enabled = false;
-                        downloadSoundPackButton.BackColor = Color.LightGray;
-                        downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
-                        if (SoundPackVersionsHelper.latestSoundPackVersion == -1 && SoundPackVersionsHelper.currentSoundPackVersion == -1)
+                        if (gotUpdateData)
                         {
-                            downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");                                
-                        }
-                        else if (SoundPackVersionsHelper.latestSoundPackVersion > SoundPackVersionsHelper.currentSoundPackVersion &&
-                            SoundPackVersionsHelper.voiceMessageUpdatePacks.Count > 0)
-                        {
-                            SoundPackVersionsHelper.SoundPackData soundPackUpdateData = SoundPackVersionsHelper.voiceMessageUpdatePacks[0];
-                            foreach (SoundPackVersionsHelper.SoundPackData soundPack in SoundPackVersionsHelper.voiceMessageUpdatePacks)
-                            {
-                                if (SoundPackVersionsHelper.currentSoundPackVersion < soundPack.upgradeFromVersion)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    soundPackUpdateData = soundPack;
-                                }
-                            }
-                            soundPackDownloadURL = soundPackUpdateData.url;
-                            if (soundPackDownloadURL != null)
-                            {
-                                Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date, next update is " + soundPackUpdateData.url);
-                                willNeedAnotherSoundPackDownload = soundPackUpdateData.willRequireAnotherUpdate;
-                                downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
-                                    "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
-                                downloadSoundPackButton.Enabled = true;
-                                downloadSoundPackButton.BackColor = Color.LightGreen;
-                                newSoundPackAvailable = true;
-                            }
-                        }
-
-                        downloadPersonalisationsButton.Enabled = false;
-                        downloadPersonalisationsButton.BackColor = Color.LightGray;
-                        downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
-                        if (SoundPackVersionsHelper.latestPersonalisationsVersion == -1 && SoundPackVersionsHelper.currentPersonalisationsVersion == -1)
-                        {
-                            downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");                                
-                        }
-                        else if (SoundPackVersionsHelper.latestPersonalisationsVersion > SoundPackVersionsHelper.currentPersonalisationsVersion &&
-                            SoundPackVersionsHelper.personalisationUpdatePacks.Count > 0)
-                        {
-                            SoundPackVersionsHelper.SoundPackData personalisationPackUpdateData = SoundPackVersionsHelper.personalisationUpdatePacks[0];
-                            foreach (SoundPackVersionsHelper.SoundPackData personalisationPack in SoundPackVersionsHelper.personalisationUpdatePacks)
-                            {
-                                if (SoundPackVersionsHelper.currentPersonalisationsVersion < personalisationPack.upgradeFromVersion)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    personalisationPackUpdateData = personalisationPack;
-                                }
-                            }
-                            personalisationsDownloadURL = personalisationPackUpdateData.url;
-                            if (personalisationsDownloadURL != null)
-                            {
-                                Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date, next update is " + personalisationPackUpdateData.url);
-                                willNeedAnotherPersonalisationsDownload = personalisationPackUpdateData.willRequireAnotherUpdate;
-                                downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
-                                    "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
-                                downloadPersonalisationsButton.Enabled = true;
-                                downloadPersonalisationsButton.BackColor = Color.LightGreen;
-                                newPersonalisationsAvailable = true;
-                            }
-                        }
-
-                        downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
-                        downloadDriverNamesButton.Enabled = false;
-                        downloadDriverNamesButton.BackColor = Color.LightGray;
-                        if (SoundPackVersionsHelper.latestDriverNamesVersion == -1 && SoundPackVersionsHelper.currentDriverNamesVersion == -1)
-                        {
-                            downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
-                        }
-                        else if (SoundPackVersionsHelper.latestDriverNamesVersion > SoundPackVersionsHelper.currentDriverNamesVersion &&
-                            SoundPackVersionsHelper.drivernamesUpdatePacks.Count > 0)
-                        {
-                            SoundPackVersionsHelper.SoundPackData drivernamesPackUpdateData = SoundPackVersionsHelper.drivernamesUpdatePacks[0];
-                            foreach (SoundPackVersionsHelper.SoundPackData drivernamesPack in SoundPackVersionsHelper.drivernamesUpdatePacks)
-                            {
-                                if (SoundPackVersionsHelper.currentDriverNamesVersion < drivernamesPack.upgradeFromVersion)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    drivernamesPackUpdateData = drivernamesPack;
-                                }
-                            }
-                            drivernamesDownloadURL = drivernamesPackUpdateData.url;
-                            if (drivernamesDownloadURL != null)
-                            {
-                                Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date, next update is " + drivernamesPackUpdateData.url);
-                                willNeedAnotherDrivernamesDownload = drivernamesPackUpdateData.willRequireAnotherUpdate;
-                                downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
-                                    "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
-                                downloadDriverNamesButton.Enabled = true;
-                                downloadDriverNamesButton.BackColor = Color.LightGreen;
-                                newDriverNamesAvailable = true;
-                            }
-                        }
-
-                        if (newSoundPackAvailable || newPersonalisationsAvailable || newDriverNamesAvailable)
-                        {
-                            // Ok, we have something available for download (any of the buttons is green).
-                            // Restore CC once so that user gets higher chance of noticing.
-                            // I am not sure what is the best approach, we could also have text in the context menu,
-                            // but I definitely dislike Balloons and other distracting methods.  But, basically if we choose
-                            // to do anything, do it here.
-                            // This has limitation if, say, we have sound pack available, and at next startup we have driver pack
-                            // available, one property is not enough.  But this is ultra rare and not worth complications.
-
-                            if (!UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
-                            {
-                                // Do this once per update availability.
-                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", true);
-                                UserSettings.GetUserSettings().saveUserSettings();
-
-                                // Slight race with minimize on startup :D
-                                this.Invoke((MethodInvoker)delegate
-                                {
-                                    this.RestoreFromTray();
-                                });
-                            }
+                            Console.WriteLine("Got update data from primary URL: " + firstUpdate.Substring(0, 24));
                         }
                         else
                         {
-                            // If there are no updates available, clear the update_notify_attempted flag if it is set.
-                            if (UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                            Console.WriteLine("Unable to get update data with primary URL, trying secondary");
+                            try
                             {
-                                UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
-                                UserSettings.GetUserSettings().saveUserSettings();
+                                if (formClosed)
+                                {
+                                    return;
+                                }
+                                if (!skipUpdates)
+                                {
+                                    AutoUpdater.Start(secondUpdate);
+                                }
+                                string xml = new WebClient().DownloadString(secondUpdate);
+                                gotUpdateData = SoundPackVersionsHelper.parseUpdateData(xml);
                             }
+                            catch (Exception) { }
                         }
+                        if (formClosed)
+                        {
+                            return;
+                        }
+                        if (gotUpdateData)
+                        {
+                            downloadSoundPackButton.Enabled = false;
+                            downloadSoundPackButton.BackColor = Color.LightGray;
+                            downloadSoundPackButton.Text = Configuration.getUIString("sound_pack_is_up_to_date");
+                            if (SoundPackVersionsHelper.latestSoundPackVersion == -1 && SoundPackVersionsHelper.currentSoundPackVersion == -1)
+                            {
+                                downloadSoundPackButton.Text = Configuration.getUIString("no_sound_pack_detected_unable_to_locate_update");
+                            }
+                            else if (SoundPackVersionsHelper.latestSoundPackVersion > SoundPackVersionsHelper.currentSoundPackVersion &&
+                                SoundPackVersionsHelper.voiceMessageUpdatePacks.Count > 0)
+                            {
+                                SoundPackVersionsHelper.SoundPackData soundPackUpdateData = SoundPackVersionsHelper.voiceMessageUpdatePacks[0];
+                                foreach (SoundPackVersionsHelper.SoundPackData soundPack in SoundPackVersionsHelper.voiceMessageUpdatePacks)
+                                {
+                                    if (SoundPackVersionsHelper.currentSoundPackVersion < soundPack.upgradeFromVersion)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        soundPackUpdateData = soundPack;
+                                    }
+                                }
+                                soundPackDownloadURL = soundPackUpdateData.url;
+                                if (soundPackDownloadURL != null)
+                                {
+                                    Console.WriteLine("Current sound pack version " + SoundPackVersionsHelper.currentSoundPackVersion + " is out of date, next update is " + soundPackUpdateData.url);
+                                    willNeedAnotherSoundPackDownload = soundPackUpdateData.willRequireAnotherUpdate;
+                                    downloadSoundPackButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestSoundPackVersion == -1 ?
+                                        "no_sound_pack_detected_press_to_download" : "updated_sound_pack_available_press_to_download");
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadSoundPackButton.Enabled = true;
+                                    }
+                                    downloadSoundPackButton.BackColor = Color.LightGreen;
+                                    newSoundPackAvailable = true;
+                                }
+                            }
 
-                        Console.WriteLine("Check for updates completed");
+                            downloadPersonalisationsButton.Enabled = false;
+                            downloadPersonalisationsButton.BackColor = Color.LightGray;
+                            downloadPersonalisationsButton.Text = Configuration.getUIString("personalisations_are_up_to_date");
+                            if (SoundPackVersionsHelper.latestPersonalisationsVersion == -1 && SoundPackVersionsHelper.currentPersonalisationsVersion == -1)
+                            {
+                                downloadPersonalisationsButton.Text = Configuration.getUIString("no_personalisations_detected_unable_to_locate_update");
+                            }
+                            else if (SoundPackVersionsHelper.latestPersonalisationsVersion > SoundPackVersionsHelper.currentPersonalisationsVersion &&
+                                SoundPackVersionsHelper.personalisationUpdatePacks.Count > 0)
+                            {
+                                SoundPackVersionsHelper.SoundPackData personalisationPackUpdateData = SoundPackVersionsHelper.personalisationUpdatePacks[0];
+                                foreach (SoundPackVersionsHelper.SoundPackData personalisationPack in SoundPackVersionsHelper.personalisationUpdatePacks)
+                                {
+                                    if (SoundPackVersionsHelper.currentPersonalisationsVersion < personalisationPack.upgradeFromVersion)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        personalisationPackUpdateData = personalisationPack;
+                                    }
+                                }
+                                personalisationsDownloadURL = personalisationPackUpdateData.url;
+                                if (personalisationsDownloadURL != null)
+                                {
+                                    Console.WriteLine("Current personalisations pack version " + SoundPackVersionsHelper.currentPersonalisationsVersion + " is out of date, next update is " + personalisationPackUpdateData.url);
+                                    willNeedAnotherPersonalisationsDownload = personalisationPackUpdateData.willRequireAnotherUpdate;
+                                    downloadPersonalisationsButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestPersonalisationsVersion == -1 ?
+                                        "no_personalisations_detected_press_to_download" : "updated_personalisations_available_press_to_download");
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadPersonalisationsButton.Enabled = true;
+                                    }
+                                    downloadPersonalisationsButton.BackColor = Color.LightGreen;
+                                    newPersonalisationsAvailable = true;
+                                }
+                            }
+
+                            downloadDriverNamesButton.Text = Configuration.getUIString("driver_names_are_up_to_date");
+                            downloadDriverNamesButton.Enabled = false;
+                            downloadDriverNamesButton.BackColor = Color.LightGray;
+                            if (SoundPackVersionsHelper.latestDriverNamesVersion == -1 && SoundPackVersionsHelper.currentDriverNamesVersion == -1)
+                            {
+                                downloadDriverNamesButton.Text = Configuration.getUIString("no_driver_names_detected_unable_to_locate_update");
+                            }
+                            else if (SoundPackVersionsHelper.latestDriverNamesVersion > SoundPackVersionsHelper.currentDriverNamesVersion &&
+                                SoundPackVersionsHelper.drivernamesUpdatePacks.Count > 0)
+                            {
+                                SoundPackVersionsHelper.SoundPackData drivernamesPackUpdateData = SoundPackVersionsHelper.drivernamesUpdatePacks[0];
+                                foreach (SoundPackVersionsHelper.SoundPackData drivernamesPack in SoundPackVersionsHelper.drivernamesUpdatePacks)
+                                {
+                                    if (SoundPackVersionsHelper.currentDriverNamesVersion < drivernamesPack.upgradeFromVersion)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        drivernamesPackUpdateData = drivernamesPack;
+                                    }
+                                }
+                                drivernamesDownloadURL = drivernamesPackUpdateData.url;
+                                if (drivernamesDownloadURL != null)
+                                {
+                                    Console.WriteLine("Current driver names pack version " + SoundPackVersionsHelper.currentDriverNamesVersion + " is out of date, next update is " + drivernamesPackUpdateData.url);
+                                    willNeedAnotherDrivernamesDownload = drivernamesPackUpdateData.willRequireAnotherUpdate;
+                                    downloadDriverNamesButton.Text = Configuration.getUIString(SoundPackVersionsHelper.latestDriverNamesVersion == -1 ?
+                                        "no_driver_names_detected_press_to_download" : "updated_driver_names_available_press_to_download");
+                                    if (!IsAppRunning)
+                                    {
+                                        downloadDriverNamesButton.Enabled = true;
+                                    }
+                                    downloadDriverNamesButton.BackColor = Color.LightGreen;
+                                    newDriverNamesAvailable = true;
+                                }
+                            }
+
+                            if (newSoundPackAvailable || newPersonalisationsAvailable || newDriverNamesAvailable)
+                            {
+                                // Ok, we have something available for download (any of the buttons is green).
+                                // Restore CC once so that user gets higher chance of noticing.
+                                // I am not sure what is the best approach, we could also have text in the context menu,
+                                // but I definitely dislike Balloons and other distracting methods.  But, basically if we choose
+                                // to do anything, do it here.
+                                // This has limitation if, say, we have sound pack available, and at next startup we have driver pack
+                                // available, one property is not enough.  But this is ultra rare and not worth complications.
+
+                                if (!UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                                {
+                                    // Do this once per update availability.
+                                    UserSettings.GetUserSettings().setProperty("update_notify_attempted", true);
+                                    UserSettings.GetUserSettings().saveUserSettings();
+
+                                    // Slight race with minimize on startup :D
+                                    this.Invoke((MethodInvoker)delegate
+                                    {
+                                        this.RestoreFromTray();
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                // If there are no updates available, clear the update_notify_attempted flag if it is set.
+                                if (UserSettings.GetUserSettings().getBoolean("update_notify_attempted"))
+                                {
+                                    UserSettings.GetUserSettings().setProperty("update_notify_attempted", false);
+                                    UserSettings.GetUserSettings().saveUserSettings();
+                                }
+                            }
+
+                            Console.WriteLine("Check for updates completed");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unable to get update data");
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        Console.WriteLine("Unable to get update data");
+                        // This can throw on form close.
                     }
-                }).Start();
+                });
+                checkForUpdatesThread.Name = "MainWindow.checkForUpdatesThread";
+                ThreadManager.RegisterResourceThread(checkForUpdatesThread);
+                checkForUpdatesThread.Start();
             }
             else
             {
@@ -361,14 +411,25 @@ namespace CrewChiefV4
 
         public void updateMessagesVolume(float messagesVolume)
         {
-            currentVolume = messagesVolume;
-            setMessagesVolume(messagesVolume, false);
-            messagesVolumeSlider.Value = (int)(messagesVolume * 10f);
+            if (messagesVolume < 0)
+            {
+                currentVolume = 0;
+            }
+            else if (messagesVolume > 1)
+            {
+                currentVolume = 1;
+            }
+            else
+            {
+                currentVolume = messagesVolume;
+            }
+            setMessagesVolume(currentVolume, false);
+            messagesVolumeSlider.Value = (int)(currentVolume * 100f);
         }
 
         private void messagesVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)messagesVolumeSlider.Value / 10;
+            float volFloat = (float)messagesVolumeSlider.Value / 100;
             setMessagesVolume(volFloat, false);
             currentVolume = volFloat;
             UserSettings.GetUserSettings().setProperty("messages_volume", volFloat);
@@ -389,7 +450,7 @@ namespace CrewChiefV4
 
         private void backgroundVolumeSlider_Scroll(object sender, EventArgs e)
         {
-            float volFloat = (float)backgroundVolumeSlider.Value / 10;
+            float volFloat = (float)backgroundVolumeSlider.Value / 100;
             UserSettings.GetUserSettings().setProperty("background_volume", volFloat);
             UserSettings.GetUserSettings().saveUserSettings();
         }
@@ -547,11 +608,14 @@ namespace CrewChiefV4
                     }
                 }
             }
-        }
-
-        private void updateSelectedGame()
-        {
-
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -642,6 +706,7 @@ namespace CrewChiefV4
 
 
             notificationTrayIcon.ContextMenuStrip = cms;
+            notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");
         }
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
@@ -651,7 +716,11 @@ namespace CrewChiefV4
 
         public MainWindow()
         {
-            MainWindow.instance = this;
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = this;
+            }
+
             this.constructingWindow = true;
 
             InitializeComponent();
@@ -690,6 +759,8 @@ namespace CrewChiefV4
             }
 
             controllerConfiguration = new ControllerConfiguration(this);
+            GlobalResources.controllerConfiguration = controllerConfiguration;
+
             setSelectedGameType();
 
             this.app_version.Text = Configuration.getUIString("version") + ": " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -699,18 +770,11 @@ namespace CrewChiefV4
             this.playbackInterval.Visible = CrewChief.Debugging;
            
             String[] commandLineArgs = Environment.GetCommandLineArgs();
-            if (commandLineArgs != null)
+            if (MainWindow.soundTestMode)
             {
-                foreach (String arg in commandLineArgs)
-                {
-                    if (arg.Equals("SOUND_TEST"))
-                    {
-                        Console.WriteLine("Sound-test enabled");
-                        this.consoleTextBox.Size = new System.Drawing.Size(793, 285);
-                        this.buttonSmokeTest.Visible = true;
-                        this.smokeTestTextBox.Visible = true;
-                    }
-                }
+                Console.WriteLine("Sound-test enabled");
+                this.buttonSmokeTest.Visible = true;
+                this.smokeTestTextBox.Visible = true;
             }
             if (CrewChief.Debugging)
             {
@@ -877,7 +941,7 @@ namespace CrewChiefV4
             float messagesVolume = UserSettings.GetUserSettings().getFloat("messages_volume");
             float backgroundVolume = UserSettings.GetUserSettings().getFloat("background_volume");
             updateMessagesVolume(messagesVolume);
-            backgroundVolumeSlider.Value = (int)(backgroundVolume * 10f);
+            backgroundVolumeSlider.Value = (int)(backgroundVolume * 100f);
 
             Console.WriteLine("Loading controller settings");
             getControllers();
@@ -943,12 +1007,6 @@ namespace CrewChiefV4
             updateActions();
             this.assignButtonToAction.Enabled = false;
             this.deleteAssigmentButton.Enabled = false;
-
-            if (UserSettings.GetUserSettings().getBoolean("run_immediately") &&
-                GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text) != null)
-            {
-                doStartAppStuff();
-            }
 
             this.ResumeLayout();
 
@@ -1049,14 +1107,26 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Invoking speech recognition...");
                             crewChief.speechRecogniser.recognizeAsyncCancel();
-                            new Thread(() =>
+                            if (youWotThread == null
+                                || !youWotThread.IsAlive)
                             {
-                                Thread.Sleep(2000);
-                                if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                ThreadManager.UnregisterTemporaryThread(youWotThread);
+                                youWotThread = new Thread(() =>
                                 {
-                                    crewChief.youWot(false);
-                                }
-                            }).Start();
+                                    Utilities.InterruptedSleep(2000 /*totalWaitMillis*/, 500 /*waitWindowMillis*/, () => crewChief.running /*keepWaitingPredicate*/);
+                                    if (!channelOpen && !SpeechRecogniser.gotRecognitionResult)
+                                    {
+                                        crewChief.youWot(false);
+                                    }
+                                });
+                                youWotThread.Name = "MainWindow.youWotThread";
+                                ThreadManager.RegisterTemporaryThread(youWotThread);
+                                youWotThread.Start();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Skipping new instance of youWot thread because previous is still running.");
+                            }
                         }
                         channelOpen = false;
                     }
@@ -1066,7 +1136,7 @@ namespace CrewChiefV4
 
         private void listenForButtons()
         {
-            DateTime lastButtoncheck = DateTime.Now;
+            DateTime lastButtoncheck = DateTime.UtcNow;
             if (crewChief.speechRecogniser.initialised && voiceOption == VoiceOptionEnum.TOGGLE)
             {
                 Console.WriteLine("Running speech recognition in 'toggle button' mode");
@@ -1074,7 +1144,7 @@ namespace CrewChiefV4
             while (runListenForButtonPressesThread)
             {
                 Thread.Sleep(100);
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 controllerConfiguration.pollForButtonClicks(voiceOption == VoiceOptionEnum.TOGGLE);
                 int nextPollWait = 0;
                 if (now > lastButtoncheck.Add(buttonCheckInterval))
@@ -1240,7 +1310,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Increasing volume");
-                            updateMessagesVolume(currentVolume + 0.1f);
+                            updateMessagesVolume(currentVolume + 0.05f);
                         }
                         nextPollWait = 200;
                     }
@@ -1257,7 +1327,7 @@ namespace CrewChiefV4
                         else
                         {
                             Console.WriteLine("Decreasing volume");
-                            updateMessagesVolume(currentVolume - 0.1f);
+                            updateMessagesVolume(currentVolume - 0.05f);
                         }
                         nextPollWait = 200;
                     }
@@ -1286,6 +1356,50 @@ namespace CrewChiefV4
         private void startApplicationButton_Click(object sender, EventArgs e)
         {
             doStartAppStuff();
+
+            if (IsAppRunning)
+            {
+                ThreadManager.DoWatchStartup(crewChief);
+            }
+            else
+            {
+                ThreadManager.DoWatchStop(crewChief);
+            }
+        }
+
+        private void uiSyncAppStart()
+        {
+            this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
+            this.assignButtonToAction.Enabled = false;
+            this.deleteAssigmentButton.Enabled = false;
+            this.groupBox1.Enabled = false;
+            this.propertiesButton.Enabled = false;
+            this.scanControllersButton.Enabled = false;
+            this.personalisationBox.Enabled = false;
+            this.chiefNameBox.Enabled = false;
+            this.spotterNameBox.Enabled = false;
+            this.recordSession.Enabled = false;
+            this.gameDefinitionList.Enabled = false;
+            this.contextMenuPreferencesItem.Enabled = false;
+            this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
+        }
+
+        public void uiSyncAppStop()
+        {
+            this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
+                this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
+
+            this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
+            this.propertiesButton.Enabled = true;
+            this.groupBox1.Enabled = true;
+            this.scanControllersButton.Enabled = true;
+            this.personalisationBox.Enabled = true;
+            this.chiefNameBox.Enabled = true;
+            this.spotterNameBox.Enabled = true;
+            this.recordSession.Enabled = true;
+            this.gameDefinitionList.Enabled = true;
+            this.contextMenuPreferencesItem.Enabled = true;
+            this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");
         }
 
         private void doStartAppStuff()
@@ -1293,66 +1407,75 @@ namespace CrewChiefV4
             IsAppRunning = !IsAppRunning;
             if (_IsAppRunning)
             {
+                startApplicationButton.Enabled = false;
+                uiSyncAppStart();
+                Console.WriteLine("Pausing console scrolling");
+                MainWindow.autoScrollConsole = false;
                 GameDefinition gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(gameDefinitionList.Text);
                 if (gameDefinition != null)
                 {
                     crewChief.setGameDefinition(gameDefinition);
+                    MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
+                    CarData.loadCarClassData();
+                    TrackData.loadTrackLandmarksData();
+                    ThreadStart crewChiefWork = runApp;
+                    Thread crewChiefThread = new Thread(crewChiefWork);
+                    crewChiefThread.Name = "MainWindow.runApp";
+                    ThreadManager.RegisterRootThread(crewChiefThread);
+
+                    // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
+                    // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
+                    // the AutoUpdater triggers and steals focus while the player is racing
+                    AutoUpdater.Stop();
+
+                    crewChief.onRestart();
+                    crewChiefThread.Start();
+                    runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
+                        && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
+                    if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
+                    {
+                        Console.WriteLine("Listening on default audio input device");
+                        ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
+                        Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
+
+                        channelOpenButtonListenerThread.Name = "MainWindow.listenForChannelOpen";
+                        ThreadManager.RegisterRootThread(channelOpenButtonListenerThread);
+
+                        channelOpenButtonListenerThread.Start();
+                    }
+                    else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
+                        crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
+                    {
+                        Console.WriteLine("Running speech recognition in 'always on' mode");
+                        crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
+                        crewChief.speechRecogniser.startContinuousListening();
+                    }
+                    if (runListenForButtonPressesThread)
+                    {
+                        Console.WriteLine("Listening for buttons");
+                        ThreadStart buttonPressesListenerWork = listenForButtons;
+                        Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
+
+                        buttonPressesListenerThread.Name = "MainWindow.listenForButtons";
+                        ThreadManager.RegisterRootThread(buttonPressesListenerThread);
+
+                        buttonPressesListenerThread.Start();
+                    }
+
                 }
                 else
                 {
                     MessageBox.Show(Configuration.getUIString("please_choose_a_game_option"), Configuration.getUIString("no_game_selected"),
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    IsAppRunning = false;
                     return;
-                }
-
-                MacroManager.initialise(crewChief.audioPlayer, crewChief.speechRecogniser);
-                CarData.loadCarClassData();
-                TrackData.loadTrackLandmarksData();
-                this.runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
-                this.assignButtonToAction.Enabled = false;
-                this.deleteAssigmentButton.Enabled = false;
-                this.groupBox1.Enabled = false;
-                this.propertiesButton.Enabled = false;
-                this.scanControllersButton.Enabled = false;
-                this.personalisationBox.Enabled = false;
-                this.chiefNameBox.Enabled = false;
-                this.spotterNameBox.Enabled = false;
-                this.recordSession.Enabled = false;
-                ThreadStart crewChiefWork = runApp;
-                Thread crewChiefThread = new Thread(crewChiefWork);
-
-                // this call is not part of the standard AutoUpdater API - I added a 'stopped' flag to prevent the auto updater timer
-                // or other Threads firing when the game is running. It's not needed 99% of the time, it just stops that edge case where
-                // the AutoUpdater triggers and steals focus while the player is racing
-                AutoUpdater.Stop();
-
-                crewChiefThread.Start();
-                runListenForChannelOpenThread = controllerConfiguration.listenForChannelOpen()
-                    && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised;
-                if (runListenForChannelOpenThread && voiceOption == VoiceOptionEnum.HOLD && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
-                {
-                    Console.WriteLine("Listening on default audio input device");
-                    ThreadStart channelOpenButtonListenerWork = listenForChannelOpen;
-                    Thread channelOpenButtonListenerThread = new Thread(channelOpenButtonListenerWork);
-                    channelOpenButtonListenerThread.Start();
-                }
-                else if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TRIGGER_WORD) && 
-                    crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
-                {
-                    Console.WriteLine("Running speech recognition in 'always on' mode");
-                    crewChief.speechRecogniser.voiceOptionEnum = voiceOption;
-                    crewChief.speechRecogniser.startContinuousListening();
-                }
-                if (runListenForButtonPressesThread)
-                {
-                    Console.WriteLine("Listening for buttons");
-                    ThreadStart buttonPressesListenerWork = listenForButtons;
-                    Thread buttonPressesListenerThread = new Thread(buttonPressesListenerWork);
-                    buttonPressesListenerThread.Start();
                 }
             }
             else
             {
+                startApplicationButton.Enabled = false;
+                Console.WriteLine("Resuming console scrolling");
+                MainWindow.autoScrollConsole = true;
                 MacroManager.stop();
                 if ((voiceOption == VoiceOptionEnum.ALWAYS_ON || voiceOption == VoiceOptionEnum.TOGGLE) && crewChief.speechRecogniser != null && crewChief.speechRecogniser.initialised)
                 {
@@ -1365,33 +1488,31 @@ namespace CrewChiefV4
                     }
                     catch (Exception) { }
                 }
-                this.deleteAssigmentButton.Enabled = this.buttonActionSelect.SelectedIndex > -1 &&
-                    this.controllerConfiguration.buttonAssignments[this.buttonActionSelect.SelectedIndex].joystick != null;
-                this.assignButtonToAction.Enabled = this.buttonActionSelect.SelectedIndex > -1 && this.controllersList.SelectedIndex > -1;
                 stopApp();
                 Console.WriteLine("Application stopped");
-                this.propertiesButton.Enabled = true;
-                this.groupBox1.Enabled = true;
-                this.scanControllersButton.Enabled = true;
-                this.personalisationBox.Enabled = true;
-                this.chiefNameBox.Enabled = true;
-                this.spotterNameBox.Enabled = true;
-                this.recordSession.Enabled = true;
                 DriverTrainingService.completeRecordingPaceNotes();
                 DriverTrainingService.stopPlayingPaceNotes();
             }
-
-            this.gameDefinitionList.Enabled = !this._IsAppRunning;
-            this.contextMenuPreferencesItem.Enabled = !this._IsAppRunning;
-
-            if (this._IsAppRunning)
-                this.notificationTrayIcon.Text = string.Format(Configuration.getUIString("running_context_menu"), this.gameDefinitionList.Text);
-            else
-                this.notificationTrayIcon.Text = Configuration.getUIString("idling_context_menu");  // Or idling, smoking, any good jokes?
         }
 
+
+        // called from the close callback on the main form
         private void stopApp(object sender, FormClosedEventArgs e)
         {
+            lock (MainWindow.instanceLock)
+            {
+                MainWindow.instance = null;
+                formClosed = true;
+            }
+
+            // Shutdown long running threads:
+            
+            // SoundCache spawns a Thread to lazy-load the sound data. Cancel this:
+            SoundCache.cancelLazyLoading = true;
+            
+            // Make sure we quit button assignment listener.
+            controllerConfiguration.listenForAssignment = false;
+
             stopApp();
         }
 
@@ -1399,11 +1520,8 @@ namespace CrewChiefV4
         {
             String filenameToRun = null;
             Boolean record = false;
-            if (filenameTextbox.Text != null && filenameTextbox.Text.Count() > 0)
+            if (!String.IsNullOrWhiteSpace(filenameTextbox.Text))
             {
-                // This will be reenabled once file is deserialized or on failure.
-                this.startApplicationButton.Enabled = false;
-
                 filenameToRun = filenameTextbox.Text;
                 if (this.playbackInterval.Text.Length > 0)
                 {
@@ -1429,12 +1547,6 @@ namespace CrewChiefV4
 
         private void stopApp()
         {
-            if (this.recordSession.Checked)
-            {
-                // This will be reenabled once dump to file succeeds or fails.
-                this.startApplicationButton.Enabled = false;
-            }
-
             runListenForChannelOpenThread = false;
             runListenForButtonPressesThread = false;
             crewChief.stop();
@@ -1498,7 +1610,10 @@ namespace CrewChiefV4
                     isAssigningButton = true;
                     this.assignButtonToAction.Text = Configuration.getUIString("waiting_for_button_click_to_cancel");
                     ThreadStart assignButtonWork = assignButton;
-                    Thread assignButtonThread = new Thread(assignButtonWork);
+                    ThreadManager.UnregisterTemporaryThread(assignButtonThread);
+                    assignButtonThread = new Thread(assignButtonWork);
+                    assignButtonThread.Name = "MainWindow.assignButtonThread";
+                    ThreadManager.RegisterTemporaryThread(assignButtonThread);
                     assignButtonThread.Start();
                 }
             }
@@ -1559,13 +1674,21 @@ namespace CrewChiefV4
                     {
                         runListenForButtonPressesThread = controllerConfiguration.listenForButtons(voiceOption == VoiceOptionEnum.TOGGLE);
                     }
-                }                
+                }
             }
             else
             {
                 isAssigningButton = false;
             }
-            this.assignButtonToAction.Text = Configuration.getUIString("assign");            
+
+            // Check if form is shut down while we're listening.
+            lock (MainWindow.instanceLock)
+            {
+                if (MainWindow.instance != null)
+                {
+                    this.assignButtonToAction.Text = Configuration.getUIString("assign");
+                }
+            }
         }
 
         private void deleteAssignmentButtonClicked(object sender, EventArgs e)
@@ -1906,6 +2029,14 @@ namespace CrewChiefV4
             {
                 controllerConfiguration.removeNetworkControllerFromList();
             }
+            if (this.gameDefinitionList.Text.Length > 0)
+            {
+                try
+                {
+                    CrewChief.gameDefinition = GameDefinition.getGameDefinitionForFriendlyName(this.gameDefinitionList.Text);
+                }
+                catch (Exception) { }
+            }
             getControllers();
         }
 
@@ -1916,6 +2047,11 @@ namespace CrewChiefV4
 
         private void startDownload(DownloadType downloadType)
         {
+            // Strictly speaking, it is not ok to dispose object before Async calls are complete.  However, due to
+            // legacy reasons, Dispose on WebClient does not interfere with Async call completion.  Correct pattern
+            // is to CancelAsync on form close, and dispose in callbacks or on form close. But code as is works too,
+            // by luck, so just add a formClosed check in callbacks.  That's safe, because they're invoked on the UI
+            // thread.
             using (WebClient wc = new WebClient())
             {
                 if (downloadType == DownloadType.SOUND_PACK)
@@ -1952,13 +2088,17 @@ namespace CrewChiefV4
                         File.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                     }
                     catch (Exception) { }
-                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);                    
+                    wc.DownloadFileAsync(new Uri(personalisationsDownloadURL), AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName);
                 }
             }
         }
 
         void soundpack_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -1970,6 +2110,10 @@ namespace CrewChiefV4
 
         void drivernames_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -1980,6 +2124,10 @@ namespace CrewChiefV4
         }
         void personalisations_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             double bytesIn = double.Parse(e.BytesReceived.ToString());
             double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
             double percentage = bytesIn / totalBytes * 100;
@@ -1991,11 +2139,15 @@ namespace CrewChiefV4
 
         void soundpack_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_sound_pack");
                 downloadSoundPackButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractSoundPackThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2006,15 +2158,27 @@ namespace CrewChiefV4
                         {
                             Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", true);
                         }
+                        if (formClosed)
+                        {
+                            return;
+                        }
                         progressThread = createProgressThread(downloadSoundPackButton, extractingButtonText);
-                        progressThread.Start(); 
+                        progressThread.Start();
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + soundPackTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp");
                         // It's important to note that the order of these two calls must *not* matter. If it does, the update process results will be inconsistent.
                         // The update pack can contain file rename instructions and file delete instructions but it can *never* contain obsolete files (or files
                         // with old names). As long as this is the case, it shouldn't matter what order we do these in...
                         UpdateHelper.ProcessFileUpdates(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp");
-                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", AudioPlayer.soundFilesPathNoChiefOverride);
-                        success = true;
+
+                        // If we made it here, block the shutdown to complete the move.
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\sounds_temp", AudioPlayer.soundFilesPathNoChiefOverride);
+                                success = true;
+                            }
+                        }
                     }
                     catch (Exception) { }
                     finally
@@ -2045,7 +2209,10 @@ namespace CrewChiefV4
                     {
                         soundPackUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractSoundPackThread.Name = "MainWindow.extractSoundPackThread";
+                ThreadManager.RegisterResourceThread(extractSoundPackThread);
+                extractSoundPackThread.Start();
             }
             else
             {
@@ -2055,11 +2222,15 @@ namespace CrewChiefV4
 
         void drivernames_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_driver_names");
                 downloadDriverNamesButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractDriverNamesThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2070,11 +2241,23 @@ namespace CrewChiefV4
                         {
                             Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", true);
                         }
+                        if (formClosed)
+                        {
+                            return;
+                        }
                         progressThread = createProgressThread(downloadDriverNamesButton, extractingButtonText);
                         progressThread.Start(); 
                         ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + driverNamesTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", Encoding.UTF8);
-                        UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", AudioPlayer.soundFilesPathNoChiefOverride);
-                        success = true;
+
+                        // If we made it here, block the shutdown to complete the move.
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\driver_names_temp", AudioPlayer.soundFilesPathNoChiefOverride);
+                                success = true;
+                            }
+                        }
                     }
                     catch (Exception) { }
                     finally
@@ -2105,7 +2288,10 @@ namespace CrewChiefV4
                     {
                         driverNamesUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractDriverNamesThread.Name = "MainWindow.extractDriverNamesThread";
+                ThreadManager.RegisterResourceThread(extractDriverNamesThread);
+                extractDriverNamesThread.Start();
             }
             else
             {
@@ -2115,11 +2301,15 @@ namespace CrewChiefV4
 
         void personalisations_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
+            if (formClosed)
+            {
+                return;
+            }
             if (e.Error == null && !e.Cancelled)
             {
                 String extractingButtonText = Configuration.getUIString("extracting_personalisations");
                 downloadPersonalisationsButton.Text = extractingButtonText;
-                new Thread(() =>
+                var extractPersonalizationsThread = new Thread(() =>
                 {
                     Thread.CurrentThread.IsBackground = true;
                     Boolean success = false;
@@ -2133,11 +2323,23 @@ namespace CrewChiefV4
                             {
                                 Directory.Delete(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", true);
                             }
+                            if (formClosed)
+                            {
+                                return;
+                            }
                             progressThread = createProgressThread(downloadPersonalisationsButton, extractingButtonText);
                             progressThread.Start();
                             ZipFile.ExtractToDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\" + personalisationsTempFileName, AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", Encoding.UTF8);
-                            UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations");
-                            success = true;
+                        
+                            // If we made it here, block the shutdown to complete the move.
+                            lock (MainWindow.instanceLock)
+                            {
+                                if (MainWindow.instance != null)
+                                {
+                                    UpdateHelper.MoveDirectory(AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations_temp", AudioPlayer.soundFilesPathNoChiefOverride + @"\personalisations");
+                                    success = true;
+                                }
+                            }
                         }
                     }
                     catch (Exception e2)
@@ -2172,7 +2374,10 @@ namespace CrewChiefV4
                     {
                         personalisationsUpdateFailed(false);
                     }
-                }).Start();
+                });
+                extractPersonalizationsThread.Name = "MainWindow.extractPersonalizationsThread";
+                ThreadManager.RegisterResourceThread(extractPersonalizationsThread);
+                extractPersonalizationsThread.Start();
             }
             else
             {
@@ -2183,6 +2388,7 @@ namespace CrewChiefV4
         // 'ticks' the button so the user knows something's happening
         private Thread createProgressThread(Button button, String text)
         {
+            // This thread is managed by sound file extractor threads.
             return new Thread(() =>
             {
                 Boolean cancelled = false;
@@ -2190,14 +2396,41 @@ namespace CrewChiefV4
                 {
                     while (!cancelled)
                     {
-                        button.Text = text + ".";
-                        Thread.Sleep(300);
-                        button.Text = text + "..";
-                        Thread.Sleep(300);
-                        button.Text = text + "...";
-                        Thread.Sleep(300);
-                        button.Text = text;
-                        Thread.Sleep(300);
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + ".";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + "..";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text + "...";
+                                Thread.Sleep(300);
+                            }
+                        }
+
+                        lock (MainWindow.instanceLock)
+                        {
+                            if (MainWindow.instance != null)
+                            {
+                                button.Text = text;
+                                Thread.Sleep(300);
+                            }
+                        }
                     }
                 }
                 catch (ThreadAbortException)
@@ -2227,7 +2460,10 @@ namespace CrewChiefV4
                 {
                     downloadDriverNamesButton.Text = Configuration.getUIString("updated_driver_names_available_press_to_download");
                 }
-                downloadDriverNamesButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadDriverNamesButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_driver_names"), Configuration.getUIString("unable_to_download_driver_names"),
@@ -2256,7 +2492,10 @@ namespace CrewChiefV4
                 {
                     downloadSoundPackButton.Text = Configuration.getUIString("updated_sound_pack_available_press_to_download");
                 }
-                downloadSoundPackButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadSoundPackButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_sound_pack"), Configuration.getUIString("unable_to_download_sound_pack"),
@@ -2286,7 +2525,10 @@ namespace CrewChiefV4
                 {
                     downloadPersonalisationsButton.Text = Configuration.getUIString("updated_personalisations_available_press_to_download");
                 }
-                downloadPersonalisationsButton.Enabled = true;
+                if (!IsAppRunning)
+                {
+                    downloadPersonalisationsButton.Enabled = true;
+                }
                 if (!cancelled)
                 {
                     MessageBox.Show(Configuration.getUIString("error_downloading_personalisations"), Configuration.getUIString("unable_to_download_personalisations"),
@@ -2425,63 +2667,77 @@ namespace CrewChiefV4
 
     public class ControlWriter : TextWriter
     {
-        public TextBox textbox = null;
+        public RichTextBox textbox = null;
         public Boolean enable = true;
         public StringBuilder builder = new StringBuilder();
-        public ControlWriter(TextBox textbox)
+        public ControlWriter(RichTextBox textbox)
         {
             this.textbox = textbox;
+            this.textbox.WordWrap = false;
         }
 
         public override void WriteLine(string value)
         {
-            if (enable || MainWindow.instance.recordSession.Checked)
+            if (MainWindow.instance != null && (enable || MainWindow.instance.recordSession.Checked))
             {
                 Boolean gotDateStamp = false;
                 StringBuilder sb = new StringBuilder();
+                DateTime now = DateTime.Now;
                 if (CrewChief.loadDataFromFile)
                 {
                     if (CrewChief.currentGameState != null)
                     {
-                        if (CrewChief.currentGameState.CurrentTimeStr == null)
+                        if (CrewChief.currentGameState.CurrentTimeStr == null || CrewChief.currentGameState.CurrentTimeStr == "")
                         {
                             CrewChief.currentGameState.CurrentTimeStr = GameStateData.CurrentTime.ToString("HH:mm:ss.fff");
                         }
-                        sb.Append(DateTime.Now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
+                        sb.Append(now.ToString("HH:mm:ss.fff")).Append(" (").Append(CrewChief.currentGameState.CurrentTimeStr).Append(")");
                         gotDateStamp = true;
                     }
                 }
                 if (!gotDateStamp)
                 {
-                    sb.Append(DateTime.Now.ToString("HH:mm:ss.fff"));
+                    sb.Append(now.ToString("HH:mm:ss.fff"));
                 }
                 sb.Append(" : ").Append(value).AppendLine();
                 if (enable)
                 {
-                    if (textbox != null && !textbox.IsDisposed)
+                    lock (MainWindow.instanceLock)
                     {
-                        try
+                        if (MainWindow.instance != null && textbox != null && !textbox.IsDisposed)
                         {
-                            lock (this)
+                            try
                             {
                                 textbox.AppendText(sb.ToString());
                             }
-                        }
-                        catch (Exception)
-                        {
-                            // swallow - nothing to log it to
+                            catch (Exception)
+                            {
+                                // swallow - nothing to log it to
+                            }
                         }
                     }
                 }
                 else
                 {
-                    lock (this)
+                    lock (MainWindow.instanceLock)
                     {
                         builder.Append(sb.ToString());
                     }
                 }
             }
+            if (MainWindow.autoScrollConsole && textbox != null && !textbox.IsDisposed)
+            {
+                try
+                {
+                    textbox.ScrollToCaret();
+                }
+                catch (Exception)
+                {
+                    // ignore
+                }
+            }
         }
+        
 
         public override Encoding Encoding
         {

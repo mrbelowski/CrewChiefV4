@@ -46,6 +46,10 @@ namespace CrewChiefV4
         private static float maxWarmUltraSoftTyreTempPeak = 95;
         private static float maxHotUltraSoftTyreTempPeak = 107;
 
+        private static float maxColdHyperSoftTyreTempPeak = 60;
+        private static float maxWarmHyperSoftTyreTempPeak = 94;
+        private static float maxHotHyperSoftTyreTempPeak = 105;
+
         private static float maxColdWetTyreTempPeak = 40;
         private static float maxWarmWetTyreTempPeak = 80;
         private static float maxHotWetTyreTempPeak = 105;
@@ -125,13 +129,13 @@ namespace CrewChiefV4
 
         public enum CarClassEnum
         {
-            GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, GT500, Kart_1, Kart_2, KART_JUNIOR, KART_F1, KART_X30_SENIOR, KART_X30_RENTAL, LMP1, LMP2, LMP3, LMP900, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D,
-            ROAD_E, ROAD_F, ROAD_G, ROAD_SUPERCAR, GROUPC, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
+            GT1X, GT1, GTE, GT2, GTC, GTLM, GT3, GT4, GT5, GT300, GT500, Kart_1, Kart_2, KART_JUNIOR, KART_F1, KART_X30_SENIOR, KART_X30_RENTAL, LMP1, LMP2, LMP3, LMP900, ROAD_B, ROAD_C1, ROAD_C2, ROAD_D,
+            ROAD_E, ROAD_F, ROAD_G, ROAD_SUPERCAR, GROUPC, GROUPB, GROUPA, GROUP4, GROUP5, GROUP6, GTO,
             VINTAGE_INDY_65, VINTAGE_F3_A, VINTAGE_F1_A, VINTAGE_F1_A1, VINTAGE_PROTOTYPE_B, VINTAGE_GT_D, VINTAGE_GT_C, HISTORIC_TOURING_1, HISTORIC_TOURING_2, VINTAGE_F1_B,
             VINTAGE_F1_C, VINTAGE_STOCK_CAR,
             F1, F2, F3, F4, FF, FORMULA_E, F1_70S, F1_90S, TC1, TC2, TCR, TC1_2014, AUDI_TT_CUP, AUDI_TT_VLN, CLIO_CUP, DTM, DTM_2013, V8_SUPERCAR, DTM_2014, DTM_2015, DTM_2016, TRANS_AM, HILL_CLIMB_ICONS, FORMULA_RENAULT,
             MEGANE_TROPHY, NSU_TT, KTM_RR, INDYCAR, HYPER_CAR, HYPER_CAR_RACE, UNKNOWN_RACE, STOCK_V8, BOXER_CUP, NASCAR_2016, ISI_STOCKCAR_2015, RADICAL_SR3, USER_CREATED,
-            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM, FORMULA_RENAULT20
+            RS01_TROPHY, TRACKDAY_A, TRACKDAY_B, BMW_235I, CARRERA_CUP, R3E_SILHOUETTE, SPEC_MIATA, SKIP_BARBER, CAYMAN_CLUBSPORT, CAN_AM, FORMULA_RENAULT20, INDYCAR_DALLARA_2011, INDYCAR_DALLARA_DW12
         }
 
         // use different thresholds for R3E car classes - there are a few different tyre models in the game with different heating characteristics:
@@ -164,6 +168,13 @@ namespace CrewChiefV4
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmRoadTyreTempPeak, maxHotRoadTyreTempPeak));
             roadTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotRoadTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.Road, roadTyreTempsThresholds);
+
+            List<CornerData.EnumWithThresholds> hyperSoftTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdUltraSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdHyperSoftTyreTempPeak, maxWarmHyperSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.HOT, maxWarmHyperSoftTyreTempPeak, maxHotHyperSoftTyreTempPeak));
+            hyperSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotHyperSoftTyreTempPeak, 10000));
+            tyreTempThresholds.Add(TyreType.Hyper_Soft, hyperSoftTyreTempsThresholds);
 
             List<CornerData.EnumWithThresholds> ultraSoftTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             ultraSoftTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdUltraSoftTyreTempPeak));

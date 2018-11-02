@@ -13,9 +13,6 @@ namespace CrewChiefV4.NumberProcessing
         // this folder contains lots of subfolders, one for each number from 0 to 99, so we can add a folder to the 
         // list to play called "numbers/[number]" - i.e. numbers/45 or numbers/1. This is used a lot in the implementations below.
         private static String folderNumbersStub = "numbers/";
-        private static String folderHoursSuffix = "_hours";
-        private static String folderMinutesSuffix = "_minutes";
-        private static String folderSecondsSuffix = "_seconds";
         private static String folderAndPrefix = "and_";
         // the number sounds for tenths sometimes need a 'hanging inflection' - add this suffix when they do
         private static String moreInflectionSuffix = "_more";
@@ -25,7 +22,7 @@ namespace CrewChiefV4.NumberProcessing
         private static String folderHours = folderNumbersStub + "hours";
         private static String folderASecond = folderNumbersStub + "a_second";
         private static String folderSeconds = folderNumbersStub + "seconds";
-        private static String folderAnd = folderNumbersStub + "and";
+        public static String folderAnd = folderNumbersStub + "and";
 
 
         private static String folderNetto = folderNumbersStub + "netto";
@@ -36,17 +33,16 @@ namespace CrewChiefV4.NumberProcessing
         // "numbers_it/1_hundreds","numbers_it/2_hundreds", etc
         private static String folderHundredSuffix = "_hundreds";
 
-        private static String folderThousand = "numbers/thousand";
-        private static String folderThousands = "numbers/thousands";
+        private static String folderThousand = folderNumbersStub + "thousand";
+        private static String folderThousands = folderNumbersStub + "thousands";
 
-        private enum Unit { HOUR, MINUTE, SECOND, TENTH, HUNDREDTH }
+        private enum Unit { HOUR, MINUTE, SECOND, AND_TENTH, JUST_TENTH, AND_HUNDREDTH, JUST_HUNDREDTH }
 
         // folders for reading out times.
 
         // This is combined with folderNumbersStub to produce tenths sounds for tenths > 1 - numbers_it/2_tenths -> numbers_it/9_tenths
-        private static String folderTenthsSuffix = "_tenths";
-        private static String folderATenth = "numbers/a_tenth";
-
+        // private static String folderTenthsSuffix = "_tenths";
+        private static String folderATenth = folderNumbersStub + "a_tenth";
 
         protected override String getLocale()
         {
@@ -57,7 +53,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of hours. Long form.
          */
-        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetHoursSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (hours > 0)
@@ -95,7 +91,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of minutes. Long form.
          */
-        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetMinutesSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (minutes > 0)
@@ -107,36 +103,42 @@ namespace CrewChiefV4.NumberProcessing
                 }
                 else
                 {
-                    // no hours, so we may be reading seconds / tenths as well. Use 'and' if there are no seconds or tenths
+                    // no hours, so we may be reading seconds / tenths as well.
                     if (seconds == 0 && tenths == 0)
                     {
-                        messages.AddRange(resolveNumberSounds(true, minutes, Unit.MINUTE, !messageHasContentAfterTime));
-                        if (minutes > 1)
+                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime));
+                        if (precision != Precision.MINUTES)
                         {
-                            if (messageHasContentAfterTime)
+                            if (minutes > 1)
                             {
-                                messages.Add(getSoundWithMoreInflection(folderNetti));
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetti));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetti);
+                                }
                             }
                             else
                             {
-                                messages.Add(folderNetti);
-                            }
-                        }
-                        else
-                        {
-                            if (messageHasContentAfterTime)
-                            {
-                                messages.Add(getSoundWithMoreInflection(folderNetto));
-                            }
-                            else
-                            {
-                                messages.Add(folderNetto);
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetto));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetto);
+                                }
                             }
                         }
                     }
                     else
                     {
-                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime && tenths == 0));
+                        // when we're here, we know that there are seconds or tenths to come. We'll either add a 'netti' for 
+                        // 0 tenths, or an 'and 8' for, e.g., 8 tenths. This means we only have 1 case where the rising inflection
+                        // is needed - some minutes, 0 seconds and some tenths with no content after the time (1 minute! and 8)
+                        messages.AddRange(resolveNumberSounds(false, minutes, Unit.MINUTE, !messageHasContentAfterTime && seconds == 0));
                     }
                 }
             }
@@ -146,7 +148,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of seconds. Long form.
          */
-        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetSecondsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             // special case here - if we're reading a time which has hours, the seconds aren't significant so ignore them
@@ -156,27 +158,30 @@ namespace CrewChiefV4.NumberProcessing
                 {
                     if (tenths == 0)
                     {
-                        messages.AddRange(resolveNumberSounds(minutes > 0, seconds, Unit.SECOND, messageHasContentAfterTime));
-                        if (seconds > 1)
+                        messages.AddRange(resolveNumberSounds(minutes > 0, seconds, Unit.SECOND, !messageHasContentAfterTime));
+                        if (precision != Precision.SECONDS && precision != Precision.MINUTES)
                         {
-                            if (messageHasContentAfterTime)
+                            if (seconds > 1)
                             {
-                                messages.Add(getSoundWithMoreInflection(folderNetti));
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetti));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetti);
+                                }
                             }
                             else
                             {
-                                messages.Add(folderNetti);
-                            }
-                        }
-                        else
-                        {
-                            if (messageHasContentAfterTime)
-                            {
-                                messages.Add(getSoundWithMoreInflection(folderNetto));
-                            }
-                            else
-                            {
-                                messages.Add(folderNetto);
+                                if (messageHasContentAfterTime)
+                                {
+                                    messages.Add(getSoundWithMoreInflection(folderNetto));
+                                }
+                                else
+                                {
+                                    messages.Add(folderNetto);
+                                }
                             }
                         }
                     }
@@ -192,12 +197,14 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for a whole number of tenths of a second.
          */
-        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime)
+        protected override List<String> GetTenthsSounds(int hours, int minutes, int seconds, int tenths, Boolean messageHasContentAfterTime, Precision precision)
         {
             List<String> messages = new List<String>();
             if (tenths > 0)
             {
-                messages.AddRange(resolveNumberSounds(true, tenths, Unit.TENTH, messageHasContentAfterTime));
+                Boolean haveMinutesOrSeconds = minutes > 0 || seconds > 0;
+                messages.AddRange(resolveNumberSounds(haveMinutesOrSeconds, tenths, 
+                    haveMinutesOrSeconds ? Unit.AND_TENTH : Unit.JUST_TENTH, messageHasContentAfterTime));
             }
             return messages;
         }
@@ -211,11 +218,133 @@ namespace CrewChiefV4.NumberProcessing
         }
 
         /**
-         * Not implemented for Italian number reader.
-         * */
-        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction)
+         * fraction is String so we can pass "01" etc - we don't know if it's tenths or hundredths so it may need zero padding.
+         */
+        protected override List<String> GetMinutesAndSecondsWithFraction(int minutes, int seconds, String fraction, Boolean messageHasContentAfterTime)
         {
-            return null;
+            // there will always be some seconds here
+            String combinedMinutesAndSecondsSoundFolder;
+            List<String> separateMinutesAndSecondsSoundFolders = new List<string>();
+            String fractionsFolder;
+            Boolean usePoint = false;
+
+            // we check for the existence of a '1_23_more' type sound, so don't need to check this twice:
+            Boolean alreadyCheckedCombinedSound = false;
+            if (minutes > 0)
+            {
+                separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + minutes.ToString());
+                // TODO: are we using padded seconds here?
+                String paddedSeconds = seconds < 10 ? "_0" + seconds : "_" + seconds;
+                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + minutes + paddedSeconds;
+                if (!messageHasContentAfterTime)
+                {
+                    String separateSound = folderNumbersStub + seconds.ToString();
+                    String separateSoundWithMore = separateSound + moreInflectionSuffix;
+                    String combinedSoundWithMore = combinedMinutesAndSecondsSoundFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(separateSoundWithMore))
+                    {
+                        separateMinutesAndSecondsSoundFolders.Add(separateSoundWithMore);
+                    }
+                    else
+                    {
+                        separateMinutesAndSecondsSoundFolders.Add(separateSound);
+                    }
+                    if (SoundCache.availableSounds.Contains(combinedSoundWithMore))
+                    {
+                        alreadyCheckedCombinedSound = true;
+                        combinedMinutesAndSecondsSoundFolder = combinedSoundWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + combinedSoundWithMore);
+                    }
+                }
+                else
+                {
+                    separateMinutesAndSecondsSoundFolders.Add(folderNumbersStub + seconds.ToString());
+                }
+            }
+            else
+            {
+                combinedMinutesAndSecondsSoundFolder = folderNumbersStub + seconds.ToString();
+                if (!messageHasContentAfterTime)
+                {
+                    String combinedSoundWithMore = combinedMinutesAndSecondsSoundFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(combinedSoundWithMore))
+                    {
+                        alreadyCheckedCombinedSound = true;
+                        combinedMinutesAndSecondsSoundFolder = combinedSoundWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + combinedSoundWithMore);
+                    }
+                }
+            }
+            if (fraction == "0" || fraction == "00")
+            {
+                fractionsFolder = folderNetti;
+                if (messageHasContentAfterTime)
+                {
+                    fractionsFolder += moreInflectionSuffix;
+                }
+            }
+            else if (fraction.Length == 1)
+            {
+                fractionsFolder = folderNumbersStub + folderAndPrefix + fraction;
+                if (messageHasContentAfterTime)
+                {
+                    String fractionsFolderWithMore = fractionsFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(fractionsFolderWithMore))
+                    {
+                        fractionsFolder = fractionsFolderWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + fractionsFolderWithMore);
+                    }
+                }
+            }
+            else
+            {
+                fractionsFolder = folderNumbersStub + fraction;
+                if (messageHasContentAfterTime)
+                {
+                    String fractionsFolderWithMore = fractionsFolder + moreInflectionSuffix;
+                    if (SoundCache.availableSounds.Contains(fractionsFolderWithMore))
+                    {
+                        fractionsFolder = fractionsFolderWithMore;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unable to find number sound: " + fractionsFolderWithMore);
+                    }
+                }
+                usePoint = true;
+            }
+            List<String> messages = new List<String>();
+
+            Boolean addCombined = true;
+            if (!alreadyCheckedCombinedSound && !SoundCache.availableSounds.Contains(combinedMinutesAndSecondsSoundFolder))
+            {
+                addCombined = false;
+            }
+            if (addCombined) 
+            {
+                messages.Add(combinedMinutesAndSecondsSoundFolder);
+            }
+            else
+            {
+                Console.WriteLine("Unable to find number sound: " + combinedMinutesAndSecondsSoundFolder);
+                messages.AddRange(separateMinutesAndSecondsSoundFolders);
+            }
+            if (usePoint)
+            {
+                messages.Add(folderPoint);
+            }
+            messages.Add(fractionsFolder);
+            Console.WriteLine("Reading short form with sounds " + String.Join(", ", messages));
+            return messages;
         }
 
         /**
@@ -237,7 +366,7 @@ namespace CrewChiefV4.NumberProcessing
         /**
          * Get an Italian sound for an Integer from 0 to 99999.
          */
-        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber)
+        protected override List<String> GetIntegerSounds(char[] digits, Boolean allowShortHundredsForThisNumber, Boolean messageHasContentAfterNumber)
         {
             List<String> messages = new List<String>();
             // if this is just zero, return a list with just "zero"
@@ -302,6 +431,13 @@ namespace CrewChiefV4.NumberProcessing
                     messages.Add(folderNumbersStub + tensAndUnits);
                 }
             }
+            // now add a _more inflection to the last number *or* the second to last
+            int messageCount = messages.Count;
+            int indexToAddInflection = messageHasContentAfterNumber ? messageCount - 1 : messageCount - 2;
+            if (indexToAddInflection >= 0)
+            {
+                messages[indexToAddInflection] = getSoundWithMoreInflection(messages[indexToAddInflection]);
+            }
             return messages;
         }
 
@@ -324,9 +460,10 @@ namespace CrewChiefV4.NumberProcessing
                     return "_minutes";
                 case Unit.SECOND:
                     return "_seconds";
-                /* case Unit.TENTH:
-                     return "_tenths";*/
+                case Unit.JUST_TENTH:
+                     return "_tenths";
                 default:
+                    // used for 'and_X' sounds
                     return "";
             }
         }
@@ -341,7 +478,7 @@ namespace CrewChiefV4.NumberProcessing
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "minute" : "minutes");
                 case Unit.SECOND:
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "second" : "seconds");
-                case Unit.TENTH:
+                case Unit.JUST_TENTH:
                     return NumberReaderIt2.folderNumbersStub + (number == 1 ? "tenth" : "tenths");
                 default:
                     return "";

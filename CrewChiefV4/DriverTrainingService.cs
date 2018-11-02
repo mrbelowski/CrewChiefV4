@@ -12,7 +12,6 @@ namespace CrewChiefV4
 {
     class DriverTrainingService
     {
-        private static long expireUnplayedMessagesAfter = 500;  // milliseconds
         private static int combineEntriesCloserThan = 20; // if a new entry's lap distance is within 20 metres of an existing entry's lap distance, combine them
         public static Boolean isPlayingPaceNotes = false;
         public static Boolean isRecordingPaceNotes = false;
@@ -141,8 +140,7 @@ namespace CrewChiefV4
                         {
                             Console.WriteLine("Playing entry at distance " + entry.distanceRoundTrack);
                         }
-                        QueuedMessage message = new QueuedMessage(entry.getRandomRecordingName(), 0, null);
-                        message.expiryTime = (now.Ticks / TimeSpan.TicksPerMillisecond) + expireUnplayedMessagesAfter;
+                        QueuedMessage message = new QueuedMessage(entry.getRandomRecordingName(), 1, type: SoundType.CRITICAL_MESSAGE, priority: 0);
                         audioPlayer.playMessageImmediately(message);
                     }
                 }
