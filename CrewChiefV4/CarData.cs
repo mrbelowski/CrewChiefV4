@@ -253,6 +253,9 @@ namespace CrewChiefV4
             unknownRaceTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COOKING, maxHotUnknownRaceTyreTempPeak, 10000));
             tyreTempThresholds.Add(TyreType.Unknown_Race, unknownRaceTyreTempsThresholds);
 
+            // to ensure uninitialized tyres still have some thresholds associated with them
+            tyreTempThresholds.Add(TyreType.Uninitialized, unknownRaceTyreTempsThresholds);
+
             List<CornerData.EnumWithThresholds> biasPlyTyreTempsThresholds = new List<CornerData.EnumWithThresholds>();
             biasPlyTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.COLD, -10000, maxColdBiasPlyTyreTempPeak));
             biasPlyTyreTempsThresholds.Add(new CornerData.EnumWithThresholds(TyreTemp.WARM, maxColdBiasPlyTyreTempPeak, maxWarmBiasPlyTyreTempPeak));
