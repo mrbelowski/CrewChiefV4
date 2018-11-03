@@ -183,9 +183,7 @@ namespace CrewChiefV4.Events
 
         private Boolean sessionHasHadFCY = false;
 
-        // used in prac and qual when we start a run which is likely to be a qual simulation
-        // TODO: should probably make this available to other events as there may be other behaviours
-        // to be adjusted when we're on a low fuel run
+        // in prac and qual, assume it's a low fuel run unless we know otherwise
         private Boolean onLowFuelRun = false;
 
         public Fuel(AudioPlayer audioPlayer)
@@ -312,24 +310,30 @@ namespace CrewChiefV4.Events
                     lapsCompletedSinceFuelReset = 0;
                     historicAverageUsagePerLap.Clear();
                     historicAverageUsagePerMinute.Clear();
-                    // set the onLowFuelRun if we're in prac / qual
-                    onLowFuelRun = false;
-                    if ((currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify) &&
-                        averageUsagePerLap > 0)
+                    // set the onLowFuelRun if we're in prac / qual - asssume we're on a low fuel run until we know otherwise
+                    if (currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
                     {
-                        float lapsForLowFuelRun = 4f;
-                        if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                        onLowFuelRun = true;
+                        if (averageUsagePerLap > 0)
                         {
-                            lapsForLowFuelRun = 3f;
+                            float lapsForLowFuelRun = 4f;
+                            if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
+                            {
+                                lapsForLowFuelRun = 3f;
+                            }
+                            else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                            {
+                                lapsForLowFuelRun = 2f;
+                            }
+                            if (initialFuelLevel / averageUsagePerLap > lapsForLowFuelRun)
+                            {
+                                onLowFuelRun = false;
+                            }
                         }
-                        else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
-                        {
-                            lapsForLowFuelRun = 2f;
-                        }
-                        if (initialFuelLevel / averageUsagePerLap <= lapsForLowFuelRun)
-                        {
-                            onLowFuelRun = true;
-                        }
+                    }
+                    else
+                    {
+                        onLowFuelRun = false;
                     }
                     // if this is the first time we've initialised the fuel stats (start of session), get the half way point of this session
                     if (!initialised)
