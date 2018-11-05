@@ -101,7 +101,7 @@ namespace CrewChiefV4.rFactor2
         private DateTime lastTimeEngineWasRunning = DateTime.MaxValue;
 
         // Session caches:
-        private Dictionary<byte, TyreType> compoundIndexToTyreType = new Dictionary<byte, TyreType>();
+        private Dictionary<string, TyreType> compoundNameToTyreType = new Dictionary<string, TyreType>();
 
         class CarInfo
         {
@@ -205,7 +205,7 @@ namespace CrewChiefV4.rFactor2
             this.lastUnknownGlobalRuleMessage = null;
             this.lastUnknownPlayerRuleMessage = null;
             this.lastTimeEngineWasRunning = DateTime.MaxValue;
-            this.compoundIndexToTyreType.Clear();
+            this.compoundNameToTyreType.Clear();
             this.idToCarInfoMap.Clear();
         }
 
@@ -996,7 +996,22 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.TyreWearActive = true;
 
             // For now, all tyres will be reported as front compund.
-            var tt = this.MapToTyreType(ref playerTelemetry);
+            var tt = TyreType.Uninitialized;
+            if (pgs != null)
+            {
+                // Restore previous tyre type.
+                tt = pgs.TyreData.FrontLeftTyreType;
+
+                // Re-evaluate on Countdown, Green and on pit exit:
+                if ((csd.SessionPhase == SessionPhase.Countdown && psd.SessionPhase != SessionPhase.Countdown)
+                    || (csd.SessionPhase == SessionPhase.Green && psd.SessionPhase != SessionPhase.Green)
+                    || (!cgs.PitData.InPitlane && pgs.PitData.InPitlane))
+                    tt = this.MapToTyreType(ref playerTelemetry);
+            }
+
+            // First time intialize.  Might stay like that until we get telemetry.
+            if (tt == TyreType.Uninitialized)
+                tt = this.MapToTyreType(ref playerTelemetry);
 
             var wheelFrontLeft = playerTelemetry.mWheels[(int)rFactor2Constants.rF2WheelIndex.FrontLeft];
             cgs.TyreData.FrontLeftTyreType = tt;
@@ -1065,7 +1080,7 @@ namespace CrewChiefV4.rFactor2
             cgs.TyreData.TyreConditionStatus = CornerData.getCornerData(this.tyreWearThresholds, cgs.TyreData.FrontLeftPercentWear,
                 cgs.TyreData.FrontRightPercentWear, cgs.TyreData.RearLeftPercentWear, cgs.TyreData.RearRightPercentWear);
 
-            var tyreTempThresholds = CarData.getTyreTempThresholds(cgs.carClass);
+            var tyreTempThresholds = CarData.getTyreTempThresholds(cgs.carClass, tt);
             cgs.TyreData.TyreTempStatus = CornerData.getCornerData(tyreTempThresholds,
                 cgs.TyreData.PeakFrontLeftTemperatureForLap, cgs.TyreData.PeakFrontRightTemperatureForLap,
                 cgs.TyreData.PeakRearLeftTemperatureForLap, cgs.TyreData.PeakRearRightTemperatureForLap);
@@ -1304,7 +1319,26 @@ namespace CrewChiefV4.rFactor2
                 var opponent = new OpponentData();
 
                 opponent.CarClass = vehicleCachedInfo.carClass;
-                opponent.CurrentTyres = this.MapToTyreType(ref vehicleTelemetry);
+
+                tt = TyreType.Uninitialized;
+                if (pgs != null && opponentPrevious != null)
+                {
+                    // Restore previous tyre type.
+                    if (opponentPrevious != null)
+                        tt = opponentPrevious.CurrentTyres;
+
+                    // Re-evaluate on Countdown and on pit exit:
+                    if ((csd.SessionPhase == SessionPhase.Countdown && psd.SessionPhase != SessionPhase.Countdown)
+                        || (csd.SessionPhase == SessionPhase.Green && psd.SessionPhase != SessionPhase.Green)
+                        || (vehicleScoring.mInPits != 1 && opponentPrevious.InPits))
+                        tt = this.MapToTyreType(ref vehicleTelemetry);
+                }
+
+                // First time intialize.  Might stay like that until we get telemetry.
+                if (tt == TyreType.Uninitialized)
+                    tt = this.MapToTyreType(ref vehicleTelemetry);
+
+                opponent.CurrentTyres = tt;
                 opponent.DriverRawName = vehicleCachedInfo.driverNameRawSanitized;
                 opponent.DriverNameSet = opponent.DriverRawName.Length > 0;
                 opponent.OverallPosition = vehicleScoring.mPlace;
@@ -2193,18 +2227,15 @@ namespace CrewChiefV4.rFactor2
         {
             // Do not cache tyre type if telemetry is not available yet.
             if (vehicleTelemetry.mFrontTireCompoundName == null)
-                return TyreType.Unknown_Race;
+                return TyreType.Uninitialized;
 
-            // Note: this might not work perfectly with per vehicle upgrades, but this is good enough I think.
-            // There are like 2 or 3 mods that allow different brands, and even then, indexes do match.
+            // For now, use fronts.
+            var frontCompound = RF2GameStateMapper.GetStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();        
             var tyreType = TyreType.Unknown_Race;
-            if (this.compoundIndexToTyreType.TryGetValue(vehicleTelemetry.mFrontTireCompoundIndex, out tyreType))
+            if (this.compoundNameToTyreType.TryGetValue(frontCompound, out tyreType))
                 return tyreType;
 
             tyreType = TyreType.Unknown_Race;
-
-            // For now, use fronts.
-            var frontCompound = RF2GameStateMapper.GetStringFromBytes(vehicleTelemetry.mFrontTireCompoundName).ToUpperInvariant();
 
             if (string.IsNullOrWhiteSpace(frontCompound))
                 tyreType = TyreType.Unknown_Race;
@@ -2238,8 +2269,8 @@ namespace CrewChiefV4.rFactor2
             else if (frontCompound.Contains("PRIMARY"))
                 tyreType = TyreType.Primary;
 
-            // Cache the tyre type.  Use compound index for fastest lookup.
-            this.compoundIndexToTyreType.Add(vehicleTelemetry.mFrontTireCompoundIndex, tyreType);
+            // Cache the tyre type.
+            this.compoundNameToTyreType.Add(frontCompound, tyreType);
 
             return tyreType;
         }
