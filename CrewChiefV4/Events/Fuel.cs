@@ -1375,8 +1375,29 @@ namespace CrewChiefV4.Events
                 // to skew these quantities and the calculation will assume you'll carry on driving like this, which isn't 
                 // necessarily the case. So if we're asking for the litresToEnd *with* the reserve, assume we want the overall
                 // average consumption, not the recent consumption
-                float averageUsagePerMinuteForCalculation = addReserve && historicAverageUsagePerMinute.Count > 0 ? historicAverageUsagePerMinute.Average() : averageUsagePerMinute;
-                float averageUsagePerLapForCalculation = addReserve && historicAverageUsagePerLap.Count > 0 ? historicAverageUsagePerLap.Average() : averageUsagePerLap;
+
+                // one additional hack (tweak...) here. The opening laps tend to have lower consumption because we're often checking-up
+                // for other cars, drafting, crashing, etc. If we don't have a decent amount of data to offset this skew, then
+                // take the max per-lap consumption rather than the average
+                float averageUsagePerMinuteForCalculation;
+                float averageUsagePerLapForCalculation;
+                if (addReserve && historicAverageUsagePerMinute.Count > 0)
+                {
+                    averageUsagePerMinuteForCalculation = historicAverageUsagePerMinute.Average();
+                }
+                else
+                {
+                    averageUsagePerMinuteForCalculation = averageUsagePerMinute;
+                }
+                if (addReserve && historicAverageUsagePerLap.Count > 0)
+                {
+                    // for per-lap consumption, get the biggest if we don't have much data
+                    averageUsagePerLapForCalculation = historicAverageUsagePerLap.Count() > 5 ? historicAverageUsagePerLap.Average() : historicAverageUsagePerLap.Max();
+                }
+                else
+                {
+                    averageUsagePerLapForCalculation = averageUsagePerLap;
+                }
 
                 float additionalFuelLiters = 2f;
                 if (averageUsagePerLapForCalculation > 0 && addAdditionalFuelLaps > 0)
