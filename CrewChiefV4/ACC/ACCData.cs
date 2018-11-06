@@ -358,6 +358,8 @@ namespace CrewChiefV4.ACC
             public int corners;
             public byte isPolesitterOnLeft;
             public WeatherStatus weatherState;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+            public float[] normalizesSectorLimits;
             
         }
         [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -380,7 +382,7 @@ namespace CrewChiefV4.ACC
             public Nationality nation;
 	        public Vec3 location;
 	        public Rotation rotation;
-            public float distanceRoundTrack;
+            public float distanceRoundTrackNormalizes;
             public float speedMS;
             public float speedKMH;
             public float lastSectorTimeStamp;
