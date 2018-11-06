@@ -185,6 +185,7 @@ namespace CrewChiefV4.Events
 
         // in prac and qual, assume it's a low fuel run unless we know otherwise
         private Boolean onLowFuelRun = false;
+        private float lapsForLowFuelRun = 4f;
 
         public Fuel(AudioPlayer audioPlayer)
         {
@@ -229,6 +230,7 @@ namespace CrewChiefV4.Events
             historicAverageUsagePerMinute.Clear();
 
             onLowFuelRun = false;
+            lapsForLowFuelRun = 4f;
         }
 
         // fuel not implemented for HotLap/LonePractice modes
@@ -314,21 +316,18 @@ namespace CrewChiefV4.Events
                     if (currentGameState.SessionData.SessionType == SessionType.Practice || currentGameState.SessionData.SessionType == SessionType.Qualify)
                     {
                         onLowFuelRun = true;
-                        if (averageUsagePerLap > 0)
+                        lapsForLowFuelRun = 4f;
+                        if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
                         {
-                            float lapsForLowFuelRun = 4f;
-                            if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.LONG)
-                            {
-                                lapsForLowFuelRun = 3f;
-                            }
-                            else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
-                            {
-                                lapsForLowFuelRun = 2f;
-                            }
-                            if (initialFuelLevel / averageUsagePerLap > lapsForLowFuelRun)
-                            {
-                                onLowFuelRun = false;
-                            }
+                            lapsForLowFuelRun = 3f;
+                        }
+                        else if (currentGameState.SessionData.TrackDefinition.trackLengthClass == TrackData.TrackLengthClass.VERY_LONG)
+                        {
+                            lapsForLowFuelRun = 2f;
+                        }
+                        if (averageUsagePerLap > 0 && initialFuelLevel / averageUsagePerLap > lapsForLowFuelRun)
+                        {
+                            onLowFuelRun = false;
                         }
                     }
                     else
@@ -428,6 +427,11 @@ namespace CrewChiefV4.Events
                             {
                                 Console.WriteLine("Fuel use per lap (basic calc) = " + averageUsagePerLap.ToString("0.000") + " fuel(liters) left = " + currentGameState.FuelData.FuelLeft.ToString("0.000"));
                             }
+                        }
+                        // now check if we need to reset the 'on low fuel run' variable, do this on our 2nd flying lap
+                        if (onLowFuelRun && lapsCompletedSinceFuelReset == 2 && averageUsagePerLap > 0 && initialFuelLevel / averageUsagePerLap > lapsForLowFuelRun)
+                        {
+                            onLowFuelRun = false;
                         }
                     }
                     if (!currentGameState.PitData.InPitlane
