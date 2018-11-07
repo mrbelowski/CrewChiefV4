@@ -55,6 +55,16 @@ namespace CrewChiefV4.rFactor2
             throw new Exception("no vehicle for player!");
         }
 
+        private bool hasVehicleInfo(CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper shared)
+        {
+            for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
+            {
+                if (shared.scoring.mVehicles[i].mIsPlayer == 1)
+                    return true;
+            }
+            return false;
+        }
+
         public override void trigger(Object lastStateObj, Object currentStateObj, GameStateData currentGameState)
         {
 #if TRACE_SPOTTER_ELAPSED_TIME
@@ -68,11 +78,11 @@ namespace CrewChiefV4.rFactor2
 
             if (!this.enabled 
                 || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
-                || currentState.extended.mInRealtimeFC == 0
-                || currentState.scoring.mScoringInfo.mInRealtime == 0
                 || currentGameState.OpponentData.Count == 0
-                || lastState.extended.mInRealtimeFC == 0
-                || lastState.scoring.mScoringInfo.mInRealtime == 0)
+                || currentState.scoring.mScoringInfo.mInRealtime == 0
+                || lastState.scoring.mScoringInfo.mInRealtime == 0
+                || !hasVehicleInfo(currentState)
+                || !hasVehicleInfo(lastState))
                 return;
 
             // turn off spotter for formation lap before going green
