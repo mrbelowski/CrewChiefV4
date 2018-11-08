@@ -48,10 +48,9 @@ namespace CrewChiefV4.rFactor2
         {
             for (int i = 0; i < shared.scoring.mScoringInfo.mNumVehicles; ++i)
             {
-                var vehicle = shared.scoring.mVehicles[i];
-                if (vehicle.mIsPlayer == 1)
+                if (shared.scoring.mVehicles[i].mIsPlayer == 1)
                 {
-                    vehicleScoring = vehicle;
+                    vehicleScoring = shared.scoring.mVehicles[i];
                     return true;
                 }
             }
@@ -80,8 +79,8 @@ namespace CrewChiefV4.rFactor2
                 || lastState.scoring.mScoringInfo.mInRealtime == 0
                 // turn off spotter for formation lap before going green
                 || currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation
-                || !tryGetVehicleInfo(currentState, out currentPlayerScoring)
-                || !tryGetVehicleInfo(lastState, out previousPlayerScoring))
+                || !this.tryGetVehicleInfo(currentState, out currentPlayerScoring)
+                || !this.tryGetVehicleInfo(lastState, out previousPlayerScoring))
                 return;
 
             var now = DateTime.UtcNow;
