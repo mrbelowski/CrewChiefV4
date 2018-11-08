@@ -70,6 +70,9 @@ namespace CrewChiefV4.rFactor2
             var lastState = lastStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
             var currentState = currentStateObj as CrewChiefV4.rFactor2.RF2SharedMemoryReader.RF2StructWrapper;
 
+            rF2VehicleScoring currentPlayerScoring;
+            rF2VehicleScoring previousPlayerScoring;
+
             if (!this.enabled 
                 || currentState.scoring.mScoringInfo.mCurrentET < this.timeAfterRaceStartToActivate
                 || currentGameState.OpponentData.Count == 0
@@ -77,8 +80,8 @@ namespace CrewChiefV4.rFactor2
                 || lastState.scoring.mScoringInfo.mInRealtime == 0
                 // turn off spotter for formation lap before going green
                 || currentState.scoring.mScoringInfo.mGamePhase == (int)rFactor2Constants.rF2GamePhase.Formation
-                || !tryGetVehicleInfo(currentState, out rF2VehicleScoring currentPlayerScoring)
-                || !tryGetVehicleInfo(lastState, out rF2VehicleScoring previousPlayerScoring))
+                || !tryGetVehicleInfo(currentState, out currentPlayerScoring)
+                || !tryGetVehicleInfo(lastState, out previousPlayerScoring))
                 return;
 
             var now = DateTime.UtcNow;
