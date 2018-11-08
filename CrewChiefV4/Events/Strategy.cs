@@ -120,6 +120,10 @@ namespace CrewChiefV4.Events
         public Strategy(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
+            if (persistBenchmarks)
+            {
+                BenchmarkHelper.loadBenchmarks();
+            }
         }
 
         public override void clearState()
@@ -565,6 +569,7 @@ namespace CrewChiefV4.Events
         {
             if (CarData.IsCarClassEqual(carClass, carClassForLastPitstopTiming) && trackName == trackNameForLastPitstopTiming)
             {
+                Console.WriteLine("Using player time loss of " + playerTimeLostForStop + "s measured in recent practice / qualifying session");
                 return playerTimeLostForStop;
             }
             if (persistBenchmarks)
@@ -572,6 +577,7 @@ namespace CrewChiefV4.Events
                 PersistedBenchmark persistedBenchmark = BenchmarkHelper.getPersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), carClass.getClassIdentifier(), trackName);
                 if (persistedBenchmark != null && persistedBenchmark.timeLoss > 0)
                 {
+                    Console.WriteLine("Using player time loss of " + persistedBenchmark.timeLoss + "s loaded from saved data");
                     return persistedBenchmark.timeLoss;
                 }
             }
@@ -1189,9 +1195,9 @@ namespace CrewChiefV4.Events
     class BenchmarkHelper
     {
         private static String fullPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pit_benchmarks.json");
-        private static List<PersistedBenchmark> persistedBenchmarks = loadBenchmarks();
+        private static List<PersistedBenchmark> persistedBenchmarks;
 
-        public static void saveBenchmarks()
+        private static void saveBenchmarks()
         {
             try
             {
@@ -1203,20 +1209,22 @@ namespace CrewChiefV4.Events
             }
         }
 
-        private static List<PersistedBenchmark> loadBenchmarks()
+        public static void loadBenchmarks()
         {
             if (File.Exists(fullPath))
             {
                 try
                 {
-                    return JsonConvert.DeserializeObject<List<PersistedBenchmark>>(File.ReadAllText(fullPath));
+                    BenchmarkHelper.persistedBenchmarks = JsonConvert.DeserializeObject<List<PersistedBenchmark>>(File.ReadAllText(fullPath));
+                    Console.WriteLine("Loaded " + BenchmarkHelper.persistedBenchmarks.Count() + " saved pitstop time loss benchmarks");
+                    return;
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("Unable to load existing benchmarkdata");
                 }
             }
-            return new List<PersistedBenchmark>();
+            BenchmarkHelper.persistedBenchmarks = new List<PersistedBenchmark>();
         }
 
         public static PersistedBenchmark getPersistedBenchmark(String game, String carClassId, String trackName)
