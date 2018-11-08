@@ -382,6 +382,12 @@ namespace CrewChiefV4.Events
                 // if we've timed our pitstop in practice, don't search for opponent stop times
                 if (currentGameState.SessionData.JustGoneGreen)
                 {
+                    // find the persisted time loss data for the current combo - we'll use this if we haven't recorded a benchmark:
+                    if (persistBenchmarks)
+                    {
+                        BenchmarkHelper.findPersistedBenchmarkForCombo(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
+                            currentGameState.SessionData.TrackDefinition.name);
+                    }
                     // don't time opponent stops for iracing because they are so variable - only make estimates for the player,
                     // and when he's done a benchmark stop.
                     timeOpponentStops = CrewChief.gameDefinition.gameEnum != GameEnum.IRACING &&
@@ -573,14 +579,12 @@ namespace CrewChiefV4.Events
             {
                 return playerTimeLostForStop;
             }
-            if (persistBenchmarks)
+            // no time loss recorded for this combo, so see if we have usable persisted data
+            if (persistBenchmarks && BenchmarkHelper.benchmarkForThisCombo != null && BenchmarkHelper.benchmarkForThisCombo.timeLoss > 0)
             {
-                PersistedBenchmark persistedBenchmark = BenchmarkHelper.getPersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), carClass.getClassIdentifier(), trackName);
-                if (persistedBenchmark != null && persistedBenchmark.timeLoss > 0)
-                {
-                    return persistedBenchmark.timeLoss;
-                }
+                return BenchmarkHelper.benchmarkForThisCombo.timeLoss;
             }
+            
             return -1;
         }
 
@@ -1190,6 +1194,18 @@ namespace CrewChiefV4.Events
         public String carClassId { get; set; }
         public String trackName { get; set; }
         public float timeLoss { get; set; }
+
+        public Boolean isForThisCombo(String game, String carClassId, String trackName)
+        {
+            return this.game != null && this.game.Equals(game) &&
+                this.carClassId != null && this.carClassId.Equals(carClassId) &&
+                this.trackName != null && this.trackName.Equals(trackName);
+        }
+
+        public String print()
+        {
+            return "game: " + this.game + ", carClassId: " + this.carClassId + ", track name name: " + this.trackName + ", time loss: " + this.timeLoss;
+        }
     }
 
     class BenchmarkHelper
@@ -1229,31 +1245,33 @@ namespace CrewChiefV4.Events
             BenchmarkHelper.persistedBenchmarks = new List<PersistedBenchmark>();
         }
 
-        public static PersistedBenchmark getPersistedBenchmark(String game, String carClassId, String trackName)
+        public static void findPersistedBenchmarkForCombo(String game, String carClassId, String trackName)
         {
-            if (benchmarkForThisCombo == null)
+            if (benchmarkForThisCombo == null || !benchmarkForThisCombo.isForThisCombo(game, carClassId, trackName))
             {
                 foreach (PersistedBenchmark persistedBenchmark in BenchmarkHelper.persistedBenchmarks)
                 {
-                    if (persistedBenchmark.game.Equals(game) && persistedBenchmark.carClassId.Equals(carClassId) && persistedBenchmark.trackName.Equals(trackName))
+                    if (persistedBenchmark.isForThisCombo(game, carClassId, trackName))
                     {
-                        Console.WriteLine("Using player time loss of " + persistedBenchmark.timeLoss + "s loaded from saved data");
+                        Console.WriteLine("Found persisted benchmark for car / track / game combo: " + persistedBenchmark.print());
                         benchmarkForThisCombo = persistedBenchmark;
+                        break;
                     }
                 }
             }
-            return benchmarkForThisCombo;
         }
 
         public static void updatePersistedBenchmark(String game, String carClassId, String trackName, float timeLoss)
         {
-            PersistedBenchmark existingBenchmark = getPersistedBenchmark(game, carClassId, trackName);
-            if (existingBenchmark != null)
+            findPersistedBenchmarkForCombo(game, carClassId, trackName);
+            if (benchmarkForThisCombo != null)
             {
-                existingBenchmark.timeLoss = timeLoss;
+                Console.WriteLine("Updating persisted time loss benchmark to " + timeLoss);
+                benchmarkForThisCombo.timeLoss = timeLoss;
             }
             else
             {
+                Console.WriteLine("Saving new time loss benchmark");
                 PersistedBenchmark newBenchmark = new PersistedBenchmark();
                 newBenchmark.game = game;
                 newBenchmark.carClassId = carClassId;
