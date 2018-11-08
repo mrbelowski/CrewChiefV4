@@ -224,6 +224,8 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
+Version 4.9.5.8: Some fuel calculation tweaks - near the start of the race, use the max per-lap consumption when calculating required fuel; RF2 - workaround for missing spotter calls after driver swaps (thanks to kcr55 for this one); RF2 - use tyre compound name rather than index when deriving tyre types - should fix issues where mods declare different available tyre compound sets; pCars2 - make macro key presses a bit longer
+
 Version 4.9.5.7: Fixed RF2 tyre type mapping and added Hyper-Soft tyre; use correct 'drizzling' sounds; added spotter 'Florian' (in latest sound pack update)
 
 Version 4.9.5.6: Don't allow some messages to be inserted into the space between spotter messages; some work to prevent stale messages being played (e.g. after a delay caused by the spotter); don't play fuel warnings when on a low-fuel run in qualifying or practice; prevent some position messages being played twice; reduce repetition of some messages; ignore rear tyre and brake temperatures in FWD classes; more internal threading fixes; a few other tweaks and fixes
