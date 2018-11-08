@@ -149,6 +149,8 @@ namespace CrewChiefV4.Events
             printS1Positions = false;
             opponentsInPitLane.Clear();
             hasPracticeLapForComparison = false;
+
+            BenchmarkHelper.benchmarkForThisCombo = null;
         }
 
         private void setTimeLossFromBenchmark(GameStateData currentGameState)
@@ -569,7 +571,6 @@ namespace CrewChiefV4.Events
         {
             if (CarData.IsCarClassEqual(carClass, carClassForLastPitstopTiming) && trackName == trackNameForLastPitstopTiming)
             {
-                Console.WriteLine("Using player time loss of " + playerTimeLostForStop + "s measured in recent practice / qualifying session");
                 return playerTimeLostForStop;
             }
             if (persistBenchmarks)
@@ -577,7 +578,6 @@ namespace CrewChiefV4.Events
                 PersistedBenchmark persistedBenchmark = BenchmarkHelper.getPersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), carClass.getClassIdentifier(), trackName);
                 if (persistedBenchmark != null && persistedBenchmark.timeLoss > 0)
                 {
-                    Console.WriteLine("Using player time loss of " + persistedBenchmark.timeLoss + "s loaded from saved data");
                     return persistedBenchmark.timeLoss;
                 }
             }
@@ -1196,6 +1196,8 @@ namespace CrewChiefV4.Events
     {
         private static String fullPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pit_benchmarks.json");
         private static List<PersistedBenchmark> persistedBenchmarks;
+        // convenience var to save us iterating list over and over again
+        public static PersistedBenchmark benchmarkForThisCombo = null;
 
         private static void saveBenchmarks()
         {
@@ -1229,14 +1231,18 @@ namespace CrewChiefV4.Events
 
         public static PersistedBenchmark getPersistedBenchmark(String game, String carClassId, String trackName)
         {
-            foreach (PersistedBenchmark persistedBenchmark in BenchmarkHelper.persistedBenchmarks)
+            if (benchmarkForThisCombo == null)
             {
-                if (persistedBenchmark.game.Equals(game) && persistedBenchmark.carClassId.Equals(carClassId) && persistedBenchmark.trackName.Equals(trackName))
+                foreach (PersistedBenchmark persistedBenchmark in BenchmarkHelper.persistedBenchmarks)
                 {
-                    return persistedBenchmark;
+                    if (persistedBenchmark.game.Equals(game) && persistedBenchmark.carClassId.Equals(carClassId) && persistedBenchmark.trackName.Equals(trackName))
+                    {
+                        Console.WriteLine("Using player time loss of " + persistedBenchmark.timeLoss + "s loaded from saved data");
+                        benchmarkForThisCombo = persistedBenchmark;
+                    }
                 }
             }
-            return null;
+            return benchmarkForThisCombo;
         }
 
         public static void updatePersistedBenchmark(String game, String carClassId, String trackName, float timeLoss)
