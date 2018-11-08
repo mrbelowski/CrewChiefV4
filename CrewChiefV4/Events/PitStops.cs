@@ -821,7 +821,7 @@ namespace CrewChiefV4.Events
                         && currentGameState.PitData.IsPitCrewReady)
                     {
                         int delay = Utilities.random.Next(1, 3);
-                        audioPlayer.playMessage(new QueuedMessage(folderPitCrewReady, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
+                        audioPlayer.playMessageImmediately(new QueuedMessage(folderPitCrewReady, delay + 6, secondsDelay: delay, abstractEvent: this, priority: 10));
                     }
                     if (!previousGameState.PitData.IsPitCrewDone
                         && currentGameState.PitData.IsPitCrewDone)
