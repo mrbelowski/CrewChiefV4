@@ -5,6 +5,8 @@ using System.Text;
 using CrewChiefV4.GameState;
 using CrewChiefV4.Audio;
 using CrewChiefV4.NumberProcessing;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace CrewChiefV4.Events
 {
@@ -16,6 +18,8 @@ namespace CrewChiefV4.Events
         // if this is enabled, don't play the pit position estimates on pit entry. This is only a fallback in case
         // we haven't made a pit request
         private Boolean pitBoxPositionCountdown = UserSettings.GetUserSettings().getBoolean("pit_box_position_countdown");
+
+        private Boolean persistBenchmarks = UserSettings.GetUserSettings().getBoolean("persist_pitstop_benchmark_times");
 
         // less than 70m => 'just ahead' or 'just behind'
         private static float distanceBehindToBeConsideredVeryClose = 70;
@@ -214,6 +218,11 @@ namespace CrewChiefV4.Events
                             abstractEvent: this, priority: 10));
                     }
                     waitingForValidDataForBenchmark = false;
+                    if (persistBenchmarks)
+                    {
+                        BenchmarkHelper.updatePersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
+                            currentGameState.SessionData.TrackDefinition.name, playerTimeLostForStop);
+                    }
                 }
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
@@ -276,6 +285,11 @@ namespace CrewChiefV4.Events
                                     messageFragments: MessageContents(folderPitStopCostsUsAbout,
                                     TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
                                     abstractEvent: this, priority: 10));
+                                if (persistBenchmarks)
+                                {
+                                    BenchmarkHelper.updatePersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
+                                        currentGameState.SessionData.TrackDefinition.name, playerTimeLostForStop);
+                                }
                             }
                             else
                             {
@@ -552,6 +566,14 @@ namespace CrewChiefV4.Events
             if (CarData.IsCarClassEqual(carClass, carClassForLastPitstopTiming) && trackName == trackNameForLastPitstopTiming)
             {
                 return playerTimeLostForStop;
+            }
+            if (persistBenchmarks)
+            {
+                PersistedBenchmark persistedBenchmark = BenchmarkHelper.getPersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), carClass.getClassIdentifier(), trackName);
+                if (persistedBenchmark != null && persistedBenchmark.timeLoss > 0)
+                {
+                    return persistedBenchmark.timeLoss;
+                }
             }
             return -1;
         }
@@ -1151,6 +1173,81 @@ namespace CrewChiefV4.Events
             {
                 respondRace();
             }                
+        }
+    }
+
+
+    // code to persist and load benchmark data
+    class PersistedBenchmark
+    {
+        public String game { get; set; }
+        public String carClassId { get; set; }
+        public String trackName { get; set; }
+        public float timeLoss { get; set; }
+    }
+
+    class BenchmarkHelper
+    {
+        private static String fullPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CrewChiefV4", "pit_benchmarks.json");
+        private static List<PersistedBenchmark> persistedBenchmarks = loadBenchmarks();
+
+        public static void saveBenchmarks()
+        {
+            try
+            {
+                File.WriteAllText(fullPath, JsonConvert.SerializeObject(BenchmarkHelper.persistedBenchmarks, Formatting.Indented));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to save pit benchmark : " + e.Message);
+            }
+        }
+
+        private static List<PersistedBenchmark> loadBenchmarks()
+        {
+            if (File.Exists(fullPath))
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<List<PersistedBenchmark>>(File.ReadAllText(fullPath));
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Unable to load existing benchmarkdata");
+                }
+            }
+            return new List<PersistedBenchmark>();
+        }
+
+        public static PersistedBenchmark getPersistedBenchmark(String game, String carClassId, String trackName)
+        {
+            foreach (PersistedBenchmark persistedBenchmark in BenchmarkHelper.persistedBenchmarks)
+            {
+                if (persistedBenchmark.game.Equals(game) && persistedBenchmark.carClassId.Equals(carClassId) && persistedBenchmark.trackName.Equals(trackName))
+                {
+                    return persistedBenchmark;
+                }
+            }
+            return null;
+        }
+
+        public static void updatePersistedBenchmark(String game, String carClassId, String trackName, float timeLoss)
+        {
+            PersistedBenchmark existingBenchmark = getPersistedBenchmark(game, carClassId, trackName);
+            if (existingBenchmark != null)
+            {
+                existingBenchmark.timeLoss = timeLoss;
+            }
+            else
+            {
+                PersistedBenchmark newBenchmark = new PersistedBenchmark();
+                newBenchmark.game = game;
+                newBenchmark.carClassId = carClassId;
+                newBenchmark.trackName = trackName;
+                newBenchmark.timeLoss = timeLoss;
+                BenchmarkHelper.persistedBenchmarks.Add(newBenchmark);
+            }
+            saveBenchmarks();
         }
     }
 }

@@ -3550,5 +3550,17 @@ namespace CrewChiefV4.Properties {
                 this["pit_box_time_countdown_end_position"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool persist_pitstop_benchmark_times {
+            get {
+                return ((bool)(this["persist_pitstop_benchmark_times"]));
+            }
+            set {
+                this["persist_pitstop_benchmark_times"] = value;
+            }
+        }
     }
 }

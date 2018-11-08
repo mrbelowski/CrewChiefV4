@@ -884,5 +884,8 @@
     <Setting Name="pit_box_time_countdown_end_position" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
+    <Setting Name="persist_pitstop_benchmark_times" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
