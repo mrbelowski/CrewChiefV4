@@ -150,6 +150,8 @@ namespace CrewChiefV4.Events
             opponentsInPitLane.Clear();
             hasPracticeLapForComparison = false;
 
+            // clear this on each session refresh to ensure we iterate the persisted data each time, 
+            // getting the data for the correct combo. This is reset for race sessions on JustGoneGreen
             BenchmarkHelper.benchmarkForThisCombo = null;
         }
 
@@ -162,6 +164,12 @@ namespace CrewChiefV4.Events
             else
             {
                 playerTimeLostForStop = lastAndFirstSectorTimesOnStop - (currentGameState.SessionData.PlayerBestLapSector3Time + currentGameState.SessionData.PlayerBestLapSector1Time);
+            }
+            // record the data
+            if (persistBenchmarks)
+            {
+                BenchmarkHelper.updatePersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
+                    currentGameState.SessionData.TrackDefinition.name, playerTimeLostForStop);
             }
         }
 
@@ -224,11 +232,6 @@ namespace CrewChiefV4.Events
                             abstractEvent: this, priority: 10));
                     }
                     waitingForValidDataForBenchmark = false;
-                    if (persistBenchmarks)
-                    {
-                        BenchmarkHelper.updatePersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
-                            currentGameState.SessionData.TrackDefinition.name, playerTimeLostForStop);
-                    }
                 }
             }
             if (currentGameState.SessionData.SessionType == SessionType.Practice)
@@ -291,11 +294,6 @@ namespace CrewChiefV4.Events
                                     messageFragments: MessageContents(folderPitStopCostsUsAbout,
                                     TimeSpanWrapper.FromSeconds(playerTimeLostForStop, Precision.SECONDS)),
                                     abstractEvent: this, priority: 10));
-                                if (persistBenchmarks)
-                                {
-                                    BenchmarkHelper.updatePersistedBenchmark(CrewChief.gameDefinition.gameEnum.ToString(), currentGameState.carClass.getClassIdentifier(),
-                                        currentGameState.SessionData.TrackDefinition.name, playerTimeLostForStop);
-                                }
                             }
                             else
                             {
@@ -583,8 +581,7 @@ namespace CrewChiefV4.Events
             if (persistBenchmarks && BenchmarkHelper.benchmarkForThisCombo != null && BenchmarkHelper.benchmarkForThisCombo.timeLoss > 0)
             {
                 return BenchmarkHelper.benchmarkForThisCombo.timeLoss;
-            }
-            
+            }            
             return -1;
         }
 
