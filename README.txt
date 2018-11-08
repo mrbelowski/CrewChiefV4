@@ -224,7 +224,7 @@ One final point. If the app says "Jim is faster than you", let him through :)
 
 Changelog
 ---------
-Version 4.9.5.8: Some fuel calculation tweaks - near the start of the race, use the max per-lap consumption when calculating required fuel; Save pitstop benchmark times for each car / track / game combination so they persist between runs of the app (written to /Documents/CrewChiefV4/pit_benchmarks.json) - this is enabled by default but can be disabled with the 'Save pitstop benchmark times to disk' property; RF2 - workaround for missing spotter calls after driver swaps (thanks to kcr55 for this one); RF2 - use tyre compound name rather than index when deriving tyre types - should fix issues where mods declare different available tyre compound sets; pCars2 - make macro key presses a bit longer
+Version 4.9.5.8: Some fuel calculation tweaks - near the start of the race, use the max per-lap consumption when calculating required fuel; Save pitstop benchmark times for each car / track / game combination so they persist between runs of the app (written to /Documents/CrewChiefV4/pit_benchmarks.json) - this is enabled by default but can be disabled with the 'Save pitstop benchmark times to disk' property; RF2 - workaround for missing spotter calls after driver swaps (thanks to kcr55 for this one); RF2 - use tyre compound name rather than index when deriving tyre types - should fix issues where mods declare different available tyre compound sets; pCars2 - make macro key presses a bit longer so they're less likely to be missed by the game (note this makes the refuelling macro execute quite slowly)
 
 Version 4.9.5.7: Fixed RF2 tyre type mapping and added Hyper-Soft tyre; use correct 'drizzling' sounds; added spotter 'Florian' (in latest sound pack update)
 
