@@ -18,6 +18,8 @@ namespace CrewChiefV4.Events
 
         private String folderNewPenaltyDriveThrough = "penalties/new_penalty_drivethrough";
 
+        private String folderNewPenaltySlowDown = "penalties/new_penalty_slowdown";
+
         private String folderThreeLapsToServe = "penalties/penalty_three_laps_left";
 
         private String folderTwoLapsToServe = "penalties/penalty_two_laps_left";
@@ -82,6 +84,12 @@ namespace CrewChiefV4.Events
 
         private Boolean warnedOfPossibleTrackLimitsViolationOnThisLap = false;
 
+        private Boolean waitingToNotifyOfSlowdown = false;
+
+        private DateTime timeToNotifyOfSlowdown = DateTime.MinValue;
+
+        private Boolean playedSlowdownNotificationOnThisLap = false;
+
         public Penalties(AudioPlayer audioPlayer)
         {
             this.audioPlayer = audioPlayer;
@@ -95,6 +103,9 @@ namespace CrewChiefV4.Events
             hasHadAPenalty = false;
             warnedOfPossibleTrackLimitsViolationOnThisLap = false;
             playedTrackCutWarningInPracticeOrQualOnThisLap = false;
+            waitingToNotifyOfSlowdown = false;
+            timeToNotifyOfSlowdown = DateTime.MinValue;
+            playedSlowdownNotificationOnThisLap = false;
         }
 
         private void clearPenaltyState()
@@ -110,6 +121,8 @@ namespace CrewChiefV4.Events
             playedPitNow = false;
             playedTimePenaltyMessage = false;
             playedNotServedPenalty = false;
+            waitingToNotifyOfSlowdown = false;
+            timeToNotifyOfSlowdown = DateTime.MinValue;
         }
 
         public override bool isMessageStillValid(String eventSubType, GameStateData currentGameState, Dictionary<String, Object> validationData)
@@ -135,6 +148,10 @@ namespace CrewChiefV4.Events
                 {
                     return currentGameState.SessionData.SessionPhase != SessionPhase.Finished && !currentGameState.PitData.InPitlane;
                 }
+                else if (eventSubType == folderNewPenaltySlowDown)
+                {
+                    return currentGameState.PenaltiesData.HasSlowDown;
+                }
                 else
                 {
                     return hasOutstandingPenalty && currentGameState.SessionData.SessionPhase != SessionPhase.Finished;
@@ -152,6 +169,7 @@ namespace CrewChiefV4.Events
             {
                 warnedOfPossibleTrackLimitsViolationOnThisLap = false;
                 playedTrackCutWarningInPracticeOrQualOnThisLap = false;
+                playedSlowdownNotificationOnThisLap = false;
             }
             if (currentGameState.SessionData.SessionType == SessionType.Race && previousGameState != null && 
                 (currentGameState.PenaltiesData.HasDriveThrough || currentGameState.PenaltiesData.HasStopAndGo || currentGameState.PenaltiesData.HasTimeDeduction))
@@ -342,6 +360,21 @@ namespace CrewChiefV4.Events
             {
                 warnedOfPossibleTrackLimitsViolationOnThisLap = true;
                 audioPlayer.playMessage(new QueuedMessage(folderPossibleTrackLimitsViolation, 4, secondsDelay: 2, abstractEvent: this, priority: 0));
+            }
+            else if (currentGameState.SessionData.SessionType == SessionType.Race && currentGameState.PenaltiesData.HasSlowDown && !playedSlowdownNotificationOnThisLap)
+            {
+                if (!waitingToNotifyOfSlowdown)
+                {
+                    waitingToNotifyOfSlowdown = true;
+                    timeToNotifyOfSlowdown = currentGameState.Now.AddSeconds(4);
+                }
+                else if (currentGameState.Now > timeToNotifyOfSlowdown)
+                {
+                    playedSlowdownNotificationOnThisLap = true;
+                    audioPlayer.playMessage(new QueuedMessage(folderNewPenaltySlowDown, 0, abstractEvent: this));
+                    waitingToNotifyOfSlowdown = false;
+                    timeToNotifyOfSlowdown = DateTime.MinValue;
+                }
             }
             else
             {

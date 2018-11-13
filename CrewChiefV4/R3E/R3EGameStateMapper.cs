@@ -1163,7 +1163,7 @@ namespace CrewChiefV4.RaceRoom
             currentGameState.PenaltiesData.HasSlowDown = shared.Penalties.SlowDown > 0;
             currentGameState.PenaltiesData.HasPitStop = shared.Penalties.PitStop > 0;
             currentGameState.PenaltiesData.HasStopAndGo = shared.Penalties.StopAndGo > 0;
-            currentGameState.PenaltiesData.HasTimeDeduction = shared.Penalties.TimeDeduction > 0; ;
+            currentGameState.PenaltiesData.HasTimeDeduction = shared.Penalties.TimeDeduction > 0;
             currentGameState.PenaltiesData.NumPenalties = shared.NumPenalties;
 
 
