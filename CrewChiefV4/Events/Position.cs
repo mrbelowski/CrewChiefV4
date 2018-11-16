@@ -412,7 +412,7 @@ namespace CrewChiefV4.Events
                 if (canPlayPositionReminder && currentGameState.SessionData.IsNewSector &&
                     currentGameState.SessionData.CompletedLaps == lapForPositionReminder && currentGameState.SessionData.SectorNumber == sectorForPositionReminder)
                 {
-                    playCurrentPositionMessage(PearlsOfWisdom.PearlType.NONE, 0f);
+                    playCurrentPositionMessage(PearlsOfWisdom.PearlType.NONE, 0f, true);
                     canPlayPositionReminder = false;
                 }
                 if (currentGameState.SessionData.IsNewLap)
@@ -470,7 +470,7 @@ namespace CrewChiefV4.Events
                                     pearlType = PearlsOfWisdom.PearlType.NEUTRAL;
                                 }
                             }
-                            playCurrentPositionMessage(pearlType, pearlLikelihood);
+                            playCurrentPositionMessage(pearlType, pearlLikelihood, false);
                         }
                     }
                 }
@@ -482,16 +482,16 @@ namespace CrewChiefV4.Events
         // position, rather than the position when it was inserted into the queue.
 
         // For RF2 use a non-zero delay here because the position data isn't always updated in a timely fashion at the start of a new lap.
-        private void playCurrentPositionMessage(PearlsOfWisdom.PearlType pearlType, float pearlLikelihood)
+        private void playCurrentPositionMessage(PearlsOfWisdom.PearlType pearlType, float pearlLikelihood, Boolean isReminder)
         {
             int delaySeconds = CrewChief.gameDefinition.gameEnum == GameEnum.RF2_64BIT ||
                                 CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_32BIT ||
                                 CrewChief.gameDefinition.gameEnum == GameEnum.ASSETTO_64BIT ? 1 : 0;
-            DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { currentPosition }, this);
+            DelayedMessageEvent delayedMessageEvent = new DelayedMessageEvent("getPositionMessages", new Object[] { currentPosition, isReminder }, this);
             audioPlayer.playMessage(new QueuedMessage("position", 10, delayedMessageEvent: delayedMessageEvent, secondsDelay: delaySeconds, priority: 10), pearlType, pearlLikelihood);
         }
 
-        public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued)
+        public Tuple<List<MessageFragment>, List<MessageFragment>> getPositionMessages(int positionWhenQueued, Boolean isReminder)
         {
             // the position might have changed between queueing this messasge and processing it, so update the
             // previousPosition here. We should probably do the same with the lapNumberAtLastMessage, but this won't
@@ -502,6 +502,11 @@ namespace CrewChiefV4.Events
             if (isLast || positionWhenQueued != this.currentPosition)
             {
                 audioPlayer.suspendPearlsOfWisdom();
+                if (isReminder)
+                {
+                    // send an empty message here, which won't play
+                    return new Tuple<List<MessageFragment>, List<MessageFragment>>(new List<MessageFragment>(), null);
+                }
             }
             if (this.currentPosition == 1)
             {

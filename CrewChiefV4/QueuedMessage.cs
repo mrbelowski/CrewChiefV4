@@ -295,122 +295,129 @@ namespace CrewChiefV4
         private List<String> getMessageFolders(List<MessageFragment> messageFragments, Boolean hasAlternative)
         {
             List<String> messages = new List<String>();
-            for (int i=0; i< messageFragments.Count; i++) 
+            if (messageFragments.Count == 0)
             {
-                MessageFragment messageFragment = messageFragments[i];
-                if (messageFragment == null)
+                canBePlayed = false;
+            }
+            else
+            {
+                for (int i = 0; i < messageFragments.Count; i++)
                 {
-                    Console.WriteLine("Message " + this.messageName + " can't be played because it has no contents");
-                    canBePlayed = false;
-                    break;
-                }
-                // if this fragment is not the last message fragment, then some languages (Italian only at the time of writing)
-                // require a different inflection to the final part of a time / number sound.
-                Boolean useMoreInflection = i < messageFragments.Count - 1;
-                switch (messageFragment.type)
-                {
-                    case FragmentType.Text:
-                        if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
-                            SoundCache.hasSingleSound(messageFragment.text))
-                        {
-                            messages.Add(messageFragment.text);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for text fragment " + messageFragment.text);
-                            canBePlayed = false;
-                        }
-                        break;
-                    case FragmentType.Time:                        
-                        if (numberReader != null)
-                        {
-                            List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
-                            if (timeFolders.Count == 0)
-                            {
-                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for timespan " 
-                                    + messageFragment.timeSpan.timeSpan.ToString() + " precision " + messageFragment.timeSpan.getPrecision());
-                                canBePlayed = false;
-                            }
-                            else
-                            {
-                                foreach (String timeFolder in timeFolders)
-                                {
-                                    if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
-                                    {
-                                        Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for time fragment " + timeFolder);
-                                        canBePlayed = false;
-                                        break;
-                                    }
-                                }
-                                messages.AddRange(timeFolders);
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available");
-                            canBePlayed = false;
-                        }
-                        break;                    
-                    case FragmentType.Opponent:
+                    MessageFragment messageFragment = messageFragments[i];
+                    if (messageFragment == null)
+                    {
+                        Console.WriteLine("Message " + this.messageName + " can't be played because it has no contents");
                         canBePlayed = false;
-                        if (messageFragment.opponent != null && messageFragment.opponent.CanUseName)
-                        {
-                            String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
-                            if (SoundCache.availableDriverNames.Contains(usableName))
-                            {
-                                messages.Add(usableName);
-                                canBePlayed = true;
-                            }
-                            else if (usableName != null && usableName.Count() > 0 && AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER 
-                                && (!hasAlternative || AudioPlayer.ttsOption == AudioPlayer.TTS_OPTION.ANY_TIME))
-                            {
-                                messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
-                                canBePlayed = true;
-                            }
-                            else
-                            {
-                                Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for opponent name " + usableName);
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Message " + this.messageName + " can't be played because the opponent is null or unusable");
-                        }
                         break;
-                    case FragmentType.Integer:                        
-                        if (numberReader != null)
-                        {
-                            List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds, useMoreInflection);
-                            if (integerFolders.Count() == 0)
+                    }
+                    // if this fragment is not the last message fragment, then some languages (Italian only at the time of writing)
+                    // require a different inflection to the final part of a time / number sound.
+                    Boolean useMoreInflection = i < messageFragments.Count - 1;
+                    switch (messageFragment.type)
+                    {
+                        case FragmentType.Text:
+                            if (messageFragment.text.StartsWith(AudioPlayer.PAUSE_ID) || SoundCache.availableSounds.Contains(messageFragment.text) ||
+                                SoundCache.hasSingleSound(messageFragment.text))
                             {
-                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for number " + messageFragment.integer);
-                                canBePlayed = false;
-                                break;
+                                messages.Add(messageFragment.text);
                             }
                             else
                             {
-                                foreach (String integerFolder in integerFolders)
+                                Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for text fragment " + messageFragment.text);
+                                canBePlayed = false;
+                            }
+                            break;
+                        case FragmentType.Time:
+                            if (numberReader != null)
+                            {
+                                List<String> timeFolders = numberReader.ConvertTimeToSounds(messageFragment.timeSpan, useMoreInflection);
+                                if (timeFolders.Count == 0)
                                 {
-                                    if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
+                                    Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for timespan "
+                                        + messageFragment.timeSpan.timeSpan.ToString() + " precision " + messageFragment.timeSpan.getPrecision());
+                                    canBePlayed = false;
+                                }
+                                else
+                                {
+                                    foreach (String timeFolder in timeFolders)
                                     {
-                                        Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for number fragment " + integerFolder);
-                                        canBePlayed = false;
-                                        break;
+                                        if (!timeFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(timeFolder))
+                                        {
+                                            Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for time fragment " + timeFolder);
+                                            canBePlayed = false;
+                                            break;
+                                        }
                                     }
+                                    messages.AddRange(timeFolders);
                                 }
                             }
-                            messages.AddRange(integerFolders);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available"); 
+                            else
+                            {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available");
+                                canBePlayed = false;
+                            }
+                            break;
+                        case FragmentType.Opponent:
                             canBePlayed = false;
-                        }
+                            if (messageFragment.opponent != null && messageFragment.opponent.CanUseName)
+                            {
+                                String usableName = DriverNameHelper.getUsableDriverName(messageFragment.opponent.DriverRawName);
+                                if (SoundCache.availableDriverNames.Contains(usableName))
+                                {
+                                    messages.Add(usableName);
+                                    canBePlayed = true;
+                                }
+                                else if (usableName != null && usableName.Count() > 0 && AudioPlayer.ttsOption != AudioPlayer.TTS_OPTION.NEVER
+                                    && (!hasAlternative || AudioPlayer.ttsOption == AudioPlayer.TTS_OPTION.ANY_TIME))
+                                {
+                                    messages.Add(SoundCache.TTS_IDENTIFIER + usableName);
+                                    canBePlayed = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for opponent name " + usableName);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because the opponent is null or unusable");
+                            }
+                            break;
+                        case FragmentType.Integer:
+                            if (numberReader != null)
+                            {
+                                List<String> integerFolders = numberReader.GetIntegerSounds(messageFragment.integer, messageFragment.allowShortHundreds, useMoreInflection);
+                                if (integerFolders.Count() == 0)
+                                {
+                                    Console.WriteLine("Message " + this.messageName + " can't be played because the number reader found no sounds for number " + messageFragment.integer);
+                                    canBePlayed = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    foreach (String integerFolder in integerFolders)
+                                    {
+                                        if (!integerFolder.StartsWith(AudioPlayer.PAUSE_ID) && !SoundCache.availableSounds.Contains(integerFolder))
+                                        {
+                                            Console.WriteLine("Message " + this.messageName + " can't be played because there is no sound for number fragment " + integerFolder);
+                                            canBePlayed = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                messages.AddRange(integerFolders);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Message " + this.messageName + " can't be played because the number reader is not available");
+                                canBePlayed = false;
+                            }
+                            break;
+                    }
+                    if (!canBePlayed)
+                    {
                         break;
-                }
-                if (!canBePlayed)
-                {
-                    break;
+                    }
                 }
             }
             return messages;

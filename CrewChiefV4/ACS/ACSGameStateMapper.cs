@@ -76,6 +76,7 @@ namespace CrewChiefV4.assetto
         #region WaYToManyTyres
         public ACSGameStateMapper()
         {
+            acTyres.Clear();
 
             CornerData.EnumWithThresholds suspensionDamageNone = new CornerData.EnumWithThresholds(DamageLevel.NONE, -10000, trivialSuspensionDamageThreshold);
             CornerData.EnumWithThresholds suspensionDamageTrivial = new CornerData.EnumWithThresholds(DamageLevel.TRIVIAL, trivialSuspensionDamageThreshold, minorSuspensionDamageThreshold);
