@@ -464,6 +464,9 @@ namespace CrewChiefV4.Events
                     {
                         // TODO: this needs a bit more investigation. We have 2 separate blocks here because the time delay may need to be different for iRacing. 
                         // I know this looks like a fucking retarded if-else statement but I don't care. It's all Morten's fault anyway. Just like the AccessViolationErrors
+
+                        // In iRacing we cant be sure our pit exit is in sector 1 that why we cant use currentGameState.SessionData.SectorNumber to id if we are at pit entry or pit exit.
+                        // also to add to this, in ACC sector wont change from sector 3 until we have started our first timed lap.
                         timeOfDisengageCheck = currentGameState.Now + TimeSpan.FromSeconds(2);
                     }
                 }

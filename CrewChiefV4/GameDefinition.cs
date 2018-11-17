@@ -62,7 +62,7 @@ namespace CrewChiefV4
             definitions.Add(assetto64Bit); definitions.Add(assetto32Bit); definitions.Add(rfactor2_64bit);
             definitions.Add(iracing);
             definitions.Add(f1_2018);
-			definitions.Add(acc);
+            definitions.Add(acc);
             return definitions;
         }
 

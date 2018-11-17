@@ -31,7 +31,7 @@ namespace CrewChiefV4
         private ACSSharedMemoryReader ascSharedMemoryReader;
         private iRacingSharedMemoryReader iracingSharedMemoryReader;
         private F12018UDPreader f12018UDPReader;
-		private ACCSharedMemoryReader accSharedMemoryReader;
+        private ACCSharedMemoryReader accSharedMemoryReader;
 
         public static GameStateReaderFactory getInstance()
         {
@@ -106,7 +106,7 @@ namespace CrewChiefV4
                             f12018UDPReader = new F12018UDPreader();
                         }
                         return f12018UDPReader;
-					case GameEnum.ACC:
+                    case GameEnum.ACC:
                         if (accSharedMemoryReader == null)
                         {
                             accSharedMemoryReader = new ACCSharedMemoryReader();
@@ -141,7 +141,7 @@ namespace CrewChiefV4
                     return new iRacingGameStateMapper();
                 case GameEnum.F1_2018:
                     return new F12018GameStateMapper();
-				case GameEnum.ACC:
+                case GameEnum.ACC:
                    return new ACCGameStateMapper();
                 default:
                     Console.WriteLine("No mapper is defined for GameDefinition " + gameDefinition.friendlyName);
