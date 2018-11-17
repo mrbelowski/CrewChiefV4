@@ -586,6 +586,14 @@ namespace CrewChiefV4
                         setFromCommandLine = true;
                         break;
                     }
+					else if (arg.Equals("ACC"))
+                    {
+                        Console.WriteLine("Set Assetto Corsa Competizione mode from command line");
+                        this.gameDefinitionList.Text = GameDefinition.acc.friendlyName;
+                        setFromCommandLine = true;
+                        break;
+                    }
+
                 }
             }
             if (!setFromCommandLine)

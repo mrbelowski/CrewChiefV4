@@ -3502,6 +3502,54 @@ namespace CrewChiefV4.Properties {
                 this["pcars2_spotter_car_length"] = value;
             }
         }
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string acc_launch_exe {
+            get {
+                return ((string)(this["acc_launch_exe"]));
+            }
+            set {
+                this["acc_launch_exe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string acc_launch_params {
+            get {
+                return ((string)(this["acc_launch_params"]));
+            }
+            set {
+                this["acc_launch_params"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool launch_acc {
+            get {
+                return ((bool)(this["launch_acc"]));
+            }
+            set {
+                this["launch_acc"] = value;
+            }
+        }
+		
+		[global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4.5")]
+        public float acc_spotter_car_length {
+            get {
+                return ((float)(this["acc_spotter_car_length"]));
+            }
+            set {
+                this["acc_spotter_car_length"] = value;
+            }
+        }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

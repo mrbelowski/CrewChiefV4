@@ -2015,6 +2015,7 @@
 		{
 			"pcarsTrackName": "Nürburgring:Grand Prix",
 			"pcars2TrackName": "Nurburgring:GP",
+			"accTrackName":  "nurburgring" ,
 			"raceroomLayoutId": 1691,
 			"raceroomRollingStartLapDistance": 4591,
 			"rf2TrackNames": ["Nuerburg GP"],

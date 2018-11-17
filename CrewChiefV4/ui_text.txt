@@ -39,6 +39,7 @@ ftruck = Formula Truck
 assetto_64_bit = Assetto Corsa (64 bit)
 assetto_32_bit = Assetto Corsa (32 bit)
 rfactor2_64_bit = rFactor 2 (64 bit)
+acc = Assetto Corsa Competizione
 iracing = iRacing
 f1_2018 = F1 2018 (spotter only)
 please_choose_a_game_option = Please choose a game option
@@ -175,6 +176,7 @@ search_box_tooltip_line5 = rF1 - for rFactor 1 specific preferences
 search_box_tooltip_line6 = rF2 - for rFactor 2 specific preferences
 search_box_tooltip_line7 = pCARS - for Project CARS 1 and 2 specific preferences
 search_box_tooltip_line8 = iRacing - for iRacing specific preferences
+search_box_tooltip_line9 = ACC - for Assetto Corsa Competizione specific preferences
 
 no_matches = No matches.
 reset_warning_text = This will reset all the Crew Chief settings to their default values, are you sure?
@@ -262,6 +264,11 @@ f1_2018_install_path = F1 2018 install path
 f1_2018_install_path_help = F1 2018 installation path
 f1_2018_install_path_filter = F1_2018
 f1_2018_install_path_category = UI_STARTUP_AND_PATHS
+
+acc_install_path = ACC install path
+acc_install_path_help = ACC installation path
+acc_install_path_filter = ACC
+acc_install_path_category = UI_STARTUP_AND_PATHS
 
 override_default_sound_pack_location = Override default Sound Pack location
 override_default_sound_pack_location_help = Use an alternative folder for the Sound Pack
@@ -411,6 +418,10 @@ f1_2018_udp_data_port = F1 2018 UDP port
 f1_2018_udp_data_port_help = F1 2018 network data UDP port (should usually be 20777)
 f1_2018_udp_data_port_filter = F1_2018
 f1_2018_udp_data_port_category = UI_STARTUP_AND_PATHS
+
+acc_spotter_car_length = ACC Spotter default car length
+acc_spotter_car_length_filter = ACC
+acc_spotter_car_length_category = SPOTTER
 
 acs_spotter_car_length = ACS Spotter default car length
 acs_spotter_car_length_filter = ASSETTO_64BIT;ASSETTO_32BIT
