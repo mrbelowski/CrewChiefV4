@@ -590,6 +590,9 @@ namespace CrewChiefV4
 
         public static Boolean IsCarClassEqual(CarClass class1, CarClass class2, Boolean assumeEqualIfSingleClass = true)
         {
+            // if multiclass is disabled (from UI setting or because of unusable car class data) then in *most*
+            // cases we can assume all car classes are equal. The exception here is when checking if the player's
+            // car class has changed (done as part of the new session logic).
             if (assumeEqualIfSingleClass && (CrewChief.forceSingleClass || !GameStateData.Multiclass))
             {
                 return true;
