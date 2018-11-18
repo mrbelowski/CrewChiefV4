@@ -255,7 +255,7 @@ namespace CrewChiefV4.PCars2
                 String carClassId = StructHelper.getNameFromBytes(shared.mCarClassName);
                 CarData.CarClass newClass = CarData.getCarClassForClassName(carClassId);
                 CarData.CLASS_ID = carClassId;
-                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass))
+                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass, false))
                 {
                     currentGameState.carClass = newClass;
                     GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);

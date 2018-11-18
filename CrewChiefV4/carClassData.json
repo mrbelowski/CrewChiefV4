@@ -841,7 +841,8 @@
 		},
 		{
 			"carClassEnum": "KTM_RR",
-			"raceroomClassIds": [5385],
+            "raceroomClassIds": [ 5385 ],
+            "acClassNames": ["ktm_xbow_r"],
 			"maxSafeWaterTemp": 102,
 			"maxSafeOilTemp": 115,
 			"timesInHundredths": true,

@@ -588,8 +588,12 @@ namespace CrewChiefV4
             }
         }
 
-        public static Boolean IsCarClassEqual(CarClass class1, CarClass class2)
+        public static Boolean IsCarClassEqual(CarClass class1, CarClass class2, Boolean assumeEqualIfSingleClass = true)
         {
+            if (assumeEqualIfSingleClass && (CrewChief.forceSingleClass || !GameStateData.Multiclass))
+            {
+                return true;
+            }
             if (class1 == class2)
             {
                 return true;

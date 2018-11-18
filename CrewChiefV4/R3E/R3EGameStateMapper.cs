@@ -1328,7 +1328,7 @@ namespace CrewChiefV4.RaceRoom
             if (currentGameState.Now < recheckCarClassesUntil)
             {
                 CarData.CarClass correctedCarClass = CarData.getCarClassForRaceRoomId(playerDriverData.DriverInfo.ClassId);
-                if (!CarData.IsCarClassEqual(correctedCarClass, currentGameState.carClass))
+                if (!CarData.IsCarClassEqual(correctedCarClass, currentGameState.carClass, false))
                 {
                     Console.WriteLine("Player car class in game data has changed. Updating to " + correctedCarClass.getClassIdentifier());
                     currentGameState.carClass = correctedCarClass;

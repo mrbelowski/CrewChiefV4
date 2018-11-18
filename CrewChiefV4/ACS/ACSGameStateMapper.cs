@@ -835,7 +835,7 @@ namespace CrewChiefV4.assetto
             {
                 CarData.CarClass newClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
                 CarData.CLASS_ID = shared.acsStatic.carModel;
-                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass))
+                if (!CarData.IsCarClassEqual(newClass, currentGameState.carClass, false))
                 {
                     currentGameState.carClass = newClass;
                     GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
@@ -979,10 +979,7 @@ namespace CrewChiefV4.assetto
                 currentGameState.carClass = CarData.getCarClassForClassName(shared.acsStatic.carModel);
                 GlobalBehaviourSettings.UpdateFromCarClass(currentGameState.carClass);
                 CarData.CLASS_ID = shared.acsStatic.carModel;
-
-                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
-                Utilities.TraceEventClass(currentGameState);
-
+                
                 if (acTyres.Count > 0 && !acTyres.ContainsKey(shared.acsGraphic.tyreCompound))
                 {
                     Console.WriteLine("Tyre information is disabled. Player is using unknown Tyre Type " + shared.acsGraphic.tyreCompound);
@@ -1010,6 +1007,9 @@ namespace CrewChiefV4.assetto
                         }
                     }
                 }
+
+                Console.WriteLine("Player is using car class " + currentGameState.carClass.getClassIdentifier());
+                Utilities.TraceEventClass(currentGameState);
 
                 currentGameState.SessionData.PlayerLapTimeSessionBest = -1;
                 currentGameState.SessionData.OpponentsLapTimeSessionBestOverall = -1;
