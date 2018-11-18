@@ -206,7 +206,7 @@
 			"raceroomClassIds": [5825],
 			"pCarsClassNames": ["GT4"],
 			"rf2ClassNames": ["*GT4*"],
-			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx"],
+			"acClassNames": ["*GT4*", "ks_bmw_m235i_racing", "lotus_evora_gx", "lotus_evora_gtc", "ginetta_g55"],
 			"timesInHundredths": true,
 			"enabledMessageTypes": "ALL",
 			"allMembersAreRWD": true,
