@@ -1642,7 +1642,7 @@ namespace CrewChiefV4.RaceRoom
             if (now < recheckCarClassesUntil)
             {
                 CarData.CarClass correctedCarClass = CarData.getCarClassForRaceRoomId(carClassId);
-                if (!CarData.IsCarClassEqual(opponentData.CarClass, correctedCarClass)) 
+                if (!CarData.IsCarClassEqual(opponentData.CarClass, correctedCarClass, false)) 
                 {
                     // note we're not correcting the tyre types here but this shouldn't matter as we don't announce them in 
                     // practice and qually anyway
