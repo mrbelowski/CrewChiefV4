@@ -1,3 +1,6 @@
+THIS PROJECT HAS BEEN MIGRATED TO https://gitlab.com/mr_belowski/CrewChiefV4.
+
+
 CrewChief version 4.9
 
 Written by Jim Britton, Morten Roslev, Vytautas Leonavičius, Dan Allongo (Automobilista and rFactor1 implementation), Daniel Nowak (nAudio speech recognition port) and Mike Schreiner (technical input on stock car rules). The application is the result of lots of lots of hard work and input from the guys above as well as some great advice and support from the community and the guys at Sector3 and SMS.
